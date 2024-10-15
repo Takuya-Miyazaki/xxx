@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -12,15 +12,6 @@ module Aws::Pinpoint
 
     # Specifies the status and settings of the ADM (Amazon Device Messaging)
     # channel for an application.
-    #
-    # @note When making an API call, you may pass ADMChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         client_id: "__string", # required
-    #         client_secret: "__string", # required
-    #         enabled: false,
-    #       }
     #
     # @!attribute [rw] client_id
     #   The Client ID that you received from Amazon to send messages by
@@ -112,32 +103,6 @@ module Aws::Pinpoint
 
     # Specifies the settings for a one-time message that's sent directly to
     # an endpoint through the ADM (Amazon Device Messaging) channel.
-    #
-    # @note When making an API call, you may pass ADMMessage
-    #   data as a hash:
-    #
-    #       {
-    #         action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #         body: "__string",
-    #         consolidation_key: "__string",
-    #         data: {
-    #           "__string" => "__string",
-    #         },
-    #         expires_after: "__string",
-    #         icon_reference: "__string",
-    #         image_icon_url: "__string",
-    #         image_url: "__string",
-    #         md5: "__string",
-    #         raw_content: "__string",
-    #         silent_push: false,
-    #         small_image_icon_url: "__string",
-    #         sound: "__string",
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #         title: "__string",
-    #         url: "__string",
-    #       }
     #
     # @!attribute [rw] action
     #   The action to occur if the recipient taps the push notification.
@@ -264,20 +229,6 @@ module Aws::Pinpoint
 
     # Specifies the status and settings of the APNs (Apple Push Notification
     # service) channel for an application.
-    #
-    # @note When making an API call, you may pass APNSChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         bundle_id: "__string",
-    #         certificate: "__string",
-    #         default_authentication_method: "__string",
-    #         enabled: false,
-    #         private_key: "__string",
-    #         team_id: "__string",
-    #         token_key: "__string",
-    #         token_key_id: "__string",
-    #       }
     #
     # @!attribute [rw] bundle_id
     #   The bundle identifier that's assigned to your iOS app. This
@@ -413,34 +364,6 @@ module Aws::Pinpoint
     # Specifies the settings for a one-time message that's sent directly to
     # an endpoint through the APNs (Apple Push Notification service)
     # channel.
-    #
-    # @note When making an API call, you may pass APNSMessage
-    #   data as a hash:
-    #
-    #       {
-    #         apns_push_type: "__string",
-    #         action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #         badge: 1,
-    #         body: "__string",
-    #         category: "__string",
-    #         collapse_id: "__string",
-    #         data: {
-    #           "__string" => "__string",
-    #         },
-    #         media_url: "__string",
-    #         preferred_authentication_method: "__string",
-    #         priority: "__string",
-    #         raw_content: "__string",
-    #         silent_push: false,
-    #         sound: "__string",
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #         thread_id: "__string",
-    #         time_to_live: 1,
-    #         title: "__string",
-    #         url: "__string",
-    #       }
     #
     # @!attribute [rw] apns_push_type
     #   The type of push notification to send. Valid values are:
@@ -682,19 +605,6 @@ module Aws::Pinpoint
     # that can be used in push notifications that are sent through the APNs
     # (Apple Push Notification service) channel.
     #
-    # @note When making an API call, you may pass APNSPushNotificationTemplate
-    #   data as a hash:
-    #
-    #       {
-    #         action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #         body: "__string",
-    #         media_url: "__string",
-    #         raw_content: "__string",
-    #         sound: "__string",
-    #         title: "__string",
-    #         url: "__string",
-    #       }
-    #
     # @!attribute [rw] action
     #   The action to occur if a recipient taps a push notification that's
     #   based on the message template. Valid values are:
@@ -763,20 +673,6 @@ module Aws::Pinpoint
 
     # Specifies the status and settings of the APNs (Apple Push Notification
     # service) sandbox channel for an application.
-    #
-    # @note When making an API call, you may pass APNSSandboxChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         bundle_id: "__string",
-    #         certificate: "__string",
-    #         default_authentication_method: "__string",
-    #         enabled: false,
-    #         private_key: "__string",
-    #         team_id: "__string",
-    #         token_key: "__string",
-    #         token_key_id: "__string",
-    #       }
     #
     # @!attribute [rw] bundle_id
     #   The bundle identifier that's assigned to your iOS app. This
@@ -918,20 +814,6 @@ module Aws::Pinpoint
     # Specifies the status and settings of the APNs (Apple Push Notification
     # service) VoIP channel for an application.
     #
-    # @note When making an API call, you may pass APNSVoipChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         bundle_id: "__string",
-    #         certificate: "__string",
-    #         default_authentication_method: "__string",
-    #         enabled: false,
-    #         private_key: "__string",
-    #         team_id: "__string",
-    #         token_key: "__string",
-    #         token_key_id: "__string",
-    #       }
-    #
     # @!attribute [rw] bundle_id
     #   The bundle identifier that's assigned to your iOS app. This
     #   identifier is used for APNs tokens.
@@ -1067,20 +949,6 @@ module Aws::Pinpoint
 
     # Specifies the status and settings of the APNs (Apple Push Notification
     # service) VoIP sandbox channel for an application.
-    #
-    # @note When making an API call, you may pass APNSVoipSandboxChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         bundle_id: "__string",
-    #         certificate: "__string",
-    #         default_authentication_method: "__string",
-    #         enabled: false,
-    #         private_key: "__string",
-    #         team_id: "__string",
-    #         token_key: "__string",
-    #         token_key_id: "__string",
-    #       }
     #
     # @!attribute [rw] bundle_id
     #   The bundle identifier that's assigned to your iOS app. This
@@ -1246,274 +1114,6 @@ module Aws::Pinpoint
     # Specifies the configuration and other settings for an activity in a
     # journey.
     #
-    # @note When making an API call, you may pass Activity
-    #   data as a hash:
-    #
-    #       {
-    #         custom: {
-    #           delivery_uri: "__string",
-    #           endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #           message_config: {
-    #             data: "__string",
-    #           },
-    #           next_activity: "__string",
-    #           template_name: "__string",
-    #           template_version: "__string",
-    #         },
-    #         conditional_split: {
-    #           condition: {
-    #             conditions: [
-    #               {
-    #                 event_condition: {
-    #                   dimensions: {
-    #                     attributes: {
-    #                       "__string" => {
-    #                         attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                         values: ["__string"], # required
-    #                       },
-    #                     },
-    #                     event_type: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     metrics: {
-    #                       "__string" => {
-    #                         comparison_operator: "__string", # required
-    #                         value: 1.0, # required
-    #                       },
-    #                     },
-    #                   },
-    #                   message_activity: "__string",
-    #                 },
-    #                 segment_condition: {
-    #                   segment_id: "__string", # required
-    #                 },
-    #                 segment_dimensions: {
-    #                   attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   behavior: {
-    #                     recency: {
-    #                       duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                       recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                     },
-    #                   },
-    #                   demographic: {
-    #                     app_version: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     channel: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     device_type: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     make: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     model: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     platform: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   location: {
-    #                     country: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     gps_point: {
-    #                       coordinates: { # required
-    #                         latitude: 1.0, # required
-    #                         longitude: 1.0, # required
-    #                       },
-    #                       range_in_kilometers: 1.0,
-    #                     },
-    #                   },
-    #                   metrics: {
-    #                     "__string" => {
-    #                       comparison_operator: "__string", # required
-    #                       value: 1.0, # required
-    #                     },
-    #                   },
-    #                   user_attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                 },
-    #               },
-    #             ],
-    #             operator: "ALL", # accepts ALL, ANY
-    #           },
-    #           evaluation_wait_time: {
-    #             wait_for: "__string",
-    #             wait_until: "__string",
-    #           },
-    #           false_activity: "__string",
-    #           true_activity: "__string",
-    #         },
-    #         description: "__string",
-    #         email: {
-    #           message_config: {
-    #             from_address: "__string",
-    #           },
-    #           next_activity: "__string",
-    #           template_name: "__string",
-    #           template_version: "__string",
-    #         },
-    #         holdout: {
-    #           next_activity: "__string",
-    #           percentage: 1, # required
-    #         },
-    #         multi_condition: {
-    #           branches: [
-    #             {
-    #               condition: {
-    #                 event_condition: {
-    #                   dimensions: {
-    #                     attributes: {
-    #                       "__string" => {
-    #                         attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                         values: ["__string"], # required
-    #                       },
-    #                     },
-    #                     event_type: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     metrics: {
-    #                       "__string" => {
-    #                         comparison_operator: "__string", # required
-    #                         value: 1.0, # required
-    #                       },
-    #                     },
-    #                   },
-    #                   message_activity: "__string",
-    #                 },
-    #                 segment_condition: {
-    #                   segment_id: "__string", # required
-    #                 },
-    #                 segment_dimensions: {
-    #                   attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   behavior: {
-    #                     recency: {
-    #                       duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                       recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                     },
-    #                   },
-    #                   demographic: {
-    #                     app_version: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     channel: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     device_type: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     make: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     model: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     platform: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   location: {
-    #                     country: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     gps_point: {
-    #                       coordinates: { # required
-    #                         latitude: 1.0, # required
-    #                         longitude: 1.0, # required
-    #                       },
-    #                       range_in_kilometers: 1.0,
-    #                     },
-    #                   },
-    #                   metrics: {
-    #                     "__string" => {
-    #                       comparison_operator: "__string", # required
-    #                       value: 1.0, # required
-    #                     },
-    #                   },
-    #                   user_attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                 },
-    #               },
-    #               next_activity: "__string",
-    #             },
-    #           ],
-    #           default_activity: "__string",
-    #           evaluation_wait_time: {
-    #             wait_for: "__string",
-    #             wait_until: "__string",
-    #           },
-    #         },
-    #         push: {
-    #           message_config: {
-    #             time_to_live: "__string",
-    #           },
-    #           next_activity: "__string",
-    #           template_name: "__string",
-    #           template_version: "__string",
-    #         },
-    #         random_split: {
-    #           branches: [
-    #             {
-    #               next_activity: "__string",
-    #               percentage: 1,
-    #             },
-    #           ],
-    #         },
-    #         sms: {
-    #           message_config: {
-    #             message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #             sender_id: "__string",
-    #           },
-    #           next_activity: "__string",
-    #           template_name: "__string",
-    #           template_version: "__string",
-    #         },
-    #         wait: {
-    #           next_activity: "__string",
-    #           wait_time: {
-    #             wait_for: "__string",
-    #             wait_until: "__string",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] custom
     #   The settings for a custom message activity. This type of activity
     #   calls an AWS Lambda function or web hook that sends messages to
@@ -1570,6 +1170,11 @@ module Aws::Pinpoint
     #   moving participants to the next activity in a journey.
     #   @return [Types::WaitActivity]
     #
+    # @!attribute [rw] contact_center
+    #   The settings for a connect activity. This type of activity initiates
+    #   a contact center call to participants.
+    #   @return [Types::ContactCenterActivity]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/Activity AWS API Documentation
     #
     class Activity < Struct.new(
@@ -1582,7 +1187,8 @@ module Aws::Pinpoint
       :push,
       :random_split,
       :sms,
-      :wait)
+      :wait,
+      :contact_center)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1651,6 +1257,17 @@ module Aws::Pinpoint
     #   for A/B testing of a campaign.
     #   @return [String]
     #
+    # @!attribute [rw] execution_metrics
+    #   A JSON object that contains metrics relating to the campaign
+    #   execution for this campaign activity. For information about the
+    #   structure and contents of the results, see [Standard Amazon Pinpoint
+    #   analytics metrics][1] in the *Amazon Pinpoint Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com//pinpoint/latest/developerguide/analytics-standard-metrics.html
+    #   @return [Hash<String,String>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/ActivityResponse AWS API Documentation
     #
     class ActivityResponse < Struct.new(
@@ -1666,29 +1283,14 @@ module Aws::Pinpoint
       :timezones_completed_count,
       :timezones_total_count,
       :total_endpoint_count,
-      :treatment_id)
+      :treatment_id,
+      :execution_metrics)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Specifies address-based configuration settings for a message that's
     # sent directly to an endpoint.
-    #
-    # @note When making an API call, you may pass AddressConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         body_override: "__string",
-    #         channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #         context: {
-    #           "__string" => "__string",
-    #         },
-    #         raw_content: "__string",
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #         title_override: "__string",
-    #       }
     #
     # @!attribute [rw] body_override
     #   The message body to use instead of the default message body. This
@@ -1742,21 +1344,6 @@ module Aws::Pinpoint
     # that can be used in push notifications that are sent through the ADM
     # (Amazon Device Messaging), Baidu (Baidu Cloud Push), or GCM (Firebase
     # Cloud Messaging, formerly Google Cloud Messaging) channel.
-    #
-    # @note When making an API call, you may pass AndroidPushNotificationTemplate
-    #   data as a hash:
-    #
-    #       {
-    #         action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #         body: "__string",
-    #         image_icon_url: "__string",
-    #         image_url: "__string",
-    #         raw_content: "__string",
-    #         small_image_icon_url: "__string",
-    #         sound: "__string",
-    #         title: "__string",
-    #         url: "__string",
-    #       }
     #
     # @!attribute [rw] action
     #   The action to occur if a recipient taps a push notification that's
@@ -1918,13 +1505,49 @@ module Aws::Pinpoint
     #   required tag key and an associated tag value.
     #   @return [Hash<String,String>]
     #
+    # @!attribute [rw] creation_date
+    #   The date and time when the Application was created.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/ApplicationResponse AWS API Documentation
     #
     class ApplicationResponse < Struct.new(
       :arn,
       :id,
       :name,
-      :tags)
+      :tags,
+      :creation_date)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The default sending limits for journeys in the application. To
+    # override these limits and define custom limits for a specific journey,
+    # use the Journey resource.
+    #
+    # @!attribute [rw] daily_cap
+    #   The daily number of messages that an endpoint can receive from all
+    #   journeys. The maximum value is 100. If set to 0, this limit will not
+    #   apply.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] timeframe_cap
+    #   The default maximum number of messages that can be sent to an
+    #   endpoint during the specified timeframe for all journeys.
+    #   @return [Types::JourneyTimeframeCap]
+    #
+    # @!attribute [rw] total_cap
+    #   The default maximum number of messages that a single journey can
+    #   sent to a single endpoint. The maximum value is 100. If set to 0,
+    #   this limit will not apply.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/ApplicationSettingsJourneyLimits AWS API Documentation
+    #
+    class ApplicationSettingsJourneyLimits < Struct.new(
+      :daily_cap,
+      :timeframe_cap,
+      :total_cap)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1975,6 +1598,12 @@ module Aws::Pinpoint
     #   enabled.
     #   @return [Types::QuietTime]
     #
+    # @!attribute [rw] journey_limits
+    #   The default sending limits for journeys in the application. These
+    #   limits apply to each journey for the application but can be
+    #   overridden, on a per journey basis, with the JourneyLimits resource.
+    #   @return [Types::ApplicationSettingsJourneyLimits]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/ApplicationSettingsResource AWS API Documentation
     #
     class ApplicationSettingsResource < Struct.new(
@@ -1982,7 +1611,8 @@ module Aws::Pinpoint
       :campaign_hook,
       :last_modified_date,
       :limits,
-      :quiet_time)
+      :quiet_time,
+      :journey_limits)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2010,14 +1640,6 @@ module Aws::Pinpoint
 
     # Specifies attribute-based criteria for including or excluding
     # endpoints from a segment.
-    #
-    # @note When making an API call, you may pass AttributeDimension
-    #   data as a hash:
-    #
-    #       {
-    #         attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #         values: ["__string"], # required
-    #       }
     #
     # @!attribute [rw] attribute_type
     #   * INCLUSIVE - endpoints that have attributes matching the values are
@@ -2108,15 +1730,6 @@ module Aws::Pinpoint
 
     # Specifies the status and settings of the Baidu (Baidu Cloud Push)
     # channel for an application.
-    #
-    # @note When making an API call, you may pass BaiduChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_key: "__string", # required
-    #         enabled: false,
-    #         secret_key: "__string", # required
-    #       }
     #
     # @!attribute [rw] api_key
     #   The API key that you received from the Baidu Cloud Push service to
@@ -2214,30 +1827,6 @@ module Aws::Pinpoint
 
     # Specifies the settings for a one-time message that's sent directly to
     # an endpoint through the Baidu (Baidu Cloud Push) channel.
-    #
-    # @note When making an API call, you may pass BaiduMessage
-    #   data as a hash:
-    #
-    #       {
-    #         action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #         body: "__string",
-    #         data: {
-    #           "__string" => "__string",
-    #         },
-    #         icon_reference: "__string",
-    #         image_icon_url: "__string",
-    #         image_url: "__string",
-    #         raw_content: "__string",
-    #         silent_push: false,
-    #         small_image_icon_url: "__string",
-    #         sound: "__string",
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #         time_to_live: 1,
-    #         title: "__string",
-    #         url: "__string",
-    #       }
     #
     # @!attribute [rw] action
     #   The action to occur if the recipient taps the push notification.
@@ -2368,13 +1957,6 @@ module Aws::Pinpoint
     # Specifies the contents of a message that's sent through a custom
     # channel to recipients of a campaign.
     #
-    # @note When making an API call, you may pass CampaignCustomMessage
-    #   data as a hash:
-    #
-    #       {
-    #         data: "__string",
-    #       }
-    #
     # @!attribute [rw] data
     #   The raw, JSON-formatted string to use as the payload for the
     #   message. The maximum size is 5 KB.
@@ -2456,16 +2038,6 @@ module Aws::Pinpoint
     # Specifies the content and "From" address for an email message
     # that's sent to recipients of a campaign.
     #
-    # @note When making an API call, you may pass CampaignEmailMessage
-    #   data as a hash:
-    #
-    #       {
-    #         body: "__string",
-    #         from_address: "__string",
-    #         html_body: "__string",
-    #         title: "__string",
-    #       }
-    #
     # @!attribute [rw] body
     #   The body of the email for recipients whose email clients don't
     #   render HTML content.
@@ -2476,6 +2048,15 @@ module Aws::Pinpoint
     #   address is the FromAddress specified for the email channel for the
     #   application.
     #   @return [String]
+    #
+    # @!attribute [rw] headers
+    #   The list of [MessageHeaders][1] for the email. You can have up to 15
+    #   MessageHeaders for each email.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-campaigns-campaign-id.html#apps-application-id-campaigns-campaign-id-model-messageheader
+    #   @return [Array<Types::MessageHeader>]
     #
     # @!attribute [rw] html_body
     #   The body of the email, in HTML format, for recipients whose email
@@ -2491,6 +2072,7 @@ module Aws::Pinpoint
     class CampaignEmailMessage < Struct.new(
       :body,
       :from_address,
+      :headers,
       :html_body,
       :title)
       SENSITIVE = []
@@ -2498,31 +2080,6 @@ module Aws::Pinpoint
     end
 
     # Specifies the settings for events that cause a campaign to be sent.
-    #
-    # @note When making an API call, you may pass CampaignEventFilter
-    #   data as a hash:
-    #
-    #       {
-    #         dimensions: { # required
-    #           attributes: {
-    #             "__string" => {
-    #               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #               values: ["__string"], # required
-    #             },
-    #           },
-    #           event_type: {
-    #             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #             values: ["__string"], # required
-    #           },
-    #           metrics: {
-    #             "__string" => {
-    #               comparison_operator: "__string", # required
-    #               value: 1.0, # required
-    #             },
-    #           },
-    #         },
-    #         filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #       }
     #
     # @!attribute [rw] dimensions
     #   The dimension settings of the event filter for the campaign.
@@ -2548,15 +2105,6 @@ module Aws::Pinpoint
 
     # Specifies settings for invoking an AWS Lambda function that customizes
     # a segment for a campaign.
-    #
-    # @note When making an API call, you may pass CampaignHook
-    #   data as a hash:
-    #
-    #       {
-    #         lambda_function_name: "__string",
-    #         mode: "DELIVERY", # accepts DELIVERY, FILTER
-    #         web_url: "__string",
-    #       }
     #
     # @!attribute [rw] lambda_function_name
     #   The name or Amazon Resource Name (ARN) of the AWS Lambda function
@@ -2592,19 +2140,39 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
+    # In-app message configuration.
+    #
+    # @!attribute [rw] body
+    #   The message body of the notification, the email body or the text
+    #   message.
+    #   @return [String]
+    #
+    # @!attribute [rw] content
+    #   In-app message content.
+    #   @return [Array<Types::InAppMessageContent>]
+    #
+    # @!attribute [rw] custom_config
+    #   Custom config to be sent to client.
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] layout
+    #   In-app message layout.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/CampaignInAppMessage AWS API Documentation
+    #
+    class CampaignInAppMessage < Struct.new(
+      :body,
+      :content,
+      :custom_config,
+      :layout)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # For a campaign, specifies limits on the messages that the campaign can
     # send. For an application, specifies the default limits for messages
     # that campaigns in the application can send.
-    #
-    # @note When making an API call, you may pass CampaignLimits
-    #   data as a hash:
-    #
-    #       {
-    #         daily: 1,
-    #         maximum_duration: 1,
-    #         messages_per_second: 1,
-    #         total: 1,
-    #       }
     #
     # @!attribute [rw] daily
     #   The maximum number of messages that a campaign can send to a single
@@ -2624,7 +2192,7 @@ module Aws::Pinpoint
     #   The maximum number of messages that a campaign can send each second.
     #   For an application, this value specifies the default limit for the
     #   number of messages that campaigns can send each second. The minimum
-    #   value is 50. The maximum value is 20,000.
+    #   value is 1. The maximum value is 20,000.
     #   @return [Integer]
     #
     # @!attribute [rw] total
@@ -2634,13 +2202,19 @@ module Aws::Pinpoint
     #   is 100.
     #   @return [Integer]
     #
+    # @!attribute [rw] session
+    #   The maximum total number of messages that the campaign can send per
+    #   user session.
+    #   @return [Integer]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/CampaignLimits AWS API Documentation
     #
     class CampaignLimits < Struct.new(
       :daily,
       :maximum_duration,
       :messages_per_second,
-      :total)
+      :total,
+      :session)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2758,6 +2332,12 @@ module Aws::Pinpoint
     #   The version number of the campaign.
     #   @return [Integer]
     #
+    # @!attribute [rw] priority
+    #   Defines the priority of the campaign, used to decide the order of
+    #   messages displayed to user if there are multiple messages scheduled
+    #   to be displayed at the same moment
+    #   @return [Integer]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/CampaignResponse AWS API Documentation
     #
     class CampaignResponse < Struct.new(
@@ -2784,22 +2364,14 @@ module Aws::Pinpoint
       :template_configuration,
       :treatment_description,
       :treatment_name,
-      :version)
+      :version,
+      :priority)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Specifies the content and settings for an SMS message that's sent to
     # recipients of a campaign.
-    #
-    # @note When making an API call, you may pass CampaignSmsMessage
-    #   data as a hash:
-    #
-    #       {
-    #         body: "__string",
-    #         message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #         sender_id: "__string",
-    #       }
     #
     # @!attribute [rw] body
     #   The body of the SMS message.
@@ -2812,9 +2384,27 @@ module Aws::Pinpoint
     #   time-sensitive, such as marketing messages).
     #   @return [String]
     #
+    # @!attribute [rw] origination_number
+    #   The long code to send the SMS message from. This value should be one
+    #   of the dedicated long codes that's assigned to your AWS account.
+    #   Although it isn't required, we recommend that you specify the long
+    #   code using an E.164 format to ensure prompt and accurate delivery of
+    #   the message. For example, +12065550100.
+    #   @return [String]
+    #
     # @!attribute [rw] sender_id
     #   The sender ID to display on recipients' devices when they receive
     #   the SMS message.
+    #   @return [String]
+    #
+    # @!attribute [rw] entity_id
+    #   The entity ID or Principal Entity (PE) id received from the
+    #   regulatory body for sending SMS in your country.
+    #   @return [String]
+    #
+    # @!attribute [rw] template_id
+    #   The template ID received from the regulatory body for sending SMS in
+    #   your country.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/CampaignSmsMessage AWS API Documentation
@@ -2822,7 +2412,10 @@ module Aws::Pinpoint
     class CampaignSmsMessage < Struct.new(
       :body,
       :message_type,
-      :sender_id)
+      :origination_number,
+      :sender_id,
+      :entity_id,
+      :template_id)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2949,106 +2542,6 @@ module Aws::Pinpoint
     # Specifies the conditions to evaluate for an activity in a journey, and
     # how to evaluate those conditions.
     #
-    # @note When making an API call, you may pass Condition
-    #   data as a hash:
-    #
-    #       {
-    #         conditions: [
-    #           {
-    #             event_condition: {
-    #               dimensions: {
-    #                 attributes: {
-    #                   "__string" => {
-    #                     attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #                 event_type: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #                 metrics: {
-    #                   "__string" => {
-    #                     comparison_operator: "__string", # required
-    #                     value: 1.0, # required
-    #                   },
-    #                 },
-    #               },
-    #               message_activity: "__string",
-    #             },
-    #             segment_condition: {
-    #               segment_id: "__string", # required
-    #             },
-    #             segment_dimensions: {
-    #               attributes: {
-    #                 "__string" => {
-    #                   attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                   values: ["__string"], # required
-    #                 },
-    #               },
-    #               behavior: {
-    #                 recency: {
-    #                   duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                   recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                 },
-    #               },
-    #               demographic: {
-    #                 app_version: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #                 channel: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #                 device_type: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #                 make: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #                 model: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #                 platform: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #               },
-    #               location: {
-    #                 country: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #                 gps_point: {
-    #                   coordinates: { # required
-    #                     latitude: 1.0, # required
-    #                     longitude: 1.0, # required
-    #                   },
-    #                   range_in_kilometers: 1.0,
-    #                 },
-    #               },
-    #               metrics: {
-    #                 "__string" => {
-    #                   comparison_operator: "__string", # required
-    #                   value: 1.0, # required
-    #                 },
-    #               },
-    #               user_attributes: {
-    #                 "__string" => {
-    #                   attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                   values: ["__string"], # required
-    #                 },
-    #               },
-    #             },
-    #           },
-    #         ],
-    #         operator: "ALL", # accepts ALL, ANY
-    #       }
-    #
     # @!attribute [rw] conditions
     #   The conditions to evaluate for the activity.
     #   @return [Array<Types::SimpleCondition>]
@@ -3086,114 +2579,6 @@ module Aws::Pinpoint
     #
     # [1]: https://docs.aws.amazon.com/pinpoint/latest/developerguide/integrate.html
     #
-    # @note When making an API call, you may pass ConditionalSplitActivity
-    #   data as a hash:
-    #
-    #       {
-    #         condition: {
-    #           conditions: [
-    #             {
-    #               event_condition: {
-    #                 dimensions: {
-    #                   attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   event_type: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   metrics: {
-    #                     "__string" => {
-    #                       comparison_operator: "__string", # required
-    #                       value: 1.0, # required
-    #                     },
-    #                   },
-    #                 },
-    #                 message_activity: "__string",
-    #               },
-    #               segment_condition: {
-    #                 segment_id: "__string", # required
-    #               },
-    #               segment_dimensions: {
-    #                 attributes: {
-    #                   "__string" => {
-    #                     attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #                 behavior: {
-    #                   recency: {
-    #                     duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                     recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                   },
-    #                 },
-    #                 demographic: {
-    #                   app_version: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   channel: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   device_type: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   make: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   model: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   platform: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #                 location: {
-    #                   country: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   gps_point: {
-    #                     coordinates: { # required
-    #                       latitude: 1.0, # required
-    #                       longitude: 1.0, # required
-    #                     },
-    #                     range_in_kilometers: 1.0,
-    #                   },
-    #                 },
-    #                 metrics: {
-    #                   "__string" => {
-    #                     comparison_operator: "__string", # required
-    #                     value: 1.0, # required
-    #                   },
-    #                 },
-    #                 user_attributes: {
-    #                   "__string" => {
-    #                     attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #               },
-    #             },
-    #           ],
-    #           operator: "ALL", # accepts ALL, ANY
-    #         },
-    #         evaluation_wait_time: {
-    #           wait_for: "__string",
-    #           wait_until: "__string",
-    #         },
-    #         false_activity: "__string",
-    #         true_activity: "__string",
-    #       }
-    #
     # @!attribute [rw] condition
     #   The conditions that define the paths for the activity, and the
     #   relationship between the conditions.
@@ -3226,6 +2611,22 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
+    # The settings for a connect activity. This type of activity initiates a
+    # contact center call to participants.
+    #
+    # @!attribute [rw] next_activity
+    #   The unique identifier for the next activity to perform after the
+    #   this activity.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/ContactCenterActivity AWS API Documentation
+    #
+    class ContactCenterActivity < Struct.new(
+      :next_activity)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Provides information about an API request or response.
     #
     # @!attribute [rw] message
@@ -3243,18 +2644,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateAppRequest
-    #   data as a hash:
-    #
-    #       {
-    #         create_application_request: { # required
-    #           name: "__string", # required
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] create_application_request
     #   Specifies the display name of an application and the tags to
     #   associate with the application.
@@ -3283,16 +2672,6 @@ module Aws::Pinpoint
     # Specifies the display name of an application and the tags to associate
     # with the application.
     #
-    # @note When making an API call, you may pass CreateApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "__string", # required
-    #         tags: {
-    #           "__string" => "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] name
     #   The display name of the application. This name is displayed as the
     #   **Project name** on the Amazon Pinpoint console.
@@ -3313,324 +2692,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateCampaignRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         write_campaign_request: { # required
-    #           additional_treatments: [
-    #             {
-    #               custom_delivery_configuration: {
-    #                 delivery_uri: "__string", # required
-    #                 endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #               },
-    #               message_configuration: {
-    #                 adm_message: {
-    #                   action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                   body: "__string",
-    #                   image_icon_url: "__string",
-    #                   image_small_icon_url: "__string",
-    #                   image_url: "__string",
-    #                   json_body: "__string",
-    #                   media_url: "__string",
-    #                   raw_content: "__string",
-    #                   silent_push: false,
-    #                   time_to_live: 1,
-    #                   title: "__string",
-    #                   url: "__string",
-    #                 },
-    #                 apns_message: {
-    #                   action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                   body: "__string",
-    #                   image_icon_url: "__string",
-    #                   image_small_icon_url: "__string",
-    #                   image_url: "__string",
-    #                   json_body: "__string",
-    #                   media_url: "__string",
-    #                   raw_content: "__string",
-    #                   silent_push: false,
-    #                   time_to_live: 1,
-    #                   title: "__string",
-    #                   url: "__string",
-    #                 },
-    #                 baidu_message: {
-    #                   action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                   body: "__string",
-    #                   image_icon_url: "__string",
-    #                   image_small_icon_url: "__string",
-    #                   image_url: "__string",
-    #                   json_body: "__string",
-    #                   media_url: "__string",
-    #                   raw_content: "__string",
-    #                   silent_push: false,
-    #                   time_to_live: 1,
-    #                   title: "__string",
-    #                   url: "__string",
-    #                 },
-    #                 custom_message: {
-    #                   data: "__string",
-    #                 },
-    #                 default_message: {
-    #                   action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                   body: "__string",
-    #                   image_icon_url: "__string",
-    #                   image_small_icon_url: "__string",
-    #                   image_url: "__string",
-    #                   json_body: "__string",
-    #                   media_url: "__string",
-    #                   raw_content: "__string",
-    #                   silent_push: false,
-    #                   time_to_live: 1,
-    #                   title: "__string",
-    #                   url: "__string",
-    #                 },
-    #                 email_message: {
-    #                   body: "__string",
-    #                   from_address: "__string",
-    #                   html_body: "__string",
-    #                   title: "__string",
-    #                 },
-    #                 gcm_message: {
-    #                   action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                   body: "__string",
-    #                   image_icon_url: "__string",
-    #                   image_small_icon_url: "__string",
-    #                   image_url: "__string",
-    #                   json_body: "__string",
-    #                   media_url: "__string",
-    #                   raw_content: "__string",
-    #                   silent_push: false,
-    #                   time_to_live: 1,
-    #                   title: "__string",
-    #                   url: "__string",
-    #                 },
-    #                 sms_message: {
-    #                   body: "__string",
-    #                   message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #                   sender_id: "__string",
-    #                 },
-    #               },
-    #               schedule: {
-    #                 end_time: "__string",
-    #                 event_filter: {
-    #                   dimensions: { # required
-    #                     attributes: {
-    #                       "__string" => {
-    #                         attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                         values: ["__string"], # required
-    #                       },
-    #                     },
-    #                     event_type: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     metrics: {
-    #                       "__string" => {
-    #                         comparison_operator: "__string", # required
-    #                         value: 1.0, # required
-    #                       },
-    #                     },
-    #                   },
-    #                   filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #                 },
-    #                 frequency: "ONCE", # accepts ONCE, HOURLY, DAILY, WEEKLY, MONTHLY, EVENT
-    #                 is_local_time: false,
-    #                 quiet_time: {
-    #                   end: "__string",
-    #                   start: "__string",
-    #                 },
-    #                 start_time: "__string", # required
-    #                 timezone: "__string",
-    #               },
-    #               size_percent: 1, # required
-    #               template_configuration: {
-    #                 email_template: {
-    #                   name: "__string",
-    #                   version: "__string",
-    #                 },
-    #                 push_template: {
-    #                   name: "__string",
-    #                   version: "__string",
-    #                 },
-    #                 sms_template: {
-    #                   name: "__string",
-    #                   version: "__string",
-    #                 },
-    #                 voice_template: {
-    #                   name: "__string",
-    #                   version: "__string",
-    #                 },
-    #               },
-    #               treatment_description: "__string",
-    #               treatment_name: "__string",
-    #             },
-    #           ],
-    #           custom_delivery_configuration: {
-    #             delivery_uri: "__string", # required
-    #             endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #           },
-    #           description: "__string",
-    #           holdout_percent: 1,
-    #           hook: {
-    #             lambda_function_name: "__string",
-    #             mode: "DELIVERY", # accepts DELIVERY, FILTER
-    #             web_url: "__string",
-    #           },
-    #           is_paused: false,
-    #           limits: {
-    #             daily: 1,
-    #             maximum_duration: 1,
-    #             messages_per_second: 1,
-    #             total: 1,
-    #           },
-    #           message_configuration: {
-    #             adm_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               image_icon_url: "__string",
-    #               image_small_icon_url: "__string",
-    #               image_url: "__string",
-    #               json_body: "__string",
-    #               media_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             apns_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               image_icon_url: "__string",
-    #               image_small_icon_url: "__string",
-    #               image_url: "__string",
-    #               json_body: "__string",
-    #               media_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             baidu_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               image_icon_url: "__string",
-    #               image_small_icon_url: "__string",
-    #               image_url: "__string",
-    #               json_body: "__string",
-    #               media_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             custom_message: {
-    #               data: "__string",
-    #             },
-    #             default_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               image_icon_url: "__string",
-    #               image_small_icon_url: "__string",
-    #               image_url: "__string",
-    #               json_body: "__string",
-    #               media_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             email_message: {
-    #               body: "__string",
-    #               from_address: "__string",
-    #               html_body: "__string",
-    #               title: "__string",
-    #             },
-    #             gcm_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               image_icon_url: "__string",
-    #               image_small_icon_url: "__string",
-    #               image_url: "__string",
-    #               json_body: "__string",
-    #               media_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             sms_message: {
-    #               body: "__string",
-    #               message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #               sender_id: "__string",
-    #             },
-    #           },
-    #           name: "__string",
-    #           schedule: {
-    #             end_time: "__string",
-    #             event_filter: {
-    #               dimensions: { # required
-    #                 attributes: {
-    #                   "__string" => {
-    #                     attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #                 event_type: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #                 metrics: {
-    #                   "__string" => {
-    #                     comparison_operator: "__string", # required
-    #                     value: 1.0, # required
-    #                   },
-    #                 },
-    #               },
-    #               filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #             },
-    #             frequency: "ONCE", # accepts ONCE, HOURLY, DAILY, WEEKLY, MONTHLY, EVENT
-    #             is_local_time: false,
-    #             quiet_time: {
-    #               end: "__string",
-    #               start: "__string",
-    #             },
-    #             start_time: "__string", # required
-    #             timezone: "__string",
-    #           },
-    #           segment_id: "__string",
-    #           segment_version: 1,
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #           template_configuration: {
-    #             email_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             push_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             sms_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             voice_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #           },
-    #           treatment_description: "__string",
-    #           treatment_name: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -3660,24 +2721,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_template_request: { # required
-    #           default_substitutions: "__string",
-    #           html_part: "__string",
-    #           recommender_id: "__string",
-    #           subject: "__string",
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #           template_description: "__string",
-    #           text_part: "__string",
-    #         },
-    #         template_name: "__string", # required
-    #       }
-    #
     # @!attribute [rw] email_template_request
     #   Specifies the content and settings for a message template that can
     #   be used in messages that are sent through the email channel.
@@ -3707,19 +2750,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateExportJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         export_job_request: { # required
-    #           role_arn: "__string", # required
-    #           s3_url_prefix: "__string", # required
-    #           segment_id: "__string",
-    #           segment_version: 1,
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -3753,23 +2783,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateImportJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         import_job_request: { # required
-    #           define_segment: false,
-    #           external_id: "__string",
-    #           format: "CSV", # required, accepts CSV, JSON
-    #           register_endpoints: false,
-    #           role_arn: "__string", # required
-    #           s3_url: "__string", # required
-    #           segment_id: "__string",
-    #           segment_name: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -3803,332 +2816,34 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateJourneyRequest
-    #   data as a hash:
+    # @!attribute [rw] in_app_template_request
+    #   In-App Template Request.
+    #   @return [Types::InAppTemplateRequest]
     #
-    #       {
-    #         application_id: "__string", # required
-    #         write_journey_request: { # required
-    #           activities: {
-    #             "__string" => {
-    #               custom: {
-    #                 delivery_uri: "__string",
-    #                 endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #                 message_config: {
-    #                   data: "__string",
-    #                 },
-    #                 next_activity: "__string",
-    #                 template_name: "__string",
-    #                 template_version: "__string",
-    #               },
-    #               conditional_split: {
-    #                 condition: {
-    #                   conditions: [
-    #                     {
-    #                       event_condition: {
-    #                         dimensions: {
-    #                           attributes: {
-    #                             "__string" => {
-    #                               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                               values: ["__string"], # required
-    #                             },
-    #                           },
-    #                           event_type: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           metrics: {
-    #                             "__string" => {
-    #                               comparison_operator: "__string", # required
-    #                               value: 1.0, # required
-    #                             },
-    #                           },
-    #                         },
-    #                         message_activity: "__string",
-    #                       },
-    #                       segment_condition: {
-    #                         segment_id: "__string", # required
-    #                       },
-    #                       segment_dimensions: {
-    #                         attributes: {
-    #                           "__string" => {
-    #                             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                         behavior: {
-    #                           recency: {
-    #                             duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                             recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                           },
-    #                         },
-    #                         demographic: {
-    #                           app_version: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           channel: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           device_type: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           make: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           model: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           platform: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                         location: {
-    #                           country: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           gps_point: {
-    #                             coordinates: { # required
-    #                               latitude: 1.0, # required
-    #                               longitude: 1.0, # required
-    #                             },
-    #                             range_in_kilometers: 1.0,
-    #                           },
-    #                         },
-    #                         metrics: {
-    #                           "__string" => {
-    #                             comparison_operator: "__string", # required
-    #                             value: 1.0, # required
-    #                           },
-    #                         },
-    #                         user_attributes: {
-    #                           "__string" => {
-    #                             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                       },
-    #                     },
-    #                   ],
-    #                   operator: "ALL", # accepts ALL, ANY
-    #                 },
-    #                 evaluation_wait_time: {
-    #                   wait_for: "__string",
-    #                   wait_until: "__string",
-    #                 },
-    #                 false_activity: "__string",
-    #                 true_activity: "__string",
-    #               },
-    #               description: "__string",
-    #               email: {
-    #                 message_config: {
-    #                   from_address: "__string",
-    #                 },
-    #                 next_activity: "__string",
-    #                 template_name: "__string",
-    #                 template_version: "__string",
-    #               },
-    #               holdout: {
-    #                 next_activity: "__string",
-    #                 percentage: 1, # required
-    #               },
-    #               multi_condition: {
-    #                 branches: [
-    #                   {
-    #                     condition: {
-    #                       event_condition: {
-    #                         dimensions: {
-    #                           attributes: {
-    #                             "__string" => {
-    #                               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                               values: ["__string"], # required
-    #                             },
-    #                           },
-    #                           event_type: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           metrics: {
-    #                             "__string" => {
-    #                               comparison_operator: "__string", # required
-    #                               value: 1.0, # required
-    #                             },
-    #                           },
-    #                         },
-    #                         message_activity: "__string",
-    #                       },
-    #                       segment_condition: {
-    #                         segment_id: "__string", # required
-    #                       },
-    #                       segment_dimensions: {
-    #                         attributes: {
-    #                           "__string" => {
-    #                             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                         behavior: {
-    #                           recency: {
-    #                             duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                             recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                           },
-    #                         },
-    #                         demographic: {
-    #                           app_version: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           channel: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           device_type: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           make: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           model: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           platform: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                         location: {
-    #                           country: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           gps_point: {
-    #                             coordinates: { # required
-    #                               latitude: 1.0, # required
-    #                               longitude: 1.0, # required
-    #                             },
-    #                             range_in_kilometers: 1.0,
-    #                           },
-    #                         },
-    #                         metrics: {
-    #                           "__string" => {
-    #                             comparison_operator: "__string", # required
-    #                             value: 1.0, # required
-    #                           },
-    #                         },
-    #                         user_attributes: {
-    #                           "__string" => {
-    #                             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                       },
-    #                     },
-    #                     next_activity: "__string",
-    #                   },
-    #                 ],
-    #                 default_activity: "__string",
-    #                 evaluation_wait_time: {
-    #                   wait_for: "__string",
-    #                   wait_until: "__string",
-    #                 },
-    #               },
-    #               push: {
-    #                 message_config: {
-    #                   time_to_live: "__string",
-    #                 },
-    #                 next_activity: "__string",
-    #                 template_name: "__string",
-    #                 template_version: "__string",
-    #               },
-    #               random_split: {
-    #                 branches: [
-    #                   {
-    #                     next_activity: "__string",
-    #                     percentage: 1,
-    #                   },
-    #                 ],
-    #               },
-    #               sms: {
-    #                 message_config: {
-    #                   message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #                   sender_id: "__string",
-    #                 },
-    #                 next_activity: "__string",
-    #                 template_name: "__string",
-    #                 template_version: "__string",
-    #               },
-    #               wait: {
-    #                 next_activity: "__string",
-    #                 wait_time: {
-    #                   wait_for: "__string",
-    #                   wait_until: "__string",
-    #                 },
-    #               },
-    #             },
-    #           },
-    #           creation_date: "__string",
-    #           last_modified_date: "__string",
-    #           limits: {
-    #             daily_cap: 1,
-    #             endpoint_reentry_cap: 1,
-    #             messages_per_second: 1,
-    #           },
-    #           local_time: false,
-    #           name: "__string", # required
-    #           quiet_time: {
-    #             end: "__string",
-    #             start: "__string",
-    #           },
-    #           refresh_frequency: "__string",
-    #           schedule: {
-    #             end_time: Time.now,
-    #             start_time: Time.now,
-    #             timezone: "__string",
-    #           },
-    #           start_activity: "__string",
-    #           start_condition: {
-    #             description: "__string",
-    #             event_start_condition: {
-    #               event_filter: {
-    #                 dimensions: { # required
-    #                   attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   event_type: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   metrics: {
-    #                     "__string" => {
-    #                       comparison_operator: "__string", # required
-    #                       value: 1.0, # required
-    #                     },
-    #                   },
-    #                 },
-    #                 filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #               },
-    #               segment_id: "__string",
-    #             },
-    #             segment_start_condition: {
-    #               segment_id: "__string", # required
-    #             },
-    #           },
-    #           state: "DRAFT", # accepts DRAFT, ACTIVE, COMPLETED, CANCELLED, CLOSED
-    #         },
-    #       }
+    # @!attribute [rw] template_name
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/CreateInAppTemplateRequest AWS API Documentation
+    #
+    class CreateInAppTemplateRequest < Struct.new(
+      :in_app_template_request,
+      :template_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] template_create_message_body
+    #   Provides information about a request to create a message template.
+    #   @return [Types::TemplateCreateMessageBody]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/CreateInAppTemplateResponse AWS API Documentation
+    #
+    class CreateInAppTemplateResponse < Struct.new(
+      :template_create_message_body)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -4158,70 +2873,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreatePushTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         push_notification_template_request: { # required
-    #           adm: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             raw_content: "__string",
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           apns: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             sound: "__string",
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           baidu: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             raw_content: "__string",
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           default: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             sound: "__string",
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           default_substitutions: "__string",
-    #           gcm: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             raw_content: "__string",
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           recommender_id: "__string",
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #           template_description: "__string",
-    #         },
-    #         template_name: "__string", # required
-    #       }
-    #
     # @!attribute [rw] push_notification_template_request
     #   Specifies the content and settings for a message template that can
     #   be used in messages that are sent through a push notification
@@ -4254,23 +2905,6 @@ module Aws::Pinpoint
 
     # Specifies Amazon Pinpoint configuration settings for retrieving and
     # processing recommendation data from a recommender model.
-    #
-    # @note When making an API call, you may pass CreateRecommenderConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         attributes: {
-    #           "__string" => "__string",
-    #         },
-    #         description: "__string",
-    #         name: "__string",
-    #         recommendation_provider_id_type: "__string",
-    #         recommendation_provider_role_arn: "__string", # required
-    #         recommendation_provider_uri: "__string", # required
-    #         recommendation_transformer_uri: "__string",
-    #         recommendations_display_name: "__string",
-    #         recommendations_per_message: 1,
-    #       }
     #
     # @!attribute [rw] attributes
     #   A map of key-value pairs that defines 1-10 custom endpoint or user
@@ -4397,25 +3031,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateRecommenderConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         create_recommender_configuration: { # required
-    #           attributes: {
-    #             "__string" => "__string",
-    #           },
-    #           description: "__string",
-    #           name: "__string",
-    #           recommendation_provider_id_type: "__string",
-    #           recommendation_provider_role_arn: "__string", # required
-    #           recommendation_provider_uri: "__string", # required
-    #           recommendation_transformer_uri: "__string",
-    #           recommendations_display_name: "__string",
-    #           recommendations_per_message: 1,
-    #         },
-    #       }
-    #
     # @!attribute [rw] create_recommender_configuration
     #   Specifies Amazon Pinpoint configuration settings for retrieving and
     #   processing recommendation data from a recommender model.
@@ -4442,166 +3057,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateSegmentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         write_segment_request: { # required
-    #           dimensions: {
-    #             attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             behavior: {
-    #               recency: {
-    #                 duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                 recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #               },
-    #             },
-    #             demographic: {
-    #               app_version: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               channel: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               device_type: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               make: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               model: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               platform: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             location: {
-    #               country: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               gps_point: {
-    #                 coordinates: { # required
-    #                   latitude: 1.0, # required
-    #                   longitude: 1.0, # required
-    #                 },
-    #                 range_in_kilometers: 1.0,
-    #               },
-    #             },
-    #             metrics: {
-    #               "__string" => {
-    #                 comparison_operator: "__string", # required
-    #                 value: 1.0, # required
-    #               },
-    #             },
-    #             user_attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #           },
-    #           name: "__string",
-    #           segment_groups: {
-    #             groups: [
-    #               {
-    #                 dimensions: [
-    #                   {
-    #                     attributes: {
-    #                       "__string" => {
-    #                         attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                         values: ["__string"], # required
-    #                       },
-    #                     },
-    #                     behavior: {
-    #                       recency: {
-    #                         duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                         recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                       },
-    #                     },
-    #                     demographic: {
-    #                       app_version: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       channel: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       device_type: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       make: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       model: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       platform: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                     },
-    #                     location: {
-    #                       country: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       gps_point: {
-    #                         coordinates: { # required
-    #                           latitude: 1.0, # required
-    #                           longitude: 1.0, # required
-    #                         },
-    #                         range_in_kilometers: 1.0,
-    #                       },
-    #                     },
-    #                     metrics: {
-    #                       "__string" => {
-    #                         comparison_operator: "__string", # required
-    #                         value: 1.0, # required
-    #                       },
-    #                     },
-    #                     user_attributes: {
-    #                       "__string" => {
-    #                         attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                         values: ["__string"], # required
-    #                       },
-    #                     },
-    #                   },
-    #                 ],
-    #                 source_segments: [
-    #                   {
-    #                     id: "__string", # required
-    #                     version: 1,
-    #                   },
-    #                 ],
-    #                 source_type: "ALL", # accepts ALL, ANY, NONE
-    #                 type: "ALL", # accepts ALL, ANY, NONE
-    #               },
-    #             ],
-    #             include: "ALL", # accepts ALL, ANY, NONE
-    #           },
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -4633,22 +3088,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateSmsTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         sms_template_request: { # required
-    #           body: "__string",
-    #           default_substitutions: "__string",
-    #           recommender_id: "__string",
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #           template_description: "__string",
-    #         },
-    #         template_name: "__string", # required
-    #       }
-    #
     # @!attribute [rw] sms_template_request
     #   Specifies the content and settings for a message template that can
     #   be used in text messages that are sent through the SMS channel.
@@ -4705,23 +3144,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateVoiceTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "__string", # required
-    #         voice_template_request: { # required
-    #           body: "__string",
-    #           default_substitutions: "__string",
-    #           language_code: "__string",
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #           template_description: "__string",
-    #           voice_id: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] template_name
     #   @return [String]
     #
@@ -4756,14 +3178,6 @@ module Aws::Pinpoint
     # required if you use the CampaignCustomMessage object to define the
     # message to send for the campaign or campaign treatment.
     #
-    # @note When making an API call, you may pass CustomDeliveryConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         delivery_uri: "__string", # required
-    #         endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #       }
-    #
     # @!attribute [rw] delivery_uri
     #   The destination to send the campaign or treatment to. This value can
     #   be one of the following:
@@ -4794,20 +3208,6 @@ module Aws::Pinpoint
     # The settings for a custom message activity. This type of activity
     # calls an AWS Lambda function or web hook that sends messages to
     # participants.
-    #
-    # @note When making an API call, you may pass CustomMessageActivity
-    #   data as a hash:
-    #
-    #       {
-    #         delivery_uri: "__string",
-    #         endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #         message_config: {
-    #           data: "__string",
-    #         },
-    #         next_activity: "__string",
-    #         template_name: "__string",
-    #         template_version: "__string",
-    #       }
     #
     # @!attribute [rw] delivery_uri
     #   The destination to send the campaign or treatment to. This value can
@@ -4872,17 +3272,46 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
+    # Default button configuration.
+    #
+    # @!attribute [rw] background_color
+    #   The background color of the button.
+    #   @return [String]
+    #
+    # @!attribute [rw] border_radius
+    #   The border radius of the button.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] button_action
+    #   Action triggered by the button.
+    #   @return [String]
+    #
+    # @!attribute [rw] link
+    #   Button destination.
+    #   @return [String]
+    #
+    # @!attribute [rw] text
+    #   Button text.
+    #   @return [String]
+    #
+    # @!attribute [rw] text_color
+    #   The text color of the button.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/DefaultButtonConfiguration AWS API Documentation
+    #
+    class DefaultButtonConfiguration < Struct.new(
+      :background_color,
+      :border_radius,
+      :button_action,
+      :link,
+      :text,
+      :text_color)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Specifies the default message for all channels.
-    #
-    # @note When making an API call, you may pass DefaultMessage
-    #   data as a hash:
-    #
-    #       {
-    #         body: "__string",
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #       }
     #
     # @!attribute [rw] body
     #   The default body of the message.
@@ -4904,23 +3333,6 @@ module Aws::Pinpoint
 
     # Specifies the default settings and content for a push notification
     # that's sent directly to an endpoint.
-    #
-    # @note When making an API call, you may pass DefaultPushNotificationMessage
-    #   data as a hash:
-    #
-    #       {
-    #         action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #         body: "__string",
-    #         data: {
-    #           "__string" => "__string",
-    #         },
-    #         silent_push: false,
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #         title: "__string",
-    #         url: "__string",
-    #       }
     #
     # @!attribute [rw] action
     #   The default action to occur if a recipient taps the push
@@ -4990,17 +3402,6 @@ module Aws::Pinpoint
     # can be used in messages that are sent through a push notification
     # channel.
     #
-    # @note When making an API call, you may pass DefaultPushNotificationTemplate
-    #   data as a hash:
-    #
-    #       {
-    #         action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #         body: "__string",
-    #         sound: "__string",
-    #         title: "__string",
-    #         url: "__string",
-    #       }
-    #
     # @!attribute [rw] action
     #   The action to occur if a recipient taps a push notification that's
     #   based on the message template. Valid values are:
@@ -5059,13 +3460,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteAdmChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5090,13 +3484,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteApnsChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5121,13 +3508,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteApnsSandboxChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5153,13 +3533,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteApnsVoipChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5184,13 +3557,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteApnsVoipSandboxChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5216,13 +3582,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteAppRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5246,13 +3605,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteBaiduChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5277,14 +3629,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteCampaignRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         campaign_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5313,13 +3657,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteEmailChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5344,14 +3681,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] template_name
     #   @return [String]
     #
@@ -5379,14 +3708,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteEndpointRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         endpoint_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5415,13 +3736,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteEventStreamRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5446,13 +3760,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteGcmChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5479,14 +3786,33 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteJourneyRequest
-    #   data as a hash:
+    # @!attribute [rw] template_name
+    #   @return [String]
     #
-    #       {
-    #         application_id: "__string", # required
-    #         journey_id: "__string", # required
-    #       }
+    # @!attribute [rw] version
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/DeleteInAppTemplateRequest AWS API Documentation
+    #
+    class DeleteInAppTemplateRequest < Struct.new(
+      :template_name,
+      :version)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] message_body
+    #   Provides information about an API request or response.
+    #   @return [Types::MessageBody]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/DeleteInAppTemplateResponse AWS API Documentation
+    #
+    class DeleteInAppTemplateResponse < Struct.new(
+      :message_body)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5515,14 +3841,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeletePushTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] template_name
     #   @return [String]
     #
@@ -5550,13 +3868,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteRecommenderConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         recommender_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] recommender_id
     #   @return [String]
     #
@@ -5581,14 +3892,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteSegmentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         segment_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5617,13 +3920,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteSmsChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5648,14 +3944,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteSmsTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] template_name
     #   @return [String]
     #
@@ -5683,14 +3971,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteUserEndpointsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         user_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5719,13 +3999,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteVoiceChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -5750,14 +4023,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteVoiceTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] template_name
     #   @return [String]
     #
@@ -5787,166 +4052,6 @@ module Aws::Pinpoint
 
     # Specifies the settings and content for the default message and any
     # default messages that you tailored for specific channels.
-    #
-    # @note When making an API call, you may pass DirectMessageConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         adm_message: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           consolidation_key: "__string",
-    #           data: {
-    #             "__string" => "__string",
-    #           },
-    #           expires_after: "__string",
-    #           icon_reference: "__string",
-    #           image_icon_url: "__string",
-    #           image_url: "__string",
-    #           md5: "__string",
-    #           raw_content: "__string",
-    #           silent_push: false,
-    #           small_image_icon_url: "__string",
-    #           sound: "__string",
-    #           substitutions: {
-    #             "__string" => ["__string"],
-    #           },
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         apns_message: {
-    #           apns_push_type: "__string",
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           badge: 1,
-    #           body: "__string",
-    #           category: "__string",
-    #           collapse_id: "__string",
-    #           data: {
-    #             "__string" => "__string",
-    #           },
-    #           media_url: "__string",
-    #           preferred_authentication_method: "__string",
-    #           priority: "__string",
-    #           raw_content: "__string",
-    #           silent_push: false,
-    #           sound: "__string",
-    #           substitutions: {
-    #             "__string" => ["__string"],
-    #           },
-    #           thread_id: "__string",
-    #           time_to_live: 1,
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         baidu_message: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           data: {
-    #             "__string" => "__string",
-    #           },
-    #           icon_reference: "__string",
-    #           image_icon_url: "__string",
-    #           image_url: "__string",
-    #           raw_content: "__string",
-    #           silent_push: false,
-    #           small_image_icon_url: "__string",
-    #           sound: "__string",
-    #           substitutions: {
-    #             "__string" => ["__string"],
-    #           },
-    #           time_to_live: 1,
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         default_message: {
-    #           body: "__string",
-    #           substitutions: {
-    #             "__string" => ["__string"],
-    #           },
-    #         },
-    #         default_push_notification_message: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           data: {
-    #             "__string" => "__string",
-    #           },
-    #           silent_push: false,
-    #           substitutions: {
-    #             "__string" => ["__string"],
-    #           },
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         email_message: {
-    #           body: "__string",
-    #           feedback_forwarding_address: "__string",
-    #           from_address: "__string",
-    #           raw_email: {
-    #             data: "data",
-    #           },
-    #           reply_to_addresses: ["__string"],
-    #           simple_email: {
-    #             html_part: {
-    #               charset: "__string",
-    #               data: "__string",
-    #             },
-    #             subject: {
-    #               charset: "__string",
-    #               data: "__string",
-    #             },
-    #             text_part: {
-    #               charset: "__string",
-    #               data: "__string",
-    #             },
-    #           },
-    #           substitutions: {
-    #             "__string" => ["__string"],
-    #           },
-    #         },
-    #         gcm_message: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           collapse_key: "__string",
-    #           data: {
-    #             "__string" => "__string",
-    #           },
-    #           icon_reference: "__string",
-    #           image_icon_url: "__string",
-    #           image_url: "__string",
-    #           priority: "__string",
-    #           raw_content: "__string",
-    #           restricted_package_name: "__string",
-    #           silent_push: false,
-    #           small_image_icon_url: "__string",
-    #           sound: "__string",
-    #           substitutions: {
-    #             "__string" => ["__string"],
-    #           },
-    #           time_to_live: 1,
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         sms_message: {
-    #           body: "__string",
-    #           keyword: "__string",
-    #           media_url: "__string",
-    #           message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #           origination_number: "__string",
-    #           sender_id: "__string",
-    #           substitutions: {
-    #             "__string" => ["__string"],
-    #           },
-    #         },
-    #         voice_message: {
-    #           body: "__string",
-    #           language_code: "__string",
-    #           origination_number: "__string",
-    #           substitutions: {
-    #             "__string" => ["__string"],
-    #           },
-    #           voice_id: "__string",
-    #         },
-    #       }
     #
     # @!attribute [rw] adm_message
     #   The default push notification message for the ADM (Amazon Device
@@ -6017,17 +4122,6 @@ module Aws::Pinpoint
     # Specifies the status and settings of the email channel for an
     # application.
     #
-    # @note When making an API call, you may pass EmailChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set: "__string",
-    #         enabled: false,
-    #         from_address: "__string", # required
-    #         identity: "__string", # required
-    #         role_arn: "__string",
-    #       }
-    #
     # @!attribute [rw] configuration_set
     #   The [Amazon SES configuration set][1] that you want to apply to
     #   messages that you send through the channel.
@@ -6058,6 +4152,11 @@ module Aws::Pinpoint
     #   data for the channel.
     #   @return [String]
     #
+    # @!attribute [rw] orchestration_sending_role_arn
+    #   The ARN of an IAM role for Amazon Pinpoint to use to send email from
+    #   your campaigns or journeys through Amazon SES.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/EmailChannelRequest AWS API Documentation
     #
     class EmailChannelRequest < Struct.new(
@@ -6065,7 +4164,8 @@ module Aws::Pinpoint
       :enabled,
       :from_address,
       :identity,
-      :role_arn)
+      :role_arn,
+      :orchestration_sending_role_arn)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -6146,6 +4246,11 @@ module Aws::Pinpoint
     #   channel.
     #   @return [String]
     #
+    # @!attribute [rw] orchestration_sending_role_arn
+    #   The ARN of an IAM role for Amazon Pinpoint to use to send email from
+    #   your campaigns or journeys through Amazon SES.
+    #   @return [String]
+    #
     # @!attribute [rw] version
     #   The current version of the email channel.
     #   @return [Integer]
@@ -6167,6 +4272,7 @@ module Aws::Pinpoint
       :messages_per_second,
       :platform,
       :role_arn,
+      :orchestration_sending_role_arn,
       :version)
       SENSITIVE = []
       include Aws::Structure
@@ -6174,36 +4280,6 @@ module Aws::Pinpoint
 
     # Specifies the default settings and content for a one-time email
     # message that's sent directly to an endpoint.
-    #
-    # @note When making an API call, you may pass EmailMessage
-    #   data as a hash:
-    #
-    #       {
-    #         body: "__string",
-    #         feedback_forwarding_address: "__string",
-    #         from_address: "__string",
-    #         raw_email: {
-    #           data: "data",
-    #         },
-    #         reply_to_addresses: ["__string"],
-    #         simple_email: {
-    #           html_part: {
-    #             charset: "__string",
-    #             data: "__string",
-    #           },
-    #           subject: {
-    #             charset: "__string",
-    #             data: "__string",
-    #           },
-    #           text_part: {
-    #             charset: "__string",
-    #             data: "__string",
-    #           },
-    #         },
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #       }
     #
     # @!attribute [rw] body
     #   The body of the email message.
@@ -6255,18 +4331,6 @@ module Aws::Pinpoint
     # Specifies the settings for an email activity in a journey. This type
     # of activity sends an email message to participants.
     #
-    # @note When making an API call, you may pass EmailMessageActivity
-    #   data as a hash:
-    #
-    #       {
-    #         message_config: {
-    #           from_address: "__string",
-    #         },
-    #         next_activity: "__string",
-    #         template_name: "__string",
-    #         template_version: "__string",
-    #       }
-    #
     # @!attribute [rw] message_config
     #   Specifies the sender address for an email message that's sent to
     #   participants in the journey.
@@ -6313,21 +4377,6 @@ module Aws::Pinpoint
     # Specifies the content and settings for a message template that can be
     # used in messages that are sent through the email channel.
     #
-    # @note When making an API call, you may pass EmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         default_substitutions: "__string",
-    #         html_part: "__string",
-    #         recommender_id: "__string",
-    #         subject: "__string",
-    #         tags: {
-    #           "__string" => "__string",
-    #         },
-    #         template_description: "__string",
-    #         text_part: "__string",
-    #       }
-    #
     # @!attribute [rw] default_substitutions
     #   A JSON object that specifies the default values to use for message
     #   variables in the message template. This object is a set of key-value
@@ -6358,10 +4407,35 @@ module Aws::Pinpoint
     #   on the message template.
     #   @return [String]
     #
+    # @!attribute [rw] headers
+    #   The list of [MessageHeaders][1] for the email. You can have up to 15
+    #   Headers.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/templates-template-name-email.html#templates-template-name-email-model-messageheader
+    #   @return [Array<Types::MessageHeader>]
+    #
     # @!attribute [rw] tags
-    #   A string-to-string map of key-value pairs that defines the tags to
-    #   associate with the message template. Each tag consists of a required
-    #   tag key and an associated tag value.
+    #   <note markdown="1">As of **22-05-2023** tags has been deprecated for update operations.
+    #   After this date any value in tags is not processed and an error code
+    #   is not returned. To manage tags we recommend using either [Tags][1]
+    #   in the *API Reference for Amazon Pinpoint*,
+    #   [resourcegroupstaggingapi][2] commands in the *AWS Command Line
+    #   Interface Documentation* or [resourcegroupstaggingapi][3] in the
+    #   *AWS SDK*.
+    #
+    #   </note>
+    #
+    #   (Deprecated) A string-to-string map of key-value pairs that defines
+    #   the tags to associate with the message template. Each tag consists
+    #   of a required tag key and an associated tag value.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/tags-resource-arn.html
+    #   [2]: https://docs.aws.amazon.com/cli/latest/reference/resourcegroupstaggingapi/index.html
+    #   [3]: https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/resourcegroupstaggingapi/package-summary.html
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] template_description
@@ -6383,6 +4457,7 @@ module Aws::Pinpoint
       :html_part,
       :recommender_id,
       :subject,
+      :headers,
       :tags,
       :template_description,
       :text_part)
@@ -6430,6 +4505,9 @@ module Aws::Pinpoint
     #   based on the message template.
     #   @return [String]
     #
+    # @!attribute [rw] headers
+    #   @return [Array<Types::MessageHeader>]
+    #
     # @!attribute [rw] tags
     #   A string-to-string map of key-value pairs that identifies the tags
     #   that are associated with the message template. Each tag consists of
@@ -6470,6 +4548,7 @@ module Aws::Pinpoint
       :last_modified_date,
       :recommender_id,
       :subject,
+      :headers,
       :tags,
       :template_description,
       :template_name,
@@ -6482,49 +4561,6 @@ module Aws::Pinpoint
 
     # Specifies an endpoint to create or update and the settings and
     # attributes to set or change for the endpoint.
-    #
-    # @note When making an API call, you may pass EndpointBatchItem
-    #   data as a hash:
-    #
-    #       {
-    #         address: "__string",
-    #         attributes: {
-    #           "__string" => ["__string"],
-    #         },
-    #         channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #         demographic: {
-    #           app_version: "__string",
-    #           locale: "__string",
-    #           make: "__string",
-    #           model: "__string",
-    #           model_version: "__string",
-    #           platform: "__string",
-    #           platform_version: "__string",
-    #           timezone: "__string",
-    #         },
-    #         effective_date: "__string",
-    #         endpoint_status: "__string",
-    #         id: "__string",
-    #         location: {
-    #           city: "__string",
-    #           country: "__string",
-    #           latitude: 1.0,
-    #           longitude: 1.0,
-    #           postal_code: "__string",
-    #           region: "__string",
-    #         },
-    #         metrics: {
-    #           "__string" => 1.0,
-    #         },
-    #         opt_out: "__string",
-    #         request_id: "__string",
-    #         user: {
-    #           user_attributes: {
-    #             "__string" => ["__string"],
-    #           },
-    #           user_id: "__string",
-    #         },
-    #       }
     #
     # @!attribute [rw] address
     #   The destination address for messages or push notifications that you
@@ -6581,7 +4617,9 @@ module Aws::Pinpoint
     #   @return [String]
     #
     # @!attribute [rw] id
-    #   The unique identifier for the endpoint in the context of the batch.
+    #   The case insensitive unique identifier for the endpoint in the
+    #   context of the batch. The identifier can't contain `$`, `\{` or
+    #   `\}`.
     #   @return [String]
     #
     # @!attribute [rw] location
@@ -6634,53 +4672,6 @@ module Aws::Pinpoint
     # Specifies a batch of endpoints to create or update and the settings
     # and attributes to set or change for each endpoint.
     #
-    # @note When making an API call, you may pass EndpointBatchRequest
-    #   data as a hash:
-    #
-    #       {
-    #         item: [ # required
-    #           {
-    #             address: "__string",
-    #             attributes: {
-    #               "__string" => ["__string"],
-    #             },
-    #             channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #             demographic: {
-    #               app_version: "__string",
-    #               locale: "__string",
-    #               make: "__string",
-    #               model: "__string",
-    #               model_version: "__string",
-    #               platform: "__string",
-    #               platform_version: "__string",
-    #               timezone: "__string",
-    #             },
-    #             effective_date: "__string",
-    #             endpoint_status: "__string",
-    #             id: "__string",
-    #             location: {
-    #               city: "__string",
-    #               country: "__string",
-    #               latitude: 1.0,
-    #               longitude: 1.0,
-    #               postal_code: "__string",
-    #               region: "__string",
-    #             },
-    #             metrics: {
-    #               "__string" => 1.0,
-    #             },
-    #             opt_out: "__string",
-    #             request_id: "__string",
-    #             user: {
-    #               user_attributes: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               user_id: "__string",
-    #             },
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] item
     #   An array that defines the endpoints to create or update and, for
     #   each endpoint, the property values to set or change. An array can
@@ -6697,20 +4688,6 @@ module Aws::Pinpoint
 
     # Specifies demographic information about an endpoint, such as the
     # applicable time zone and platform.
-    #
-    # @note When making an API call, you may pass EndpointDemographic
-    #   data as a hash:
-    #
-    #       {
-    #         app_version: "__string",
-    #         locale: "__string",
-    #         make: "__string",
-    #         model: "__string",
-    #         model_version: "__string",
-    #         platform: "__string",
-    #         platform_version: "__string",
-    #         timezone: "__string",
-    #       }
     #
     # @!attribute [rw] app_version
     #   The version of the app that's associated with the endpoint.
@@ -6787,18 +4764,6 @@ module Aws::Pinpoint
 
     # Specifies geographic information about an endpoint.
     #
-    # @note When making an API call, you may pass EndpointLocation
-    #   data as a hash:
-    #
-    #       {
-    #         city: "__string",
-    #         country: "__string",
-    #         latitude: 1.0,
-    #         longitude: 1.0,
-    #         postal_code: "__string",
-    #         region: "__string",
-    #       }
-    #
     # @!attribute [rw] city
     #   The name of the city where the endpoint is located.
     #   @return [String]
@@ -6872,8 +4837,6 @@ module Aws::Pinpoint
     #   * THROTTLED - Amazon Pinpoint throttled the operation to send the
     #     message to the endpoint.
     #
-    #   * TIMEOUT - The message couldn't be sent within the timeout period.
-    #
     #   * UNKNOWN\_FAILURE - An unknown error occurred.
     #   @return [String]
     #
@@ -6909,48 +4872,6 @@ module Aws::Pinpoint
     end
 
     # Specifies the channel type and other settings for an endpoint.
-    #
-    # @note When making an API call, you may pass EndpointRequest
-    #   data as a hash:
-    #
-    #       {
-    #         address: "__string",
-    #         attributes: {
-    #           "__string" => ["__string"],
-    #         },
-    #         channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #         demographic: {
-    #           app_version: "__string",
-    #           locale: "__string",
-    #           make: "__string",
-    #           model: "__string",
-    #           model_version: "__string",
-    #           platform: "__string",
-    #           platform_version: "__string",
-    #           timezone: "__string",
-    #         },
-    #         effective_date: "__string",
-    #         endpoint_status: "__string",
-    #         location: {
-    #           city: "__string",
-    #           country: "__string",
-    #           latitude: 1.0,
-    #           longitude: 1.0,
-    #           postal_code: "__string",
-    #           region: "__string",
-    #         },
-    #         metrics: {
-    #           "__string" => 1.0,
-    #         },
-    #         opt_out: "__string",
-    #         request_id: "__string",
-    #         user: {
-    #           user_attributes: {
-    #             "__string" => ["__string"],
-    #           },
-    #           user_id: "__string",
-    #         },
-    #       }
     #
     # @!attribute [rw] address
     #   The destination address for messages or push notifications that you
@@ -7178,21 +5099,6 @@ module Aws::Pinpoint
     # Specifies the content, including message variables and attributes, to
     # use in a message that's sent directly to an endpoint.
     #
-    # @note When making an API call, you may pass EndpointSendConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         body_override: "__string",
-    #         context: {
-    #           "__string" => "__string",
-    #         },
-    #         raw_content: "__string",
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #         title_override: "__string",
-    #       }
-    #
     # @!attribute [rw] body_override
     #   The body of the message. If specified, this value overrides the
     #   default message body.
@@ -7239,16 +5145,6 @@ module Aws::Pinpoint
 
     # Specifies data for one or more attributes that describe the user
     # who's associated with an endpoint.
-    #
-    # @note When making an API call, you may pass EndpointUser
-    #   data as a hash:
-    #
-    #       {
-    #         user_attributes: {
-    #           "__string" => ["__string"],
-    #         },
-    #         user_id: "__string",
-    #       }
     #
     # @!attribute [rw] user_attributes
     #   One or more custom attributes that describe the user by associating
@@ -7297,31 +5193,6 @@ module Aws::Pinpoint
 
     # Specifies information about an event that reports data to Amazon
     # Pinpoint.
-    #
-    # @note When making an API call, you may pass Event
-    #   data as a hash:
-    #
-    #       {
-    #         app_package_name: "__string",
-    #         app_title: "__string",
-    #         app_version_code: "__string",
-    #         attributes: {
-    #           "__string" => "__string",
-    #         },
-    #         client_sdk_version: "__string",
-    #         event_type: "__string", # required
-    #         metrics: {
-    #           "__string" => 1.0,
-    #         },
-    #         sdk_name: "__string",
-    #         session: {
-    #           duration: 1,
-    #           id: "__string", # required
-    #           start_timestamp: "__string", # required
-    #           stop_timestamp: "__string",
-    #         },
-    #         timestamp: "__string", # required
-    #       }
     #
     # @!attribute [rw] app_package_name
     #   The package name of the app that's recording the event.
@@ -7383,31 +5254,6 @@ module Aws::Pinpoint
     # Specifies the conditions to evaluate for an event that applies to an
     # activity in a journey.
     #
-    # @note When making an API call, you may pass EventCondition
-    #   data as a hash:
-    #
-    #       {
-    #         dimensions: {
-    #           attributes: {
-    #             "__string" => {
-    #               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #               values: ["__string"], # required
-    #             },
-    #           },
-    #           event_type: {
-    #             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #             values: ["__string"], # required
-    #           },
-    #           metrics: {
-    #             "__string" => {
-    #               comparison_operator: "__string", # required
-    #               value: 1.0, # required
-    #             },
-    #           },
-    #         },
-    #         message_activity: "__string",
-    #       }
-    #
     # @!attribute [rw] dimensions
     #   The dimensions for the event filter to use for the activity.
     #   @return [Types::EventDimensions]
@@ -7428,28 +5274,6 @@ module Aws::Pinpoint
 
     # Specifies the dimensions for an event filter that determines when a
     # campaign is sent or a journey activity is performed.
-    #
-    # @note When making an API call, you may pass EventDimensions
-    #   data as a hash:
-    #
-    #       {
-    #         attributes: {
-    #           "__string" => {
-    #             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #             values: ["__string"], # required
-    #           },
-    #         },
-    #         event_type: {
-    #           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #           values: ["__string"], # required
-    #         },
-    #         metrics: {
-    #           "__string" => {
-    #             comparison_operator: "__string", # required
-    #             value: 1.0, # required
-    #           },
-    #         },
-    #       }
     #
     # @!attribute [rw] attributes
     #   One or more custom attributes that your application reports to
@@ -7488,31 +5312,6 @@ module Aws::Pinpoint
 
     # Specifies the settings for an event that causes a campaign to be sent
     # or a journey activity to be performed.
-    #
-    # @note When making an API call, you may pass EventFilter
-    #   data as a hash:
-    #
-    #       {
-    #         dimensions: { # required
-    #           attributes: {
-    #             "__string" => {
-    #               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #               values: ["__string"], # required
-    #             },
-    #           },
-    #           event_type: {
-    #             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #             values: ["__string"], # required
-    #           },
-    #           metrics: {
-    #             "__string" => {
-    #               comparison_operator: "__string", # required
-    #               value: 1.0, # required
-    #             },
-    #           },
-    #         },
-    #         filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #       }
     #
     # @!attribute [rw] dimensions
     #   The dimensions for the event filter to use for the campaign or the
@@ -7564,34 +5363,6 @@ module Aws::Pinpoint
     # Specifies the settings for an event that causes a journey activity to
     # start.
     #
-    # @note When making an API call, you may pass EventStartCondition
-    #   data as a hash:
-    #
-    #       {
-    #         event_filter: {
-    #           dimensions: { # required
-    #             attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             event_type: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             metrics: {
-    #               "__string" => {
-    #                 comparison_operator: "__string", # required
-    #                 value: 1.0, # required
-    #               },
-    #             },
-    #           },
-    #           filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #         },
-    #         segment_id: "__string",
-    #       }
-    #
     # @!attribute [rw] event_filter
     #   Specifies the settings for an event that causes a campaign to be
     #   sent or a journey activity to be performed.
@@ -7622,10 +5393,10 @@ module Aws::Pinpoint
     #   to.
     #
     #   For a Kinesis data stream, the ARN format is:
-    #   arn:aws:kinesis:*region*\:*account-id*\:stream/*stream\_name*
+    #   arn:aws:kinesis:*region*:*account-id*:stream/*stream\_name*
     #
     #   For a Kinesis Data Firehose delivery stream, the ARN format is:
-    #   arn:aws:firehose:*region*\:*account-id*\:deliverystream/*stream\_name*
+    #   arn:aws:firehose:*region*:*account-id*:deliverystream/*stream\_name*
     #   @return [String]
     #
     # @!attribute [rw] external_id
@@ -7666,73 +5437,6 @@ module Aws::Pinpoint
 
     # Specifies a batch of endpoints and events to process.
     #
-    # @note When making an API call, you may pass EventsBatch
-    #   data as a hash:
-    #
-    #       {
-    #         endpoint: { # required
-    #           address: "__string",
-    #           attributes: {
-    #             "__string" => ["__string"],
-    #           },
-    #           channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #           demographic: {
-    #             app_version: "__string",
-    #             locale: "__string",
-    #             make: "__string",
-    #             model: "__string",
-    #             model_version: "__string",
-    #             platform: "__string",
-    #             platform_version: "__string",
-    #             timezone: "__string",
-    #           },
-    #           effective_date: "__string",
-    #           endpoint_status: "__string",
-    #           location: {
-    #             city: "__string",
-    #             country: "__string",
-    #             latitude: 1.0,
-    #             longitude: 1.0,
-    #             postal_code: "__string",
-    #             region: "__string",
-    #           },
-    #           metrics: {
-    #             "__string" => 1.0,
-    #           },
-    #           opt_out: "__string",
-    #           request_id: "__string",
-    #           user: {
-    #             user_attributes: {
-    #               "__string" => ["__string"],
-    #             },
-    #             user_id: "__string",
-    #           },
-    #         },
-    #         events: { # required
-    #           "__string" => {
-    #             app_package_name: "__string",
-    #             app_title: "__string",
-    #             app_version_code: "__string",
-    #             attributes: {
-    #               "__string" => "__string",
-    #             },
-    #             client_sdk_version: "__string",
-    #             event_type: "__string", # required
-    #             metrics: {
-    #               "__string" => 1.0,
-    #             },
-    #             sdk_name: "__string",
-    #             session: {
-    #               duration: 1,
-    #               id: "__string", # required
-    #               start_timestamp: "__string", # required
-    #               stop_timestamp: "__string",
-    #             },
-    #             timestamp: "__string", # required
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] endpoint
     #   A set of properties and attributes that are associated with the
     #   endpoint.
@@ -7752,77 +5456,6 @@ module Aws::Pinpoint
     end
 
     # Specifies a batch of events to process.
-    #
-    # @note When making an API call, you may pass EventsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         batch_item: { # required
-    #           "__string" => {
-    #             endpoint: { # required
-    #               address: "__string",
-    #               attributes: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #               demographic: {
-    #                 app_version: "__string",
-    #                 locale: "__string",
-    #                 make: "__string",
-    #                 model: "__string",
-    #                 model_version: "__string",
-    #                 platform: "__string",
-    #                 platform_version: "__string",
-    #                 timezone: "__string",
-    #               },
-    #               effective_date: "__string",
-    #               endpoint_status: "__string",
-    #               location: {
-    #                 city: "__string",
-    #                 country: "__string",
-    #                 latitude: 1.0,
-    #                 longitude: 1.0,
-    #                 postal_code: "__string",
-    #                 region: "__string",
-    #               },
-    #               metrics: {
-    #                 "__string" => 1.0,
-    #               },
-    #               opt_out: "__string",
-    #               request_id: "__string",
-    #               user: {
-    #                 user_attributes: {
-    #                   "__string" => ["__string"],
-    #                 },
-    #                 user_id: "__string",
-    #               },
-    #             },
-    #             events: { # required
-    #               "__string" => {
-    #                 app_package_name: "__string",
-    #                 app_title: "__string",
-    #                 app_version_code: "__string",
-    #                 attributes: {
-    #                   "__string" => "__string",
-    #                 },
-    #                 client_sdk_version: "__string",
-    #                 event_type: "__string", # required
-    #                 metrics: {
-    #                   "__string" => 1.0,
-    #                 },
-    #                 sdk_name: "__string",
-    #                 session: {
-    #                   duration: 1,
-    #                   id: "__string", # required
-    #                   start_timestamp: "__string", # required
-    #                   stop_timestamp: "__string",
-    #                 },
-    #                 timestamp: "__string", # required
-    #               },
-    #             },
-    #           },
-    #         },
-    #       }
     #
     # @!attribute [rw] batch_item
     #   The batch of events to process. For each item in a batch, the
@@ -7860,16 +5493,6 @@ module Aws::Pinpoint
 
     # Specifies the settings for a job that exports endpoint definitions to
     # an Amazon Simple Storage Service (Amazon S3) bucket.
-    #
-    # @note When making an API call, you may pass ExportJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         role_arn: "__string", # required
-    #         s3_url_prefix: "__string", # required
-    #         segment_id: "__string",
-    #         segment_version: 1,
-    #       }
     #
     # @!attribute [rw] role_arn
     #   The Amazon Resource Name (ARN) of the AWS Identity and Access
@@ -8086,28 +5709,37 @@ module Aws::Pinpoint
     # notifications through the Firebase Cloud Messaging (FCM), formerly
     # Google Cloud Messaging (GCM), service.
     #
-    # @note When making an API call, you may pass GCMChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_key: "__string", # required
-    #         enabled: false,
-    #       }
-    #
     # @!attribute [rw] api_key
     #   The Web API Key, also referred to as an *API\_KEY* or *server key*,
     #   that you received from Google to communicate with Google services.
+    #   @return [String]
+    #
+    # @!attribute [rw] default_authentication_method
+    #   The default authentication method used for GCM. Values are either
+    #   "TOKEN" or "KEY". Defaults to "KEY".
     #   @return [String]
     #
     # @!attribute [rw] enabled
     #   Specifies whether to enable the GCM channel for the application.
     #   @return [Boolean]
     #
+    # @!attribute [rw] service_json
+    #   The contents of the JSON file provided by Google during registration
+    #   in order to generate an access token for authentication. For more
+    #   information see [Migrate from legacy FCM APIs to HTTP v1][1].
+    #
+    #
+    #
+    #   [1]: https://firebase.google.com/docs/cloud-messaging/migrate-v1
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GCMChannelRequest AWS API Documentation
     #
     class GCMChannelRequest < Struct.new(
       :api_key,
-      :enabled)
+      :default_authentication_method,
+      :enabled,
+      :service_json)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -8131,6 +5763,11 @@ module Aws::Pinpoint
     #   that you received from Google to communicate with Google services.
     #   @return [String]
     #
+    # @!attribute [rw] default_authentication_method
+    #   The default authentication method used for GCM. Values are either
+    #   "TOKEN" or "KEY". Defaults to "KEY".
+    #   @return [String]
+    #
     # @!attribute [rw] enabled
     #   Specifies whether the GCM channel is enabled for the application.
     #   @return [Boolean]
@@ -8138,6 +5775,11 @@ module Aws::Pinpoint
     # @!attribute [rw] has_credential
     #   (Not used) This property is retained only for backward
     #   compatibility.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] has_fcm_service_credentials
+    #   Returns true if the JSON file provided by Google during registration
+    #   process was used in the **ServiceJson** field of the request.
     #   @return [Boolean]
     #
     # @!attribute [rw] id
@@ -8172,8 +5814,10 @@ module Aws::Pinpoint
       :application_id,
       :creation_date,
       :credential,
+      :default_authentication_method,
       :enabled,
       :has_credential,
+      :has_fcm_service_credentials,
       :id,
       :is_archived,
       :last_modified_by,
@@ -8188,33 +5832,6 @@ module Aws::Pinpoint
     # an endpoint through the GCM channel. The GCM channel enables Amazon
     # Pinpoint to send messages to the Firebase Cloud Messaging (FCM),
     # formerly Google Cloud Messaging (GCM), service.
-    #
-    # @note When making an API call, you may pass GCMMessage
-    #   data as a hash:
-    #
-    #       {
-    #         action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #         body: "__string",
-    #         collapse_key: "__string",
-    #         data: {
-    #           "__string" => "__string",
-    #         },
-    #         icon_reference: "__string",
-    #         image_icon_url: "__string",
-    #         image_url: "__string",
-    #         priority: "__string",
-    #         raw_content: "__string",
-    #         restricted_package_name: "__string",
-    #         silent_push: false,
-    #         small_image_icon_url: "__string",
-    #         sound: "__string",
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #         time_to_live: 1,
-    #         title: "__string",
-    #         url: "__string",
-    #       }
     #
     # @!attribute [rw] action
     #   The action to occur if the recipient taps the push notification.
@@ -8264,6 +5881,12 @@ module Aws::Pinpoint
     #
     # @!attribute [rw] image_url
     #   The URL of an image to display in the push notification.
+    #   @return [String]
+    #
+    # @!attribute [rw] preferred_authentication_method
+    #   The preferred authentication method, with valid values "KEY" or
+    #   "TOKEN". If a value isn't provided then the
+    #   **DefaultAuthenticationMethod** is used.
     #   @return [String]
     #
     # @!attribute [rw] priority
@@ -8352,6 +5975,7 @@ module Aws::Pinpoint
       :icon_reference,
       :image_icon_url,
       :image_url,
+      :preferred_authentication_method,
       :priority,
       :raw_content,
       :restricted_package_name,
@@ -8367,14 +5991,6 @@ module Aws::Pinpoint
     end
 
     # Specifies the GPS coordinates of a location.
-    #
-    # @note When making an API call, you may pass GPSCoordinates
-    #   data as a hash:
-    #
-    #       {
-    #         latitude: 1.0, # required
-    #         longitude: 1.0, # required
-    #       }
     #
     # @!attribute [rw] latitude
     #   The latitude coordinate of the location.
@@ -8396,17 +6012,6 @@ module Aws::Pinpoint
     # Specifies GPS-based criteria for including or excluding endpoints from
     # a segment.
     #
-    # @note When making an API call, you may pass GPSPointDimension
-    #   data as a hash:
-    #
-    #       {
-    #         coordinates: { # required
-    #           latitude: 1.0, # required
-    #           longitude: 1.0, # required
-    #         },
-    #         range_in_kilometers: 1.0,
-    #       }
-    #
     # @!attribute [rw] coordinates
     #   The GPS coordinates to measure distance from.
     #   @return [Types::GPSCoordinates]
@@ -8424,13 +6029,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetAdmChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8455,13 +6053,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetApnsChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8486,13 +6077,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetApnsSandboxChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8518,13 +6102,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetApnsVoipChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8549,13 +6126,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetApnsVoipSandboxChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8581,13 +6151,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetAppRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8611,18 +6174,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetApplicationDateRangeKpiRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         end_time: Time.now,
-    #         kpi_name: "__string", # required
-    #         next_token: "__string",
-    #         page_size: "__string",
-    #         start_time: Time.now,
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8668,13 +6219,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetApplicationSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8699,14 +6243,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetAppsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         page_size: "__string",
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] page_size
     #   @return [String]
     #
@@ -8734,13 +6270,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetBaiduChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8765,16 +6294,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCampaignActivitiesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         campaign_id: "__string", # required
-    #         page_size: "__string",
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8811,19 +6330,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCampaignDateRangeKpiRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         campaign_id: "__string", # required
-    #         end_time: Time.now,
-    #         kpi_name: "__string", # required
-    #         next_token: "__string",
-    #         page_size: "__string",
-    #         start_time: Time.now,
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8873,14 +6379,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCampaignRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         campaign_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8909,15 +6407,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCampaignVersionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         campaign_id: "__string", # required
-    #         version: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8950,16 +6439,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCampaignVersionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         campaign_id: "__string", # required
-    #         page_size: "__string",
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -8996,15 +6475,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCampaignsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         page_size: "__string",
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9037,13 +6507,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetChannelsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9069,13 +6532,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetEmailChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9100,14 +6556,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] template_name
     #   @return [String]
     #
@@ -9137,14 +6585,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetEndpointRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         endpoint_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9173,13 +6613,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetEventStreamRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9204,14 +6637,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetExportJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         job_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9243,15 +6668,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetExportJobsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         page_size: "__string",
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9285,13 +6701,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetGcmChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9318,14 +6727,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetImportJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         job_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9357,15 +6758,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetImportJobsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         page_size: "__string",
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9400,19 +6792,60 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetJourneyDateRangeKpiRequest
-    #   data as a hash:
+    # @!attribute [rw] application_id
+    #   @return [String]
     #
-    #       {
-    #         application_id: "__string", # required
-    #         end_time: Time.now,
-    #         journey_id: "__string", # required
-    #         kpi_name: "__string", # required
-    #         next_token: "__string",
-    #         page_size: "__string",
-    #         start_time: Time.now,
-    #       }
+    # @!attribute [rw] endpoint_id
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GetInAppMessagesRequest AWS API Documentation
+    #
+    class GetInAppMessagesRequest < Struct.new(
+      :application_id,
+      :endpoint_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] in_app_messages_response
+    #   Get in-app messages response object.
+    #   @return [Types::InAppMessagesResponse]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GetInAppMessagesResponse AWS API Documentation
+    #
+    class GetInAppMessagesResponse < Struct.new(
+      :in_app_messages_response)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] template_name
+    #   @return [String]
+    #
+    # @!attribute [rw] version
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GetInAppTemplateRequest AWS API Documentation
+    #
+    class GetInAppTemplateRequest < Struct.new(
+      :template_name,
+      :version)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] in_app_template_response
+    #   In-App Template Response.
+    #   @return [Types::InAppTemplateResponse]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GetInAppTemplateResponse AWS API Documentation
+    #
+    class GetInAppTemplateResponse < Struct.new(
+      :in_app_template_response)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9462,17 +6895,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetJourneyExecutionActivityMetricsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         journey_activity_id: "__string", # required
-    #         journey_id: "__string", # required
-    #         next_token: "__string",
-    #         page_size: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9514,16 +6936,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetJourneyExecutionMetricsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         journey_id: "__string", # required
-    #         next_token: "__string",
-    #         page_size: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9561,14 +6973,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetJourneyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         journey_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9597,14 +7001,127 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetPushTemplateRequest
-    #   data as a hash:
+    # @!attribute [rw] application_id
+    #   @return [String]
     #
-    #       {
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
+    # @!attribute [rw] journey_activity_id
+    #   @return [String]
     #
+    # @!attribute [rw] journey_id
+    #   @return [String]
+    #
+    # @!attribute [rw] next_token
+    #   @return [String]
+    #
+    # @!attribute [rw] page_size
+    #   @return [String]
+    #
+    # @!attribute [rw] run_id
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GetJourneyRunExecutionActivityMetricsRequest AWS API Documentation
+    #
+    class GetJourneyRunExecutionActivityMetricsRequest < Struct.new(
+      :application_id,
+      :journey_activity_id,
+      :journey_id,
+      :next_token,
+      :page_size,
+      :run_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] journey_run_execution_activity_metrics_response
+    #   Provides the results of a query that retrieved the data for a
+    #   standard execution metric that applies to a journey activity for a
+    #   particular journey run, and provides information about that query.
+    #   @return [Types::JourneyRunExecutionActivityMetricsResponse]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GetJourneyRunExecutionActivityMetricsResponse AWS API Documentation
+    #
+    class GetJourneyRunExecutionActivityMetricsResponse < Struct.new(
+      :journey_run_execution_activity_metrics_response)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] application_id
+    #   @return [String]
+    #
+    # @!attribute [rw] journey_id
+    #   @return [String]
+    #
+    # @!attribute [rw] next_token
+    #   @return [String]
+    #
+    # @!attribute [rw] page_size
+    #   @return [String]
+    #
+    # @!attribute [rw] run_id
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GetJourneyRunExecutionMetricsRequest AWS API Documentation
+    #
+    class GetJourneyRunExecutionMetricsRequest < Struct.new(
+      :application_id,
+      :journey_id,
+      :next_token,
+      :page_size,
+      :run_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] journey_run_execution_metrics_response
+    #   Provides the results of a query that retrieved the data for a
+    #   standard execution metric that applies to a journey run, and
+    #   provides information about that query.
+    #   @return [Types::JourneyRunExecutionMetricsResponse]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GetJourneyRunExecutionMetricsResponse AWS API Documentation
+    #
+    class GetJourneyRunExecutionMetricsResponse < Struct.new(
+      :journey_run_execution_metrics_response)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] application_id
+    #   @return [String]
+    #
+    # @!attribute [rw] journey_id
+    #   @return [String]
+    #
+    # @!attribute [rw] page_size
+    #   @return [String]
+    #
+    # @!attribute [rw] token
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GetJourneyRunsRequest AWS API Documentation
+    #
+    class GetJourneyRunsRequest < Struct.new(
+      :application_id,
+      :journey_id,
+      :page_size,
+      :token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] journey_runs_response
+    #   Provides information from all runs of a journey.
+    #   @return [Types::JourneyRunsResponse]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/GetJourneyRunsResponse AWS API Documentation
+    #
+    class GetJourneyRunsResponse < Struct.new(
+      :journey_runs_response)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] template_name
     #   @return [String]
     #
@@ -9634,13 +7151,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetRecommenderConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         recommender_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] recommender_id
     #   @return [String]
     #
@@ -9665,14 +7175,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetRecommenderConfigurationsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         page_size: "__string",
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] page_size
     #   @return [String]
     #
@@ -9701,16 +7203,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSegmentExportJobsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         page_size: "__string",
-    #         segment_id: "__string", # required
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9748,16 +7240,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSegmentImportJobsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         page_size: "__string",
-    #         segment_id: "__string", # required
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9796,14 +7278,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSegmentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         segment_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9832,15 +7306,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSegmentVersionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         segment_id: "__string", # required
-    #         version: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9873,16 +7338,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSegmentVersionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         page_size: "__string",
-    #         segment_id: "__string", # required
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9919,15 +7374,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSegmentsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         page_size: "__string",
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9960,13 +7406,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSmsChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -9991,14 +7430,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSmsTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] template_name
     #   @return [String]
     #
@@ -10028,14 +7459,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetUserEndpointsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         user_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -10064,13 +7487,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -10095,14 +7511,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] template_name
     #   @return [String]
     #
@@ -10136,14 +7544,6 @@ module Aws::Pinpoint
     # of activity stops a journey for a specified percentage of
     # participants.
     #
-    # @note When making an API call, you may pass HoldoutActivity
-    #   data as a hash:
-    #
-    #       {
-    #         next_activity: "__string",
-    #         percentage: 1, # required
-    #       }
-    #
     # @!attribute [rw] next_activity
     #   The unique identifier for the next activity to perform, after
     #   performing the holdout activity.
@@ -10169,20 +7569,6 @@ module Aws::Pinpoint
 
     # Specifies the settings for a job that imports endpoint definitions
     # from an Amazon Simple Storage Service (Amazon S3) bucket.
-    #
-    # @note When making an API call, you may pass ImportJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         define_segment: false,
-    #         external_id: "__string",
-    #         format: "CSV", # required, accepts CSV, JSON
-    #         register_endpoints: false,
-    #         role_arn: "__string", # required
-    #         s3_url: "__string", # required
-    #         segment_id: "__string",
-    #         segment_name: "__string",
-    #       }
     #
     # @!attribute [rw] define_segment
     #   Specifies whether to create a segment that contains the endpoints,
@@ -10448,6 +7834,357 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
+    # @!attribute [rw] end_date
+    #   The scheduled time after which the in-app message should not be
+    #   shown. Timestamp is in ISO 8601 format.
+    #   @return [String]
+    #
+    # @!attribute [rw] event_filter
+    #   The event filter the SDK has to use to show the in-app message in
+    #   the application.
+    #   @return [Types::CampaignEventFilter]
+    #
+    # @!attribute [rw] quiet_time
+    #   Time during which the in-app message should not be shown to the
+    #   user.
+    #   @return [Types::QuietTime]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/InAppCampaignSchedule AWS API Documentation
+    #
+    class InAppCampaignSchedule < Struct.new(
+      :end_date,
+      :event_filter,
+      :quiet_time)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides all fields required for building an in-app message.
+    #
+    # @!attribute [rw] content
+    #   In-app message content.
+    #   @return [Array<Types::InAppMessageContent>]
+    #
+    # @!attribute [rw] custom_config
+    #   Custom config to be sent to SDK.
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] layout
+    #   The layout of the message.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/InAppMessage AWS API Documentation
+    #
+    class InAppMessage < Struct.new(
+      :content,
+      :custom_config,
+      :layout)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Text config for Message Body.
+    #
+    # @!attribute [rw] alignment
+    #   The alignment of the text. Valid values: LEFT, CENTER, RIGHT.
+    #   @return [String]
+    #
+    # @!attribute [rw] body
+    #   Message Body.
+    #   @return [String]
+    #
+    # @!attribute [rw] text_color
+    #   The text color.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/InAppMessageBodyConfig AWS API Documentation
+    #
+    class InAppMessageBodyConfig < Struct.new(
+      :alignment,
+      :body,
+      :text_color)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Button Config for an in-app message.
+    #
+    # @!attribute [rw] android
+    #   Default button content.
+    #   @return [Types::OverrideButtonConfiguration]
+    #
+    # @!attribute [rw] default_config
+    #   Default button content.
+    #   @return [Types::DefaultButtonConfiguration]
+    #
+    # @!attribute [rw] ios
+    #   Default button content.
+    #   @return [Types::OverrideButtonConfiguration]
+    #
+    # @!attribute [rw] web
+    #   Default button content.
+    #   @return [Types::OverrideButtonConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/InAppMessageButton AWS API Documentation
+    #
+    class InAppMessageButton < Struct.new(
+      :android,
+      :default_config,
+      :ios,
+      :web)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] campaign_id
+    #   Campaign id of the corresponding campaign.
+    #   @return [String]
+    #
+    # @!attribute [rw] daily_cap
+    #   Daily cap which controls the number of times any in-app messages can
+    #   be shown to the endpoint during a day.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] in_app_message
+    #   In-app message content with all fields required for rendering an
+    #   in-app message.
+    #   @return [Types::InAppMessage]
+    #
+    # @!attribute [rw] priority
+    #   Priority of the in-app message.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] schedule
+    #   Schedule of the campaign.
+    #   @return [Types::InAppCampaignSchedule]
+    #
+    # @!attribute [rw] session_cap
+    #   Session cap which controls the number of times an in-app message can
+    #   be shown to the endpoint during an application session.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] total_cap
+    #   Total cap which controls the number of times an in-app message can
+    #   be shown to the endpoint.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] treatment_id
+    #   Treatment id of the campaign.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/InAppMessageCampaign AWS API Documentation
+    #
+    class InAppMessageCampaign < Struct.new(
+      :campaign_id,
+      :daily_cap,
+      :in_app_message,
+      :priority,
+      :schedule,
+      :session_cap,
+      :total_cap,
+      :treatment_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The configuration for the message content.
+    #
+    # @!attribute [rw] background_color
+    #   The background color for the message.
+    #   @return [String]
+    #
+    # @!attribute [rw] body_config
+    #   The configuration for the message body.
+    #   @return [Types::InAppMessageBodyConfig]
+    #
+    # @!attribute [rw] header_config
+    #   The configuration for the message header.
+    #   @return [Types::InAppMessageHeaderConfig]
+    #
+    # @!attribute [rw] image_url
+    #   The image url for the background of message.
+    #   @return [String]
+    #
+    # @!attribute [rw] primary_btn
+    #   The first button inside the message.
+    #   @return [Types::InAppMessageButton]
+    #
+    # @!attribute [rw] secondary_btn
+    #   The second button inside message.
+    #   @return [Types::InAppMessageButton]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/InAppMessageContent AWS API Documentation
+    #
+    class InAppMessageContent < Struct.new(
+      :background_color,
+      :body_config,
+      :header_config,
+      :image_url,
+      :primary_btn,
+      :secondary_btn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Text config for Message Header.
+    #
+    # @!attribute [rw] alignment
+    #   The alignment of the text. Valid values: LEFT, CENTER, RIGHT.
+    #   @return [String]
+    #
+    # @!attribute [rw] header
+    #   Message Header.
+    #   @return [String]
+    #
+    # @!attribute [rw] text_color
+    #   The text color.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/InAppMessageHeaderConfig AWS API Documentation
+    #
+    class InAppMessageHeaderConfig < Struct.new(
+      :alignment,
+      :header,
+      :text_color)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Get in-app messages response object.
+    #
+    # @!attribute [rw] in_app_message_campaigns
+    #   List of targeted in-app message campaigns.
+    #   @return [Array<Types::InAppMessageCampaign>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/InAppMessagesResponse AWS API Documentation
+    #
+    class InAppMessagesResponse < Struct.new(
+      :in_app_message_campaigns)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # In-App Template Request.
+    #
+    # @!attribute [rw] content
+    #   The content of the message, can include up to 5 modals. Each modal
+    #   must contain a message, a header, and background color. ImageUrl and
+    #   buttons are optional.
+    #   @return [Array<Types::InAppMessageContent>]
+    #
+    # @!attribute [rw] custom_config
+    #   Custom config to be sent to client.
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] layout
+    #   The layout of the message.
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   <note markdown="1">As of **22-05-2023** tags has been deprecated for update operations.
+    #   After this date any value in tags is not processed and an error code
+    #   is not returned. To manage tags we recommend using either [Tags][1]
+    #   in the *API Reference for Amazon Pinpoint*,
+    #   [resourcegroupstaggingapi][2] commands in the *AWS Command Line
+    #   Interface Documentation* or [resourcegroupstaggingapi][3] in the
+    #   *AWS SDK*.
+    #
+    #   </note>
+    #
+    #   (Deprecated) A string-to-string map of key-value pairs that defines
+    #   the tags to associate with the message template. Each tag consists
+    #   of a required tag key and an associated tag value.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/tags-resource-arn.html
+    #   [2]: https://docs.aws.amazon.com/cli/latest/reference/resourcegroupstaggingapi/index.html
+    #   [3]: https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/resourcegroupstaggingapi/package-summary.html
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] template_description
+    #   The description of the template.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/InAppTemplateRequest AWS API Documentation
+    #
+    class InAppTemplateRequest < Struct.new(
+      :content,
+      :custom_config,
+      :layout,
+      :tags,
+      :template_description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # In-App Template Response.
+    #
+    # @!attribute [rw] arn
+    #   The resource arn of the template.
+    #   @return [String]
+    #
+    # @!attribute [rw] content
+    #   The content of the message, can include up to 5 modals. Each modal
+    #   must contain a message, a header, and background color. ImageUrl and
+    #   buttons are optional.
+    #   @return [Array<Types::InAppMessageContent>]
+    #
+    # @!attribute [rw] creation_date
+    #   The creation date of the template.
+    #   @return [String]
+    #
+    # @!attribute [rw] custom_config
+    #   Custom config to be sent to client.
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] last_modified_date
+    #   The last modified date of the template.
+    #   @return [String]
+    #
+    # @!attribute [rw] layout
+    #   The layout of the message.
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   Tags map that contains arn and InternalId for API GW.
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] template_description
+    #   The description of the template.
+    #   @return [String]
+    #
+    # @!attribute [rw] template_name
+    #   The name of the template.
+    #   @return [String]
+    #
+    # @!attribute [rw] template_type
+    #   The type of channel that the message template is designed for. For
+    #   an in-app message template, this value is INAPP.
+    #   @return [String]
+    #
+    # @!attribute [rw] version
+    #   The version id of the template.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/InAppTemplateResponse AWS API Documentation
+    #
+    class InAppTemplateResponse < Struct.new(
+      :arn,
+      :content,
+      :creation_date,
+      :custom_config,
+      :last_modified_date,
+      :layout,
+      :tags,
+      :template_description,
+      :template_name,
+      :template_type,
+      :version)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Provides information about an API request or response.
     #
     # @!attribute [rw] message
@@ -10489,13 +8226,6 @@ module Aws::Pinpoint
 
     # Specifies the message content for a custom channel message that's
     # sent to participants in a journey.
-    #
-    # @note When making an API call, you may pass JourneyCustomMessage
-    #   data as a hash:
-    #
-    #       {
-    #         data: "__string",
-    #       }
     #
     # @!attribute [rw] data
     #   The message content that's passed to an AWS Lambda function or to a
@@ -10578,13 +8308,6 @@ module Aws::Pinpoint
     # Specifies the "From" address for an email message that's sent to
     # participants in a journey.
     #
-    # @note When making an API call, you may pass JourneyEmailMessage
-    #   data as a hash:
-    #
-    #       {
-    #         from_address: "__string",
-    #       }
-    #
     # @!attribute [rw] from_address
     #   The verified email address to send the email message from. The
     #   default address is the FromAddress specified for the email channel
@@ -10607,25 +8330,25 @@ module Aws::Pinpoint
     #   The type of activity that the metric applies to. Possible values
     #   are:
     #
-    #   * CONDITIONAL\_SPLIT - For a yes/no split activity, which is an
+    #   * CONDITIONAL\_SPLIT – For a yes/no split activity, which is an
     #     activity that sends participants down one of two paths in a
     #     journey.
     #
-    #   * HOLDOUT - For a holdout activity, which is an activity that stops
+    #   * HOLDOUT – For a holdout activity, which is an activity that stops
     #     a journey for a specified percentage of participants.
     #
-    #   * MESSAGE - For an email activity, which is an activity that sends
+    #   * MESSAGE – For an email activity, which is an activity that sends
     #     an email message to participants.
     #
-    #   * MULTI\_CONDITIONAL\_SPLIT - For a multivariate split activity,
+    #   * MULTI\_CONDITIONAL\_SPLIT – For a multivariate split activity,
     #     which is an activity that sends participants down one of as many
     #     as five paths in a journey.
     #
-    #   * RANDOM\_SPLIT - For a random split activity, which is an activity
+    #   * RANDOM\_SPLIT – For a random split activity, which is an activity
     #     that sends specified percentages of participants down one of as
     #     many as five paths in a journey.
     #
-    #   * WAIT - For a wait activity, which is an activity that waits for a
+    #   * WAIT – For a wait activity, which is an activity that waits for a
     #     certain amount of time or until a specific date and time before
     #     moving participants to the next activity in a journey.
     #   @return [String]
@@ -10715,15 +8438,6 @@ module Aws::Pinpoint
     # Specifies limits on the messages that a journey can send and the
     # number of times participants can enter a journey.
     #
-    # @note When making an API call, you may pass JourneyLimits
-    #   data as a hash:
-    #
-    #       {
-    #         daily_cap: 1,
-    #         endpoint_reentry_cap: 1,
-    #         messages_per_second: 1,
-    #       }
-    #
     # @!attribute [rw] daily_cap
     #   The maximum number of messages that the journey can send to a single
     #   participant during a 24-hour period. The maximum value is 100.
@@ -10740,12 +8454,31 @@ module Aws::Pinpoint
     #   second.
     #   @return [Integer]
     #
+    # @!attribute [rw] endpoint_reentry_interval
+    #   Minimum time that must pass before an endpoint can re-enter a given
+    #   journey.
+    #   @return [String]
+    #
+    # @!attribute [rw] timeframe_cap
+    #   The number of messages that an endpoint can receive during the
+    #   specified timeframe.
+    #   @return [Types::JourneyTimeframeCap]
+    #
+    # @!attribute [rw] total_cap
+    #   The maximum number of messages a journey can sent to a single
+    #   endpoint. The maximum value is 100. If set to 0, this limit will not
+    #   apply.
+    #   @return [Integer]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/JourneyLimits AWS API Documentation
     #
     class JourneyLimits < Struct.new(
       :daily_cap,
       :endpoint_reentry_cap,
-      :messages_per_second)
+      :messages_per_second,
+      :endpoint_reentry_interval,
+      :timeframe_cap,
+      :total_cap)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -10753,18 +8486,11 @@ module Aws::Pinpoint
     # Specifies the message configuration for a push notification that's
     # sent to participants in a journey.
     #
-    # @note When making an API call, you may pass JourneyPushMessage
-    #   data as a hash:
-    #
-    #       {
-    #         time_to_live: "__string",
-    #       }
-    #
     # @!attribute [rw] time_to_live
     #   The number of seconds that the push notification service should keep
     #   the message, if the service is unable to deliver the notification
     #   the first time. This value is converted to an expiration value when
-    #   it's sent to a push-notification service. If this value is 0, the
+    #   it's sent to a push notification service. If this value is 0, the
     #   service treats the notification as if it expires immediately and the
     #   service doesn't store or try to deliver the notification again.
     #
@@ -10776,6 +8502,26 @@ module Aws::Pinpoint
     #
     class JourneyPushMessage < Struct.new(
       :time_to_live)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The channel-specific configurations for the journey.
+    #
+    # @!attribute [rw] connect_campaign_arn
+    #   Amazon Resource Name (ARN) of the Connect Campaign.
+    #   @return [String]
+    #
+    # @!attribute [rw] connect_campaign_execution_role_arn
+    #   IAM role ARN to be assumed when invoking Connect campaign execution
+    #   APIs for dialing.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/JourneyChannelSettings AWS API Documentation
+    #
+    class JourneyChannelSettings < Struct.new(
+      :connect_campaign_arn,
+      :connect_campaign_execution_role_arn)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -10871,6 +8617,10 @@ module Aws::Pinpoint
     #     status is ACTIVE, you can't add, change, or remove activities
     #     from it.
     #
+    #   * PAUSED - The journey has been paused. Amazon Pinpoint continues to
+    #     perform activities that are currently in progress, until those
+    #     activities are complete.
+    #
     #   * COMPLETED - The journey has been published and has finished
     #     running. All participants have entered the journey and no
     #     participants are waiting to complete the journey or any activities
@@ -10894,6 +8644,58 @@ module Aws::Pinpoint
     #   This object is not used or supported.
     #   @return [Hash<String,String>]
     #
+    # @!attribute [rw] wait_for_quiet_time
+    #   Indicates whether endpoints in quiet hours should enter a wait
+    #   activity until quiet hours have elapsed.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] refresh_on_segment_update
+    #   Indicates whether the journey participants should be refreshed when
+    #   a segment is updated.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] journey_channel_settings
+    #   Amazon Resource Name (ARN) of the Connect Campaign.
+    #   @return [Types::JourneyChannelSettings]
+    #
+    # @!attribute [rw] sending_schedule
+    #   Indicates if journey has Advance Quiet Time enabled. This flag
+    #   should be set to true in order to allow using OpenHours and
+    #   ClosedDays.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] open_hours
+    #   The time when a journey can send messages. QuietTime should be
+    #   configured first and SendingSchedule should be set to true.
+    #   @return [Types::OpenHours]
+    #
+    # @!attribute [rw] closed_days
+    #   The time when a journey will not send messages. QuietTime should be
+    #   configured first and SendingSchedule should be set to true.
+    #   @return [Types::ClosedDays]
+    #
+    # @!attribute [rw] timezone_estimation_methods
+    #   An array of time zone estimation methods, if any, to use for
+    #   determining an [Endpoints][1] time zone if the Endpoint does not
+    #   have a value for the Demographic.Timezone attribute.
+    #
+    #   * PHONE\_NUMBER - A time zone is determined based on the
+    #     Endpoint.Address and Endpoint.Location.Country.
+    #
+    #   * POSTAL\_CODE - A time zone is determined based on the
+    #     Endpoint.Location.PostalCode and Endpoint.Location.Country.
+    #
+    #     <note markdown="1">POSTAL\_CODE detection is only supported in the United States,
+    #     United Kingdom, Australia, New Zealand, Canada, France, Italy,
+    #     Spain, Germany and in regions where Amazon Pinpoint is available.
+    #
+    #     </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-endpoints-endpoint-id.html
+    #   @return [Array<String>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/JourneyResponse AWS API Documentation
     #
     class JourneyResponse < Struct.new(
@@ -10911,7 +8713,191 @@ module Aws::Pinpoint
       :start_activity,
       :start_condition,
       :state,
-      :tags)
+      :tags,
+      :wait_for_quiet_time,
+      :refresh_on_segment_update,
+      :journey_channel_settings,
+      :sending_schedule,
+      :open_hours,
+      :closed_days,
+      :timezone_estimation_methods)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides the results of a query that retrieved the data for a standard
+    # execution metric that applies to a journey activity for a particular
+    # journey run, and provides information about that query.
+    #
+    # @!attribute [rw] activity_type
+    #   The type of activity that the metric applies to. Possible values
+    #   are:
+    #
+    #   * CONDITIONAL\_SPLIT – For a yes/no split activity, which is an
+    #     activity that sends participants down one of two paths in a
+    #     journey.
+    #
+    #   * HOLDOUT – For a holdout activity, which is an activity that stops
+    #     a journey for a specified percentage of participants.
+    #
+    #   * MESSAGE – For an email activity, which is an activity that sends
+    #     an email message to participants.
+    #
+    #   * MULTI\_CONDITIONAL\_SPLIT – For a multivariate split activity,
+    #     which is an activity that sends participants down one of as many
+    #     as five paths in a journey.
+    #
+    #   * RANDOM\_SPLIT – For a random split activity, which is an activity
+    #     that sends specified percentages of participants down one of as
+    #     many as five paths in a journey.
+    #
+    #   * WAIT – For a wait activity, which is an activity that waits for a
+    #     certain amount of time or until a specific date and time before
+    #     moving participants to the next activity in a journey.
+    #   @return [String]
+    #
+    # @!attribute [rw] application_id
+    #   The unique identifier for the application that the metric applies
+    #   to.
+    #   @return [String]
+    #
+    # @!attribute [rw] journey_activity_id
+    #   The unique identifier for the activity that the metric applies to.
+    #   @return [String]
+    #
+    # @!attribute [rw] journey_id
+    #   The unique identifier for the journey that the metric applies to.
+    #   @return [String]
+    #
+    # @!attribute [rw] last_evaluated_time
+    #   The date and time, in ISO 8601 format, when Amazon Pinpoint last
+    #   evaluated the execution status of the activity for this journey run
+    #   and updated the data for the metric.
+    #   @return [String]
+    #
+    # @!attribute [rw] metrics
+    #   A JSON object that contains the results of the query. For
+    #   information about the structure and contents of the results, see see
+    #   [Standard Amazon Pinpoint analytics metrics][1] in the *Amazon
+    #   Pinpoint Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com//pinpoint/latest/developerguide/analytics-standard-metrics.html
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] run_id
+    #   The unique identifier for the journey run that the metric applies
+    #   to.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/JourneyRunExecutionActivityMetricsResponse AWS API Documentation
+    #
+    class JourneyRunExecutionActivityMetricsResponse < Struct.new(
+      :activity_type,
+      :application_id,
+      :journey_activity_id,
+      :journey_id,
+      :last_evaluated_time,
+      :metrics,
+      :run_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides the results of a query that retrieved the data for a standard
+    # execution metric that applies to a journey run, and provides
+    # information about that query.
+    #
+    # @!attribute [rw] application_id
+    #   The unique identifier for the application that the metric applies
+    #   to.
+    #   @return [String]
+    #
+    # @!attribute [rw] journey_id
+    #   The unique identifier for the journey that the metric applies to.
+    #   @return [String]
+    #
+    # @!attribute [rw] last_evaluated_time
+    #   The date and time, in ISO 8601 format, when Amazon Pinpoint last
+    #   evaluated the journey run and updated the data for the metric.
+    #   @return [String]
+    #
+    # @!attribute [rw] metrics
+    #   A JSON object that contains the results of the query. For
+    #   information about the structure and contents of the results, see the
+    #   [Standard Amazon Pinpoint analytics metrics][1] in the *Amazon
+    #   Pinpoint Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com//pinpoint/latest/developerguide/analytics-standard-metrics.html
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] run_id
+    #   The unique identifier for the journey run that the metric applies
+    #   to.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/JourneyRunExecutionMetricsResponse AWS API Documentation
+    #
+    class JourneyRunExecutionMetricsResponse < Struct.new(
+      :application_id,
+      :journey_id,
+      :last_evaluated_time,
+      :metrics,
+      :run_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides information from a specified run of a journey.
+    #
+    # @!attribute [rw] creation_time
+    #   The time when the journey run was created or scheduled, in ISO 8601
+    #   format.
+    #   @return [String]
+    #
+    # @!attribute [rw] last_update_time
+    #   The last time the journey run was updated, in ISO 8601 format..
+    #   @return [String]
+    #
+    # @!attribute [rw] run_id
+    #   The unique identifier for the run.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The current status of the journey run.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/JourneyRunResponse AWS API Documentation
+    #
+    class JourneyRunResponse < Struct.new(
+      :creation_time,
+      :last_update_time,
+      :run_id,
+      :status)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides information from all runs of a journey.
+    #
+    # @!attribute [rw] item
+    #   An array of responses, one for each run of the journey
+    #   @return [Array<Types::JourneyRunResponse>]
+    #
+    # @!attribute [rw] next_token
+    #   The string to use in a subsequent request to get the next page of
+    #   results in a paginated response. This value is null if there are no
+    #   additional pages.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/JourneyRunsResponse AWS API Documentation
+    #
+    class JourneyRunsResponse < Struct.new(
+      :item,
+      :next_token)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -10919,19 +8905,19 @@ module Aws::Pinpoint
     # Specifies the sender ID and message type for an SMS message that's
     # sent to participants in a journey.
     #
-    # @note When making an API call, you may pass JourneySMSMessage
-    #   data as a hash:
-    #
-    #       {
-    #         message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #         sender_id: "__string",
-    #       }
-    #
     # @!attribute [rw] message_type
     #   The SMS message type. Valid values are TRANSACTIONAL (for messages
     #   that are critical or time-sensitive, such as a one-time passwords)
     #   and PROMOTIONAL (for messsages that aren't critical or
     #   time-sensitive, such as marketing messages).
+    #   @return [String]
+    #
+    # @!attribute [rw] origination_number
+    #   The long code to send the SMS message from. This value should be one
+    #   of the dedicated long codes that's assigned to your AWS account.
+    #   Although it isn't required, we recommend that you specify the long
+    #   code using an E.164 format to ensure prompt and accurate delivery of
+    #   the message. For example, +12065550100.
     #   @return [String]
     #
     # @!attribute [rw] sender_id
@@ -10945,25 +8931,29 @@ module Aws::Pinpoint
     #   [1]: https://docs.aws.amazon.com/pinpoint/latest/userguide/channels-sms-countries.html
     #   @return [String]
     #
+    # @!attribute [rw] entity_id
+    #   The entity ID or Principal Entity (PE) id received from the
+    #   regulatory body for sending SMS in your country.
+    #   @return [String]
+    #
+    # @!attribute [rw] template_id
+    #   The template ID received from the regulatory body for sending SMS in
+    #   your country.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/JourneySMSMessage AWS API Documentation
     #
     class JourneySMSMessage < Struct.new(
       :message_type,
-      :sender_id)
+      :origination_number,
+      :sender_id,
+      :entity_id,
+      :template_id)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Specifies the schedule settings for a journey.
-    #
-    # @note When making an API call, you may pass JourneySchedule
-    #   data as a hash:
-    #
-    #       {
-    #         end_time: Time.now,
-    #         start_time: Time.now,
-    #         timezone: "__string",
-    #       }
     #
     # @!attribute [rw] end_time
     #   The scheduled time, in ISO 8601 format, when the journey ended or
@@ -10998,16 +8988,9 @@ module Aws::Pinpoint
 
     # Changes the status of a journey.
     #
-    # @note When making an API call, you may pass JourneyStateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         state: "DRAFT", # accepts DRAFT, ACTIVE, COMPLETED, CANCELLED, CLOSED
-    #       }
-    #
     # @!attribute [rw] state
-    #   The status of the journey. Currently, the only supported value is
-    #   CANCELLED.
+    #   The status of the journey. Currently, Supported values are ACTIVE,
+    #   PAUSED, and CANCELLED
     #
     #   If you cancel a journey, Amazon Pinpoint continues to perform
     #   activities that are currently in progress, until those activities
@@ -11020,12 +9003,43 @@ module Aws::Pinpoint
     #   activities from the journey. In addition, Amazon Pinpoint stops
     #   evaluating the journey and doesn't perform any activities that
     #   haven't started.
+    #
+    #   When the journey is paused, Amazon Pinpoint continues to perform
+    #   activities that are currently in progress, until those activities
+    #   are complete. Endpoints will stop entering journeys when the journey
+    #   is paused and will resume entering the journey after the journey is
+    #   resumed. For wait activities, wait time is paused when the journey
+    #   is paused. Currently, PAUSED only supports journeys with a segment
+    #   refresh interval.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/JourneyStateRequest AWS API Documentation
     #
     class JourneyStateRequest < Struct.new(
       :state)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The number of messages that can be sent to an endpoint during the
+    # specified timeframe for all journeys.
+    #
+    # @!attribute [rw] cap
+    #   The maximum number of messages that all journeys can send to an
+    #   endpoint during the specified timeframe. The maximum value is 100.
+    #   If set to 0, this limit will not apply.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] days
+    #   The length of the timeframe in days. The maximum value is 30. If set
+    #   to 0, this limit will not apply.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/JourneyTimeframeCap AWS API Documentation
+    #
+    class JourneyTimeframeCap < Struct.new(
+      :cap,
+      :days)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -11053,15 +9067,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListJourneysRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         page_size: "__string",
-    #         token: "__string",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -11118,13 +9123,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "__string", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   @return [String]
     #
@@ -11149,16 +9147,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTemplateVersionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "__string",
-    #         page_size: "__string",
-    #         template_name: "__string", # required
-    #         template_type: "__string", # required
-    #       }
-    #
     # @!attribute [rw] next_token
     #   @return [String]
     #
@@ -11195,16 +9183,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTemplatesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "__string",
-    #         page_size: "__string",
-    #         prefix: "__string",
-    #         template_type: "__string",
-    #       }
-    #
     # @!attribute [rw] next_token
     #   @return [String]
     #
@@ -11243,24 +9221,6 @@ module Aws::Pinpoint
 
     # Specifies the content and settings for a push notification that's
     # sent to recipients of a campaign.
-    #
-    # @note When making an API call, you may pass Message
-    #   data as a hash:
-    #
-    #       {
-    #         action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #         body: "__string",
-    #         image_icon_url: "__string",
-    #         image_small_icon_url: "__string",
-    #         image_url: "__string",
-    #         json_body: "__string",
-    #         media_url: "__string",
-    #         raw_content: "__string",
-    #         silent_push: false,
-    #         time_to_live: 1,
-    #         title: "__string",
-    #         url: "__string",
-    #       }
     #
     # @!attribute [rw] action
     #   The action to occur if a recipient taps the push notification. Valid
@@ -11381,96 +9341,6 @@ module Aws::Pinpoint
 
     # Specifies the message configuration settings for a campaign.
     #
-    # @note When making an API call, you may pass MessageConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         adm_message: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           image_icon_url: "__string",
-    #           image_small_icon_url: "__string",
-    #           image_url: "__string",
-    #           json_body: "__string",
-    #           media_url: "__string",
-    #           raw_content: "__string",
-    #           silent_push: false,
-    #           time_to_live: 1,
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         apns_message: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           image_icon_url: "__string",
-    #           image_small_icon_url: "__string",
-    #           image_url: "__string",
-    #           json_body: "__string",
-    #           media_url: "__string",
-    #           raw_content: "__string",
-    #           silent_push: false,
-    #           time_to_live: 1,
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         baidu_message: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           image_icon_url: "__string",
-    #           image_small_icon_url: "__string",
-    #           image_url: "__string",
-    #           json_body: "__string",
-    #           media_url: "__string",
-    #           raw_content: "__string",
-    #           silent_push: false,
-    #           time_to_live: 1,
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         custom_message: {
-    #           data: "__string",
-    #         },
-    #         default_message: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           image_icon_url: "__string",
-    #           image_small_icon_url: "__string",
-    #           image_url: "__string",
-    #           json_body: "__string",
-    #           media_url: "__string",
-    #           raw_content: "__string",
-    #           silent_push: false,
-    #           time_to_live: 1,
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         email_message: {
-    #           body: "__string",
-    #           from_address: "__string",
-    #           html_body: "__string",
-    #           title: "__string",
-    #         },
-    #         gcm_message: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           image_icon_url: "__string",
-    #           image_small_icon_url: "__string",
-    #           image_url: "__string",
-    #           json_body: "__string",
-    #           media_url: "__string",
-    #           raw_content: "__string",
-    #           silent_push: false,
-    #           time_to_live: 1,
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         sms_message: {
-    #           body: "__string",
-    #           message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #           sender_id: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] adm_message
     #   The message that the campaign sends through the ADM (Amazon Device
     #   Messaging) channel. If specified, this message overrides the default
@@ -11519,6 +9389,10 @@ module Aws::Pinpoint
     #   specified, this message overrides the default message.
     #   @return [Types::CampaignSmsMessage]
     #
+    # @!attribute [rw] in_app_message
+    #   The in-app message configuration.
+    #   @return [Types::CampaignInAppMessage]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/MessageConfiguration AWS API Documentation
     #
     class MessageConfiguration < Struct.new(
@@ -11529,223 +9403,13 @@ module Aws::Pinpoint
       :default_message,
       :email_message,
       :gcm_message,
-      :sms_message)
+      :sms_message,
+      :in_app_message)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Specifies the configuration and other settings for a message.
-    #
-    # @note When making an API call, you may pass MessageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         addresses: {
-    #           "__string" => {
-    #             body_override: "__string",
-    #             channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #             context: {
-    #               "__string" => "__string",
-    #             },
-    #             raw_content: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             title_override: "__string",
-    #           },
-    #         },
-    #         context: {
-    #           "__string" => "__string",
-    #         },
-    #         endpoints: {
-    #           "__string" => {
-    #             body_override: "__string",
-    #             context: {
-    #               "__string" => "__string",
-    #             },
-    #             raw_content: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             title_override: "__string",
-    #           },
-    #         },
-    #         message_configuration: { # required
-    #           adm_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             consolidation_key: "__string",
-    #             data: {
-    #               "__string" => "__string",
-    #             },
-    #             expires_after: "__string",
-    #             icon_reference: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             md5: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           apns_message: {
-    #             apns_push_type: "__string",
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             badge: 1,
-    #             body: "__string",
-    #             category: "__string",
-    #             collapse_id: "__string",
-    #             data: {
-    #               "__string" => "__string",
-    #             },
-    #             media_url: "__string",
-    #             preferred_authentication_method: "__string",
-    #             priority: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             sound: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             thread_id: "__string",
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           baidu_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             data: {
-    #               "__string" => "__string",
-    #             },
-    #             icon_reference: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           default_message: {
-    #             body: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #           },
-    #           default_push_notification_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             data: {
-    #               "__string" => "__string",
-    #             },
-    #             silent_push: false,
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           email_message: {
-    #             body: "__string",
-    #             feedback_forwarding_address: "__string",
-    #             from_address: "__string",
-    #             raw_email: {
-    #               data: "data",
-    #             },
-    #             reply_to_addresses: ["__string"],
-    #             simple_email: {
-    #               html_part: {
-    #                 charset: "__string",
-    #                 data: "__string",
-    #               },
-    #               subject: {
-    #                 charset: "__string",
-    #                 data: "__string",
-    #               },
-    #               text_part: {
-    #                 charset: "__string",
-    #                 data: "__string",
-    #               },
-    #             },
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #           },
-    #           gcm_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             collapse_key: "__string",
-    #             data: {
-    #               "__string" => "__string",
-    #             },
-    #             icon_reference: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             priority: "__string",
-    #             raw_content: "__string",
-    #             restricted_package_name: "__string",
-    #             silent_push: false,
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           sms_message: {
-    #             body: "__string",
-    #             keyword: "__string",
-    #             media_url: "__string",
-    #             message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #             origination_number: "__string",
-    #             sender_id: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #           },
-    #           voice_message: {
-    #             body: "__string",
-    #             language_code: "__string",
-    #             origination_number: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             voice_id: "__string",
-    #           },
-    #         },
-    #         template_configuration: {
-    #           email_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           push_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           sms_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           voice_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #         },
-    #         trace_id: "__string",
-    #       }
     #
     # @!attribute [rw] addresses
     #   A map of key-value pairs, where each key is an address and each
@@ -11870,8 +9534,6 @@ module Aws::Pinpoint
     #   * THROTTLED - Amazon Pinpoint throttled the operation to send the
     #     message to the endpoint address.
     #
-    #   * TIMEOUT - The message couldn't be sent within the timeout period.
-    #
     #   * UNKNOWN\_FAILURE - An unknown error occurred.
     #   @return [String]
     #
@@ -11926,14 +9588,6 @@ module Aws::Pinpoint
     # from a segment. These criteria derive from custom metrics that you
     # define for endpoints.
     #
-    # @note When making an API call, you may pass MetricDimension
-    #   data as a hash:
-    #
-    #       {
-    #         comparison_operator: "__string", # required
-    #         value: 1.0, # required
-    #       }
-    #
     # @!attribute [rw] comparison_operator
     #   The operator to use when comparing metric values. Valid values are:
     #   GREATER\_THAN, LESS\_THAN, GREATER\_THAN\_OR\_EQUAL,
@@ -11954,104 +9608,6 @@ module Aws::Pinpoint
     end
 
     # Specifies a condition to evaluate for an activity path in a journey.
-    #
-    # @note When making an API call, you may pass MultiConditionalBranch
-    #   data as a hash:
-    #
-    #       {
-    #         condition: {
-    #           event_condition: {
-    #             dimensions: {
-    #               attributes: {
-    #                 "__string" => {
-    #                   attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                   values: ["__string"], # required
-    #                 },
-    #               },
-    #               event_type: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               metrics: {
-    #                 "__string" => {
-    #                   comparison_operator: "__string", # required
-    #                   value: 1.0, # required
-    #                 },
-    #               },
-    #             },
-    #             message_activity: "__string",
-    #           },
-    #           segment_condition: {
-    #             segment_id: "__string", # required
-    #           },
-    #           segment_dimensions: {
-    #             attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             behavior: {
-    #               recency: {
-    #                 duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                 recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #               },
-    #             },
-    #             demographic: {
-    #               app_version: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               channel: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               device_type: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               make: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               model: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               platform: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             location: {
-    #               country: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               gps_point: {
-    #                 coordinates: { # required
-    #                   latitude: 1.0, # required
-    #                   longitude: 1.0, # required
-    #                 },
-    #                 range_in_kilometers: 1.0,
-    #               },
-    #             },
-    #             metrics: {
-    #               "__string" => {
-    #                 comparison_operator: "__string", # required
-    #                 value: 1.0, # required
-    #               },
-    #             },
-    #             user_attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #           },
-    #         },
-    #         next_activity: "__string",
-    #       }
     #
     # @!attribute [rw] condition
     #   The condition to evaluate for the activity path.
@@ -12088,113 +9644,6 @@ module Aws::Pinpoint
     #
     #
     # [1]: https://docs.aws.amazon.com/pinpoint/latest/developerguide/integrate.html
-    #
-    # @note When making an API call, you may pass MultiConditionalSplitActivity
-    #   data as a hash:
-    #
-    #       {
-    #         branches: [
-    #           {
-    #             condition: {
-    #               event_condition: {
-    #                 dimensions: {
-    #                   attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   event_type: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   metrics: {
-    #                     "__string" => {
-    #                       comparison_operator: "__string", # required
-    #                       value: 1.0, # required
-    #                     },
-    #                   },
-    #                 },
-    #                 message_activity: "__string",
-    #               },
-    #               segment_condition: {
-    #                 segment_id: "__string", # required
-    #               },
-    #               segment_dimensions: {
-    #                 attributes: {
-    #                   "__string" => {
-    #                     attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #                 behavior: {
-    #                   recency: {
-    #                     duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                     recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                   },
-    #                 },
-    #                 demographic: {
-    #                   app_version: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   channel: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   device_type: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   make: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   model: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   platform: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #                 location: {
-    #                   country: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   gps_point: {
-    #                     coordinates: { # required
-    #                       latitude: 1.0, # required
-    #                       longitude: 1.0, # required
-    #                     },
-    #                     range_in_kilometers: 1.0,
-    #                   },
-    #                 },
-    #                 metrics: {
-    #                   "__string" => {
-    #                     comparison_operator: "__string", # required
-    #                     value: 1.0, # required
-    #                   },
-    #                 },
-    #                 user_attributes: {
-    #                   "__string" => {
-    #                     attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #               },
-    #             },
-    #             next_activity: "__string",
-    #           },
-    #         ],
-    #         default_activity: "__string",
-    #         evaluation_wait_time: {
-    #           wait_for: "__string",
-    #           wait_until: "__string",
-    #         },
-    #       }
     #
     # @!attribute [rw] branches
     #   The paths for the activity, including the conditions for entering
@@ -12240,14 +9689,6 @@ module Aws::Pinpoint
     end
 
     # Specifies a phone number to validate and retrieve information about.
-    #
-    # @note When making an API call, you may pass NumberValidateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         iso_country_code: "__string",
-    #         phone_number: "__string",
-    #       }
     #
     # @!attribute [rw] iso_country_code
     #   The two-character code, in ISO 3166-1 alpha-2 format, for the
@@ -12364,6 +9805,25 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
+    # Override button configuration.
+    #
+    # @!attribute [rw] button_action
+    #   Action triggered by the button.
+    #   @return [String]
+    #
+    # @!attribute [rw] link
+    #   Button destination.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/OverrideButtonConfiguration AWS API Documentation
+    #
+    class OverrideButtonConfiguration < Struct.new(
+      :button_action,
+      :link)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Provides information about an API request or response.
     #
     # @!attribute [rw] message
@@ -12381,16 +9841,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PhoneNumberValidateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         number_validate_request: { # required
-    #           iso_country_code: "__string",
-    #           phone_number: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] number_validate_request
     #   Specifies a phone number to validate and retrieve information about.
     #   @return [Types::NumberValidateRequest]
@@ -12417,48 +9867,6 @@ module Aws::Pinpoint
 
     # Specifies the properties and attributes of an endpoint that's
     # associated with an event.
-    #
-    # @note When making an API call, you may pass PublicEndpoint
-    #   data as a hash:
-    #
-    #       {
-    #         address: "__string",
-    #         attributes: {
-    #           "__string" => ["__string"],
-    #         },
-    #         channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #         demographic: {
-    #           app_version: "__string",
-    #           locale: "__string",
-    #           make: "__string",
-    #           model: "__string",
-    #           model_version: "__string",
-    #           platform: "__string",
-    #           platform_version: "__string",
-    #           timezone: "__string",
-    #         },
-    #         effective_date: "__string",
-    #         endpoint_status: "__string",
-    #         location: {
-    #           city: "__string",
-    #           country: "__string",
-    #           latitude: 1.0,
-    #           longitude: 1.0,
-    #           postal_code: "__string",
-    #           region: "__string",
-    #         },
-    #         metrics: {
-    #           "__string" => 1.0,
-    #         },
-    #         opt_out: "__string",
-    #         request_id: "__string",
-    #         user: {
-    #           user_attributes: {
-    #             "__string" => ["__string"],
-    #           },
-    #           user_id: "__string",
-    #         },
-    #       }
     #
     # @!attribute [rw] address
     #   The unique identifier for the recipient, such as a device token,
@@ -12547,18 +9955,6 @@ module Aws::Pinpoint
     # Specifies the settings for a push notification activity in a journey.
     # This type of activity sends a push notification to participants.
     #
-    # @note When making an API call, you may pass PushMessageActivity
-    #   data as a hash:
-    #
-    #       {
-    #         message_config: {
-    #           time_to_live: "__string",
-    #         },
-    #         next_activity: "__string",
-    #         template_name: "__string",
-    #         template_version: "__string",
-    #       }
-    #
     # @!attribute [rw] message_config
     #   Specifies the time to live (TTL) value for push notifications that
     #   are sent to participants in a journey.
@@ -12604,67 +10000,6 @@ module Aws::Pinpoint
 
     # Specifies the content and settings for a message template that can be
     # used in messages that are sent through a push notification channel.
-    #
-    # @note When making an API call, you may pass PushNotificationTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         adm: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           image_icon_url: "__string",
-    #           image_url: "__string",
-    #           raw_content: "__string",
-    #           small_image_icon_url: "__string",
-    #           sound: "__string",
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         apns: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           media_url: "__string",
-    #           raw_content: "__string",
-    #           sound: "__string",
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         baidu: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           image_icon_url: "__string",
-    #           image_url: "__string",
-    #           raw_content: "__string",
-    #           small_image_icon_url: "__string",
-    #           sound: "__string",
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         default: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           sound: "__string",
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         default_substitutions: "__string",
-    #         gcm: {
-    #           action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #           body: "__string",
-    #           image_icon_url: "__string",
-    #           image_url: "__string",
-    #           raw_content: "__string",
-    #           small_image_icon_url: "__string",
-    #           sound: "__string",
-    #           title: "__string",
-    #           url: "__string",
-    #         },
-    #         recommender_id: "__string",
-    #         tags: {
-    #           "__string" => "__string",
-    #         },
-    #         template_description: "__string",
-    #       }
     #
     # @!attribute [rw] adm
     #   The message template to use for the ADM (Amazon Device Messaging)
@@ -12716,9 +10051,25 @@ module Aws::Pinpoint
     #   @return [String]
     #
     # @!attribute [rw] tags
-    #   A string-to-string map of key-value pairs that defines the tags to
-    #   associate with the message template. Each tag consists of a required
-    #   tag key and an associated tag value.
+    #   <note markdown="1">As of **22-05-2023** tags has been deprecated for update operations.
+    #   After this date any value in tags is not processed and an error code
+    #   is not returned. To manage tags we recommend using either [Tags][1]
+    #   in the *API Reference for Amazon Pinpoint*,
+    #   [resourcegroupstaggingapi][2] commands in the *AWS Command Line
+    #   Interface Documentation* or [resourcegroupstaggingapi][3] in the
+    #   *AWS SDK*.
+    #
+    #   </note>
+    #
+    #   (Deprecated) A string-to-string map of key-value pairs that defines
+    #   the tags to associate with the message template. Each tag consists
+    #   of a required tag key and an associated tag value.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/tags-resource-arn.html
+    #   [2]: https://docs.aws.amazon.com/cli/latest/reference/resourcegroupstaggingapi/index.html
+    #   [3]: https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/resourcegroupstaggingapi/package-summary.html
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] template_description
@@ -12851,17 +10202,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutEventStreamRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         write_event_stream: { # required
-    #           destination_stream_arn: "__string", # required
-    #           role_arn: "__string", # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -12893,80 +10233,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutEventsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         events_request: { # required
-    #           batch_item: { # required
-    #             "__string" => {
-    #               endpoint: { # required
-    #                 address: "__string",
-    #                 attributes: {
-    #                   "__string" => ["__string"],
-    #                 },
-    #                 channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #                 demographic: {
-    #                   app_version: "__string",
-    #                   locale: "__string",
-    #                   make: "__string",
-    #                   model: "__string",
-    #                   model_version: "__string",
-    #                   platform: "__string",
-    #                   platform_version: "__string",
-    #                   timezone: "__string",
-    #                 },
-    #                 effective_date: "__string",
-    #                 endpoint_status: "__string",
-    #                 location: {
-    #                   city: "__string",
-    #                   country: "__string",
-    #                   latitude: 1.0,
-    #                   longitude: 1.0,
-    #                   postal_code: "__string",
-    #                   region: "__string",
-    #                 },
-    #                 metrics: {
-    #                   "__string" => 1.0,
-    #                 },
-    #                 opt_out: "__string",
-    #                 request_id: "__string",
-    #                 user: {
-    #                   user_attributes: {
-    #                     "__string" => ["__string"],
-    #                   },
-    #                   user_id: "__string",
-    #                 },
-    #               },
-    #               events: { # required
-    #                 "__string" => {
-    #                   app_package_name: "__string",
-    #                   app_title: "__string",
-    #                   app_version_code: "__string",
-    #                   attributes: {
-    #                     "__string" => "__string",
-    #                   },
-    #                   client_sdk_version: "__string",
-    #                   event_type: "__string", # required
-    #                   metrics: {
-    #                     "__string" => 1.0,
-    #                   },
-    #                   sdk_name: "__string",
-    #                   session: {
-    #                     duration: 1,
-    #                     id: "__string", # required
-    #                     start_timestamp: "__string", # required
-    #                     stop_timestamp: "__string",
-    #                   },
-    #                   timestamp: "__string", # required
-    #                 },
-    #               },
-    #             },
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -12999,14 +10265,6 @@ module Aws::Pinpoint
     # Specifies the start and end times that define a time range when
     # messages aren't sent to endpoints.
     #
-    # @note When making an API call, you may pass QuietTime
-    #   data as a hash:
-    #
-    #       {
-    #         end: "__string",
-    #         start: "__string",
-    #       }
-    #
     # @!attribute [rw] end
     #   The specific time when quiet time ends. This value has to use
     #   24-hour notation and be in HH:MM format, where HH is the hour (with
@@ -13035,18 +10293,6 @@ module Aws::Pinpoint
     # down one of as many as five paths in a journey, based on conditions
     # that you specify.
     #
-    # @note When making an API call, you may pass RandomSplitActivity
-    #   data as a hash:
-    #
-    #       {
-    #         branches: [
-    #           {
-    #             next_activity: "__string",
-    #             percentage: 1,
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] branches
     #   The paths for the activity, including the percentage of participants
     #   to enter each path and the activity to perform for each path.
@@ -13062,14 +10308,6 @@ module Aws::Pinpoint
 
     # Specifies the settings for a path in a random split activity in a
     # journey.
-    #
-    # @note When making an API call, you may pass RandomSplitEntry
-    #   data as a hash:
-    #
-    #       {
-    #         next_activity: "__string",
-    #         percentage: 1,
-    #       }
     #
     # @!attribute [rw] next_activity
     #   The unique identifier for the next activity to perform, after
@@ -13098,13 +10336,6 @@ module Aws::Pinpoint
     # Specifies the contents of an email message, represented as a raw MIME
     # message.
     #
-    # @note When making an API call, you may pass RawEmail
-    #   data as a hash:
-    #
-    #       {
-    #         data: "data",
-    #       }
-    #
     # @!attribute [rw] data
     #   The email message, represented as a raw MIME message. The entire
     #   message must be base64 encoded.
@@ -13120,14 +10351,6 @@ module Aws::Pinpoint
 
     # Specifies criteria for including or excluding endpoints from a segment
     # based on how recently an endpoint was active.
-    #
-    # @note When making an API call, you may pass RecencyDimension
-    #   data as a hash:
-    #
-    #       {
-    #         duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #         recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #       }
     #
     # @!attribute [rw] duration
     #   The duration to use when determining whether an endpoint is active
@@ -13266,17 +10489,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RemoveAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         attribute_type: "__string", # required
-    #         update_attributes_request: { # required
-    #           blacklist: ["__string"],
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -13369,15 +10581,6 @@ module Aws::Pinpoint
 
     # Specifies the status and settings of the SMS channel for an
     # application.
-    #
-    # @note When making an API call, you may pass SMSChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         enabled: false,
-    #         sender_id: "__string",
-    #         short_code: "__string",
-    #       }
     #
     # @!attribute [rw] enabled
     #   Specifies whether to enable the SMS channel for the application.
@@ -13496,21 +10699,6 @@ module Aws::Pinpoint
     # Specifies the default settings for a one-time SMS message that's sent
     # directly to an endpoint.
     #
-    # @note When making an API call, you may pass SMSMessage
-    #   data as a hash:
-    #
-    #       {
-    #         body: "__string",
-    #         keyword: "__string",
-    #         media_url: "__string",
-    #         message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #         origination_number: "__string",
-    #         sender_id: "__string",
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #       }
-    #
     # @!attribute [rw] body
     #   The body of the SMS message.
     #   @return [String]
@@ -13550,6 +10738,16 @@ module Aws::Pinpoint
     #   the default variables with individual address variables.
     #   @return [Hash<String,Array<String>>]
     #
+    # @!attribute [rw] entity_id
+    #   The entity ID or Principal Entity (PE) id received from the
+    #   regulatory body for sending SMS in your country.
+    #   @return [String]
+    #
+    # @!attribute [rw] template_id
+    #   The template ID received from the regulatory body for sending SMS in
+    #   your country.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/SMSMessage AWS API Documentation
     #
     class SMSMessage < Struct.new(
@@ -13559,26 +10757,15 @@ module Aws::Pinpoint
       :message_type,
       :origination_number,
       :sender_id,
-      :substitutions)
+      :substitutions,
+      :entity_id,
+      :template_id)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Specifies the settings for an SMS activity in a journey. This type of
     # activity sends a text message to participants.
-    #
-    # @note When making an API call, you may pass SMSMessageActivity
-    #   data as a hash:
-    #
-    #       {
-    #         message_config: {
-    #           message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #           sender_id: "__string",
-    #         },
-    #         next_activity: "__string",
-    #         template_name: "__string",
-    #         template_version: "__string",
-    #       }
     #
     # @!attribute [rw] message_config
     #   Specifies the sender ID and message type for an SMS message that's
@@ -13626,19 +10813,6 @@ module Aws::Pinpoint
     # Specifies the content and settings for a message template that can be
     # used in text messages that are sent through the SMS channel.
     #
-    # @note When making an API call, you may pass SMSTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         body: "__string",
-    #         default_substitutions: "__string",
-    #         recommender_id: "__string",
-    #         tags: {
-    #           "__string" => "__string",
-    #         },
-    #         template_description: "__string",
-    #       }
-    #
     # @!attribute [rw] body
     #   The message body to use in text messages that are based on the
     #   message template.
@@ -13663,9 +10837,25 @@ module Aws::Pinpoint
     #   @return [String]
     #
     # @!attribute [rw] tags
-    #   A string-to-string map of key-value pairs that defines the tags to
-    #   associate with the message template. Each tag consists of a required
-    #   tag key and an associated tag value.
+    #   <note markdown="1">As of **22-05-2023** tags has been deprecated for update operations.
+    #   After this date any value in tags is not processed and an error code
+    #   is not returned. To manage tags we recommend using either [Tags][1]
+    #   in the *API Reference for Amazon Pinpoint*,
+    #   [resourcegroupstaggingapi][2] commands in the *AWS Command Line
+    #   Interface Documentation* or [resourcegroupstaggingapi][3] in the
+    #   *AWS SDK*.
+    #
+    #   </note>
+    #
+    #   (Deprecated) A string-to-string map of key-value pairs that defines
+    #   the tags to associate with the message template. Each tag consists
+    #   of a required tag key and an associated tag value.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/tags-resource-arn.html
+    #   [2]: https://docs.aws.amazon.com/cli/latest/reference/resourcegroupstaggingapi/index.html
+    #   [3]: https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/resourcegroupstaggingapi/package-summary.html
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] template_description
@@ -13764,42 +10954,6 @@ module Aws::Pinpoint
 
     # Specifies the schedule settings for a campaign.
     #
-    # @note When making an API call, you may pass Schedule
-    #   data as a hash:
-    #
-    #       {
-    #         end_time: "__string",
-    #         event_filter: {
-    #           dimensions: { # required
-    #             attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             event_type: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             metrics: {
-    #               "__string" => {
-    #                 comparison_operator: "__string", # required
-    #                 value: 1.0, # required
-    #               },
-    #             },
-    #           },
-    #           filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #         },
-    #         frequency: "ONCE", # accepts ONCE, HOURLY, DAILY, WEEKLY, MONTHLY, EVENT
-    #         is_local_time: false,
-    #         quiet_time: {
-    #           end: "__string",
-    #           start: "__string",
-    #         },
-    #         start_time: "__string", # required
-    #         timezone: "__string",
-    #       }
-    #
     # @!attribute [rw] end_time
     #   The scheduled time, in ISO 8601 format, when the campaign ended or
     #   will end.
@@ -13873,16 +11027,6 @@ module Aws::Pinpoint
     # Specifies dimension settings for including or excluding endpoints from
     # a segment based on how recently an endpoint was active.
     #
-    # @note When making an API call, you may pass SegmentBehaviors
-    #   data as a hash:
-    #
-    #       {
-    #         recency: {
-    #           duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #           recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #         },
-    #       }
-    #
     # @!attribute [rw] recency
     #   The dimension settings that are based on how recently an endpoint
     #   was active.
@@ -13897,13 +11041,6 @@ module Aws::Pinpoint
     end
 
     # Specifies a segment to associate with an activity in a journey.
-    #
-    # @note When making an API call, you may pass SegmentCondition
-    #   data as a hash:
-    #
-    #       {
-    #         segment_id: "__string", # required
-    #       }
     #
     # @!attribute [rw] segment_id
     #   The unique identifier for the segment to associate with the
@@ -13922,36 +11059,6 @@ module Aws::Pinpoint
     # excluding endpoints from a segment. These settings derive from
     # characteristics of endpoint devices, such as platform, make, and
     # model.
-    #
-    # @note When making an API call, you may pass SegmentDemographics
-    #   data as a hash:
-    #
-    #       {
-    #         app_version: {
-    #           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #           values: ["__string"], # required
-    #         },
-    #         channel: {
-    #           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #           values: ["__string"], # required
-    #         },
-    #         device_type: {
-    #           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #           values: ["__string"], # required
-    #         },
-    #         make: {
-    #           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #           values: ["__string"], # required
-    #         },
-    #         model: {
-    #           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #           values: ["__string"], # required
-    #         },
-    #         platform: {
-    #           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #           values: ["__string"], # required
-    #         },
-    #       }
     #
     # @!attribute [rw] app_version
     #   The app version criteria for the segment.
@@ -13991,75 +11098,6 @@ module Aws::Pinpoint
     end
 
     # Specifies the dimension settings for a segment.
-    #
-    # @note When making an API call, you may pass SegmentDimensions
-    #   data as a hash:
-    #
-    #       {
-    #         attributes: {
-    #           "__string" => {
-    #             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #             values: ["__string"], # required
-    #           },
-    #         },
-    #         behavior: {
-    #           recency: {
-    #             duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #             recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #           },
-    #         },
-    #         demographic: {
-    #           app_version: {
-    #             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #             values: ["__string"], # required
-    #           },
-    #           channel: {
-    #             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #             values: ["__string"], # required
-    #           },
-    #           device_type: {
-    #             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #             values: ["__string"], # required
-    #           },
-    #           make: {
-    #             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #             values: ["__string"], # required
-    #           },
-    #           model: {
-    #             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #             values: ["__string"], # required
-    #           },
-    #           platform: {
-    #             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #             values: ["__string"], # required
-    #           },
-    #         },
-    #         location: {
-    #           country: {
-    #             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #             values: ["__string"], # required
-    #           },
-    #           gps_point: {
-    #             coordinates: { # required
-    #               latitude: 1.0, # required
-    #               longitude: 1.0, # required
-    #             },
-    #             range_in_kilometers: 1.0,
-    #           },
-    #         },
-    #         metrics: {
-    #           "__string" => {
-    #             comparison_operator: "__string", # required
-    #             value: 1.0, # required
-    #           },
-    #         },
-    #         user_attributes: {
-    #           "__string" => {
-    #             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #             values: ["__string"], # required
-    #           },
-    #         },
-    #       }
     #
     # @!attribute [rw] attributes
     #   One or more custom attributes to use as criteria for the segment.
@@ -14105,87 +11143,6 @@ module Aws::Pinpoint
     # Specifies the base segments and dimensions for a segment, and the
     # relationships between these base segments and dimensions.
     #
-    # @note When making an API call, you may pass SegmentGroup
-    #   data as a hash:
-    #
-    #       {
-    #         dimensions: [
-    #           {
-    #             attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             behavior: {
-    #               recency: {
-    #                 duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                 recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #               },
-    #             },
-    #             demographic: {
-    #               app_version: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               channel: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               device_type: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               make: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               model: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               platform: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             location: {
-    #               country: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               gps_point: {
-    #                 coordinates: { # required
-    #                   latitude: 1.0, # required
-    #                   longitude: 1.0, # required
-    #                 },
-    #                 range_in_kilometers: 1.0,
-    #               },
-    #             },
-    #             metrics: {
-    #               "__string" => {
-    #                 comparison_operator: "__string", # required
-    #                 value: 1.0, # required
-    #               },
-    #             },
-    #             user_attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #           },
-    #         ],
-    #         source_segments: [
-    #           {
-    #             id: "__string", # required
-    #             version: 1,
-    #           },
-    #         ],
-    #         source_type: "ALL", # accepts ALL, ANY, NONE
-    #         type: "ALL", # accepts ALL, ANY, NONE
-    #       }
-    #
     # @!attribute [rw] dimensions
     #   An array that defines the dimensions for the segment.
     #   @return [Array<Types::SegmentDimensions>]
@@ -14230,92 +11187,6 @@ module Aws::Pinpoint
 
     # Specifies the settings that define the relationships between segment
     # groups for a segment.
-    #
-    # @note When making an API call, you may pass SegmentGroupList
-    #   data as a hash:
-    #
-    #       {
-    #         groups: [
-    #           {
-    #             dimensions: [
-    #               {
-    #                 attributes: {
-    #                   "__string" => {
-    #                     attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #                 behavior: {
-    #                   recency: {
-    #                     duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                     recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                   },
-    #                 },
-    #                 demographic: {
-    #                   app_version: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   channel: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   device_type: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   make: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   model: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   platform: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #                 location: {
-    #                   country: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   gps_point: {
-    #                     coordinates: { # required
-    #                       latitude: 1.0, # required
-    #                       longitude: 1.0, # required
-    #                     },
-    #                     range_in_kilometers: 1.0,
-    #                   },
-    #                 },
-    #                 metrics: {
-    #                   "__string" => {
-    #                     comparison_operator: "__string", # required
-    #                     value: 1.0, # required
-    #                   },
-    #                 },
-    #                 user_attributes: {
-    #                   "__string" => {
-    #                     attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #               },
-    #             ],
-    #             source_segments: [
-    #               {
-    #                 id: "__string", # required
-    #                 version: 1,
-    #               },
-    #             ],
-    #             source_type: "ALL", # accepts ALL, ANY, NONE
-    #             type: "ALL", # accepts ALL, ANY, NONE
-    #           },
-    #         ],
-    #         include: "ALL", # accepts ALL, ANY, NONE
-    #       }
     #
     # @!attribute [rw] groups
     #   An array that defines the set of segment criteria to evaluate when
@@ -14392,23 +11263,6 @@ module Aws::Pinpoint
 
     # Specifies geographical dimension settings for a segment.
     #
-    # @note When making an API call, you may pass SegmentLocation
-    #   data as a hash:
-    #
-    #       {
-    #         country: {
-    #           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #           values: ["__string"], # required
-    #         },
-    #         gps_point: {
-    #           coordinates: { # required
-    #             latitude: 1.0, # required
-    #             longitude: 1.0, # required
-    #           },
-    #           range_in_kilometers: 1.0,
-    #         },
-    #       }
-    #
     # @!attribute [rw] country
     #   The country or region code, in ISO 3166-1 alpha-2 format, for the
     #   segment.
@@ -14428,14 +11282,6 @@ module Aws::Pinpoint
     end
 
     # Specifies the segment identifier and version of a segment.
-    #
-    # @note When making an API call, you may pass SegmentReference
-    #   data as a hash:
-    #
-    #       {
-    #         id: "__string", # required
-    #         version: 1,
-    #       }
     #
     # @!attribute [rw] id
     #   The unique identifier for the segment.
@@ -14563,220 +11409,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SendMessagesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         message_request: { # required
-    #           addresses: {
-    #             "__string" => {
-    #               body_override: "__string",
-    #               channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #               context: {
-    #                 "__string" => "__string",
-    #               },
-    #               raw_content: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               title_override: "__string",
-    #             },
-    #           },
-    #           context: {
-    #             "__string" => "__string",
-    #           },
-    #           endpoints: {
-    #             "__string" => {
-    #               body_override: "__string",
-    #               context: {
-    #                 "__string" => "__string",
-    #               },
-    #               raw_content: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               title_override: "__string",
-    #             },
-    #           },
-    #           message_configuration: { # required
-    #             adm_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               consolidation_key: "__string",
-    #               data: {
-    #                 "__string" => "__string",
-    #               },
-    #               expires_after: "__string",
-    #               icon_reference: "__string",
-    #               image_icon_url: "__string",
-    #               image_url: "__string",
-    #               md5: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               small_image_icon_url: "__string",
-    #               sound: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             apns_message: {
-    #               apns_push_type: "__string",
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               badge: 1,
-    #               body: "__string",
-    #               category: "__string",
-    #               collapse_id: "__string",
-    #               data: {
-    #                 "__string" => "__string",
-    #               },
-    #               media_url: "__string",
-    #               preferred_authentication_method: "__string",
-    #               priority: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               sound: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               thread_id: "__string",
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             baidu_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               data: {
-    #                 "__string" => "__string",
-    #               },
-    #               icon_reference: "__string",
-    #               image_icon_url: "__string",
-    #               image_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               small_image_icon_url: "__string",
-    #               sound: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             default_message: {
-    #               body: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #             },
-    #             default_push_notification_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               data: {
-    #                 "__string" => "__string",
-    #               },
-    #               silent_push: false,
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             email_message: {
-    #               body: "__string",
-    #               feedback_forwarding_address: "__string",
-    #               from_address: "__string",
-    #               raw_email: {
-    #                 data: "data",
-    #               },
-    #               reply_to_addresses: ["__string"],
-    #               simple_email: {
-    #                 html_part: {
-    #                   charset: "__string",
-    #                   data: "__string",
-    #                 },
-    #                 subject: {
-    #                   charset: "__string",
-    #                   data: "__string",
-    #                 },
-    #                 text_part: {
-    #                   charset: "__string",
-    #                   data: "__string",
-    #                 },
-    #               },
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #             },
-    #             gcm_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               collapse_key: "__string",
-    #               data: {
-    #                 "__string" => "__string",
-    #               },
-    #               icon_reference: "__string",
-    #               image_icon_url: "__string",
-    #               image_url: "__string",
-    #               priority: "__string",
-    #               raw_content: "__string",
-    #               restricted_package_name: "__string",
-    #               silent_push: false,
-    #               small_image_icon_url: "__string",
-    #               sound: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             sms_message: {
-    #               body: "__string",
-    #               keyword: "__string",
-    #               media_url: "__string",
-    #               message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #               origination_number: "__string",
-    #               sender_id: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #             },
-    #             voice_message: {
-    #               body: "__string",
-    #               language_code: "__string",
-    #               origination_number: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               voice_id: "__string",
-    #             },
-    #           },
-    #           template_configuration: {
-    #             email_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             push_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             sms_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             voice_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #           },
-    #           trace_id: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -14806,205 +11438,106 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
+    # @!attribute [rw] application_id
+    #   @return [String]
+    #
+    # @!attribute [rw] send_otp_message_request_parameters
+    #   Send OTP message request parameters.
+    #   @return [Types::SendOTPMessageRequestParameters]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/SendOTPMessageRequest AWS API Documentation
+    #
+    class SendOTPMessageRequest < Struct.new(
+      :application_id,
+      :send_otp_message_request_parameters)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Send OTP message request parameters.
+    #
+    # @!attribute [rw] allowed_attempts
+    #   The attempts allowed to validate an OTP.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] brand_name
+    #   The brand name that will be substituted into the OTP message body.
+    #   Should be owned by calling AWS account.
+    #   @return [String]
+    #
+    # @!attribute [rw] channel
+    #   Channel type for the OTP message. Supported values: \[SMS\].
+    #   @return [String]
+    #
+    # @!attribute [rw] code_length
+    #   The number of characters in the generated OTP.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] destination_identity
+    #   The destination identity to send OTP to.
+    #   @return [String]
+    #
+    # @!attribute [rw] entity_id
+    #   A unique Entity ID received from DLT after entity registration is
+    #   approved.
+    #   @return [String]
+    #
+    # @!attribute [rw] language
+    #   The language to be used for the outgoing message body containing the
+    #   OTP.
+    #   @return [String]
+    #
+    # @!attribute [rw] origination_identity
+    #   The origination identity used to send OTP from.
+    #   @return [String]
+    #
+    # @!attribute [rw] reference_id
+    #   Developer-specified reference identifier. Required to match during
+    #   OTP verification.
+    #   @return [String]
+    #
+    # @!attribute [rw] template_id
+    #   A unique Template ID received from DLT after entity registration is
+    #   approved.
+    #   @return [String]
+    #
+    # @!attribute [rw] validity_period
+    #   The time in minutes before the OTP is no longer valid.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/SendOTPMessageRequestParameters AWS API Documentation
+    #
+    class SendOTPMessageRequestParameters < Struct.new(
+      :allowed_attempts,
+      :brand_name,
+      :channel,
+      :code_length,
+      :destination_identity,
+      :entity_id,
+      :language,
+      :origination_identity,
+      :reference_id,
+      :template_id,
+      :validity_period)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] message_response
+    #   Provides information about the results of a request to send a
+    #   message to an endpoint address.
+    #   @return [Types::MessageResponse]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/SendOTPMessageResponse AWS API Documentation
+    #
+    class SendOTPMessageResponse < Struct.new(
+      :message_response)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Specifies the configuration and other settings for a message to send
     # to all the endpoints that are associated with a list of users.
-    #
-    # @note When making an API call, you may pass SendUsersMessageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         context: {
-    #           "__string" => "__string",
-    #         },
-    #         message_configuration: { # required
-    #           adm_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             consolidation_key: "__string",
-    #             data: {
-    #               "__string" => "__string",
-    #             },
-    #             expires_after: "__string",
-    #             icon_reference: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             md5: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           apns_message: {
-    #             apns_push_type: "__string",
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             badge: 1,
-    #             body: "__string",
-    #             category: "__string",
-    #             collapse_id: "__string",
-    #             data: {
-    #               "__string" => "__string",
-    #             },
-    #             media_url: "__string",
-    #             preferred_authentication_method: "__string",
-    #             priority: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             sound: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             thread_id: "__string",
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           baidu_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             data: {
-    #               "__string" => "__string",
-    #             },
-    #             icon_reference: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           default_message: {
-    #             body: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #           },
-    #           default_push_notification_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             data: {
-    #               "__string" => "__string",
-    #             },
-    #             silent_push: false,
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           email_message: {
-    #             body: "__string",
-    #             feedback_forwarding_address: "__string",
-    #             from_address: "__string",
-    #             raw_email: {
-    #               data: "data",
-    #             },
-    #             reply_to_addresses: ["__string"],
-    #             simple_email: {
-    #               html_part: {
-    #                 charset: "__string",
-    #                 data: "__string",
-    #               },
-    #               subject: {
-    #                 charset: "__string",
-    #                 data: "__string",
-    #               },
-    #               text_part: {
-    #                 charset: "__string",
-    #                 data: "__string",
-    #               },
-    #             },
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #           },
-    #           gcm_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             collapse_key: "__string",
-    #             data: {
-    #               "__string" => "__string",
-    #             },
-    #             icon_reference: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             priority: "__string",
-    #             raw_content: "__string",
-    #             restricted_package_name: "__string",
-    #             silent_push: false,
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           sms_message: {
-    #             body: "__string",
-    #             keyword: "__string",
-    #             media_url: "__string",
-    #             message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #             origination_number: "__string",
-    #             sender_id: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #           },
-    #           voice_message: {
-    #             body: "__string",
-    #             language_code: "__string",
-    #             origination_number: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             voice_id: "__string",
-    #           },
-    #         },
-    #         template_configuration: {
-    #           email_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           push_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           sms_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           voice_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #         },
-    #         trace_id: "__string",
-    #         users: { # required
-    #           "__string" => {
-    #             body_override: "__string",
-    #             context: {
-    #               "__string" => "__string",
-    #             },
-    #             raw_content: "__string",
-    #             substitutions: {
-    #               "__string" => ["__string"],
-    #             },
-    #             title_override: "__string",
-    #           },
-    #         },
-    #       }
     #
     # @!attribute [rw] context
     #   A map of custom attribute-value pairs. For a push notification,
@@ -15080,206 +11613,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SendUsersMessagesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         send_users_message_request: { # required
-    #           context: {
-    #             "__string" => "__string",
-    #           },
-    #           message_configuration: { # required
-    #             adm_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               consolidation_key: "__string",
-    #               data: {
-    #                 "__string" => "__string",
-    #               },
-    #               expires_after: "__string",
-    #               icon_reference: "__string",
-    #               image_icon_url: "__string",
-    #               image_url: "__string",
-    #               md5: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               small_image_icon_url: "__string",
-    #               sound: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             apns_message: {
-    #               apns_push_type: "__string",
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               badge: 1,
-    #               body: "__string",
-    #               category: "__string",
-    #               collapse_id: "__string",
-    #               data: {
-    #                 "__string" => "__string",
-    #               },
-    #               media_url: "__string",
-    #               preferred_authentication_method: "__string",
-    #               priority: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               sound: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               thread_id: "__string",
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             baidu_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               data: {
-    #                 "__string" => "__string",
-    #               },
-    #               icon_reference: "__string",
-    #               image_icon_url: "__string",
-    #               image_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               small_image_icon_url: "__string",
-    #               sound: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             default_message: {
-    #               body: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #             },
-    #             default_push_notification_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               data: {
-    #                 "__string" => "__string",
-    #               },
-    #               silent_push: false,
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             email_message: {
-    #               body: "__string",
-    #               feedback_forwarding_address: "__string",
-    #               from_address: "__string",
-    #               raw_email: {
-    #                 data: "data",
-    #               },
-    #               reply_to_addresses: ["__string"],
-    #               simple_email: {
-    #                 html_part: {
-    #                   charset: "__string",
-    #                   data: "__string",
-    #                 },
-    #                 subject: {
-    #                   charset: "__string",
-    #                   data: "__string",
-    #                 },
-    #                 text_part: {
-    #                   charset: "__string",
-    #                   data: "__string",
-    #                 },
-    #               },
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #             },
-    #             gcm_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               collapse_key: "__string",
-    #               data: {
-    #                 "__string" => "__string",
-    #               },
-    #               icon_reference: "__string",
-    #               image_icon_url: "__string",
-    #               image_url: "__string",
-    #               priority: "__string",
-    #               raw_content: "__string",
-    #               restricted_package_name: "__string",
-    #               silent_push: false,
-    #               small_image_icon_url: "__string",
-    #               sound: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             sms_message: {
-    #               body: "__string",
-    #               keyword: "__string",
-    #               media_url: "__string",
-    #               message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #               origination_number: "__string",
-    #               sender_id: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #             },
-    #             voice_message: {
-    #               body: "__string",
-    #               language_code: "__string",
-    #               origination_number: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               voice_id: "__string",
-    #             },
-    #           },
-    #           template_configuration: {
-    #             email_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             push_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             sms_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             voice_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #           },
-    #           trace_id: "__string",
-    #           users: { # required
-    #             "__string" => {
-    #               body_override: "__string",
-    #               context: {
-    #                 "__string" => "__string",
-    #               },
-    #               raw_content: "__string",
-    #               substitutions: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               title_override: "__string",
-    #             },
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -15312,16 +11645,6 @@ module Aws::Pinpoint
 
     # Provides information about a session.
     #
-    # @note When making an API call, you may pass Session
-    #   data as a hash:
-    #
-    #       {
-    #         duration: 1,
-    #         id: "__string", # required
-    #         start_timestamp: "__string", # required
-    #         stop_timestamp: "__string",
-    #       }
-    #
     # @!attribute [rw] duration
     #   The duration of the session, in milliseconds.
     #   @return [Integer]
@@ -15351,14 +11674,6 @@ module Aws::Pinpoint
 
     # Specifies the dimension type and values for a segment dimension.
     #
-    # @note When making an API call, you may pass SetDimension
-    #   data as a hash:
-    #
-    #       {
-    #         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #         values: ["__string"], # required
-    #       }
-    #
     # @!attribute [rw] dimension_type
     #   The type of segment dimension to use. Valid values are: INCLUSIVE,
     #   endpoints that match the criteria are included in the segment; and,
@@ -15382,101 +11697,6 @@ module Aws::Pinpoint
     end
 
     # Specifies a condition to evaluate for an activity in a journey.
-    #
-    # @note When making an API call, you may pass SimpleCondition
-    #   data as a hash:
-    #
-    #       {
-    #         event_condition: {
-    #           dimensions: {
-    #             attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             event_type: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             metrics: {
-    #               "__string" => {
-    #                 comparison_operator: "__string", # required
-    #                 value: 1.0, # required
-    #               },
-    #             },
-    #           },
-    #           message_activity: "__string",
-    #         },
-    #         segment_condition: {
-    #           segment_id: "__string", # required
-    #         },
-    #         segment_dimensions: {
-    #           attributes: {
-    #             "__string" => {
-    #               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #               values: ["__string"], # required
-    #             },
-    #           },
-    #           behavior: {
-    #             recency: {
-    #               duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #               recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #             },
-    #           },
-    #           demographic: {
-    #             app_version: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             channel: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             device_type: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             make: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             model: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             platform: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #           },
-    #           location: {
-    #             country: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             gps_point: {
-    #               coordinates: { # required
-    #                 latitude: 1.0, # required
-    #                 longitude: 1.0, # required
-    #               },
-    #               range_in_kilometers: 1.0,
-    #             },
-    #           },
-    #           metrics: {
-    #             "__string" => {
-    #               comparison_operator: "__string", # required
-    #               value: 1.0, # required
-    #             },
-    #           },
-    #           user_attributes: {
-    #             "__string" => {
-    #               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #               values: ["__string"], # required
-    #             },
-    #           },
-    #         },
-    #       }
     #
     # @!attribute [rw] event_condition
     #   The dimension settings for the event that's associated with the
@@ -15505,24 +11725,6 @@ module Aws::Pinpoint
     # Specifies the contents of an email message, composed of a subject, a
     # text part, and an HTML part.
     #
-    # @note When making an API call, you may pass SimpleEmail
-    #   data as a hash:
-    #
-    #       {
-    #         html_part: {
-    #           charset: "__string",
-    #           data: "__string",
-    #         },
-    #         subject: {
-    #           charset: "__string",
-    #           data: "__string",
-    #         },
-    #         text_part: {
-    #           charset: "__string",
-    #           data: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] html_part
     #   The body of the email message, in HTML format. We recommend using
     #   HTML format for email clients that render HTML content. You can
@@ -15540,26 +11742,48 @@ module Aws::Pinpoint
     #   such as mobile devices.
     #   @return [Types::SimpleEmailPart]
     #
+    # @!attribute [rw] headers
+    #   List of Headers for the email.
+    #   @return [Array<Types::MessageHeader>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/SimpleEmail AWS API Documentation
     #
     class SimpleEmail < Struct.new(
       :html_part,
       :subject,
-      :text_part)
+      :text_part,
+      :headers)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains the name and value pair of an email header to add to your
+    # email. You can have up to 15 MessageHeaders. A header can contain
+    # information such as the sender, receiver, route, or timestamp.
+    #
+    # @!attribute [rw] name
+    #   The name of the message header. The header name can contain up to
+    #   126 characters.
+    #   @return [String]
+    #
+    # @!attribute [rw] value
+    #   The value of the message header. The header value can contain up to
+    #   870 characters, including the length of any rendered attributes. For
+    #   example if you add the \\\{CreationDate\\} attribute, it renders as
+    #   YYYY-MM-DDTHH:MM:SS.SSSZ and is 24 characters in length.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/MessageHeader AWS API Documentation
+    #
+    class MessageHeader < Struct.new(
+      :name,
+      :value)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Specifies the subject or body of an email message, represented as
     # textual email data and the applicable character set.
-    #
-    # @note When making an API call, you may pass SimpleEmailPart
-    #   data as a hash:
-    #
-    #       {
-    #         charset: "__string",
-    #         data: "__string",
-    #       }
     #
     # @!attribute [rw] charset
     #   The applicable character set for the message content.
@@ -15581,40 +11805,6 @@ module Aws::Pinpoint
     # Specifies the conditions for the first activity in a journey. This
     # activity and its conditions determine which users are participants in
     # a journey.
-    #
-    # @note When making an API call, you may pass StartCondition
-    #   data as a hash:
-    #
-    #       {
-    #         description: "__string",
-    #         event_start_condition: {
-    #           event_filter: {
-    #             dimensions: { # required
-    #               attributes: {
-    #                 "__string" => {
-    #                   attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                   values: ["__string"], # required
-    #                 },
-    #               },
-    #               event_type: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               metrics: {
-    #                 "__string" => {
-    #                   comparison_operator: "__string", # required
-    #                   value: 1.0, # required
-    #                 },
-    #               },
-    #             },
-    #             filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #           },
-    #           segment_id: "__string",
-    #         },
-    #         segment_start_condition: {
-    #           segment_id: "__string", # required
-    #         },
-    #       }
     #
     # @!attribute [rw] description
     #   The custom description of the condition.
@@ -15641,18 +11831,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "__string", # required
-    #         tags_model: { # required
-    #           tags: { # required
-    #             "__string" => "__string",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   @return [String]
     #
@@ -15672,15 +11850,6 @@ module Aws::Pinpoint
 
     # Specifies the tags (keys and values) for an application, campaign,
     # message template, or segment.
-    #
-    # @note When making an API call, you may pass TagsModel
-    #   data as a hash:
-    #
-    #       {
-    #         tags: { # required
-    #           "__string" => "__string",
-    #         },
-    #       }
     #
     # @!attribute [rw] tags
     #   A string-to-string map of key-value pairs that defines the tags for
@@ -15702,14 +11871,6 @@ module Aws::Pinpoint
 
     # Specifies the name and version of the message template to use for the
     # message.
-    #
-    # @note When making an API call, you may pass Template
-    #   data as a hash:
-    #
-    #       {
-    #         name: "__string",
-    #         version: "__string",
-    #       }
     #
     # @!attribute [rw] name
     #   The name of the message template to use for the message. If
@@ -15745,13 +11906,6 @@ module Aws::Pinpoint
     # Specifies which version of a message template to use as the active
     # version of the template.
     #
-    # @note When making an API call, you may pass TemplateActiveVersionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] version
     #   The version of the message template to use as the active version of
     #   the template. Valid values are: latest, for the most recent version
@@ -15775,28 +11929,6 @@ module Aws::Pinpoint
     # Specifies the message template to use for the message, for each type
     # of channel.
     #
-    # @note When making an API call, you may pass TemplateConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         email_template: {
-    #           name: "__string",
-    #           version: "__string",
-    #         },
-    #         push_template: {
-    #           name: "__string",
-    #           version: "__string",
-    #         },
-    #         sms_template: {
-    #           name: "__string",
-    #           version: "__string",
-    #         },
-    #         voice_template: {
-    #           name: "__string",
-    #           version: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] email_template
     #   The email template to use for the message.
     #   @return [Types::Template]
@@ -15814,13 +11946,46 @@ module Aws::Pinpoint
     #   supported for campaigns.
     #   @return [Types::Template]
     #
+    # @!attribute [rw] in_app_template
+    #   The InApp template to use for the message. The InApp template object
+    #   is not supported for SendMessages.
+    #   @return [Types::Template]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/TemplateConfiguration AWS API Documentation
     #
     class TemplateConfiguration < Struct.new(
       :email_template,
       :push_template,
       :sms_template,
-      :voice_template)
+      :voice_template,
+      :in_app_template)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides information about a request to create a message template.
+    #
+    # @!attribute [rw] arn
+    #   The Amazon Resource Name (ARN) of the message template that was
+    #   created.
+    #   @return [String]
+    #
+    # @!attribute [rw] message
+    #   The message that's returned from the API for the request to create
+    #   the message template.
+    #   @return [String]
+    #
+    # @!attribute [rw] request_id
+    #   The unique identifier for the request to create the message
+    #   template.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/TemplateCreateMessageBody AWS API Documentation
+    #
+    class TemplateCreateMessageBody < Struct.new(
+      :arn,
+      :message,
+      :request_id)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -15877,7 +12042,7 @@ module Aws::Pinpoint
     #
     # @!attribute [rw] template_type
     #   The type of channel that the message template is designed for.
-    #   Possible values are: EMAIL, PUSH, SMS, and VOICE.
+    #   Possible values are: EMAIL, PUSH, SMS, INAPP, and VOICE.
     #   @return [String]
     #
     # @!attribute [rw] version
@@ -15931,7 +12096,7 @@ module Aws::Pinpoint
     #
     # @!attribute [rw] template_type
     #   The type of channel that the message template is designed for.
-    #   Possible values are: EMAIL, PUSH, SMS, and VOICE.
+    #   Possible values are: EMAIL, PUSH, SMS, INAPP, and VOICE.
     #   @return [String]
     #
     # @!attribute [rw] version
@@ -16088,14 +12253,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "__string", # required
-    #         tag_keys: ["__string"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   @return [String]
     #
@@ -16111,18 +12268,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateAdmChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         adm_channel_request: { # required
-    #           client_id: "__string", # required
-    #           client_secret: "__string", # required
-    #           enabled: false,
-    #         },
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] adm_channel_request
     #   Specifies the status and settings of the ADM (Amazon Device
     #   Messaging) channel for an application.
@@ -16153,23 +12298,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateApnsChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         apns_channel_request: { # required
-    #           bundle_id: "__string",
-    #           certificate: "__string",
-    #           default_authentication_method: "__string",
-    #           enabled: false,
-    #           private_key: "__string",
-    #           team_id: "__string",
-    #           token_key: "__string",
-    #           token_key_id: "__string",
-    #         },
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] apns_channel_request
     #   Specifies the status and settings of the APNs (Apple Push
     #   Notification service) channel for an application.
@@ -16200,23 +12328,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateApnsSandboxChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         apns_sandbox_channel_request: { # required
-    #           bundle_id: "__string",
-    #           certificate: "__string",
-    #           default_authentication_method: "__string",
-    #           enabled: false,
-    #           private_key: "__string",
-    #           team_id: "__string",
-    #           token_key: "__string",
-    #           token_key_id: "__string",
-    #         },
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] apns_sandbox_channel_request
     #   Specifies the status and settings of the APNs (Apple Push
     #   Notification service) sandbox channel for an application.
@@ -16248,23 +12359,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateApnsVoipChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         apns_voip_channel_request: { # required
-    #           bundle_id: "__string",
-    #           certificate: "__string",
-    #           default_authentication_method: "__string",
-    #           enabled: false,
-    #           private_key: "__string",
-    #           team_id: "__string",
-    #           token_key: "__string",
-    #           token_key_id: "__string",
-    #         },
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] apns_voip_channel_request
     #   Specifies the status and settings of the APNs (Apple Push
     #   Notification service) VoIP channel for an application.
@@ -16295,23 +12389,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateApnsVoipSandboxChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         apns_voip_sandbox_channel_request: { # required
-    #           bundle_id: "__string",
-    #           certificate: "__string",
-    #           default_authentication_method: "__string",
-    #           enabled: false,
-    #           private_key: "__string",
-    #           team_id: "__string",
-    #           token_key: "__string",
-    #           token_key_id: "__string",
-    #         },
-    #         application_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] apns_voip_sandbox_channel_request
     #   Specifies the status and settings of the APNs (Apple Push
     #   Notification service) VoIP sandbox channel for an application.
@@ -16343,31 +12420,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateApplicationSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         write_application_settings_request: { # required
-    #           campaign_hook: {
-    #             lambda_function_name: "__string",
-    #             mode: "DELIVERY", # accepts DELIVERY, FILTER
-    #             web_url: "__string",
-    #           },
-    #           cloud_watch_metrics_enabled: false,
-    #           limits: {
-    #             daily: 1,
-    #             maximum_duration: 1,
-    #             messages_per_second: 1,
-    #             total: 1,
-    #           },
-    #           quiet_time: {
-    #             end: "__string",
-    #             start: "__string",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -16400,13 +12452,6 @@ module Aws::Pinpoint
     # Specifies one or more attributes to remove from all the endpoints that
     # are associated with an application.
     #
-    # @note When making an API call, you may pass UpdateAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         blacklist: ["__string"],
-    #       }
-    #
     # @!attribute [rw] blacklist
     #   An array of the attributes to remove from all the endpoints that are
     #   associated with the application. The array can specify the complete,
@@ -16423,18 +12468,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateBaiduChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         baidu_channel_request: { # required
-    #           api_key: "__string", # required
-    #           enabled: false,
-    #           secret_key: "__string", # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -16465,325 +12498,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateCampaignRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         campaign_id: "__string", # required
-    #         write_campaign_request: { # required
-    #           additional_treatments: [
-    #             {
-    #               custom_delivery_configuration: {
-    #                 delivery_uri: "__string", # required
-    #                 endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #               },
-    #               message_configuration: {
-    #                 adm_message: {
-    #                   action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                   body: "__string",
-    #                   image_icon_url: "__string",
-    #                   image_small_icon_url: "__string",
-    #                   image_url: "__string",
-    #                   json_body: "__string",
-    #                   media_url: "__string",
-    #                   raw_content: "__string",
-    #                   silent_push: false,
-    #                   time_to_live: 1,
-    #                   title: "__string",
-    #                   url: "__string",
-    #                 },
-    #                 apns_message: {
-    #                   action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                   body: "__string",
-    #                   image_icon_url: "__string",
-    #                   image_small_icon_url: "__string",
-    #                   image_url: "__string",
-    #                   json_body: "__string",
-    #                   media_url: "__string",
-    #                   raw_content: "__string",
-    #                   silent_push: false,
-    #                   time_to_live: 1,
-    #                   title: "__string",
-    #                   url: "__string",
-    #                 },
-    #                 baidu_message: {
-    #                   action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                   body: "__string",
-    #                   image_icon_url: "__string",
-    #                   image_small_icon_url: "__string",
-    #                   image_url: "__string",
-    #                   json_body: "__string",
-    #                   media_url: "__string",
-    #                   raw_content: "__string",
-    #                   silent_push: false,
-    #                   time_to_live: 1,
-    #                   title: "__string",
-    #                   url: "__string",
-    #                 },
-    #                 custom_message: {
-    #                   data: "__string",
-    #                 },
-    #                 default_message: {
-    #                   action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                   body: "__string",
-    #                   image_icon_url: "__string",
-    #                   image_small_icon_url: "__string",
-    #                   image_url: "__string",
-    #                   json_body: "__string",
-    #                   media_url: "__string",
-    #                   raw_content: "__string",
-    #                   silent_push: false,
-    #                   time_to_live: 1,
-    #                   title: "__string",
-    #                   url: "__string",
-    #                 },
-    #                 email_message: {
-    #                   body: "__string",
-    #                   from_address: "__string",
-    #                   html_body: "__string",
-    #                   title: "__string",
-    #                 },
-    #                 gcm_message: {
-    #                   action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                   body: "__string",
-    #                   image_icon_url: "__string",
-    #                   image_small_icon_url: "__string",
-    #                   image_url: "__string",
-    #                   json_body: "__string",
-    #                   media_url: "__string",
-    #                   raw_content: "__string",
-    #                   silent_push: false,
-    #                   time_to_live: 1,
-    #                   title: "__string",
-    #                   url: "__string",
-    #                 },
-    #                 sms_message: {
-    #                   body: "__string",
-    #                   message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #                   sender_id: "__string",
-    #                 },
-    #               },
-    #               schedule: {
-    #                 end_time: "__string",
-    #                 event_filter: {
-    #                   dimensions: { # required
-    #                     attributes: {
-    #                       "__string" => {
-    #                         attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                         values: ["__string"], # required
-    #                       },
-    #                     },
-    #                     event_type: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     metrics: {
-    #                       "__string" => {
-    #                         comparison_operator: "__string", # required
-    #                         value: 1.0, # required
-    #                       },
-    #                     },
-    #                   },
-    #                   filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #                 },
-    #                 frequency: "ONCE", # accepts ONCE, HOURLY, DAILY, WEEKLY, MONTHLY, EVENT
-    #                 is_local_time: false,
-    #                 quiet_time: {
-    #                   end: "__string",
-    #                   start: "__string",
-    #                 },
-    #                 start_time: "__string", # required
-    #                 timezone: "__string",
-    #               },
-    #               size_percent: 1, # required
-    #               template_configuration: {
-    #                 email_template: {
-    #                   name: "__string",
-    #                   version: "__string",
-    #                 },
-    #                 push_template: {
-    #                   name: "__string",
-    #                   version: "__string",
-    #                 },
-    #                 sms_template: {
-    #                   name: "__string",
-    #                   version: "__string",
-    #                 },
-    #                 voice_template: {
-    #                   name: "__string",
-    #                   version: "__string",
-    #                 },
-    #               },
-    #               treatment_description: "__string",
-    #               treatment_name: "__string",
-    #             },
-    #           ],
-    #           custom_delivery_configuration: {
-    #             delivery_uri: "__string", # required
-    #             endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #           },
-    #           description: "__string",
-    #           holdout_percent: 1,
-    #           hook: {
-    #             lambda_function_name: "__string",
-    #             mode: "DELIVERY", # accepts DELIVERY, FILTER
-    #             web_url: "__string",
-    #           },
-    #           is_paused: false,
-    #           limits: {
-    #             daily: 1,
-    #             maximum_duration: 1,
-    #             messages_per_second: 1,
-    #             total: 1,
-    #           },
-    #           message_configuration: {
-    #             adm_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               image_icon_url: "__string",
-    #               image_small_icon_url: "__string",
-    #               image_url: "__string",
-    #               json_body: "__string",
-    #               media_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             apns_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               image_icon_url: "__string",
-    #               image_small_icon_url: "__string",
-    #               image_url: "__string",
-    #               json_body: "__string",
-    #               media_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             baidu_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               image_icon_url: "__string",
-    #               image_small_icon_url: "__string",
-    #               image_url: "__string",
-    #               json_body: "__string",
-    #               media_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             custom_message: {
-    #               data: "__string",
-    #             },
-    #             default_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               image_icon_url: "__string",
-    #               image_small_icon_url: "__string",
-    #               image_url: "__string",
-    #               json_body: "__string",
-    #               media_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             email_message: {
-    #               body: "__string",
-    #               from_address: "__string",
-    #               html_body: "__string",
-    #               title: "__string",
-    #             },
-    #             gcm_message: {
-    #               action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #               body: "__string",
-    #               image_icon_url: "__string",
-    #               image_small_icon_url: "__string",
-    #               image_url: "__string",
-    #               json_body: "__string",
-    #               media_url: "__string",
-    #               raw_content: "__string",
-    #               silent_push: false,
-    #               time_to_live: 1,
-    #               title: "__string",
-    #               url: "__string",
-    #             },
-    #             sms_message: {
-    #               body: "__string",
-    #               message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #               sender_id: "__string",
-    #             },
-    #           },
-    #           name: "__string",
-    #           schedule: {
-    #             end_time: "__string",
-    #             event_filter: {
-    #               dimensions: { # required
-    #                 attributes: {
-    #                   "__string" => {
-    #                     attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #                 event_type: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #                 metrics: {
-    #                   "__string" => {
-    #                     comparison_operator: "__string", # required
-    #                     value: 1.0, # required
-    #                   },
-    #                 },
-    #               },
-    #               filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #             },
-    #             frequency: "ONCE", # accepts ONCE, HOURLY, DAILY, WEEKLY, MONTHLY, EVENT
-    #             is_local_time: false,
-    #             quiet_time: {
-    #               end: "__string",
-    #               start: "__string",
-    #             },
-    #             start_time: "__string", # required
-    #             timezone: "__string",
-    #           },
-    #           segment_id: "__string",
-    #           segment_version: 1,
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #           template_configuration: {
-    #             email_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             push_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             sms_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #             voice_template: {
-    #               name: "__string",
-    #               version: "__string",
-    #             },
-    #           },
-    #           treatment_description: "__string",
-    #           treatment_name: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -16817,20 +12531,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateEmailChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         email_channel_request: { # required
-    #           configuration_set: "__string",
-    #           enabled: false,
-    #           from_address: "__string", # required
-    #           identity: "__string", # required
-    #           role_arn: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -16861,26 +12561,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         create_new_version: false,
-    #         email_template_request: { # required
-    #           default_substitutions: "__string",
-    #           html_part: "__string",
-    #           recommender_id: "__string",
-    #           subject: "__string",
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #           template_description: "__string",
-    #           text_part: "__string",
-    #         },
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] create_new_version
     #   @return [Boolean]
     #
@@ -16918,52 +12598,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateEndpointRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         endpoint_id: "__string", # required
-    #         endpoint_request: { # required
-    #           address: "__string",
-    #           attributes: {
-    #             "__string" => ["__string"],
-    #           },
-    #           channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #           demographic: {
-    #             app_version: "__string",
-    #             locale: "__string",
-    #             make: "__string",
-    #             model: "__string",
-    #             model_version: "__string",
-    #             platform: "__string",
-    #             platform_version: "__string",
-    #             timezone: "__string",
-    #           },
-    #           effective_date: "__string",
-    #           endpoint_status: "__string",
-    #           location: {
-    #             city: "__string",
-    #             country: "__string",
-    #             latitude: 1.0,
-    #             longitude: 1.0,
-    #             postal_code: "__string",
-    #             region: "__string",
-    #           },
-    #           metrics: {
-    #             "__string" => 1.0,
-    #           },
-    #           opt_out: "__string",
-    #           request_id: "__string",
-    #           user: {
-    #             user_attributes: {
-    #               "__string" => ["__string"],
-    #             },
-    #             user_id: "__string",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -16996,56 +12630,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateEndpointsBatchRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         endpoint_batch_request: { # required
-    #           item: [ # required
-    #             {
-    #               address: "__string",
-    #               attributes: {
-    #                 "__string" => ["__string"],
-    #               },
-    #               channel_type: "PUSH", # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #               demographic: {
-    #                 app_version: "__string",
-    #                 locale: "__string",
-    #                 make: "__string",
-    #                 model: "__string",
-    #                 model_version: "__string",
-    #                 platform: "__string",
-    #                 platform_version: "__string",
-    #                 timezone: "__string",
-    #               },
-    #               effective_date: "__string",
-    #               endpoint_status: "__string",
-    #               id: "__string",
-    #               location: {
-    #                 city: "__string",
-    #                 country: "__string",
-    #                 latitude: 1.0,
-    #                 longitude: 1.0,
-    #                 postal_code: "__string",
-    #                 region: "__string",
-    #               },
-    #               metrics: {
-    #                 "__string" => 1.0,
-    #               },
-    #               opt_out: "__string",
-    #               request_id: "__string",
-    #               user: {
-    #                 user_attributes: {
-    #                   "__string" => ["__string"],
-    #                 },
-    #                 user_id: "__string",
-    #               },
-    #             },
-    #           ],
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -17075,17 +12659,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateGcmChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         gcm_channel_request: { # required
-    #           api_key: "__string", # required
-    #           enabled: false,
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -17120,333 +12693,42 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateJourneyRequest
-    #   data as a hash:
+    # @!attribute [rw] create_new_version
+    #   @return [Boolean]
     #
-    #       {
-    #         application_id: "__string", # required
-    #         journey_id: "__string", # required
-    #         write_journey_request: { # required
-    #           activities: {
-    #             "__string" => {
-    #               custom: {
-    #                 delivery_uri: "__string",
-    #                 endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #                 message_config: {
-    #                   data: "__string",
-    #                 },
-    #                 next_activity: "__string",
-    #                 template_name: "__string",
-    #                 template_version: "__string",
-    #               },
-    #               conditional_split: {
-    #                 condition: {
-    #                   conditions: [
-    #                     {
-    #                       event_condition: {
-    #                         dimensions: {
-    #                           attributes: {
-    #                             "__string" => {
-    #                               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                               values: ["__string"], # required
-    #                             },
-    #                           },
-    #                           event_type: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           metrics: {
-    #                             "__string" => {
-    #                               comparison_operator: "__string", # required
-    #                               value: 1.0, # required
-    #                             },
-    #                           },
-    #                         },
-    #                         message_activity: "__string",
-    #                       },
-    #                       segment_condition: {
-    #                         segment_id: "__string", # required
-    #                       },
-    #                       segment_dimensions: {
-    #                         attributes: {
-    #                           "__string" => {
-    #                             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                         behavior: {
-    #                           recency: {
-    #                             duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                             recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                           },
-    #                         },
-    #                         demographic: {
-    #                           app_version: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           channel: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           device_type: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           make: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           model: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           platform: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                         location: {
-    #                           country: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           gps_point: {
-    #                             coordinates: { # required
-    #                               latitude: 1.0, # required
-    #                               longitude: 1.0, # required
-    #                             },
-    #                             range_in_kilometers: 1.0,
-    #                           },
-    #                         },
-    #                         metrics: {
-    #                           "__string" => {
-    #                             comparison_operator: "__string", # required
-    #                             value: 1.0, # required
-    #                           },
-    #                         },
-    #                         user_attributes: {
-    #                           "__string" => {
-    #                             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                       },
-    #                     },
-    #                   ],
-    #                   operator: "ALL", # accepts ALL, ANY
-    #                 },
-    #                 evaluation_wait_time: {
-    #                   wait_for: "__string",
-    #                   wait_until: "__string",
-    #                 },
-    #                 false_activity: "__string",
-    #                 true_activity: "__string",
-    #               },
-    #               description: "__string",
-    #               email: {
-    #                 message_config: {
-    #                   from_address: "__string",
-    #                 },
-    #                 next_activity: "__string",
-    #                 template_name: "__string",
-    #                 template_version: "__string",
-    #               },
-    #               holdout: {
-    #                 next_activity: "__string",
-    #                 percentage: 1, # required
-    #               },
-    #               multi_condition: {
-    #                 branches: [
-    #                   {
-    #                     condition: {
-    #                       event_condition: {
-    #                         dimensions: {
-    #                           attributes: {
-    #                             "__string" => {
-    #                               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                               values: ["__string"], # required
-    #                             },
-    #                           },
-    #                           event_type: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           metrics: {
-    #                             "__string" => {
-    #                               comparison_operator: "__string", # required
-    #                               value: 1.0, # required
-    #                             },
-    #                           },
-    #                         },
-    #                         message_activity: "__string",
-    #                       },
-    #                       segment_condition: {
-    #                         segment_id: "__string", # required
-    #                       },
-    #                       segment_dimensions: {
-    #                         attributes: {
-    #                           "__string" => {
-    #                             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                         behavior: {
-    #                           recency: {
-    #                             duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                             recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                           },
-    #                         },
-    #                         demographic: {
-    #                           app_version: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           channel: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           device_type: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           make: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           model: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           platform: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                         location: {
-    #                           country: {
-    #                             dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                             values: ["__string"], # required
-    #                           },
-    #                           gps_point: {
-    #                             coordinates: { # required
-    #                               latitude: 1.0, # required
-    #                               longitude: 1.0, # required
-    #                             },
-    #                             range_in_kilometers: 1.0,
-    #                           },
-    #                         },
-    #                         metrics: {
-    #                           "__string" => {
-    #                             comparison_operator: "__string", # required
-    #                             value: 1.0, # required
-    #                           },
-    #                         },
-    #                         user_attributes: {
-    #                           "__string" => {
-    #                             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                       },
-    #                     },
-    #                     next_activity: "__string",
-    #                   },
-    #                 ],
-    #                 default_activity: "__string",
-    #                 evaluation_wait_time: {
-    #                   wait_for: "__string",
-    #                   wait_until: "__string",
-    #                 },
-    #               },
-    #               push: {
-    #                 message_config: {
-    #                   time_to_live: "__string",
-    #                 },
-    #                 next_activity: "__string",
-    #                 template_name: "__string",
-    #                 template_version: "__string",
-    #               },
-    #               random_split: {
-    #                 branches: [
-    #                   {
-    #                     next_activity: "__string",
-    #                     percentage: 1,
-    #                   },
-    #                 ],
-    #               },
-    #               sms: {
-    #                 message_config: {
-    #                   message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #                   sender_id: "__string",
-    #                 },
-    #                 next_activity: "__string",
-    #                 template_name: "__string",
-    #                 template_version: "__string",
-    #               },
-    #               wait: {
-    #                 next_activity: "__string",
-    #                 wait_time: {
-    #                   wait_for: "__string",
-    #                   wait_until: "__string",
-    #                 },
-    #               },
-    #             },
-    #           },
-    #           creation_date: "__string",
-    #           last_modified_date: "__string",
-    #           limits: {
-    #             daily_cap: 1,
-    #             endpoint_reentry_cap: 1,
-    #             messages_per_second: 1,
-    #           },
-    #           local_time: false,
-    #           name: "__string", # required
-    #           quiet_time: {
-    #             end: "__string",
-    #             start: "__string",
-    #           },
-    #           refresh_frequency: "__string",
-    #           schedule: {
-    #             end_time: Time.now,
-    #             start_time: Time.now,
-    #             timezone: "__string",
-    #           },
-    #           start_activity: "__string",
-    #           start_condition: {
-    #             description: "__string",
-    #             event_start_condition: {
-    #               event_filter: {
-    #                 dimensions: { # required
-    #                   attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   event_type: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   metrics: {
-    #                     "__string" => {
-    #                       comparison_operator: "__string", # required
-    #                       value: 1.0, # required
-    #                     },
-    #                   },
-    #                 },
-    #                 filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #               },
-    #               segment_id: "__string",
-    #             },
-    #             segment_start_condition: {
-    #               segment_id: "__string", # required
-    #             },
-    #           },
-    #           state: "DRAFT", # accepts DRAFT, ACTIVE, COMPLETED, CANCELLED, CLOSED
-    #         },
-    #       }
+    # @!attribute [rw] in_app_template_request
+    #   In-App Template Request.
+    #   @return [Types::InAppTemplateRequest]
     #
+    # @!attribute [rw] template_name
+    #   @return [String]
+    #
+    # @!attribute [rw] version
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/UpdateInAppTemplateRequest AWS API Documentation
+    #
+    class UpdateInAppTemplateRequest < Struct.new(
+      :create_new_version,
+      :in_app_template_request,
+      :template_name,
+      :version)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] message_body
+    #   Provides information about an API request or response.
+    #   @return [Types::MessageBody]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/UpdateInAppTemplateResponse AWS API Documentation
+    #
+    class UpdateInAppTemplateResponse < Struct.new(
+      :message_body)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -17480,17 +12762,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateJourneyStateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         journey_id: "__string", # required
-    #         journey_state_request: { # required
-    #           state: "DRAFT", # accepts DRAFT, ACTIVE, COMPLETED, CANCELLED, CLOSED
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -17524,72 +12795,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdatePushTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         create_new_version: false,
-    #         push_notification_template_request: { # required
-    #           adm: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             raw_content: "__string",
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           apns: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             sound: "__string",
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           baidu: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             raw_content: "__string",
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           default: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             sound: "__string",
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           default_substitutions: "__string",
-    #           gcm: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_url: "__string",
-    #             raw_content: "__string",
-    #             small_image_icon_url: "__string",
-    #             sound: "__string",
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           recommender_id: "__string",
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #           template_description: "__string",
-    #         },
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] create_new_version
     #   @return [Boolean]
     #
@@ -17630,23 +12835,6 @@ module Aws::Pinpoint
 
     # Specifies Amazon Pinpoint configuration settings for retrieving and
     # processing recommendation data from a recommender model.
-    #
-    # @note When making an API call, you may pass UpdateRecommenderConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         attributes: {
-    #           "__string" => "__string",
-    #         },
-    #         description: "__string",
-    #         name: "__string",
-    #         recommendation_provider_id_type: "__string",
-    #         recommendation_provider_role_arn: "__string", # required
-    #         recommendation_provider_uri: "__string", # required
-    #         recommendation_transformer_uri: "__string",
-    #         recommendations_display_name: "__string",
-    #         recommendations_per_message: 1,
-    #       }
     #
     # @!attribute [rw] attributes
     #   A map of key-value pairs that defines 1-10 custom endpoint or user
@@ -17773,26 +12961,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateRecommenderConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         recommender_id: "__string", # required
-    #         update_recommender_configuration: { # required
-    #           attributes: {
-    #             "__string" => "__string",
-    #           },
-    #           description: "__string",
-    #           name: "__string",
-    #           recommendation_provider_id_type: "__string",
-    #           recommendation_provider_role_arn: "__string", # required
-    #           recommendation_provider_uri: "__string", # required
-    #           recommendation_transformer_uri: "__string",
-    #           recommendations_display_name: "__string",
-    #           recommendations_per_message: 1,
-    #         },
-    #       }
-    #
     # @!attribute [rw] recommender_id
     #   @return [String]
     #
@@ -17823,167 +12991,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateSegmentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         segment_id: "__string", # required
-    #         write_segment_request: { # required
-    #           dimensions: {
-    #             attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             behavior: {
-    #               recency: {
-    #                 duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                 recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #               },
-    #             },
-    #             demographic: {
-    #               app_version: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               channel: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               device_type: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               make: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               model: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               platform: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #             location: {
-    #               country: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               gps_point: {
-    #                 coordinates: { # required
-    #                   latitude: 1.0, # required
-    #                   longitude: 1.0, # required
-    #                 },
-    #                 range_in_kilometers: 1.0,
-    #               },
-    #             },
-    #             metrics: {
-    #               "__string" => {
-    #                 comparison_operator: "__string", # required
-    #                 value: 1.0, # required
-    #               },
-    #             },
-    #             user_attributes: {
-    #               "__string" => {
-    #                 attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                 values: ["__string"], # required
-    #               },
-    #             },
-    #           },
-    #           name: "__string",
-    #           segment_groups: {
-    #             groups: [
-    #               {
-    #                 dimensions: [
-    #                   {
-    #                     attributes: {
-    #                       "__string" => {
-    #                         attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                         values: ["__string"], # required
-    #                       },
-    #                     },
-    #                     behavior: {
-    #                       recency: {
-    #                         duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                         recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                       },
-    #                     },
-    #                     demographic: {
-    #                       app_version: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       channel: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       device_type: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       make: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       model: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       platform: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                     },
-    #                     location: {
-    #                       country: {
-    #                         dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                         values: ["__string"], # required
-    #                       },
-    #                       gps_point: {
-    #                         coordinates: { # required
-    #                           latitude: 1.0, # required
-    #                           longitude: 1.0, # required
-    #                         },
-    #                         range_in_kilometers: 1.0,
-    #                       },
-    #                     },
-    #                     metrics: {
-    #                       "__string" => {
-    #                         comparison_operator: "__string", # required
-    #                         value: 1.0, # required
-    #                       },
-    #                     },
-    #                     user_attributes: {
-    #                       "__string" => {
-    #                         attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                         values: ["__string"], # required
-    #                       },
-    #                     },
-    #                   },
-    #                 ],
-    #                 source_segments: [
-    #                   {
-    #                     id: "__string", # required
-    #                     version: 1,
-    #                   },
-    #                 ],
-    #                 source_type: "ALL", # accepts ALL, ANY, NONE
-    #                 type: "ALL", # accepts ALL, ANY, NONE
-    #               },
-    #             ],
-    #             include: "ALL", # accepts ALL, ANY, NONE
-    #           },
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -18019,18 +13026,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateSmsChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         sms_channel_request: { # required
-    #           enabled: false,
-    #           sender_id: "__string",
-    #           short_code: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -18061,24 +13056,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateSmsTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         create_new_version: false,
-    #         sms_template_request: { # required
-    #           body: "__string",
-    #           default_substitutions: "__string",
-    #           recommender_id: "__string",
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #           template_description: "__string",
-    #         },
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #       }
-    #
     # @!attribute [rw] create_new_version
     #   @return [Boolean]
     #
@@ -18116,17 +13093,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateTemplateActiveVersionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_active_version_request: { # required
-    #           version: "__string",
-    #         },
-    #         template_name: "__string", # required
-    #         template_type: "__string", # required
-    #       }
-    #
     # @!attribute [rw] template_active_version_request
     #   Specifies which version of a message template to use as the active
     #   version of the template.
@@ -18160,16 +13126,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateVoiceChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "__string", # required
-    #         voice_channel_request: { # required
-    #           enabled: false,
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_id
     #   @return [String]
     #
@@ -18200,25 +13156,6 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateVoiceTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         create_new_version: false,
-    #         template_name: "__string", # required
-    #         version: "__string",
-    #         voice_template_request: { # required
-    #           body: "__string",
-    #           default_substitutions: "__string",
-    #           language_code: "__string",
-    #           tags: {
-    #             "__string" => "__string",
-    #           },
-    #           template_description: "__string",
-    #           voice_id: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] create_new_version
     #   @return [Boolean]
     #
@@ -18256,15 +13193,74 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
+    # Verify OTP Message Response.
+    #
+    # @!attribute [rw] valid
+    #   Specifies whether the OTP is valid or not.
+    #   @return [Boolean]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/VerificationResponse AWS API Documentation
+    #
+    class VerificationResponse < Struct.new(
+      :valid)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] application_id
+    #   @return [String]
+    #
+    # @!attribute [rw] verify_otp_message_request_parameters
+    #   Verify OTP message request.
+    #   @return [Types::VerifyOTPMessageRequestParameters]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/VerifyOTPMessageRequest AWS API Documentation
+    #
+    class VerifyOTPMessageRequest < Struct.new(
+      :application_id,
+      :verify_otp_message_request_parameters)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Verify OTP message request.
+    #
+    # @!attribute [rw] destination_identity
+    #   The destination identity to send OTP to.
+    #   @return [String]
+    #
+    # @!attribute [rw] otp
+    #   The OTP the end user provided for verification.
+    #   @return [String]
+    #
+    # @!attribute [rw] reference_id
+    #   The reference identifier provided when the OTP was previously sent.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/VerifyOTPMessageRequestParameters AWS API Documentation
+    #
+    class VerifyOTPMessageRequestParameters < Struct.new(
+      :destination_identity,
+      :otp,
+      :reference_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] verification_response
+    #   Verify OTP Message Response.
+    #   @return [Types::VerificationResponse]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/VerifyOTPMessageResponse AWS API Documentation
+    #
+    class VerifyOTPMessageResponse < Struct.new(
+      :verification_response)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Specifies the status and settings of the voice channel for an
     # application.
-    #
-    # @note When making an API call, you may pass VoiceChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         enabled: false,
-    #       }
     #
     # @!attribute [rw] enabled
     #   Specifies whether to enable the voice channel for the application.
@@ -18347,19 +13343,6 @@ module Aws::Pinpoint
     # Specifies the settings for a one-time voice message that's sent
     # directly to an endpoint through the voice channel.
     #
-    # @note When making an API call, you may pass VoiceMessage
-    #   data as a hash:
-    #
-    #       {
-    #         body: "__string",
-    #         language_code: "__string",
-    #         origination_number: "__string",
-    #         substitutions: {
-    #           "__string" => ["__string"],
-    #         },
-    #         voice_id: "__string",
-    #       }
-    #
     # @!attribute [rw] body
     #   The text of the script to use for the voice message.
     #   @return [String]
@@ -18411,20 +13394,6 @@ module Aws::Pinpoint
     # Specifies the content and settings for a message template that can be
     # used in messages that are sent through the voice channel.
     #
-    # @note When making an API call, you may pass VoiceTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         body: "__string",
-    #         default_substitutions: "__string",
-    #         language_code: "__string",
-    #         tags: {
-    #           "__string" => "__string",
-    #         },
-    #         template_description: "__string",
-    #         voice_id: "__string",
-    #       }
-    #
     # @!attribute [rw] body
     #   The text of the script to use in messages that are based on the
     #   message template, in plain text format.
@@ -18452,9 +13421,25 @@ module Aws::Pinpoint
     #   @return [String]
     #
     # @!attribute [rw] tags
-    #   A string-to-string map of key-value pairs that defines the tags to
-    #   associate with the message template. Each tag consists of a required
-    #   tag key and an associated tag value.
+    #   <note markdown="1">As of **22-05-2023** tags has been deprecated for update operations.
+    #   After this date any value in tags is not processed and an error code
+    #   is not returned. To manage tags we recommend using either [Tags][1]
+    #   in the *API Reference for Amazon Pinpoint*,
+    #   [resourcegroupstaggingapi][2] commands in the *AWS Command Line
+    #   Interface Documentation* or [resourcegroupstaggingapi][3] in the
+    #   *AWS SDK*.
+    #
+    #   </note>
+    #
+    #   (Deprecated) A string-to-string map of key-value pairs that defines
+    #   the tags to associate with the message template. Each tag consists
+    #   of a required tag key and an associated tag value.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/tags-resource-arn.html
+    #   [2]: https://docs.aws.amazon.com/cli/latest/reference/resourcegroupstaggingapi/index.html
+    #   [3]: https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/resourcegroupstaggingapi/package-summary.html
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] template_description
@@ -18583,17 +13568,6 @@ module Aws::Pinpoint
     # activity waits for a certain amount of time or until a specific date
     # and time before moving participants to the next activity in a journey.
     #
-    # @note When making an API call, you may pass WaitActivity
-    #   data as a hash:
-    #
-    #       {
-    #         next_activity: "__string",
-    #         wait_time: {
-    #           wait_for: "__string",
-    #           wait_until: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] next_activity
     #   The unique identifier for the next activity to perform, after
     #   performing the wait activity.
@@ -18617,14 +13591,6 @@ module Aws::Pinpoint
     # Pinpoint determines whether an activity's conditions have been met or
     # an activity moves participants to the next activity in a journey.
     #
-    # @note When making an API call, you may pass WaitTime
-    #   data as a hash:
-    #
-    #       {
-    #         wait_for: "__string",
-    #         wait_until: "__string",
-    #       }
-    #
     # @!attribute [rw] wait_for
     #   The amount of time to wait, as a duration in ISO 8601 format, before
     #   determining whether the activity's conditions have been met or
@@ -18647,28 +13613,6 @@ module Aws::Pinpoint
     end
 
     # Specifies the default settings for an application.
-    #
-    # @note When making an API call, you may pass WriteApplicationSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         campaign_hook: {
-    #           lambda_function_name: "__string",
-    #           mode: "DELIVERY", # accepts DELIVERY, FILTER
-    #           web_url: "__string",
-    #         },
-    #         cloud_watch_metrics_enabled: false,
-    #         limits: {
-    #           daily: 1,
-    #           maximum_duration: 1,
-    #           messages_per_second: 1,
-    #           total: 1,
-    #         },
-    #         quiet_time: {
-    #           end: "__string",
-    #           start: "__string",
-    #         },
-    #       }
     #
     # @!attribute [rw] campaign_hook
     #   The settings for the AWS Lambda function to invoke by default as a
@@ -18732,333 +13676,25 @@ module Aws::Pinpoint
     #   campaign or journey.
     #   @return [Types::QuietTime]
     #
+    # @!attribute [rw] journey_limits
+    #   The default sending limits for journeys in the application. These
+    #   limits apply to each journey for the application but can be
+    #   overridden, on a per journey basis, with the JourneyLimits resource.
+    #   @return [Types::ApplicationSettingsJourneyLimits]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/WriteApplicationSettingsRequest AWS API Documentation
     #
     class WriteApplicationSettingsRequest < Struct.new(
       :campaign_hook,
       :cloud_watch_metrics_enabled,
       :limits,
-      :quiet_time)
+      :quiet_time,
+      :journey_limits)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Specifies the configuration and other settings for a campaign.
-    #
-    # @note When making an API call, you may pass WriteCampaignRequest
-    #   data as a hash:
-    #
-    #       {
-    #         additional_treatments: [
-    #           {
-    #             custom_delivery_configuration: {
-    #               delivery_uri: "__string", # required
-    #               endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #             },
-    #             message_configuration: {
-    #               adm_message: {
-    #                 action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                 body: "__string",
-    #                 image_icon_url: "__string",
-    #                 image_small_icon_url: "__string",
-    #                 image_url: "__string",
-    #                 json_body: "__string",
-    #                 media_url: "__string",
-    #                 raw_content: "__string",
-    #                 silent_push: false,
-    #                 time_to_live: 1,
-    #                 title: "__string",
-    #                 url: "__string",
-    #               },
-    #               apns_message: {
-    #                 action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                 body: "__string",
-    #                 image_icon_url: "__string",
-    #                 image_small_icon_url: "__string",
-    #                 image_url: "__string",
-    #                 json_body: "__string",
-    #                 media_url: "__string",
-    #                 raw_content: "__string",
-    #                 silent_push: false,
-    #                 time_to_live: 1,
-    #                 title: "__string",
-    #                 url: "__string",
-    #               },
-    #               baidu_message: {
-    #                 action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                 body: "__string",
-    #                 image_icon_url: "__string",
-    #                 image_small_icon_url: "__string",
-    #                 image_url: "__string",
-    #                 json_body: "__string",
-    #                 media_url: "__string",
-    #                 raw_content: "__string",
-    #                 silent_push: false,
-    #                 time_to_live: 1,
-    #                 title: "__string",
-    #                 url: "__string",
-    #               },
-    #               custom_message: {
-    #                 data: "__string",
-    #               },
-    #               default_message: {
-    #                 action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                 body: "__string",
-    #                 image_icon_url: "__string",
-    #                 image_small_icon_url: "__string",
-    #                 image_url: "__string",
-    #                 json_body: "__string",
-    #                 media_url: "__string",
-    #                 raw_content: "__string",
-    #                 silent_push: false,
-    #                 time_to_live: 1,
-    #                 title: "__string",
-    #                 url: "__string",
-    #               },
-    #               email_message: {
-    #                 body: "__string",
-    #                 from_address: "__string",
-    #                 html_body: "__string",
-    #                 title: "__string",
-    #               },
-    #               gcm_message: {
-    #                 action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #                 body: "__string",
-    #                 image_icon_url: "__string",
-    #                 image_small_icon_url: "__string",
-    #                 image_url: "__string",
-    #                 json_body: "__string",
-    #                 media_url: "__string",
-    #                 raw_content: "__string",
-    #                 silent_push: false,
-    #                 time_to_live: 1,
-    #                 title: "__string",
-    #                 url: "__string",
-    #               },
-    #               sms_message: {
-    #                 body: "__string",
-    #                 message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #                 sender_id: "__string",
-    #               },
-    #             },
-    #             schedule: {
-    #               end_time: "__string",
-    #               event_filter: {
-    #                 dimensions: { # required
-    #                   attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   event_type: {
-    #                     dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                     values: ["__string"], # required
-    #                   },
-    #                   metrics: {
-    #                     "__string" => {
-    #                       comparison_operator: "__string", # required
-    #                       value: 1.0, # required
-    #                     },
-    #                   },
-    #                 },
-    #                 filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #               },
-    #               frequency: "ONCE", # accepts ONCE, HOURLY, DAILY, WEEKLY, MONTHLY, EVENT
-    #               is_local_time: false,
-    #               quiet_time: {
-    #                 end: "__string",
-    #                 start: "__string",
-    #               },
-    #               start_time: "__string", # required
-    #               timezone: "__string",
-    #             },
-    #             size_percent: 1, # required
-    #             template_configuration: {
-    #               email_template: {
-    #                 name: "__string",
-    #                 version: "__string",
-    #               },
-    #               push_template: {
-    #                 name: "__string",
-    #                 version: "__string",
-    #               },
-    #               sms_template: {
-    #                 name: "__string",
-    #                 version: "__string",
-    #               },
-    #               voice_template: {
-    #                 name: "__string",
-    #                 version: "__string",
-    #               },
-    #             },
-    #             treatment_description: "__string",
-    #             treatment_name: "__string",
-    #           },
-    #         ],
-    #         custom_delivery_configuration: {
-    #           delivery_uri: "__string", # required
-    #           endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #         },
-    #         description: "__string",
-    #         holdout_percent: 1,
-    #         hook: {
-    #           lambda_function_name: "__string",
-    #           mode: "DELIVERY", # accepts DELIVERY, FILTER
-    #           web_url: "__string",
-    #         },
-    #         is_paused: false,
-    #         limits: {
-    #           daily: 1,
-    #           maximum_duration: 1,
-    #           messages_per_second: 1,
-    #           total: 1,
-    #         },
-    #         message_configuration: {
-    #           adm_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_small_icon_url: "__string",
-    #             image_url: "__string",
-    #             json_body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           apns_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_small_icon_url: "__string",
-    #             image_url: "__string",
-    #             json_body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           baidu_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_small_icon_url: "__string",
-    #             image_url: "__string",
-    #             json_body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           custom_message: {
-    #             data: "__string",
-    #           },
-    #           default_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_small_icon_url: "__string",
-    #             image_url: "__string",
-    #             json_body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           email_message: {
-    #             body: "__string",
-    #             from_address: "__string",
-    #             html_body: "__string",
-    #             title: "__string",
-    #           },
-    #           gcm_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_small_icon_url: "__string",
-    #             image_url: "__string",
-    #             json_body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           sms_message: {
-    #             body: "__string",
-    #             message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #             sender_id: "__string",
-    #           },
-    #         },
-    #         name: "__string",
-    #         schedule: {
-    #           end_time: "__string",
-    #           event_filter: {
-    #             dimensions: { # required
-    #               attributes: {
-    #                 "__string" => {
-    #                   attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                   values: ["__string"], # required
-    #                 },
-    #               },
-    #               event_type: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               metrics: {
-    #                 "__string" => {
-    #                   comparison_operator: "__string", # required
-    #                   value: 1.0, # required
-    #                 },
-    #               },
-    #             },
-    #             filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #           },
-    #           frequency: "ONCE", # accepts ONCE, HOURLY, DAILY, WEEKLY, MONTHLY, EVENT
-    #           is_local_time: false,
-    #           quiet_time: {
-    #             end: "__string",
-    #             start: "__string",
-    #           },
-    #           start_time: "__string", # required
-    #           timezone: "__string",
-    #         },
-    #         segment_id: "__string",
-    #         segment_version: 1,
-    #         tags: {
-    #           "__string" => "__string",
-    #         },
-    #         template_configuration: {
-    #           email_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           push_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           sms_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           voice_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #         },
-    #         treatment_description: "__string",
-    #         treatment_name: "__string",
-    #       }
     #
     # @!attribute [rw] additional_treatments
     #   An array of requests that defines additional treatments for the
@@ -19118,9 +13754,25 @@ module Aws::Pinpoint
     #   @return [Integer]
     #
     # @!attribute [rw] tags
-    #   A string-to-string map of key-value pairs that defines the tags to
-    #   associate with the campaign. Each tag consists of a required tag key
-    #   and an associated tag value.
+    #   <note markdown="1">As of **22-05-2023** tags has been deprecated for update operations.
+    #   After this date any value in tags is not processed and an error code
+    #   is not returned. To manage tags we recommend using either [Tags][1]
+    #   in the *API Reference for Amazon Pinpoint*,
+    #   [resourcegroupstaggingapi][2] commands in the *AWS Command Line
+    #   Interface Documentation* or [resourcegroupstaggingapi][3] in the
+    #   *AWS SDK*.
+    #
+    #   </note>
+    #
+    #   (Deprecated) A string-to-string map of key-value pairs that defines
+    #   the tags to associate with the campaign. Each tag consists of a
+    #   required tag key and an associated tag value.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/tags-resource-arn.html
+    #   [2]: https://docs.aws.amazon.com/cli/latest/reference/resourcegroupstaggingapi/index.html
+    #   [3]: https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/resourcegroupstaggingapi/package-summary.html
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] template_configuration
@@ -19136,6 +13788,12 @@ module Aws::Pinpoint
     #   campaign has multiple treatments. A *treatment* is a variation of a
     #   campaign that's used for A/B testing.
     #   @return [String]
+    #
+    # @!attribute [rw] priority
+    #   Defines the priority of the campaign, used to decide the order of
+    #   messages displayed to user if there are multiple messages scheduled
+    #   to be displayed at the same moment.
+    #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/WriteCampaignRequest AWS API Documentation
     #
@@ -19155,7 +13813,8 @@ module Aws::Pinpoint
       :tags,
       :template_configuration,
       :treatment_description,
-      :treatment_name)
+      :treatment_name,
+      :priority)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -19164,24 +13823,16 @@ module Aws::Pinpoint
     # events to and the AWS Identity and Access Management (IAM) role to use
     # when publishing those events.
     #
-    # @note When making an API call, you may pass WriteEventStream
-    #   data as a hash:
-    #
-    #       {
-    #         destination_stream_arn: "__string", # required
-    #         role_arn: "__string", # required
-    #       }
-    #
     # @!attribute [rw] destination_stream_arn
     #   The Amazon Resource Name (ARN) of the Amazon Kinesis data stream or
     #   Amazon Kinesis Data Firehose delivery stream that you want to
     #   publish event data to.
     #
     #   For a Kinesis data stream, the ARN format is:
-    #   arn:aws:kinesis:*region*\:*account-id*\:stream/*stream\_name*
+    #   arn:aws:kinesis:*region*:*account-id*:stream/*stream\_name*
     #
     #   For a Kinesis Data Firehose delivery stream, the ARN format is:
-    #   arn:aws:firehose:*region*\:*account-id*\:deliverystream/*stream\_name*
+    #   arn:aws:firehose:*region*:*account-id*:deliverystream/*stream\_name*
     #   @return [String]
     #
     # @!attribute [rw] role_arn
@@ -19200,329 +13851,6 @@ module Aws::Pinpoint
     end
 
     # Specifies the configuration and other settings for a journey.
-    #
-    # @note When making an API call, you may pass WriteJourneyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         activities: {
-    #           "__string" => {
-    #             custom: {
-    #               delivery_uri: "__string",
-    #               endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #               message_config: {
-    #                 data: "__string",
-    #               },
-    #               next_activity: "__string",
-    #               template_name: "__string",
-    #               template_version: "__string",
-    #             },
-    #             conditional_split: {
-    #               condition: {
-    #                 conditions: [
-    #                   {
-    #                     event_condition: {
-    #                       dimensions: {
-    #                         attributes: {
-    #                           "__string" => {
-    #                             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                         event_type: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         metrics: {
-    #                           "__string" => {
-    #                             comparison_operator: "__string", # required
-    #                             value: 1.0, # required
-    #                           },
-    #                         },
-    #                       },
-    #                       message_activity: "__string",
-    #                     },
-    #                     segment_condition: {
-    #                       segment_id: "__string", # required
-    #                     },
-    #                     segment_dimensions: {
-    #                       attributes: {
-    #                         "__string" => {
-    #                           attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                           values: ["__string"], # required
-    #                         },
-    #                       },
-    #                       behavior: {
-    #                         recency: {
-    #                           duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                           recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                         },
-    #                       },
-    #                       demographic: {
-    #                         app_version: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         channel: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         device_type: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         make: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         model: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         platform: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                       },
-    #                       location: {
-    #                         country: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         gps_point: {
-    #                           coordinates: { # required
-    #                             latitude: 1.0, # required
-    #                             longitude: 1.0, # required
-    #                           },
-    #                           range_in_kilometers: 1.0,
-    #                         },
-    #                       },
-    #                       metrics: {
-    #                         "__string" => {
-    #                           comparison_operator: "__string", # required
-    #                           value: 1.0, # required
-    #                         },
-    #                       },
-    #                       user_attributes: {
-    #                         "__string" => {
-    #                           attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                           values: ["__string"], # required
-    #                         },
-    #                       },
-    #                     },
-    #                   },
-    #                 ],
-    #                 operator: "ALL", # accepts ALL, ANY
-    #               },
-    #               evaluation_wait_time: {
-    #                 wait_for: "__string",
-    #                 wait_until: "__string",
-    #               },
-    #               false_activity: "__string",
-    #               true_activity: "__string",
-    #             },
-    #             description: "__string",
-    #             email: {
-    #               message_config: {
-    #                 from_address: "__string",
-    #               },
-    #               next_activity: "__string",
-    #               template_name: "__string",
-    #               template_version: "__string",
-    #             },
-    #             holdout: {
-    #               next_activity: "__string",
-    #               percentage: 1, # required
-    #             },
-    #             multi_condition: {
-    #               branches: [
-    #                 {
-    #                   condition: {
-    #                     event_condition: {
-    #                       dimensions: {
-    #                         attributes: {
-    #                           "__string" => {
-    #                             attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                             values: ["__string"], # required
-    #                           },
-    #                         },
-    #                         event_type: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         metrics: {
-    #                           "__string" => {
-    #                             comparison_operator: "__string", # required
-    #                             value: 1.0, # required
-    #                           },
-    #                         },
-    #                       },
-    #                       message_activity: "__string",
-    #                     },
-    #                     segment_condition: {
-    #                       segment_id: "__string", # required
-    #                     },
-    #                     segment_dimensions: {
-    #                       attributes: {
-    #                         "__string" => {
-    #                           attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                           values: ["__string"], # required
-    #                         },
-    #                       },
-    #                       behavior: {
-    #                         recency: {
-    #                           duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                           recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                         },
-    #                       },
-    #                       demographic: {
-    #                         app_version: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         channel: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         device_type: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         make: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         model: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         platform: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                       },
-    #                       location: {
-    #                         country: {
-    #                           dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                           values: ["__string"], # required
-    #                         },
-    #                         gps_point: {
-    #                           coordinates: { # required
-    #                             latitude: 1.0, # required
-    #                             longitude: 1.0, # required
-    #                           },
-    #                           range_in_kilometers: 1.0,
-    #                         },
-    #                       },
-    #                       metrics: {
-    #                         "__string" => {
-    #                           comparison_operator: "__string", # required
-    #                           value: 1.0, # required
-    #                         },
-    #                       },
-    #                       user_attributes: {
-    #                         "__string" => {
-    #                           attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                           values: ["__string"], # required
-    #                         },
-    #                       },
-    #                     },
-    #                   },
-    #                   next_activity: "__string",
-    #                 },
-    #               ],
-    #               default_activity: "__string",
-    #               evaluation_wait_time: {
-    #                 wait_for: "__string",
-    #                 wait_until: "__string",
-    #               },
-    #             },
-    #             push: {
-    #               message_config: {
-    #                 time_to_live: "__string",
-    #               },
-    #               next_activity: "__string",
-    #               template_name: "__string",
-    #               template_version: "__string",
-    #             },
-    #             random_split: {
-    #               branches: [
-    #                 {
-    #                   next_activity: "__string",
-    #                   percentage: 1,
-    #                 },
-    #               ],
-    #             },
-    #             sms: {
-    #               message_config: {
-    #                 message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #                 sender_id: "__string",
-    #               },
-    #               next_activity: "__string",
-    #               template_name: "__string",
-    #               template_version: "__string",
-    #             },
-    #             wait: {
-    #               next_activity: "__string",
-    #               wait_time: {
-    #                 wait_for: "__string",
-    #                 wait_until: "__string",
-    #               },
-    #             },
-    #           },
-    #         },
-    #         creation_date: "__string",
-    #         last_modified_date: "__string",
-    #         limits: {
-    #           daily_cap: 1,
-    #           endpoint_reentry_cap: 1,
-    #           messages_per_second: 1,
-    #         },
-    #         local_time: false,
-    #         name: "__string", # required
-    #         quiet_time: {
-    #           end: "__string",
-    #           start: "__string",
-    #         },
-    #         refresh_frequency: "__string",
-    #         schedule: {
-    #           end_time: Time.now,
-    #           start_time: Time.now,
-    #           timezone: "__string",
-    #         },
-    #         start_activity: "__string",
-    #         start_condition: {
-    #           description: "__string",
-    #           event_start_condition: {
-    #             event_filter: {
-    #               dimensions: { # required
-    #                 attributes: {
-    #                   "__string" => {
-    #                     attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                     values: ["__string"], # required
-    #                   },
-    #                 },
-    #                 event_type: {
-    #                   dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                   values: ["__string"], # required
-    #                 },
-    #                 metrics: {
-    #                   "__string" => {
-    #                     comparison_operator: "__string", # required
-    #                     value: 1.0, # required
-    #                   },
-    #                 },
-    #               },
-    #               filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #             },
-    #             segment_id: "__string",
-    #           },
-    #           segment_start_condition: {
-    #             segment_id: "__string", # required
-    #           },
-    #         },
-    #         state: "DRAFT", # accepts DRAFT, ACTIVE, COMPLETED, CANCELLED, CLOSED
-    #       }
     #
     # @!attribute [rw] activities
     #   A map that contains a set of Activity objects, one object for each
@@ -19608,12 +13936,66 @@ module Aws::Pinpoint
     #     the scheduled start time. If a journey's status is ACTIVE, you
     #     can't add, change, or remove activities from it.
     #
-    #   The CANCELLED, COMPLETED, and CLOSED values are not supported in
-    #   requests to create or update a journey. To cancel a journey, use the
-    #   <link linkend="apps-application-id-journeys-journey-id-state" />
+    #   PAUSED, CANCELLED, COMPLETED, and CLOSED states are not supported in
+    #   requests to create or update a journey. To cancel, pause, or resume
+    #   a journey, use the <link
+    #   linkend="apps-application-id-journeys-journey-id-state" />
     #
     #   Journey State</link> resource.
     #   @return [String]
+    #
+    # @!attribute [rw] wait_for_quiet_time
+    #   Indicates whether endpoints in quiet hours should enter a wait
+    #   activity until quiet hours have elapsed.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] refresh_on_segment_update
+    #   Indicates whether the journey participants should be refreshed when
+    #   a segment is updated.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] journey_channel_settings
+    #   IAM role ARN to be assumed when invoking Connect campaign execution
+    #   APIs for dialing.
+    #   @return [Types::JourneyChannelSettings]
+    #
+    # @!attribute [rw] sending_schedule
+    #   Indicates if journey has Advance Quiet Time enabled. This flag
+    #   should be set to true in order to allow using OpenHours and
+    #   ClosedDays.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] open_hours
+    #   The time when journey allow to send messages. QuietTime should be
+    #   configured first and SendingSchedule should be set to true.
+    #   @return [Types::OpenHours]
+    #
+    # @!attribute [rw] closed_days
+    #   The time when journey will stop sending messages. QuietTime should
+    #   be configured first and SendingSchedule should be set to true.
+    #   @return [Types::ClosedDays]
+    #
+    # @!attribute [rw] timezone_estimation_methods
+    #   An array of time zone estimation methods, if any, to use for
+    #   determining an [Endpoints][1] time zone if the Endpoint does not
+    #   have a value for the Demographic.Timezone attribute.
+    #
+    #   * PHONE\_NUMBER - A time zone is determined based on the
+    #     Endpoint.Address and Endpoint.Location.Country.
+    #
+    #   * POSTAL\_CODE - A time zone is determined based on the
+    #     Endpoint.Location.PostalCode and Endpoint.Location.Country.
+    #
+    #     <note markdown="1">POSTAL\_CODE detection is only supported in the United States,
+    #     United Kingdom, Australia, New Zealand, Canada, France, Italy,
+    #     Spain, Germany and in regions where Amazon Pinpoint is available.
+    #
+    #     </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-endpoints-endpoint-id.html
+    #   @return [Array<String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/WriteJourneyRequest AWS API Documentation
     #
@@ -19629,7 +14011,14 @@ module Aws::Pinpoint
       :schedule,
       :start_activity,
       :start_condition,
-      :state)
+      :state,
+      :wait_for_quiet_time,
+      :refresh_on_segment_update,
+      :journey_channel_settings,
+      :sending_schedule,
+      :open_hours,
+      :closed_days,
+      :timezone_estimation_methods)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -19637,163 +14026,6 @@ module Aws::Pinpoint
     # Specifies the configuration, dimension, and other settings for a
     # segment. A WriteSegmentRequest object can include a Dimensions object
     # or a SegmentGroups object, but not both.
-    #
-    # @note When making an API call, you may pass WriteSegmentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dimensions: {
-    #           attributes: {
-    #             "__string" => {
-    #               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #               values: ["__string"], # required
-    #             },
-    #           },
-    #           behavior: {
-    #             recency: {
-    #               duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #               recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #             },
-    #           },
-    #           demographic: {
-    #             app_version: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             channel: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             device_type: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             make: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             model: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             platform: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #           },
-    #           location: {
-    #             country: {
-    #               dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #               values: ["__string"], # required
-    #             },
-    #             gps_point: {
-    #               coordinates: { # required
-    #                 latitude: 1.0, # required
-    #                 longitude: 1.0, # required
-    #               },
-    #               range_in_kilometers: 1.0,
-    #             },
-    #           },
-    #           metrics: {
-    #             "__string" => {
-    #               comparison_operator: "__string", # required
-    #               value: 1.0, # required
-    #             },
-    #           },
-    #           user_attributes: {
-    #             "__string" => {
-    #               attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #               values: ["__string"], # required
-    #             },
-    #           },
-    #         },
-    #         name: "__string",
-    #         segment_groups: {
-    #           groups: [
-    #             {
-    #               dimensions: [
-    #                 {
-    #                   attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   behavior: {
-    #                     recency: {
-    #                       duration: "HR_24", # required, accepts HR_24, DAY_7, DAY_14, DAY_30
-    #                       recency_type: "ACTIVE", # required, accepts ACTIVE, INACTIVE
-    #                     },
-    #                   },
-    #                   demographic: {
-    #                     app_version: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     channel: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     device_type: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     make: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     model: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     platform: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                   location: {
-    #                     country: {
-    #                       dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                       values: ["__string"], # required
-    #                     },
-    #                     gps_point: {
-    #                       coordinates: { # required
-    #                         latitude: 1.0, # required
-    #                         longitude: 1.0, # required
-    #                       },
-    #                       range_in_kilometers: 1.0,
-    #                     },
-    #                   },
-    #                   metrics: {
-    #                     "__string" => {
-    #                       comparison_operator: "__string", # required
-    #                       value: 1.0, # required
-    #                     },
-    #                   },
-    #                   user_attributes: {
-    #                     "__string" => {
-    #                       attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                       values: ["__string"], # required
-    #                     },
-    #                   },
-    #                 },
-    #               ],
-    #               source_segments: [
-    #                 {
-    #                   id: "__string", # required
-    #                   version: 1,
-    #                 },
-    #               ],
-    #               source_type: "ALL", # accepts ALL, ANY, NONE
-    #               type: "ALL", # accepts ALL, ANY, NONE
-    #             },
-    #           ],
-    #           include: "ALL", # accepts ALL, ANY, NONE
-    #         },
-    #         tags: {
-    #           "__string" => "__string",
-    #         },
-    #       }
     #
     # @!attribute [rw] dimensions
     #   The criteria that define the dimensions for the segment.
@@ -19811,9 +14043,25 @@ module Aws::Pinpoint
     #   @return [Types::SegmentGroupList]
     #
     # @!attribute [rw] tags
-    #   A string-to-string map of key-value pairs that defines the tags to
-    #   associate with the segment. Each tag consists of a required tag key
-    #   and an associated tag value.
+    #   <note markdown="1">As of **22-05-2023** tags has been deprecated for update operations.
+    #   After this date any value in tags is not processed and an error code
+    #   is not returned. To manage tags we recommend using either [Tags][1]
+    #   in the *API Reference for Amazon Pinpoint*,
+    #   [resourcegroupstaggingapi][2] commands in the *AWS Command Line
+    #   Interface Documentation* or [resourcegroupstaggingapi][3] in the
+    #   *AWS SDK*.
+    #
+    #   </note>
+    #
+    #   (Deprecated) A string-to-string map of key-value pairs that defines
+    #   the tags to associate with the segment. Each tag consists of a
+    #   required tag key and an associated tag value.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/pinpoint/latest/apireference/tags-resource-arn.html
+    #   [2]: https://docs.aws.amazon.com/cli/latest/reference/resourcegroupstaggingapi/index.html
+    #   [3]: https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/resourcegroupstaggingapi/package-summary.html
     #   @return [Hash<String,String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/WriteSegmentRequest AWS API Documentation
@@ -19829,155 +14077,6 @@ module Aws::Pinpoint
 
     # Specifies the settings for a campaign treatment. A *treatment* is a
     # variation of a campaign that's used for A/B testing of a campaign.
-    #
-    # @note When making an API call, you may pass WriteTreatmentResource
-    #   data as a hash:
-    #
-    #       {
-    #         custom_delivery_configuration: {
-    #           delivery_uri: "__string", # required
-    #           endpoint_types: ["PUSH"], # accepts PUSH, GCM, APNS, APNS_SANDBOX, APNS_VOIP, APNS_VOIP_SANDBOX, ADM, SMS, VOICE, EMAIL, BAIDU, CUSTOM
-    #         },
-    #         message_configuration: {
-    #           adm_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_small_icon_url: "__string",
-    #             image_url: "__string",
-    #             json_body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           apns_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_small_icon_url: "__string",
-    #             image_url: "__string",
-    #             json_body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           baidu_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_small_icon_url: "__string",
-    #             image_url: "__string",
-    #             json_body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           custom_message: {
-    #             data: "__string",
-    #           },
-    #           default_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_small_icon_url: "__string",
-    #             image_url: "__string",
-    #             json_body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           email_message: {
-    #             body: "__string",
-    #             from_address: "__string",
-    #             html_body: "__string",
-    #             title: "__string",
-    #           },
-    #           gcm_message: {
-    #             action: "OPEN_APP", # accepts OPEN_APP, DEEP_LINK, URL
-    #             body: "__string",
-    #             image_icon_url: "__string",
-    #             image_small_icon_url: "__string",
-    #             image_url: "__string",
-    #             json_body: "__string",
-    #             media_url: "__string",
-    #             raw_content: "__string",
-    #             silent_push: false,
-    #             time_to_live: 1,
-    #             title: "__string",
-    #             url: "__string",
-    #           },
-    #           sms_message: {
-    #             body: "__string",
-    #             message_type: "TRANSACTIONAL", # accepts TRANSACTIONAL, PROMOTIONAL
-    #             sender_id: "__string",
-    #           },
-    #         },
-    #         schedule: {
-    #           end_time: "__string",
-    #           event_filter: {
-    #             dimensions: { # required
-    #               attributes: {
-    #                 "__string" => {
-    #                   attribute_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, BETWEEN, ON
-    #                   values: ["__string"], # required
-    #                 },
-    #               },
-    #               event_type: {
-    #                 dimension_type: "INCLUSIVE", # accepts INCLUSIVE, EXCLUSIVE
-    #                 values: ["__string"], # required
-    #               },
-    #               metrics: {
-    #                 "__string" => {
-    #                   comparison_operator: "__string", # required
-    #                   value: 1.0, # required
-    #                 },
-    #               },
-    #             },
-    #             filter_type: "SYSTEM", # required, accepts SYSTEM, ENDPOINT
-    #           },
-    #           frequency: "ONCE", # accepts ONCE, HOURLY, DAILY, WEEKLY, MONTHLY, EVENT
-    #           is_local_time: false,
-    #           quiet_time: {
-    #             end: "__string",
-    #             start: "__string",
-    #           },
-    #           start_time: "__string", # required
-    #           timezone: "__string",
-    #         },
-    #         size_percent: 1, # required
-    #         template_configuration: {
-    #           email_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           push_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           sms_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #           voice_template: {
-    #             name: "__string",
-    #             version: "__string",
-    #           },
-    #         },
-    #         treatment_description: "__string",
-    #         treatment_name: "__string",
-    #       }
     #
     # @!attribute [rw] custom_delivery_configuration
     #   The delivery configuration settings for sending the treatment
@@ -20025,5 +14124,120 @@ module Aws::Pinpoint
       include Aws::Structure
     end
 
+    # Specifies the start and end time for OpenHours.
+    #
+    # @!attribute [rw] start_time
+    #   The start of the scheduled time, in ISO 8601 format, when the
+    #   channel can send messages.
+    #   @return [String]
+    #
+    # @!attribute [rw] end_time
+    #   The end of the scheduled time, in ISO 8601 format, when the channel
+    #   can't send messages.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/OpenHoursRule AWS API Documentation
+    #
+    class OpenHoursRule < Struct.new(
+      :start_time,
+      :end_time)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Specifies the times when message are allowed to be sent to endpoints.
+    #
+    # @!attribute [rw] email
+    #   Rules for Email Channel.
+    #   @return [Hash<String,Array<Types::OpenHoursRule>>]
+    #
+    # @!attribute [rw] sms
+    #   Rules for SMS Channel.
+    #   @return [Hash<String,Array<Types::OpenHoursRule>>]
+    #
+    # @!attribute [rw] push
+    #   Rules for Push Channel.
+    #   @return [Hash<String,Array<Types::OpenHoursRule>>]
+    #
+    # @!attribute [rw] voice
+    #   Rules for Email Channel.
+    #   @return [Hash<String,Array<Types::OpenHoursRule>>]
+    #
+    # @!attribute [rw] custom
+    #   Rules for Custom Channel.
+    #   @return [Hash<String,Array<Types::OpenHoursRule>>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/OpenHours AWS API Documentation
+    #
+    class OpenHours < Struct.new(
+      :email,
+      :sms,
+      :push,
+      :voice,
+      :custom)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Specifies the rule settings for when messages can't be sent.
+    #
+    # @!attribute [rw] name
+    #   The name of the closed day rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] start_date_time
+    #   Start DateTime ISO 8601 format
+    #   @return [String]
+    #
+    # @!attribute [rw] end_date_time
+    #   End DateTime ISO 8601 format
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/ClosedDaysRule AWS API Documentation
+    #
+    class ClosedDaysRule < Struct.new(
+      :name,
+      :start_date_time,
+      :end_date_time)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The time when a journey will not send messages. QuietTime should be
+    # configured first and SendingSchedule should be set to true.
+    #
+    # @!attribute [rw] email
+    #   Rules for a Channel.
+    #   @return [Array<Types::ClosedDaysRule>]
+    #
+    # @!attribute [rw] sms
+    #   Rules for a Channel.
+    #   @return [Array<Types::ClosedDaysRule>]
+    #
+    # @!attribute [rw] push
+    #   Rules for a Channel.
+    #   @return [Array<Types::ClosedDaysRule>]
+    #
+    # @!attribute [rw] voice
+    #   Rules for a Channel.
+    #   @return [Array<Types::ClosedDaysRule>]
+    #
+    # @!attribute [rw] custom
+    #   Rules for a Channel.
+    #   @return [Array<Types::ClosedDaysRule>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/pinpoint-2016-12-01/ClosedDays AWS API Documentation
+    #
+    class ClosedDays < Struct.new(
+      :email,
+      :sms,
+      :push,
+      :voice,
+      :custom)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
   end
 end
+

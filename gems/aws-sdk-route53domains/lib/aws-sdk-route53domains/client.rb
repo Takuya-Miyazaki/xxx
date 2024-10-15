@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:route53domains)
 
 module Aws::Route53Domains
   # An API client for Route53Domains.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::Route53Domains
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::Route53Domains::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::Route53Domains
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::Route53Domains
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::Route53Domains
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::Route53Domains
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::Route53Domains
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::Route53Domains
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +341,112 @@ module Aws::Route53Domains
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::Route53Domains::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::Route53Domains::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -337,24 +454,32 @@ module Aws::Route53Domains
 
     # @!group API Operations
 
-    # Accepts the transfer of a domain from another AWS account to the
-    # current AWS account. You initiate a transfer between AWS accounts
-    # using [TransferDomainToAnotherAwsAccount][1].
+    # Accepts the transfer of a domain from another Amazon Web Services
+    # account to the currentAmazon Web Services account. You initiate a
+    # transfer between Amazon Web Services accounts using
+    # [TransferDomainToAnotherAwsAccount][1].
     #
-    # Use either [ListOperations][2] or [GetOperationDetail][3] to determine
-    # whether the operation succeeded. [GetOperationDetail][3] provides
+    # If you use the CLI command at
+    # [accept-domain-transfer-from-another-aws-account][2], use JSON format
+    # as input instead of text because otherwise CLI will throw an error
+    # from domain transfer input that includes single quotes.
+    #
+    # Use either [ListOperations][3] or [GetOperationDetail][4] to determine
+    # whether the operation succeeded. [GetOperationDetail][4] provides
     # additional information, for example, `Domain Transfer from Aws Account
     # 111122223333 has been cancelled`.
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_TransferDomainToAnotherAwsAccount.html
-    # [2]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_ListOperations.html
-    # [3]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_GetOperationDetail.html
+    # [2]: https://docs.aws.amazon.com/cli/latest/reference/route53domains/accept-domain-transfer-from-another-aws-account.html
+    # [3]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_ListOperations.html
+    # [4]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_GetOperationDetail.html
     #
     # @option params [required, String] :domain_name
-    #   The name of the domain that was specified when another AWS account
-    #   submitted a [TransferDomainToAnotherAwsAccount][1] request.
+    #   The name of the domain that was specified when another Amazon Web
+    #   Services account submitted a [TransferDomainToAnotherAwsAccount][1]
+    #   request.
     #
     #
     #
@@ -376,7 +501,7 @@ module Aws::Route53Domains
     #
     #   resp = client.accept_domain_transfer_from_another_aws_account({
     #     domain_name: "DomainName", # required
-    #     password: "String", # required
+    #     password: "Password", # required
     #   })
     #
     # @example Response structure
@@ -392,12 +517,63 @@ module Aws::Route53Domains
       req.send_request(options)
     end
 
-    # Cancels the transfer of a domain from the current AWS account to
-    # another AWS account. You initiate a transfer between AWS accounts
-    # using [TransferDomainToAnotherAwsAccount][1].
+    # Creates a delegation signer (DS) record in the registry zone for this
+    # domain name.
     #
-    # You must cancel the transfer before the other AWS account accepts the
-    # transfer using [AcceptDomainTransferFromAnotherAwsAccount][2].
+    # Note that creating DS record at the registry impacts DNSSEC validation
+    # of your DNS records. This action may render your domain name
+    # unavailable on the internet if the steps are completed in the wrong
+    # order, or with incorrect timing. For more information about DNSSEC
+    # signing, see [Configuring DNSSEC signing][1] in the *Route 53
+    # developer guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec.html
+    #
+    # @option params [required, String] :domain_name
+    #   The name of the domain.
+    #
+    # @option params [required, Types::DnssecSigningAttributes] :signing_attributes
+    #   The information about a key, including the algorithm, public
+    #   key-value, and flags.
+    #
+    # @return [Types::AssociateDelegationSignerToDomainResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::AssociateDelegationSignerToDomainResponse#operation_id #operation_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.associate_delegation_signer_to_domain({
+    #     domain_name: "DomainName", # required
+    #     signing_attributes: { # required
+    #       algorithm: 1,
+    #       flags: 1,
+    #       public_key: "DnssecPublicKey",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operation_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/AssociateDelegationSignerToDomain AWS API Documentation
+    #
+    # @overload associate_delegation_signer_to_domain(params = {})
+    # @param [Hash] params ({})
+    def associate_delegation_signer_to_domain(params = {}, options = {})
+      req = build_request(:associate_delegation_signer_to_domain, params)
+      req.send_request(options)
+    end
+
+    # Cancels the transfer of a domain from the current Amazon Web Services
+    # account to another Amazon Web Services account. You initiate a
+    # transfer betweenAmazon Web Services accounts using
+    # [TransferDomainToAnotherAwsAccount][1].
+    #
+    # You must cancel the transfer before the other Amazon Web Services
+    # account accepts the transfer using
+    # [AcceptDomainTransferFromAnotherAwsAccount][2].
     #
     # Use either [ListOperations][3] or [GetOperationDetail][4] to determine
     # whether the operation succeeded. [GetOperationDetail][4] provides
@@ -413,7 +589,7 @@ module Aws::Route53Domains
     #
     # @option params [required, String] :domain_name
     #   The name of the domain for which you want to cancel the transfer to
-    #   another AWS account.
+    #   another Amazon Web Services account.
     #
     # @return [Types::CancelDomainTransferToAnotherAwsAccountResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -488,7 +664,7 @@ module Aws::Route53Domains
     #
     # @example Response structure
     #
-    #   resp.availability #=> String, one of "AVAILABLE", "AVAILABLE_RESERVED", "AVAILABLE_PREORDER", "UNAVAILABLE", "UNAVAILABLE_PREMIUM", "UNAVAILABLE_RESTRICTED", "RESERVED", "DONT_KNOW"
+    #   resp.availability #=> String, one of "AVAILABLE", "AVAILABLE_RESERVED", "AVAILABLE_PREORDER", "UNAVAILABLE", "UNAVAILABLE_PREMIUM", "UNAVAILABLE_RESTRICTED", "RESERVED", "DONT_KNOW", "INVALID_NAME_FOR_TLD", "PENDING"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/CheckDomainAvailability AWS API Documentation
     #
@@ -532,6 +708,7 @@ module Aws::Route53Domains
     # @return [Types::CheckDomainTransferabilityResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CheckDomainTransferabilityResponse#transferability #transferability} => Types::DomainTransferability
+    #   * {Types::CheckDomainTransferabilityResponse#message #message} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -542,7 +719,8 @@ module Aws::Route53Domains
     #
     # @example Response structure
     #
-    #   resp.transferability.transferable #=> String, one of "TRANSFERABLE", "UNTRANSFERABLE", "DONT_KNOW"
+    #   resp.transferability.transferable #=> String, one of "TRANSFERABLE", "UNTRANSFERABLE", "DONT_KNOW", "DOMAIN_IN_OWN_ACCOUNT", "DOMAIN_IN_ANOTHER_ACCOUNT", "PREMIUM_DOMAIN"
+    #   resp.message #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/CheckDomainTransferability AWS API Documentation
     #
@@ -550,6 +728,55 @@ module Aws::Route53Domains
     # @param [Hash] params ({})
     def check_domain_transferability(params = {}, options = {})
       req = build_request(:check_domain_transferability, params)
+      req.send_request(options)
+    end
+
+    # This operation deletes the specified domain. This action is permanent.
+    # For more information, see [Deleting a domain name registration][1].
+    #
+    # To transfer the domain registration to another registrar, use the
+    # transfer process that’s provided by the registrar to which you want to
+    # transfer the registration. Otherwise, the following apply:
+    #
+    # 1.  You can’t get a refund for the cost of a deleted domain
+    #     registration.
+    #
+    # 2.  The registry for the top-level domain might hold the domain name
+    #     for a brief time before releasing it for other users to register
+    #     (varies by registry).
+    #
+    # 3.  When the registration has been deleted, we'll send you a
+    #     confirmation to the registrant contact. The email will come from
+    #     `noreply@domainnameverification.net` or
+    #     `noreply@registrar.amazon.com`.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-delete.html
+    #
+    # @option params [required, String] :domain_name
+    #   Name of the domain to be deleted.
+    #
+    # @return [Types::DeleteDomainResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteDomainResponse#operation_id #operation_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_domain({
+    #     domain_name: "DomainName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operation_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/DeleteDomain AWS API Documentation
+    #
+    # @overload delete_domain(params = {})
+    # @param [Hash] params ({})
+    def delete_domain(params = {}, options = {})
+      req = build_request(:delete_domain, params)
       req.send_request(options)
     end
 
@@ -639,9 +866,49 @@ module Aws::Route53Domains
       req.send_request(options)
     end
 
+    # Deletes a delegation signer (DS) record in the registry zone for this
+    # domain name.
+    #
+    # @option params [required, String] :domain_name
+    #   Name of the domain.
+    #
+    # @option params [required, String] :id
+    #   An internal identification number assigned to each DS record after
+    #   it’s created. You can retrieve it as part of DNSSEC information
+    #   returned by [GetDomainDetail][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_GetDomainDetail.html
+    #
+    # @return [Types::DisassociateDelegationSignerFromDomainResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DisassociateDelegationSignerFromDomainResponse#operation_id #operation_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.disassociate_delegation_signer_from_domain({
+    #     domain_name: "DomainName", # required
+    #     id: "String", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operation_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/DisassociateDelegationSignerFromDomain AWS API Documentation
+    #
+    # @overload disassociate_delegation_signer_from_domain(params = {})
+    # @param [Hash] params ({})
+    def disassociate_delegation_signer_from_domain(params = {}, options = {})
+      req = build_request(:disassociate_delegation_signer_from_domain, params)
+      req.send_request(options)
+    end
+
     # This operation configures Amazon Route 53 to automatically renew the
     # specified domain before the domain registration expires. The cost of
-    # renewing your domain registration is billed to your AWS account.
+    # renewing your domain registration is billed to your Amazon Web
+    # Services account.
     #
     # The period during which you can renew a domain name varies by TLD. For
     # a list of TLDs and their renewal policies, see [Domains That You Can
@@ -744,8 +1011,9 @@ module Aws::Route53Domains
     end
 
     # This operation returns detailed information about a specified domain
-    # that is associated with the current AWS account. Contact information
-    # for the domain is also returned as part of the output.
+    # that is associated with the current Amazon Web Services account.
+    # Contact information for the domain is also returned as part of the
+    # output.
     #
     # @option params [required, String] :domain_name
     #   The name of the domain that you want to get detailed information
@@ -774,6 +1042,9 @@ module Aws::Route53Domains
     #   * {Types::GetDomainDetailResponse#reseller #reseller} => String
     #   * {Types::GetDomainDetailResponse#dns_sec #dns_sec} => String
     #   * {Types::GetDomainDetailResponse#status_list #status_list} => Array&lt;String&gt;
+    #   * {Types::GetDomainDetailResponse#dnssec_keys #dnssec_keys} => Array&lt;Types::DnssecKey&gt;
+    #   * {Types::GetDomainDetailResponse#billing_contact #billing_contact} => Types::ContactDetail
+    #   * {Types::GetDomainDetailResponse#billing_privacy #billing_privacy} => Boolean
     #
     # @example Request syntax with placeholder values
     #
@@ -797,13 +1068,13 @@ module Aws::Route53Domains
     #   resp.admin_contact.address_line_2 #=> String
     #   resp.admin_contact.city #=> String
     #   resp.admin_contact.state #=> String
-    #   resp.admin_contact.country_code #=> String, one of "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BR", "BS", "BT", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GH", "GI", "GL", "GM", "GN", "GQ", "GR", "GT", "GU", "GW", "GY", "HK", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IQ", "IR", "IS", "IT", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PT", "PW", "PY", "QA", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SK", "SL", "SM", "SN", "SO", "SR", "ST", "SV", "SY", "SZ", "TC", "TD", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"
+    #   resp.admin_contact.country_code #=> String, one of "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"
     #   resp.admin_contact.zip_code #=> String
     #   resp.admin_contact.phone_number #=> String
     #   resp.admin_contact.email #=> String
     #   resp.admin_contact.fax #=> String
     #   resp.admin_contact.extra_params #=> Array
-    #   resp.admin_contact.extra_params[0].name #=> String, one of "DUNS_NUMBER", "BRAND_NUMBER", "BIRTH_DEPARTMENT", "BIRTH_DATE_IN_YYYY_MM_DD", "BIRTH_COUNTRY", "BIRTH_CITY", "DOCUMENT_NUMBER", "AU_ID_NUMBER", "AU_ID_TYPE", "CA_LEGAL_TYPE", "CA_BUSINESS_ENTITY_TYPE", "CA_LEGAL_REPRESENTATIVE", "CA_LEGAL_REPRESENTATIVE_CAPACITY", "ES_IDENTIFICATION", "ES_IDENTIFICATION_TYPE", "ES_LEGAL_FORM", "FI_BUSINESS_NUMBER", "FI_ID_NUMBER", "FI_NATIONALITY", "FI_ORGANIZATION_TYPE", "IT_NATIONALITY", "IT_PIN", "IT_REGISTRANT_ENTITY_TYPE", "RU_PASSPORT_DATA", "SE_ID_NUMBER", "SG_ID_NUMBER", "VAT_NUMBER", "UK_CONTACT_TYPE", "UK_COMPANY_NUMBER"
+    #   resp.admin_contact.extra_params[0].name #=> String, one of "DUNS_NUMBER", "BRAND_NUMBER", "BIRTH_DEPARTMENT", "BIRTH_DATE_IN_YYYY_MM_DD", "BIRTH_COUNTRY", "BIRTH_CITY", "DOCUMENT_NUMBER", "AU_ID_NUMBER", "AU_ID_TYPE", "CA_LEGAL_TYPE", "CA_BUSINESS_ENTITY_TYPE", "CA_LEGAL_REPRESENTATIVE", "CA_LEGAL_REPRESENTATIVE_CAPACITY", "ES_IDENTIFICATION", "ES_IDENTIFICATION_TYPE", "ES_LEGAL_FORM", "FI_BUSINESS_NUMBER", "FI_ID_NUMBER", "FI_NATIONALITY", "FI_ORGANIZATION_TYPE", "IT_NATIONALITY", "IT_PIN", "IT_REGISTRANT_ENTITY_TYPE", "RU_PASSPORT_DATA", "SE_ID_NUMBER", "SG_ID_NUMBER", "VAT_NUMBER", "UK_CONTACT_TYPE", "UK_COMPANY_NUMBER", "EU_COUNTRY_OF_CITIZENSHIP", "AU_PRIORITY_TOKEN"
     #   resp.admin_contact.extra_params[0].value #=> String
     #   resp.registrant_contact.first_name #=> String
     #   resp.registrant_contact.last_name #=> String
@@ -813,13 +1084,13 @@ module Aws::Route53Domains
     #   resp.registrant_contact.address_line_2 #=> String
     #   resp.registrant_contact.city #=> String
     #   resp.registrant_contact.state #=> String
-    #   resp.registrant_contact.country_code #=> String, one of "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BR", "BS", "BT", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GH", "GI", "GL", "GM", "GN", "GQ", "GR", "GT", "GU", "GW", "GY", "HK", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IQ", "IR", "IS", "IT", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PT", "PW", "PY", "QA", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SK", "SL", "SM", "SN", "SO", "SR", "ST", "SV", "SY", "SZ", "TC", "TD", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"
+    #   resp.registrant_contact.country_code #=> String, one of "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"
     #   resp.registrant_contact.zip_code #=> String
     #   resp.registrant_contact.phone_number #=> String
     #   resp.registrant_contact.email #=> String
     #   resp.registrant_contact.fax #=> String
     #   resp.registrant_contact.extra_params #=> Array
-    #   resp.registrant_contact.extra_params[0].name #=> String, one of "DUNS_NUMBER", "BRAND_NUMBER", "BIRTH_DEPARTMENT", "BIRTH_DATE_IN_YYYY_MM_DD", "BIRTH_COUNTRY", "BIRTH_CITY", "DOCUMENT_NUMBER", "AU_ID_NUMBER", "AU_ID_TYPE", "CA_LEGAL_TYPE", "CA_BUSINESS_ENTITY_TYPE", "CA_LEGAL_REPRESENTATIVE", "CA_LEGAL_REPRESENTATIVE_CAPACITY", "ES_IDENTIFICATION", "ES_IDENTIFICATION_TYPE", "ES_LEGAL_FORM", "FI_BUSINESS_NUMBER", "FI_ID_NUMBER", "FI_NATIONALITY", "FI_ORGANIZATION_TYPE", "IT_NATIONALITY", "IT_PIN", "IT_REGISTRANT_ENTITY_TYPE", "RU_PASSPORT_DATA", "SE_ID_NUMBER", "SG_ID_NUMBER", "VAT_NUMBER", "UK_CONTACT_TYPE", "UK_COMPANY_NUMBER"
+    #   resp.registrant_contact.extra_params[0].name #=> String, one of "DUNS_NUMBER", "BRAND_NUMBER", "BIRTH_DEPARTMENT", "BIRTH_DATE_IN_YYYY_MM_DD", "BIRTH_COUNTRY", "BIRTH_CITY", "DOCUMENT_NUMBER", "AU_ID_NUMBER", "AU_ID_TYPE", "CA_LEGAL_TYPE", "CA_BUSINESS_ENTITY_TYPE", "CA_LEGAL_REPRESENTATIVE", "CA_LEGAL_REPRESENTATIVE_CAPACITY", "ES_IDENTIFICATION", "ES_IDENTIFICATION_TYPE", "ES_LEGAL_FORM", "FI_BUSINESS_NUMBER", "FI_ID_NUMBER", "FI_NATIONALITY", "FI_ORGANIZATION_TYPE", "IT_NATIONALITY", "IT_PIN", "IT_REGISTRANT_ENTITY_TYPE", "RU_PASSPORT_DATA", "SE_ID_NUMBER", "SG_ID_NUMBER", "VAT_NUMBER", "UK_CONTACT_TYPE", "UK_COMPANY_NUMBER", "EU_COUNTRY_OF_CITIZENSHIP", "AU_PRIORITY_TOKEN"
     #   resp.registrant_contact.extra_params[0].value #=> String
     #   resp.tech_contact.first_name #=> String
     #   resp.tech_contact.last_name #=> String
@@ -829,13 +1100,13 @@ module Aws::Route53Domains
     #   resp.tech_contact.address_line_2 #=> String
     #   resp.tech_contact.city #=> String
     #   resp.tech_contact.state #=> String
-    #   resp.tech_contact.country_code #=> String, one of "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BR", "BS", "BT", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GH", "GI", "GL", "GM", "GN", "GQ", "GR", "GT", "GU", "GW", "GY", "HK", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IQ", "IR", "IS", "IT", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PT", "PW", "PY", "QA", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SK", "SL", "SM", "SN", "SO", "SR", "ST", "SV", "SY", "SZ", "TC", "TD", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"
+    #   resp.tech_contact.country_code #=> String, one of "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"
     #   resp.tech_contact.zip_code #=> String
     #   resp.tech_contact.phone_number #=> String
     #   resp.tech_contact.email #=> String
     #   resp.tech_contact.fax #=> String
     #   resp.tech_contact.extra_params #=> Array
-    #   resp.tech_contact.extra_params[0].name #=> String, one of "DUNS_NUMBER", "BRAND_NUMBER", "BIRTH_DEPARTMENT", "BIRTH_DATE_IN_YYYY_MM_DD", "BIRTH_COUNTRY", "BIRTH_CITY", "DOCUMENT_NUMBER", "AU_ID_NUMBER", "AU_ID_TYPE", "CA_LEGAL_TYPE", "CA_BUSINESS_ENTITY_TYPE", "CA_LEGAL_REPRESENTATIVE", "CA_LEGAL_REPRESENTATIVE_CAPACITY", "ES_IDENTIFICATION", "ES_IDENTIFICATION_TYPE", "ES_LEGAL_FORM", "FI_BUSINESS_NUMBER", "FI_ID_NUMBER", "FI_NATIONALITY", "FI_ORGANIZATION_TYPE", "IT_NATIONALITY", "IT_PIN", "IT_REGISTRANT_ENTITY_TYPE", "RU_PASSPORT_DATA", "SE_ID_NUMBER", "SG_ID_NUMBER", "VAT_NUMBER", "UK_CONTACT_TYPE", "UK_COMPANY_NUMBER"
+    #   resp.tech_contact.extra_params[0].name #=> String, one of "DUNS_NUMBER", "BRAND_NUMBER", "BIRTH_DEPARTMENT", "BIRTH_DATE_IN_YYYY_MM_DD", "BIRTH_COUNTRY", "BIRTH_CITY", "DOCUMENT_NUMBER", "AU_ID_NUMBER", "AU_ID_TYPE", "CA_LEGAL_TYPE", "CA_BUSINESS_ENTITY_TYPE", "CA_LEGAL_REPRESENTATIVE", "CA_LEGAL_REPRESENTATIVE_CAPACITY", "ES_IDENTIFICATION", "ES_IDENTIFICATION_TYPE", "ES_LEGAL_FORM", "FI_BUSINESS_NUMBER", "FI_ID_NUMBER", "FI_NATIONALITY", "FI_ORGANIZATION_TYPE", "IT_NATIONALITY", "IT_PIN", "IT_REGISTRANT_ENTITY_TYPE", "RU_PASSPORT_DATA", "SE_ID_NUMBER", "SG_ID_NUMBER", "VAT_NUMBER", "UK_CONTACT_TYPE", "UK_COMPANY_NUMBER", "EU_COUNTRY_OF_CITIZENSHIP", "AU_PRIORITY_TOKEN"
     #   resp.tech_contact.extra_params[0].value #=> String
     #   resp.admin_privacy #=> Boolean
     #   resp.registrant_privacy #=> Boolean
@@ -853,6 +1124,31 @@ module Aws::Route53Domains
     #   resp.dns_sec #=> String
     #   resp.status_list #=> Array
     #   resp.status_list[0] #=> String
+    #   resp.dnssec_keys #=> Array
+    #   resp.dnssec_keys[0].algorithm #=> Integer
+    #   resp.dnssec_keys[0].flags #=> Integer
+    #   resp.dnssec_keys[0].public_key #=> String
+    #   resp.dnssec_keys[0].digest_type #=> Integer
+    #   resp.dnssec_keys[0].digest #=> String
+    #   resp.dnssec_keys[0].key_tag #=> Integer
+    #   resp.dnssec_keys[0].id #=> String
+    #   resp.billing_contact.first_name #=> String
+    #   resp.billing_contact.last_name #=> String
+    #   resp.billing_contact.contact_type #=> String, one of "PERSON", "COMPANY", "ASSOCIATION", "PUBLIC_BODY", "RESELLER"
+    #   resp.billing_contact.organization_name #=> String
+    #   resp.billing_contact.address_line_1 #=> String
+    #   resp.billing_contact.address_line_2 #=> String
+    #   resp.billing_contact.city #=> String
+    #   resp.billing_contact.state #=> String
+    #   resp.billing_contact.country_code #=> String, one of "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"
+    #   resp.billing_contact.zip_code #=> String
+    #   resp.billing_contact.phone_number #=> String
+    #   resp.billing_contact.email #=> String
+    #   resp.billing_contact.fax #=> String
+    #   resp.billing_contact.extra_params #=> Array
+    #   resp.billing_contact.extra_params[0].name #=> String, one of "DUNS_NUMBER", "BRAND_NUMBER", "BIRTH_DEPARTMENT", "BIRTH_DATE_IN_YYYY_MM_DD", "BIRTH_COUNTRY", "BIRTH_CITY", "DOCUMENT_NUMBER", "AU_ID_NUMBER", "AU_ID_TYPE", "CA_LEGAL_TYPE", "CA_BUSINESS_ENTITY_TYPE", "CA_LEGAL_REPRESENTATIVE", "CA_LEGAL_REPRESENTATIVE_CAPACITY", "ES_IDENTIFICATION", "ES_IDENTIFICATION_TYPE", "ES_LEGAL_FORM", "FI_BUSINESS_NUMBER", "FI_ID_NUMBER", "FI_NATIONALITY", "FI_ORGANIZATION_TYPE", "IT_NATIONALITY", "IT_PIN", "IT_REGISTRANT_ENTITY_TYPE", "RU_PASSPORT_DATA", "SE_ID_NUMBER", "SG_ID_NUMBER", "VAT_NUMBER", "UK_CONTACT_TYPE", "UK_COMPANY_NUMBER", "EU_COUNTRY_OF_CITIZENSHIP", "AU_PRIORITY_TOKEN"
+    #   resp.billing_contact.extra_params[0].value #=> String
+    #   resp.billing_privacy #=> Boolean
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/GetDomainDetail AWS API Documentation
     #
@@ -948,6 +1244,8 @@ module Aws::Route53Domains
     #   * {Types::GetOperationDetailResponse#domain_name #domain_name} => String
     #   * {Types::GetOperationDetailResponse#type #type} => String
     #   * {Types::GetOperationDetailResponse#submitted_date #submitted_date} => Time
+    #   * {Types::GetOperationDetailResponse#last_updated_date #last_updated_date} => Time
+    #   * {Types::GetOperationDetailResponse#status_flag #status_flag} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -961,8 +1259,10 @@ module Aws::Route53Domains
     #   resp.status #=> String, one of "SUBMITTED", "IN_PROGRESS", "ERROR", "SUCCESSFUL", "FAILED"
     #   resp.message #=> String
     #   resp.domain_name #=> String
-    #   resp.type #=> String, one of "REGISTER_DOMAIN", "DELETE_DOMAIN", "TRANSFER_IN_DOMAIN", "UPDATE_DOMAIN_CONTACT", "UPDATE_NAMESERVER", "CHANGE_PRIVACY_PROTECTION", "DOMAIN_LOCK", "ENABLE_AUTORENEW", "DISABLE_AUTORENEW", "ADD_DNSSEC", "REMOVE_DNSSEC", "EXPIRE_DOMAIN", "TRANSFER_OUT_DOMAIN", "CHANGE_DOMAIN_OWNER", "RENEW_DOMAIN", "PUSH_DOMAIN", "INTERNAL_TRANSFER_OUT_DOMAIN", "INTERNAL_TRANSFER_IN_DOMAIN"
+    #   resp.type #=> String, one of "REGISTER_DOMAIN", "DELETE_DOMAIN", "TRANSFER_IN_DOMAIN", "UPDATE_DOMAIN_CONTACT", "UPDATE_NAMESERVER", "CHANGE_PRIVACY_PROTECTION", "DOMAIN_LOCK", "ENABLE_AUTORENEW", "DISABLE_AUTORENEW", "ADD_DNSSEC", "REMOVE_DNSSEC", "EXPIRE_DOMAIN", "TRANSFER_OUT_DOMAIN", "CHANGE_DOMAIN_OWNER", "RENEW_DOMAIN", "PUSH_DOMAIN", "INTERNAL_TRANSFER_OUT_DOMAIN", "INTERNAL_TRANSFER_IN_DOMAIN", "RELEASE_TO_GANDI", "TRANSFER_ON_RENEW"
     #   resp.submitted_date #=> Time
+    #   resp.last_updated_date #=> Time
+    #   resp.status_flag #=> String, one of "PENDING_ACCEPTANCE", "PENDING_CUSTOMER_ACTION", "PENDING_AUTHORIZATION", "PENDING_PAYMENT_VERIFICATION", "PENDING_SUPPORT_CASE"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/GetOperationDetail AWS API Documentation
     #
@@ -974,16 +1274,26 @@ module Aws::Route53Domains
     end
 
     # This operation returns all the domain names registered with Amazon
-    # Route 53 for the current AWS account.
+    # Route 53 for the current Amazon Web Services account if no filtering
+    # conditions are used.
+    #
+    # @option params [Array<Types::FilterCondition>] :filter_conditions
+    #   A complex type that contains information about the filters applied
+    #   during the `ListDomains` request. The filter conditions can include
+    #   domain name and domain expiration.
+    #
+    # @option params [Types::SortCondition] :sort_condition
+    #   A complex type that contains information about the requested ordering
+    #   of domains in the returned list.
     #
     # @option params [String] :marker
     #   For an initial request for a list of domains, omit this element. If
-    #   the number of domains that are associated with the current AWS account
-    #   is greater than the value that you specified for `MaxItems`, you can
-    #   use `Marker` to return additional domains. Get the value of
-    #   `NextPageMarker` from the previous response, and submit another
-    #   request that includes the value of `NextPageMarker` in the `Marker`
-    #   element.
+    #   the number of domains that are associated with the current Amazon Web
+    #   Services account is greater than the value that you specified for
+    #   `MaxItems`, you can use `Marker` to return additional domains. Get the
+    #   value of `NextPageMarker` from the previous response, and submit
+    #   another request that includes the value of `NextPageMarker` in the
+    #   `Marker` element.
     #
     #   Constraints: The marker must match the value specified in the previous
     #   request.
@@ -1003,6 +1313,17 @@ module Aws::Route53Domains
     # @example Request syntax with placeholder values
     #
     #   resp = client.list_domains({
+    #     filter_conditions: [
+    #       {
+    #         name: "DomainName", # required, accepts DomainName, Expiry
+    #         operator: "LE", # required, accepts LE, GE, BEGINS_WITH
+    #         values: ["Value"], # required
+    #       },
+    #     ],
+    #     sort_condition: {
+    #       name: "DomainName", # required, accepts DomainName, Expiry
+    #       sort_order: "ASC", # required, accepts ASC, DESC
+    #     },
     #     marker: "PageMarker",
     #     max_items: 1,
     #   })
@@ -1029,6 +1350,8 @@ module Aws::Route53Domains
     # operation ID and that have ever been performed on domains that were
     # registered by the current account.
     #
+    # This command runs only in the us-east-1 Region.
+    #
     # @option params [Time,DateTime,Date,Integer,String] :submitted_since
     #   An optional parameter that lets you get information about all the
     #   operations that you submitted after a specified date and time. Specify
@@ -1048,6 +1371,18 @@ module Aws::Route53Domains
     #
     #   Default: 20
     #
+    # @option params [Array<String>] :status
+    #   The status of the operations.
+    #
+    # @option params [Array<String>] :type
+    #   An arrays of the domains operation types.
+    #
+    # @option params [String] :sort_by
+    #   The sort type for returned values.
+    #
+    # @option params [String] :sort_order
+    #   The sort order for returned values, either ascending or descending.
+    #
     # @return [Types::ListOperationsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ListOperationsResponse#operations #operations} => Array&lt;Types::OperationSummary&gt;
@@ -1061,6 +1396,10 @@ module Aws::Route53Domains
     #     submitted_since: Time.now,
     #     marker: "PageMarker",
     #     max_items: 1,
+    #     status: ["SUBMITTED"], # accepts SUBMITTED, IN_PROGRESS, ERROR, SUCCESSFUL, FAILED
+    #     type: ["REGISTER_DOMAIN"], # accepts REGISTER_DOMAIN, DELETE_DOMAIN, TRANSFER_IN_DOMAIN, UPDATE_DOMAIN_CONTACT, UPDATE_NAMESERVER, CHANGE_PRIVACY_PROTECTION, DOMAIN_LOCK, ENABLE_AUTORENEW, DISABLE_AUTORENEW, ADD_DNSSEC, REMOVE_DNSSEC, EXPIRE_DOMAIN, TRANSFER_OUT_DOMAIN, CHANGE_DOMAIN_OWNER, RENEW_DOMAIN, PUSH_DOMAIN, INTERNAL_TRANSFER_OUT_DOMAIN, INTERNAL_TRANSFER_IN_DOMAIN, RELEASE_TO_GANDI, TRANSFER_ON_RENEW
+    #     sort_by: "SubmittedDate", # accepts SubmittedDate
+    #     sort_order: "ASC", # accepts ASC, DESC
     #   })
     #
     # @example Response structure
@@ -1068,8 +1407,12 @@ module Aws::Route53Domains
     #   resp.operations #=> Array
     #   resp.operations[0].operation_id #=> String
     #   resp.operations[0].status #=> String, one of "SUBMITTED", "IN_PROGRESS", "ERROR", "SUCCESSFUL", "FAILED"
-    #   resp.operations[0].type #=> String, one of "REGISTER_DOMAIN", "DELETE_DOMAIN", "TRANSFER_IN_DOMAIN", "UPDATE_DOMAIN_CONTACT", "UPDATE_NAMESERVER", "CHANGE_PRIVACY_PROTECTION", "DOMAIN_LOCK", "ENABLE_AUTORENEW", "DISABLE_AUTORENEW", "ADD_DNSSEC", "REMOVE_DNSSEC", "EXPIRE_DOMAIN", "TRANSFER_OUT_DOMAIN", "CHANGE_DOMAIN_OWNER", "RENEW_DOMAIN", "PUSH_DOMAIN", "INTERNAL_TRANSFER_OUT_DOMAIN", "INTERNAL_TRANSFER_IN_DOMAIN"
+    #   resp.operations[0].type #=> String, one of "REGISTER_DOMAIN", "DELETE_DOMAIN", "TRANSFER_IN_DOMAIN", "UPDATE_DOMAIN_CONTACT", "UPDATE_NAMESERVER", "CHANGE_PRIVACY_PROTECTION", "DOMAIN_LOCK", "ENABLE_AUTORENEW", "DISABLE_AUTORENEW", "ADD_DNSSEC", "REMOVE_DNSSEC", "EXPIRE_DOMAIN", "TRANSFER_OUT_DOMAIN", "CHANGE_DOMAIN_OWNER", "RENEW_DOMAIN", "PUSH_DOMAIN", "INTERNAL_TRANSFER_OUT_DOMAIN", "INTERNAL_TRANSFER_IN_DOMAIN", "RELEASE_TO_GANDI", "TRANSFER_ON_RENEW"
     #   resp.operations[0].submitted_date #=> Time
+    #   resp.operations[0].domain_name #=> String
+    #   resp.operations[0].message #=> String
+    #   resp.operations[0].status_flag #=> String, one of "PENDING_ACCEPTANCE", "PENDING_CUSTOMER_ACTION", "PENDING_AUTHORIZATION", "PENDING_PAYMENT_VERIFICATION", "PENDING_SUPPORT_CASE"
+    #   resp.operations[0].last_updated_date #=> Time
     #   resp.next_page_marker #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/ListOperations AWS API Documentation
@@ -1078,6 +1421,83 @@ module Aws::Route53Domains
     # @param [Hash] params ({})
     def list_operations(params = {}, options = {})
       req = build_request(:list_operations, params)
+      req.send_request(options)
+    end
+
+    # Lists the following prices for either all the TLDs supported by
+    # Route 53, or the specified TLD:
+    #
+    # * Registration
+    #
+    # * Transfer
+    #
+    # * Owner change
+    #
+    # * Domain renewal
+    #
+    # * Domain restoration
+    #
+    # @option params [String] :tld
+    #   The TLD for which you want to receive the pricing information. For
+    #   example. `.net`.
+    #
+    #   If a `Tld` value is not provided, a list of prices for all TLDs
+    #   supported by Route 53 is returned.
+    #
+    # @option params [String] :marker
+    #   For an initial request for a list of prices, omit this element. If the
+    #   number of prices that are not yet complete is greater than the value
+    #   that you specified for `MaxItems`, you can use `Marker` to return
+    #   additional prices. Get the value of `NextPageMarker` from the previous
+    #   response, and submit another request that includes the value of
+    #   `NextPageMarker` in the `Marker` element.
+    #
+    #   Used only for all TLDs. If you specify a TLD, don't specify a
+    #   `Marker`.
+    #
+    # @option params [Integer] :max_items
+    #   Number of `Prices` to be returned.
+    #
+    #   Used only for all TLDs. If you specify a TLD, don't specify a
+    #   `MaxItems`.
+    #
+    # @return [Types::ListPricesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListPricesResponse#prices #prices} => Array&lt;Types::DomainPrice&gt;
+    #   * {Types::ListPricesResponse#next_page_marker #next_page_marker} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_prices({
+    #     tld: "TldName",
+    #     marker: "PageMarker",
+    #     max_items: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.prices #=> Array
+    #   resp.prices[0].name #=> String
+    #   resp.prices[0].registration_price.price #=> Float
+    #   resp.prices[0].registration_price.currency #=> String
+    #   resp.prices[0].transfer_price.price #=> Float
+    #   resp.prices[0].transfer_price.currency #=> String
+    #   resp.prices[0].renewal_price.price #=> Float
+    #   resp.prices[0].renewal_price.currency #=> String
+    #   resp.prices[0].change_ownership_price.price #=> Float
+    #   resp.prices[0].change_ownership_price.currency #=> String
+    #   resp.prices[0].restoration_price.price #=> Float
+    #   resp.prices[0].restoration_price.currency #=> String
+    #   resp.next_page_marker #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/ListPrices AWS API Documentation
+    #
+    # @overload list_prices(params = {})
+    # @param [Hash] params ({})
+    def list_prices(params = {}, options = {})
+      req = build_request(:list_prices, params)
       req.send_request(options)
     end
 
@@ -1115,10 +1535,42 @@ module Aws::Route53Domains
       req.send_request(options)
     end
 
-    # This operation registers a domain. Domains are registered either by
-    # Amazon Registrar (for .com, .net, and .org domains) or by our
-    # registrar associate, Gandi (for all other domains). For some top-level
-    # domains (TLDs), this operation requires extra parameters.
+    # Moves a domain from Amazon Web Services to another registrar.
+    #
+    # Supported actions:
+    #
+    # * Changes the IPS tags of a .uk domain, and pushes it to transit.
+    #   Transit means that the domain is ready to be transferred to another
+    #   registrar.
+    #
+    # ^
+    #
+    # @option params [required, String] :domain_name
+    #   Name of the domain.
+    #
+    # @option params [required, String] :target
+    #   New IPS tag for the domain.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.push_domain({
+    #     domain_name: "DomainName", # required
+    #     target: "Label", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/PushDomain AWS API Documentation
+    #
+    # @overload push_domain(params = {})
+    # @param [Hash] params ({})
+    def push_domain(params = {}, options = {})
+      req = build_request(:push_domain, params)
+      req.send_request(options)
+    end
+
+    # This operation registers a domain. For some top-level domains (TLDs),
+    # this operation requires extra parameters.
     #
     # When you register a domain, Amazon Route 53 does the following:
     #
@@ -1127,24 +1579,29 @@ module Aws::Route53Domains
     #   automatically updates your domain registration with the names of
     #   these name servers.
     #
-    # * Enables autorenew, so your domain registration will renew
+    # * Enables auto renew, so your domain registration will renew
     #   automatically each year. We'll notify you in advance of the renewal
     #   date so you can choose whether to renew the registration.
     #
     # * Optionally enables privacy protection, so WHOIS queries return
-    #   contact information either for Amazon Registrar (for .com, .net, and
-    #   .org domains) or for our registrar associate, Gandi (for all other
-    #   TLDs). If you don't enable privacy protection, WHOIS queries return
-    #   the information that you entered for the registrant, admin, and tech
-    #   contacts.
+    #   contact for the registrar or the phrase "REDACTED FOR PRIVACY", or
+    #   "On behalf of &lt;domain name&gt; owner." If you don't enable
+    #   privacy protection, WHOIS queries return the information that you
+    #   entered for the administrative, registrant, and technical contacts.
+    #
+    #   <note markdown="1"> While some domains may allow different privacy settings per contact,
+    #   we recommend specifying the same privacy setting for all contacts.
+    #
+    #    </note>
     #
     # * If registration is successful, returns an operation ID that you can
     #   use to track the progress and completion of the action. If the
     #   request is not completed successfully, the domain registrant is
     #   notified by email.
     #
-    # * Charges your AWS account an amount based on the top-level domain.
-    #   For more information, see [Amazon Route 53 Pricing][1].
+    # * Charges your Amazon Web Services account an amount based on the
+    #   top-level domain. For more information, see [Amazon Route 53
+    #   Pricing][1].
     #
     #
     #
@@ -1197,7 +1654,7 @@ module Aws::Route53Domains
     #
     # @option params [Boolean] :auto_renew
     #   Indicates whether the domain will be automatically renewed (`true`) or
-    #   not (`false`). Autorenewal only takes effect after the account is
+    #   not (`false`). Auto renewal only takes effect after the account is
     #   charged.
     #
     #   Default: `true`
@@ -1229,32 +1686,65 @@ module Aws::Route53Domains
     # @option params [Boolean] :privacy_protect_admin_contact
     #   Whether you want to conceal contact information from WHOIS queries. If
     #   you specify `true`, WHOIS ("who is") queries return contact
-    #   information either for Amazon Registrar (for .com, .net, and .org
-    #   domains) or for our registrar associate, Gandi (for all other TLDs).
-    #   If you specify `false`, WHOIS queries return the information that you
-    #   entered for the admin contact.
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the admin contact.
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
     #
     #   Default: `true`
     #
     # @option params [Boolean] :privacy_protect_registrant_contact
     #   Whether you want to conceal contact information from WHOIS queries. If
     #   you specify `true`, WHOIS ("who is") queries return contact
-    #   information either for Amazon Registrar (for .com, .net, and .org
-    #   domains) or for our registrar associate, Gandi (for all other TLDs).
-    #   If you specify `false`, WHOIS queries return the information that you
-    #   entered for the registrant contact (the domain owner).
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the registrant contact (the domain
+    #   owner).
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
     #
     #   Default: `true`
     #
     # @option params [Boolean] :privacy_protect_tech_contact
     #   Whether you want to conceal contact information from WHOIS queries. If
     #   you specify `true`, WHOIS ("who is") queries return contact
-    #   information either for Amazon Registrar (for .com, .net, and .org
-    #   domains) or for our registrar associate, Gandi (for all other TLDs).
-    #   If you specify `false`, WHOIS queries return the information that you
-    #   entered for the technical contact.
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the technical contact.
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
     #
     #   Default: `true`
+    #
+    # @option params [Types::ContactDetail] :billing_contact
+    #   Provides detailed contact information. For information about the
+    #   values that you specify for each element, see [ContactDetail][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_ContactDetail.html
+    #
+    # @option params [Boolean] :privacy_protect_billing_contact
+    #   Whether you want to conceal contact information from WHOIS queries. If
+    #   you specify `true`, WHOIS ("who is") queries return contact
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the billing contact.
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
     #
     # @return [Types::RegisterDomainResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1276,14 +1766,14 @@ module Aws::Route53Domains
     #       address_line_2: "AddressLine",
     #       city: "City",
     #       state: "State",
-    #       country_code: "AD", # accepts AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BR, BS, BT, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GH, GI, GL, GM, GN, GQ, GR, GT, GU, GW, GY, HK, HN, HR, HT, HU, ID, IE, IL, IM, IN, IQ, IR, IS, IT, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PT, PW, PY, QA, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SK, SL, SM, SN, SO, SR, ST, SV, SY, SZ, TC, TD, TG, TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
     #       zip_code: "ZipCode",
     #       phone_number: "ContactNumber",
     #       email: "Email",
     #       fax: "ContactNumber",
     #       extra_params: [
     #         {
-    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
     #           value: "ExtraParamValue", # required
     #         },
     #       ],
@@ -1297,14 +1787,14 @@ module Aws::Route53Domains
     #       address_line_2: "AddressLine",
     #       city: "City",
     #       state: "State",
-    #       country_code: "AD", # accepts AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BR, BS, BT, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GH, GI, GL, GM, GN, GQ, GR, GT, GU, GW, GY, HK, HN, HR, HT, HU, ID, IE, IL, IM, IN, IQ, IR, IS, IT, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PT, PW, PY, QA, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SK, SL, SM, SN, SO, SR, ST, SV, SY, SZ, TC, TD, TG, TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
     #       zip_code: "ZipCode",
     #       phone_number: "ContactNumber",
     #       email: "Email",
     #       fax: "ContactNumber",
     #       extra_params: [
     #         {
-    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
     #           value: "ExtraParamValue", # required
     #         },
     #       ],
@@ -1318,14 +1808,14 @@ module Aws::Route53Domains
     #       address_line_2: "AddressLine",
     #       city: "City",
     #       state: "State",
-    #       country_code: "AD", # accepts AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BR, BS, BT, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GH, GI, GL, GM, GN, GQ, GR, GT, GU, GW, GY, HK, HN, HR, HT, HU, ID, IE, IL, IM, IN, IQ, IR, IS, IT, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PT, PW, PY, QA, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SK, SL, SM, SN, SO, SR, ST, SV, SY, SZ, TC, TD, TG, TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
     #       zip_code: "ZipCode",
     #       phone_number: "ContactNumber",
     #       email: "Email",
     #       fax: "ContactNumber",
     #       extra_params: [
     #         {
-    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
     #           value: "ExtraParamValue", # required
     #         },
     #       ],
@@ -1333,6 +1823,28 @@ module Aws::Route53Domains
     #     privacy_protect_admin_contact: false,
     #     privacy_protect_registrant_contact: false,
     #     privacy_protect_tech_contact: false,
+    #     billing_contact: {
+    #       first_name: "ContactName",
+    #       last_name: "ContactName",
+    #       contact_type: "PERSON", # accepts PERSON, COMPANY, ASSOCIATION, PUBLIC_BODY, RESELLER
+    #       organization_name: "ContactName",
+    #       address_line_1: "AddressLine",
+    #       address_line_2: "AddressLine",
+    #       city: "City",
+    #       state: "State",
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       zip_code: "ZipCode",
+    #       phone_number: "ContactNumber",
+    #       email: "Email",
+    #       fax: "ContactNumber",
+    #       extra_params: [
+    #         {
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
+    #           value: "ExtraParamValue", # required
+    #         },
+    #       ],
+    #     },
+    #     privacy_protect_billing_contact: false,
     #   })
     #
     # @example Response structure
@@ -1348,9 +1860,10 @@ module Aws::Route53Domains
       req.send_request(options)
     end
 
-    # Rejects the transfer of a domain from another AWS account to the
-    # current AWS account. You initiate a transfer between AWS accounts
-    # using [TransferDomainToAnotherAwsAccount][1].
+    # Rejects the transfer of a domain from another Amazon Web Services
+    # account to the current Amazon Web Services account. You initiate a
+    # transfer betweenAmazon Web Services accounts using
+    # [TransferDomainToAnotherAwsAccount][1].
     #
     # Use either [ListOperations][2] or [GetOperationDetail][3] to determine
     # whether the operation succeeded. [GetOperationDetail][3] provides
@@ -1364,8 +1877,9 @@ module Aws::Route53Domains
     # [3]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_GetOperationDetail.html
     #
     # @option params [required, String] :domain_name
-    #   The name of the domain that was specified when another AWS account
-    #   submitted a [TransferDomainToAnotherAwsAccount][1] request.
+    #   The name of the domain that was specified when another Amazon Web
+    #   Services account submitted a [TransferDomainToAnotherAwsAccount][1]
+    #   request.
     #
     #
     #
@@ -1395,7 +1909,8 @@ module Aws::Route53Domains
     end
 
     # This operation renews a domain for the specified number of years. The
-    # cost of renewing your domain is billed to your AWS account.
+    # cost of renewing your domain is billed to your Amazon Web Services
+    # account.
     #
     # We recommend that you renew your domain several weeks before the
     # expiration date. Some TLD registries delete domains before the
@@ -1488,9 +2003,31 @@ module Aws::Route53Domains
       req.send_request(options)
     end
 
-    # This operation returns the AuthCode for the domain. To transfer a
-    # domain to another registrar, you provide this value to the new
-    # registrar.
+    # Resend the form of authorization email for this operation.
+    #
+    # @option params [required, String] :operation_id
+    #   Operation ID.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.resend_operation_authorization({
+    #     operation_id: "OperationId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/route53domains-2014-05-15/ResendOperationAuthorization AWS API Documentation
+    #
+    # @overload resend_operation_authorization(params = {})
+    # @param [Hash] params ({})
+    def resend_operation_authorization(params = {}, options = {})
+      req = build_request(:resend_operation_authorization, params)
+      req.send_request(options)
+    end
+
+    # This operation returns the authorization code for the domain. To
+    # transfer a domain to another registrar, you provide this value to the
+    # new registrar.
     #
     # @option params [required, String] :domain_name
     #   The name of the domain that you want to get an authorization code for.
@@ -1518,10 +2055,7 @@ module Aws::Route53Domains
       req.send_request(options)
     end
 
-    # Transfers a domain from another registrar to Amazon Route 53. When the
-    # transfer is complete, the domain is registered either with Amazon
-    # Registrar (for .com, .net, and .org domains) or with our registrar
-    # associate, Gandi (for all other TLDs).
+    # Transfers a domain from another registrar to Amazon Route 53.
     #
     # For more information about transferring domains, see the following
     # topics:
@@ -1531,12 +2065,19 @@ module Aws::Route53Domains
     #   Route 53, see [Transferring Registration for a Domain to Amazon
     #   Route 53][1] in the *Amazon Route 53 Developer Guide*.
     #
-    # * For information about how to transfer a domain from one AWS account
-    #   to another, see [TransferDomainToAnotherAwsAccount][2].
+    # * For information about how to transfer a domain from one Amazon Web
+    #   Services account to another, see
+    #   [TransferDomainToAnotherAwsAccount][2].
     #
     # * For information about how to transfer a domain to another domain
     #   registrar, see [Transferring a Domain from Amazon Route 53 to
     #   Another Registrar][3] in the *Amazon Route 53 Developer Guide*.
+    #
+    # During the transfer of any country code top-level domains (ccTLDs) to
+    # Route 53, except for .cc and .tv, updates to the owner contact are
+    # ignored and the owner contact data from the registry is used. You can
+    # update the owner contact after the transfer is complete. For more
+    # information, see [UpdateDomainContact][4].
     #
     # If the registrar for your domain is also the DNS service provider for
     # the domain, we highly recommend that you transfer your DNS service to
@@ -1561,6 +2102,7 @@ module Aws::Route53Domains
     # [1]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-transfer-to-route-53.html
     # [2]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_TransferDomainToAnotherAwsAccount.html
     # [3]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-transfer-from-route-53.html
+    # [4]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_UpdateDomainContact.html
     #
     # @option params [required, String] :domain_name
     #   The name of the domain that you want to transfer to Route 53. The
@@ -1604,7 +2146,7 @@ module Aws::Route53Domains
     #
     # @option params [Boolean] :auto_renew
     #   Indicates whether the domain will be automatically renewed (true) or
-    #   not (false). Autorenewal only takes effect after the account is
+    #   not (false). Auto renewal only takes effect after the account is
     #   charged.
     #
     #   Default: true
@@ -1621,32 +2163,59 @@ module Aws::Route53Domains
     # @option params [Boolean] :privacy_protect_admin_contact
     #   Whether you want to conceal contact information from WHOIS queries. If
     #   you specify `true`, WHOIS ("who is") queries return contact
-    #   information either for Amazon Registrar (for .com, .net, and .org
-    #   domains) or for our registrar associate, Gandi (for all other TLDs).
-    #   If you specify `false`, WHOIS queries return the information that you
-    #   entered for the admin contact.
+    #   information for the registrar, the phrase "REDACTED FOR PRIVACY", or
+    #   "On behalf of &lt;domain name&gt; owner.".
+    #
+    #   <note markdown="1"> While some domains may allow different privacy settings per contact,
+    #   we recommend specifying the same privacy setting for all contacts.
+    #
+    #    </note>
     #
     #   Default: `true`
     #
     # @option params [Boolean] :privacy_protect_registrant_contact
     #   Whether you want to conceal contact information from WHOIS queries. If
     #   you specify `true`, WHOIS ("who is") queries return contact
-    #   information either for Amazon Registrar (for .com, .net, and .org
-    #   domains) or for our registrar associate, Gandi (for all other TLDs).
-    #   If you specify `false`, WHOIS queries return the information that you
-    #   entered for the registrant contact (domain owner).
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the registrant contact (domain
+    #   owner).
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
     #
     #   Default: `true`
     #
     # @option params [Boolean] :privacy_protect_tech_contact
     #   Whether you want to conceal contact information from WHOIS queries. If
     #   you specify `true`, WHOIS ("who is") queries return contact
-    #   information either for Amazon Registrar (for .com, .net, and .org
-    #   domains) or for our registrar associate, Gandi (for all other TLDs).
-    #   If you specify `false`, WHOIS queries return the information that you
-    #   entered for the technical contact.
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the technical contact.
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
     #
     #   Default: `true`
+    #
+    # @option params [Types::ContactDetail] :billing_contact
+    #   Provides detailed contact information.
+    #
+    # @option params [Boolean] :privacy_protect_billing_contact
+    #   Whether you want to conceal contact information from WHOIS queries. If
+    #   you specify `true`, WHOIS ("who is") queries return contact
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the billing contact.
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
     #
     # @return [Types::TransferDomainResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1675,14 +2244,14 @@ module Aws::Route53Domains
     #       address_line_2: "AddressLine",
     #       city: "City",
     #       state: "State",
-    #       country_code: "AD", # accepts AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BR, BS, BT, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GH, GI, GL, GM, GN, GQ, GR, GT, GU, GW, GY, HK, HN, HR, HT, HU, ID, IE, IL, IM, IN, IQ, IR, IS, IT, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PT, PW, PY, QA, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SK, SL, SM, SN, SO, SR, ST, SV, SY, SZ, TC, TD, TG, TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
     #       zip_code: "ZipCode",
     #       phone_number: "ContactNumber",
     #       email: "Email",
     #       fax: "ContactNumber",
     #       extra_params: [
     #         {
-    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
     #           value: "ExtraParamValue", # required
     #         },
     #       ],
@@ -1696,14 +2265,14 @@ module Aws::Route53Domains
     #       address_line_2: "AddressLine",
     #       city: "City",
     #       state: "State",
-    #       country_code: "AD", # accepts AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BR, BS, BT, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GH, GI, GL, GM, GN, GQ, GR, GT, GU, GW, GY, HK, HN, HR, HT, HU, ID, IE, IL, IM, IN, IQ, IR, IS, IT, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PT, PW, PY, QA, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SK, SL, SM, SN, SO, SR, ST, SV, SY, SZ, TC, TD, TG, TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
     #       zip_code: "ZipCode",
     #       phone_number: "ContactNumber",
     #       email: "Email",
     #       fax: "ContactNumber",
     #       extra_params: [
     #         {
-    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
     #           value: "ExtraParamValue", # required
     #         },
     #       ],
@@ -1717,14 +2286,14 @@ module Aws::Route53Domains
     #       address_line_2: "AddressLine",
     #       city: "City",
     #       state: "State",
-    #       country_code: "AD", # accepts AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BR, BS, BT, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GH, GI, GL, GM, GN, GQ, GR, GT, GU, GW, GY, HK, HN, HR, HT, HU, ID, IE, IL, IM, IN, IQ, IR, IS, IT, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PT, PW, PY, QA, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SK, SL, SM, SN, SO, SR, ST, SV, SY, SZ, TC, TD, TG, TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
     #       zip_code: "ZipCode",
     #       phone_number: "ContactNumber",
     #       email: "Email",
     #       fax: "ContactNumber",
     #       extra_params: [
     #         {
-    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
     #           value: "ExtraParamValue", # required
     #         },
     #       ],
@@ -1732,6 +2301,28 @@ module Aws::Route53Domains
     #     privacy_protect_admin_contact: false,
     #     privacy_protect_registrant_contact: false,
     #     privacy_protect_tech_contact: false,
+    #     billing_contact: {
+    #       first_name: "ContactName",
+    #       last_name: "ContactName",
+    #       contact_type: "PERSON", # accepts PERSON, COMPANY, ASSOCIATION, PUBLIC_BODY, RESELLER
+    #       organization_name: "ContactName",
+    #       address_line_1: "AddressLine",
+    #       address_line_2: "AddressLine",
+    #       city: "City",
+    #       state: "State",
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       zip_code: "ZipCode",
+    #       phone_number: "ContactNumber",
+    #       email: "Email",
+    #       fax: "ContactNumber",
+    #       extra_params: [
+    #         {
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
+    #           value: "ExtraParamValue", # required
+    #         },
+    #       ],
+    #     },
+    #     privacy_protect_billing_contact: false,
     #   })
     #
     # @example Response structure
@@ -1747,12 +2338,12 @@ module Aws::Route53Domains
       req.send_request(options)
     end
 
-    # Transfers a domain from the current AWS account to another AWS
-    # account. Note the following:
+    # Transfers a domain from the current Amazon Web Services account to
+    # another Amazon Web Services account. Note the following:
     #
-    # * The AWS account that you're transferring the domain to must accept
-    #   the transfer. If the other account doesn't accept the transfer
-    #   within 3 days, we cancel the transfer. See
+    # * The Amazon Web Services account that you're transferring the domain
+    #   to must accept the transfer. If the other account doesn't accept
+    #   the transfer within 3 days, we cancel the transfer. See
     #   [AcceptDomainTransferFromAnotherAwsAccount][1].
     #
     # * You can cancel the transfer before the other account accepts it. See
@@ -1761,13 +2352,14 @@ module Aws::Route53Domains
     # * The other account can reject the transfer. See
     #   [RejectDomainTransferFromAnotherAwsAccount][3].
     #
-    # When you transfer a domain from one AWS account to another, Route 53
-    # doesn't transfer the hosted zone that is associated with the domain.
-    # DNS resolution isn't affected if the domain and the hosted zone are
-    # owned by separate accounts, so transferring the hosted zone is
-    # optional. For information about transferring the hosted zone to
-    # another AWS account, see [Migrating a Hosted Zone to a Different AWS
-    # Account][4] in the *Amazon Route 53 Developer Guide*.
+    # When you transfer a domain from one Amazon Web Services account to
+    # another, Route 53 doesn't transfer the hosted zone that is associated
+    # with the domain. DNS resolution isn't affected if the domain and the
+    # hosted zone are owned by separate accounts, so transferring the hosted
+    # zone is optional. For information about transferring the hosted zone
+    # to another Amazon Web Services account, see [Migrating a Hosted Zone
+    # to a Different Amazon Web Services Account][4] in the *Amazon Route 53
+    # Developer Guide*.
     #
     # Use either [ListOperations][5] or [GetOperationDetail][6] to determine
     # whether the operation succeeded. [GetOperationDetail][6] provides
@@ -1784,12 +2376,12 @@ module Aws::Route53Domains
     # [6]: https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_GetOperationDetail.html
     #
     # @option params [required, String] :domain_name
-    #   The name of the domain that you want to transfer from the current AWS
-    #   account to another account.
+    #   The name of the domain that you want to transfer from the current
+    #   Amazon Web Services account to another account.
     #
     # @option params [required, String] :account_id
-    #   The account ID of the AWS account that you want to transfer the domain
-    #   to, for example, `111122223333`.
+    #   The account ID of the Amazon Web Services account that you want to
+    #   transfer the domain to, for example, `111122223333`.
     #
     # @return [Types::TransferDomainToAnotherAwsAccountResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1822,9 +2414,9 @@ module Aws::Route53Domains
     # registrant, administrator, or technical.
     #
     # If the update is successful, this method returns an operation ID that
-    # you can use to track the progress and completion of the action. If the
-    # request is not completed successfully, the domain registrant will be
-    # notified by email.
+    # you can use to track the progress and completion of the operation. If
+    # the request is not completed successfully, the domain registrant will
+    # be notified by email.
     #
     # @option params [required, String] :domain_name
     #   The name of the domain that you want to update contact information
@@ -1837,6 +2429,13 @@ module Aws::Route53Domains
     #   Provides detailed contact information.
     #
     # @option params [Types::ContactDetail] :tech_contact
+    #   Provides detailed contact information.
+    #
+    # @option params [Types::Consent] :consent
+    #   Customer's consent for the owner change request. Required if the
+    #   domain is not free (consent price is more than $0.00).
+    #
+    # @option params [Types::ContactDetail] :billing_contact
     #   Provides detailed contact information.
     #
     # @return [Types::UpdateDomainContactResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -1856,14 +2455,14 @@ module Aws::Route53Domains
     #       address_line_2: "AddressLine",
     #       city: "City",
     #       state: "State",
-    #       country_code: "AD", # accepts AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BR, BS, BT, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GH, GI, GL, GM, GN, GQ, GR, GT, GU, GW, GY, HK, HN, HR, HT, HU, ID, IE, IL, IM, IN, IQ, IR, IS, IT, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PT, PW, PY, QA, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SK, SL, SM, SN, SO, SR, ST, SV, SY, SZ, TC, TD, TG, TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
     #       zip_code: "ZipCode",
     #       phone_number: "ContactNumber",
     #       email: "Email",
     #       fax: "ContactNumber",
     #       extra_params: [
     #         {
-    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
     #           value: "ExtraParamValue", # required
     #         },
     #       ],
@@ -1877,14 +2476,14 @@ module Aws::Route53Domains
     #       address_line_2: "AddressLine",
     #       city: "City",
     #       state: "State",
-    #       country_code: "AD", # accepts AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BR, BS, BT, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GH, GI, GL, GM, GN, GQ, GR, GT, GU, GW, GY, HK, HN, HR, HT, HU, ID, IE, IL, IM, IN, IQ, IR, IS, IT, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PT, PW, PY, QA, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SK, SL, SM, SN, SO, SR, ST, SV, SY, SZ, TC, TD, TG, TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
     #       zip_code: "ZipCode",
     #       phone_number: "ContactNumber",
     #       email: "Email",
     #       fax: "ContactNumber",
     #       extra_params: [
     #         {
-    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
     #           value: "ExtraParamValue", # required
     #         },
     #       ],
@@ -1898,14 +2497,39 @@ module Aws::Route53Domains
     #       address_line_2: "AddressLine",
     #       city: "City",
     #       state: "State",
-    #       country_code: "AD", # accepts AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BR, BS, BT, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GH, GI, GL, GM, GN, GQ, GR, GT, GU, GW, GY, HK, HN, HR, HT, HU, ID, IE, IL, IM, IN, IQ, IR, IS, IT, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PT, PW, PY, QA, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SK, SL, SM, SN, SO, SR, ST, SV, SY, SZ, TC, TD, TG, TH, TJ, TK, TL, TM, TN, TO, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
     #       zip_code: "ZipCode",
     #       phone_number: "ContactNumber",
     #       email: "Email",
     #       fax: "ContactNumber",
     #       extra_params: [
     #         {
-    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
+    #           value: "ExtraParamValue", # required
+    #         },
+    #       ],
+    #     },
+    #     consent: {
+    #       max_price: 1.0, # required
+    #       currency: "Currency", # required
+    #     },
+    #     billing_contact: {
+    #       first_name: "ContactName",
+    #       last_name: "ContactName",
+    #       contact_type: "PERSON", # accepts PERSON, COMPANY, ASSOCIATION, PUBLIC_BODY, RESELLER
+    #       organization_name: "ContactName",
+    #       address_line_1: "AddressLine",
+    #       address_line_2: "AddressLine",
+    #       city: "City",
+    #       state: "State",
+    #       country_code: "AC", # accepts AC, AD, AE, AF, AG, AI, AL, AM, AN, AO, AQ, AR, AS, AT, AU, AW, AX, AZ, BA, BB, BD, BE, BF, BG, BH, BI, BJ, BL, BM, BN, BO, BQ, BR, BS, BT, BV, BW, BY, BZ, CA, CC, CD, CF, CG, CH, CI, CK, CL, CM, CN, CO, CR, CU, CV, CW, CX, CY, CZ, DE, DJ, DK, DM, DO, DZ, EC, EE, EG, EH, ER, ES, ET, FI, FJ, FK, FM, FO, FR, GA, GB, GD, GE, GF, GG, GH, GI, GL, GM, GN, GP, GQ, GR, GS, GT, GU, GW, GY, HK, HM, HN, HR, HT, HU, ID, IE, IL, IM, IN, IO, IQ, IR, IS, IT, JE, JM, JO, JP, KE, KG, KH, KI, KM, KN, KP, KR, KW, KY, KZ, LA, LB, LC, LI, LK, LR, LS, LT, LU, LV, LY, MA, MC, MD, ME, MF, MG, MH, MK, ML, MM, MN, MO, MP, MQ, MR, MS, MT, MU, MV, MW, MX, MY, MZ, NA, NC, NE, NF, NG, NI, NL, NO, NP, NR, NU, NZ, OM, PA, PE, PF, PG, PH, PK, PL, PM, PN, PR, PS, PT, PW, PY, QA, RE, RO, RS, RU, RW, SA, SB, SC, SD, SE, SG, SH, SI, SJ, SK, SL, SM, SN, SO, SR, SS, ST, SV, SX, SY, SZ, TC, TD, TF, TG, TH, TJ, TK, TL, TM, TN, TO, TP, TR, TT, TV, TW, TZ, UA, UG, US, UY, UZ, VA, VC, VE, VG, VI, VN, VU, WF, WS, YE, YT, ZA, ZM, ZW
+    #       zip_code: "ZipCode",
+    #       phone_number: "ContactNumber",
+    #       email: "Email",
+    #       fax: "ContactNumber",
+    #       extra_params: [
+    #         {
+    #           name: "DUNS_NUMBER", # required, accepts DUNS_NUMBER, BRAND_NUMBER, BIRTH_DEPARTMENT, BIRTH_DATE_IN_YYYY_MM_DD, BIRTH_COUNTRY, BIRTH_CITY, DOCUMENT_NUMBER, AU_ID_NUMBER, AU_ID_TYPE, CA_LEGAL_TYPE, CA_BUSINESS_ENTITY_TYPE, CA_LEGAL_REPRESENTATIVE, CA_LEGAL_REPRESENTATIVE_CAPACITY, ES_IDENTIFICATION, ES_IDENTIFICATION_TYPE, ES_LEGAL_FORM, FI_BUSINESS_NUMBER, FI_ID_NUMBER, FI_NATIONALITY, FI_ORGANIZATION_TYPE, IT_NATIONALITY, IT_PIN, IT_REGISTRANT_ENTITY_TYPE, RU_PASSPORT_DATA, SE_ID_NUMBER, SG_ID_NUMBER, VAT_NUMBER, UK_CONTACT_TYPE, UK_COMPANY_NUMBER, EU_COUNTRY_OF_CITIZENSHIP, AU_PRIORITY_TOKEN
     #           value: "ExtraParamValue", # required
     #         },
     #       ],
@@ -1926,17 +2550,22 @@ module Aws::Route53Domains
     end
 
     # This operation updates the specified domain contact's privacy
-    # setting. When privacy protection is enabled, contact information such
-    # as email address is replaced either with contact information for
-    # Amazon Registrar (for .com, .net, and .org domains) or with contact
-    # information for our registrar associate, Gandi.
+    # setting. When privacy protection is enabled, your contact information
+    # is replaced with contact information for the registrar or with the
+    # phrase "REDACTED FOR PRIVACY", or "On behalf of &lt;domain name&gt;
+    # owner."
+    #
+    # <note markdown="1"> While some domains may allow different privacy settings per contact,
+    # we recommend specifying the same privacy setting for all contacts.
+    #
+    #  </note>
     #
     # This operation affects only the contact information for the specified
-    # contact type (registrant, administrator, or tech). If the request
-    # succeeds, Amazon Route 53 returns an operation ID that you can use
-    # with [GetOperationDetail][1] to track the progress and completion of
-    # the action. If the request doesn't complete successfully, the domain
-    # registrant will be notified by email.
+    # contact type (administrative, registrant, or technical). If the
+    # request succeeds, Amazon Route 53 returns an operation ID that you can
+    # use with [GetOperationDetail][1] to track the progress and completion
+    # of the action. If the request doesn't complete successfully, the
+    # domain registrant will be notified by email.
     #
     # By disabling the privacy service via API, you consent to the
     # publication of the contact information provided for this domain via
@@ -1960,26 +2589,51 @@ module Aws::Route53Domains
     # @option params [Boolean] :admin_privacy
     #   Whether you want to conceal contact information from WHOIS queries. If
     #   you specify `true`, WHOIS ("who is") queries return contact
-    #   information either for Amazon Registrar (for .com, .net, and .org
-    #   domains) or for our registrar associate, Gandi (for all other TLDs).
-    #   If you specify `false`, WHOIS queries return the information that you
-    #   entered for the admin contact.
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the admin contact.
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
     #
     # @option params [Boolean] :registrant_privacy
     #   Whether you want to conceal contact information from WHOIS queries. If
     #   you specify `true`, WHOIS ("who is") queries return contact
-    #   information either for Amazon Registrar (for .com, .net, and .org
-    #   domains) or for our registrar associate, Gandi (for all other TLDs).
-    #   If you specify `false`, WHOIS queries return the information that you
-    #   entered for the registrant contact (domain owner).
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the registrant contact (domain
+    #   owner).
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
     #
     # @option params [Boolean] :tech_privacy
     #   Whether you want to conceal contact information from WHOIS queries. If
     #   you specify `true`, WHOIS ("who is") queries return contact
-    #   information either for Amazon Registrar (for .com, .net, and .org
-    #   domains) or for our registrar associate, Gandi (for all other TLDs).
-    #   If you specify `false`, WHOIS queries return the information that you
-    #   entered for the technical contact.
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the technical contact.
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
+    #
+    # @option params [Boolean] :billing_privacy
+    #   Whether you want to conceal contact information from WHOIS queries. If
+    #   you specify `true`, WHOIS ("who is") queries return contact
+    #   information either for Amazon Registrar or for our registrar
+    #   associate, Gandi. If you specify `false`, WHOIS queries return the
+    #   information that you entered for the billing contact.
+    #
+    #   <note markdown="1"> You must specify the same privacy setting for the administrative,
+    #   billing, registrant, and technical contacts.
+    #
+    #    </note>
     #
     # @return [Types::UpdateDomainContactPrivacyResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1992,6 +2646,7 @@ module Aws::Route53Domains
     #     admin_privacy: false,
     #     registrant_privacy: false,
     #     tech_privacy: false,
+    #     billing_privacy: false,
     #   })
     #
     # @example Response structure
@@ -2092,8 +2747,8 @@ module Aws::Route53Domains
       req.send_request(options)
     end
 
-    # Returns all the domain-related billing records for the current AWS
-    # account for a specified period
+    # Returns all the domain-related billing records for the current Amazon
+    # Web Services account for a specified period
     #
     # @option params [Time,DateTime,Date,Integer,String] :start
     #   The beginning date and time for the time period for which you want a
@@ -2108,11 +2763,12 @@ module Aws::Route53Domains
     # @option params [String] :marker
     #   For an initial request for a list of billing records, omit this
     #   element. If the number of billing records that are associated with the
-    #   current AWS account during the specified period is greater than the
-    #   value that you specified for `MaxItems`, you can use `Marker` to
-    #   return additional billing records. Get the value of `NextPageMarker`
-    #   from the previous response, and submit another request that includes
-    #   the value of `NextPageMarker` in the `Marker` element.
+    #   current Amazon Web Services account during the specified period is
+    #   greater than the value that you specified for `MaxItems`, you can use
+    #   `Marker` to return additional billing records. Get the value of
+    #   `NextPageMarker` from the previous response, and submit another
+    #   request that includes the value of `NextPageMarker` in the `Marker`
+    #   element.
     #
     #   Constraints: The marker must match the value of `NextPageMarker` that
     #   was returned in the previous response.
@@ -2126,6 +2782,8 @@ module Aws::Route53Domains
     #
     #   * {Types::ViewBillingResponse#next_page_marker #next_page_marker} => String
     #   * {Types::ViewBillingResponse#billing_records #billing_records} => Array&lt;Types::BillingRecord&gt;
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
     # @example Request syntax with placeholder values
     #
@@ -2141,7 +2799,7 @@ module Aws::Route53Domains
     #   resp.next_page_marker #=> String
     #   resp.billing_records #=> Array
     #   resp.billing_records[0].domain_name #=> String
-    #   resp.billing_records[0].operation #=> String, one of "REGISTER_DOMAIN", "DELETE_DOMAIN", "TRANSFER_IN_DOMAIN", "UPDATE_DOMAIN_CONTACT", "UPDATE_NAMESERVER", "CHANGE_PRIVACY_PROTECTION", "DOMAIN_LOCK", "ENABLE_AUTORENEW", "DISABLE_AUTORENEW", "ADD_DNSSEC", "REMOVE_DNSSEC", "EXPIRE_DOMAIN", "TRANSFER_OUT_DOMAIN", "CHANGE_DOMAIN_OWNER", "RENEW_DOMAIN", "PUSH_DOMAIN", "INTERNAL_TRANSFER_OUT_DOMAIN", "INTERNAL_TRANSFER_IN_DOMAIN"
+    #   resp.billing_records[0].operation #=> String, one of "REGISTER_DOMAIN", "DELETE_DOMAIN", "TRANSFER_IN_DOMAIN", "UPDATE_DOMAIN_CONTACT", "UPDATE_NAMESERVER", "CHANGE_PRIVACY_PROTECTION", "DOMAIN_LOCK", "ENABLE_AUTORENEW", "DISABLE_AUTORENEW", "ADD_DNSSEC", "REMOVE_DNSSEC", "EXPIRE_DOMAIN", "TRANSFER_OUT_DOMAIN", "CHANGE_DOMAIN_OWNER", "RENEW_DOMAIN", "PUSH_DOMAIN", "INTERNAL_TRANSFER_OUT_DOMAIN", "INTERNAL_TRANSFER_IN_DOMAIN", "RELEASE_TO_GANDI", "TRANSFER_ON_RENEW"
     #   resp.billing_records[0].invoice_id #=> String
     #   resp.billing_records[0].bill_date #=> Time
     #   resp.billing_records[0].price #=> Float
@@ -2161,14 +2819,19 @@ module Aws::Route53Domains
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::Route53Domains')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-route53domains'
-      context[:gem_version] = '1.28.0'
+      context[:gem_version] = '1.69.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

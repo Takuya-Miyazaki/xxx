@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-mediatailor/types'
-require_relative 'aws-sdk-mediatailor/client_api'
-require_relative 'aws-sdk-mediatailor/client'
-require_relative 'aws-sdk-mediatailor/errors'
-require_relative 'aws-sdk-mediatailor/resource'
-require_relative 'aws-sdk-mediatailor/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:mediatailor)
 
 # This module provides support for AWS MediaTailor. This module is available in the
 # `aws-sdk-mediatailor` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-mediatailor/customizations'
 # structure.
 #
 #     media_tailor = Aws::MediaTailor::Client.new
-#     resp = media_tailor.delete_playback_configuration(params)
+#     resp = media_tailor.configure_logs_for_channel(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-mediatailor/customizations'
 #
 # @!group service
 module Aws::MediaTailor
+  autoload :Types, 'aws-sdk-mediatailor/types'
+  autoload :ClientApi, 'aws-sdk-mediatailor/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-mediatailor/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-mediatailor/client'
+  autoload :Errors, 'aws-sdk-mediatailor/errors'
+  autoload :Resource, 'aws-sdk-mediatailor/resource'
+  autoload :EndpointParameters, 'aws-sdk-mediatailor/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-mediatailor/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-mediatailor/endpoints'
 
-  GEM_VERSION = '1.33.0'
+  GEM_VERSION = '1.90.0'
 
 end
+
+require_relative 'aws-sdk-mediatailor/customizations'

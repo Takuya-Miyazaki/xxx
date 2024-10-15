@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:budgets)
 
 module Aws::Budgets
   # An API client for Budgets.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::Budgets
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::Budgets::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::Budgets
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::Budgets
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::Budgets
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::Budgets
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::Budgets
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::Budgets
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +341,112 @@ module Aws::Budgets
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::Budgets::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::Budgets::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -358,8 +475,13 @@ module Aws::Budgets
     #   A notification that you want to associate with a budget. A budget can
     #   have up to five notifications, and each notification can have one SNS
     #   subscriber and up to 10 email subscribers. If you include
-    #   notifications and subscribers in your `CreateBudget` call, AWS creates
-    #   the notifications and subscribers for you.
+    #   notifications and subscribers in your `CreateBudget` call, Amazon Web
+    #   Services creates the notifications and subscribers for you.
+    #
+    # @option params [Array<Types::ResourceTag>] :resource_tags
+    #   An optional list of tags to associate with the specified budget. Each
+    #   tag consists of a key and a value, and each key must be unique for the
+    #   resource.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -380,7 +502,7 @@ module Aws::Budgets
     #         },
     #       },
     #       cost_filters: {
-    #         "GenericString" => ["GenericString"],
+    #         "GenericString" => ["DimensionValue"],
     #       },
     #       cost_types: {
     #         include_tax: false,
@@ -412,6 +534,14 @@ module Aws::Budgets
     #       },
     #       budget_type: "USAGE", # required, accepts USAGE, COST, RI_UTILIZATION, RI_COVERAGE, SAVINGS_PLANS_UTILIZATION, SAVINGS_PLANS_COVERAGE
     #       last_updated_time: Time.now,
+    #       auto_adjust_data: {
+    #         auto_adjust_type: "HISTORICAL", # required, accepts HISTORICAL, FORECAST
+    #         historical_options: {
+    #           budget_adjustment_period: 1, # required
+    #           look_back_available_periods: 1,
+    #         },
+    #         last_auto_adjust_time: Time.now,
+    #       },
     #     },
     #     notifications_with_subscribers: [
     #       {
@@ -430,6 +560,12 @@ module Aws::Budgets
     #         ],
     #       },
     #     ],
+    #     resource_tags: [
+    #       {
+    #         key: "ResourceTagKey", # required
+    #         value: "ResourceTagValue", # required
+    #       },
+    #     ],
     #   })
     #
     # @overload create_budget(params = {})
@@ -442,11 +578,11 @@ module Aws::Budgets
     # Creates a budget action.
     #
     # @option params [required, String] :account_id
-    #   The account ID of the user. It should be a 12-digit number.
+    #   The account ID of the user. It's a 12-digit number.
     #
     # @option params [required, String] :budget_name
     #   A string that represents the budget name. The ":" and "\\"
-    #   characters aren't allowed.
+    #   characters, and the "/action/" substring, aren't allowed.
     #
     # @option params [required, String] :notification_type
     #   The type of a notification. It must be ACTUAL or FORECASTED.
@@ -471,6 +607,11 @@ module Aws::Budgets
     #
     # @option params [required, Array<Types::Subscriber>] :subscribers
     #   A list of subscribers.
+    #
+    # @option params [Array<Types::ResourceTag>] :resource_tags
+    #   An optional list of tags to associate with the specified budget
+    #   action. Each tag consists of a key and a value, and each key must be
+    #   unique for the resource.
     #
     # @return [Types::CreateBudgetActionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -514,6 +655,12 @@ module Aws::Budgets
     #         address: "SubscriberAddress", # required
     #       },
     #     ],
+    #     resource_tags: [
+    #       {
+    #         key: "ResourceTagKey", # required
+    #         value: "ResourceTagValue", # required
+    #       },
+    #     ],
     #   })
     #
     # @example Response structure
@@ -537,8 +684,8 @@ module Aws::Budgets
     #   create a notification for.
     #
     # @option params [required, String] :budget_name
-    #   The name of the budget that you want AWS to notify you about. Budget
-    #   names must be unique within an account.
+    #   The name of the budget that you want Amazon Web Services to notify you
+    #   about. Budget names must be unique within an account.
     #
     # @option params [required, Types::Notification] :notification
     #   The notification that you want to create.
@@ -652,11 +799,11 @@ module Aws::Budgets
     # Deletes a budget action.
     #
     # @option params [required, String] :account_id
-    #   The account ID of the user. It should be a 12-digit number.
+    #   The account ID of the user. It's a 12-digit number.
     #
     # @option params [required, String] :budget_name
     #   A string that represents the budget name. The ":" and "\\"
-    #   characters aren't allowed.
+    #   characters, and the "/action/" substring, aren't allowed.
     #
     # @option params [required, String] :action_id
     #   A system-generated universally unique identifier (UUID) for the
@@ -855,6 +1002,10 @@ module Aws::Budgets
     #   resp.budget.calculated_spend.forecasted_spend.unit #=> String
     #   resp.budget.budget_type #=> String, one of "USAGE", "COST", "RI_UTILIZATION", "RI_COVERAGE", "SAVINGS_PLANS_UTILIZATION", "SAVINGS_PLANS_COVERAGE"
     #   resp.budget.last_updated_time #=> Time
+    #   resp.budget.auto_adjust_data.auto_adjust_type #=> String, one of "HISTORICAL", "FORECAST"
+    #   resp.budget.auto_adjust_data.historical_options.budget_adjustment_period #=> Integer
+    #   resp.budget.auto_adjust_data.historical_options.look_back_available_periods #=> Integer
+    #   resp.budget.auto_adjust_data.last_auto_adjust_time #=> Time
     #
     # @overload describe_budget(params = {})
     # @param [Hash] params ({})
@@ -866,11 +1017,11 @@ module Aws::Budgets
     # Describes a budget action detail.
     #
     # @option params [required, String] :account_id
-    #   The account ID of the user. It should be a 12-digit number.
+    #   The account ID of the user. It's a 12-digit number.
     #
     # @option params [required, String] :budget_name
     #   A string that represents the budget name. The ":" and "\\"
-    #   characters aren't allowed.
+    #   characters, and the "/action/" substring, aren't allowed.
     #
     # @option params [required, String] :action_id
     #   A system-generated universally unique identifier (UUID) for the
@@ -931,18 +1082,18 @@ module Aws::Budgets
     # Describes a budget action history detail.
     #
     # @option params [required, String] :account_id
-    #   The account ID of the user. It should be a 12-digit number.
+    #   The account ID of the user. It's a 12-digit number.
     #
     # @option params [required, String] :budget_name
     #   A string that represents the budget name. The ":" and "\\"
-    #   characters aren't allowed.
+    #   characters, and the "/action/" substring, aren't allowed.
     #
     # @option params [required, String] :action_id
     #   A system-generated universally unique identifier (UUID) for the
     #   action.
     #
     # @option params [Types::TimePeriod] :time_period
-    #   The period of time that is covered by a budget. The period has a start
+    #   The period of time that's covered by a budget. The period has a start
     #   date and an end date. The start date must come before the end date.
     #   There are no restrictions on the end date.
     #
@@ -1019,7 +1170,7 @@ module Aws::Budgets
     # Describes all of the budget actions for an account.
     #
     # @option params [required, String] :account_id
-    #   The account ID of the user. It should be a 12-digit number.
+    #   The account ID of the user. It's a 12-digit number.
     #
     # @option params [Integer] :max_results
     #   An integer that represents how many entries a paginated response
@@ -1084,11 +1235,11 @@ module Aws::Budgets
     # Describes all of the budget actions for a budget.
     #
     # @option params [required, String] :account_id
-    #   The account ID of the user. It should be a 12-digit number.
+    #   The account ID of the user. It's a 12-digit number.
     #
     # @option params [required, String] :budget_name
     #   A string that represents the budget name. The ":" and "\\"
-    #   characters aren't allowed.
+    #   characters, and the "/action/" substring, aren't allowed.
     #
     # @option params [Integer] :max_results
     #   An integer that represents how many entries a paginated response
@@ -1151,15 +1302,62 @@ module Aws::Budgets
       req.send_request(options)
     end
 
+    # Lists the budget names and notifications that are associated with an
+    # account.
+    #
+    # @option params [required, String] :account_id
+    #   The account ID of the user. It's a 12-digit number.
+    #
+    # @option params [Integer] :max_results
+    #   An integer that represents how many budgets a paginated response
+    #   contains. The default is 50.
+    #
+    # @option params [String] :next_token
+    #   A generic string.
+    #
+    # @return [Types::DescribeBudgetNotificationsForAccountResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeBudgetNotificationsForAccountResponse#budget_notifications_for_account #budget_notifications_for_account} => Array&lt;Types::BudgetNotificationsForAccount&gt;
+    #   * {Types::DescribeBudgetNotificationsForAccountResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_budget_notifications_for_account({
+    #     account_id: "AccountId", # required
+    #     max_results: 1,
+    #     next_token: "GenericString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.budget_notifications_for_account #=> Array
+    #   resp.budget_notifications_for_account[0].notifications #=> Array
+    #   resp.budget_notifications_for_account[0].notifications[0].notification_type #=> String, one of "ACTUAL", "FORECASTED"
+    #   resp.budget_notifications_for_account[0].notifications[0].comparison_operator #=> String, one of "GREATER_THAN", "LESS_THAN", "EQUAL_TO"
+    #   resp.budget_notifications_for_account[0].notifications[0].threshold #=> Float
+    #   resp.budget_notifications_for_account[0].notifications[0].threshold_type #=> String, one of "PERCENTAGE", "ABSOLUTE_VALUE"
+    #   resp.budget_notifications_for_account[0].notifications[0].notification_state #=> String, one of "OK", "ALARM"
+    #   resp.budget_notifications_for_account[0].budget_name #=> String
+    #   resp.next_token #=> String
+    #
+    # @overload describe_budget_notifications_for_account(params = {})
+    # @param [Hash] params ({})
+    def describe_budget_notifications_for_account(params = {}, options = {})
+      req = build_request(:describe_budget_notifications_for_account, params)
+      req.send_request(options)
+    end
+
     # Describes the history for `DAILY`, `MONTHLY`, and `QUARTERLY` budgets.
     # Budget history isn't available for `ANNUAL` budgets.
     #
     # @option params [required, String] :account_id
-    #   The account ID of the user. It should be a 12-digit number.
+    #   The account ID of the user. It's a 12-digit number.
     #
     # @option params [required, String] :budget_name
     #   A string that represents the budget name. The ":" and "\\"
-    #   characters aren't allowed.
+    #   characters, and the "/action/" substring, aren't allowed.
     #
     # @option params [Types::TimePeriod] :time_period
     #   Retrieves how often the budget went into an `ALARM` state for the
@@ -1237,12 +1435,12 @@ module Aws::Budgets
     # [1]: https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_budgets_DescribeBudgets.html#API_DescribeBudgets_Examples
     #
     # @option params [required, String] :account_id
-    #   The `accountId` that is associated with the budgets that you want
-    #   descriptions of.
+    #   The `accountId` that is associated with the budgets that you want to
+    #   describe.
     #
     # @option params [Integer] :max_results
-    #   An optional integer that represents how many entries a paginated
-    #   response contains. The maximum is 100.
+    #   An integer that represents how many budgets a paginated response
+    #   contains. The default is 100.
     #
     # @option params [String] :next_token
     #   The pagination token that you include in your request to indicate the
@@ -1295,6 +1493,10 @@ module Aws::Budgets
     #   resp.budgets[0].calculated_spend.forecasted_spend.unit #=> String
     #   resp.budgets[0].budget_type #=> String, one of "USAGE", "COST", "RI_UTILIZATION", "RI_COVERAGE", "SAVINGS_PLANS_UTILIZATION", "SAVINGS_PLANS_COVERAGE"
     #   resp.budgets[0].last_updated_time #=> Time
+    #   resp.budgets[0].auto_adjust_data.auto_adjust_type #=> String, one of "HISTORICAL", "FORECAST"
+    #   resp.budgets[0].auto_adjust_data.historical_options.budget_adjustment_period #=> Integer
+    #   resp.budgets[0].auto_adjust_data.historical_options.look_back_available_periods #=> Integer
+    #   resp.budgets[0].auto_adjust_data.last_auto_adjust_time #=> Time
     #   resp.next_token #=> String
     #
     # @overload describe_budgets(params = {})
@@ -1315,7 +1517,7 @@ module Aws::Budgets
     #
     # @option params [Integer] :max_results
     #   An optional integer that represents how many entries a paginated
-    #   response contains. The maximum is 100.
+    #   response contains.
     #
     # @option params [String] :next_token
     #   The pagination token that you include in your request to indicate the
@@ -1368,7 +1570,7 @@ module Aws::Budgets
     #
     # @option params [Integer] :max_results
     #   An optional integer that represents how many entries a paginated
-    #   response contains. The maximum is 100.
+    #   response contains.
     #
     # @option params [String] :next_token
     #   The pagination token that you include in your request to indicate the
@@ -1414,11 +1616,11 @@ module Aws::Budgets
     # Executes a budget action.
     #
     # @option params [required, String] :account_id
-    #   The account ID of the user. It should be a 12-digit number.
+    #   The account ID of the user. It's a 12-digit number.
     #
     # @option params [required, String] :budget_name
     #   A string that represents the budget name. The ":" and "\\"
-    #   characters aren't allowed.
+    #   characters, and the "/action/" substring, aren't allowed.
     #
     # @option params [required, String] :action_id
     #   A system-generated universally unique identifier (UUID) for the
@@ -1457,10 +1659,91 @@ module Aws::Budgets
       req.send_request(options)
     end
 
+    # Lists tags associated with a budget or budget action resource.
+    #
+    # @option params [required, String] :resource_arn
+    #   The unique identifier for the resource.
+    #
+    # @return [Types::ListTagsForResourceResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListTagsForResourceResponse#resource_tags #resource_tags} => Array&lt;Types::ResourceTag&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_tags_for_resource({
+    #     resource_arn: "AmazonResourceName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.resource_tags #=> Array
+    #   resp.resource_tags[0].key #=> String
+    #   resp.resource_tags[0].value #=> String
+    #
+    # @overload list_tags_for_resource(params = {})
+    # @param [Hash] params ({})
+    def list_tags_for_resource(params = {}, options = {})
+      req = build_request(:list_tags_for_resource, params)
+      req.send_request(options)
+    end
+
+    # Creates tags for a budget or budget action resource.
+    #
+    # @option params [required, String] :resource_arn
+    #   The unique identifier for the resource.
+    #
+    # @option params [required, Array<Types::ResourceTag>] :resource_tags
+    #   The tags associated with the resource.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.tag_resource({
+    #     resource_arn: "AmazonResourceName", # required
+    #     resource_tags: [ # required
+    #       {
+    #         key: "ResourceTagKey", # required
+    #         value: "ResourceTagValue", # required
+    #       },
+    #     ],
+    #   })
+    #
+    # @overload tag_resource(params = {})
+    # @param [Hash] params ({})
+    def tag_resource(params = {}, options = {})
+      req = build_request(:tag_resource, params)
+      req.send_request(options)
+    end
+
+    # Deletes tags associated with a budget or budget action resource.
+    #
+    # @option params [required, String] :resource_arn
+    #   The unique identifier for the resource.
+    #
+    # @option params [required, Array<String>] :resource_tag_keys
+    #   The key that's associated with the tag.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.untag_resource({
+    #     resource_arn: "AmazonResourceName", # required
+    #     resource_tag_keys: ["ResourceTagKey"], # required
+    #   })
+    #
+    # @overload untag_resource(params = {})
+    # @param [Hash] params ({})
+    def untag_resource(params = {}, options = {})
+      req = build_request(:untag_resource, params)
+      req.send_request(options)
+    end
+
     # Updates a budget. You can change every part of a budget except for the
     # `budgetName` and the `calculatedSpend`. When you modify a budget, the
-    # `calculatedSpend` drops to zero until AWS has new usage data to use
-    # for forecasting.
+    # `calculatedSpend` drops to zero until Amazon Web Services has new
+    # usage data to use for forecasting.
     #
     # Only one of `BudgetLimit` or `PlannedBudgetLimits` can be present in
     # the syntax at one time. Use the syntax that matches your case. The
@@ -1497,7 +1780,7 @@ module Aws::Budgets
     #         },
     #       },
     #       cost_filters: {
-    #         "GenericString" => ["GenericString"],
+    #         "GenericString" => ["DimensionValue"],
     #       },
     #       cost_types: {
     #         include_tax: false,
@@ -1529,6 +1812,14 @@ module Aws::Budgets
     #       },
     #       budget_type: "USAGE", # required, accepts USAGE, COST, RI_UTILIZATION, RI_COVERAGE, SAVINGS_PLANS_UTILIZATION, SAVINGS_PLANS_COVERAGE
     #       last_updated_time: Time.now,
+    #       auto_adjust_data: {
+    #         auto_adjust_type: "HISTORICAL", # required, accepts HISTORICAL, FORECAST
+    #         historical_options: {
+    #           budget_adjustment_period: 1, # required
+    #           look_back_available_periods: 1,
+    #         },
+    #         last_auto_adjust_time: Time.now,
+    #       },
     #     },
     #   })
     #
@@ -1542,11 +1833,11 @@ module Aws::Budgets
     # Updates a budget action.
     #
     # @option params [required, String] :account_id
-    #   The account ID of the user. It should be a 12-digit number.
+    #   The account ID of the user. It's a 12-digit number.
     #
     # @option params [required, String] :budget_name
     #   A string that represents the budget name. The ":" and "\\"
-    #   characters aren't allowed.
+    #   characters, and the "/action/" substring, aren't allowed.
     #
     # @option params [required, String] :action_id
     #   A system-generated universally unique identifier (UUID) for the
@@ -1780,14 +2071,19 @@ module Aws::Budgets
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::Budgets')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-budgets'
-      context[:gem_version] = '1.36.0'
+      context[:gem_version] = '1.77.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

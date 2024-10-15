@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::Neptune
   # @api private
@@ -21,15 +22,16 @@ module Aws::Neptune
     ApplyPendingMaintenanceActionMessage = Shapes::StructureShape.new(name: 'ApplyPendingMaintenanceActionMessage')
     ApplyPendingMaintenanceActionResult = Shapes::StructureShape.new(name: 'ApplyPendingMaintenanceActionResult')
     AttributeValueList = Shapes::ListShape.new(name: 'AttributeValueList')
-    AuthorizationNotFoundFault = Shapes::StructureShape.new(name: 'AuthorizationNotFoundFault')
+    AuthorizationNotFoundFault = Shapes::StructureShape.new(name: 'AuthorizationNotFoundFault', error: {"code"=>"AuthorizationNotFound", "httpStatusCode"=>404, "senderFault"=>true})
     AvailabilityZone = Shapes::StructureShape.new(name: 'AvailabilityZone')
     AvailabilityZoneList = Shapes::ListShape.new(name: 'AvailabilityZoneList')
     AvailabilityZones = Shapes::ListShape.new(name: 'AvailabilityZones')
     Boolean = Shapes::BooleanShape.new(name: 'Boolean')
     BooleanOptional = Shapes::BooleanShape.new(name: 'BooleanOptional')
-    CertificateNotFoundFault = Shapes::StructureShape.new(name: 'CertificateNotFoundFault')
+    CertificateNotFoundFault = Shapes::StructureShape.new(name: 'CertificateNotFoundFault', error: {"code"=>"CertificateNotFound", "httpStatusCode"=>404, "senderFault"=>true})
     CharacterSet = Shapes::StructureShape.new(name: 'CharacterSet')
     CloudwatchLogsExportConfiguration = Shapes::StructureShape.new(name: 'CloudwatchLogsExportConfiguration')
+    ClusterPendingModifiedValues = Shapes::StructureShape.new(name: 'ClusterPendingModifiedValues')
     CopyDBClusterParameterGroupMessage = Shapes::StructureShape.new(name: 'CopyDBClusterParameterGroupMessage')
     CopyDBClusterParameterGroupResult = Shapes::StructureShape.new(name: 'CopyDBClusterParameterGroupResult')
     CopyDBClusterSnapshotMessage = Shapes::StructureShape.new(name: 'CopyDBClusterSnapshotMessage')
@@ -52,76 +54,78 @@ module Aws::Neptune
     CreateDBSubnetGroupResult = Shapes::StructureShape.new(name: 'CreateDBSubnetGroupResult')
     CreateEventSubscriptionMessage = Shapes::StructureShape.new(name: 'CreateEventSubscriptionMessage')
     CreateEventSubscriptionResult = Shapes::StructureShape.new(name: 'CreateEventSubscriptionResult')
+    CreateGlobalClusterMessage = Shapes::StructureShape.new(name: 'CreateGlobalClusterMessage')
+    CreateGlobalClusterResult = Shapes::StructureShape.new(name: 'CreateGlobalClusterResult')
     DBCluster = Shapes::StructureShape.new(name: 'DBCluster')
-    DBClusterAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBClusterAlreadyExistsFault')
+    DBClusterAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBClusterAlreadyExistsFault', error: {"code"=>"DBClusterAlreadyExistsFault", "httpStatusCode"=>400, "senderFault"=>true})
     DBClusterEndpoint = Shapes::StructureShape.new(name: 'DBClusterEndpoint')
-    DBClusterEndpointAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBClusterEndpointAlreadyExistsFault')
+    DBClusterEndpointAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBClusterEndpointAlreadyExistsFault', error: {"code"=>"DBClusterEndpointAlreadyExistsFault", "httpStatusCode"=>400, "senderFault"=>true})
     DBClusterEndpointList = Shapes::ListShape.new(name: 'DBClusterEndpointList')
     DBClusterEndpointMessage = Shapes::StructureShape.new(name: 'DBClusterEndpointMessage')
-    DBClusterEndpointNotFoundFault = Shapes::StructureShape.new(name: 'DBClusterEndpointNotFoundFault')
-    DBClusterEndpointQuotaExceededFault = Shapes::StructureShape.new(name: 'DBClusterEndpointQuotaExceededFault')
+    DBClusterEndpointNotFoundFault = Shapes::StructureShape.new(name: 'DBClusterEndpointNotFoundFault', error: {"code"=>"DBClusterEndpointNotFoundFault", "httpStatusCode"=>400, "senderFault"=>true})
+    DBClusterEndpointQuotaExceededFault = Shapes::StructureShape.new(name: 'DBClusterEndpointQuotaExceededFault', error: {"code"=>"DBClusterEndpointQuotaExceededFault", "httpStatusCode"=>403, "senderFault"=>true})
     DBClusterList = Shapes::ListShape.new(name: 'DBClusterList')
     DBClusterMember = Shapes::StructureShape.new(name: 'DBClusterMember')
     DBClusterMemberList = Shapes::ListShape.new(name: 'DBClusterMemberList')
     DBClusterMessage = Shapes::StructureShape.new(name: 'DBClusterMessage')
-    DBClusterNotFoundFault = Shapes::StructureShape.new(name: 'DBClusterNotFoundFault')
+    DBClusterNotFoundFault = Shapes::StructureShape.new(name: 'DBClusterNotFoundFault', error: {"code"=>"DBClusterNotFoundFault", "httpStatusCode"=>404, "senderFault"=>true})
     DBClusterOptionGroupMemberships = Shapes::ListShape.new(name: 'DBClusterOptionGroupMemberships')
     DBClusterOptionGroupStatus = Shapes::StructureShape.new(name: 'DBClusterOptionGroupStatus')
     DBClusterParameterGroup = Shapes::StructureShape.new(name: 'DBClusterParameterGroup')
     DBClusterParameterGroupDetails = Shapes::StructureShape.new(name: 'DBClusterParameterGroupDetails')
     DBClusterParameterGroupList = Shapes::ListShape.new(name: 'DBClusterParameterGroupList')
     DBClusterParameterGroupNameMessage = Shapes::StructureShape.new(name: 'DBClusterParameterGroupNameMessage')
-    DBClusterParameterGroupNotFoundFault = Shapes::StructureShape.new(name: 'DBClusterParameterGroupNotFoundFault')
+    DBClusterParameterGroupNotFoundFault = Shapes::StructureShape.new(name: 'DBClusterParameterGroupNotFoundFault', error: {"code"=>"DBClusterParameterGroupNotFound", "httpStatusCode"=>404, "senderFault"=>true})
     DBClusterParameterGroupsMessage = Shapes::StructureShape.new(name: 'DBClusterParameterGroupsMessage')
-    DBClusterQuotaExceededFault = Shapes::StructureShape.new(name: 'DBClusterQuotaExceededFault')
+    DBClusterQuotaExceededFault = Shapes::StructureShape.new(name: 'DBClusterQuotaExceededFault', error: {"code"=>"DBClusterQuotaExceededFault", "httpStatusCode"=>403, "senderFault"=>true})
     DBClusterRole = Shapes::StructureShape.new(name: 'DBClusterRole')
-    DBClusterRoleAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBClusterRoleAlreadyExistsFault')
-    DBClusterRoleNotFoundFault = Shapes::StructureShape.new(name: 'DBClusterRoleNotFoundFault')
-    DBClusterRoleQuotaExceededFault = Shapes::StructureShape.new(name: 'DBClusterRoleQuotaExceededFault')
+    DBClusterRoleAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBClusterRoleAlreadyExistsFault', error: {"code"=>"DBClusterRoleAlreadyExists", "httpStatusCode"=>400, "senderFault"=>true})
+    DBClusterRoleNotFoundFault = Shapes::StructureShape.new(name: 'DBClusterRoleNotFoundFault', error: {"code"=>"DBClusterRoleNotFound", "httpStatusCode"=>404, "senderFault"=>true})
+    DBClusterRoleQuotaExceededFault = Shapes::StructureShape.new(name: 'DBClusterRoleQuotaExceededFault', error: {"code"=>"DBClusterRoleQuotaExceeded", "httpStatusCode"=>400, "senderFault"=>true})
     DBClusterRoles = Shapes::ListShape.new(name: 'DBClusterRoles')
     DBClusterSnapshot = Shapes::StructureShape.new(name: 'DBClusterSnapshot')
-    DBClusterSnapshotAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBClusterSnapshotAlreadyExistsFault')
+    DBClusterSnapshotAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBClusterSnapshotAlreadyExistsFault', error: {"code"=>"DBClusterSnapshotAlreadyExistsFault", "httpStatusCode"=>400, "senderFault"=>true})
     DBClusterSnapshotAttribute = Shapes::StructureShape.new(name: 'DBClusterSnapshotAttribute')
     DBClusterSnapshotAttributeList = Shapes::ListShape.new(name: 'DBClusterSnapshotAttributeList')
     DBClusterSnapshotAttributesResult = Shapes::StructureShape.new(name: 'DBClusterSnapshotAttributesResult')
     DBClusterSnapshotList = Shapes::ListShape.new(name: 'DBClusterSnapshotList')
     DBClusterSnapshotMessage = Shapes::StructureShape.new(name: 'DBClusterSnapshotMessage')
-    DBClusterSnapshotNotFoundFault = Shapes::StructureShape.new(name: 'DBClusterSnapshotNotFoundFault')
+    DBClusterSnapshotNotFoundFault = Shapes::StructureShape.new(name: 'DBClusterSnapshotNotFoundFault', error: {"code"=>"DBClusterSnapshotNotFoundFault", "httpStatusCode"=>404, "senderFault"=>true})
     DBEngineVersion = Shapes::StructureShape.new(name: 'DBEngineVersion')
     DBEngineVersionList = Shapes::ListShape.new(name: 'DBEngineVersionList')
     DBEngineVersionMessage = Shapes::StructureShape.new(name: 'DBEngineVersionMessage')
     DBInstance = Shapes::StructureShape.new(name: 'DBInstance')
-    DBInstanceAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBInstanceAlreadyExistsFault')
+    DBInstanceAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBInstanceAlreadyExistsFault', error: {"code"=>"DBInstanceAlreadyExists", "httpStatusCode"=>400, "senderFault"=>true})
     DBInstanceList = Shapes::ListShape.new(name: 'DBInstanceList')
     DBInstanceMessage = Shapes::StructureShape.new(name: 'DBInstanceMessage')
-    DBInstanceNotFoundFault = Shapes::StructureShape.new(name: 'DBInstanceNotFoundFault')
+    DBInstanceNotFoundFault = Shapes::StructureShape.new(name: 'DBInstanceNotFoundFault', error: {"code"=>"DBInstanceNotFound", "httpStatusCode"=>404, "senderFault"=>true})
     DBInstanceStatusInfo = Shapes::StructureShape.new(name: 'DBInstanceStatusInfo')
     DBInstanceStatusInfoList = Shapes::ListShape.new(name: 'DBInstanceStatusInfoList')
     DBParameterGroup = Shapes::StructureShape.new(name: 'DBParameterGroup')
-    DBParameterGroupAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBParameterGroupAlreadyExistsFault')
+    DBParameterGroupAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBParameterGroupAlreadyExistsFault', error: {"code"=>"DBParameterGroupAlreadyExists", "httpStatusCode"=>400, "senderFault"=>true})
     DBParameterGroupDetails = Shapes::StructureShape.new(name: 'DBParameterGroupDetails')
     DBParameterGroupList = Shapes::ListShape.new(name: 'DBParameterGroupList')
     DBParameterGroupNameMessage = Shapes::StructureShape.new(name: 'DBParameterGroupNameMessage')
-    DBParameterGroupNotFoundFault = Shapes::StructureShape.new(name: 'DBParameterGroupNotFoundFault')
-    DBParameterGroupQuotaExceededFault = Shapes::StructureShape.new(name: 'DBParameterGroupQuotaExceededFault')
+    DBParameterGroupNotFoundFault = Shapes::StructureShape.new(name: 'DBParameterGroupNotFoundFault', error: {"code"=>"DBParameterGroupNotFound", "httpStatusCode"=>404, "senderFault"=>true})
+    DBParameterGroupQuotaExceededFault = Shapes::StructureShape.new(name: 'DBParameterGroupQuotaExceededFault', error: {"code"=>"DBParameterGroupQuotaExceeded", "httpStatusCode"=>400, "senderFault"=>true})
     DBParameterGroupStatus = Shapes::StructureShape.new(name: 'DBParameterGroupStatus')
     DBParameterGroupStatusList = Shapes::ListShape.new(name: 'DBParameterGroupStatusList')
     DBParameterGroupsMessage = Shapes::StructureShape.new(name: 'DBParameterGroupsMessage')
     DBSecurityGroupMembership = Shapes::StructureShape.new(name: 'DBSecurityGroupMembership')
     DBSecurityGroupMembershipList = Shapes::ListShape.new(name: 'DBSecurityGroupMembershipList')
     DBSecurityGroupNameList = Shapes::ListShape.new(name: 'DBSecurityGroupNameList')
-    DBSecurityGroupNotFoundFault = Shapes::StructureShape.new(name: 'DBSecurityGroupNotFoundFault')
-    DBSnapshotAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBSnapshotAlreadyExistsFault')
-    DBSnapshotNotFoundFault = Shapes::StructureShape.new(name: 'DBSnapshotNotFoundFault')
+    DBSecurityGroupNotFoundFault = Shapes::StructureShape.new(name: 'DBSecurityGroupNotFoundFault', error: {"code"=>"DBSecurityGroupNotFound", "httpStatusCode"=>404, "senderFault"=>true})
+    DBSnapshotAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBSnapshotAlreadyExistsFault', error: {"code"=>"DBSnapshotAlreadyExists", "httpStatusCode"=>400, "senderFault"=>true})
+    DBSnapshotNotFoundFault = Shapes::StructureShape.new(name: 'DBSnapshotNotFoundFault', error: {"code"=>"DBSnapshotNotFound", "httpStatusCode"=>404, "senderFault"=>true})
     DBSubnetGroup = Shapes::StructureShape.new(name: 'DBSubnetGroup')
-    DBSubnetGroupAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBSubnetGroupAlreadyExistsFault')
-    DBSubnetGroupDoesNotCoverEnoughAZs = Shapes::StructureShape.new(name: 'DBSubnetGroupDoesNotCoverEnoughAZs')
+    DBSubnetGroupAlreadyExistsFault = Shapes::StructureShape.new(name: 'DBSubnetGroupAlreadyExistsFault', error: {"code"=>"DBSubnetGroupAlreadyExists", "httpStatusCode"=>400, "senderFault"=>true})
+    DBSubnetGroupDoesNotCoverEnoughAZs = Shapes::StructureShape.new(name: 'DBSubnetGroupDoesNotCoverEnoughAZs', error: {"code"=>"DBSubnetGroupDoesNotCoverEnoughAZs", "httpStatusCode"=>400, "senderFault"=>true})
     DBSubnetGroupMessage = Shapes::StructureShape.new(name: 'DBSubnetGroupMessage')
-    DBSubnetGroupNotFoundFault = Shapes::StructureShape.new(name: 'DBSubnetGroupNotFoundFault')
-    DBSubnetGroupQuotaExceededFault = Shapes::StructureShape.new(name: 'DBSubnetGroupQuotaExceededFault')
+    DBSubnetGroupNotFoundFault = Shapes::StructureShape.new(name: 'DBSubnetGroupNotFoundFault', error: {"code"=>"DBSubnetGroupNotFoundFault", "httpStatusCode"=>404, "senderFault"=>true})
+    DBSubnetGroupQuotaExceededFault = Shapes::StructureShape.new(name: 'DBSubnetGroupQuotaExceededFault', error: {"code"=>"DBSubnetGroupQuotaExceeded", "httpStatusCode"=>400, "senderFault"=>true})
     DBSubnetGroups = Shapes::ListShape.new(name: 'DBSubnetGroups')
-    DBSubnetQuotaExceededFault = Shapes::StructureShape.new(name: 'DBSubnetQuotaExceededFault')
-    DBUpgradeDependencyFailureFault = Shapes::StructureShape.new(name: 'DBUpgradeDependencyFailureFault')
+    DBSubnetQuotaExceededFault = Shapes::StructureShape.new(name: 'DBSubnetQuotaExceededFault', error: {"code"=>"DBSubnetQuotaExceededFault", "httpStatusCode"=>400, "senderFault"=>true})
+    DBUpgradeDependencyFailureFault = Shapes::StructureShape.new(name: 'DBUpgradeDependencyFailureFault', error: {"code"=>"DBUpgradeDependencyFailure", "httpStatusCode"=>400, "senderFault"=>true})
     DeleteDBClusterEndpointMessage = Shapes::StructureShape.new(name: 'DeleteDBClusterEndpointMessage')
     DeleteDBClusterEndpointOutput = Shapes::StructureShape.new(name: 'DeleteDBClusterEndpointOutput')
     DeleteDBClusterMessage = Shapes::StructureShape.new(name: 'DeleteDBClusterMessage')
@@ -135,6 +139,8 @@ module Aws::Neptune
     DeleteDBSubnetGroupMessage = Shapes::StructureShape.new(name: 'DeleteDBSubnetGroupMessage')
     DeleteEventSubscriptionMessage = Shapes::StructureShape.new(name: 'DeleteEventSubscriptionMessage')
     DeleteEventSubscriptionResult = Shapes::StructureShape.new(name: 'DeleteEventSubscriptionResult')
+    DeleteGlobalClusterMessage = Shapes::StructureShape.new(name: 'DeleteGlobalClusterMessage')
+    DeleteGlobalClusterResult = Shapes::StructureShape.new(name: 'DeleteGlobalClusterResult')
     DescribeDBClusterEndpointsMessage = Shapes::StructureShape.new(name: 'DescribeDBClusterEndpointsMessage')
     DescribeDBClusterParameterGroupsMessage = Shapes::StructureShape.new(name: 'DescribeDBClusterParameterGroupsMessage')
     DescribeDBClusterParametersMessage = Shapes::StructureShape.new(name: 'DescribeDBClusterParametersMessage')
@@ -154,13 +160,14 @@ module Aws::Neptune
     DescribeEventCategoriesMessage = Shapes::StructureShape.new(name: 'DescribeEventCategoriesMessage')
     DescribeEventSubscriptionsMessage = Shapes::StructureShape.new(name: 'DescribeEventSubscriptionsMessage')
     DescribeEventsMessage = Shapes::StructureShape.new(name: 'DescribeEventsMessage')
+    DescribeGlobalClustersMessage = Shapes::StructureShape.new(name: 'DescribeGlobalClustersMessage')
     DescribeOrderableDBInstanceOptionsMessage = Shapes::StructureShape.new(name: 'DescribeOrderableDBInstanceOptionsMessage')
     DescribePendingMaintenanceActionsMessage = Shapes::StructureShape.new(name: 'DescribePendingMaintenanceActionsMessage')
     DescribeValidDBInstanceModificationsMessage = Shapes::StructureShape.new(name: 'DescribeValidDBInstanceModificationsMessage')
     DescribeValidDBInstanceModificationsResult = Shapes::StructureShape.new(name: 'DescribeValidDBInstanceModificationsResult')
     DomainMembership = Shapes::StructureShape.new(name: 'DomainMembership')
     DomainMembershipList = Shapes::ListShape.new(name: 'DomainMembershipList')
-    DomainNotFoundFault = Shapes::StructureShape.new(name: 'DomainNotFoundFault')
+    DomainNotFoundFault = Shapes::StructureShape.new(name: 'DomainNotFoundFault', error: {"code"=>"DomainNotFoundFault", "httpStatusCode"=>404, "senderFault"=>true})
     Double = Shapes::FloatShape.new(name: 'Double')
     DoubleOptional = Shapes::FloatShape.new(name: 'DoubleOptional')
     DoubleRange = Shapes::StructureShape.new(name: 'DoubleRange')
@@ -174,35 +181,47 @@ module Aws::Neptune
     EventCategoriesMessage = Shapes::StructureShape.new(name: 'EventCategoriesMessage')
     EventList = Shapes::ListShape.new(name: 'EventList')
     EventSubscription = Shapes::StructureShape.new(name: 'EventSubscription')
-    EventSubscriptionQuotaExceededFault = Shapes::StructureShape.new(name: 'EventSubscriptionQuotaExceededFault')
+    EventSubscriptionQuotaExceededFault = Shapes::StructureShape.new(name: 'EventSubscriptionQuotaExceededFault', error: {"code"=>"EventSubscriptionQuotaExceeded", "httpStatusCode"=>400, "senderFault"=>true})
     EventSubscriptionsList = Shapes::ListShape.new(name: 'EventSubscriptionsList')
     EventSubscriptionsMessage = Shapes::StructureShape.new(name: 'EventSubscriptionsMessage')
     EventsMessage = Shapes::StructureShape.new(name: 'EventsMessage')
     FailoverDBClusterMessage = Shapes::StructureShape.new(name: 'FailoverDBClusterMessage')
     FailoverDBClusterResult = Shapes::StructureShape.new(name: 'FailoverDBClusterResult')
+    FailoverGlobalClusterMessage = Shapes::StructureShape.new(name: 'FailoverGlobalClusterMessage')
+    FailoverGlobalClusterResult = Shapes::StructureShape.new(name: 'FailoverGlobalClusterResult')
     Filter = Shapes::StructureShape.new(name: 'Filter')
     FilterList = Shapes::ListShape.new(name: 'FilterList')
     FilterValueList = Shapes::ListShape.new(name: 'FilterValueList')
-    InstanceQuotaExceededFault = Shapes::StructureShape.new(name: 'InstanceQuotaExceededFault')
-    InsufficientDBClusterCapacityFault = Shapes::StructureShape.new(name: 'InsufficientDBClusterCapacityFault')
-    InsufficientDBInstanceCapacityFault = Shapes::StructureShape.new(name: 'InsufficientDBInstanceCapacityFault')
-    InsufficientStorageClusterCapacityFault = Shapes::StructureShape.new(name: 'InsufficientStorageClusterCapacityFault')
+    GlobalCluster = Shapes::StructureShape.new(name: 'GlobalCluster')
+    GlobalClusterAlreadyExistsFault = Shapes::StructureShape.new(name: 'GlobalClusterAlreadyExistsFault', error: {"code"=>"GlobalClusterAlreadyExistsFault", "httpStatusCode"=>400, "senderFault"=>true})
+    GlobalClusterIdentifier = Shapes::StringShape.new(name: 'GlobalClusterIdentifier')
+    GlobalClusterList = Shapes::ListShape.new(name: 'GlobalClusterList')
+    GlobalClusterMember = Shapes::StructureShape.new(name: 'GlobalClusterMember')
+    GlobalClusterMemberList = Shapes::ListShape.new(name: 'GlobalClusterMemberList')
+    GlobalClusterNotFoundFault = Shapes::StructureShape.new(name: 'GlobalClusterNotFoundFault', error: {"code"=>"GlobalClusterNotFoundFault", "httpStatusCode"=>404, "senderFault"=>true})
+    GlobalClusterQuotaExceededFault = Shapes::StructureShape.new(name: 'GlobalClusterQuotaExceededFault', error: {"code"=>"GlobalClusterQuotaExceededFault", "httpStatusCode"=>400, "senderFault"=>true})
+    GlobalClustersMessage = Shapes::StructureShape.new(name: 'GlobalClustersMessage')
+    InstanceQuotaExceededFault = Shapes::StructureShape.new(name: 'InstanceQuotaExceededFault', error: {"code"=>"InstanceQuotaExceeded", "httpStatusCode"=>400, "senderFault"=>true})
+    InsufficientDBClusterCapacityFault = Shapes::StructureShape.new(name: 'InsufficientDBClusterCapacityFault', error: {"code"=>"InsufficientDBClusterCapacityFault", "httpStatusCode"=>403, "senderFault"=>true})
+    InsufficientDBInstanceCapacityFault = Shapes::StructureShape.new(name: 'InsufficientDBInstanceCapacityFault', error: {"code"=>"InsufficientDBInstanceCapacity", "httpStatusCode"=>400, "senderFault"=>true})
+    InsufficientStorageClusterCapacityFault = Shapes::StructureShape.new(name: 'InsufficientStorageClusterCapacityFault', error: {"code"=>"InsufficientStorageClusterCapacity", "httpStatusCode"=>400, "senderFault"=>true})
     Integer = Shapes::IntegerShape.new(name: 'Integer')
     IntegerOptional = Shapes::IntegerShape.new(name: 'IntegerOptional')
-    InvalidDBClusterEndpointStateFault = Shapes::StructureShape.new(name: 'InvalidDBClusterEndpointStateFault')
-    InvalidDBClusterSnapshotStateFault = Shapes::StructureShape.new(name: 'InvalidDBClusterSnapshotStateFault')
-    InvalidDBClusterStateFault = Shapes::StructureShape.new(name: 'InvalidDBClusterStateFault')
-    InvalidDBInstanceStateFault = Shapes::StructureShape.new(name: 'InvalidDBInstanceStateFault')
-    InvalidDBParameterGroupStateFault = Shapes::StructureShape.new(name: 'InvalidDBParameterGroupStateFault')
-    InvalidDBSecurityGroupStateFault = Shapes::StructureShape.new(name: 'InvalidDBSecurityGroupStateFault')
-    InvalidDBSnapshotStateFault = Shapes::StructureShape.new(name: 'InvalidDBSnapshotStateFault')
-    InvalidDBSubnetGroupStateFault = Shapes::StructureShape.new(name: 'InvalidDBSubnetGroupStateFault')
-    InvalidDBSubnetStateFault = Shapes::StructureShape.new(name: 'InvalidDBSubnetStateFault')
-    InvalidEventSubscriptionStateFault = Shapes::StructureShape.new(name: 'InvalidEventSubscriptionStateFault')
-    InvalidRestoreFault = Shapes::StructureShape.new(name: 'InvalidRestoreFault')
-    InvalidSubnet = Shapes::StructureShape.new(name: 'InvalidSubnet')
-    InvalidVPCNetworkStateFault = Shapes::StructureShape.new(name: 'InvalidVPCNetworkStateFault')
-    KMSKeyNotAccessibleFault = Shapes::StructureShape.new(name: 'KMSKeyNotAccessibleFault')
+    InvalidDBClusterEndpointStateFault = Shapes::StructureShape.new(name: 'InvalidDBClusterEndpointStateFault', error: {"code"=>"InvalidDBClusterEndpointStateFault", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidDBClusterSnapshotStateFault = Shapes::StructureShape.new(name: 'InvalidDBClusterSnapshotStateFault', error: {"code"=>"InvalidDBClusterSnapshotStateFault", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidDBClusterStateFault = Shapes::StructureShape.new(name: 'InvalidDBClusterStateFault', error: {"code"=>"InvalidDBClusterStateFault", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidDBInstanceStateFault = Shapes::StructureShape.new(name: 'InvalidDBInstanceStateFault', error: {"code"=>"InvalidDBInstanceState", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidDBParameterGroupStateFault = Shapes::StructureShape.new(name: 'InvalidDBParameterGroupStateFault', error: {"code"=>"InvalidDBParameterGroupState", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidDBSecurityGroupStateFault = Shapes::StructureShape.new(name: 'InvalidDBSecurityGroupStateFault', error: {"code"=>"InvalidDBSecurityGroupState", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidDBSnapshotStateFault = Shapes::StructureShape.new(name: 'InvalidDBSnapshotStateFault', error: {"code"=>"InvalidDBSnapshotState", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidDBSubnetGroupStateFault = Shapes::StructureShape.new(name: 'InvalidDBSubnetGroupStateFault', error: {"code"=>"InvalidDBSubnetGroupStateFault", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidDBSubnetStateFault = Shapes::StructureShape.new(name: 'InvalidDBSubnetStateFault', error: {"code"=>"InvalidDBSubnetStateFault", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidEventSubscriptionStateFault = Shapes::StructureShape.new(name: 'InvalidEventSubscriptionStateFault', error: {"code"=>"InvalidEventSubscriptionState", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidGlobalClusterStateFault = Shapes::StructureShape.new(name: 'InvalidGlobalClusterStateFault', error: {"code"=>"InvalidGlobalClusterStateFault", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidRestoreFault = Shapes::StructureShape.new(name: 'InvalidRestoreFault', error: {"code"=>"InvalidRestoreFault", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidSubnet = Shapes::StructureShape.new(name: 'InvalidSubnet', error: {"code"=>"InvalidSubnet", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidVPCNetworkStateFault = Shapes::StructureShape.new(name: 'InvalidVPCNetworkStateFault', error: {"code"=>"InvalidVPCNetworkStateFault", "httpStatusCode"=>400, "senderFault"=>true})
+    KMSKeyNotAccessibleFault = Shapes::StructureShape.new(name: 'KMSKeyNotAccessibleFault', error: {"code"=>"KMSKeyNotAccessibleFault", "httpStatusCode"=>400, "senderFault"=>true})
     KeyList = Shapes::ListShape.new(name: 'KeyList')
     ListTagsForResourceMessage = Shapes::StructureShape.new(name: 'ListTagsForResourceMessage')
     LogTypeList = Shapes::ListShape.new(name: 'LogTypeList')
@@ -220,9 +239,11 @@ module Aws::Neptune
     ModifyDBSubnetGroupResult = Shapes::StructureShape.new(name: 'ModifyDBSubnetGroupResult')
     ModifyEventSubscriptionMessage = Shapes::StructureShape.new(name: 'ModifyEventSubscriptionMessage')
     ModifyEventSubscriptionResult = Shapes::StructureShape.new(name: 'ModifyEventSubscriptionResult')
+    ModifyGlobalClusterMessage = Shapes::StructureShape.new(name: 'ModifyGlobalClusterMessage')
+    ModifyGlobalClusterResult = Shapes::StructureShape.new(name: 'ModifyGlobalClusterResult')
     OptionGroupMembership = Shapes::StructureShape.new(name: 'OptionGroupMembership')
     OptionGroupMembershipList = Shapes::ListShape.new(name: 'OptionGroupMembershipList')
-    OptionGroupNotFoundFault = Shapes::StructureShape.new(name: 'OptionGroupNotFoundFault')
+    OptionGroupNotFoundFault = Shapes::StructureShape.new(name: 'OptionGroupNotFoundFault', error: {"code"=>"OptionGroupNotFoundFault", "httpStatusCode"=>404, "senderFault"=>true})
     OrderableDBInstanceOption = Shapes::StructureShape.new(name: 'OrderableDBInstanceOption')
     OrderableDBInstanceOptionsList = Shapes::ListShape.new(name: 'OrderableDBInstanceOptionsList')
     OrderableDBInstanceOptionsMessage = Shapes::StructureShape.new(name: 'OrderableDBInstanceOptionsMessage')
@@ -236,49 +257,55 @@ module Aws::Neptune
     PendingModifiedValues = Shapes::StructureShape.new(name: 'PendingModifiedValues')
     PromoteReadReplicaDBClusterMessage = Shapes::StructureShape.new(name: 'PromoteReadReplicaDBClusterMessage')
     PromoteReadReplicaDBClusterResult = Shapes::StructureShape.new(name: 'PromoteReadReplicaDBClusterResult')
-    ProvisionedIopsNotAvailableInAZFault = Shapes::StructureShape.new(name: 'ProvisionedIopsNotAvailableInAZFault')
+    ProvisionedIopsNotAvailableInAZFault = Shapes::StructureShape.new(name: 'ProvisionedIopsNotAvailableInAZFault', error: {"code"=>"ProvisionedIopsNotAvailableInAZFault", "httpStatusCode"=>400, "senderFault"=>true})
     Range = Shapes::StructureShape.new(name: 'Range')
     RangeList = Shapes::ListShape.new(name: 'RangeList')
     ReadReplicaDBClusterIdentifierList = Shapes::ListShape.new(name: 'ReadReplicaDBClusterIdentifierList')
     ReadReplicaDBInstanceIdentifierList = Shapes::ListShape.new(name: 'ReadReplicaDBInstanceIdentifierList')
     ReadReplicaIdentifierList = Shapes::ListShape.new(name: 'ReadReplicaIdentifierList')
+    ReadersArnList = Shapes::ListShape.new(name: 'ReadersArnList')
     RebootDBInstanceMessage = Shapes::StructureShape.new(name: 'RebootDBInstanceMessage')
     RebootDBInstanceResult = Shapes::StructureShape.new(name: 'RebootDBInstanceResult')
+    RemoveFromGlobalClusterMessage = Shapes::StructureShape.new(name: 'RemoveFromGlobalClusterMessage')
+    RemoveFromGlobalClusterResult = Shapes::StructureShape.new(name: 'RemoveFromGlobalClusterResult')
     RemoveRoleFromDBClusterMessage = Shapes::StructureShape.new(name: 'RemoveRoleFromDBClusterMessage')
     RemoveSourceIdentifierFromSubscriptionMessage = Shapes::StructureShape.new(name: 'RemoveSourceIdentifierFromSubscriptionMessage')
     RemoveSourceIdentifierFromSubscriptionResult = Shapes::StructureShape.new(name: 'RemoveSourceIdentifierFromSubscriptionResult')
     RemoveTagsFromResourceMessage = Shapes::StructureShape.new(name: 'RemoveTagsFromResourceMessage')
     ResetDBClusterParameterGroupMessage = Shapes::StructureShape.new(name: 'ResetDBClusterParameterGroupMessage')
     ResetDBParameterGroupMessage = Shapes::StructureShape.new(name: 'ResetDBParameterGroupMessage')
-    ResourceNotFoundFault = Shapes::StructureShape.new(name: 'ResourceNotFoundFault')
+    ResourceNotFoundFault = Shapes::StructureShape.new(name: 'ResourceNotFoundFault', error: {"code"=>"ResourceNotFoundFault", "httpStatusCode"=>404, "senderFault"=>true})
     ResourcePendingMaintenanceActions = Shapes::StructureShape.new(name: 'ResourcePendingMaintenanceActions')
     RestoreDBClusterFromSnapshotMessage = Shapes::StructureShape.new(name: 'RestoreDBClusterFromSnapshotMessage')
     RestoreDBClusterFromSnapshotResult = Shapes::StructureShape.new(name: 'RestoreDBClusterFromSnapshotResult')
     RestoreDBClusterToPointInTimeMessage = Shapes::StructureShape.new(name: 'RestoreDBClusterToPointInTimeMessage')
     RestoreDBClusterToPointInTimeResult = Shapes::StructureShape.new(name: 'RestoreDBClusterToPointInTimeResult')
-    SNSInvalidTopicFault = Shapes::StructureShape.new(name: 'SNSInvalidTopicFault')
-    SNSNoAuthorizationFault = Shapes::StructureShape.new(name: 'SNSNoAuthorizationFault')
-    SNSTopicArnNotFoundFault = Shapes::StructureShape.new(name: 'SNSTopicArnNotFoundFault')
-    SharedSnapshotQuotaExceededFault = Shapes::StructureShape.new(name: 'SharedSnapshotQuotaExceededFault')
-    SnapshotQuotaExceededFault = Shapes::StructureShape.new(name: 'SnapshotQuotaExceededFault')
+    SNSInvalidTopicFault = Shapes::StructureShape.new(name: 'SNSInvalidTopicFault', error: {"code"=>"SNSInvalidTopic", "httpStatusCode"=>400, "senderFault"=>true})
+    SNSNoAuthorizationFault = Shapes::StructureShape.new(name: 'SNSNoAuthorizationFault', error: {"code"=>"SNSNoAuthorization", "httpStatusCode"=>400, "senderFault"=>true})
+    SNSTopicArnNotFoundFault = Shapes::StructureShape.new(name: 'SNSTopicArnNotFoundFault', error: {"code"=>"SNSTopicArnNotFound", "httpStatusCode"=>404, "senderFault"=>true})
+    SensitiveString = Shapes::StringShape.new(name: 'SensitiveString')
+    ServerlessV2ScalingConfiguration = Shapes::StructureShape.new(name: 'ServerlessV2ScalingConfiguration')
+    ServerlessV2ScalingConfigurationInfo = Shapes::StructureShape.new(name: 'ServerlessV2ScalingConfigurationInfo')
+    SharedSnapshotQuotaExceededFault = Shapes::StructureShape.new(name: 'SharedSnapshotQuotaExceededFault', error: {"code"=>"SharedSnapshotQuotaExceeded", "httpStatusCode"=>400, "senderFault"=>true})
+    SnapshotQuotaExceededFault = Shapes::StructureShape.new(name: 'SnapshotQuotaExceededFault', error: {"code"=>"SnapshotQuotaExceeded", "httpStatusCode"=>400, "senderFault"=>true})
     SourceIdsList = Shapes::ListShape.new(name: 'SourceIdsList')
-    SourceNotFoundFault = Shapes::StructureShape.new(name: 'SourceNotFoundFault')
+    SourceNotFoundFault = Shapes::StructureShape.new(name: 'SourceNotFoundFault', error: {"code"=>"SourceNotFound", "httpStatusCode"=>404, "senderFault"=>true})
     SourceType = Shapes::StringShape.new(name: 'SourceType')
     StartDBClusterMessage = Shapes::StructureShape.new(name: 'StartDBClusterMessage')
     StartDBClusterResult = Shapes::StructureShape.new(name: 'StartDBClusterResult')
     StopDBClusterMessage = Shapes::StructureShape.new(name: 'StopDBClusterMessage')
     StopDBClusterResult = Shapes::StructureShape.new(name: 'StopDBClusterResult')
-    StorageQuotaExceededFault = Shapes::StructureShape.new(name: 'StorageQuotaExceededFault')
-    StorageTypeNotSupportedFault = Shapes::StructureShape.new(name: 'StorageTypeNotSupportedFault')
+    StorageQuotaExceededFault = Shapes::StructureShape.new(name: 'StorageQuotaExceededFault', error: {"code"=>"StorageQuotaExceeded", "httpStatusCode"=>400, "senderFault"=>true})
+    StorageTypeNotSupportedFault = Shapes::StructureShape.new(name: 'StorageTypeNotSupportedFault', error: {"code"=>"StorageTypeNotSupported", "httpStatusCode"=>400, "senderFault"=>true})
     String = Shapes::StringShape.new(name: 'String')
     StringList = Shapes::ListShape.new(name: 'StringList')
     Subnet = Shapes::StructureShape.new(name: 'Subnet')
-    SubnetAlreadyInUse = Shapes::StructureShape.new(name: 'SubnetAlreadyInUse')
+    SubnetAlreadyInUse = Shapes::StructureShape.new(name: 'SubnetAlreadyInUse', error: {"code"=>"SubnetAlreadyInUse", "httpStatusCode"=>400, "senderFault"=>true})
     SubnetIdentifierList = Shapes::ListShape.new(name: 'SubnetIdentifierList')
     SubnetList = Shapes::ListShape.new(name: 'SubnetList')
-    SubscriptionAlreadyExistFault = Shapes::StructureShape.new(name: 'SubscriptionAlreadyExistFault')
-    SubscriptionCategoryNotFoundFault = Shapes::StructureShape.new(name: 'SubscriptionCategoryNotFoundFault')
-    SubscriptionNotFoundFault = Shapes::StructureShape.new(name: 'SubscriptionNotFoundFault')
+    SubscriptionAlreadyExistFault = Shapes::StructureShape.new(name: 'SubscriptionAlreadyExistFault', error: {"code"=>"SubscriptionAlreadyExist", "httpStatusCode"=>400, "senderFault"=>true})
+    SubscriptionCategoryNotFoundFault = Shapes::StructureShape.new(name: 'SubscriptionCategoryNotFoundFault', error: {"code"=>"SubscriptionCategoryNotFound", "httpStatusCode"=>404, "senderFault"=>true})
+    SubscriptionNotFoundFault = Shapes::StructureShape.new(name: 'SubscriptionNotFoundFault', error: {"code"=>"SubscriptionNotFound", "httpStatusCode"=>404, "senderFault"=>true})
     SupportedCharacterSetsList = Shapes::ListShape.new(name: 'SupportedCharacterSetsList')
     SupportedTimezonesList = Shapes::ListShape.new(name: 'SupportedTimezonesList')
     TStamp = Shapes::TimestampShape.new(name: 'TStamp')
@@ -340,6 +367,16 @@ module Aws::Neptune
     CloudwatchLogsExportConfiguration.add_member(:disable_log_types, Shapes::ShapeRef.new(shape: LogTypeList, location_name: "DisableLogTypes"))
     CloudwatchLogsExportConfiguration.struct_class = Types::CloudwatchLogsExportConfiguration
 
+    ClusterPendingModifiedValues.add_member(:pending_cloudwatch_logs_exports, Shapes::ShapeRef.new(shape: PendingCloudwatchLogsExports, location_name: "PendingCloudwatchLogsExports"))
+    ClusterPendingModifiedValues.add_member(:db_cluster_identifier, Shapes::ShapeRef.new(shape: String, location_name: "DBClusterIdentifier"))
+    ClusterPendingModifiedValues.add_member(:iam_database_authentication_enabled, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "IAMDatabaseAuthenticationEnabled"))
+    ClusterPendingModifiedValues.add_member(:engine_version, Shapes::ShapeRef.new(shape: String, location_name: "EngineVersion"))
+    ClusterPendingModifiedValues.add_member(:backup_retention_period, Shapes::ShapeRef.new(shape: IntegerOptional, location_name: "BackupRetentionPeriod"))
+    ClusterPendingModifiedValues.add_member(:storage_type, Shapes::ShapeRef.new(shape: String, location_name: "StorageType"))
+    ClusterPendingModifiedValues.add_member(:allocated_storage, Shapes::ShapeRef.new(shape: IntegerOptional, location_name: "AllocatedStorage"))
+    ClusterPendingModifiedValues.add_member(:iops, Shapes::ShapeRef.new(shape: IntegerOptional, location_name: "Iops"))
+    ClusterPendingModifiedValues.struct_class = Types::ClusterPendingModifiedValues
+
     CopyDBClusterParameterGroupMessage.add_member(:source_db_cluster_parameter_group_identifier, Shapes::ShapeRef.new(shape: String, required: true, location_name: "SourceDBClusterParameterGroupIdentifier"))
     CopyDBClusterParameterGroupMessage.add_member(:target_db_cluster_parameter_group_identifier, Shapes::ShapeRef.new(shape: String, required: true, location_name: "TargetDBClusterParameterGroupIdentifier"))
     CopyDBClusterParameterGroupMessage.add_member(:target_db_cluster_parameter_group_description, Shapes::ShapeRef.new(shape: String, required: true, location_name: "TargetDBClusterParameterGroupDescription"))
@@ -393,6 +430,7 @@ module Aws::Neptune
     CreateDBClusterMessage.add_member(:availability_zones, Shapes::ShapeRef.new(shape: AvailabilityZones, location_name: "AvailabilityZones"))
     CreateDBClusterMessage.add_member(:backup_retention_period, Shapes::ShapeRef.new(shape: IntegerOptional, location_name: "BackupRetentionPeriod"))
     CreateDBClusterMessage.add_member(:character_set_name, Shapes::ShapeRef.new(shape: String, location_name: "CharacterSetName"))
+    CreateDBClusterMessage.add_member(:copy_tags_to_snapshot, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "CopyTagsToSnapshot"))
     CreateDBClusterMessage.add_member(:database_name, Shapes::ShapeRef.new(shape: String, location_name: "DatabaseName"))
     CreateDBClusterMessage.add_member(:db_cluster_identifier, Shapes::ShapeRef.new(shape: String, required: true, location_name: "DBClusterIdentifier"))
     CreateDBClusterMessage.add_member(:db_cluster_parameter_group_name, Shapes::ShapeRef.new(shape: String, location_name: "DBClusterParameterGroupName"))
@@ -414,6 +452,9 @@ module Aws::Neptune
     CreateDBClusterMessage.add_member(:enable_iam_database_authentication, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "EnableIAMDatabaseAuthentication"))
     CreateDBClusterMessage.add_member(:enable_cloudwatch_logs_exports, Shapes::ShapeRef.new(shape: LogTypeList, location_name: "EnableCloudwatchLogsExports"))
     CreateDBClusterMessage.add_member(:deletion_protection, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "DeletionProtection"))
+    CreateDBClusterMessage.add_member(:serverless_v2_scaling_configuration, Shapes::ShapeRef.new(shape: ServerlessV2ScalingConfiguration, location_name: "ServerlessV2ScalingConfiguration"))
+    CreateDBClusterMessage.add_member(:global_cluster_identifier, Shapes::ShapeRef.new(shape: GlobalClusterIdentifier, location_name: "GlobalClusterIdentifier"))
+    CreateDBClusterMessage.add_member(:storage_type, Shapes::ShapeRef.new(shape: String, location_name: "StorageType"))
     CreateDBClusterMessage.add_member(:source_region, Shapes::ShapeRef.new(shape: String, location_name: "SourceRegion"))
     CreateDBClusterMessage.struct_class = Types::CreateDBClusterMessage
 
@@ -462,10 +503,10 @@ module Aws::Neptune
     CreateDBInstanceMessage.add_member(:character_set_name, Shapes::ShapeRef.new(shape: String, location_name: "CharacterSetName"))
     CreateDBInstanceMessage.add_member(:publicly_accessible, Shapes::ShapeRef.new(shape: BooleanOptional, deprecated: true, location_name: "PubliclyAccessible"))
     CreateDBInstanceMessage.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
-    CreateDBInstanceMessage.add_member(:db_cluster_identifier, Shapes::ShapeRef.new(shape: String, location_name: "DBClusterIdentifier"))
+    CreateDBInstanceMessage.add_member(:db_cluster_identifier, Shapes::ShapeRef.new(shape: String, required: true, location_name: "DBClusterIdentifier"))
     CreateDBInstanceMessage.add_member(:storage_type, Shapes::ShapeRef.new(shape: String, location_name: "StorageType"))
     CreateDBInstanceMessage.add_member(:tde_credential_arn, Shapes::ShapeRef.new(shape: String, location_name: "TdeCredentialArn"))
-    CreateDBInstanceMessage.add_member(:tde_credential_password, Shapes::ShapeRef.new(shape: String, location_name: "TdeCredentialPassword"))
+    CreateDBInstanceMessage.add_member(:tde_credential_password, Shapes::ShapeRef.new(shape: SensitiveString, location_name: "TdeCredentialPassword"))
     CreateDBInstanceMessage.add_member(:storage_encrypted, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "StorageEncrypted"))
     CreateDBInstanceMessage.add_member(:kms_key_id, Shapes::ShapeRef.new(shape: String, location_name: "KmsKeyId"))
     CreateDBInstanceMessage.add_member(:domain, Shapes::ShapeRef.new(shape: String, location_name: "Domain"))
@@ -515,6 +556,17 @@ module Aws::Neptune
     CreateEventSubscriptionResult.add_member(:event_subscription, Shapes::ShapeRef.new(shape: EventSubscription, location_name: "EventSubscription"))
     CreateEventSubscriptionResult.struct_class = Types::CreateEventSubscriptionResult
 
+    CreateGlobalClusterMessage.add_member(:global_cluster_identifier, Shapes::ShapeRef.new(shape: GlobalClusterIdentifier, required: true, location_name: "GlobalClusterIdentifier"))
+    CreateGlobalClusterMessage.add_member(:source_db_cluster_identifier, Shapes::ShapeRef.new(shape: String, location_name: "SourceDBClusterIdentifier"))
+    CreateGlobalClusterMessage.add_member(:engine, Shapes::ShapeRef.new(shape: String, location_name: "Engine"))
+    CreateGlobalClusterMessage.add_member(:engine_version, Shapes::ShapeRef.new(shape: String, location_name: "EngineVersion"))
+    CreateGlobalClusterMessage.add_member(:deletion_protection, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "DeletionProtection"))
+    CreateGlobalClusterMessage.add_member(:storage_encrypted, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "StorageEncrypted"))
+    CreateGlobalClusterMessage.struct_class = Types::CreateGlobalClusterMessage
+
+    CreateGlobalClusterResult.add_member(:global_cluster, Shapes::ShapeRef.new(shape: GlobalCluster, location_name: "GlobalCluster"))
+    CreateGlobalClusterResult.struct_class = Types::CreateGlobalClusterResult
+
     DBCluster.add_member(:allocated_storage, Shapes::ShapeRef.new(shape: IntegerOptional, location_name: "AllocatedStorage"))
     DBCluster.add_member(:availability_zones, Shapes::ShapeRef.new(shape: AvailabilityZones, location_name: "AvailabilityZones"))
     DBCluster.add_member(:backup_retention_period, Shapes::ShapeRef.new(shape: IntegerOptional, location_name: "BackupRetentionPeriod"))
@@ -550,8 +602,16 @@ module Aws::Neptune
     DBCluster.add_member(:iam_database_authentication_enabled, Shapes::ShapeRef.new(shape: Boolean, location_name: "IAMDatabaseAuthenticationEnabled"))
     DBCluster.add_member(:clone_group_id, Shapes::ShapeRef.new(shape: String, location_name: "CloneGroupId"))
     DBCluster.add_member(:cluster_create_time, Shapes::ShapeRef.new(shape: TStamp, location_name: "ClusterCreateTime"))
+    DBCluster.add_member(:copy_tags_to_snapshot, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "CopyTagsToSnapshot"))
     DBCluster.add_member(:enabled_cloudwatch_logs_exports, Shapes::ShapeRef.new(shape: LogTypeList, location_name: "EnabledCloudwatchLogsExports"))
+    DBCluster.add_member(:pending_modified_values, Shapes::ShapeRef.new(shape: ClusterPendingModifiedValues, location_name: "PendingModifiedValues"))
     DBCluster.add_member(:deletion_protection, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "DeletionProtection"))
+    DBCluster.add_member(:cross_account_clone, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "CrossAccountClone"))
+    DBCluster.add_member(:automatic_restart_time, Shapes::ShapeRef.new(shape: TStamp, location_name: "AutomaticRestartTime"))
+    DBCluster.add_member(:serverless_v2_scaling_configuration, Shapes::ShapeRef.new(shape: ServerlessV2ScalingConfigurationInfo, location_name: "ServerlessV2ScalingConfiguration"))
+    DBCluster.add_member(:global_cluster_identifier, Shapes::ShapeRef.new(shape: GlobalClusterIdentifier, location_name: "GlobalClusterIdentifier"))
+    DBCluster.add_member(:io_optimized_next_allowed_modification_time, Shapes::ShapeRef.new(shape: TStamp, location_name: "IOOptimizedNextAllowedModificationTime"))
+    DBCluster.add_member(:storage_type, Shapes::ShapeRef.new(shape: String, location_name: "StorageType"))
     DBCluster.struct_class = Types::DBCluster
 
     DBClusterAlreadyExistsFault.struct_class = Types::DBClusterAlreadyExistsFault
@@ -658,6 +718,7 @@ module Aws::Neptune
     DBClusterSnapshot.add_member(:db_cluster_snapshot_arn, Shapes::ShapeRef.new(shape: String, location_name: "DBClusterSnapshotArn"))
     DBClusterSnapshot.add_member(:source_db_cluster_snapshot_arn, Shapes::ShapeRef.new(shape: String, location_name: "SourceDBClusterSnapshotArn"))
     DBClusterSnapshot.add_member(:iam_database_authentication_enabled, Shapes::ShapeRef.new(shape: Boolean, location_name: "IAMDatabaseAuthenticationEnabled"))
+    DBClusterSnapshot.add_member(:storage_type, Shapes::ShapeRef.new(shape: String, location_name: "StorageType"))
     DBClusterSnapshot.struct_class = Types::DBClusterSnapshot
 
     DBClusterSnapshotAlreadyExistsFault.struct_class = Types::DBClusterSnapshotAlreadyExistsFault
@@ -692,6 +753,7 @@ module Aws::Neptune
     DBEngineVersion.add_member(:exportable_log_types, Shapes::ShapeRef.new(shape: LogTypeList, location_name: "ExportableLogTypes"))
     DBEngineVersion.add_member(:supports_log_exports_to_cloudwatch_logs, Shapes::ShapeRef.new(shape: Boolean, location_name: "SupportsLogExportsToCloudwatchLogs"))
     DBEngineVersion.add_member(:supports_read_replica, Shapes::ShapeRef.new(shape: Boolean, location_name: "SupportsReadReplica"))
+    DBEngineVersion.add_member(:supports_global_databases, Shapes::ShapeRef.new(shape: Boolean, location_name: "SupportsGlobalDatabases"))
     DBEngineVersion.struct_class = Types::DBEngineVersion
 
     DBEngineVersionList.member = Shapes::ShapeRef.new(shape: DBEngineVersion, location_name: "DBEngineVersion")
@@ -896,6 +958,12 @@ module Aws::Neptune
     DeleteEventSubscriptionResult.add_member(:event_subscription, Shapes::ShapeRef.new(shape: EventSubscription, location_name: "EventSubscription"))
     DeleteEventSubscriptionResult.struct_class = Types::DeleteEventSubscriptionResult
 
+    DeleteGlobalClusterMessage.add_member(:global_cluster_identifier, Shapes::ShapeRef.new(shape: GlobalClusterIdentifier, required: true, location_name: "GlobalClusterIdentifier"))
+    DeleteGlobalClusterMessage.struct_class = Types::DeleteGlobalClusterMessage
+
+    DeleteGlobalClusterResult.add_member(:global_cluster, Shapes::ShapeRef.new(shape: GlobalCluster, location_name: "GlobalCluster"))
+    DeleteGlobalClusterResult.struct_class = Types::DeleteGlobalClusterResult
+
     DescribeDBClusterEndpointsMessage.add_member(:db_cluster_identifier, Shapes::ShapeRef.new(shape: String, location_name: "DBClusterIdentifier"))
     DescribeDBClusterEndpointsMessage.add_member(:db_cluster_endpoint_identifier, Shapes::ShapeRef.new(shape: String, location_name: "DBClusterEndpointIdentifier"))
     DescribeDBClusterEndpointsMessage.add_member(:filters, Shapes::ShapeRef.new(shape: FilterList, location_name: "Filters"))
@@ -1013,6 +1081,11 @@ module Aws::Neptune
     DescribeEventsMessage.add_member(:marker, Shapes::ShapeRef.new(shape: String, location_name: "Marker"))
     DescribeEventsMessage.struct_class = Types::DescribeEventsMessage
 
+    DescribeGlobalClustersMessage.add_member(:global_cluster_identifier, Shapes::ShapeRef.new(shape: GlobalClusterIdentifier, location_name: "GlobalClusterIdentifier"))
+    DescribeGlobalClustersMessage.add_member(:max_records, Shapes::ShapeRef.new(shape: IntegerOptional, location_name: "MaxRecords"))
+    DescribeGlobalClustersMessage.add_member(:marker, Shapes::ShapeRef.new(shape: String, location_name: "Marker"))
+    DescribeGlobalClustersMessage.struct_class = Types::DescribeGlobalClustersMessage
+
     DescribeOrderableDBInstanceOptionsMessage.add_member(:engine, Shapes::ShapeRef.new(shape: String, required: true, location_name: "Engine"))
     DescribeOrderableDBInstanceOptionsMessage.add_member(:engine_version, Shapes::ShapeRef.new(shape: String, location_name: "EngineVersion"))
     DescribeOrderableDBInstanceOptionsMessage.add_member(:db_instance_class, Shapes::ShapeRef.new(shape: String, location_name: "DBInstanceClass"))
@@ -1113,6 +1186,13 @@ module Aws::Neptune
     FailoverDBClusterResult.add_member(:db_cluster, Shapes::ShapeRef.new(shape: DBCluster, location_name: "DBCluster"))
     FailoverDBClusterResult.struct_class = Types::FailoverDBClusterResult
 
+    FailoverGlobalClusterMessage.add_member(:global_cluster_identifier, Shapes::ShapeRef.new(shape: GlobalClusterIdentifier, required: true, location_name: "GlobalClusterIdentifier"))
+    FailoverGlobalClusterMessage.add_member(:target_db_cluster_identifier, Shapes::ShapeRef.new(shape: String, required: true, location_name: "TargetDbClusterIdentifier"))
+    FailoverGlobalClusterMessage.struct_class = Types::FailoverGlobalClusterMessage
+
+    FailoverGlobalClusterResult.add_member(:global_cluster, Shapes::ShapeRef.new(shape: GlobalCluster, location_name: "GlobalCluster"))
+    FailoverGlobalClusterResult.struct_class = Types::FailoverGlobalClusterResult
+
     Filter.add_member(:name, Shapes::ShapeRef.new(shape: String, required: true, location_name: "Name"))
     Filter.add_member(:values, Shapes::ShapeRef.new(shape: FilterValueList, required: true, location_name: "Values"))
     Filter.struct_class = Types::Filter
@@ -1120,6 +1200,36 @@ module Aws::Neptune
     FilterList.member = Shapes::ShapeRef.new(shape: Filter, location_name: "Filter")
 
     FilterValueList.member = Shapes::ShapeRef.new(shape: String, location_name: "Value")
+
+    GlobalCluster.add_member(:global_cluster_identifier, Shapes::ShapeRef.new(shape: GlobalClusterIdentifier, location_name: "GlobalClusterIdentifier"))
+    GlobalCluster.add_member(:global_cluster_resource_id, Shapes::ShapeRef.new(shape: String, location_name: "GlobalClusterResourceId"))
+    GlobalCluster.add_member(:global_cluster_arn, Shapes::ShapeRef.new(shape: String, location_name: "GlobalClusterArn"))
+    GlobalCluster.add_member(:status, Shapes::ShapeRef.new(shape: String, location_name: "Status"))
+    GlobalCluster.add_member(:engine, Shapes::ShapeRef.new(shape: String, location_name: "Engine"))
+    GlobalCluster.add_member(:engine_version, Shapes::ShapeRef.new(shape: String, location_name: "EngineVersion"))
+    GlobalCluster.add_member(:storage_encrypted, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "StorageEncrypted"))
+    GlobalCluster.add_member(:deletion_protection, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "DeletionProtection"))
+    GlobalCluster.add_member(:global_cluster_members, Shapes::ShapeRef.new(shape: GlobalClusterMemberList, location_name: "GlobalClusterMembers"))
+    GlobalCluster.struct_class = Types::GlobalCluster
+
+    GlobalClusterAlreadyExistsFault.struct_class = Types::GlobalClusterAlreadyExistsFault
+
+    GlobalClusterList.member = Shapes::ShapeRef.new(shape: GlobalCluster, location_name: "GlobalClusterMember")
+
+    GlobalClusterMember.add_member(:db_cluster_arn, Shapes::ShapeRef.new(shape: String, location_name: "DBClusterArn"))
+    GlobalClusterMember.add_member(:readers, Shapes::ShapeRef.new(shape: ReadersArnList, location_name: "Readers"))
+    GlobalClusterMember.add_member(:is_writer, Shapes::ShapeRef.new(shape: Boolean, location_name: "IsWriter"))
+    GlobalClusterMember.struct_class = Types::GlobalClusterMember
+
+    GlobalClusterMemberList.member = Shapes::ShapeRef.new(shape: GlobalClusterMember, location_name: "GlobalClusterMember")
+
+    GlobalClusterNotFoundFault.struct_class = Types::GlobalClusterNotFoundFault
+
+    GlobalClusterQuotaExceededFault.struct_class = Types::GlobalClusterQuotaExceededFault
+
+    GlobalClustersMessage.add_member(:marker, Shapes::ShapeRef.new(shape: String, location_name: "Marker"))
+    GlobalClustersMessage.add_member(:global_clusters, Shapes::ShapeRef.new(shape: GlobalClusterList, location_name: "GlobalClusters"))
+    GlobalClustersMessage.struct_class = Types::GlobalClustersMessage
 
     InstanceQuotaExceededFault.struct_class = Types::InstanceQuotaExceededFault
 
@@ -1148,6 +1258,8 @@ module Aws::Neptune
     InvalidDBSubnetStateFault.struct_class = Types::InvalidDBSubnetStateFault
 
     InvalidEventSubscriptionStateFault.struct_class = Types::InvalidEventSubscriptionStateFault
+
+    InvalidGlobalClusterStateFault.struct_class = Types::InvalidGlobalClusterStateFault
 
     InvalidRestoreFault.struct_class = Types::InvalidRestoreFault
 
@@ -1197,7 +1309,12 @@ module Aws::Neptune
     ModifyDBClusterMessage.add_member(:enable_iam_database_authentication, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "EnableIAMDatabaseAuthentication"))
     ModifyDBClusterMessage.add_member(:cloudwatch_logs_export_configuration, Shapes::ShapeRef.new(shape: CloudwatchLogsExportConfiguration, location_name: "CloudwatchLogsExportConfiguration"))
     ModifyDBClusterMessage.add_member(:engine_version, Shapes::ShapeRef.new(shape: String, location_name: "EngineVersion"))
+    ModifyDBClusterMessage.add_member(:allow_major_version_upgrade, Shapes::ShapeRef.new(shape: Boolean, location_name: "AllowMajorVersionUpgrade"))
+    ModifyDBClusterMessage.add_member(:db_instance_parameter_group_name, Shapes::ShapeRef.new(shape: String, location_name: "DBInstanceParameterGroupName"))
     ModifyDBClusterMessage.add_member(:deletion_protection, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "DeletionProtection"))
+    ModifyDBClusterMessage.add_member(:copy_tags_to_snapshot, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "CopyTagsToSnapshot"))
+    ModifyDBClusterMessage.add_member(:serverless_v2_scaling_configuration, Shapes::ShapeRef.new(shape: ServerlessV2ScalingConfiguration, location_name: "ServerlessV2ScalingConfiguration"))
+    ModifyDBClusterMessage.add_member(:storage_type, Shapes::ShapeRef.new(shape: String, location_name: "StorageType"))
     ModifyDBClusterMessage.struct_class = Types::ModifyDBClusterMessage
 
     ModifyDBClusterParameterGroupMessage.add_member(:db_cluster_parameter_group_name, Shapes::ShapeRef.new(shape: String, required: true, location_name: "DBClusterParameterGroupName"))
@@ -1238,7 +1355,7 @@ module Aws::Neptune
     ModifyDBInstanceMessage.add_member(:new_db_instance_identifier, Shapes::ShapeRef.new(shape: String, location_name: "NewDBInstanceIdentifier"))
     ModifyDBInstanceMessage.add_member(:storage_type, Shapes::ShapeRef.new(shape: String, location_name: "StorageType"))
     ModifyDBInstanceMessage.add_member(:tde_credential_arn, Shapes::ShapeRef.new(shape: String, location_name: "TdeCredentialArn"))
-    ModifyDBInstanceMessage.add_member(:tde_credential_password, Shapes::ShapeRef.new(shape: String, location_name: "TdeCredentialPassword"))
+    ModifyDBInstanceMessage.add_member(:tde_credential_password, Shapes::ShapeRef.new(shape: SensitiveString, location_name: "TdeCredentialPassword"))
     ModifyDBInstanceMessage.add_member(:ca_certificate_identifier, Shapes::ShapeRef.new(shape: String, location_name: "CACertificateIdentifier"))
     ModifyDBInstanceMessage.add_member(:domain, Shapes::ShapeRef.new(shape: String, location_name: "Domain"))
     ModifyDBInstanceMessage.add_member(:copy_tags_to_snapshot, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "CopyTagsToSnapshot"))
@@ -1280,6 +1397,16 @@ module Aws::Neptune
     ModifyEventSubscriptionResult.add_member(:event_subscription, Shapes::ShapeRef.new(shape: EventSubscription, location_name: "EventSubscription"))
     ModifyEventSubscriptionResult.struct_class = Types::ModifyEventSubscriptionResult
 
+    ModifyGlobalClusterMessage.add_member(:global_cluster_identifier, Shapes::ShapeRef.new(shape: GlobalClusterIdentifier, required: true, location_name: "GlobalClusterIdentifier"))
+    ModifyGlobalClusterMessage.add_member(:new_global_cluster_identifier, Shapes::ShapeRef.new(shape: GlobalClusterIdentifier, location_name: "NewGlobalClusterIdentifier"))
+    ModifyGlobalClusterMessage.add_member(:deletion_protection, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "DeletionProtection"))
+    ModifyGlobalClusterMessage.add_member(:engine_version, Shapes::ShapeRef.new(shape: String, location_name: "EngineVersion"))
+    ModifyGlobalClusterMessage.add_member(:allow_major_version_upgrade, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "AllowMajorVersionUpgrade"))
+    ModifyGlobalClusterMessage.struct_class = Types::ModifyGlobalClusterMessage
+
+    ModifyGlobalClusterResult.add_member(:global_cluster, Shapes::ShapeRef.new(shape: GlobalCluster, location_name: "GlobalCluster"))
+    ModifyGlobalClusterResult.struct_class = Types::ModifyGlobalClusterResult
+
     OptionGroupMembership.add_member(:option_group_name, Shapes::ShapeRef.new(shape: String, location_name: "OptionGroupName"))
     OptionGroupMembership.add_member(:status, Shapes::ShapeRef.new(shape: String, location_name: "Status"))
     OptionGroupMembership.struct_class = Types::OptionGroupMembership
@@ -1308,6 +1435,7 @@ module Aws::Neptune
     OrderableDBInstanceOption.add_member(:max_iops_per_db_instance, Shapes::ShapeRef.new(shape: IntegerOptional, location_name: "MaxIopsPerDbInstance"))
     OrderableDBInstanceOption.add_member(:min_iops_per_gib, Shapes::ShapeRef.new(shape: DoubleOptional, location_name: "MinIopsPerGib"))
     OrderableDBInstanceOption.add_member(:max_iops_per_gib, Shapes::ShapeRef.new(shape: DoubleOptional, location_name: "MaxIopsPerGib"))
+    OrderableDBInstanceOption.add_member(:supports_global_databases, Shapes::ShapeRef.new(shape: Boolean, location_name: "SupportsGlobalDatabases"))
     OrderableDBInstanceOption.struct_class = Types::OrderableDBInstanceOption
 
     OrderableDBInstanceOptionsList.member = Shapes::ShapeRef.new(shape: OrderableDBInstanceOption, location_name: "OrderableDBInstanceOption")
@@ -1387,12 +1515,21 @@ module Aws::Neptune
 
     ReadReplicaIdentifierList.member = Shapes::ShapeRef.new(shape: String, location_name: "ReadReplicaIdentifier")
 
+    ReadersArnList.member = Shapes::ShapeRef.new(shape: String)
+
     RebootDBInstanceMessage.add_member(:db_instance_identifier, Shapes::ShapeRef.new(shape: String, required: true, location_name: "DBInstanceIdentifier"))
     RebootDBInstanceMessage.add_member(:force_failover, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "ForceFailover"))
     RebootDBInstanceMessage.struct_class = Types::RebootDBInstanceMessage
 
     RebootDBInstanceResult.add_member(:db_instance, Shapes::ShapeRef.new(shape: DBInstance, location_name: "DBInstance"))
     RebootDBInstanceResult.struct_class = Types::RebootDBInstanceResult
+
+    RemoveFromGlobalClusterMessage.add_member(:global_cluster_identifier, Shapes::ShapeRef.new(shape: GlobalClusterIdentifier, required: true, location_name: "GlobalClusterIdentifier"))
+    RemoveFromGlobalClusterMessage.add_member(:db_cluster_identifier, Shapes::ShapeRef.new(shape: String, required: true, location_name: "DbClusterIdentifier"))
+    RemoveFromGlobalClusterMessage.struct_class = Types::RemoveFromGlobalClusterMessage
+
+    RemoveFromGlobalClusterResult.add_member(:global_cluster, Shapes::ShapeRef.new(shape: GlobalCluster, location_name: "GlobalCluster"))
+    RemoveFromGlobalClusterResult.struct_class = Types::RemoveFromGlobalClusterResult
 
     RemoveRoleFromDBClusterMessage.add_member(:db_cluster_identifier, Shapes::ShapeRef.new(shape: String, required: true, location_name: "DBClusterIdentifier"))
     RemoveRoleFromDBClusterMessage.add_member(:role_arn, Shapes::ShapeRef.new(shape: String, required: true, location_name: "RoleArn"))
@@ -1442,6 +1579,9 @@ module Aws::Neptune
     RestoreDBClusterFromSnapshotMessage.add_member(:enable_cloudwatch_logs_exports, Shapes::ShapeRef.new(shape: LogTypeList, location_name: "EnableCloudwatchLogsExports"))
     RestoreDBClusterFromSnapshotMessage.add_member(:db_cluster_parameter_group_name, Shapes::ShapeRef.new(shape: String, location_name: "DBClusterParameterGroupName"))
     RestoreDBClusterFromSnapshotMessage.add_member(:deletion_protection, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "DeletionProtection"))
+    RestoreDBClusterFromSnapshotMessage.add_member(:copy_tags_to_snapshot, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "CopyTagsToSnapshot"))
+    RestoreDBClusterFromSnapshotMessage.add_member(:serverless_v2_scaling_configuration, Shapes::ShapeRef.new(shape: ServerlessV2ScalingConfiguration, location_name: "ServerlessV2ScalingConfiguration"))
+    RestoreDBClusterFromSnapshotMessage.add_member(:storage_type, Shapes::ShapeRef.new(shape: String, location_name: "StorageType"))
     RestoreDBClusterFromSnapshotMessage.struct_class = Types::RestoreDBClusterFromSnapshotMessage
 
     RestoreDBClusterFromSnapshotResult.add_member(:db_cluster, Shapes::ShapeRef.new(shape: DBCluster, location_name: "DBCluster"))
@@ -1462,6 +1602,8 @@ module Aws::Neptune
     RestoreDBClusterToPointInTimeMessage.add_member(:enable_cloudwatch_logs_exports, Shapes::ShapeRef.new(shape: LogTypeList, location_name: "EnableCloudwatchLogsExports"))
     RestoreDBClusterToPointInTimeMessage.add_member(:db_cluster_parameter_group_name, Shapes::ShapeRef.new(shape: String, location_name: "DBClusterParameterGroupName"))
     RestoreDBClusterToPointInTimeMessage.add_member(:deletion_protection, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "DeletionProtection"))
+    RestoreDBClusterToPointInTimeMessage.add_member(:serverless_v2_scaling_configuration, Shapes::ShapeRef.new(shape: ServerlessV2ScalingConfiguration, location_name: "ServerlessV2ScalingConfiguration"))
+    RestoreDBClusterToPointInTimeMessage.add_member(:storage_type, Shapes::ShapeRef.new(shape: String, location_name: "StorageType"))
     RestoreDBClusterToPointInTimeMessage.struct_class = Types::RestoreDBClusterToPointInTimeMessage
 
     RestoreDBClusterToPointInTimeResult.add_member(:db_cluster, Shapes::ShapeRef.new(shape: DBCluster, location_name: "DBCluster"))
@@ -1472,6 +1614,14 @@ module Aws::Neptune
     SNSNoAuthorizationFault.struct_class = Types::SNSNoAuthorizationFault
 
     SNSTopicArnNotFoundFault.struct_class = Types::SNSTopicArnNotFoundFault
+
+    ServerlessV2ScalingConfiguration.add_member(:min_capacity, Shapes::ShapeRef.new(shape: DoubleOptional, location_name: "MinCapacity"))
+    ServerlessV2ScalingConfiguration.add_member(:max_capacity, Shapes::ShapeRef.new(shape: DoubleOptional, location_name: "MaxCapacity"))
+    ServerlessV2ScalingConfiguration.struct_class = Types::ServerlessV2ScalingConfiguration
+
+    ServerlessV2ScalingConfigurationInfo.add_member(:min_capacity, Shapes::ShapeRef.new(shape: DoubleOptional, location_name: "MinCapacity"))
+    ServerlessV2ScalingConfigurationInfo.add_member(:max_capacity, Shapes::ShapeRef.new(shape: DoubleOptional, location_name: "MaxCapacity"))
+    ServerlessV2ScalingConfigurationInfo.struct_class = Types::ServerlessV2ScalingConfigurationInfo
 
     SharedSnapshotQuotaExceededFault.struct_class = Types::SharedSnapshotQuotaExceededFault
 
@@ -1537,6 +1687,7 @@ module Aws::Neptune
     UpgradeTarget.add_member(:description, Shapes::ShapeRef.new(shape: String, location_name: "Description"))
     UpgradeTarget.add_member(:auto_upgrade, Shapes::ShapeRef.new(shape: Boolean, location_name: "AutoUpgrade"))
     UpgradeTarget.add_member(:is_major_version_upgrade, Shapes::ShapeRef.new(shape: Boolean, location_name: "IsMajorVersionUpgrade"))
+    UpgradeTarget.add_member(:supports_global_databases, Shapes::ShapeRef.new(shape: BooleanOptional, location_name: "SupportsGlobalDatabases"))
     UpgradeTarget.struct_class = Types::UpgradeTarget
 
     ValidDBInstanceModificationsMessage.add_member(:storage, Shapes::ShapeRef.new(shape: ValidStorageOptionsList, location_name: "Storage"))
@@ -1568,8 +1719,10 @@ module Aws::Neptune
 
       api.metadata = {
         "apiVersion" => "2014-10-31",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "rds",
         "protocol" => "query",
+        "protocols" => ["query"],
         "serviceAbbreviation" => "Amazon Neptune",
         "serviceFullName" => "Amazon Neptune",
         "serviceId" => "Neptune",
@@ -1678,6 +1831,8 @@ module Aws::Neptune
         o.errors << Shapes::ShapeRef.new(shape: DBClusterNotFoundFault)
         o.errors << Shapes::ShapeRef.new(shape: DBInstanceNotFoundFault)
         o.errors << Shapes::ShapeRef.new(shape: DBSubnetGroupDoesNotCoverEnoughAZs)
+        o.errors << Shapes::ShapeRef.new(shape: GlobalClusterNotFoundFault)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidGlobalClusterStateFault)
       end)
 
       api.add_operation(:create_db_cluster_endpoint, Seahorse::Model::Operation.new.tap do |o|
@@ -1781,6 +1936,18 @@ module Aws::Neptune
         o.errors << Shapes::ShapeRef.new(shape: SourceNotFoundFault)
       end)
 
+      api.add_operation(:create_global_cluster, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "CreateGlobalCluster"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: CreateGlobalClusterMessage)
+        o.output = Shapes::ShapeRef.new(shape: CreateGlobalClusterResult)
+        o.errors << Shapes::ShapeRef.new(shape: GlobalClusterAlreadyExistsFault)
+        o.errors << Shapes::ShapeRef.new(shape: GlobalClusterQuotaExceededFault)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidDBClusterStateFault)
+        o.errors << Shapes::ShapeRef.new(shape: DBClusterNotFoundFault)
+      end)
+
       api.add_operation(:delete_db_cluster, Seahorse::Model::Operation.new.tap do |o|
         o.name = "DeleteDBCluster"
         o.http_method = "POST"
@@ -1869,6 +2036,16 @@ module Aws::Neptune
         o.errors << Shapes::ShapeRef.new(shape: InvalidEventSubscriptionStateFault)
       end)
 
+      api.add_operation(:delete_global_cluster, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DeleteGlobalCluster"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DeleteGlobalClusterMessage)
+        o.output = Shapes::ShapeRef.new(shape: DeleteGlobalClusterResult)
+        o.errors << Shapes::ShapeRef.new(shape: GlobalClusterNotFoundFault)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidGlobalClusterStateFault)
+      end)
+
       api.add_operation(:describe_db_cluster_endpoints, Seahorse::Model::Operation.new.tap do |o|
         o.name = "DescribeDBClusterEndpoints"
         o.http_method = "POST"
@@ -1891,6 +2068,12 @@ module Aws::Neptune
         o.input = Shapes::ShapeRef.new(shape: DescribeDBClusterParameterGroupsMessage)
         o.output = Shapes::ShapeRef.new(shape: DBClusterParameterGroupsMessage)
         o.errors << Shapes::ShapeRef.new(shape: DBParameterGroupNotFoundFault)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_records",
+          tokens: {
+            "marker" => "marker"
+          }
+        )
       end)
 
       api.add_operation(:describe_db_cluster_parameters, Seahorse::Model::Operation.new.tap do |o|
@@ -1900,6 +2083,12 @@ module Aws::Neptune
         o.input = Shapes::ShapeRef.new(shape: DescribeDBClusterParametersMessage)
         o.output = Shapes::ShapeRef.new(shape: DBClusterParameterGroupDetails)
         o.errors << Shapes::ShapeRef.new(shape: DBParameterGroupNotFoundFault)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_records",
+          tokens: {
+            "marker" => "marker"
+          }
+        )
       end)
 
       api.add_operation(:describe_db_cluster_snapshot_attributes, Seahorse::Model::Operation.new.tap do |o|
@@ -1918,6 +2107,12 @@ module Aws::Neptune
         o.input = Shapes::ShapeRef.new(shape: DescribeDBClusterSnapshotsMessage)
         o.output = Shapes::ShapeRef.new(shape: DBClusterSnapshotMessage)
         o.errors << Shapes::ShapeRef.new(shape: DBClusterSnapshotNotFoundFault)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_records",
+          tokens: {
+            "marker" => "marker"
+          }
+        )
       end)
 
       api.add_operation(:describe_db_clusters, Seahorse::Model::Operation.new.tap do |o|
@@ -1927,6 +2122,12 @@ module Aws::Neptune
         o.input = Shapes::ShapeRef.new(shape: DescribeDBClustersMessage)
         o.output = Shapes::ShapeRef.new(shape: DBClusterMessage)
         o.errors << Shapes::ShapeRef.new(shape: DBClusterNotFoundFault)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_records",
+          tokens: {
+            "marker" => "marker"
+          }
+        )
       end)
 
       api.add_operation(:describe_db_engine_versions, Seahorse::Model::Operation.new.tap do |o|
@@ -2062,6 +2263,21 @@ module Aws::Neptune
         )
       end)
 
+      api.add_operation(:describe_global_clusters, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeGlobalClusters"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeGlobalClustersMessage)
+        o.output = Shapes::ShapeRef.new(shape: GlobalClustersMessage)
+        o.errors << Shapes::ShapeRef.new(shape: GlobalClusterNotFoundFault)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_records",
+          tokens: {
+            "marker" => "marker"
+          }
+        )
+      end)
+
       api.add_operation(:describe_orderable_db_instance_options, Seahorse::Model::Operation.new.tap do |o|
         o.name = "DescribeOrderableDBInstanceOptions"
         o.http_method = "POST"
@@ -2083,6 +2299,12 @@ module Aws::Neptune
         o.input = Shapes::ShapeRef.new(shape: DescribePendingMaintenanceActionsMessage)
         o.output = Shapes::ShapeRef.new(shape: PendingMaintenanceActionsMessage)
         o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundFault)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_records",
+          tokens: {
+            "marker" => "marker"
+          }
+        )
       end)
 
       api.add_operation(:describe_valid_db_instance_modifications, Seahorse::Model::Operation.new.tap do |o|
@@ -2104,6 +2326,18 @@ module Aws::Neptune
         o.errors << Shapes::ShapeRef.new(shape: DBClusterNotFoundFault)
         o.errors << Shapes::ShapeRef.new(shape: InvalidDBClusterStateFault)
         o.errors << Shapes::ShapeRef.new(shape: InvalidDBInstanceStateFault)
+      end)
+
+      api.add_operation(:failover_global_cluster, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "FailoverGlobalCluster"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: FailoverGlobalClusterMessage)
+        o.output = Shapes::ShapeRef.new(shape: FailoverGlobalClusterResult)
+        o.errors << Shapes::ShapeRef.new(shape: GlobalClusterNotFoundFault)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidGlobalClusterStateFault)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidDBClusterStateFault)
+        o.errors << Shapes::ShapeRef.new(shape: DBClusterNotFoundFault)
       end)
 
       api.add_operation(:list_tags_for_resource, Seahorse::Model::Operation.new.tap do |o|
@@ -2134,6 +2368,7 @@ module Aws::Neptune
         o.errors << Shapes::ShapeRef.new(shape: InvalidDBSecurityGroupStateFault)
         o.errors << Shapes::ShapeRef.new(shape: InvalidDBInstanceStateFault)
         o.errors << Shapes::ShapeRef.new(shape: DBClusterAlreadyExistsFault)
+        o.errors << Shapes::ShapeRef.new(shape: StorageTypeNotSupportedFault)
       end)
 
       api.add_operation(:modify_db_cluster_endpoint, Seahorse::Model::Operation.new.tap do |o|
@@ -2231,6 +2466,16 @@ module Aws::Neptune
         o.errors << Shapes::ShapeRef.new(shape: SubscriptionCategoryNotFoundFault)
       end)
 
+      api.add_operation(:modify_global_cluster, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ModifyGlobalCluster"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: ModifyGlobalClusterMessage)
+        o.output = Shapes::ShapeRef.new(shape: ModifyGlobalClusterResult)
+        o.errors << Shapes::ShapeRef.new(shape: GlobalClusterNotFoundFault)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidGlobalClusterStateFault)
+      end)
+
       api.add_operation(:promote_read_replica_db_cluster, Seahorse::Model::Operation.new.tap do |o|
         o.name = "PromoteReadReplicaDBCluster"
         o.http_method = "POST"
@@ -2249,6 +2494,17 @@ module Aws::Neptune
         o.output = Shapes::ShapeRef.new(shape: RebootDBInstanceResult)
         o.errors << Shapes::ShapeRef.new(shape: InvalidDBInstanceStateFault)
         o.errors << Shapes::ShapeRef.new(shape: DBInstanceNotFoundFault)
+      end)
+
+      api.add_operation(:remove_from_global_cluster, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "RemoveFromGlobalCluster"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: RemoveFromGlobalClusterMessage)
+        o.output = Shapes::ShapeRef.new(shape: RemoveFromGlobalClusterResult)
+        o.errors << Shapes::ShapeRef.new(shape: GlobalClusterNotFoundFault)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidGlobalClusterStateFault)
+        o.errors << Shapes::ShapeRef.new(shape: DBClusterNotFoundFault)
       end)
 
       api.add_operation(:remove_role_from_db_cluster, Seahorse::Model::Operation.new.tap do |o|

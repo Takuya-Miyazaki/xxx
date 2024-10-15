@@ -3,20 +3,13 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::Polly
   module Types
 
-    # @note When making an API call, you may pass DeleteLexiconInput
-    #   data as a hash:
-    #
-    #       {
-    #         name: "LexiconName", # required
-    #       }
-    #
     # @!attribute [rw] name
     #   The name of the lexicon to delete. Must be an existing lexicon in
     #   the region.
@@ -34,19 +27,10 @@ module Aws::Polly
     #
     class DeleteLexiconOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DescribeVoicesInput
-    #   data as a hash:
-    #
-    #       {
-    #         engine: "standard", # accepts standard, neural
-    #         language_code: "arb", # accepts arb, cmn-CN, cy-GB, da-DK, de-DE, en-AU, en-GB, en-GB-WLS, en-IN, en-US, es-ES, es-MX, es-US, fr-CA, fr-FR, is-IS, it-IT, ja-JP, hi-IN, ko-KR, nb-NO, nl-NL, pl-PL, pt-BR, pt-PT, ro-RO, ru-RU, sv-SE, tr-TR
-    #         include_additional_language_codes: false,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] engine
-    #   Specifies the engine (`standard` or `neural`) used by Amazon Polly
-    #   when processing input text for speech synthesis.
+    #   Specifies the engine (`standard`, `neural`, `long-form` or
+    #   `generative`) used by Amazon Polly when processing input text for
+    #   speech synthesis.
     #   @return [String]
     #
     # @!attribute [rw] language_code
@@ -116,13 +100,6 @@ module Aws::Polly
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetLexiconInput
-    #   data as a hash:
-    #
-    #       {
-    #         name: "LexiconName", # required
-    #       }
-    #
     # @!attribute [rw] name
     #   Name of the lexicon.
     #   @return [String]
@@ -155,13 +132,6 @@ module Aws::Polly
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSpeechSynthesisTaskInput
-    #   data as a hash:
-    #
-    #       {
-    #         task_id: "TaskId", # required
-    #       }
-    #
     # @!attribute [rw] task_id
     #   The Amazon Polly generated identifier for a speech synthesis task.
     #   @return [String]
@@ -438,13 +408,6 @@ module Aws::Polly
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListLexiconsInput
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] next_token
     #   An opaque pagination token returned from previous `ListLexicons`
     #   operation. If present, indicates where to continue the list of
@@ -478,15 +441,6 @@ module Aws::Polly
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListSpeechSynthesisTasksInput
-    #   data as a hash:
-    #
-    #       {
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #         status: "scheduled", # accepts scheduled, inProgress, completed, failed
-    #       }
-    #
     # @!attribute [rw] max_results
     #   Maximum number of speech synthesis tasks returned in a List
     #   operation.
@@ -572,14 +526,6 @@ module Aws::Polly
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutLexiconInput
-    #   data as a hash:
-    #
-    #       {
-    #         name: "LexiconName", # required
-    #         content: "LexiconContent", # required
-    #       }
-    #
     # @!attribute [rw] name
     #   Name of the lexicon. The name must follow the regular express format
     #   \[0-9A-Za-z\]\\\{1,20\\}. That is, the name is a case-sensitive
@@ -629,29 +575,11 @@ module Aws::Polly
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass StartSpeechSynthesisTaskInput
-    #   data as a hash:
-    #
-    #       {
-    #         engine: "standard", # accepts standard, neural
-    #         language_code: "arb", # accepts arb, cmn-CN, cy-GB, da-DK, de-DE, en-AU, en-GB, en-GB-WLS, en-IN, en-US, es-ES, es-MX, es-US, fr-CA, fr-FR, is-IS, it-IT, ja-JP, hi-IN, ko-KR, nb-NO, nl-NL, pl-PL, pt-BR, pt-PT, ro-RO, ru-RU, sv-SE, tr-TR
-    #         lexicon_names: ["LexiconName"],
-    #         output_format: "json", # required, accepts json, mp3, ogg_vorbis, pcm
-    #         output_s3_bucket_name: "OutputS3BucketName", # required
-    #         output_s3_key_prefix: "OutputS3KeyPrefix",
-    #         sample_rate: "SampleRate",
-    #         sns_topic_arn: "SnsTopicArn",
-    #         speech_mark_types: ["sentence"], # accepts sentence, ssml, viseme, word
-    #         text: "Text", # required
-    #         text_type: "ssml", # accepts ssml, text
-    #         voice_id: "Aditi", # required, accepts Aditi, Amy, Astrid, Bianca, Brian, Camila, Carla, Carmen, Celine, Chantal, Conchita, Cristiano, Dora, Emma, Enrique, Ewa, Filiz, Geraint, Giorgio, Gwyneth, Hans, Ines, Ivy, Jacek, Jan, Joanna, Joey, Justin, Karl, Kendra, Kevin, Kimberly, Lea, Liv, Lotte, Lucia, Lupe, Mads, Maja, Marlene, Mathieu, Matthew, Maxim, Mia, Miguel, Mizuki, Naja, Nicole, Olivia, Penelope, Raveena, Ricardo, Ruben, Russell, Salli, Seoyeon, Takumi, Tatyana, Vicki, Vitoria, Zeina, Zhiyu
-    #       }
-    #
     # @!attribute [rw] engine
-    #   Specifies the engine (`standard` or `neural`) for Amazon Polly to
-    #   use when processing input text for speech synthesis. Using a voice
-    #   that is not supported for the engine selected will result in an
-    #   error.
+    #   Specifies the engine (`standard`, `neural`, `long-form` or
+    #   `generative`) for Amazon Polly to use when processing input text for
+    #   speech synthesis. Using a voice that is not supported for the engine
+    #   selected will result in an error.
     #   @return [String]
     #
     # @!attribute [rw] language_code
@@ -660,8 +588,8 @@ module Aws::Polly
     #   be used for either Indian English (en-IN) or Hindi (hi-IN).
     #
     #   If a bilingual voice is used and no language code is specified,
-    #   Amazon Polly will use the default language of the bilingual voice.
-    #   The default language for any voice is the one returned by the
+    #   Amazon Polly uses the default language of the bilingual voice. The
+    #   default language for any voice is the one returned by the
     #   [DescribeVoices][1] operation for the `LanguageCode` parameter. For
     #   example, if no language code is specified, Aditi will use Indian
     #   English rather than Hindi.
@@ -696,7 +624,9 @@ module Aws::Polly
     #
     #   The valid values for mp3 and ogg\_vorbis are "8000", "16000",
     #   "22050", and "24000". The default value for standard voices is
-    #   "22050". The default value for neural voices is "24000".
+    #   "22050". The default value for neural voices is "24000". The
+    #   default value for long-form voices is "24000". The default value
+    #   for generative voices is "24000".
     #
     #   Valid values for pcm are "8000" and "16000" The default value is
     #   "16000".
@@ -761,10 +691,10 @@ module Aws::Polly
     # synthesis task.
     #
     # @!attribute [rw] engine
-    #   Specifies the engine (`standard` or `neural`) for Amazon Polly to
-    #   use when processing input text for speech synthesis. Using a voice
-    #   that is not supported for the engine selected will result in an
-    #   error.
+    #   Specifies the engine (`standard`, `neural`, `long-form` or
+    #   `generative`) for Amazon Polly to use when processing input text for
+    #   speech synthesis. Using a voice that is not supported for the engine
+    #   selected will result in an error.
     #   @return [String]
     #
     # @!attribute [rw] task_id
@@ -814,7 +744,9 @@ module Aws::Polly
     #
     #   The valid values for mp3 and ogg\_vorbis are "8000", "16000",
     #   "22050", and "24000". The default value for standard voices is
-    #   "22050". The default value for neural voices is "24000".
+    #   "22050". The default value for neural voices is "24000". The
+    #   default value for long-form voices is "24000". The default value
+    #   for generative voices is "24000".
     #
     #   Valid values for pcm are "8000" and "16000" The default value is
     #   "16000".
@@ -839,8 +771,8 @@ module Aws::Polly
     #   either Indian English (en-IN) or Hindi (hi-IN).
     #
     #   If a bilingual voice is used and no language code is specified,
-    #   Amazon Polly will use the default language of the bilingual voice.
-    #   The default language for any voice is the one returned by the
+    #   Amazon Polly uses the default language of the bilingual voice. The
+    #   default language for any voice is the one returned by the
     #   [DescribeVoices][1] operation for the `LanguageCode` parameter. For
     #   example, if no language code is specified, Aditi will use Indian
     #   English rather than Hindi.
@@ -885,46 +817,21 @@ module Aws::Polly
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SynthesizeSpeechInput
-    #   data as a hash:
-    #
-    #       {
-    #         engine: "standard", # accepts standard, neural
-    #         language_code: "arb", # accepts arb, cmn-CN, cy-GB, da-DK, de-DE, en-AU, en-GB, en-GB-WLS, en-IN, en-US, es-ES, es-MX, es-US, fr-CA, fr-FR, is-IS, it-IT, ja-JP, hi-IN, ko-KR, nb-NO, nl-NL, pl-PL, pt-BR, pt-PT, ro-RO, ru-RU, sv-SE, tr-TR
-    #         lexicon_names: ["LexiconName"],
-    #         output_format: "json", # required, accepts json, mp3, ogg_vorbis, pcm
-    #         sample_rate: "SampleRate",
-    #         speech_mark_types: ["sentence"], # accepts sentence, ssml, viseme, word
-    #         text: "Text", # required
-    #         text_type: "ssml", # accepts ssml, text
-    #         voice_id: "Aditi", # required, accepts Aditi, Amy, Astrid, Bianca, Brian, Camila, Carla, Carmen, Celine, Chantal, Conchita, Cristiano, Dora, Emma, Enrique, Ewa, Filiz, Geraint, Giorgio, Gwyneth, Hans, Ines, Ivy, Jacek, Jan, Joanna, Joey, Justin, Karl, Kendra, Kevin, Kimberly, Lea, Liv, Lotte, Lucia, Lupe, Mads, Maja, Marlene, Mathieu, Matthew, Maxim, Mia, Miguel, Mizuki, Naja, Nicole, Olivia, Penelope, Raveena, Ricardo, Ruben, Russell, Salli, Seoyeon, Takumi, Tatyana, Vicki, Vitoria, Zeina, Zhiyu
-    #       }
-    #
     # @!attribute [rw] engine
-    #   Specifies the engine (`standard` or `neural`) for Amazon Polly to
-    #   use when processing input text for speech synthesis. For information
-    #   on Amazon Polly voices and which voices are available in
-    #   standard-only, NTTS-only, and both standard and NTTS formats, see
-    #   [Available Voices][1].
-    #
-    #   **NTTS-only voices**
-    #
-    #   When using NTTS-only voices such as Kevin (en-US), this parameter is
-    #   required and must be set to `neural`. If the engine is not
-    #   specified, or is set to `standard`, this will result in an error.
+    #   Specifies the engine (`standard`, `neural`, `long-form`, or
+    #   `generative`) for Amazon Polly to use when processing input text for
+    #   speech synthesis. Provide an engine that is supported by the voice
+    #   you select. If you don't provide an engine, the standard engine is
+    #   selected by default. If a chosen voice isn't supported by the
+    #   standard engine, this will result in an error. For information on
+    #   Amazon Polly voices and which voices are available for each engine,
+    #   see [Available Voices][1].
     #
     #   Type: String
     #
-    #   Valid Values: `standard` \| `neural`
+    #   Valid Values: `standard` \| `neural` \| `long-form` \| `generative`
     #
     #   Required: Yes
-    #
-    #   **Standard voices**
-    #
-    #   For standard voices, this is not required; the engine parameter
-    #   defaults to `standard`. If the engine is not specified, or is set to
-    #   `standard` and an NTTS-only voice is selected, this will result in
-    #   an error.
     #
     #
     #
@@ -937,8 +844,8 @@ module Aws::Polly
     #   be used for either Indian English (en-IN) or Hindi (hi-IN).
     #
     #   If a bilingual voice is used and no language code is specified,
-    #   Amazon Polly will use the default language of the bilingual voice.
-    #   The default language for any voice is the one returned by the
+    #   Amazon Polly uses the default language of the bilingual voice. The
+    #   default language for any voice is the one returned by the
     #   [DescribeVoices][1] operation for the `LanguageCode` parameter. For
     #   example, if no language code is specified, Aditi will use Indian
     #   English rather than Hindi.
@@ -973,7 +880,9 @@ module Aws::Polly
     #
     #   The valid values for mp3 and ogg\_vorbis are "8000", "16000",
     #   "22050", and "24000". The default value for standard voices is
-    #   "22050". The default value for neural voices is "24000".
+    #   "22050". The default value for neural voices is "24000". The
+    #   default value for long-form voices is "24000". The default value
+    #   for generative voices is "24000".
     #
     #   Valid values for pcm are "8000" and "16000" The default value is
     #   "16000".
@@ -1041,7 +950,7 @@ module Aws::Polly
     #     little-endian format.
     #
     #   * If you request `json` as the `OutputFormat`, the `ContentType`
-    #     returned is audio/json.
+    #     returned is application/x-json-stream.
     #   @return [String]
     #
     # @!attribute [rw] request_characters
@@ -1144,8 +1053,8 @@ module Aws::Polly
     #   @return [Array<String>]
     #
     # @!attribute [rw] supported_engines
-    #   Specifies which engines (`standard` or `neural`) that are supported
-    #   by a given voice.
+    #   Specifies which engines (`standard`, `neural`, `long-form` or
+    #   `generative`) are supported by a given voice.
     #   @return [Array<String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/polly-2016-06-10/Voice AWS API Documentation
@@ -1164,3 +1073,4 @@ module Aws::Polly
 
   end
 end
+

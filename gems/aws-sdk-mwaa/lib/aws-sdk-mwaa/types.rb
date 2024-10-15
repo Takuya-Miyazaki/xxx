@@ -3,16 +3,20 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::MWAA
   module Types
 
-    # Access to the Airflow Web UI or CLI has been Denied. Please follow the
-    # MWAA user guide to setup permissions to access the Web UI and CLI
-    # functionality.
+    # Access to the Apache Airflow Web UI or CLI has been denied due to
+    # insufficient permissions. To learn more, see [Accessing an Amazon MWAA
+    # environment][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/access-policies.html
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -25,15 +29,9 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateCliTokenRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "EnvironmentName", # required
-    #       }
-    #
     # @!attribute [rw] name
-    #   Create a CLI token request for a MWAA environment.
+    #   The name of the Amazon MWAA environment. For example,
+    #   `MyMWAAEnvironment`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/CreateCliTokenRequest AWS API Documentation
@@ -45,13 +43,11 @@ module Aws::MWAA
     end
 
     # @!attribute [rw] cli_token
-    #   Create an Airflow CLI login token response for the provided JWT
-    #   token.
+    #   An Airflow CLI login token.
     #   @return [String]
     #
     # @!attribute [rw] web_server_hostname
-    #   Create an Airflow CLI login token response for the provided
-    #   webserver hostname.
+    #   The Airflow web server hostname for the environment.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/CreateCliTokenResponse AWS API Documentation
@@ -72,181 +68,203 @@ module Aws::MWAA
     #
     # [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/get-started.html
     #
-    # @note When making an API call, you may pass CreateEnvironmentInput
-    #   data as a hash:
+    # @!attribute [rw] name
+    #   The name of the Amazon MWAA environment. For example,
+    #   `MyMWAAEnvironment`.
+    #   @return [String]
     #
-    #       {
-    #         airflow_configuration_options: {
-    #           "ConfigKey" => "ConfigValue",
-    #         },
-    #         airflow_version: "AirflowVersion",
-    #         dag_s3_path: "RelativePath", # required
-    #         environment_class: "EnvironmentClass",
-    #         execution_role_arn: "IamRoleArn", # required
-    #         kms_key: "KmsKey",
-    #         logging_configuration: {
-    #           dag_processing_logs: {
-    #             enabled: false, # required
-    #             log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #           },
-    #           scheduler_logs: {
-    #             enabled: false, # required
-    #             log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #           },
-    #           task_logs: {
-    #             enabled: false, # required
-    #             log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #           },
-    #           webserver_logs: {
-    #             enabled: false, # required
-    #             log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #           },
-    #           worker_logs: {
-    #             enabled: false, # required
-    #             log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #           },
-    #         },
-    #         max_workers: 1,
-    #         name: "EnvironmentName", # required
-    #         network_configuration: { # required
-    #           security_group_ids: ["SecurityGroupId"],
-    #           subnet_ids: ["SubnetId"],
-    #         },
-    #         plugins_s3_object_version: "S3ObjectVersion",
-    #         plugins_s3_path: "RelativePath",
-    #         requirements_s3_object_version: "S3ObjectVersion",
-    #         requirements_s3_path: "RelativePath",
-    #         source_bucket_arn: "S3BucketArn", # required
-    #         tags: {
-    #           "TagKey" => "TagValue",
-    #         },
-    #         webserver_access_mode: "PRIVATE_ONLY", # accepts PRIVATE_ONLY, PUBLIC_ONLY
-    #         weekly_maintenance_window_start: "WeeklyMaintenanceWindowStart",
-    #       }
+    # @!attribute [rw] execution_role_arn
+    #   The Amazon Resource Name (ARN) of the execution role for your
+    #   environment. An execution role is an Amazon Web Services Identity
+    #   and Access Management (IAM) role that grants MWAA permission to
+    #   access Amazon Web Services services and resources used by your
+    #   environment. For example,
+    #   `arn:aws:iam::123456789:role/my-execution-role`. For more
+    #   information, see [Amazon MWAA Execution role][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-create-role.html
+    #   @return [String]
+    #
+    # @!attribute [rw] source_bucket_arn
+    #   The Amazon Resource Name (ARN) of the Amazon S3 bucket where your
+    #   DAG code and supporting files are stored. For example,
+    #   `arn:aws:s3:::my-airflow-bucket-unique-name`. For more information,
+    #   see [Create an Amazon S3 bucket for Amazon MWAA][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-s3-bucket.html
+    #   @return [String]
+    #
+    # @!attribute [rw] dag_s3_path
+    #   The relative path to the DAGs folder on your Amazon S3 bucket. For
+    #   example, `dags`. For more information, see [Adding or updating
+    #   DAGs][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-dag-folder.html
+    #   @return [String]
+    #
+    # @!attribute [rw] network_configuration
+    #   The VPC networking components used to secure and enable network
+    #   traffic between the Amazon Web Services resources for your
+    #   environment. For more information, see [About networking on Amazon
+    #   MWAA][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/networking-about.html
+    #   @return [Types::NetworkConfiguration]
+    #
+    # @!attribute [rw] plugins_s3_path
+    #   The relative path to the `plugins.zip` file on your Amazon S3
+    #   bucket. For example, `plugins.zip`. If specified, then the
+    #   `plugins.zip` version is required. For more information, see
+    #   [Installing custom plugins][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-dag-import-plugins.html
+    #   @return [String]
+    #
+    # @!attribute [rw] plugins_s3_object_version
+    #   The version of the plugins.zip file on your Amazon S3 bucket. You
+    #   must specify a version each time a plugins.zip file is updated. For
+    #   more information, see [How S3 Versioning works][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html
+    #   @return [String]
+    #
+    # @!attribute [rw] requirements_s3_path
+    #   The relative path to the `requirements.txt` file on your Amazon S3
+    #   bucket. For example, `requirements.txt`. If specified, then a
+    #   version is required. For more information, see [Installing Python
+    #   dependencies][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/working-dags-dependencies.html
+    #   @return [String]
+    #
+    # @!attribute [rw] requirements_s3_object_version
+    #   The version of the `requirements.txt` file on your Amazon S3 bucket.
+    #   You must specify a version each time a requirements.txt file is
+    #   updated. For more information, see [How S3 Versioning works][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html
+    #   @return [String]
+    #
+    # @!attribute [rw] startup_script_s3_path
+    #   The relative path to the startup shell script in your Amazon S3
+    #   bucket. For example, `s3://mwaa-environment/startup.sh`.
+    #
+    #   Amazon MWAA runs the script as your environment starts, and before
+    #   running the Apache Airflow process. You can use this script to
+    #   install dependencies, modify Apache Airflow configuration options,
+    #   and set environment variables. For more information, see [Using a
+    #   startup script][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/using-startup-script.html
+    #   @return [String]
+    #
+    # @!attribute [rw] startup_script_s3_object_version
+    #   The version of the startup shell script in your Amazon S3 bucket.
+    #   You must specify the [version ID][1] that Amazon S3 assigns to the
+    #   file every time you update the script.
+    #
+    #   Version IDs are Unicode, UTF-8 encoded, URL-ready, opaque strings
+    #   that are no more than 1,024 bytes long. The following is an example:
+    #
+    #   `3sL4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo`
+    #
+    #   For more information, see [Using a startup script][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html
+    #   [2]: https://docs.aws.amazon.com/mwaa/latest/userguide/using-startup-script.html
+    #   @return [String]
     #
     # @!attribute [rw] airflow_configuration_options
-    #   The Apache Airflow configuration setting you want to override in
-    #   your environment. For more information, see [Environment
-    #   configuration][1].
+    #   A list of key-value pairs containing the Apache Airflow
+    #   configuration options you want to attach to your environment. For
+    #   more information, see [Apache Airflow configuration options][1].
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-env-variables.html
     #   @return [Hash<String,String>]
     #
-    # @!attribute [rw] airflow_version
-    #   The Apache Airflow version you want to use for your environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] dag_s3_path
-    #   The relative path to the DAG folder on your Amazon S3 storage
-    #   bucket. For example, `dags`. For more information, see [Importing
-    #   DAGs on Amazon MWAA][1].
-    #
-    #
-    #
-    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-dag-import.html
-    #   @return [String]
-    #
     # @!attribute [rw] environment_class
-    #   The environment class you want to use for your environment. The
-    #   environment class determines the size of the containers and database
-    #   used for your Apache Airflow services.
+    #   The environment class type. Valid values: `mw1.small`, `mw1.medium`,
+    #   `mw1.large`, `mw1.xlarge`, and `mw1.2xlarge`. For more information,
+    #   see [Amazon MWAA environment class][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/environment-class.html
     #   @return [String]
-    #
-    # @!attribute [rw] execution_role_arn
-    #   The Amazon Resource Name (ARN) of the execution role for your
-    #   environment. An execution role is an AWS Identity and Access
-    #   Management (IAM) role that grants MWAA permission to access AWS
-    #   services and resources used by your environment. For example,
-    #   `arn:aws:iam::123456789:role/my-execution-role`. For more
-    #   information, see [Managing access to Amazon Managed Workflows for
-    #   Apache Airflow][1].
-    #
-    #
-    #
-    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/manage-access.html
-    #   @return [String]
-    #
-    # @!attribute [rw] kms_key
-    #   The AWS Key Management Service (KMS) key to encrypt and decrypt the
-    #   data in your environment. You can use an AWS KMS key managed by
-    #   MWAA, or a custom KMS key (advanced). For more information, see
-    #   [Customer master keys (CMKs)][1] in the AWS KMS developer guide.
-    #
-    #
-    #
-    #   [1]: https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html?icmpid=docs_console_unmapped#master_keys
-    #   @return [String]
-    #
-    # @!attribute [rw] logging_configuration
-    #   The Apache Airflow logs you want to send to Amazon CloudWatch Logs.
-    #   @return [Types::LoggingConfigurationInput]
     #
     # @!attribute [rw] max_workers
     #   The maximum number of workers that you want to run in your
-    #   environment. MWAA scales the number of Apache Airflow workers and
-    #   the Fargate containers that run your tasks up to the number you
-    #   specify in this field. When there are no more tasks running, and no
-    #   more in the queue, MWAA disposes of the extra containers leaving the
-    #   one worker that is included with your environment.
+    #   environment. MWAA scales the number of Apache Airflow workers up to
+    #   the number you specify in the `MaxWorkers` field. For example, `20`.
+    #   When there are no more tasks running, and no more in the queue, MWAA
+    #   disposes of the extra workers leaving the one worker that is
+    #   included with your environment, or the number you specify in
+    #   `MinWorkers`.
     #   @return [Integer]
     #
-    # @!attribute [rw] name
-    #   The name of your MWAA environment.
+    # @!attribute [rw] kms_key
+    #   The Amazon Web Services Key Management Service (KMS) key to encrypt
+    #   the data in your environment. You can use an Amazon Web Services
+    #   owned CMK, or a Customer managed CMK (advanced). For more
+    #   information, see [Create an Amazon MWAA environment][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/create-environment.html
     #   @return [String]
     #
-    # @!attribute [rw] network_configuration
-    #   The VPC networking components you want to use for your environment.
-    #   At least two private subnet identifiers and one VPC security group
-    #   identifier are required to create an environment. For more
-    #   information, see [Creating the VPC network for a MWAA
-    #   environment][1].
+    # @!attribute [rw] airflow_version
+    #   The Apache Airflow version for your environment. If no value is
+    #   specified, it defaults to the latest version. For more information,
+    #   see [Apache Airflow versions on Amazon Managed Workflows for Apache
+    #   Airflow (MWAA)][1].
+    #
+    #   Valid values: `1.10.12`, `2.0.2`, `2.2.2`, `2.4.3`, `2.5.1`,
+    #   `2.6.3`, `2.7.2` `2.8.1`
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/vpc-mwaa.html
-    #   @return [Types::NetworkConfiguration]
-    #
-    # @!attribute [rw] plugins_s3_object_version
-    #   The `plugins.zip` file version you want to use.
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/airflow-versions.html
     #   @return [String]
     #
-    # @!attribute [rw] plugins_s3_path
-    #   The relative path to the `plugins.zip` file on your Amazon S3
-    #   storage bucket. For example, `plugins.zip`. If a relative path is
-    #   provided in the request, then `PluginsS3ObjectVersion` is required.
-    #   For more information, see [Importing DAGs on Amazon MWAA][1].
+    # @!attribute [rw] logging_configuration
+    #   Defines the Apache Airflow logs to send to CloudWatch Logs.
+    #   @return [Types::LoggingConfigurationInput]
     #
-    #
-    #
-    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-dag-import.html
-    #   @return [String]
-    #
-    # @!attribute [rw] requirements_s3_object_version
-    #   The `requirements.txt` file version you want to use.
-    #   @return [String]
-    #
-    # @!attribute [rw] requirements_s3_path
-    #   The relative path to the `requirements.txt` file on your Amazon S3
-    #   storage bucket. For example, `requirements.txt`. If a relative path
-    #   is provided in the request, then `RequirementsS3ObjectVersion` is
-    #   required. For more information, see [Importing DAGs on Amazon
-    #   MWAA][1].
-    #
-    #
-    #
-    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-dag-import.html
-    #   @return [String]
-    #
-    # @!attribute [rw] source_bucket_arn
-    #   The Amazon Resource Name (ARN) of your Amazon S3 storage bucket. For
-    #   example, `arn:aws:s3:::airflow-mybucketname`.
+    # @!attribute [rw] weekly_maintenance_window_start
+    #   The day and time of the week in Coordinated Universal Time (UTC)
+    #   24-hour standard time to start weekly maintenance updates of your
+    #   environment in the following format: `DAY:HH:MM`. For example:
+    #   `TUE:03:30`. You can specify a start time in 30 minute increments
+    #   only.
     #   @return [String]
     #
     # @!attribute [rw] tags
-    #   The metadata tags you want to attach to your environment. For more
-    #   information, see [Tagging AWS resources][1].
+    #   The key-value tag pairs you want to associate to your environment.
+    #   For example, `"Environment": "Staging"`. For more information, see
+    #   [Tagging Amazon Web Services resources][1].
     #
     #
     #
@@ -254,50 +272,110 @@ module Aws::MWAA
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] webserver_access_mode
-    #   The networking access of your Apache Airflow web server. A public
-    #   network allows your Airflow UI to be accessed over the Internet by
-    #   users granted access in your IAM policy. A private network limits
-    #   access of your Airflow UI to users within your VPC. For more
-    #   information, see [Creating the VPC network for a MWAA
-    #   environment][1].
+    #   Defines the access mode for the Apache Airflow *web server*. For
+    #   more information, see [Apache Airflow access modes][1].
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/vpc-mwaa.html
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-networking.html
     #   @return [String]
     #
-    # @!attribute [rw] weekly_maintenance_window_start
-    #   The day and time you want MWAA to start weekly maintenance updates
-    #   on your environment.
+    # @!attribute [rw] min_workers
+    #   The minimum number of workers that you want to run in your
+    #   environment. MWAA scales the number of Apache Airflow workers up to
+    #   the number you specify in the `MaxWorkers` field. When there are no
+    #   more tasks running, and no more in the queue, MWAA disposes of the
+    #   extra workers leaving the worker count you specify in the
+    #   `MinWorkers` field. For example, `2`.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] schedulers
+    #   The number of Apache Airflow schedulers to run in your environment.
+    #   Valid values:
+    #
+    #   * v2 - Accepts between `2` to `5`. Defaults to `2`.
+    #
+    #   * v1 - Accepts `1`.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] endpoint_management
+    #   Defines whether the VPC endpoints configured for the environment are
+    #   created, and managed, by the customer or by Amazon MWAA. If set to
+    #   `SERVICE`, Amazon MWAA will create and manage the required VPC
+    #   endpoints in your VPC. If set to `CUSTOMER`, you must create, and
+    #   manage, the VPC endpoints for your VPC. If you choose to create an
+    #   environment in a shared VPC, you must set this value to `CUSTOMER`.
+    #   In a shared VPC deployment, the environment will remain in `PENDING`
+    #   status until you create the VPC endpoints. If you do not take action
+    #   to create the endpoints within 72 hours, the status will change to
+    #   `CREATE_FAILED`. You can delete the failed environment and create a
+    #   new one.
     #   @return [String]
+    #
+    # @!attribute [rw] min_webservers
+    #   The minimum number of web servers that you want to run in your
+    #   environment. Amazon MWAA scales the number of Apache Airflow web
+    #   servers up to the number you specify for `MaxWebservers` when you
+    #   interact with your Apache Airflow environment using Apache Airflow
+    #   REST API, or the Apache Airflow CLI. As the transaction-per-second
+    #   rate, and the network load, decrease, Amazon MWAA disposes of the
+    #   additional web servers, and scales down to the number set in
+    #   `MinxWebserers`.
+    #
+    #   Valid values: Accepts between `2` and `5`. Defaults to `2`.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] max_webservers
+    #   The maximum number of web servers that you want to run in your
+    #   environment. Amazon MWAA scales the number of Apache Airflow web
+    #   servers up to the number you specify for `MaxWebservers` when you
+    #   interact with your Apache Airflow environment using Apache Airflow
+    #   REST API, or the Apache Airflow CLI. For example, in scenarios where
+    #   your workload requires network calls to the Apache Airflow REST API
+    #   with a high transaction-per-second (TPS) rate, Amazon MWAA will
+    #   increase the number of web servers up to the number set in
+    #   `MaxWebserers`. As TPS rates decrease Amazon MWAA disposes of the
+    #   additional web servers, and scales down to the number set in
+    #   `MinxWebserers`.
+    #
+    #   Valid values: Accepts between `2` and `5`. Defaults to `2`.
+    #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/CreateEnvironmentInput AWS API Documentation
     #
     class CreateEnvironmentInput < Struct.new(
-      :airflow_configuration_options,
-      :airflow_version,
-      :dag_s3_path,
-      :environment_class,
-      :execution_role_arn,
-      :kms_key,
-      :logging_configuration,
-      :max_workers,
       :name,
-      :network_configuration,
-      :plugins_s3_object_version,
-      :plugins_s3_path,
-      :requirements_s3_object_version,
-      :requirements_s3_path,
+      :execution_role_arn,
       :source_bucket_arn,
+      :dag_s3_path,
+      :network_configuration,
+      :plugins_s3_path,
+      :plugins_s3_object_version,
+      :requirements_s3_path,
+      :requirements_s3_object_version,
+      :startup_script_s3_path,
+      :startup_script_s3_object_version,
+      :airflow_configuration_options,
+      :environment_class,
+      :max_workers,
+      :kms_key,
+      :airflow_version,
+      :logging_configuration,
+      :weekly_maintenance_window_start,
       :tags,
       :webserver_access_mode,
-      :weekly_maintenance_window_start)
+      :min_workers,
+      :schedulers,
+      :endpoint_management,
+      :min_webservers,
+      :max_webservers)
       SENSITIVE = [:airflow_configuration_options]
       include Aws::Structure
     end
 
     # @!attribute [rw] arn
-    #   The resulting Amazon MWAA envirnonment ARN.
+    #   The Amazon Resource Name (ARN) returned in the response for the
+    #   environment.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/CreateEnvironmentOutput AWS API Documentation
@@ -308,15 +386,9 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateWebLoginTokenRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "EnvironmentName", # required
-    #       }
-    #
     # @!attribute [rw] name
-    #   Create an Airflow Web UI login token request for a MWAA environment.
+    #   The name of the Amazon MWAA environment. For example,
+    #   `MyMWAAEnvironment`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/CreateWebLoginTokenRequest AWS API Documentation
@@ -327,34 +399,39 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # @!attribute [rw] web_server_hostname
-    #   Create an Airflow Web UI login token response for the provided
-    #   webserver hostname.
+    # @!attribute [rw] web_token
+    #   An Airflow web server login token.
     #   @return [String]
     #
-    # @!attribute [rw] web_token
-    #   Create an Airflow Web UI login token response for the provided JWT
+    # @!attribute [rw] web_server_hostname
+    #   The Airflow web server hostname for the environment.
+    #   @return [String]
+    #
+    # @!attribute [rw] iam_identity
+    #   The name of the IAM identity creating the web login token. This
+    #   might be an IAM user, or an assumed or federated identity. For
+    #   example, `assumed-role/Admin/your-name`.
+    #   @return [String]
+    #
+    # @!attribute [rw] airflow_identity
+    #   The user name of the Apache Airflow identity creating the web login
     #   token.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/CreateWebLoginTokenResponse AWS API Documentation
     #
     class CreateWebLoginTokenResponse < Struct.new(
+      :web_token,
       :web_server_hostname,
-      :web_token)
+      :iam_identity,
+      :airflow_identity)
       SENSITIVE = [:web_token]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteEnvironmentInput
-    #   data as a hash:
-    #
-    #       {
-    #         name: "EnvironmentName", # required
-    #       }
-    #
     # @!attribute [rw] name
-    #   The name of the environment to delete.
+    #   The name of the Amazon MWAA environment. For example,
+    #   `MyMWAAEnvironment`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/DeleteEnvironmentInput AWS API Documentation
@@ -369,22 +446,20 @@ module Aws::MWAA
     #
     class DeleteEnvironmentOutput < Aws::EmptyStructure; end
 
-    # Internal only API.
+    # **Internal only**. Represents the dimensions of a metric. To learn
+    # more about the metrics published to Amazon CloudWatch, see [Amazon
+    # MWAA performance metrics in Amazon CloudWatch][1].
     #
-    # @note When making an API call, you may pass Dimension
-    #   data as a hash:
     #
-    #       {
-    #         name: "String", # required
-    #         value: "String", # required
-    #       }
+    #
+    # [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/cw-metrics.html
     #
     # @!attribute [rw] name
-    #   Internal only API.
+    #   **Internal only**. The name of the dimension.
     #   @return [String]
     #
     # @!attribute [rw] value
-    #   Internal only API.
+    #   **Internal only**. The value of the dimension.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/Dimension AWS API Documentation
@@ -396,147 +471,416 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # An Amazon MWAA environment.
-    #
-    # @!attribute [rw] airflow_configuration_options
-    #   The Airflow Configuration Options of the Amazon MWAA Environment.
-    #   @return [Hash<String,String>]
-    #
-    # @!attribute [rw] airflow_version
-    #   The AirflowV ersion of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] arn
-    #   The ARN of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] created_at
-    #   The Created At date of the Amazon MWAA Environment.
-    #   @return [Time]
-    #
-    # @!attribute [rw] dag_s3_path
-    #   The Dags S3 Path of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] environment_class
-    #   The Environment Class (size) of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] execution_role_arn
-    #   The Execution Role ARN of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] kms_key
-    #   The Kms Key of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] last_update
-    #   Last update information for the environment.
-    #   @return [Types::LastUpdate]
-    #
-    # @!attribute [rw] logging_configuration
-    #   The Logging Configuration of the Amazon MWAA Environment.
-    #   @return [Types::LoggingConfiguration]
-    #
-    # @!attribute [rw] max_workers
-    #   The Maximum Workers of the Amazon MWAA Environment.
-    #   @return [Integer]
+    # Describes an Amazon Managed Workflows for Apache Airflow (MWAA)
+    # environment.
     #
     # @!attribute [rw] name
-    #   The name of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] network_configuration
-    #   Provide the security group and subnet IDs for the workers and
-    #   scheduler.
-    #   @return [Types::NetworkConfiguration]
-    #
-    # @!attribute [rw] plugins_s3_object_version
-    #   The Plugins.zip S3 Object Version of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] plugins_s3_path
-    #   The Plugins.zip S3 Path of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] requirements_s3_object_version
-    #   The Requirements.txt file S3 Object Version of the Amazon MWAA
-    #   Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] requirements_s3_path
-    #   The Requirement.txt S3 Path of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] service_role_arn
-    #   The Service Role ARN of the Amazon MWAA Environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] source_bucket_arn
-    #   The Source S3 Bucket ARN of the Amazon MWAA Environment.
+    #   The name of the Amazon MWAA environment. For example,
+    #   `MyMWAAEnvironment`.
     #   @return [String]
     #
     # @!attribute [rw] status
-    #   The status of the Amazon MWAA Environment.
+    #   The status of the Amazon MWAA environment.
+    #
+    #   Valid values:
+    #
+    #   * `CREATING` - Indicates the request to create the environment is in
+    #     progress.
+    #
+    #   * `CREATING_SNAPSHOT` - Indicates the request to update environment
+    #     details, or upgrade the environment version, is in progress and
+    #     Amazon MWAA is creating a storage volume snapshot of the Amazon
+    #     RDS database cluster associated with the environment. A database
+    #     snapshot is a backup created at a specific point in time. Amazon
+    #     MWAA uses snapshots to recover environment metadata if the process
+    #     to update or upgrade an environment fails.
+    #
+    #   * `CREATE_FAILED` - Indicates the request to create the environment
+    #     failed, and the environment could not be created.
+    #
+    #   * `AVAILABLE` - Indicates the request was successful and the
+    #     environment is ready to use.
+    #
+    #   * `PENDING` - Indicates the request was successful, but the process
+    #     to create the environment is paused until you create the required
+    #     VPC endpoints in your VPC. After you create the VPC endpoints, the
+    #     process resumes.
+    #
+    #   * `UPDATING` - Indicates the request to update the environment is in
+    #     progress.
+    #
+    #   * `ROLLING_BACK` - Indicates the request to update environment
+    #     details, or upgrade the environment version, failed and Amazon
+    #     MWAA is restoring the environment using the latest storage volume
+    #     snapshot.
+    #
+    #   * `DELETING` - Indicates the request to delete the environment is in
+    #     progress.
+    #
+    #   * `DELETED` - Indicates the request to delete the environment is
+    #     complete, and the environment has been deleted.
+    #
+    #   * `UNAVAILABLE` - Indicates the request failed, but the environment
+    #     did not return to its previous state and is not stable.
+    #
+    #   * `UPDATE_FAILED` - Indicates the request to update the environment
+    #     failed, and the environment was restored to its previous state
+    #     successfully and is ready to use.
+    #
+    #   * `MAINTENANCE` - Indicates that the environment is undergoing
+    #     maintenance. Depending on the type of work Amazon MWAA is
+    #     performing, your environment might become unavailable during this
+    #     process. After all operations are done, your environment will
+    #     return to its status prior to mainteneace operations.
+    #
+    #   We recommend reviewing our troubleshooting guide for a list of
+    #   common errors and their solutions. For more information, see [Amazon
+    #   MWAA troubleshooting][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/troubleshooting.html
+    #   @return [String]
+    #
+    # @!attribute [rw] arn
+    #   The Amazon Resource Name (ARN) of the Amazon MWAA environment.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
+    #   The day and time the environment was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] webserver_url
+    #   The Apache Airflow *web server* host name for the Amazon MWAA
+    #   environment. For more information, see [Accessing the Apache Airflow
+    #   UI][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/access-airflow-ui.html
+    #   @return [String]
+    #
+    # @!attribute [rw] execution_role_arn
+    #   The Amazon Resource Name (ARN) of the execution role in IAM that
+    #   allows MWAA to access Amazon Web Services resources in your
+    #   environment. For example,
+    #   `arn:aws:iam::123456789:role/my-execution-role`. For more
+    #   information, see [Amazon MWAA Execution role][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-create-role.html
+    #   @return [String]
+    #
+    # @!attribute [rw] service_role_arn
+    #   The Amazon Resource Name (ARN) for the service-linked role of the
+    #   environment. For more information, see [Amazon MWAA Service-linked
+    #   role][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-slr.html
+    #   @return [String]
+    #
+    # @!attribute [rw] kms_key
+    #   The KMS encryption key used to encrypt the data in your environment.
+    #   @return [String]
+    #
+    # @!attribute [rw] airflow_version
+    #   The Apache Airflow version on your environment.
+    #
+    #   Valid values: `1.10.12`, `2.0.2`, `2.2.2`, `2.4.3`, `2.5.1`,
+    #   `2.6.3`, `2.7.2`, `2.8.1`.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_bucket_arn
+    #   The Amazon Resource Name (ARN) of the Amazon S3 bucket where your
+    #   DAG code and supporting files are stored. For example,
+    #   `arn:aws:s3:::my-airflow-bucket-unique-name`. For more information,
+    #   see [Create an Amazon S3 bucket for Amazon MWAA][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-s3-bucket.html
+    #   @return [String]
+    #
+    # @!attribute [rw] dag_s3_path
+    #   The relative path to the DAGs folder in your Amazon S3 bucket. For
+    #   example, `s3://mwaa-environment/dags`. For more information, see
+    #   [Adding or updating DAGs][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-dag-folder.html
+    #   @return [String]
+    #
+    # @!attribute [rw] plugins_s3_path
+    #   The relative path to the file in your Amazon S3 bucket. For example,
+    #   `s3://mwaa-environment/plugins.zip`. For more information, see
+    #   [Installing custom plugins][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-dag-import-plugins.html
+    #   @return [String]
+    #
+    # @!attribute [rw] plugins_s3_object_version
+    #   The version of the `plugins.zip` file in your Amazon S3 bucket. You
+    #   must specify the [version ID][1] that Amazon S3 assigns to the file.
+    #
+    #   Version IDs are Unicode, UTF-8 encoded, URL-ready, opaque strings
+    #   that are no more than 1,024 bytes long. The following is an example:
+    #
+    #   `3sL4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo`
+    #
+    #   For more information, see [Installing custom plugins][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html
+    #   [2]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-dag-import-plugins.html
+    #   @return [String]
+    #
+    # @!attribute [rw] requirements_s3_path
+    #   The relative path to the `requirements.txt` file in your Amazon S3
+    #   bucket. For example, `s3://mwaa-environment/requirements.txt`. For
+    #   more information, see [Installing Python dependencies][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/working-dags-dependencies.html
+    #   @return [String]
+    #
+    # @!attribute [rw] requirements_s3_object_version
+    #   The version of the `requirements.txt ` file on your Amazon S3
+    #   bucket. You must specify the [version ID][1] that Amazon S3 assigns
+    #   to the file.
+    #
+    #   Version IDs are Unicode, UTF-8 encoded, URL-ready, opaque strings
+    #   that are no more than 1,024 bytes long. The following is an example:
+    #
+    #   `3sL4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo`
+    #
+    #   For more information, see [Installing Python dependencies][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html
+    #   [2]: https://docs.aws.amazon.com/mwaa/latest/userguide/working-dags-dependencies.html
+    #   @return [String]
+    #
+    # @!attribute [rw] startup_script_s3_path
+    #   The relative path to the startup shell script in your Amazon S3
+    #   bucket. For example, `s3://mwaa-environment/startup.sh`.
+    #
+    #   Amazon MWAA runs the script as your environment starts, and before
+    #   running the Apache Airflow process. You can use this script to
+    #   install dependencies, modify Apache Airflow configuration options,
+    #   and set environment variables. For more information, see [Using a
+    #   startup script][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/using-startup-script.html
+    #   @return [String]
+    #
+    # @!attribute [rw] startup_script_s3_object_version
+    #   The version of the startup shell script in your Amazon S3 bucket.
+    #   You must specify the [version ID][1] that Amazon S3 assigns to the
+    #   file.
+    #
+    #   Version IDs are Unicode, UTF-8 encoded, URL-ready, opaque strings
+    #   that are no more than 1,024 bytes long. The following is an example:
+    #
+    #   `3sL4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo`
+    #
+    #   For more information, see [Using a startup script][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html
+    #   [2]: https://docs.aws.amazon.com/mwaa/latest/userguide/using-startup-script.html
+    #   @return [String]
+    #
+    # @!attribute [rw] airflow_configuration_options
+    #   A list of key-value pairs containing the Apache Airflow
+    #   configuration options attached to your environment. For more
+    #   information, see [Apache Airflow configuration options][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-env-variables.html
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] environment_class
+    #   The environment class type. Valid values: `mw1.small`, `mw1.medium`,
+    #   `mw1.large`, `mw1.xlarge`, and `mw1.2xlarge`. For more information,
+    #   see [Amazon MWAA environment class][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/environment-class.html
+    #   @return [String]
+    #
+    # @!attribute [rw] max_workers
+    #   The maximum number of workers that run in your environment. For
+    #   example, `20`.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] network_configuration
+    #   Describes the VPC networking components used to secure and enable
+    #   network traffic between the Amazon Web Services resources for your
+    #   environment. For more information, see [About networking on Amazon
+    #   MWAA][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/networking-about.html
+    #   @return [Types::NetworkConfiguration]
+    #
+    # @!attribute [rw] logging_configuration
+    #   The Apache Airflow logs published to CloudWatch Logs.
+    #   @return [Types::LoggingConfiguration]
+    #
+    # @!attribute [rw] last_update
+    #   The status of the last update on the environment.
+    #   @return [Types::LastUpdate]
+    #
+    # @!attribute [rw] weekly_maintenance_window_start
+    #   The day and time of the week in Coordinated Universal Time (UTC)
+    #   24-hour standard time that weekly maintenance updates are scheduled.
+    #   For example: `TUE:03:30`.
     #   @return [String]
     #
     # @!attribute [rw] tags
-    #   The Tags of the Amazon MWAA Environment.
+    #   The key-value tag pairs associated to your environment. For example,
+    #   `"Environment": "Staging"`. For more information, see [Tagging
+    #   Amazon Web Services resources][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] webserver_access_mode
-    #   The Webserver Access Mode of the Amazon MWAA Environment (public or
-    #   private only).
+    #   The Apache Airflow *web server* access mode. For more information,
+    #   see [Apache Airflow access modes][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-networking.html
     #   @return [String]
     #
-    # @!attribute [rw] webserver_url
-    #   The Webserver URL of the Amazon MWAA Environment.
+    # @!attribute [rw] min_workers
+    #   The minimum number of workers that run in your environment. For
+    #   example, `2`.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] schedulers
+    #   The number of Apache Airflow schedulers that run in your Amazon MWAA
+    #   environment.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] webserver_vpc_endpoint_service
+    #   The VPC endpoint for the environment's web server.
     #   @return [String]
     #
-    # @!attribute [rw] weekly_maintenance_window_start
-    #   The Weekly Maintenance Window Start of the Amazon MWAA Environment.
+    # @!attribute [rw] database_vpc_endpoint_service
+    #   The VPC endpoint for the environment's Amazon RDS database.
     #   @return [String]
+    #
+    # @!attribute [rw] celery_executor_queue
+    #   The queue ARN for the environment's [Celery Executor][1]. Amazon
+    #   MWAA uses a Celery Executor to distribute tasks across multiple
+    #   workers. When you create an environment in a shared VPC, you must
+    #   provide access to the Celery Executor queue from your VPC.
+    #
+    #
+    #
+    #   [1]: https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/celery.html
+    #   @return [String]
+    #
+    # @!attribute [rw] endpoint_management
+    #   Defines whether the VPC endpoints configured for the environment are
+    #   created, and managed, by the customer or by Amazon MWAA. If set to
+    #   `SERVICE`, Amazon MWAA will create and manage the required VPC
+    #   endpoints in your VPC. If set to `CUSTOMER`, you must create, and
+    #   manage, the VPC endpoints in your VPC.
+    #   @return [String]
+    #
+    # @!attribute [rw] min_webservers
+    #   The minimum number of web servers that you want to run in your
+    #   environment. Amazon MWAA scales the number of Apache Airflow web
+    #   servers up to the number you specify for `MaxWebservers` when you
+    #   interact with your Apache Airflow environment using Apache Airflow
+    #   REST API, or the Apache Airflow CLI. As the transaction-per-second
+    #   rate, and the network load, decrease, Amazon MWAA disposes of the
+    #   additional web servers, and scales down to the number set in
+    #   `MinxWebserers`.
+    #
+    #   Valid values: Accepts between `2` and `5`. Defaults to `2`.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] max_webservers
+    #   The maximum number of web servers that you want to run in your
+    #   environment. Amazon MWAA scales the number of Apache Airflow web
+    #   servers up to the number you specify for `MaxWebservers` when you
+    #   interact with your Apache Airflow environment using Apache Airflow
+    #   REST API, or the Apache Airflow CLI. For example, in scenarios where
+    #   your workload requires network calls to the Apache Airflow REST API
+    #   with a high transaction-per-second (TPS) rate, Amazon MWAA will
+    #   increase the number of web servers up to the number set in
+    #   `MaxWebserers`. As TPS rates decrease Amazon MWAA disposes of the
+    #   additional web servers, and scales down to the number set in
+    #   `MinxWebserers`.
+    #
+    #   Valid values: Accepts between `2` and `5`. Defaults to `2`.
+    #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/Environment AWS API Documentation
     #
     class Environment < Struct.new(
-      :airflow_configuration_options,
-      :airflow_version,
+      :name,
+      :status,
       :arn,
       :created_at,
-      :dag_s3_path,
-      :environment_class,
+      :webserver_url,
       :execution_role_arn,
-      :kms_key,
-      :last_update,
-      :logging_configuration,
-      :max_workers,
-      :name,
-      :network_configuration,
-      :plugins_s3_object_version,
-      :plugins_s3_path,
-      :requirements_s3_object_version,
-      :requirements_s3_path,
       :service_role_arn,
+      :kms_key,
+      :airflow_version,
       :source_bucket_arn,
-      :status,
+      :dag_s3_path,
+      :plugins_s3_path,
+      :plugins_s3_object_version,
+      :requirements_s3_path,
+      :requirements_s3_object_version,
+      :startup_script_s3_path,
+      :startup_script_s3_object_version,
+      :airflow_configuration_options,
+      :environment_class,
+      :max_workers,
+      :network_configuration,
+      :logging_configuration,
+      :last_update,
+      :weekly_maintenance_window_start,
       :tags,
       :webserver_access_mode,
-      :webserver_url,
-      :weekly_maintenance_window_start)
-      SENSITIVE = []
+      :min_workers,
+      :schedulers,
+      :webserver_vpc_endpoint_service,
+      :database_vpc_endpoint_service,
+      :celery_executor_queue,
+      :endpoint_management,
+      :min_webservers,
+      :max_webservers)
+      SENSITIVE = [:airflow_configuration_options]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetEnvironmentInput
-    #   data as a hash:
-    #
-    #       {
-    #         name: "EnvironmentName", # required
-    #       }
-    #
     # @!attribute [rw] name
-    #   The name of the environment to retrieve.
+    #   The name of the Amazon MWAA environment. For example,
+    #   `MyMWAAEnvironment`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/GetEnvironmentInput AWS API Documentation
@@ -548,7 +892,7 @@ module Aws::MWAA
     end
 
     # @!attribute [rw] environment
-    #   A JSON blob with environment details.
+    #   An object containing all available details about the environment.
     #   @return [Types::Environment]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/GetEnvironmentOutput AWS API Documentation
@@ -572,61 +916,62 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # Last update information for the environment.
+    # Describes the status of the last update on the environment, and any
+    # errors that were encountered.
+    #
+    # @!attribute [rw] status
+    #   The status of the last update on the environment.
+    #   @return [String]
     #
     # @!attribute [rw] created_at
-    #   Time that last update occurred.
+    #   The day and time of the last update on the environment.
     #   @return [Time]
     #
     # @!attribute [rw] error
-    #   Error string of last update, if applicable.
+    #   The error that was encountered during the last update of the
+    #   environment.
     #   @return [Types::UpdateError]
     #
-    # @!attribute [rw] status
-    #   Status of last update of SUCCESS, FAILED, CREATING, DELETING.
+    # @!attribute [rw] source
+    #   The source of the last update to the environment. Includes internal
+    #   processes by Amazon MWAA, such as an environment maintenance update.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/LastUpdate AWS API Documentation
     #
     class LastUpdate < Struct.new(
+      :status,
       :created_at,
       :error,
-      :status)
+      :source)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListEnvironmentsInput
-    #   data as a hash:
-    #
-    #       {
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
+    # @!attribute [rw] next_token
+    #   Retrieves the next page of the results.
+    #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The maximum results when listing MWAA environments.
+    #   The maximum number of results to retrieve per page. For example, `5`
+    #   environments per page.
     #   @return [Integer]
-    #
-    # @!attribute [rw] next_token
-    #   The Next Token when listing MWAA environments.
-    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/ListEnvironmentsInput AWS API Documentation
     #
     class ListEnvironmentsInput < Struct.new(
-      :max_results,
-      :next_token)
+      :next_token,
+      :max_results)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # @!attribute [rw] environments
-    #   The list of Amazon MWAA Environments.
+    #   Returns a list of Amazon MWAA environments.
     #   @return [Array<String>]
     #
     # @!attribute [rw] next_token
-    #   The Next Token when listing MWAA environments.
+    #   Retrieves the next page of the results.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/ListEnvironmentsOutput AWS API Documentation
@@ -638,15 +983,10 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "EnvironmentArn", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
-    #   The ARN of the MWAA environment.
+    #   The Amazon Resource Name (ARN) of the Amazon MWAA environment. For
+    #   example,
+    #   `arn:aws:airflow:us-east-1:123456789012:environment/MyMWAAEnvironment`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/ListTagsForResourceInput AWS API Documentation
@@ -658,7 +998,12 @@ module Aws::MWAA
     end
 
     # @!attribute [rw] tags
-    #   The tags of the MWAA environments.
+    #   The key-value tag pairs associated to your environment. For more
+    #   information, see [Tagging Amazon Web Services resources][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html
     #   @return [Hash<String,String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/ListTagsForResourceOutput AWS API Documentation
@@ -669,36 +1014,32 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # The Logging Configuration of your Amazon MWAA environment.
+    # Describes the Apache Airflow log types that are published to
+    # CloudWatch Logs.
     #
     # @!attribute [rw] dag_processing_logs
-    #   A JSON blob that provides configuration to use for logging with
-    #   respect to the various Apache Airflow services: DagProcessingLogs,
-    #   SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
+    #   The Airflow DAG processing logs published to CloudWatch Logs and the
+    #   log level.
     #   @return [Types::ModuleLoggingConfiguration]
     #
     # @!attribute [rw] scheduler_logs
-    #   A JSON blob that provides configuration to use for logging with
-    #   respect to the various Apache Airflow services: DagProcessingLogs,
-    #   SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
-    #   @return [Types::ModuleLoggingConfiguration]
-    #
-    # @!attribute [rw] task_logs
-    #   A JSON blob that provides configuration to use for logging with
-    #   respect to the various Apache Airflow services: DagProcessingLogs,
-    #   SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
+    #   The Airflow scheduler logs published to CloudWatch Logs and the log
+    #   level.
     #   @return [Types::ModuleLoggingConfiguration]
     #
     # @!attribute [rw] webserver_logs
-    #   A JSON blob that provides configuration to use for logging with
-    #   respect to the various Apache Airflow services: DagProcessingLogs,
-    #   SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
+    #   The Airflow web server logs published to CloudWatch Logs and the log
+    #   level.
     #   @return [Types::ModuleLoggingConfiguration]
     #
     # @!attribute [rw] worker_logs
-    #   A JSON blob that provides configuration to use for logging with
-    #   respect to the various Apache Airflow services: DagProcessingLogs,
-    #   SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
+    #   The Airflow worker logs published to CloudWatch Logs and the log
+    #   level.
+    #   @return [Types::ModuleLoggingConfiguration]
+    #
+    # @!attribute [rw] task_logs
+    #   The Airflow task logs published to CloudWatch Logs and the log
+    #   level.
     #   @return [Types::ModuleLoggingConfiguration]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/LoggingConfiguration AWS API Documentation
@@ -706,69 +1047,33 @@ module Aws::MWAA
     class LoggingConfiguration < Struct.new(
       :dag_processing_logs,
       :scheduler_logs,
-      :task_logs,
       :webserver_logs,
-      :worker_logs)
+      :worker_logs,
+      :task_logs)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # The Logging Configuration of your Amazon MWAA environment.
-    #
-    # @note When making an API call, you may pass LoggingConfigurationInput
-    #   data as a hash:
-    #
-    #       {
-    #         dag_processing_logs: {
-    #           enabled: false, # required
-    #           log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #         },
-    #         scheduler_logs: {
-    #           enabled: false, # required
-    #           log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #         },
-    #         task_logs: {
-    #           enabled: false, # required
-    #           log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #         },
-    #         webserver_logs: {
-    #           enabled: false, # required
-    #           log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #         },
-    #         worker_logs: {
-    #           enabled: false, # required
-    #           log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #         },
-    #       }
+    # Defines the Apache Airflow log types to send to CloudWatch Logs.
     #
     # @!attribute [rw] dag_processing_logs
-    #   A JSON blob that provides configuration to use for logging with
-    #   respect to the various Apache Airflow services: DagProcessingLogs,
-    #   SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
+    #   Publishes Airflow DAG processing logs to CloudWatch Logs.
     #   @return [Types::ModuleLoggingConfigurationInput]
     #
     # @!attribute [rw] scheduler_logs
-    #   A JSON blob that provides configuration to use for logging with
-    #   respect to the various Apache Airflow services: DagProcessingLogs,
-    #   SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
-    #   @return [Types::ModuleLoggingConfigurationInput]
-    #
-    # @!attribute [rw] task_logs
-    #   A JSON blob that provides configuration to use for logging with
-    #   respect to the various Apache Airflow services: DagProcessingLogs,
-    #   SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
+    #   Publishes Airflow scheduler logs to CloudWatch Logs.
     #   @return [Types::ModuleLoggingConfigurationInput]
     #
     # @!attribute [rw] webserver_logs
-    #   A JSON blob that provides configuration to use for logging with
-    #   respect to the various Apache Airflow services: DagProcessingLogs,
-    #   SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
+    #   Publishes Airflow web server logs to CloudWatch Logs.
     #   @return [Types::ModuleLoggingConfigurationInput]
     #
     # @!attribute [rw] worker_logs
-    #   A JSON blob that provides configuration to use for logging with
-    #   respect to the various Apache Airflow services: DagProcessingLogs,
-    #   SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
+    #   Publishes Airflow worker logs to CloudWatch Logs.
+    #   @return [Types::ModuleLoggingConfigurationInput]
+    #
+    # @!attribute [rw] task_logs
+    #   Publishes Airflow task logs to CloudWatch Logs.
     #   @return [Types::ModuleLoggingConfigurationInput]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/LoggingConfigurationInput AWS API Documentation
@@ -776,121 +1081,99 @@ module Aws::MWAA
     class LoggingConfigurationInput < Struct.new(
       :dag_processing_logs,
       :scheduler_logs,
-      :task_logs,
       :webserver_logs,
-      :worker_logs)
+      :worker_logs,
+      :task_logs)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # Internal only API.
+    # **Internal only**. Collects Apache Airflow metrics. To learn more
+    # about the metrics published to Amazon CloudWatch, see [Amazon MWAA
+    # performance metrics in Amazon CloudWatch][1].
     #
-    # @note When making an API call, you may pass MetricDatum
-    #   data as a hash:
     #
-    #       {
-    #         dimensions: [
-    #           {
-    #             name: "String", # required
-    #             value: "String", # required
-    #           },
-    #         ],
-    #         metric_name: "String", # required
-    #         statistic_values: {
-    #           maximum: 1.0,
-    #           minimum: 1.0,
-    #           sample_count: 1,
-    #           sum: 1.0,
-    #         },
-    #         timestamp: Time.now, # required
-    #         unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #         value: 1.0,
-    #       }
     #
-    # @!attribute [rw] dimensions
-    #   Internal only API.
-    #   @return [Array<Types::Dimension>]
+    # [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/cw-metrics.html
     #
     # @!attribute [rw] metric_name
-    #   Internal only API.
+    #   **Internal only**. The name of the metric.
+    #   @return [String]
+    #
+    # @!attribute [rw] timestamp
+    #   **Internal only**. The time the metric data was received.
+    #   @return [Time]
+    #
+    # @!attribute [rw] dimensions
+    #   **Internal only**. The dimensions associated with the metric.
+    #   @return [Array<Types::Dimension>]
+    #
+    # @!attribute [rw] value
+    #   **Internal only**. The value for the metric.
+    #   @return [Float]
+    #
+    # @!attribute [rw] unit
+    #   **Internal only**. The unit used to store the metric.
     #   @return [String]
     #
     # @!attribute [rw] statistic_values
-    #   Internal only API.
+    #   **Internal only**. The statistical values for the metric.
     #   @return [Types::StatisticSet]
-    #
-    # @!attribute [rw] timestamp
-    #   Internal only API.
-    #   @return [Time]
-    #
-    # @!attribute [rw] unit
-    #   Unit
-    #   @return [String]
-    #
-    # @!attribute [rw] value
-    #   Internal only API.
-    #   @return [Float]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/MetricDatum AWS API Documentation
     #
     class MetricDatum < Struct.new(
-      :dimensions,
       :metric_name,
-      :statistic_values,
       :timestamp,
+      :dimensions,
+      :value,
       :unit,
-      :value)
+      :statistic_values)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # A JSON blob that provides configuration to use for logging with
-    # respect to the various Apache Airflow services: DagProcessingLogs,
-    # SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
-    #
-    # @!attribute [rw] cloud_watch_log_group_arn
-    #   Provides the ARN for the CloudWatch group where the logs will be
-    #   published.
-    #   @return [String]
+    # Describes the Apache Airflow log details for the log type (e.g.
+    # `DagProcessingLogs`).
     #
     # @!attribute [rw] enabled
-    #   Defines that the logging module is enabled.
+    #   Indicates whether the Apache Airflow log type (e.g.
+    #   `DagProcessingLogs`) is enabled.
     #   @return [Boolean]
     #
     # @!attribute [rw] log_level
-    #   Defines the log level, which can be CRITICAL, ERROR, WARNING, or
-    #   INFO.
+    #   The Apache Airflow log level for the log type (e.g.
+    #   `DagProcessingLogs`).
+    #   @return [String]
+    #
+    # @!attribute [rw] cloud_watch_log_group_arn
+    #   The Amazon Resource Name (ARN) for the CloudWatch Logs group where
+    #   the Apache Airflow log type (e.g. `DagProcessingLogs`) is published.
+    #   For example,
+    #   `arn:aws:logs:us-east-1:123456789012:log-group:airflow-MyMWAAEnvironment-MwaaEnvironment-DAGProcessing:*`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/ModuleLoggingConfiguration AWS API Documentation
     #
     class ModuleLoggingConfiguration < Struct.new(
-      :cloud_watch_log_group_arn,
       :enabled,
-      :log_level)
+      :log_level,
+      :cloud_watch_log_group_arn)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # A JSON blob that provides configuration to use for logging with
-    # respect to the various Apache Airflow services: DagProcessingLogs,
-    # SchedulerLogs, TaskLogs, WebserverLogs, and WorkerLogs.
-    #
-    # @note When making an API call, you may pass ModuleLoggingConfigurationInput
-    #   data as a hash:
-    #
-    #       {
-    #         enabled: false, # required
-    #         log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #       }
+    # Enables the Apache Airflow log type (e.g. `DagProcessingLogs`) and
+    # defines the log level to send to CloudWatch Logs (e.g. `INFO`).
     #
     # @!attribute [rw] enabled
-    #   Defines that the logging module is enabled.
+    #   Indicates whether to enable the Apache Airflow log type (e.g.
+    #   `DagProcessingLogs`).
     #   @return [Boolean]
     #
     # @!attribute [rw] log_level
-    #   Defines the log level, which can be CRITICAL, ERROR, WARNING, or
-    #   INFO.
+    #   Defines the Apache Airflow log level (e.g. `INFO`) to send to
+    #   CloudWatch Logs.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/ModuleLoggingConfigurationInput AWS API Documentation
@@ -902,70 +1185,54 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # Provide the security group and subnet IDs for the workers and
-    # scheduler.
+    # Describes the VPC networking components used to secure and enable
+    # network traffic between the Amazon Web Services resources for your
+    # environment. For more information, see [About networking on Amazon
+    # MWAA][1].
     #
-    # @note When making an API call, you may pass NetworkConfiguration
-    #   data as a hash:
     #
-    #       {
-    #         security_group_ids: ["SecurityGroupId"],
-    #         subnet_ids: ["SubnetId"],
-    #       }
     #
-    # @!attribute [rw] security_group_ids
-    #   A JSON list of 1 or more security groups IDs by name, in the same
-    #   VPC as the subnets.
-    #   @return [Array<String>]
+    # [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/networking-about.html
     #
     # @!attribute [rw] subnet_ids
-    #   Provide a JSON list of 2 subnet IDs by name. These must be private
-    #   subnets, in the same VPC, in two different availability zones.
+    #   A list of subnet IDs. For more information, see [About networking on
+    #   Amazon MWAA][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/networking-about.html
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] security_group_ids
+    #   A list of security group IDs. For more information, see [Security in
+    #   your VPC on Amazon MWAA][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/vpc-security.html
     #   @return [Array<String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/NetworkConfiguration AWS API Documentation
     #
     class NetworkConfiguration < Struct.new(
-      :security_group_ids,
-      :subnet_ids)
+      :subnet_ids,
+      :security_group_ids)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PublishMetricsInput
-    #   data as a hash:
-    #
-    #       {
-    #         environment_name: "EnvironmentName", # required
-    #         metric_data: [ # required
-    #           {
-    #             dimensions: [
-    #               {
-    #                 name: "String", # required
-    #                 value: "String", # required
-    #               },
-    #             ],
-    #             metric_name: "String", # required
-    #             statistic_values: {
-    #               maximum: 1.0,
-    #               minimum: 1.0,
-    #               sample_count: 1,
-    #               sum: 1.0,
-    #             },
-    #             timestamp: Time.now, # required
-    #             unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #             value: 1.0,
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] environment_name
-    #   Publishes environment metric data to Amazon CloudWatch.
+    #   **Internal only**. The name of the environment.
     #   @return [String]
     #
     # @!attribute [rw] metric_data
-    #   Publishes metric data points to Amazon CloudWatch. CloudWatch
-    #   associates the data points with the specified metrica.
+    #   **Internal only**. Publishes metrics to Amazon CloudWatch. To learn
+    #   more about the metrics published to Amazon CloudWatch, see [Amazon
+    #   MWAA performance metrics in Amazon CloudWatch][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/cw-metrics.html
     #   @return [Array<Types::MetricDatum>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/PublishMetricsInput AWS API Documentation
@@ -994,61 +1261,56 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # Internal only API.
+    # **Internal only**. Represents a set of statistics that describe a
+    # specific metric. To learn more about the metrics published to Amazon
+    # CloudWatch, see [Amazon MWAA performance metrics in Amazon
+    # CloudWatch][1].
     #
-    # @note When making an API call, you may pass StatisticSet
-    #   data as a hash:
     #
-    #       {
-    #         maximum: 1.0,
-    #         minimum: 1.0,
-    #         sample_count: 1,
-    #         sum: 1.0,
-    #       }
     #
-    # @!attribute [rw] maximum
-    #   Internal only API.
-    #   @return [Float]
-    #
-    # @!attribute [rw] minimum
-    #   Internal only API.
-    #   @return [Float]
+    # [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/cw-metrics.html
     #
     # @!attribute [rw] sample_count
-    #   Internal only API.
+    #   **Internal only**. The number of samples used for the statistic set.
     #   @return [Integer]
     #
     # @!attribute [rw] sum
-    #   Internal only API.
+    #   **Internal only**. The sum of values for the sample set.
+    #   @return [Float]
+    #
+    # @!attribute [rw] minimum
+    #   **Internal only**. The minimum value of the sample set.
+    #   @return [Float]
+    #
+    # @!attribute [rw] maximum
+    #   **Internal only**. The maximum value of the sample set.
     #   @return [Float]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/StatisticSet AWS API Documentation
     #
     class StatisticSet < Struct.new(
-      :maximum,
-      :minimum,
       :sample_count,
-      :sum)
+      :sum,
+      :minimum,
+      :maximum)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "EnvironmentArn", # required
-    #         tags: { # required
-    #           "TagKey" => "TagValue",
-    #         },
-    #       }
-    #
     # @!attribute [rw] resource_arn
-    #   The tag resource ARN of the MWAA environments.
+    #   The Amazon Resource Name (ARN) of the Amazon MWAA environment. For
+    #   example,
+    #   `arn:aws:airflow:us-east-1:123456789012:environment/MyMWAAEnvironment`.
     #   @return [String]
     #
     # @!attribute [rw] tags
-    #   The tag resource tag of the MWAA environments.
+    #   The key-value tag pairs you want to associate to your environment.
+    #   For example, `"Environment": "Staging"`. For more information, see
+    #   [Tagging Amazon Web Services resources][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html
     #   @return [Hash<String,String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/TagResourceInput AWS API Documentation
@@ -1064,20 +1326,15 @@ module Aws::MWAA
     #
     class TagResourceOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UntagResourceInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "EnvironmentArn", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
-    #   The tag resource ARN of the MWAA environments.
+    #   The Amazon Resource Name (ARN) of the Amazon MWAA environment. For
+    #   example,
+    #   `arn:aws:airflow:us-east-1:123456789012:environment/MyMWAAEnvironment`.
     #   @return [String]
     #
     # @!attribute [rw] tag_keys
-    #   The tag resource key of the MWAA environments.
+    #   The key-value tag pair you want to remove. For example,
+    #   `"Environment": "Staging"`.
     #   @return [Array<String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/UntagResourceInput AWS API Documentation
@@ -1093,147 +1350,276 @@ module Aws::MWAA
     #
     class UntagResourceOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UpdateEnvironmentInput
-    #   data as a hash:
-    #
-    #       {
-    #         airflow_configuration_options: {
-    #           "ConfigKey" => "ConfigValue",
-    #         },
-    #         airflow_version: "AirflowVersion",
-    #         dag_s3_path: "RelativePath",
-    #         environment_class: "EnvironmentClass",
-    #         execution_role_arn: "IamRoleArn",
-    #         logging_configuration: {
-    #           dag_processing_logs: {
-    #             enabled: false, # required
-    #             log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #           },
-    #           scheduler_logs: {
-    #             enabled: false, # required
-    #             log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #           },
-    #           task_logs: {
-    #             enabled: false, # required
-    #             log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #           },
-    #           webserver_logs: {
-    #             enabled: false, # required
-    #             log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #           },
-    #           worker_logs: {
-    #             enabled: false, # required
-    #             log_level: "CRITICAL", # required, accepts CRITICAL, ERROR, WARNING, INFO, DEBUG
-    #           },
-    #         },
-    #         max_workers: 1,
-    #         name: "EnvironmentName", # required
-    #         network_configuration: {
-    #           security_group_ids: ["SecurityGroupId"], # required
-    #         },
-    #         plugins_s3_object_version: "S3ObjectVersion",
-    #         plugins_s3_path: "RelativePath",
-    #         requirements_s3_object_version: "S3ObjectVersion",
-    #         requirements_s3_path: "RelativePath",
-    #         source_bucket_arn: "S3BucketArn",
-    #         webserver_access_mode: "PRIVATE_ONLY", # accepts PRIVATE_ONLY, PUBLIC_ONLY
-    #         weekly_maintenance_window_start: "WeeklyMaintenanceWindowStart",
-    #       }
-    #
-    # @!attribute [rw] airflow_configuration_options
-    #   The Airflow Configuration Options to update of your Amazon MWAA
-    #   environment.
-    #   @return [Hash<String,String>]
-    #
-    # @!attribute [rw] airflow_version
-    #   The Airflow Version to update of your Amazon MWAA environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] dag_s3_path
-    #   The Dags folder S3 Path to update of your Amazon MWAA environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] environment_class
-    #   The Environment Class to update of your Amazon MWAA environment.
+    # @!attribute [rw] name
+    #   The name of your Amazon MWAA environment. For example,
+    #   `MyMWAAEnvironment`.
     #   @return [String]
     #
     # @!attribute [rw] execution_role_arn
-    #   The Executio Role ARN to update of your Amazon MWAA environment.
+    #   The Amazon Resource Name (ARN) of the execution role in IAM that
+    #   allows MWAA to access Amazon Web Services resources in your
+    #   environment. For example,
+    #   `arn:aws:iam::123456789:role/my-execution-role`. For more
+    #   information, see [Amazon MWAA Execution role][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-create-role.html
     #   @return [String]
     #
-    # @!attribute [rw] logging_configuration
-    #   The Logging Configuration to update of your Amazon MWAA environment.
-    #   @return [Types::LoggingConfigurationInput]
+    # @!attribute [rw] airflow_version
+    #   The Apache Airflow version for your environment. To upgrade your
+    #   environment, specify a newer version of Apache Airflow supported by
+    #   Amazon MWAA.
     #
-    # @!attribute [rw] max_workers
-    #   The Maximum Workers to update of your Amazon MWAA environment.
-    #   @return [Integer]
+    #   Before you upgrade an environment, make sure your requirements,
+    #   DAGs, plugins, and other resources used in your workflows are
+    #   compatible with the new Apache Airflow version. For more information
+    #   about updating your resources, see [Upgrading an Amazon MWAA
+    #   environment][1].
     #
-    # @!attribute [rw] name
-    #   The name of your Amazon MWAA environment that you wish to update.
-    #   @return [String]
+    #   Valid values: `1.10.12`, `2.0.2`, `2.2.2`, `2.4.3`, `2.5.1`,
+    #   `2.6.3`, `2.7.2`, `2.8.1`.
     #
-    # @!attribute [rw] network_configuration
-    #   The Network Configuration to update of your Amazon MWAA environment.
-    #   @return [Types::UpdateNetworkConfigurationInput]
     #
-    # @!attribute [rw] plugins_s3_object_version
-    #   The Plugins.zip S3 Object Version to update of your Amazon MWAA
-    #   environment.
-    #   @return [String]
     #
-    # @!attribute [rw] plugins_s3_path
-    #   The Plugins.zip S3 Path to update of your Amazon MWAA environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] requirements_s3_object_version
-    #   The Requirements.txt S3 ObjectV ersion to update of your Amazon MWAA
-    #   environment.
-    #   @return [String]
-    #
-    # @!attribute [rw] requirements_s3_path
-    #   The Requirements.txt S3 Path to update of your Amazon MWAA
-    #   environment.
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/upgrading-environment.html
     #   @return [String]
     #
     # @!attribute [rw] source_bucket_arn
-    #   The S3 Source Bucket ARN to update of your Amazon MWAA environment.
+    #   The Amazon Resource Name (ARN) of the Amazon S3 bucket where your
+    #   DAG code and supporting files are stored. For example,
+    #   `arn:aws:s3:::my-airflow-bucket-unique-name`. For more information,
+    #   see [Create an Amazon S3 bucket for Amazon MWAA][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-s3-bucket.html
+    #   @return [String]
+    #
+    # @!attribute [rw] dag_s3_path
+    #   The relative path to the DAGs folder on your Amazon S3 bucket. For
+    #   example, `dags`. For more information, see [Adding or updating
+    #   DAGs][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-dag-folder.html
+    #   @return [String]
+    #
+    # @!attribute [rw] plugins_s3_path
+    #   The relative path to the `plugins.zip` file on your Amazon S3
+    #   bucket. For example, `plugins.zip`. If specified, then the
+    #   plugins.zip version is required. For more information, see
+    #   [Installing custom plugins][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-dag-import-plugins.html
+    #   @return [String]
+    #
+    # @!attribute [rw] plugins_s3_object_version
+    #   The version of the plugins.zip file on your Amazon S3 bucket. You
+    #   must specify a version each time a `plugins.zip` file is updated.
+    #   For more information, see [How S3 Versioning works][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html
+    #   @return [String]
+    #
+    # @!attribute [rw] requirements_s3_path
+    #   The relative path to the `requirements.txt` file on your Amazon S3
+    #   bucket. For example, `requirements.txt`. If specified, then a file
+    #   version is required. For more information, see [Installing Python
+    #   dependencies][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/working-dags-dependencies.html
+    #   @return [String]
+    #
+    # @!attribute [rw] requirements_s3_object_version
+    #   The version of the requirements.txt file on your Amazon S3 bucket.
+    #   You must specify a version each time a `requirements.txt` file is
+    #   updated. For more information, see [How S3 Versioning works][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html
+    #   @return [String]
+    #
+    # @!attribute [rw] startup_script_s3_path
+    #   The relative path to the startup shell script in your Amazon S3
+    #   bucket. For example, `s3://mwaa-environment/startup.sh`.
+    #
+    #   Amazon MWAA runs the script as your environment starts, and before
+    #   running the Apache Airflow process. You can use this script to
+    #   install dependencies, modify Apache Airflow configuration options,
+    #   and set environment variables. For more information, see [Using a
+    #   startup script][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/using-startup-script.html
+    #   @return [String]
+    #
+    # @!attribute [rw] startup_script_s3_object_version
+    #   The version of the startup shell script in your Amazon S3 bucket.
+    #   You must specify the [version ID][1] that Amazon S3 assigns to the
+    #   file every time you update the script.
+    #
+    #   Version IDs are Unicode, UTF-8 encoded, URL-ready, opaque strings
+    #   that are no more than 1,024 bytes long. The following is an example:
+    #
+    #   `3sL4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo`
+    #
+    #   For more information, see [Using a startup script][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html
+    #   [2]: https://docs.aws.amazon.com/mwaa/latest/userguide/using-startup-script.html
+    #   @return [String]
+    #
+    # @!attribute [rw] airflow_configuration_options
+    #   A list of key-value pairs containing the Apache Airflow
+    #   configuration options you want to attach to your environment. For
+    #   more information, see [Apache Airflow configuration options][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-env-variables.html
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] environment_class
+    #   The environment class type. Valid values: `mw1.small`, `mw1.medium`,
+    #   `mw1.large`, `mw1.xlarge`, and `mw1.2xlarge`. For more information,
+    #   see [Amazon MWAA environment class][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/environment-class.html
+    #   @return [String]
+    #
+    # @!attribute [rw] max_workers
+    #   The maximum number of workers that you want to run in your
+    #   environment. MWAA scales the number of Apache Airflow workers up to
+    #   the number you specify in the `MaxWorkers` field. For example, `20`.
+    #   When there are no more tasks running, and no more in the queue, MWAA
+    #   disposes of the extra workers leaving the one worker that is
+    #   included with your environment, or the number you specify in
+    #   `MinWorkers`.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] network_configuration
+    #   The VPC networking components used to secure and enable network
+    #   traffic between the Amazon Web Services resources for your
+    #   environment. For more information, see [About networking on Amazon
+    #   MWAA][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/networking-about.html
+    #   @return [Types::UpdateNetworkConfigurationInput]
+    #
+    # @!attribute [rw] logging_configuration
+    #   The Apache Airflow log types to send to CloudWatch Logs.
+    #   @return [Types::LoggingConfigurationInput]
+    #
+    # @!attribute [rw] weekly_maintenance_window_start
+    #   The day and time of the week in Coordinated Universal Time (UTC)
+    #   24-hour standard time to start weekly maintenance updates of your
+    #   environment in the following format: `DAY:HH:MM`. For example:
+    #   `TUE:03:30`. You can specify a start time in 30 minute increments
+    #   only.
     #   @return [String]
     #
     # @!attribute [rw] webserver_access_mode
-    #   The Webserver Access Mode to update of your Amazon MWAA environment.
+    #   The Apache Airflow *Web server* access mode. For more information,
+    #   see [Apache Airflow access modes][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/configuring-networking.html
     #   @return [String]
     #
-    # @!attribute [rw] weekly_maintenance_window_start
-    #   The Weekly Maintenance Window Start to update of your Amazon MWAA
+    # @!attribute [rw] min_workers
+    #   The minimum number of workers that you want to run in your
+    #   environment. MWAA scales the number of Apache Airflow workers up to
+    #   the number you specify in the `MaxWorkers` field. When there are no
+    #   more tasks running, and no more in the queue, MWAA disposes of the
+    #   extra workers leaving the worker count you specify in the
+    #   `MinWorkers` field. For example, `2`.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] schedulers
+    #   The number of Apache Airflow schedulers to run in your Amazon MWAA
     #   environment.
-    #   @return [String]
+    #   @return [Integer]
+    #
+    # @!attribute [rw] min_webservers
+    #   The minimum number of web servers that you want to run in your
+    #   environment. Amazon MWAA scales the number of Apache Airflow web
+    #   servers up to the number you specify for `MaxWebservers` when you
+    #   interact with your Apache Airflow environment using Apache Airflow
+    #   REST API, or the Apache Airflow CLI. As the transaction-per-second
+    #   rate, and the network load, decrease, Amazon MWAA disposes of the
+    #   additional web servers, and scales down to the number set in
+    #   `MinxWebserers`.
+    #
+    #   Valid values: Accepts between `2` and `5`. Defaults to `2`.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] max_webservers
+    #   The maximum number of web servers that you want to run in your
+    #   environment. Amazon MWAA scales the number of Apache Airflow web
+    #   servers up to the number you specify for `MaxWebservers` when you
+    #   interact with your Apache Airflow environment using Apache Airflow
+    #   REST API, or the Apache Airflow CLI. For example, in scenarios where
+    #   your workload requires network calls to the Apache Airflow REST API
+    #   with a high transaction-per-second (TPS) rate, Amazon MWAA will
+    #   increase the number of web servers up to the number set in
+    #   `MaxWebserers`. As TPS rates decrease Amazon MWAA disposes of the
+    #   additional web servers, and scales down to the number set in
+    #   `MinxWebserers`.
+    #
+    #   Valid values: Accepts between `2` and `5`. Defaults to `2`.
+    #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/UpdateEnvironmentInput AWS API Documentation
     #
     class UpdateEnvironmentInput < Struct.new(
-      :airflow_configuration_options,
-      :airflow_version,
-      :dag_s3_path,
-      :environment_class,
-      :execution_role_arn,
-      :logging_configuration,
-      :max_workers,
       :name,
-      :network_configuration,
-      :plugins_s3_object_version,
-      :plugins_s3_path,
-      :requirements_s3_object_version,
-      :requirements_s3_path,
+      :execution_role_arn,
+      :airflow_version,
       :source_bucket_arn,
+      :dag_s3_path,
+      :plugins_s3_path,
+      :plugins_s3_object_version,
+      :requirements_s3_path,
+      :requirements_s3_object_version,
+      :startup_script_s3_path,
+      :startup_script_s3_object_version,
+      :airflow_configuration_options,
+      :environment_class,
+      :max_workers,
+      :network_configuration,
+      :logging_configuration,
+      :weekly_maintenance_window_start,
       :webserver_access_mode,
-      :weekly_maintenance_window_start)
+      :min_workers,
+      :schedulers,
+      :min_webservers,
+      :max_webservers)
       SENSITIVE = [:airflow_configuration_options]
       include Aws::Structure
     end
 
     # @!attribute [rw] arn
-    #   The ARN to update of your Amazon MWAA environment.
+    #   The Amazon Resource Name (ARN) of the Amazon MWAA environment. For
+    #   example,
+    #   `arn:aws:airflow:us-east-1:123456789012:environment/MyMWAAEnvironment`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/UpdateEnvironmentOutput AWS API Documentation
@@ -1244,14 +1630,15 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # Error information of update, if applicable.
+    # Describes the error(s) encountered with the last update of the
+    # environment.
     #
     # @!attribute [rw] error_code
-    #   Error code of update.
+    #   The error code that corresponds to the error with the last update.
     #   @return [String]
     #
     # @!attribute [rw] error_message
-    #   Error message of update.
+    #   The error message that corresponds to the error code.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/UpdateError AWS API Documentation
@@ -1263,19 +1650,23 @@ module Aws::MWAA
       include Aws::Structure
     end
 
-    # Provide the security group and subnet IDs for the workers and
-    # scheduler.
+    # Defines the VPC networking components used to secure and enable
+    # network traffic between the Amazon Web Services resources for your
+    # environment. For more information, see [About networking on Amazon
+    # MWAA][1].
     #
-    # @note When making an API call, you may pass UpdateNetworkConfigurationInput
-    #   data as a hash:
     #
-    #       {
-    #         security_group_ids: ["SecurityGroupId"], # required
-    #       }
+    #
+    # [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/networking-about.html
     #
     # @!attribute [rw] security_group_ids
-    #   Provide a JSON list of 1 or more security groups IDs by name, in the
-    #   same VPC as the subnets.
+    #   A list of security group IDs. A security group must be attached to
+    #   the same VPC as the subnets. For more information, see [Security in
+    #   your VPC on Amazon MWAA][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/mwaa/latest/userguide/vpc-security.html
     #   @return [Array<String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mwaa-2020-07-01/UpdateNetworkConfigurationInput AWS API Documentation
@@ -1301,3 +1692,4 @@ module Aws::MWAA
 
   end
 end
+

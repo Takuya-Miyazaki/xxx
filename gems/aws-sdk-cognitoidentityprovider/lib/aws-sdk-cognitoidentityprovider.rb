@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-cognitoidentityprovider/types'
-require_relative 'aws-sdk-cognitoidentityprovider/client_api'
-require_relative 'aws-sdk-cognitoidentityprovider/client'
-require_relative 'aws-sdk-cognitoidentityprovider/errors'
-require_relative 'aws-sdk-cognitoidentityprovider/resource'
-require_relative 'aws-sdk-cognitoidentityprovider/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:cognitoidentityprovider)
 
 # This module provides support for Amazon Cognito Identity Provider. This module is available in the
 # `aws-sdk-cognitoidentityprovider` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-cognitoidentityprovider/customizations'
 #
 # @!group service
 module Aws::CognitoIdentityProvider
+  autoload :Types, 'aws-sdk-cognitoidentityprovider/types'
+  autoload :ClientApi, 'aws-sdk-cognitoidentityprovider/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-cognitoidentityprovider/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-cognitoidentityprovider/client'
+  autoload :Errors, 'aws-sdk-cognitoidentityprovider/errors'
+  autoload :Resource, 'aws-sdk-cognitoidentityprovider/resource'
+  autoload :EndpointParameters, 'aws-sdk-cognitoidentityprovider/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-cognitoidentityprovider/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-cognitoidentityprovider/endpoints'
 
-  GEM_VERSION = '1.48.0'
+  GEM_VERSION = '1.107.0'
 
 end
+
+require_relative 'aws-sdk-cognitoidentityprovider/customizations'

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -27,13 +27,16 @@ module Aws::CostExplorer
   # See {Seahorse::Client::RequestContext} for more information.
   #
   # ## Error Classes
+  # * {BackfillLimitExceededException}
   # * {BillExpirationException}
   # * {DataUnavailableException}
+  # * {GenerationExistsException}
   # * {InvalidNextTokenException}
   # * {LimitExceededException}
   # * {RequestChangedException}
   # * {ResourceNotFoundException}
   # * {ServiceQuotaExceededException}
+  # * {TooManyTagsException}
   # * {UnknownMonitorException}
   # * {UnknownSubscriptionException}
   # * {UnresolvableUsageUnitException}
@@ -43,6 +46,21 @@ module Aws::CostExplorer
   module Errors
 
     extend Aws::Errors::DynamicErrors
+
+    class BackfillLimitExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CostExplorer::Types::BackfillLimitExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
 
     class BillExpirationException < ServiceError
 
@@ -64,6 +82,21 @@ module Aws::CostExplorer
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CostExplorer::Types::DataUnavailableException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class GenerationExistsException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CostExplorer::Types::GenerationExistsException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -132,6 +165,11 @@ module Aws::CostExplorer
       def message
         @message || @data[:message]
       end
+
+      # @return [String]
+      def resource_name
+        @data[:resource_name]
+      end
     end
 
     class ServiceQuotaExceededException < ServiceError
@@ -146,6 +184,26 @@ module Aws::CostExplorer
       # @return [String]
       def message
         @message || @data[:message]
+      end
+    end
+
+    class TooManyTagsException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CostExplorer::Types::TooManyTagsException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+
+      # @return [String]
+      def resource_name
+        @data[:resource_name]
       end
     end
 

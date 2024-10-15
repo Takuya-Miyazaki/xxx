@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:resourcegroupstaggingapi)
 
 module Aws::ResourceGroupsTaggingAPI
   # An API client for ResourceGroupsTaggingAPI.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::ResourceGroupsTaggingAPI
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::ResourceGroupsTaggingAPI::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::ResourceGroupsTaggingAPI
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::ResourceGroupsTaggingAPI
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::ResourceGroupsTaggingAPI
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::ResourceGroupsTaggingAPI
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::ResourceGroupsTaggingAPI
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::ResourceGroupsTaggingAPI
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +341,112 @@ module Aws::ResourceGroupsTaggingAPI
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::ResourceGroupsTaggingAPI::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::ResourceGroupsTaggingAPI::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -339,7 +456,7 @@ module Aws::ResourceGroupsTaggingAPI
 
     # Describes the status of the `StartReportCreation` operation.
     #
-    # You can call this operation only from the organization's master
+    # You can call this operation only from the organization's management
     # account and from the us-east-1 Region.
     #
     # @return [Types::DescribeReportCreationOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -367,72 +484,86 @@ module Aws::ResourceGroupsTaggingAPI
     # with their tag policies.
     #
     # For more information on tag policies, see [Tag Policies][1] in the
-    # *AWS Organizations User Guide.*
+    # *Organizations User Guide.*
     #
-    # You can call this operation only from the organization's master
+    # You can call this operation only from the organization's management
     # account and from the us-east-1 Region.
     #
+    # This operation supports pagination, where the response can be sent in
+    # multiple pages. You should check the `PaginationToken` response
+    # parameter to determine if there are additional results available to
+    # return. Repeat the query, passing the `PaginationToken` response
+    # parameter value as an input to the next request until you recieve a
+    # `null` value. A null value for `PaginationToken` indicates that there
+    # are no more results waiting to be returned.
     #
     #
-    # [1]: http://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_tag-policies.html
+    #
+    # [1]: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_tag-policies.html
     #
     # @option params [Array<String>] :target_id_filters
-    #   The target identifiers (usually, specific account IDs) to limit the
-    #   output by. If you use this parameter, the count of returned
+    #   Specifies target identifiers (usually, specific account IDs) to limit
+    #   the output by. If you use this parameter, the count of returned
     #   noncompliant resources includes only resources with the specified
     #   target IDs.
     #
     # @option params [Array<String>] :region_filters
-    #   A list of Regions to limit the output by. If you use this parameter,
-    #   the count of returned noncompliant resources includes only resources
-    #   in the specified Regions.
+    #   Specifies a list of Amazon Web Services Regions to limit the output
+    #   to. If you use this parameter, the count of returned noncompliant
+    #   resources includes only resources in the specified Regions.
     #
     # @option params [Array<String>] :resource_type_filters
-    #   The constraints on the resources that you want returned. The format of
-    #   each resource type is `service[:resourceType]`. For example,
-    #   specifying a resource type of `ec2` returns all Amazon EC2 resources
-    #   (which includes EC2 instances). Specifying a resource type of
-    #   `ec2:instance` returns only EC2 instances.
+    #   Specifies that you want the response to include information for only
+    #   resources of the specified types. The format of each resource type is
+    #   `service[:resourceType]`. For example, specifying a resource type of
+    #   `ec2` returns all Amazon EC2 resources (which includes EC2 instances).
+    #   Specifying a resource type of `ec2:instance` returns only EC2
+    #   instances.
     #
     #   The string for each service name and resource type is the same as that
-    #   embedded in a resource's Amazon Resource Name (ARN). Consult the *AWS
-    #   General Reference* for the following:
+    #   embedded in a resource's Amazon Resource Name (ARN). Consult the <i>
+    #   <a href="https://docs.aws.amazon.com/general/latest/gr/">Amazon Web
+    #   Services General Reference</a> </i> for the following:
     #
-    #   * For a list of service name strings, see [AWS Service Namespaces][1].
+    #   * For a list of service name strings, see [Amazon Web Services Service
+    #     Namespaces][1].
     #
     #   * For resource type strings, see [Example ARNs][2].
     #
     #   * For more information about ARNs, see [Amazon Resource Names (ARNs)
-    #     and AWS Service Namespaces][3].
+    #     and Amazon Web Services Service Namespaces][3].
     #
-    #   You can specify multiple resource types by using an array. The array
-    #   can include up to 100 items. Note that the length constraint
-    #   requirement applies to each resource type filter.
+    #   You can specify multiple resource types by using a comma separated
+    #   array. The array can include up to 100 items. Note that the length
+    #   constraint requirement applies to each resource type filter.
     #
     #
     #
-    #   [1]: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
-    #   [2]: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arns-syntax
-    #   [3]: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
+    #   [1]: https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
+    #   [2]: https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arns-syntax
+    #   [3]: https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
     #
     # @option params [Array<String>] :tag_key_filters
-    #   A list of tag keys to limit the output by. If you use this parameter,
-    #   the count of returned noncompliant resources includes only resources
-    #   that have the specified tag keys.
+    #   Specifies that you want the response to include information for only
+    #   resources that have tags with the specified tag keys. If you use this
+    #   parameter, the count of returned noncompliant resources includes only
+    #   resources that have the specified tag keys.
     #
     # @option params [Array<String>] :group_by
-    #   A list of attributes to group the counts of noncompliant resources by.
-    #   If supplied, the counts are sorted by those attributes.
+    #   Specifies a list of attributes to group the counts of noncompliant
+    #   resources by. If supplied, the counts are sorted by those attributes.
     #
     # @option params [Integer] :max_results
-    #   A limit that restricts the number of results that are returned per
-    #   page.
+    #   Specifies the maximum number of results to be returned in each page. A
+    #   query can return fewer than this maximum, even if there are more
+    #   results still to return. You should always check the `PaginationToken`
+    #   response value to see if there are more results. You can specify a
+    #   minimum of 1 and a maximum value of 100.
     #
     # @option params [String] :pagination_token
-    #   A string that indicates that additional data is available. Leave this
-    #   value empty for your initial request. If the response includes a
-    #   `PaginationToken`, use that string for this value to request an
-    #   additional page of data.
+    #   Specifies a `PaginationToken` response value from a previous request
+    #   to indicate that you want the next page of results. Leave this
+    #   parameter empty in your initial request.
     #
     # @return [Types::GetComplianceSummaryOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -474,7 +605,7 @@ module Aws::ResourceGroupsTaggingAPI
     end
 
     # Returns all the tagged or previously tagged resources that are located
-    # in the specified Region for the AWS account.
+    # in the specified Amazon Web Services Region for the account.
     #
     # Depending on what information you want returned, you can also specify
     # the following:
@@ -485,79 +616,80 @@ module Aws::ResourceGroupsTaggingAPI
     #
     # * Information about compliance with the account's effective tag
     #   policy. For more information on tag policies, see [Tag Policies][1]
-    #   in the *AWS Organizations User Guide.*
+    #   in the *Organizations User Guide.*
     #
-    # <note markdown="1"> You can check the `PaginationToken` response parameter to determine if
-    # a query is complete. Queries occasionally return fewer results on a
-    # page than allowed. The `PaginationToken` response parameter value is
-    # `null` *only* when there are no more results to display.
+    # This operation supports pagination, where the response can be sent in
+    # multiple pages. You should check the `PaginationToken` response
+    # parameter to determine if there are additional results available to
+    # return. Repeat the query, passing the `PaginationToken` response
+    # parameter value as an input to the next request until you recieve a
+    # `null` value. A null value for `PaginationToken` indicates that there
+    # are no more results waiting to be returned.
     #
-    #  </note>
     #
     #
-    #
-    # [1]: http://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_tag-policies.html
+    # [1]: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_tag-policies.html
     #
     # @option params [String] :pagination_token
-    #   A string that indicates that additional data is available. Leave this
-    #   value empty for your initial request. If the response includes a
-    #   `PaginationToken`, use that string for this value to request an
-    #   additional page of data.
+    #   Specifies a `PaginationToken` response value from a previous request
+    #   to indicate that you want the next page of results. Leave this
+    #   parameter empty in your initial request.
     #
     # @option params [Array<Types::TagFilter>] :tag_filters
-    #   A list of TagFilters (keys and values). Each TagFilter specified must
-    #   contain a key with values as optional. A request can include up to 50
-    #   keys, and each key can include up to 20 values.
+    #   Specifies a list of TagFilters (keys and values) to restrict the
+    #   output to only those resources that have tags with the specified keys
+    #   and, if included, the specified values. Each `TagFilter` must contain
+    #   a key with values optional. A request can include up to 50 keys, and
+    #   each key can include up to 20 values.
     #
     #   Note the following when deciding how to use TagFilters:
     #
-    #   * If you *do* specify a TagFilter, the response returns only those
-    #     resources that are currently associated with the specified tag.
-    #
-    #   * If you *don't* specify a TagFilter, the response includes all
-    #     resources that were ever associated with tags. Resources that
-    #     currently don't have associated tags are shown with an empty tag
-    #     set, like this: `"Tags": []`.
+    #   * If you *don't* specify a `TagFilter`, the response includes all
+    #     resources that are currently tagged or ever had a tag. Resources
+    #     that currently don't have tags are shown with an empty tag set,
+    #     like this: `"Tags": []`.
     #
     #   * If you specify more than one filter in a single request, the
-    #     response returns only those resources that satisfy all specified
-    #     filters.
+    #     response returns only those resources that satisfy all filters.
     #
     #   * If you specify a filter that contains more than one value for a key,
-    #     the response returns resources that match any of the specified
+    #     the response returns resources that match *any* of the specified
     #     values for that key.
     #
-    #   * If you don't specify any values for a key, the response returns
-    #     resources that are tagged with that key irrespective of the value.
+    #   * If you don't specify a value for a key, the response returns all
+    #     resources that are tagged with that key, with any or no value.
     #
-    #     For example, for filters: filter1 = \\\{key1, \\\{value1\\}\\},
-    #     filter2 = \\\{key2, \\\{value2,value3,value4\\}\\} , filter3 =
-    #     \\\{key3\\}:
+    #     For example, for the following filters: `filter1=
+    #     \{keyA,\{value1\}\}`, `filter2=\{keyB,\{value2,value3,value4\}\}`,
+    #     `filter3= \{keyC\}`:
     #
-    #     * GetResources( \\\{filter1\\} ) returns resources tagged with
-    #       key1=value1
+    #     * `GetResources(\{filter1\})` returns resources tagged with
+    #       `key1=value1`
     #
-    #     * GetResources( \\\{filter2\\} ) returns resources tagged with
-    #       key2=value2 or key2=value3 or key2=value4
+    #     * `GetResources(\{filter2\})` returns resources tagged with
+    #       `key2=value2` or `key2=value3` or `key2=value4`
     #
-    #     * GetResources( \\\{filter3\\} ) returns resources tagged with any
-    #       tag containing key3 as its tag key, irrespective of its value
+    #     * `GetResources(\{filter3\})` returns resources tagged with any tag
+    #       with the key `key3`, and with any or no value
     #
-    #     * GetResources( \\\{filter1,filter2,filter3\\} ) returns resources
-    #       tagged with ( key1=value1) and ( key2=value2 or key2=value3 or
-    #       key2=value4) and (key3, irrespective of the value)
+    #     * `GetResources(\{filter1,filter2,filter3\})` returns resources
+    #       tagged with `(key1=value1) and (key2=value2 or key2=value3 or
+    #       key2=value4) and (key3, any or no value)`
     #
     # @option params [Integer] :resources_per_page
-    #   A limit that restricts the number of resources returned by
-    #   GetResources in paginated output. You can set ResourcesPerPage to a
-    #   minimum of 1 item and the maximum of 100 items.
+    #   Specifies the maximum number of results to be returned in each page. A
+    #   query can return fewer than this maximum, even if there are more
+    #   results still to return. You should always check the `PaginationToken`
+    #   response value to see if there are more results. You can specify a
+    #   minimum of 1 and a maximum value of 100.
     #
     # @option params [Integer] :tags_per_page
-    #   AWS recommends using `ResourcesPerPage` instead of this parameter.
+    #   Amazon Web Services recommends using `ResourcesPerPage` instead of
+    #   this parameter.
     #
     #   A limit that restricts the number of tags (key and value pairs)
-    #   returned by GetResources in paginated output. A resource with no tags
-    #   is counted as having one tag (one key and value pair).
+    #   returned by `GetResources` in paginated output. A resource with no
+    #   tags is counted as having one tag (one key and value pair).
     #
     #   `GetResources` does not split a resource and its associated tags
     #   across pages. If the specified `TagsPerPage` would cause such a break,
@@ -570,36 +702,32 @@ module Aws::ResourceGroupsTaggingAPI
     #   second page displays the next 10 resources, each with its 10 tags. The
     #   third page displays the remaining 2 resources, each with its 10 tags.
     #
-    #   You can set `TagsPerPage` to a minimum of 100 items and the maximum of
+    #   You can set `TagsPerPage` to a minimum of 100 items up to a maximum of
     #   500 items.
     #
     # @option params [Array<String>] :resource_type_filters
-    #   The constraints on the resources that you want returned. The format of
-    #   each resource type is `service[:resourceType]`. For example,
-    #   specifying a resource type of `ec2` returns all Amazon EC2 resources
-    #   (which includes EC2 instances). Specifying a resource type of
-    #   `ec2:instance` returns only EC2 instances.
+    #   Specifies the resource types that you want included in the response.
+    #   The format of each resource type is `service[:resourceType]`. For
+    #   example, specifying a resource type of `ec2` returns all Amazon EC2
+    #   resources (which includes EC2 instances). Specifying a resource type
+    #   of `ec2:instance` returns only EC2 instances.
     #
     #   The string for each service name and resource type is the same as that
-    #   embedded in a resource's Amazon Resource Name (ARN). Consult the *AWS
-    #   General Reference* for the following:
-    #
-    #   * For a list of service name strings, see [AWS Service Namespaces][1].
-    #
-    #   * For resource type strings, see [Example ARNs][2].
-    #
-    #   * For more information about ARNs, see [Amazon Resource Names (ARNs)
-    #     and AWS Service Namespaces][3].
+    #   embedded in a resource's Amazon Resource Name (ARN). For the list of
+    #   services whose resources you can use in this parameter, see [Services
+    #   that support the Resource Groups Tagging API][1].
     #
     #   You can specify multiple resource types by using an array. The array
     #   can include up to 100 items. Note that the length constraint
-    #   requirement applies to each resource type filter.
+    #   requirement applies to each resource type filter. For example, the
+    #   following string would limit the response to only Amazon EC2
+    #   instances, Amazon S3 buckets, or any Audit Manager resource:
+    #
+    #   `ec2:instance,s3:bucket,auditmanager`
     #
     #
     #
-    #   [1]: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
-    #   [2]: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arns-syntax
-    #   [3]: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
+    #   [1]: https://docs.aws.amazon.com/resourcegroupstagging/latest/APIReference/supported-services.html
     #
     # @option params [Boolean] :include_compliance_details
     #   Specifies whether to include details regarding the compliance with the
@@ -613,6 +741,24 @@ module Aws::ResourceGroupsTaggingAPI
     #
     #   You can use this parameter only if the `IncludeComplianceDetails`
     #   parameter is also set to `true`.
+    #
+    # @option params [Array<String>] :resource_arn_list
+    #   Specifies a list of ARNs of resources for which you want to retrieve
+    #   tag data. You can't specify both this parameter and any of the
+    #   pagination parameters (`ResourcesPerPage`, `TagsPerPage`,
+    #   `PaginationToken`) in the same request. If you specify both, you get
+    #   an `Invalid Parameter` exception.
+    #
+    #   If a resource specified by this parameter doesn't exist, it doesn't
+    #   generate an error; it simply isn't included in the response.
+    #
+    #   An ARN (Amazon Resource Name) uniquely identifies a resource. For more
+    #   information, see [Amazon Resource Names (ARNs) and Amazon Web Services
+    #   Service Namespaces][1] in the *Amazon Web Services General Reference*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
     #
     # @return [Types::GetResourcesOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -636,6 +782,7 @@ module Aws::ResourceGroupsTaggingAPI
     #     resource_type_filters: ["AmazonResourceType"],
     #     include_compliance_details: false,
     #     exclude_compliant_resources: false,
+    #     resource_arn_list: ["ResourceARN"],
     #   })
     #
     # @example Response structure
@@ -661,13 +808,21 @@ module Aws::ResourceGroupsTaggingAPI
       req.send_request(options)
     end
 
-    # Returns all tag keys in the specified Region for the AWS account.
+    # Returns all tag keys currently in use in the specified Amazon Web
+    # Services Region for the calling account.
+    #
+    # This operation supports pagination, where the response can be sent in
+    # multiple pages. You should check the `PaginationToken` response
+    # parameter to determine if there are additional results available to
+    # return. Repeat the query, passing the `PaginationToken` response
+    # parameter value as an input to the next request until you recieve a
+    # `null` value. A null value for `PaginationToken` indicates that there
+    # are no more results waiting to be returned.
     #
     # @option params [String] :pagination_token
-    #   A string that indicates that additional data is available. Leave this
-    #   value empty for your initial request. If the response includes a
-    #   `PaginationToken`, use that string for this value to request an
-    #   additional page of data.
+    #   Specifies a `PaginationToken` response value from a previous request
+    #   to indicate that you want the next page of results. Leave this
+    #   parameter empty in your initial request.
     #
     # @return [Types::GetTagKeysOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -697,18 +852,26 @@ module Aws::ResourceGroupsTaggingAPI
       req.send_request(options)
     end
 
-    # Returns all tag values for the specified key in the specified Region
-    # for the AWS account.
+    # Returns all tag values for the specified key that are used in the
+    # specified Amazon Web Services Region for the calling account.
+    #
+    # This operation supports pagination, where the response can be sent in
+    # multiple pages. You should check the `PaginationToken` response
+    # parameter to determine if there are additional results available to
+    # return. Repeat the query, passing the `PaginationToken` response
+    # parameter value as an input to the next request until you recieve a
+    # `null` value. A null value for `PaginationToken` indicates that there
+    # are no more results waiting to be returned.
     #
     # @option params [String] :pagination_token
-    #   A string that indicates that additional data is available. Leave this
-    #   value empty for your initial request. If the response includes a
-    #   `PaginationToken`, use that string for this value to request an
-    #   additional page of data.
+    #   Specifies a `PaginationToken` response value from a previous request
+    #   to indicate that you want the next page of results. Leave this
+    #   parameter empty in your initial request.
     #
     # @option params [required, String] :key
-    #   The key for which you want to list all existing values in the
-    #   specified Region for the AWS account.
+    #   Specifies the tag key for which you want to list all existing values
+    #   that are currently used in the specified Amazon Web Services Region
+    #   for the calling account.
     #
     # @return [Types::GetTagValuesOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -739,15 +902,16 @@ module Aws::ResourceGroupsTaggingAPI
       req.send_request(options)
     end
 
-    # Generates a report that lists all tagged resources in accounts across
-    # your organization and tells whether each resource is compliant with
-    # the effective tag policy. Compliance data is refreshed daily.
+    # Generates a report that lists all tagged resources in the accounts
+    # across your organization and tells whether each resource is compliant
+    # with the effective tag policy. Compliance data is refreshed daily. The
+    # report is generated asynchronously.
     #
     # The generated report is saved to the following location:
     #
     # `s3://example-bucket/AwsTagPolicies/o-exampleorgid/YYYY-MM-ddTHH:mm:ssZ/report.csv`
     #
-    # You can call this operation only from the organization's master
+    # You can call this operation only from the organization's management
     # account and from the us-east-1 Region.
     #
     # @option params [required, String] :s3_bucket
@@ -779,41 +943,62 @@ module Aws::ResourceGroupsTaggingAPI
     # Applies one or more tags to the specified resources. Note the
     # following:
     #
-    # * Not all resources can have tags. For a list of services that support
-    #   tagging, see [this list][1].
+    # * Not all resources can have tags. For a list of services with
+    #   resources that support tagging using this operation, see [Services
+    #   that support the Resource Groups Tagging API][1]. If the resource
+    #   doesn't yet support this operation, the resource's service might
+    #   support tagging using its own API operations. For more information,
+    #   refer to the documentation for that service.
     #
     # * Each resource can have up to 50 tags. For other limits, see [Tag
-    #   Naming and Usage Conventions][2] in the *AWS General Reference.*
+    #   Naming and Usage Conventions][2] in the *Amazon Web Services General
+    #   Reference.*
     #
-    # * You can only tag resources that are located in the specified Region
-    #   for the AWS account.
+    # * You can only tag resources that are located in the specified Amazon
+    #   Web Services Region for the Amazon Web Services account.
     #
     # * To add tags to a resource, you need the necessary permissions for
     #   the service that the resource belongs to as well as permissions for
-    #   adding tags. For more information, see [this list][1].
+    #   adding tags. For more information, see the documentation for each
+    #   service.
     #
     # Do not store personally identifiable information (PII) or other
     # confidential or sensitive information in tags. We use tags to provide
     # you with billing and administration services. Tags are not intended to
     # be used for private or sensitive data.
     #
+    # **Minimum permissions**
+    #
+    # In addition to the `tag:TagResources` permission required by this
+    # operation, you must also have the tagging permission defined by the
+    # service that created the resource. For example, to tag an Amazon EC2
+    # instance using the `TagResources` operation, you must have both of the
+    # following permissions:
+    #
+    # * `tag:TagResource`
+    #
+    # * `ec2:CreateTags`
     #
     #
-    # [1]: http://docs.aws.amazon.com/resourcegroupstagging/latest/APIReference/Welcome.html
-    # [2]: http://docs.aws.amazon.com/general/latest/gr/aws_tagging.html#tag-conventions
+    #
+    # [1]: https://docs.aws.amazon.com/resourcegroupstagging/latest/APIReference/supported-services.html
+    # [2]: https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html#tag-conventions
     #
     # @option params [required, Array<String>] :resource_arn_list
-    #   A list of ARNs. An ARN (Amazon Resource Name) uniquely identifies a
-    #   resource. For more information, see [Amazon Resource Names (ARNs) and
-    #   AWS Service Namespaces][1] in the *AWS General Reference*.
+    #   Specifies the list of ARNs of the resources that you want to apply
+    #   tags to.
+    #
+    #   An ARN (Amazon Resource Name) uniquely identifies a resource. For more
+    #   information, see [Amazon Resource Names (ARNs) and Amazon Web Services
+    #   Service Namespaces][1] in the *Amazon Web Services General Reference*.
     #
     #
     #
-    #   [1]: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
+    #   [1]: https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
     #
     # @option params [required, Hash<String,String>] :tags
-    #   The tags that you want to add to the specified resources. A tag
-    #   consists of a key and a value that you define.
+    #   Specifies a list of tags that you want to add to the specified
+    #   resources. A tag consists of a key and a value that you define.
     #
     # @return [Types::TagResourcesOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -851,27 +1036,39 @@ module Aws::ResourceGroupsTaggingAPI
     #
     # * To remove tags from a resource, you need the necessary permissions
     #   for the service that the resource belongs to as well as permissions
-    #   for removing tags. For more information, see [this list][1].
+    #   for removing tags. For more information, see the documentation for
+    #   the service whose resource you want to untag.
     #
-    # * You can only tag resources that are located in the specified Region
-    #   for the AWS account.
+    # * You can only tag resources that are located in the specified Amazon
+    #   Web Services Region for the calling Amazon Web Services account.
     #
+    # **Minimum permissions**
     #
+    # In addition to the `tag:UntagResources` permission required by this
+    # operation, you must also have the remove tags permission defined by
+    # the service that created the resource. For example, to remove the tags
+    # from an Amazon EC2 instance using the `UntagResources` operation, you
+    # must have both of the following permissions:
     #
-    # [1]: http://docs.aws.amazon.com/resourcegroupstagging/latest/APIReference/Welcome.html
+    # * `tag:UntagResource`
+    #
+    # * `ec2:DeleteTags`
     #
     # @option params [required, Array<String>] :resource_arn_list
-    #   A list of ARNs. An ARN (Amazon Resource Name) uniquely identifies a
-    #   resource. For more information, see [Amazon Resource Names (ARNs) and
-    #   AWS Service Namespaces][1] in the *AWS General Reference*.
+    #   Specifies a list of ARNs of the resources that you want to remove tags
+    #   from.
+    #
+    #   An ARN (Amazon Resource Name) uniquely identifies a resource. For more
+    #   information, see [Amazon Resource Names (ARNs) and Amazon Web Services
+    #   Service Namespaces][1] in the *Amazon Web Services General Reference*.
     #
     #
     #
-    #   [1]: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
+    #   [1]: https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
     #
     # @option params [required, Array<String>] :tag_keys
-    #   A list of the tag keys that you want to remove from the specified
-    #   resources.
+    #   Specifies a list of tag keys that you want to remove from the
+    #   specified resources.
     #
     # @return [Types::UntagResourcesOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -906,14 +1103,19 @@ module Aws::ResourceGroupsTaggingAPI
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::ResourceGroupsTaggingAPI')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-resourcegroupstaggingapi'
-      context[:gem_version] = '1.34.0'
+      context[:gem_version] = '1.72.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

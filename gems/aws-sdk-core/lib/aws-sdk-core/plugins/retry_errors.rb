@@ -73,6 +73,7 @@ is only used in the `legacy` retry mode.
         :retry_jitter,
         default: :none,
         doc_type: Symbol,
+        rbs_type: '(:none | :equal | :full | ^(Integer) -> Integer)',
         docstring: <<-DOCS)
 A delay randomiser function used by the default backoff function.
 Some predefined functions can be referenced by name - :none, :equal, :full,
@@ -97,6 +98,7 @@ This option is only used in the `legacy` retry mode.
         :retry_mode,
         default: 'legacy',
         doc_type: String,
+        rbs_type: '("legacy" | "standard" | "adaptive")',
         docstring: <<-DOCS) do |cfg|
 Specifies which retry algorithm to use. Values are:
 
@@ -111,7 +113,6 @@ Specifies which retry algorithm to use. Values are:
   functionality of `standard` mode along with automatic client side
   throttling.  This is a provisional mode that may change behavior
   in the future.
-
         DOCS
         resolve_retry_mode(cfg)
       end
@@ -163,9 +164,15 @@ a clock skew correction and retry requests with skewed client clocks.
       option(:clock_skew) { Retries::ClockSkew.new }
 
       def self.resolve_retry_mode(cfg)
-        value = ENV['AWS_RETRY_MODE'] ||
-                Aws.shared_config.retry_mode(profile: cfg.profile) ||
-                'legacy'
+        default_mode_value =
+          if cfg.respond_to?(:defaults_mode_config_resolver)
+            cfg.defaults_mode_config_resolver.resolve(:retry_mode)
+          end
+
+          value = ENV['AWS_RETRY_MODE'] ||
+                  Aws.shared_config.retry_mode(profile: cfg.profile) ||
+                  default_mode_value ||
+                  'legacy'
         # Raise if provided value is not one of the retry modes
         if value != 'legacy' && value != 'standard' && value != 'adaptive'
           raise ArgumentError,
@@ -227,7 +234,7 @@ a clock skew correction and retry requests with skewed client clocks.
 
           get_send_token(config)
           add_retry_headers(context)
-          response = @handler.call(context)
+          response = with_metric(config.retry_mode) { @handler.call(context) }
           error_inspector = Retries::ErrorInspector.new(
             response.error, response.context.http_response.status_code
           )
@@ -263,6 +270,10 @@ a clock skew correction and retry requests with skewed client clocks.
         end
 
         private
+
+        def with_metric(retry_mode, &block)
+          Aws::Plugins::UserAgent.metric("RETRY_MODE_#{retry_mode.upcase}", &block)
+        end
 
         def get_send_token(config)
           # either fail fast or block until a token becomes available
@@ -307,10 +318,15 @@ a clock skew correction and retry requests with skewed client clocks.
 
         def retry_request(context, error)
           context.retries += 1
-          context.config.credentials.refresh! if error.expired_credentials?
+          context.config.credentials.refresh! if refresh_credentials?(context, error)
           context.http_request.body.rewind
           context.http_response.reset
           call(context)
+        end
+
+        def refresh_credentials?(context, error)
+          error.expired_credentials? &&
+            context.config.credentials.respond_to?(:refresh!)
         end
 
         def add_retry_headers(context)
@@ -346,7 +362,7 @@ a clock skew correction and retry requests with skewed client clocks.
       class LegacyHandler < Seahorse::Client::Handler
 
         def call(context)
-          response = @handler.call(context)
+          response = with_metric { @handler.call(context) }
           if response.error
             error_inspector = Retries::ErrorInspector.new(
               response.error, response.context.http_response.status_code
@@ -365,6 +381,10 @@ a clock skew correction and retry requests with skewed client clocks.
 
         private
 
+        def with_metric(&block)
+          Aws::Plugins::UserAgent.metric('RETRY_MODE_LEGACY', &block)
+        end
+
         def retry_if_possible(response, error_inspector)
           context = response.context
           if should_retry?(context, error_inspector)
@@ -377,7 +397,7 @@ a clock skew correction and retry requests with skewed client clocks.
         def retry_request(context, error)
           delay_retry(context)
           context.retries += 1
-          context.config.credentials.refresh! if error.expired_credentials?
+          context.config.credentials.refresh! if refresh_credentials?(context, error)
           context.http_request.body.rewind
           context.http_response.reset
           call(context)
@@ -391,6 +411,11 @@ a clock skew correction and retry requests with skewed client clocks.
           error.retryable?(context) &&
             context.retries < retry_limit(context) &&
             response_truncatable?(context)
+        end
+
+        def refresh_credentials?(context, error)
+          error.expired_credentials? &&
+            context.config.credentials.respond_to?(:refresh!)
         end
 
         def retry_limit(context)

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -25,13 +25,6 @@ module Aws::AugmentedAIRuntime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteHumanLoopRequest
-    #   data as a hash:
-    #
-    #       {
-    #         human_loop_name: "HumanLoopName", # required
-    #       }
-    #
     # @!attribute [rw] human_loop_name
     #   The name of the human loop that you want to delete.
     #   @return [String]
@@ -48,13 +41,6 @@ module Aws::AugmentedAIRuntime
     #
     class DeleteHumanLoopResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DescribeHumanLoopRequest
-    #   data as a hash:
-    #
-    #       {
-    #         human_loop_name: "HumanLoopName", # required
-    #       }
-    #
     # @!attribute [rw] human_loop_name
     #   The name of the human loop that you want information about.
     #   @return [String]
@@ -78,6 +64,8 @@ module Aws::AugmentedAIRuntime
     #
     # @!attribute [rw] failure_code
     #   A failure code that identifies the type of failure.
+    #
+    #   Possible values: `ValidationError`, `Expired`, `InternalError`
     #   @return [String]
     #
     # @!attribute [rw] human_loop_status
@@ -121,13 +109,6 @@ module Aws::AugmentedAIRuntime
     # Attributes of the data specified by the customer. Use these to
     # describe the data to be labeled.
     #
-    # @note When making an API call, you may pass HumanLoopDataAttributes
-    #   data as a hash:
-    #
-    #       {
-    #         content_classifiers: ["FreeOfPersonallyIdentifiableInformation"], # required, accepts FreeOfPersonallyIdentifiableInformation, FreeOfAdultContent
-    #       }
-    #
     # @!attribute [rw] content_classifiers
     #   Declares that your content is free of personally identifiable
     #   information or adult content.
@@ -145,13 +126,6 @@ module Aws::AugmentedAIRuntime
     end
 
     # An object containing the human loop input in JSON format.
-    #
-    # @note When making an API call, you may pass HumanLoopInput
-    #   data as a hash:
-    #
-    #       {
-    #         input_content: "InputContent", # required
-    #       }
     #
     # @!attribute [rw] input_content
     #   Serialized input from the human loop. The input must be a string
@@ -231,18 +205,6 @@ module Aws::AugmentedAIRuntime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListHumanLoopsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         creation_time_after: Time.now,
-    #         creation_time_before: Time.now,
-    #         flow_definition_arn: "FlowDefinitionArn", # required
-    #         sort_order: "Ascending", # accepts Ascending, Descending
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] creation_time_after
     #   (Optional) The timestamp of the date when you want the human loops
     #   to begin in ISO 8601 format. For example, `2020-02-24`.
@@ -303,7 +265,9 @@ module Aws::AugmentedAIRuntime
       include Aws::Structure
     end
 
-    # We couldn't find the requested resource.
+    # We couldn't find the requested resource. Check that your resources
+    # exists and were created in the same AWS Region as your request, and
+    # try your request again.
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -316,8 +280,18 @@ module Aws::AugmentedAIRuntime
       include Aws::Structure
     end
 
-    # You exceeded your service quota. Delete some resources or request an
-    # increase in your service quota.
+    # You exceeded your service quota. Service quotas, also referred to as
+    # limits, are the maximum number of service resources or operations for
+    # your AWS account. For a list of Amazon A2I service quotes, see [Amazon
+    # Augmented AI Service Quotes][1]. Delete some resources or request an
+    # increase in your service quota. You can request a quota increase using
+    # Service Quotas or the AWS Support Center. To request an increase, see
+    # [AWS Service Quotas][2] in the *AWS General Reference*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/general/latest/gr/a2i.html
+    # [2]: https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -330,20 +304,6 @@ module Aws::AugmentedAIRuntime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass StartHumanLoopRequest
-    #   data as a hash:
-    #
-    #       {
-    #         human_loop_name: "HumanLoopName", # required
-    #         flow_definition_arn: "FlowDefinitionArn", # required
-    #         human_loop_input: { # required
-    #           input_content: "InputContent", # required
-    #         },
-    #         data_attributes: {
-    #           content_classifiers: ["FreeOfPersonallyIdentifiableInformation"], # required, accepts FreeOfPersonallyIdentifiableInformation, FreeOfAdultContent
-    #         },
-    #       }
-    #
     # @!attribute [rw] human_loop_name
     #   The name of the human loop.
     #   @return [String]
@@ -386,13 +346,6 @@ module Aws::AugmentedAIRuntime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass StopHumanLoopRequest
-    #   data as a hash:
-    #
-    #       {
-    #         human_loop_name: "HumanLoopName", # required
-    #       }
-    #
     # @!attribute [rw] human_loop_name
     #   The name of the human loop that you want to stop.
     #   @return [String]
@@ -437,3 +390,4 @@ module Aws::AugmentedAIRuntime
 
   end
 end
+

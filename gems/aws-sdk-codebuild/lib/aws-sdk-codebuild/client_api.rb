@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::CodeBuild
   # @api private
@@ -24,14 +25,18 @@ module Aws::CodeBuild
     BatchGetBuildBatchesOutput = Shapes::StructureShape.new(name: 'BatchGetBuildBatchesOutput')
     BatchGetBuildsInput = Shapes::StructureShape.new(name: 'BatchGetBuildsInput')
     BatchGetBuildsOutput = Shapes::StructureShape.new(name: 'BatchGetBuildsOutput')
+    BatchGetFleetsInput = Shapes::StructureShape.new(name: 'BatchGetFleetsInput')
+    BatchGetFleetsOutput = Shapes::StructureShape.new(name: 'BatchGetFleetsOutput')
     BatchGetProjectsInput = Shapes::StructureShape.new(name: 'BatchGetProjectsInput')
     BatchGetProjectsOutput = Shapes::StructureShape.new(name: 'BatchGetProjectsOutput')
     BatchGetReportGroupsInput = Shapes::StructureShape.new(name: 'BatchGetReportGroupsInput')
     BatchGetReportGroupsOutput = Shapes::StructureShape.new(name: 'BatchGetReportGroupsOutput')
     BatchGetReportsInput = Shapes::StructureShape.new(name: 'BatchGetReportsInput')
     BatchGetReportsOutput = Shapes::StructureShape.new(name: 'BatchGetReportsOutput')
+    BatchReportModeType = Shapes::StringShape.new(name: 'BatchReportModeType')
     BatchRestrictions = Shapes::StructureShape.new(name: 'BatchRestrictions')
     Boolean = Shapes::BooleanShape.new(name: 'Boolean')
+    BucketOwnerAccess = Shapes::StringShape.new(name: 'BucketOwnerAccess')
     Build = Shapes::StructureShape.new(name: 'Build')
     BuildArtifacts = Shapes::StructureShape.new(name: 'BuildArtifacts')
     BuildArtifactsList = Shapes::ListShape.new(name: 'BuildArtifactsList')
@@ -53,6 +58,7 @@ module Aws::CodeBuild
     BuildStatusConfig = Shapes::StructureShape.new(name: 'BuildStatusConfig')
     BuildSummaries = Shapes::ListShape.new(name: 'BuildSummaries')
     BuildSummary = Shapes::StructureShape.new(name: 'BuildSummary')
+    BuildTimeOut = Shapes::IntegerShape.new(name: 'BuildTimeOut')
     Builds = Shapes::ListShape.new(name: 'Builds')
     BuildsNotDeleted = Shapes::ListShape.new(name: 'BuildsNotDeleted')
     CacheMode = Shapes::StringShape.new(name: 'CacheMode')
@@ -63,6 +69,8 @@ module Aws::CodeBuild
     CodeCoverages = Shapes::ListShape.new(name: 'CodeCoverages')
     ComputeType = Shapes::StringShape.new(name: 'ComputeType')
     ComputeTypesAllowed = Shapes::ListShape.new(name: 'ComputeTypesAllowed')
+    CreateFleetInput = Shapes::StructureShape.new(name: 'CreateFleetInput')
+    CreateFleetOutput = Shapes::StructureShape.new(name: 'CreateFleetOutput')
     CreateProjectInput = Shapes::StructureShape.new(name: 'CreateProjectInput')
     CreateProjectOutput = Shapes::StructureShape.new(name: 'CreateProjectOutput')
     CreateReportGroupInput = Shapes::StructureShape.new(name: 'CreateReportGroupInput')
@@ -73,6 +81,8 @@ module Aws::CodeBuild
     DebugSession = Shapes::StructureShape.new(name: 'DebugSession')
     DeleteBuildBatchInput = Shapes::StructureShape.new(name: 'DeleteBuildBatchInput')
     DeleteBuildBatchOutput = Shapes::StructureShape.new(name: 'DeleteBuildBatchOutput')
+    DeleteFleetInput = Shapes::StructureShape.new(name: 'DeleteFleetInput')
+    DeleteFleetOutput = Shapes::StructureShape.new(name: 'DeleteFleetOutput')
     DeleteProjectInput = Shapes::StructureShape.new(name: 'DeleteProjectInput')
     DeleteProjectOutput = Shapes::StructureShape.new(name: 'DeleteProjectOutput')
     DeleteReportGroupInput = Shapes::StructureShape.new(name: 'DeleteReportGroupInput')
@@ -104,6 +114,19 @@ module Aws::CodeBuild
     FileSystemType = Shapes::StringShape.new(name: 'FileSystemType')
     FilterGroup = Shapes::ListShape.new(name: 'FilterGroup')
     FilterGroups = Shapes::ListShape.new(name: 'FilterGroups')
+    Fleet = Shapes::StructureShape.new(name: 'Fleet')
+    FleetArns = Shapes::ListShape.new(name: 'FleetArns')
+    FleetCapacity = Shapes::IntegerShape.new(name: 'FleetCapacity')
+    FleetContextCode = Shapes::StringShape.new(name: 'FleetContextCode')
+    FleetName = Shapes::StringShape.new(name: 'FleetName')
+    FleetNames = Shapes::ListShape.new(name: 'FleetNames')
+    FleetOverflowBehavior = Shapes::StringShape.new(name: 'FleetOverflowBehavior')
+    FleetScalingMetricType = Shapes::StringShape.new(name: 'FleetScalingMetricType')
+    FleetScalingType = Shapes::StringShape.new(name: 'FleetScalingType')
+    FleetSortByType = Shapes::StringShape.new(name: 'FleetSortByType')
+    FleetStatus = Shapes::StructureShape.new(name: 'FleetStatus')
+    FleetStatusCode = Shapes::StringShape.new(name: 'FleetStatusCode')
+    Fleets = Shapes::ListShape.new(name: 'Fleets')
     GetReportGroupTrendInput = Shapes::StructureShape.new(name: 'GetReportGroupTrendInput')
     GetReportGroupTrendOutput = Shapes::StructureShape.new(name: 'GetReportGroupTrendOutput')
     GetResourcePolicyInput = Shapes::StructureShape.new(name: 'GetResourcePolicyInput')
@@ -130,6 +153,8 @@ module Aws::CodeBuild
     ListBuildsOutput = Shapes::StructureShape.new(name: 'ListBuildsOutput')
     ListCuratedEnvironmentImagesInput = Shapes::StructureShape.new(name: 'ListCuratedEnvironmentImagesInput')
     ListCuratedEnvironmentImagesOutput = Shapes::StructureShape.new(name: 'ListCuratedEnvironmentImagesOutput')
+    ListFleetsInput = Shapes::StructureShape.new(name: 'ListFleetsInput')
+    ListFleetsOutput = Shapes::StructureShape.new(name: 'ListFleetsOutput')
     ListProjectsInput = Shapes::StructureShape.new(name: 'ListProjectsInput')
     ListProjectsOutput = Shapes::StructureShape.new(name: 'ListProjectsOutput')
     ListReportGroupsInput = Shapes::StructureShape.new(name: 'ListReportGroupsInput')
@@ -168,6 +193,7 @@ module Aws::CodeBuild
     ProjectEnvironment = Shapes::StructureShape.new(name: 'ProjectEnvironment')
     ProjectFileSystemLocation = Shapes::StructureShape.new(name: 'ProjectFileSystemLocation')
     ProjectFileSystemLocations = Shapes::ListShape.new(name: 'ProjectFileSystemLocations')
+    ProjectFleet = Shapes::StructureShape.new(name: 'ProjectFleet')
     ProjectName = Shapes::StringShape.new(name: 'ProjectName')
     ProjectNames = Shapes::ListShape.new(name: 'ProjectNames')
     ProjectSecondarySourceVersions = Shapes::ListShape.new(name: 'ProjectSecondarySourceVersions')
@@ -175,6 +201,7 @@ module Aws::CodeBuild
     ProjectSource = Shapes::StructureShape.new(name: 'ProjectSource')
     ProjectSourceVersion = Shapes::StructureShape.new(name: 'ProjectSourceVersion')
     ProjectSources = Shapes::ListShape.new(name: 'ProjectSources')
+    ProjectVisibilityType = Shapes::StringShape.new(name: 'ProjectVisibilityType')
     Projects = Shapes::ListShape.new(name: 'Projects')
     PutResourcePolicyInput = Shapes::StructureShape.new(name: 'PutResourcePolicyInput')
     PutResourcePolicyOutput = Shapes::StructureShape.new(name: 'PutResourcePolicyOutput')
@@ -211,8 +238,12 @@ module Aws::CodeBuild
     RetryBuildOutput = Shapes::StructureShape.new(name: 'RetryBuildOutput')
     S3LogsConfig = Shapes::StructureShape.new(name: 'S3LogsConfig')
     S3ReportExportConfig = Shapes::StructureShape.new(name: 'S3ReportExportConfig')
+    ScalingConfigurationInput = Shapes::StructureShape.new(name: 'ScalingConfigurationInput')
+    ScalingConfigurationOutput = Shapes::StructureShape.new(name: 'ScalingConfigurationOutput')
+    ScopeConfiguration = Shapes::StructureShape.new(name: 'ScopeConfiguration')
     SecurityGroupIds = Shapes::ListShape.new(name: 'SecurityGroupIds')
     SensitiveNonEmptyString = Shapes::StringShape.new(name: 'SensitiveNonEmptyString')
+    SensitiveString = Shapes::StringShape.new(name: 'SensitiveString')
     ServerType = Shapes::StringShape.new(name: 'ServerType')
     SharedResourceSortByType = Shapes::StringShape.new(name: 'SharedResourceSortByType')
     SortOrderType = Shapes::StringShape.new(name: 'SortOrderType')
@@ -234,14 +265,20 @@ module Aws::CodeBuild
     Subnets = Shapes::ListShape.new(name: 'Subnets')
     Tag = Shapes::StructureShape.new(name: 'Tag')
     TagList = Shapes::ListShape.new(name: 'TagList')
+    TargetTrackingScalingConfiguration = Shapes::StructureShape.new(name: 'TargetTrackingScalingConfiguration')
+    TargetTrackingScalingConfigurations = Shapes::ListShape.new(name: 'TargetTrackingScalingConfigurations')
     TestCase = Shapes::StructureShape.new(name: 'TestCase')
     TestCaseFilter = Shapes::StructureShape.new(name: 'TestCaseFilter')
     TestCases = Shapes::ListShape.new(name: 'TestCases')
     TestReportSummary = Shapes::StructureShape.new(name: 'TestReportSummary')
     TimeOut = Shapes::IntegerShape.new(name: 'TimeOut')
     Timestamp = Shapes::TimestampShape.new(name: 'Timestamp')
+    UpdateFleetInput = Shapes::StructureShape.new(name: 'UpdateFleetInput')
+    UpdateFleetOutput = Shapes::StructureShape.new(name: 'UpdateFleetOutput')
     UpdateProjectInput = Shapes::StructureShape.new(name: 'UpdateProjectInput')
     UpdateProjectOutput = Shapes::StructureShape.new(name: 'UpdateProjectOutput')
+    UpdateProjectVisibilityInput = Shapes::StructureShape.new(name: 'UpdateProjectVisibilityInput')
+    UpdateProjectVisibilityOutput = Shapes::StructureShape.new(name: 'UpdateProjectVisibilityOutput')
     UpdateReportGroupInput = Shapes::StructureShape.new(name: 'UpdateReportGroupInput')
     UpdateReportGroupOutput = Shapes::StructureShape.new(name: 'UpdateReportGroupOutput')
     UpdateWebhookInput = Shapes::StructureShape.new(name: 'UpdateWebhookInput')
@@ -252,7 +289,9 @@ module Aws::CodeBuild
     WebhookBuildType = Shapes::StringShape.new(name: 'WebhookBuildType')
     WebhookFilter = Shapes::StructureShape.new(name: 'WebhookFilter')
     WebhookFilterType = Shapes::StringShape.new(name: 'WebhookFilterType')
+    WebhookScopeType = Shapes::StringShape.new(name: 'WebhookScopeType')
     WrapperBoolean = Shapes::BooleanShape.new(name: 'WrapperBoolean')
+    WrapperDouble = Shapes::FloatShape.new(name: 'WrapperDouble')
     WrapperInt = Shapes::IntegerShape.new(name: 'WrapperInt')
     WrapperLong = Shapes::IntegerShape.new(name: 'WrapperLong')
 
@@ -278,6 +317,13 @@ module Aws::CodeBuild
     BatchGetBuildsOutput.add_member(:builds, Shapes::ShapeRef.new(shape: Builds, location_name: "builds"))
     BatchGetBuildsOutput.add_member(:builds_not_found, Shapes::ShapeRef.new(shape: BuildIds, location_name: "buildsNotFound"))
     BatchGetBuildsOutput.struct_class = Types::BatchGetBuildsOutput
+
+    BatchGetFleetsInput.add_member(:names, Shapes::ShapeRef.new(shape: FleetNames, required: true, location_name: "names"))
+    BatchGetFleetsInput.struct_class = Types::BatchGetFleetsInput
+
+    BatchGetFleetsOutput.add_member(:fleets, Shapes::ShapeRef.new(shape: Fleets, location_name: "fleets"))
+    BatchGetFleetsOutput.add_member(:fleets_not_found, Shapes::ShapeRef.new(shape: FleetNames, location_name: "fleetsNotFound"))
+    BatchGetFleetsOutput.struct_class = Types::BatchGetFleetsOutput
 
     BatchGetProjectsInput.add_member(:names, Shapes::ShapeRef.new(shape: ProjectNames, required: true, location_name: "names"))
     BatchGetProjectsInput.struct_class = Types::BatchGetProjectsInput
@@ -344,6 +390,7 @@ module Aws::CodeBuild
     BuildArtifacts.add_member(:override_artifact_name, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "overrideArtifactName"))
     BuildArtifacts.add_member(:encryption_disabled, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "encryptionDisabled"))
     BuildArtifacts.add_member(:artifact_identifier, Shapes::ShapeRef.new(shape: String, location_name: "artifactIdentifier"))
+    BuildArtifacts.add_member(:bucket_owner_access, Shapes::ShapeRef.new(shape: BucketOwnerAccess, location_name: "bucketOwnerAccess"))
     BuildArtifacts.struct_class = Types::BuildArtifacts
 
     BuildArtifactsList.member = Shapes::ShapeRef.new(shape: BuildArtifacts)
@@ -377,6 +424,7 @@ module Aws::CodeBuild
     BuildBatch.add_member(:file_system_locations, Shapes::ShapeRef.new(shape: ProjectFileSystemLocations, location_name: "fileSystemLocations"))
     BuildBatch.add_member(:build_batch_config, Shapes::ShapeRef.new(shape: ProjectBuildBatchConfig, location_name: "buildBatchConfig"))
     BuildBatch.add_member(:build_groups, Shapes::ShapeRef.new(shape: BuildGroups, location_name: "buildGroups"))
+    BuildBatch.add_member(:debug_session_enabled, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "debugSessionEnabled"))
     BuildBatch.struct_class = Types::BuildBatch
 
     BuildBatchFilter.add_member(:status, Shapes::ShapeRef.new(shape: StatusType, location_name: "status"))
@@ -469,6 +517,21 @@ module Aws::CodeBuild
 
     ComputeTypesAllowed.member = Shapes::ShapeRef.new(shape: NonEmptyString)
 
+    CreateFleetInput.add_member(:name, Shapes::ShapeRef.new(shape: FleetName, required: true, location_name: "name"))
+    CreateFleetInput.add_member(:base_capacity, Shapes::ShapeRef.new(shape: FleetCapacity, required: true, location_name: "baseCapacity"))
+    CreateFleetInput.add_member(:environment_type, Shapes::ShapeRef.new(shape: EnvironmentType, required: true, location_name: "environmentType"))
+    CreateFleetInput.add_member(:compute_type, Shapes::ShapeRef.new(shape: ComputeType, required: true, location_name: "computeType"))
+    CreateFleetInput.add_member(:scaling_configuration, Shapes::ShapeRef.new(shape: ScalingConfigurationInput, location_name: "scalingConfiguration"))
+    CreateFleetInput.add_member(:overflow_behavior, Shapes::ShapeRef.new(shape: FleetOverflowBehavior, location_name: "overflowBehavior"))
+    CreateFleetInput.add_member(:vpc_config, Shapes::ShapeRef.new(shape: VpcConfig, location_name: "vpcConfig"))
+    CreateFleetInput.add_member(:image_id, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "imageId"))
+    CreateFleetInput.add_member(:fleet_service_role, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "fleetServiceRole"))
+    CreateFleetInput.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "tags"))
+    CreateFleetInput.struct_class = Types::CreateFleetInput
+
+    CreateFleetOutput.add_member(:fleet, Shapes::ShapeRef.new(shape: Fleet, location_name: "fleet"))
+    CreateFleetOutput.struct_class = Types::CreateFleetOutput
+
     CreateProjectInput.add_member(:name, Shapes::ShapeRef.new(shape: ProjectName, required: true, location_name: "name"))
     CreateProjectInput.add_member(:description, Shapes::ShapeRef.new(shape: ProjectDescription, location_name: "description"))
     CreateProjectInput.add_member(:source, Shapes::ShapeRef.new(shape: ProjectSource, required: true, location_name: "source"))
@@ -480,7 +543,7 @@ module Aws::CodeBuild
     CreateProjectInput.add_member(:cache, Shapes::ShapeRef.new(shape: ProjectCache, location_name: "cache"))
     CreateProjectInput.add_member(:environment, Shapes::ShapeRef.new(shape: ProjectEnvironment, required: true, location_name: "environment"))
     CreateProjectInput.add_member(:service_role, Shapes::ShapeRef.new(shape: NonEmptyString, required: true, location_name: "serviceRole"))
-    CreateProjectInput.add_member(:timeout_in_minutes, Shapes::ShapeRef.new(shape: TimeOut, location_name: "timeoutInMinutes"))
+    CreateProjectInput.add_member(:timeout_in_minutes, Shapes::ShapeRef.new(shape: BuildTimeOut, location_name: "timeoutInMinutes"))
     CreateProjectInput.add_member(:queued_timeout_in_minutes, Shapes::ShapeRef.new(shape: TimeOut, location_name: "queuedTimeoutInMinutes"))
     CreateProjectInput.add_member(:encryption_key, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "encryptionKey"))
     CreateProjectInput.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "tags"))
@@ -489,6 +552,7 @@ module Aws::CodeBuild
     CreateProjectInput.add_member(:logs_config, Shapes::ShapeRef.new(shape: LogsConfig, location_name: "logsConfig"))
     CreateProjectInput.add_member(:file_system_locations, Shapes::ShapeRef.new(shape: ProjectFileSystemLocations, location_name: "fileSystemLocations"))
     CreateProjectInput.add_member(:build_batch_config, Shapes::ShapeRef.new(shape: ProjectBuildBatchConfig, location_name: "buildBatchConfig"))
+    CreateProjectInput.add_member(:concurrent_build_limit, Shapes::ShapeRef.new(shape: WrapperInt, location_name: "concurrentBuildLimit"))
     CreateProjectInput.struct_class = Types::CreateProjectInput
 
     CreateProjectOutput.add_member(:project, Shapes::ShapeRef.new(shape: Project, location_name: "project"))
@@ -507,6 +571,8 @@ module Aws::CodeBuild
     CreateWebhookInput.add_member(:branch_filter, Shapes::ShapeRef.new(shape: String, location_name: "branchFilter"))
     CreateWebhookInput.add_member(:filter_groups, Shapes::ShapeRef.new(shape: FilterGroups, location_name: "filterGroups"))
     CreateWebhookInput.add_member(:build_type, Shapes::ShapeRef.new(shape: WebhookBuildType, location_name: "buildType"))
+    CreateWebhookInput.add_member(:manual_creation, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "manualCreation"))
+    CreateWebhookInput.add_member(:scope_configuration, Shapes::ShapeRef.new(shape: ScopeConfiguration, location_name: "scopeConfiguration"))
     CreateWebhookInput.struct_class = Types::CreateWebhookInput
 
     CreateWebhookOutput.add_member(:webhook, Shapes::ShapeRef.new(shape: Webhook, location_name: "webhook"))
@@ -523,6 +589,11 @@ module Aws::CodeBuild
     DeleteBuildBatchOutput.add_member(:builds_deleted, Shapes::ShapeRef.new(shape: BuildIds, location_name: "buildsDeleted"))
     DeleteBuildBatchOutput.add_member(:builds_not_deleted, Shapes::ShapeRef.new(shape: BuildsNotDeleted, location_name: "buildsNotDeleted"))
     DeleteBuildBatchOutput.struct_class = Types::DeleteBuildBatchOutput
+
+    DeleteFleetInput.add_member(:arn, Shapes::ShapeRef.new(shape: NonEmptyString, required: true, location_name: "arn"))
+    DeleteFleetInput.struct_class = Types::DeleteFleetInput
+
+    DeleteFleetOutput.struct_class = Types::DeleteFleetOutput
 
     DeleteProjectInput.add_member(:name, Shapes::ShapeRef.new(shape: NonEmptyString, required: true, location_name: "name"))
     DeleteProjectInput.struct_class = Types::DeleteProjectInput
@@ -615,6 +686,34 @@ module Aws::CodeBuild
 
     FilterGroups.member = Shapes::ShapeRef.new(shape: FilterGroup)
 
+    Fleet.add_member(:arn, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "arn"))
+    Fleet.add_member(:name, Shapes::ShapeRef.new(shape: FleetName, location_name: "name"))
+    Fleet.add_member(:id, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "id"))
+    Fleet.add_member(:created, Shapes::ShapeRef.new(shape: Timestamp, location_name: "created"))
+    Fleet.add_member(:last_modified, Shapes::ShapeRef.new(shape: Timestamp, location_name: "lastModified"))
+    Fleet.add_member(:status, Shapes::ShapeRef.new(shape: FleetStatus, location_name: "status"))
+    Fleet.add_member(:base_capacity, Shapes::ShapeRef.new(shape: FleetCapacity, location_name: "baseCapacity"))
+    Fleet.add_member(:environment_type, Shapes::ShapeRef.new(shape: EnvironmentType, location_name: "environmentType"))
+    Fleet.add_member(:compute_type, Shapes::ShapeRef.new(shape: ComputeType, location_name: "computeType"))
+    Fleet.add_member(:scaling_configuration, Shapes::ShapeRef.new(shape: ScalingConfigurationOutput, location_name: "scalingConfiguration"))
+    Fleet.add_member(:overflow_behavior, Shapes::ShapeRef.new(shape: FleetOverflowBehavior, location_name: "overflowBehavior"))
+    Fleet.add_member(:vpc_config, Shapes::ShapeRef.new(shape: VpcConfig, location_name: "vpcConfig"))
+    Fleet.add_member(:image_id, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "imageId"))
+    Fleet.add_member(:fleet_service_role, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "fleetServiceRole"))
+    Fleet.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "tags"))
+    Fleet.struct_class = Types::Fleet
+
+    FleetArns.member = Shapes::ShapeRef.new(shape: NonEmptyString)
+
+    FleetNames.member = Shapes::ShapeRef.new(shape: NonEmptyString)
+
+    FleetStatus.add_member(:status_code, Shapes::ShapeRef.new(shape: FleetStatusCode, location_name: "statusCode"))
+    FleetStatus.add_member(:context, Shapes::ShapeRef.new(shape: FleetContextCode, location_name: "context"))
+    FleetStatus.add_member(:message, Shapes::ShapeRef.new(shape: String, location_name: "message"))
+    FleetStatus.struct_class = Types::FleetStatus
+
+    Fleets.member = Shapes::ShapeRef.new(shape: Fleet)
+
     GetReportGroupTrendInput.add_member(:report_group_arn, Shapes::ShapeRef.new(shape: NonEmptyString, required: true, location_name: "reportGroupArn"))
     GetReportGroupTrendInput.add_member(:num_of_reports, Shapes::ShapeRef.new(shape: PageSize, location_name: "numOfReports"))
     GetReportGroupTrendInput.add_member(:trend_field, Shapes::ShapeRef.new(shape: ReportGroupTrendFieldType, required: true, location_name: "trendField"))
@@ -696,6 +795,16 @@ module Aws::CodeBuild
 
     ListCuratedEnvironmentImagesOutput.add_member(:platforms, Shapes::ShapeRef.new(shape: EnvironmentPlatforms, location_name: "platforms"))
     ListCuratedEnvironmentImagesOutput.struct_class = Types::ListCuratedEnvironmentImagesOutput
+
+    ListFleetsInput.add_member(:next_token, Shapes::ShapeRef.new(shape: SensitiveString, location_name: "nextToken"))
+    ListFleetsInput.add_member(:max_results, Shapes::ShapeRef.new(shape: PageSize, location_name: "maxResults"))
+    ListFleetsInput.add_member(:sort_order, Shapes::ShapeRef.new(shape: SortOrderType, location_name: "sortOrder"))
+    ListFleetsInput.add_member(:sort_by, Shapes::ShapeRef.new(shape: FleetSortByType, location_name: "sortBy"))
+    ListFleetsInput.struct_class = Types::ListFleetsInput
+
+    ListFleetsOutput.add_member(:next_token, Shapes::ShapeRef.new(shape: String, location_name: "nextToken"))
+    ListFleetsOutput.add_member(:fleets, Shapes::ShapeRef.new(shape: FleetArns, location_name: "fleets"))
+    ListFleetsOutput.struct_class = Types::ListFleetsOutput
 
     ListProjectsInput.add_member(:sort_by, Shapes::ShapeRef.new(shape: ProjectSortByType, location_name: "sortBy"))
     ListProjectsInput.add_member(:sort_order, Shapes::ShapeRef.new(shape: SortOrderType, location_name: "sortOrder"))
@@ -800,7 +909,7 @@ module Aws::CodeBuild
     Project.add_member(:cache, Shapes::ShapeRef.new(shape: ProjectCache, location_name: "cache"))
     Project.add_member(:environment, Shapes::ShapeRef.new(shape: ProjectEnvironment, location_name: "environment"))
     Project.add_member(:service_role, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "serviceRole"))
-    Project.add_member(:timeout_in_minutes, Shapes::ShapeRef.new(shape: TimeOut, location_name: "timeoutInMinutes"))
+    Project.add_member(:timeout_in_minutes, Shapes::ShapeRef.new(shape: BuildTimeOut, location_name: "timeoutInMinutes"))
     Project.add_member(:queued_timeout_in_minutes, Shapes::ShapeRef.new(shape: TimeOut, location_name: "queuedTimeoutInMinutes"))
     Project.add_member(:encryption_key, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "encryptionKey"))
     Project.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "tags"))
@@ -812,6 +921,10 @@ module Aws::CodeBuild
     Project.add_member(:logs_config, Shapes::ShapeRef.new(shape: LogsConfig, location_name: "logsConfig"))
     Project.add_member(:file_system_locations, Shapes::ShapeRef.new(shape: ProjectFileSystemLocations, location_name: "fileSystemLocations"))
     Project.add_member(:build_batch_config, Shapes::ShapeRef.new(shape: ProjectBuildBatchConfig, location_name: "buildBatchConfig"))
+    Project.add_member(:concurrent_build_limit, Shapes::ShapeRef.new(shape: WrapperInt, location_name: "concurrentBuildLimit"))
+    Project.add_member(:project_visibility, Shapes::ShapeRef.new(shape: ProjectVisibilityType, location_name: "projectVisibility"))
+    Project.add_member(:public_project_alias, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "publicProjectAlias"))
+    Project.add_member(:resource_access_role, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "resourceAccessRole"))
     Project.struct_class = Types::Project
 
     ProjectArns.member = Shapes::ShapeRef.new(shape: NonEmptyString)
@@ -825,6 +938,7 @@ module Aws::CodeBuild
     ProjectArtifacts.add_member(:override_artifact_name, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "overrideArtifactName"))
     ProjectArtifacts.add_member(:encryption_disabled, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "encryptionDisabled"))
     ProjectArtifacts.add_member(:artifact_identifier, Shapes::ShapeRef.new(shape: String, location_name: "artifactIdentifier"))
+    ProjectArtifacts.add_member(:bucket_owner_access, Shapes::ShapeRef.new(shape: BucketOwnerAccess, location_name: "bucketOwnerAccess"))
     ProjectArtifacts.struct_class = Types::ProjectArtifacts
 
     ProjectArtifactsList.member = Shapes::ShapeRef.new(shape: ProjectArtifacts)
@@ -837,6 +951,7 @@ module Aws::CodeBuild
     ProjectBuildBatchConfig.add_member(:combine_artifacts, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "combineArtifacts"))
     ProjectBuildBatchConfig.add_member(:restrictions, Shapes::ShapeRef.new(shape: BatchRestrictions, location_name: "restrictions"))
     ProjectBuildBatchConfig.add_member(:timeout_in_mins, Shapes::ShapeRef.new(shape: WrapperInt, location_name: "timeoutInMins"))
+    ProjectBuildBatchConfig.add_member(:batch_report_mode, Shapes::ShapeRef.new(shape: BatchReportModeType, location_name: "batchReportMode"))
     ProjectBuildBatchConfig.struct_class = Types::ProjectBuildBatchConfig
 
     ProjectCache.add_member(:type, Shapes::ShapeRef.new(shape: CacheType, required: true, location_name: "type"))
@@ -849,6 +964,7 @@ module Aws::CodeBuild
     ProjectEnvironment.add_member(:type, Shapes::ShapeRef.new(shape: EnvironmentType, required: true, location_name: "type"))
     ProjectEnvironment.add_member(:image, Shapes::ShapeRef.new(shape: NonEmptyString, required: true, location_name: "image"))
     ProjectEnvironment.add_member(:compute_type, Shapes::ShapeRef.new(shape: ComputeType, required: true, location_name: "computeType"))
+    ProjectEnvironment.add_member(:fleet, Shapes::ShapeRef.new(shape: ProjectFleet, location_name: "fleet"))
     ProjectEnvironment.add_member(:environment_variables, Shapes::ShapeRef.new(shape: EnvironmentVariables, location_name: "environmentVariables"))
     ProjectEnvironment.add_member(:privileged_mode, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "privilegedMode"))
     ProjectEnvironment.add_member(:certificate, Shapes::ShapeRef.new(shape: String, location_name: "certificate"))
@@ -864,6 +980,9 @@ module Aws::CodeBuild
     ProjectFileSystemLocation.struct_class = Types::ProjectFileSystemLocation
 
     ProjectFileSystemLocations.member = Shapes::ShapeRef.new(shape: ProjectFileSystemLocation)
+
+    ProjectFleet.add_member(:fleet_arn, Shapes::ShapeRef.new(shape: String, location_name: "fleetArn"))
+    ProjectFleet.struct_class = Types::ProjectFleet
 
     ProjectNames.member = Shapes::ShapeRef.new(shape: NonEmptyString)
 
@@ -982,14 +1101,32 @@ module Aws::CodeBuild
     S3LogsConfig.add_member(:status, Shapes::ShapeRef.new(shape: LogsConfigStatusType, required: true, location_name: "status"))
     S3LogsConfig.add_member(:location, Shapes::ShapeRef.new(shape: String, location_name: "location"))
     S3LogsConfig.add_member(:encryption_disabled, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "encryptionDisabled"))
+    S3LogsConfig.add_member(:bucket_owner_access, Shapes::ShapeRef.new(shape: BucketOwnerAccess, location_name: "bucketOwnerAccess"))
     S3LogsConfig.struct_class = Types::S3LogsConfig
 
     S3ReportExportConfig.add_member(:bucket, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "bucket"))
+    S3ReportExportConfig.add_member(:bucket_owner, Shapes::ShapeRef.new(shape: String, location_name: "bucketOwner"))
     S3ReportExportConfig.add_member(:path, Shapes::ShapeRef.new(shape: String, location_name: "path"))
     S3ReportExportConfig.add_member(:packaging, Shapes::ShapeRef.new(shape: ReportPackagingType, location_name: "packaging"))
     S3ReportExportConfig.add_member(:encryption_key, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "encryptionKey"))
     S3ReportExportConfig.add_member(:encryption_disabled, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "encryptionDisabled"))
     S3ReportExportConfig.struct_class = Types::S3ReportExportConfig
+
+    ScalingConfigurationInput.add_member(:scaling_type, Shapes::ShapeRef.new(shape: FleetScalingType, location_name: "scalingType"))
+    ScalingConfigurationInput.add_member(:target_tracking_scaling_configs, Shapes::ShapeRef.new(shape: TargetTrackingScalingConfigurations, location_name: "targetTrackingScalingConfigs"))
+    ScalingConfigurationInput.add_member(:max_capacity, Shapes::ShapeRef.new(shape: FleetCapacity, location_name: "maxCapacity"))
+    ScalingConfigurationInput.struct_class = Types::ScalingConfigurationInput
+
+    ScalingConfigurationOutput.add_member(:scaling_type, Shapes::ShapeRef.new(shape: FleetScalingType, location_name: "scalingType"))
+    ScalingConfigurationOutput.add_member(:target_tracking_scaling_configs, Shapes::ShapeRef.new(shape: TargetTrackingScalingConfigurations, location_name: "targetTrackingScalingConfigs"))
+    ScalingConfigurationOutput.add_member(:max_capacity, Shapes::ShapeRef.new(shape: FleetCapacity, location_name: "maxCapacity"))
+    ScalingConfigurationOutput.add_member(:desired_capacity, Shapes::ShapeRef.new(shape: FleetCapacity, location_name: "desiredCapacity"))
+    ScalingConfigurationOutput.struct_class = Types::ScalingConfigurationOutput
+
+    ScopeConfiguration.add_member(:name, Shapes::ShapeRef.new(shape: String, required: true, location_name: "name"))
+    ScopeConfiguration.add_member(:domain, Shapes::ShapeRef.new(shape: String, location_name: "domain"))
+    ScopeConfiguration.add_member(:scope, Shapes::ShapeRef.new(shape: WebhookScopeType, required: true, location_name: "scope"))
+    ScopeConfiguration.struct_class = Types::ScopeConfiguration
 
     SecurityGroupIds.member = Shapes::ShapeRef.new(shape: NonEmptyString)
 
@@ -1000,6 +1137,7 @@ module Aws::CodeBuild
     SourceCredentialsInfo.add_member(:arn, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "arn"))
     SourceCredentialsInfo.add_member(:server_type, Shapes::ShapeRef.new(shape: ServerType, location_name: "serverType"))
     SourceCredentialsInfo.add_member(:auth_type, Shapes::ShapeRef.new(shape: AuthType, location_name: "authType"))
+    SourceCredentialsInfo.add_member(:resource, Shapes::ShapeRef.new(shape: String, location_name: "resource"))
     SourceCredentialsInfo.struct_class = Types::SourceCredentialsInfo
 
     SourceCredentialsInfos.member = Shapes::ShapeRef.new(shape: SourceCredentialsInfo)
@@ -1026,7 +1164,7 @@ module Aws::CodeBuild
     StartBuildBatchInput.add_member(:cache_override, Shapes::ShapeRef.new(shape: ProjectCache, location_name: "cacheOverride"))
     StartBuildBatchInput.add_member(:service_role_override, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "serviceRoleOverride"))
     StartBuildBatchInput.add_member(:privileged_mode_override, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "privilegedModeOverride"))
-    StartBuildBatchInput.add_member(:build_timeout_in_minutes_override, Shapes::ShapeRef.new(shape: TimeOut, location_name: "buildTimeoutInMinutesOverride"))
+    StartBuildBatchInput.add_member(:build_timeout_in_minutes_override, Shapes::ShapeRef.new(shape: BuildTimeOut, location_name: "buildTimeoutInMinutesOverride"))
     StartBuildBatchInput.add_member(:queued_timeout_in_minutes_override, Shapes::ShapeRef.new(shape: TimeOut, location_name: "queuedTimeoutInMinutesOverride"))
     StartBuildBatchInput.add_member(:encryption_key_override, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "encryptionKeyOverride"))
     StartBuildBatchInput.add_member(:idempotency_token, Shapes::ShapeRef.new(shape: String, location_name: "idempotencyToken"))
@@ -1034,6 +1172,7 @@ module Aws::CodeBuild
     StartBuildBatchInput.add_member(:registry_credential_override, Shapes::ShapeRef.new(shape: RegistryCredential, location_name: "registryCredentialOverride"))
     StartBuildBatchInput.add_member(:image_pull_credentials_type_override, Shapes::ShapeRef.new(shape: ImagePullCredentialsType, location_name: "imagePullCredentialsTypeOverride"))
     StartBuildBatchInput.add_member(:build_batch_config_override, Shapes::ShapeRef.new(shape: ProjectBuildBatchConfig, location_name: "buildBatchConfigOverride"))
+    StartBuildBatchInput.add_member(:debug_session_enabled, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "debugSessionEnabled"))
     StartBuildBatchInput.struct_class = Types::StartBuildBatchInput
 
     StartBuildBatchOutput.add_member(:build_batch, Shapes::ShapeRef.new(shape: BuildBatch, location_name: "buildBatch"))
@@ -1062,7 +1201,7 @@ module Aws::CodeBuild
     StartBuildInput.add_member(:cache_override, Shapes::ShapeRef.new(shape: ProjectCache, location_name: "cacheOverride"))
     StartBuildInput.add_member(:service_role_override, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "serviceRoleOverride"))
     StartBuildInput.add_member(:privileged_mode_override, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "privilegedModeOverride"))
-    StartBuildInput.add_member(:timeout_in_minutes_override, Shapes::ShapeRef.new(shape: TimeOut, location_name: "timeoutInMinutesOverride"))
+    StartBuildInput.add_member(:timeout_in_minutes_override, Shapes::ShapeRef.new(shape: BuildTimeOut, location_name: "timeoutInMinutesOverride"))
     StartBuildInput.add_member(:queued_timeout_in_minutes_override, Shapes::ShapeRef.new(shape: TimeOut, location_name: "queuedTimeoutInMinutesOverride"))
     StartBuildInput.add_member(:encryption_key_override, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "encryptionKeyOverride"))
     StartBuildInput.add_member(:idempotency_token, Shapes::ShapeRef.new(shape: String, location_name: "idempotencyToken"))
@@ -1070,6 +1209,7 @@ module Aws::CodeBuild
     StartBuildInput.add_member(:registry_credential_override, Shapes::ShapeRef.new(shape: RegistryCredential, location_name: "registryCredentialOverride"))
     StartBuildInput.add_member(:image_pull_credentials_type_override, Shapes::ShapeRef.new(shape: ImagePullCredentialsType, location_name: "imagePullCredentialsTypeOverride"))
     StartBuildInput.add_member(:debug_session_enabled, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "debugSessionEnabled"))
+    StartBuildInput.add_member(:fleet_override, Shapes::ShapeRef.new(shape: ProjectFleet, location_name: "fleetOverride"))
     StartBuildInput.struct_class = Types::StartBuildInput
 
     StartBuildOutput.add_member(:build, Shapes::ShapeRef.new(shape: Build, location_name: "build"))
@@ -1095,6 +1235,12 @@ module Aws::CodeBuild
 
     TagList.member = Shapes::ShapeRef.new(shape: Tag)
 
+    TargetTrackingScalingConfiguration.add_member(:metric_type, Shapes::ShapeRef.new(shape: FleetScalingMetricType, location_name: "metricType"))
+    TargetTrackingScalingConfiguration.add_member(:target_value, Shapes::ShapeRef.new(shape: WrapperDouble, location_name: "targetValue"))
+    TargetTrackingScalingConfiguration.struct_class = Types::TargetTrackingScalingConfiguration
+
+    TargetTrackingScalingConfigurations.member = Shapes::ShapeRef.new(shape: TargetTrackingScalingConfiguration)
+
     TestCase.add_member(:report_arn, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "reportArn"))
     TestCase.add_member(:test_raw_data_path, Shapes::ShapeRef.new(shape: String, location_name: "testRawDataPath"))
     TestCase.add_member(:prefix, Shapes::ShapeRef.new(shape: String, location_name: "prefix"))
@@ -1116,6 +1262,21 @@ module Aws::CodeBuild
     TestReportSummary.add_member(:duration_in_nano_seconds, Shapes::ShapeRef.new(shape: WrapperLong, required: true, location_name: "durationInNanoSeconds"))
     TestReportSummary.struct_class = Types::TestReportSummary
 
+    UpdateFleetInput.add_member(:arn, Shapes::ShapeRef.new(shape: NonEmptyString, required: true, location_name: "arn"))
+    UpdateFleetInput.add_member(:base_capacity, Shapes::ShapeRef.new(shape: FleetCapacity, location_name: "baseCapacity"))
+    UpdateFleetInput.add_member(:environment_type, Shapes::ShapeRef.new(shape: EnvironmentType, location_name: "environmentType"))
+    UpdateFleetInput.add_member(:compute_type, Shapes::ShapeRef.new(shape: ComputeType, location_name: "computeType"))
+    UpdateFleetInput.add_member(:scaling_configuration, Shapes::ShapeRef.new(shape: ScalingConfigurationInput, location_name: "scalingConfiguration"))
+    UpdateFleetInput.add_member(:overflow_behavior, Shapes::ShapeRef.new(shape: FleetOverflowBehavior, location_name: "overflowBehavior"))
+    UpdateFleetInput.add_member(:vpc_config, Shapes::ShapeRef.new(shape: VpcConfig, location_name: "vpcConfig"))
+    UpdateFleetInput.add_member(:image_id, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "imageId"))
+    UpdateFleetInput.add_member(:fleet_service_role, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "fleetServiceRole"))
+    UpdateFleetInput.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "tags"))
+    UpdateFleetInput.struct_class = Types::UpdateFleetInput
+
+    UpdateFleetOutput.add_member(:fleet, Shapes::ShapeRef.new(shape: Fleet, location_name: "fleet"))
+    UpdateFleetOutput.struct_class = Types::UpdateFleetOutput
+
     UpdateProjectInput.add_member(:name, Shapes::ShapeRef.new(shape: NonEmptyString, required: true, location_name: "name"))
     UpdateProjectInput.add_member(:description, Shapes::ShapeRef.new(shape: ProjectDescription, location_name: "description"))
     UpdateProjectInput.add_member(:source, Shapes::ShapeRef.new(shape: ProjectSource, location_name: "source"))
@@ -1127,7 +1288,7 @@ module Aws::CodeBuild
     UpdateProjectInput.add_member(:cache, Shapes::ShapeRef.new(shape: ProjectCache, location_name: "cache"))
     UpdateProjectInput.add_member(:environment, Shapes::ShapeRef.new(shape: ProjectEnvironment, location_name: "environment"))
     UpdateProjectInput.add_member(:service_role, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "serviceRole"))
-    UpdateProjectInput.add_member(:timeout_in_minutes, Shapes::ShapeRef.new(shape: TimeOut, location_name: "timeoutInMinutes"))
+    UpdateProjectInput.add_member(:timeout_in_minutes, Shapes::ShapeRef.new(shape: BuildTimeOut, location_name: "timeoutInMinutes"))
     UpdateProjectInput.add_member(:queued_timeout_in_minutes, Shapes::ShapeRef.new(shape: TimeOut, location_name: "queuedTimeoutInMinutes"))
     UpdateProjectInput.add_member(:encryption_key, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "encryptionKey"))
     UpdateProjectInput.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "tags"))
@@ -1136,10 +1297,21 @@ module Aws::CodeBuild
     UpdateProjectInput.add_member(:logs_config, Shapes::ShapeRef.new(shape: LogsConfig, location_name: "logsConfig"))
     UpdateProjectInput.add_member(:file_system_locations, Shapes::ShapeRef.new(shape: ProjectFileSystemLocations, location_name: "fileSystemLocations"))
     UpdateProjectInput.add_member(:build_batch_config, Shapes::ShapeRef.new(shape: ProjectBuildBatchConfig, location_name: "buildBatchConfig"))
+    UpdateProjectInput.add_member(:concurrent_build_limit, Shapes::ShapeRef.new(shape: WrapperInt, location_name: "concurrentBuildLimit"))
     UpdateProjectInput.struct_class = Types::UpdateProjectInput
 
     UpdateProjectOutput.add_member(:project, Shapes::ShapeRef.new(shape: Project, location_name: "project"))
     UpdateProjectOutput.struct_class = Types::UpdateProjectOutput
+
+    UpdateProjectVisibilityInput.add_member(:project_arn, Shapes::ShapeRef.new(shape: NonEmptyString, required: true, location_name: "projectArn"))
+    UpdateProjectVisibilityInput.add_member(:project_visibility, Shapes::ShapeRef.new(shape: ProjectVisibilityType, required: true, location_name: "projectVisibility"))
+    UpdateProjectVisibilityInput.add_member(:resource_access_role, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "resourceAccessRole"))
+    UpdateProjectVisibilityInput.struct_class = Types::UpdateProjectVisibilityInput
+
+    UpdateProjectVisibilityOutput.add_member(:project_arn, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "projectArn"))
+    UpdateProjectVisibilityOutput.add_member(:public_project_alias, Shapes::ShapeRef.new(shape: NonEmptyString, location_name: "publicProjectAlias"))
+    UpdateProjectVisibilityOutput.add_member(:project_visibility, Shapes::ShapeRef.new(shape: ProjectVisibilityType, location_name: "projectVisibility"))
+    UpdateProjectVisibilityOutput.struct_class = Types::UpdateProjectVisibilityOutput
 
     UpdateReportGroupInput.add_member(:arn, Shapes::ShapeRef.new(shape: NonEmptyString, required: true, location_name: "arn"))
     UpdateReportGroupInput.add_member(:export_config, Shapes::ShapeRef.new(shape: ReportExportConfig, location_name: "exportConfig"))
@@ -1170,7 +1342,9 @@ module Aws::CodeBuild
     Webhook.add_member(:branch_filter, Shapes::ShapeRef.new(shape: String, location_name: "branchFilter"))
     Webhook.add_member(:filter_groups, Shapes::ShapeRef.new(shape: FilterGroups, location_name: "filterGroups"))
     Webhook.add_member(:build_type, Shapes::ShapeRef.new(shape: WebhookBuildType, location_name: "buildType"))
+    Webhook.add_member(:manual_creation, Shapes::ShapeRef.new(shape: WrapperBoolean, location_name: "manualCreation"))
     Webhook.add_member(:last_modified_secret, Shapes::ShapeRef.new(shape: Timestamp, location_name: "lastModifiedSecret"))
+    Webhook.add_member(:scope_configuration, Shapes::ShapeRef.new(shape: ScopeConfiguration, location_name: "scopeConfiguration"))
     Webhook.struct_class = Types::Webhook
 
     WebhookFilter.add_member(:type, Shapes::ShapeRef.new(shape: WebhookFilterType, required: true, location_name: "type"))
@@ -1186,9 +1360,11 @@ module Aws::CodeBuild
 
       api.metadata = {
         "apiVersion" => "2016-10-06",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "codebuild",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceFullName" => "AWS CodeBuild",
         "serviceId" => "CodeBuild",
         "signatureVersion" => "v4",
@@ -1223,6 +1399,15 @@ module Aws::CodeBuild
         o.errors << Shapes::ShapeRef.new(shape: InvalidInputException)
       end)
 
+      api.add_operation(:batch_get_fleets, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "BatchGetFleets"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: BatchGetFleetsInput)
+        o.output = Shapes::ShapeRef.new(shape: BatchGetFleetsOutput)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidInputException)
+      end)
+
       api.add_operation(:batch_get_projects, Seahorse::Model::Operation.new.tap do |o|
         o.name = "BatchGetProjects"
         o.http_method = "POST"
@@ -1248,6 +1433,17 @@ module Aws::CodeBuild
         o.input = Shapes::ShapeRef.new(shape: BatchGetReportsInput)
         o.output = Shapes::ShapeRef.new(shape: BatchGetReportsOutput)
         o.errors << Shapes::ShapeRef.new(shape: InvalidInputException)
+      end)
+
+      api.add_operation(:create_fleet, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "CreateFleet"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: CreateFleetInput)
+        o.output = Shapes::ShapeRef.new(shape: CreateFleetOutput)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidInputException)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceAlreadyExistsException)
+        o.errors << Shapes::ShapeRef.new(shape: AccountLimitExceededException)
       end)
 
       api.add_operation(:create_project, Seahorse::Model::Operation.new.tap do |o|
@@ -1290,6 +1486,15 @@ module Aws::CodeBuild
         o.http_request_uri = "/"
         o.input = Shapes::ShapeRef.new(shape: DeleteBuildBatchInput)
         o.output = Shapes::ShapeRef.new(shape: DeleteBuildBatchOutput)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidInputException)
+      end)
+
+      api.add_operation(:delete_fleet, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DeleteFleet"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DeleteFleetInput)
+        o.output = Shapes::ShapeRef.new(shape: DeleteFleetOutput)
         o.errors << Shapes::ShapeRef.new(shape: InvalidInputException)
       end)
 
@@ -1490,6 +1695,21 @@ module Aws::CodeBuild
         o.output = Shapes::ShapeRef.new(shape: ListCuratedEnvironmentImagesOutput)
       end)
 
+      api.add_operation(:list_fleets, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ListFleets"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: ListFleetsInput)
+        o.output = Shapes::ShapeRef.new(shape: ListFleetsOutput)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidInputException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_results",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
       api.add_operation(:list_projects, Seahorse::Model::Operation.new.tap do |o|
         o.name = "ListProjects"
         o.http_method = "POST"
@@ -1661,12 +1881,33 @@ module Aws::CodeBuild
         o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
       end)
 
+      api.add_operation(:update_fleet, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "UpdateFleet"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: UpdateFleetInput)
+        o.output = Shapes::ShapeRef.new(shape: UpdateFleetOutput)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidInputException)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: AccountLimitExceededException)
+      end)
+
       api.add_operation(:update_project, Seahorse::Model::Operation.new.tap do |o|
         o.name = "UpdateProject"
         o.http_method = "POST"
         o.http_request_uri = "/"
         o.input = Shapes::ShapeRef.new(shape: UpdateProjectInput)
         o.output = Shapes::ShapeRef.new(shape: UpdateProjectOutput)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidInputException)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
+      end)
+
+      api.add_operation(:update_project_visibility, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "UpdateProjectVisibility"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: UpdateProjectVisibilityInput)
+        o.output = Shapes::ShapeRef.new(shape: UpdateProjectVisibilityOutput)
         o.errors << Shapes::ShapeRef.new(shape: InvalidInputException)
         o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
       end)

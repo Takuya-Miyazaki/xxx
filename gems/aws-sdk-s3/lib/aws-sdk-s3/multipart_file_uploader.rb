@@ -21,6 +21,10 @@ module Aws
         Client.api.operation(:create_multipart_upload).input.shape.member_names
       )
 
+      COMPLETE_OPTIONS = Set.new(
+        Client.api.operation(:complete_multipart_upload).input.shape.member_names
+      )
+
       # @api private
       UPLOAD_PART_OPTIONS = Set.new(
         Client.api.operation(:upload_part).input.shape.member_names
@@ -42,7 +46,7 @@ module Aws
       # @option options [Proc] :progress_callback
       #   A Proc that will be called when each chunk of the upload is sent.
       #   It will be invoked with [bytes_read], [total_sizes]
-      # @return [void]
+      # @return [Seahorse::Client::Response] - the CompleteMultipartUploadResponse
       def upload(source, options = {})
         if File.size(source) < MIN_PART_SIZE
           raise ArgumentError, FILE_TOO_SMALL
@@ -61,10 +65,10 @@ module Aws
 
       def complete_upload(upload_id, parts, options)
         @client.complete_multipart_upload(
-          bucket: options[:bucket],
-          key: options[:key],
-          upload_id: upload_id,
-          multipart_upload: { parts: parts }
+          **complete_opts(options).merge(
+            upload_id: upload_id,
+            multipart_upload: { parts: parts }
+          )
         )
       end
 
@@ -85,12 +89,13 @@ module Aws
           key: options[:key],
           upload_id: upload_id
         )
-        msg = "multipart upload failed: #{errors.map(&:message).join("; ")}"
+        msg = "multipart upload failed: #{errors.map(&:message).join('; ')}"
         raise MultipartUploadError.new(msg, errors)
       rescue MultipartUploadError => error
         raise error
       rescue => error
-        msg = "failed to abort multipart upload: #{error.message}"
+        msg = "failed to abort multipart upload: #{error.message}. "\
+          "Multipart upload failed: #{errors.map(&:message).join('; ')}"
         raise MultipartUploadError.new(msg, errors + [error])
       end
 
@@ -123,6 +128,13 @@ module Aws
         end
       end
 
+      def complete_opts(options)
+        COMPLETE_OPTIONS.inject({}) do |hash, key|
+          hash[key] = options[key] if options.key?(key)
+          hash
+        end
+      end
+
       def upload_part_opts(options)
         UPLOAD_PART_OPTIONS.inject({}) do |hash, key|
           hash[key] = options[key] if options.key?(key)
@@ -135,7 +147,7 @@ module Aws
         if (callback = options[:progress_callback])
           progress = MultipartProgress.new(pending, callback)
         end
-        @thread_count.times do
+        options.fetch(:thread_count, @thread_count).times do
           thread = Thread.new do
             begin
               while part = pending.shift
@@ -147,7 +159,15 @@ module Aws
                 end
                 resp = @client.upload_part(part)
                 part[:body].close
-                completed.push(etag: resp.etag, part_number: part[:part_number])
+                completed_part = {etag: resp.etag, part_number: part[:part_number]}
+
+                # get the requested checksum from the response
+                if part[:checksum_algorithm]
+                  k = "checksum_#{part[:checksum_algorithm].downcase}".to_sym
+                  completed_part[k] = resp[k]
+                end
+
+                completed.push(completed_part)
               end
               nil
             rescue => error
@@ -156,7 +176,6 @@ module Aws
               error
             end
           end
-          thread.abort_on_exception = true
           threads << thread
         end
         threads.map(&:value).compact

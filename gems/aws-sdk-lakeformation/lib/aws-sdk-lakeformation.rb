@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-lakeformation/types'
-require_relative 'aws-sdk-lakeformation/client_api'
-require_relative 'aws-sdk-lakeformation/client'
-require_relative 'aws-sdk-lakeformation/errors'
-require_relative 'aws-sdk-lakeformation/resource'
-require_relative 'aws-sdk-lakeformation/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:lakeformation)
 
 # This module provides support for AWS Lake Formation. This module is available in the
 # `aws-sdk-lakeformation` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-lakeformation/customizations'
 # structure.
 #
 #     lake_formation = Aws::LakeFormation::Client.new
-#     resp = lake_formation.batch_grant_permissions(params)
+#     resp = lake_formation.add_lf_tags_to_resource(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-lakeformation/customizations'
 #
 # @!group service
 module Aws::LakeFormation
+  autoload :Types, 'aws-sdk-lakeformation/types'
+  autoload :ClientApi, 'aws-sdk-lakeformation/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-lakeformation/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-lakeformation/client'
+  autoload :Errors, 'aws-sdk-lakeformation/errors'
+  autoload :Resource, 'aws-sdk-lakeformation/resource'
+  autoload :EndpointParameters, 'aws-sdk-lakeformation/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-lakeformation/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-lakeformation/endpoints'
 
-  GEM_VERSION = '1.11.0'
+  GEM_VERSION = '1.62.0'
 
 end
+
+require_relative 'aws-sdk-lakeformation/customizations'

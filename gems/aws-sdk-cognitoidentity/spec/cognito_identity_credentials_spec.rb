@@ -29,19 +29,34 @@ module Aws
 
       let(:identity_id) { 'identity_id' }
       let(:identity_pool_id) { 'pool_id' }
-
+      let(:logins) do
+        { 'login_provider' => 'login_token' }
+      end
       let(:resp) { double('client-resp', credentials: cognito_creds) }
 
       describe '#initialize' do
 
         it 'constructs a client with passed arguments when not given' do
           expect(CognitoIdentity::Client).to receive(:new)
-            .with(region: 'us-east-1', credentials: false)
+            .with({region: 'us-east-1', credentials: false})
             .and_return(client)
 
           creds = CognitoIdentityCredentials.new(
             identity_id: identity_id,
             region: 'us-east-1'
+          )
+          expect(creds.client).to be(client)
+        end
+
+        it 'excludes before_refresh from client construction' do
+          expect(CognitoIdentity::Client).to receive(:new)
+                                               .with({region: 'us-east-1', credentials: false})
+                                               .and_return(client)
+
+          creds = CognitoIdentityCredentials.new(
+            identity_id: identity_id,
+            region: 'us-east-1',
+            before_refresh: proc { }
           )
           expect(creds.client).to be(client)
         end
@@ -75,11 +90,13 @@ module Aws
 
         it 'gets identity_id from the identity_pool_id' do
           expect(client).to receive(:get_id)
-            .with(identity_pool_id: identity_pool_id)
+            .with(identity_pool_id: identity_pool_id, logins: logins)
             .and_return(double("getid", identity_id: identity_id))
-          
+
           creds = CognitoIdentityCredentials.new(
-            client: client, identity_pool_id: identity_pool_id
+            client: client,
+            identity_pool_id: identity_pool_id,
+            logins: logins
           )
 
           expect(creds.identity_id).to eq(identity_id)
@@ -89,7 +106,7 @@ module Aws
       describe '#refresh' do
         it 'extracts credentials and expiration from the response' do
           expect(client).to receive(:get_credentials_for_identity)
-            .with(identity_id: identity_id, custom_role_arn: nil)
+            .with(identity_id: identity_id, custom_role_arn: nil, logins: {})
             .and_return(resp)
 
           creds = CognitoIdentityCredentials.new(
@@ -112,7 +129,7 @@ module Aws
             before_refresh_called = true
             expect(cred_provider).to be_instance_of(CognitoIdentityCredentials)
           end
-          
+
           CognitoIdentityCredentials.new(
             client: client,
             identity_id: identity_id,
@@ -121,8 +138,21 @@ module Aws
 
           expect(before_refresh_called).to be(true)
         end
-      end
 
+        it 'passes logins to the credentials' do
+          expect(client).to receive(:get_credentials_for_identity)
+            .with(identity_id: identity_id, logins: logins, custom_role_arn: nil)
+            .and_return(resp)
+
+          creds = CognitoIdentityCredentials.new(
+            client: client,
+            identity_id: identity_id,
+            logins: logins
+          )
+
+          expect(creds.logins).to eq(logins)
+        end
+      end
     end
   end
 end

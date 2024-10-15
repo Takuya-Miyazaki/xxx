@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:workspaces)
 
 module Aws::WorkSpaces
   # An API client for WorkSpaces.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::WorkSpaces
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::WorkSpaces::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::WorkSpaces
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::WorkSpaces
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::WorkSpaces
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::WorkSpaces
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::WorkSpaces
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::WorkSpaces
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,57 +341,157 @@ module Aws::WorkSpaces
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::WorkSpaces::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::WorkSpaces::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
     end
 
     # @!group API Operations
+
+    # Accepts the account link invitation.
+    #
+    # There's currently no unlinking capability after you accept the
+    # account linking invitation.
+    #
+    # @option params [required, String] :link_id
+    #   The identifier of the account link.
+    #
+    # @option params [String] :client_token
+    #   A string of up to 64 ASCII characters that Amazon EFS uses to ensure
+    #   idempotent creation.
+    #
+    # @return [Types::AcceptAccountLinkInvitationResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::AcceptAccountLinkInvitationResult#account_link #account_link} => Types::AccountLink
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.accept_account_link_invitation({
+    #     link_id: "LinkId", # required
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.account_link.account_link_id #=> String
+    #   resp.account_link.account_link_status #=> String, one of "LINKED", "LINKING_FAILED", "LINK_NOT_FOUND", "PENDING_ACCEPTANCE_BY_TARGET_ACCOUNT", "REJECTED"
+    #   resp.account_link.source_account_id #=> String
+    #   resp.account_link.target_account_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/AcceptAccountLinkInvitation AWS API Documentation
+    #
+    # @overload accept_account_link_invitation(params = {})
+    # @param [Hash] params ({})
+    def accept_account_link_invitation(params = {}, options = {})
+      req = build_request(:accept_account_link_invitation, params)
+      req.send_request(options)
+    end
 
     # Associates the specified connection alias with the specified directory
     # to enable cross-Region redirection. For more information, see [
@@ -410,6 +566,45 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Associates the specified application to the specified WorkSpace.
+    #
+    # @option params [required, String] :workspace_id
+    #   The identifier of the WorkSpace.
+    #
+    # @option params [required, String] :application_id
+    #   The identifier of the application.
+    #
+    # @return [Types::AssociateWorkspaceApplicationResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::AssociateWorkspaceApplicationResult#association #association} => Types::WorkspaceResourceAssociation
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.associate_workspace_application({
+    #     workspace_id: "WorkspaceId", # required
+    #     application_id: "WorkSpaceApplicationId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.association.associated_resource_id #=> String
+    #   resp.association.associated_resource_type #=> String, one of "APPLICATION"
+    #   resp.association.created #=> Time
+    #   resp.association.last_updated_time #=> Time
+    #   resp.association.state #=> String, one of "PENDING_INSTALL", "PENDING_INSTALL_DEPLOYMENT", "PENDING_UNINSTALL", "PENDING_UNINSTALL_DEPLOYMENT", "INSTALLING", "UNINSTALLING", "ERROR", "COMPLETED", "REMOVED"
+    #   resp.association.state_reason.error_code #=> String, one of "ValidationError.InsufficientDiskSpace", "ValidationError.InsufficientMemory", "ValidationError.UnsupportedOperatingSystem", "DeploymentError.InternalServerError", "DeploymentError.WorkspaceUnreachable"
+    #   resp.association.state_reason.error_message #=> String
+    #   resp.association.workspace_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/AssociateWorkspaceApplication AWS API Documentation
+    #
+    # @overload associate_workspace_application(params = {})
+    # @param [Hash] params ({})
+    def associate_workspace_application(params = {}, options = {})
+      req = build_request(:associate_workspace_application, params)
+      req.send_request(options)
+    end
+
     # Adds one or more rules to the specified IP access control group.
     #
     # This action gives users permission to access their WorkSpaces from the
@@ -448,18 +643,16 @@ module Aws::WorkSpaces
     # Region. For more information about copying images, see [ Copy a Custom
     # WorkSpaces Image][1].
     #
-    # <note markdown="1"> In the China (Ningxia) Region, you can copy images only within the
+    # In the China (Ningxia) Region, you can copy images only within the
     # same Region.
     #
-    #  In the AWS GovCloud (US-West) Region, to copy images to and from other
-    # AWS Regions, contact AWS Support.
-    #
-    #  </note>
+    # In Amazon Web Services GovCloud (US), to copy images to and from other
+    # Regions, contact Amazon Web Services Support.
     #
     # Before copying a shared image, be sure to verify that it has been
-    # shared from the correct AWS account. To determine if an image has been
-    # shared and to see the AWS account ID that owns an image, use the
-    # [DescribeWorkSpaceImages][2] and
+    # shared from the correct Amazon Web Services account. To determine if
+    # an image has been shared and to see the ID of the Amazon Web Services
+    # account that owns an image, use the [DescribeWorkSpaceImages][2] and
     # [DescribeWorkspaceImagePermissions][3] API operations.
     #
     #
@@ -515,6 +708,82 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Creates the account link invitation.
+    #
+    # @option params [required, String] :target_account_id
+    #   The identifier of the target account.
+    #
+    # @option params [String] :client_token
+    #   A string of up to 64 ASCII characters that Amazon EFS uses to ensure
+    #   idempotent creation.
+    #
+    # @return [Types::CreateAccountLinkInvitationResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateAccountLinkInvitationResult#account_link #account_link} => Types::AccountLink
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_account_link_invitation({
+    #     target_account_id: "AwsAccount", # required
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.account_link.account_link_id #=> String
+    #   resp.account_link.account_link_status #=> String, one of "LINKED", "LINKING_FAILED", "LINK_NOT_FOUND", "PENDING_ACCEPTANCE_BY_TARGET_ACCOUNT", "REJECTED"
+    #   resp.account_link.source_account_id #=> String
+    #   resp.account_link.target_account_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/CreateAccountLinkInvitation AWS API Documentation
+    #
+    # @overload create_account_link_invitation(params = {})
+    # @param [Hash] params ({})
+    def create_account_link_invitation(params = {}, options = {})
+      req = build_request(:create_account_link_invitation, params)
+      req.send_request(options)
+    end
+
+    # Creates a client-add-in for Amazon Connect within a directory. You can
+    # create only one Amazon Connect client add-in within a directory.
+    #
+    # This client add-in allows WorkSpaces users to seamlessly connect to
+    # Amazon Connect.
+    #
+    # @option params [required, String] :resource_id
+    #   The directory identifier for which to configure the client add-in.
+    #
+    # @option params [required, String] :name
+    #   The name of the client add-in.
+    #
+    # @option params [required, String] :url
+    #   The endpoint URL of the Amazon Connect client add-in.
+    #
+    # @return [Types::CreateConnectClientAddInResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateConnectClientAddInResult#add_in_id #add_in_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_connect_client_add_in({
+    #     resource_id: "DirectoryId", # required
+    #     name: "AddInName", # required
+    #     url: "AddInUrl", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.add_in_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/CreateConnectClientAddIn AWS API Documentation
+    #
+    # @overload create_connect_client_add_in(params = {})
+    # @param [Hash] params ({})
+    def create_connect_client_add_in(params = {}, options = {})
+      req = build_request(:create_connect_client_add_in, params)
+      req.send_request(options)
+    end
+
     # Creates the specified connection alias for use with cross-Region
     # redirection. For more information, see [ Cross-Region Redirection for
     # Amazon WorkSpaces][1].
@@ -528,10 +797,10 @@ module Aws::WorkSpaces
     #   (FQDN), such as `www.example.com`.
     #
     #   After you create a connection string, it is always associated to your
-    #   AWS account. You cannot recreate the same connection string with a
-    #   different account, even if you delete all instances of it from the
-    #   original account. The connection string is globally reserved for your
-    #   account.
+    #   Amazon Web Services account. You cannot recreate the same connection
+    #   string with a different account, even if you delete all instances of
+    #   it from the original account. The connection string is globally
+    #   reserved for your account.
     #
     # @option params [Array<Types::Tag>] :tags
     #   The tags to associate with the connection alias.
@@ -629,6 +898,66 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Creates a standby WorkSpace in a secondary Region.
+    #
+    # @option params [required, String] :primary_region
+    #   The Region of the primary WorkSpace.
+    #
+    # @option params [required, Array<Types::StandbyWorkspace>] :standby_workspaces
+    #   Information about the standby WorkSpace to be created.
+    #
+    # @return [Types::CreateStandbyWorkspacesResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateStandbyWorkspacesResult#failed_standby_requests #failed_standby_requests} => Array&lt;Types::FailedCreateStandbyWorkspacesRequest&gt;
+    #   * {Types::CreateStandbyWorkspacesResult#pending_standby_requests #pending_standby_requests} => Array&lt;Types::PendingCreateStandbyWorkspacesRequest&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_standby_workspaces({
+    #     primary_region: "Region", # required
+    #     standby_workspaces: [ # required
+    #       {
+    #         primary_workspace_id: "WorkspaceId", # required
+    #         volume_encryption_key: "VolumeEncryptionKey",
+    #         directory_id: "DirectoryId", # required
+    #         tags: [
+    #           {
+    #             key: "TagKey", # required
+    #             value: "TagValue",
+    #           },
+    #         ],
+    #         data_replication: "NO_REPLICATION", # accepts NO_REPLICATION, PRIMARY_AS_SOURCE
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.failed_standby_requests #=> Array
+    #   resp.failed_standby_requests[0].standby_workspace_request.primary_workspace_id #=> String
+    #   resp.failed_standby_requests[0].standby_workspace_request.volume_encryption_key #=> String
+    #   resp.failed_standby_requests[0].standby_workspace_request.directory_id #=> String
+    #   resp.failed_standby_requests[0].standby_workspace_request.tags #=> Array
+    #   resp.failed_standby_requests[0].standby_workspace_request.tags[0].key #=> String
+    #   resp.failed_standby_requests[0].standby_workspace_request.tags[0].value #=> String
+    #   resp.failed_standby_requests[0].standby_workspace_request.data_replication #=> String, one of "NO_REPLICATION", "PRIMARY_AS_SOURCE"
+    #   resp.failed_standby_requests[0].error_code #=> String
+    #   resp.failed_standby_requests[0].error_message #=> String
+    #   resp.pending_standby_requests #=> Array
+    #   resp.pending_standby_requests[0].user_name #=> String
+    #   resp.pending_standby_requests[0].directory_id #=> String
+    #   resp.pending_standby_requests[0].state #=> String, one of "PENDING", "AVAILABLE", "IMPAIRED", "UNHEALTHY", "REBOOTING", "STARTING", "REBUILDING", "RESTORING", "MAINTENANCE", "ADMIN_MAINTENANCE", "TERMINATING", "TERMINATED", "SUSPENDED", "UPDATING", "STOPPING", "STOPPED", "ERROR"
+    #   resp.pending_standby_requests[0].workspace_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/CreateStandbyWorkspaces AWS API Documentation
+    #
+    # @overload create_standby_workspaces(params = {})
+    # @param [Hash] params ({})
+    def create_standby_workspaces(params = {}, options = {})
+      req = build_request(:create_standby_workspaces, params)
+      req.send_request(options)
+    end
+
     # Creates the specified tags for the specified WorkSpaces resource.
     #
     # @option params [required, String] :resource_id
@@ -662,10 +991,252 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Creates a new updated WorkSpace image based on the specified source
+    # image. The new updated WorkSpace image has the latest drivers and
+    # other updates required by the Amazon WorkSpaces components.
+    #
+    # To determine which WorkSpace images need to be updated with the latest
+    # Amazon WorkSpaces requirements, use [ DescribeWorkspaceImages][1].
+    #
+    # <note markdown="1"> * Only Windows 10, Windows Server 2016, and Windows Server 2019
+    #   WorkSpace images can be programmatically updated at this time.
+    #
+    # * Microsoft Windows updates and other application updates are not
+    #   included in the update process.
+    #
+    # * The source WorkSpace image is not deleted. You can delete the source
+    #   image after you've verified your new updated image and created a
+    #   new bundle.
+    #
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/workspaces/latest/api/API_DescribeWorkspaceImages.html
+    #
+    # @option params [required, String] :name
+    #   The name of the new updated WorkSpace image.
+    #
+    # @option params [required, String] :description
+    #   A description of whether updates for the WorkSpace image are
+    #   available.
+    #
+    # @option params [required, String] :source_image_id
+    #   The identifier of the source WorkSpace image.
+    #
+    # @option params [Array<Types::Tag>] :tags
+    #   The tags that you want to add to the new updated WorkSpace image.
+    #
+    #   <note markdown="1"> To add tags at the same time when you're creating the updated image,
+    #   you must create an IAM policy that grants your IAM user permissions to
+    #   use `workspaces:CreateTags`.
+    #
+    #    </note>
+    #
+    # @return [Types::CreateUpdatedWorkspaceImageResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateUpdatedWorkspaceImageResult#image_id #image_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_updated_workspace_image({
+    #     name: "WorkspaceImageName", # required
+    #     description: "WorkspaceImageDescription", # required
+    #     source_image_id: "WorkspaceImageId", # required
+    #     tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue",
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.image_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/CreateUpdatedWorkspaceImage AWS API Documentation
+    #
+    # @overload create_updated_workspace_image(params = {})
+    # @param [Hash] params ({})
+    def create_updated_workspace_image(params = {}, options = {})
+      req = build_request(:create_updated_workspace_image, params)
+      req.send_request(options)
+    end
+
+    # Creates the specified WorkSpace bundle. For more information about
+    # creating WorkSpace bundles, see [ Create a Custom WorkSpaces Image and
+    # Bundle][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/workspaces/latest/adminguide/create-custom-bundle.html
+    #
+    # @option params [required, String] :bundle_name
+    #   The name of the bundle.
+    #
+    # @option params [required, String] :bundle_description
+    #   The description of the bundle.
+    #
+    # @option params [required, String] :image_id
+    #   The identifier of the image that is used to create the bundle.
+    #
+    # @option params [required, Types::ComputeType] :compute_type
+    #   Describes the compute type of the bundle.
+    #
+    # @option params [required, Types::UserStorage] :user_storage
+    #   Describes the user volume for a WorkSpace bundle.
+    #
+    # @option params [Types::RootStorage] :root_storage
+    #   Describes the root volume for a WorkSpace bundle.
+    #
+    # @option params [Array<Types::Tag>] :tags
+    #   The tags associated with the bundle.
+    #
+    #   <note markdown="1"> To add tags at the same time when you're creating the bundle, you
+    #   must create an IAM policy that grants your IAM user permissions to use
+    #   `workspaces:CreateTags`.
+    #
+    #    </note>
+    #
+    # @return [Types::CreateWorkspaceBundleResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateWorkspaceBundleResult#workspace_bundle #workspace_bundle} => Types::WorkspaceBundle
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_workspace_bundle({
+    #     bundle_name: "WorkspaceBundleName", # required
+    #     bundle_description: "WorkspaceBundleDescription", # required
+    #     image_id: "WorkspaceImageId", # required
+    #     compute_type: { # required
+    #       name: "VALUE", # accepts VALUE, STANDARD, PERFORMANCE, POWER, GRAPHICS, POWERPRO, GRAPHICSPRO, GRAPHICS_G4DN, GRAPHICSPRO_G4DN
+    #     },
+    #     user_storage: { # required
+    #       capacity: "NonEmptyString", # required
+    #     },
+    #     root_storage: {
+    #       capacity: "NonEmptyString", # required
+    #     },
+    #     tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue",
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.workspace_bundle.bundle_id #=> String
+    #   resp.workspace_bundle.name #=> String
+    #   resp.workspace_bundle.owner #=> String
+    #   resp.workspace_bundle.description #=> String
+    #   resp.workspace_bundle.image_id #=> String
+    #   resp.workspace_bundle.root_storage.capacity #=> String
+    #   resp.workspace_bundle.user_storage.capacity #=> String
+    #   resp.workspace_bundle.compute_type.name #=> String, one of "VALUE", "STANDARD", "PERFORMANCE", "POWER", "GRAPHICS", "POWERPRO", "GRAPHICSPRO", "GRAPHICS_G4DN", "GRAPHICSPRO_G4DN"
+    #   resp.workspace_bundle.last_updated_time #=> Time
+    #   resp.workspace_bundle.creation_time #=> Time
+    #   resp.workspace_bundle.state #=> String, one of "AVAILABLE", "PENDING", "ERROR"
+    #   resp.workspace_bundle.bundle_type #=> String, one of "REGULAR", "STANDBY"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/CreateWorkspaceBundle AWS API Documentation
+    #
+    # @overload create_workspace_bundle(params = {})
+    # @param [Hash] params ({})
+    def create_workspace_bundle(params = {}, options = {})
+      req = build_request(:create_workspace_bundle, params)
+      req.send_request(options)
+    end
+
+    # Creates a new WorkSpace image from an existing WorkSpace.
+    #
+    # @option params [required, String] :name
+    #   The name of the new WorkSpace image.
+    #
+    # @option params [required, String] :description
+    #   The description of the new WorkSpace image.
+    #
+    # @option params [required, String] :workspace_id
+    #   The identifier of the source WorkSpace
+    #
+    # @option params [Array<Types::Tag>] :tags
+    #   The tags that you want to add to the new WorkSpace image. To add tags
+    #   when you're creating the image, you must create an IAM policy that
+    #   grants your IAM user permission to use `workspaces:CreateTags`.
+    #
+    # @return [Types::CreateWorkspaceImageResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateWorkspaceImageResult#image_id #image_id} => String
+    #   * {Types::CreateWorkspaceImageResult#name #name} => String
+    #   * {Types::CreateWorkspaceImageResult#description #description} => String
+    #   * {Types::CreateWorkspaceImageResult#operating_system #operating_system} => Types::OperatingSystem
+    #   * {Types::CreateWorkspaceImageResult#state #state} => String
+    #   * {Types::CreateWorkspaceImageResult#required_tenancy #required_tenancy} => String
+    #   * {Types::CreateWorkspaceImageResult#created #created} => Time
+    #   * {Types::CreateWorkspaceImageResult#owner_account_id #owner_account_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_workspace_image({
+    #     name: "WorkspaceImageName", # required
+    #     description: "WorkspaceImageDescription", # required
+    #     workspace_id: "WorkspaceId", # required
+    #     tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue",
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.image_id #=> String
+    #   resp.name #=> String
+    #   resp.description #=> String
+    #   resp.operating_system.type #=> String, one of "WINDOWS", "LINUX"
+    #   resp.state #=> String, one of "AVAILABLE", "PENDING", "ERROR"
+    #   resp.required_tenancy #=> String, one of "DEFAULT", "DEDICATED"
+    #   resp.created #=> Time
+    #   resp.owner_account_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/CreateWorkspaceImage AWS API Documentation
+    #
+    # @overload create_workspace_image(params = {})
+    # @param [Hash] params ({})
+    def create_workspace_image(params = {}, options = {})
+      req = build_request(:create_workspace_image, params)
+      req.send_request(options)
+    end
+
     # Creates one or more WorkSpaces.
     #
     # This operation is asynchronous and returns before the WorkSpaces are
     # created.
+    #
+    # <note markdown="1"> * The `MANUAL` running mode value is only supported by Amazon
+    #   WorkSpaces Core. Contact your account team to be allow-listed to use
+    #   this value. For more information, see [Amazon WorkSpaces Core][1].
+    #
+    # * You don't need to specify the `PCOIP` protocol for Linux bundles
+    #   because `DCV` (formerly WSP) is the default protocol for those
+    #   bundles.
+    #
+    # * User-decoupled WorkSpaces are only supported by Amazon WorkSpaces
+    #   Core.
+    #
+    # * Review your running mode to ensure you are using one that is optimal
+    #   for your needs and budget. For more information on switching running
+    #   modes, see [ Can I switch between hourly and monthly billing?][2]
+    #
+    #  </note>
+    #
+    #
+    #
+    # [1]: http://aws.amazon.com/workspaces/core/
+    # [2]: http://aws.amazon.com/workspaces-family/workspaces/faqs/#:~:text=Can%20I%20switch%20between%20hourly%20and%20monthly%20billing%20on%20WorkSpaces%20Personal%3F
     #
     # @option params [required, Array<Types::WorkspaceRequest>] :workspaces
     #   The WorkSpaces to create. You can specify up to 25 WorkSpaces.
@@ -687,11 +1258,13 @@ module Aws::WorkSpaces
     #         user_volume_encryption_enabled: false,
     #         root_volume_encryption_enabled: false,
     #         workspace_properties: {
-    #           running_mode: "AUTO_STOP", # accepts AUTO_STOP, ALWAYS_ON
+    #           running_mode: "AUTO_STOP", # accepts AUTO_STOP, ALWAYS_ON, MANUAL
     #           running_mode_auto_stop_timeout_in_minutes: 1,
     #           root_volume_size_gib: 1,
     #           user_volume_size_gib: 1,
-    #           compute_type_name: "VALUE", # accepts VALUE, STANDARD, PERFORMANCE, POWER, GRAPHICS, POWERPRO, GRAPHICSPRO
+    #           compute_type_name: "VALUE", # accepts VALUE, STANDARD, PERFORMANCE, POWER, GRAPHICS, POWERPRO, GRAPHICSPRO, GRAPHICS_G4DN, GRAPHICSPRO_G4DN
+    #           protocols: ["PCOIP"], # accepts PCOIP, WSP
+    #           operating_system_name: "AMAZON_LINUX_2", # accepts AMAZON_LINUX_2, UBUNTU_18_04, UBUNTU_20_04, UBUNTU_22_04, UNKNOWN, WINDOWS_10, WINDOWS_11, WINDOWS_7, WINDOWS_SERVER_2016, WINDOWS_SERVER_2019, WINDOWS_SERVER_2022, RHEL_8
     #         },
     #         tags: [
     #           {
@@ -699,6 +1272,7 @@ module Aws::WorkSpaces
     #             value: "TagValue",
     #           },
     #         ],
+    #         workspace_name: "WorkspaceName",
     #       },
     #     ],
     #   })
@@ -712,14 +1286,18 @@ module Aws::WorkSpaces
     #   resp.failed_requests[0].workspace_request.volume_encryption_key #=> String
     #   resp.failed_requests[0].workspace_request.user_volume_encryption_enabled #=> Boolean
     #   resp.failed_requests[0].workspace_request.root_volume_encryption_enabled #=> Boolean
-    #   resp.failed_requests[0].workspace_request.workspace_properties.running_mode #=> String, one of "AUTO_STOP", "ALWAYS_ON"
+    #   resp.failed_requests[0].workspace_request.workspace_properties.running_mode #=> String, one of "AUTO_STOP", "ALWAYS_ON", "MANUAL"
     #   resp.failed_requests[0].workspace_request.workspace_properties.running_mode_auto_stop_timeout_in_minutes #=> Integer
     #   resp.failed_requests[0].workspace_request.workspace_properties.root_volume_size_gib #=> Integer
     #   resp.failed_requests[0].workspace_request.workspace_properties.user_volume_size_gib #=> Integer
-    #   resp.failed_requests[0].workspace_request.workspace_properties.compute_type_name #=> String, one of "VALUE", "STANDARD", "PERFORMANCE", "POWER", "GRAPHICS", "POWERPRO", "GRAPHICSPRO"
+    #   resp.failed_requests[0].workspace_request.workspace_properties.compute_type_name #=> String, one of "VALUE", "STANDARD", "PERFORMANCE", "POWER", "GRAPHICS", "POWERPRO", "GRAPHICSPRO", "GRAPHICS_G4DN", "GRAPHICSPRO_G4DN"
+    #   resp.failed_requests[0].workspace_request.workspace_properties.protocols #=> Array
+    #   resp.failed_requests[0].workspace_request.workspace_properties.protocols[0] #=> String, one of "PCOIP", "WSP"
+    #   resp.failed_requests[0].workspace_request.workspace_properties.operating_system_name #=> String, one of "AMAZON_LINUX_2", "UBUNTU_18_04", "UBUNTU_20_04", "UBUNTU_22_04", "UNKNOWN", "WINDOWS_10", "WINDOWS_11", "WINDOWS_7", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "RHEL_8"
     #   resp.failed_requests[0].workspace_request.tags #=> Array
     #   resp.failed_requests[0].workspace_request.tags[0].key #=> String
     #   resp.failed_requests[0].workspace_request.tags[0].value #=> String
+    #   resp.failed_requests[0].workspace_request.workspace_name #=> String
     #   resp.failed_requests[0].error_code #=> String
     #   resp.failed_requests[0].error_message #=> String
     #   resp.pending_requests #=> Array
@@ -736,14 +1314,29 @@ module Aws::WorkSpaces
     #   resp.pending_requests[0].volume_encryption_key #=> String
     #   resp.pending_requests[0].user_volume_encryption_enabled #=> Boolean
     #   resp.pending_requests[0].root_volume_encryption_enabled #=> Boolean
-    #   resp.pending_requests[0].workspace_properties.running_mode #=> String, one of "AUTO_STOP", "ALWAYS_ON"
+    #   resp.pending_requests[0].workspace_name #=> String
+    #   resp.pending_requests[0].workspace_properties.running_mode #=> String, one of "AUTO_STOP", "ALWAYS_ON", "MANUAL"
     #   resp.pending_requests[0].workspace_properties.running_mode_auto_stop_timeout_in_minutes #=> Integer
     #   resp.pending_requests[0].workspace_properties.root_volume_size_gib #=> Integer
     #   resp.pending_requests[0].workspace_properties.user_volume_size_gib #=> Integer
-    #   resp.pending_requests[0].workspace_properties.compute_type_name #=> String, one of "VALUE", "STANDARD", "PERFORMANCE", "POWER", "GRAPHICS", "POWERPRO", "GRAPHICSPRO"
+    #   resp.pending_requests[0].workspace_properties.compute_type_name #=> String, one of "VALUE", "STANDARD", "PERFORMANCE", "POWER", "GRAPHICS", "POWERPRO", "GRAPHICSPRO", "GRAPHICS_G4DN", "GRAPHICSPRO_G4DN"
+    #   resp.pending_requests[0].workspace_properties.protocols #=> Array
+    #   resp.pending_requests[0].workspace_properties.protocols[0] #=> String, one of "PCOIP", "WSP"
+    #   resp.pending_requests[0].workspace_properties.operating_system_name #=> String, one of "AMAZON_LINUX_2", "UBUNTU_18_04", "UBUNTU_20_04", "UBUNTU_22_04", "UNKNOWN", "WINDOWS_10", "WINDOWS_11", "WINDOWS_7", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "RHEL_8"
     #   resp.pending_requests[0].modification_states #=> Array
     #   resp.pending_requests[0].modification_states[0].resource #=> String, one of "ROOT_VOLUME", "USER_VOLUME", "COMPUTE_TYPE"
     #   resp.pending_requests[0].modification_states[0].state #=> String, one of "UPDATE_INITIATED", "UPDATE_IN_PROGRESS"
+    #   resp.pending_requests[0].related_workspaces #=> Array
+    #   resp.pending_requests[0].related_workspaces[0].workspace_id #=> String
+    #   resp.pending_requests[0].related_workspaces[0].region #=> String
+    #   resp.pending_requests[0].related_workspaces[0].state #=> String, one of "PENDING", "AVAILABLE", "IMPAIRED", "UNHEALTHY", "REBOOTING", "STARTING", "REBUILDING", "RESTORING", "MAINTENANCE", "ADMIN_MAINTENANCE", "TERMINATING", "TERMINATED", "SUSPENDED", "UPDATING", "STOPPING", "STOPPED", "ERROR"
+    #   resp.pending_requests[0].related_workspaces[0].type #=> String, one of "PRIMARY", "STANDBY"
+    #   resp.pending_requests[0].data_replication_settings.data_replication #=> String, one of "NO_REPLICATION", "PRIMARY_AS_SOURCE"
+    #   resp.pending_requests[0].data_replication_settings.recovery_snapshot_time #=> Time
+    #   resp.pending_requests[0].standby_workspaces_properties #=> Array
+    #   resp.pending_requests[0].standby_workspaces_properties[0].standby_workspace_id #=> String
+    #   resp.pending_requests[0].standby_workspaces_properties[0].data_replication #=> String, one of "NO_REPLICATION", "PRIMARY_AS_SOURCE"
+    #   resp.pending_requests[0].standby_workspaces_properties[0].recovery_snapshot_time #=> Time
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/CreateWorkspaces AWS API Documentation
     #
@@ -751,6 +1344,193 @@ module Aws::WorkSpaces
     # @param [Hash] params ({})
     def create_workspaces(params = {}, options = {})
       req = build_request(:create_workspaces, params)
+      req.send_request(options)
+    end
+
+    # Creates a pool of WorkSpaces.
+    #
+    # @option params [required, String] :pool_name
+    #   The name of the pool.
+    #
+    # @option params [required, String] :description
+    #   The pool description.
+    #
+    # @option params [required, String] :bundle_id
+    #   The identifier of the bundle for the pool.
+    #
+    # @option params [required, String] :directory_id
+    #   The identifier of the directory for the pool.
+    #
+    # @option params [required, Types::Capacity] :capacity
+    #   The user capacity of the pool.
+    #
+    # @option params [Array<Types::Tag>] :tags
+    #   The tags for the pool.
+    #
+    # @option params [Types::ApplicationSettingsRequest] :application_settings
+    #   Indicates the application settings of the pool.
+    #
+    # @option params [Types::TimeoutSettings] :timeout_settings
+    #   Indicates the timeout settings of the pool.
+    #
+    # @return [Types::CreateWorkspacesPoolResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateWorkspacesPoolResult#workspaces_pool #workspaces_pool} => Types::WorkspacesPool
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_workspaces_pool({
+    #     pool_name: "WorkspacesPoolName", # required
+    #     description: "UpdateDescription", # required
+    #     bundle_id: "BundleId", # required
+    #     directory_id: "DirectoryId", # required
+    #     capacity: { # required
+    #       desired_user_sessions: 1, # required
+    #     },
+    #     tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue",
+    #       },
+    #     ],
+    #     application_settings: {
+    #       status: "DISABLED", # required, accepts DISABLED, ENABLED
+    #       settings_group: "SettingsGroup",
+    #     },
+    #     timeout_settings: {
+    #       disconnect_timeout_in_seconds: 1,
+    #       idle_disconnect_timeout_in_seconds: 1,
+    #       max_user_duration_in_seconds: 1,
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.workspaces_pool.pool_id #=> String
+    #   resp.workspaces_pool.pool_arn #=> String
+    #   resp.workspaces_pool.capacity_status.available_user_sessions #=> Integer
+    #   resp.workspaces_pool.capacity_status.desired_user_sessions #=> Integer
+    #   resp.workspaces_pool.capacity_status.actual_user_sessions #=> Integer
+    #   resp.workspaces_pool.capacity_status.active_user_sessions #=> Integer
+    #   resp.workspaces_pool.pool_name #=> String
+    #   resp.workspaces_pool.description #=> String
+    #   resp.workspaces_pool.state #=> String, one of "CREATING", "DELETING", "RUNNING", "STARTING", "STOPPED", "STOPPING", "UPDATING"
+    #   resp.workspaces_pool.created_at #=> Time
+    #   resp.workspaces_pool.bundle_id #=> String
+    #   resp.workspaces_pool.directory_id #=> String
+    #   resp.workspaces_pool.errors #=> Array
+    #   resp.workspaces_pool.errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_IS_MISSING", "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "WORKSPACES_POOL_STOPPED", "WORKSPACES_POOL_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR", "DOMAIN_JOIN_ERROR_SECRET_ACTION_PERMISSION_IS_MISSING", "DOMAIN_JOIN_ERROR_SECRET_DECRYPTION_FAILURE", "DOMAIN_JOIN_ERROR_SECRET_STATE_INVALID", "DOMAIN_JOIN_ERROR_SECRET_NOT_FOUND", "DOMAIN_JOIN_ERROR_SECRET_VALUE_KEY_NOT_FOUND", "DOMAIN_JOIN_ERROR_SECRET_INVALID", "BUNDLE_NOT_FOUND", "DIRECTORY_NOT_FOUND", "INSUFFICIENT_PERMISSIONS_ERROR", "DEFAULT_OU_IS_MISSING"
+    #   resp.workspaces_pool.errors[0].error_message #=> String
+    #   resp.workspaces_pool.application_settings.status #=> String, one of "DISABLED", "ENABLED"
+    #   resp.workspaces_pool.application_settings.settings_group #=> String
+    #   resp.workspaces_pool.application_settings.s3_bucket_name #=> String
+    #   resp.workspaces_pool.timeout_settings.disconnect_timeout_in_seconds #=> Integer
+    #   resp.workspaces_pool.timeout_settings.idle_disconnect_timeout_in_seconds #=> Integer
+    #   resp.workspaces_pool.timeout_settings.max_user_duration_in_seconds #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/CreateWorkspacesPool AWS API Documentation
+    #
+    # @overload create_workspaces_pool(params = {})
+    # @param [Hash] params ({})
+    def create_workspaces_pool(params = {}, options = {})
+      req = build_request(:create_workspaces_pool, params)
+      req.send_request(options)
+    end
+
+    # Deletes the account link invitation.
+    #
+    # @option params [required, String] :link_id
+    #   The identifier of the account link.
+    #
+    # @option params [String] :client_token
+    #   A string of up to 64 ASCII characters that Amazon EFS uses to ensure
+    #   idempotent creation.
+    #
+    # @return [Types::DeleteAccountLinkInvitationResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteAccountLinkInvitationResult#account_link #account_link} => Types::AccountLink
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_account_link_invitation({
+    #     link_id: "LinkId", # required
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.account_link.account_link_id #=> String
+    #   resp.account_link.account_link_status #=> String, one of "LINKED", "LINKING_FAILED", "LINK_NOT_FOUND", "PENDING_ACCEPTANCE_BY_TARGET_ACCOUNT", "REJECTED"
+    #   resp.account_link.source_account_id #=> String
+    #   resp.account_link.target_account_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DeleteAccountLinkInvitation AWS API Documentation
+    #
+    # @overload delete_account_link_invitation(params = {})
+    # @param [Hash] params ({})
+    def delete_account_link_invitation(params = {}, options = {})
+      req = build_request(:delete_account_link_invitation, params)
+      req.send_request(options)
+    end
+
+    # Deletes customized client branding. Client branding allows you to
+    # customize your WorkSpace's client login portal. You can tailor your
+    # login portal company logo, the support email address, support link,
+    # link to reset password, and a custom message for users trying to sign
+    # in.
+    #
+    # After you delete your customized client branding, your login portal
+    # reverts to the default client branding.
+    #
+    # @option params [required, String] :resource_id
+    #   The directory identifier of the WorkSpace for which you want to delete
+    #   client branding.
+    #
+    # @option params [required, Array<String>] :platforms
+    #   The device type for which you want to delete client branding.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_client_branding({
+    #     resource_id: "DirectoryId", # required
+    #     platforms: ["DeviceTypeWindows"], # required, accepts DeviceTypeWindows, DeviceTypeOsx, DeviceTypeAndroid, DeviceTypeIos, DeviceTypeLinux, DeviceTypeWeb
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DeleteClientBranding AWS API Documentation
+    #
+    # @overload delete_client_branding(params = {})
+    # @param [Hash] params ({})
+    def delete_client_branding(params = {}, options = {})
+      req = build_request(:delete_client_branding, params)
+      req.send_request(options)
+    end
+
+    # Deletes a client-add-in for Amazon Connect that is configured within a
+    # directory.
+    #
+    # @option params [required, String] :add_in_id
+    #   The identifier of the client add-in to delete.
+    #
+    # @option params [required, String] :resource_id
+    #   The directory identifier for which the client add-in is configured.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_connect_client_add_in({
+    #     add_in_id: "AmazonUuid", # required
+    #     resource_id: "DirectoryId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DeleteConnectClientAddIn AWS API Documentation
+    #
+    # @overload delete_connect_client_add_in(params = {})
+    # @param [Hash] params ({})
+    def delete_connect_client_add_in(params = {}, options = {})
+      req = build_request(:delete_connect_client_add_in, params)
       req.send_request(options)
     end
 
@@ -850,6 +1630,34 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Deletes the specified WorkSpace bundle. For more information about
+    # deleting WorkSpace bundles, see [ Delete a Custom WorkSpaces Bundle or
+    # Image][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/workspaces/latest/adminguide/delete_bundle.html
+    #
+    # @option params [String] :bundle_id
+    #   The identifier of the bundle.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_workspace_bundle({
+    #     bundle_id: "BundleId",
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DeleteWorkspaceBundle AWS API Documentation
+    #
+    # @overload delete_workspace_bundle(params = {})
+    # @param [Hash] params ({})
+    def delete_workspace_bundle(params = {}, options = {})
+      req = build_request(:delete_workspace_bundle, params)
+      req.send_request(options)
+    end
+
     # Deletes the specified image from your account. To delete an image, you
     # must first delete any bundles that are associated with the image and
     # unshare the image if it is shared with other accounts.
@@ -874,6 +1682,48 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Deploys associated applications to the specified WorkSpace
+    #
+    # @option params [required, String] :workspace_id
+    #   The identifier of the WorkSpace.
+    #
+    # @option params [Boolean] :force
+    #   Indicates whether the force flag is applied for the specified
+    #   WorkSpace. When the force flag is enabled, it allows previously failed
+    #   deployments to be retried.
+    #
+    # @return [Types::DeployWorkspaceApplicationsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeployWorkspaceApplicationsResult#deployment #deployment} => Types::WorkSpaceApplicationDeployment
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.deploy_workspace_applications({
+    #     workspace_id: "WorkspaceId", # required
+    #     force: false,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.deployment.associations #=> Array
+    #   resp.deployment.associations[0].associated_resource_id #=> String
+    #   resp.deployment.associations[0].associated_resource_type #=> String, one of "APPLICATION"
+    #   resp.deployment.associations[0].created #=> Time
+    #   resp.deployment.associations[0].last_updated_time #=> Time
+    #   resp.deployment.associations[0].state #=> String, one of "PENDING_INSTALL", "PENDING_INSTALL_DEPLOYMENT", "PENDING_UNINSTALL", "PENDING_UNINSTALL_DEPLOYMENT", "INSTALLING", "UNINSTALLING", "ERROR", "COMPLETED", "REMOVED"
+    #   resp.deployment.associations[0].state_reason.error_code #=> String, one of "ValidationError.InsufficientDiskSpace", "ValidationError.InsufficientMemory", "ValidationError.UnsupportedOperatingSystem", "DeploymentError.InternalServerError", "DeploymentError.WorkspaceUnreachable"
+    #   resp.deployment.associations[0].state_reason.error_message #=> String
+    #   resp.deployment.associations[0].workspace_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DeployWorkspaceApplications AWS API Documentation
+    #
+    # @overload deploy_workspace_applications(params = {})
+    # @param [Hash] params ({})
+    def deploy_workspace_applications(params = {}, options = {})
+      req = build_request(:deploy_workspace_applications, params)
+      req.send_request(options)
+    end
+
     # Deregisters the specified directory. This operation is asynchronous
     # and returns before the WorkSpace directory is deregistered. If any
     # WorkSpaces are registered to this directory, you must remove them
@@ -883,8 +1733,8 @@ module Aws::WorkSpaces
     # use with WorkSpaces. If there are no WorkSpaces being used with your
     # Simple AD or AD Connector directory for 30 consecutive days, this
     # directory will be automatically deregistered for use with Amazon
-    # WorkSpaces, and you will be charged for this directory as per the [AWS
-    # Directory Services pricing terms][1].
+    # WorkSpaces, and you will be charged for this directory as per the
+    # [Directory Service pricing terms][1].
     #
     #  To delete empty directories, see [ Delete the Directory for Your
     # WorkSpaces][2]. If you delete your Simple AD or AD Connector
@@ -928,11 +1778,13 @@ module Aws::WorkSpaces
     #
     #   * {Types::DescribeAccountResult#dedicated_tenancy_support #dedicated_tenancy_support} => String
     #   * {Types::DescribeAccountResult#dedicated_tenancy_management_cidr_range #dedicated_tenancy_management_cidr_range} => String
+    #   * {Types::DescribeAccountResult#dedicated_tenancy_account_type #dedicated_tenancy_account_type} => String
     #
     # @example Response structure
     #
     #   resp.dedicated_tenancy_support #=> String, one of "ENABLED", "DISABLED"
     #   resp.dedicated_tenancy_management_cidr_range #=> String
+    #   resp.dedicated_tenancy_account_type #=> String, one of "SOURCE_ACCOUNT", "TARGET_ACCOUNT"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeAccount AWS API Documentation
     #
@@ -981,6 +1833,250 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Describes the associations between the application and the specified
+    # associated resources.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of associations to return.
+    #
+    # @option params [String] :next_token
+    #   If you received a `NextToken` from a previous call that was paginated,
+    #   provide this token to receive the next set of results.
+    #
+    # @option params [required, String] :application_id
+    #   The identifier of the specified application.
+    #
+    # @option params [required, Array<String>] :associated_resource_types
+    #   The resource type of the associated resources.
+    #
+    # @return [Types::DescribeApplicationAssociationsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeApplicationAssociationsResult#associations #associations} => Array&lt;Types::ApplicationResourceAssociation&gt;
+    #   * {Types::DescribeApplicationAssociationsResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_application_associations({
+    #     max_results: 1,
+    #     next_token: "PaginationToken",
+    #     application_id: "WorkSpaceApplicationId", # required
+    #     associated_resource_types: ["WORKSPACE"], # required, accepts WORKSPACE, BUNDLE, IMAGE
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.associations #=> Array
+    #   resp.associations[0].application_id #=> String
+    #   resp.associations[0].associated_resource_id #=> String
+    #   resp.associations[0].associated_resource_type #=> String, one of "WORKSPACE", "BUNDLE", "IMAGE"
+    #   resp.associations[0].created #=> Time
+    #   resp.associations[0].last_updated_time #=> Time
+    #   resp.associations[0].state #=> String, one of "PENDING_INSTALL", "PENDING_INSTALL_DEPLOYMENT", "PENDING_UNINSTALL", "PENDING_UNINSTALL_DEPLOYMENT", "INSTALLING", "UNINSTALLING", "ERROR", "COMPLETED", "REMOVED"
+    #   resp.associations[0].state_reason.error_code #=> String, one of "ValidationError.InsufficientDiskSpace", "ValidationError.InsufficientMemory", "ValidationError.UnsupportedOperatingSystem", "DeploymentError.InternalServerError", "DeploymentError.WorkspaceUnreachable"
+    #   resp.associations[0].state_reason.error_message #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeApplicationAssociations AWS API Documentation
+    #
+    # @overload describe_application_associations(params = {})
+    # @param [Hash] params ({})
+    def describe_application_associations(params = {}, options = {})
+      req = build_request(:describe_application_associations, params)
+      req.send_request(options)
+    end
+
+    # Describes the specified applications by filtering based on their
+    # compute types, license availability, operating systems, and owners.
+    #
+    # @option params [Array<String>] :application_ids
+    #   The identifiers of one or more applications.
+    #
+    # @option params [Array<String>] :compute_type_names
+    #   The compute types supported by the applications.
+    #
+    # @option params [String] :license_type
+    #   The license availability for the applications.
+    #
+    # @option params [Array<String>] :operating_system_names
+    #   The operating systems supported by the applications.
+    #
+    # @option params [String] :owner
+    #   The owner of the applications.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of applications to return.
+    #
+    # @option params [String] :next_token
+    #   If you received a `NextToken` from a previous call that was paginated,
+    #   provide this token to receive the next set of results.
+    #
+    # @return [Types::DescribeApplicationsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeApplicationsResult#applications #applications} => Array&lt;Types::WorkSpaceApplication&gt;
+    #   * {Types::DescribeApplicationsResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_applications({
+    #     application_ids: ["WorkSpaceApplicationId"],
+    #     compute_type_names: ["VALUE"], # accepts VALUE, STANDARD, PERFORMANCE, POWER, GRAPHICS, POWERPRO, GRAPHICSPRO, GRAPHICS_G4DN, GRAPHICSPRO_G4DN
+    #     license_type: "LICENSED", # accepts LICENSED, UNLICENSED
+    #     operating_system_names: ["AMAZON_LINUX_2"], # accepts AMAZON_LINUX_2, UBUNTU_18_04, UBUNTU_20_04, UBUNTU_22_04, UNKNOWN, WINDOWS_10, WINDOWS_11, WINDOWS_7, WINDOWS_SERVER_2016, WINDOWS_SERVER_2019, WINDOWS_SERVER_2022, RHEL_8
+    #     owner: "WorkSpaceApplicationOwner",
+    #     max_results: 1,
+    #     next_token: "PaginationToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.applications #=> Array
+    #   resp.applications[0].application_id #=> String
+    #   resp.applications[0].created #=> Time
+    #   resp.applications[0].description #=> String
+    #   resp.applications[0].license_type #=> String, one of "LICENSED", "UNLICENSED"
+    #   resp.applications[0].name #=> String
+    #   resp.applications[0].owner #=> String
+    #   resp.applications[0].state #=> String, one of "PENDING", "ERROR", "AVAILABLE", "UNINSTALL_ONLY"
+    #   resp.applications[0].supported_compute_type_names #=> Array
+    #   resp.applications[0].supported_compute_type_names[0] #=> String, one of "VALUE", "STANDARD", "PERFORMANCE", "POWER", "GRAPHICS", "POWERPRO", "GRAPHICSPRO", "GRAPHICS_G4DN", "GRAPHICSPRO_G4DN"
+    #   resp.applications[0].supported_operating_system_names #=> Array
+    #   resp.applications[0].supported_operating_system_names[0] #=> String, one of "AMAZON_LINUX_2", "UBUNTU_18_04", "UBUNTU_20_04", "UBUNTU_22_04", "UNKNOWN", "WINDOWS_10", "WINDOWS_11", "WINDOWS_7", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "RHEL_8"
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeApplications AWS API Documentation
+    #
+    # @overload describe_applications(params = {})
+    # @param [Hash] params ({})
+    def describe_applications(params = {}, options = {})
+      req = build_request(:describe_applications, params)
+      req.send_request(options)
+    end
+
+    # Describes the associations between the applications and the specified
+    # bundle.
+    #
+    # @option params [required, String] :bundle_id
+    #   The identifier of the bundle.
+    #
+    # @option params [required, Array<String>] :associated_resource_types
+    #   The resource types of the associated resource.
+    #
+    # @return [Types::DescribeBundleAssociationsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeBundleAssociationsResult#associations #associations} => Array&lt;Types::BundleResourceAssociation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_bundle_associations({
+    #     bundle_id: "BundleId", # required
+    #     associated_resource_types: ["APPLICATION"], # required, accepts APPLICATION
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.associations #=> Array
+    #   resp.associations[0].associated_resource_id #=> String
+    #   resp.associations[0].associated_resource_type #=> String, one of "APPLICATION"
+    #   resp.associations[0].bundle_id #=> String
+    #   resp.associations[0].created #=> Time
+    #   resp.associations[0].last_updated_time #=> Time
+    #   resp.associations[0].state #=> String, one of "PENDING_INSTALL", "PENDING_INSTALL_DEPLOYMENT", "PENDING_UNINSTALL", "PENDING_UNINSTALL_DEPLOYMENT", "INSTALLING", "UNINSTALLING", "ERROR", "COMPLETED", "REMOVED"
+    #   resp.associations[0].state_reason.error_code #=> String, one of "ValidationError.InsufficientDiskSpace", "ValidationError.InsufficientMemory", "ValidationError.UnsupportedOperatingSystem", "DeploymentError.InternalServerError", "DeploymentError.WorkspaceUnreachable"
+    #   resp.associations[0].state_reason.error_message #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeBundleAssociations AWS API Documentation
+    #
+    # @overload describe_bundle_associations(params = {})
+    # @param [Hash] params ({})
+    def describe_bundle_associations(params = {}, options = {})
+      req = build_request(:describe_bundle_associations, params)
+      req.send_request(options)
+    end
+
+    # Describes the specified client branding. Client branding allows you to
+    # customize the log in page of various device types for your users. You
+    # can add your company logo, the support email address, support link,
+    # link to reset password, and a custom message for users trying to sign
+    # in.
+    #
+    # <note markdown="1"> Only device types that have branding information configured will be
+    # shown in the response.
+    #
+    #  </note>
+    #
+    # @option params [required, String] :resource_id
+    #   The directory identifier of the WorkSpace for which you want to view
+    #   client branding information.
+    #
+    # @return [Types::DescribeClientBrandingResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeClientBrandingResult#device_type_windows #device_type_windows} => Types::DefaultClientBrandingAttributes
+    #   * {Types::DescribeClientBrandingResult#device_type_osx #device_type_osx} => Types::DefaultClientBrandingAttributes
+    #   * {Types::DescribeClientBrandingResult#device_type_android #device_type_android} => Types::DefaultClientBrandingAttributes
+    #   * {Types::DescribeClientBrandingResult#device_type_ios #device_type_ios} => Types::IosClientBrandingAttributes
+    #   * {Types::DescribeClientBrandingResult#device_type_linux #device_type_linux} => Types::DefaultClientBrandingAttributes
+    #   * {Types::DescribeClientBrandingResult#device_type_web #device_type_web} => Types::DefaultClientBrandingAttributes
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_client_branding({
+    #     resource_id: "DirectoryId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.device_type_windows.logo_url #=> String
+    #   resp.device_type_windows.support_email #=> String
+    #   resp.device_type_windows.support_link #=> String
+    #   resp.device_type_windows.forgot_password_link #=> String
+    #   resp.device_type_windows.login_message #=> Hash
+    #   resp.device_type_windows.login_message["ClientLocale"] #=> String
+    #   resp.device_type_osx.logo_url #=> String
+    #   resp.device_type_osx.support_email #=> String
+    #   resp.device_type_osx.support_link #=> String
+    #   resp.device_type_osx.forgot_password_link #=> String
+    #   resp.device_type_osx.login_message #=> Hash
+    #   resp.device_type_osx.login_message["ClientLocale"] #=> String
+    #   resp.device_type_android.logo_url #=> String
+    #   resp.device_type_android.support_email #=> String
+    #   resp.device_type_android.support_link #=> String
+    #   resp.device_type_android.forgot_password_link #=> String
+    #   resp.device_type_android.login_message #=> Hash
+    #   resp.device_type_android.login_message["ClientLocale"] #=> String
+    #   resp.device_type_ios.logo_url #=> String
+    #   resp.device_type_ios.logo_2x_url #=> String
+    #   resp.device_type_ios.logo_3x_url #=> String
+    #   resp.device_type_ios.support_email #=> String
+    #   resp.device_type_ios.support_link #=> String
+    #   resp.device_type_ios.forgot_password_link #=> String
+    #   resp.device_type_ios.login_message #=> Hash
+    #   resp.device_type_ios.login_message["ClientLocale"] #=> String
+    #   resp.device_type_linux.logo_url #=> String
+    #   resp.device_type_linux.support_email #=> String
+    #   resp.device_type_linux.support_link #=> String
+    #   resp.device_type_linux.forgot_password_link #=> String
+    #   resp.device_type_linux.login_message #=> Hash
+    #   resp.device_type_linux.login_message["ClientLocale"] #=> String
+    #   resp.device_type_web.logo_url #=> String
+    #   resp.device_type_web.support_email #=> String
+    #   resp.device_type_web.support_link #=> String
+    #   resp.device_type_web.forgot_password_link #=> String
+    #   resp.device_type_web.login_message #=> Hash
+    #   resp.device_type_web.login_message["ClientLocale"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeClientBranding AWS API Documentation
+    #
+    # @overload describe_client_branding(params = {})
+    # @param [Hash] params ({})
+    def describe_client_branding(params = {}, options = {})
+      req = build_request(:describe_client_branding, params)
+      req.send_request(options)
+    end
+
     # Retrieves a list that describes one or more specified Amazon
     # WorkSpaces clients.
     #
@@ -1002,6 +2098,7 @@ module Aws::WorkSpaces
     #   resp.client_properties_list #=> Array
     #   resp.client_properties_list[0].resource_id #=> String
     #   resp.client_properties_list[0].client_properties.reconnect_enabled #=> String, one of "ENABLED", "DISABLED"
+    #   resp.client_properties_list[0].client_properties.log_upload_enabled #=> String, one of "ENABLED", "DISABLED"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeClientProperties AWS API Documentation
     #
@@ -1012,10 +2109,54 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Retrieves a list of Amazon Connect client add-ins that have been
+    # created.
+    #
+    # @option params [required, String] :resource_id
+    #   The directory identifier for which the client add-in is configured.
+    #
+    # @option params [String] :next_token
+    #   If you received a `NextToken` from a previous call that was paginated,
+    #   provide this token to receive the next set of results.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of items to return.
+    #
+    # @return [Types::DescribeConnectClientAddInsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeConnectClientAddInsResult#add_ins #add_ins} => Array&lt;Types::ConnectClientAddIn&gt;
+    #   * {Types::DescribeConnectClientAddInsResult#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_connect_client_add_ins({
+    #     resource_id: "DirectoryId", # required
+    #     next_token: "PaginationToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.add_ins #=> Array
+    #   resp.add_ins[0].add_in_id #=> String
+    #   resp.add_ins[0].resource_id #=> String
+    #   resp.add_ins[0].name #=> String
+    #   resp.add_ins[0].url #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeConnectClientAddIns AWS API Documentation
+    #
+    # @overload describe_connect_client_add_ins(params = {})
+    # @param [Hash] params ({})
+    def describe_connect_client_add_ins(params = {}, options = {})
+      req = build_request(:describe_connect_client_add_ins, params)
+      req.send_request(options)
+    end
+
     # Describes the permissions that the owner of a connection alias has
-    # granted to another AWS account for the specified connection alias. For
-    # more information, see [ Cross-Region Redirection for Amazon
-    # WorkSpaces][1].
+    # granted to another Amazon Web Services account for the specified
+    # connection alias. For more information, see [ Cross-Region Redirection
+    # for Amazon WorkSpaces][1].
     #
     #
     #
@@ -1120,6 +2261,47 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Describes the associations between the applications and the specified
+    # image.
+    #
+    # @option params [required, String] :image_id
+    #   The identifier of the image.
+    #
+    # @option params [required, Array<String>] :associated_resource_types
+    #   The resource types of the associated resource.
+    #
+    # @return [Types::DescribeImageAssociationsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeImageAssociationsResult#associations #associations} => Array&lt;Types::ImageResourceAssociation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_image_associations({
+    #     image_id: "WorkspaceImageId", # required
+    #     associated_resource_types: ["APPLICATION"], # required, accepts APPLICATION
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.associations #=> Array
+    #   resp.associations[0].associated_resource_id #=> String
+    #   resp.associations[0].associated_resource_type #=> String, one of "APPLICATION"
+    #   resp.associations[0].created #=> Time
+    #   resp.associations[0].last_updated_time #=> Time
+    #   resp.associations[0].image_id #=> String
+    #   resp.associations[0].state #=> String, one of "PENDING_INSTALL", "PENDING_INSTALL_DEPLOYMENT", "PENDING_UNINSTALL", "PENDING_UNINSTALL_DEPLOYMENT", "INSTALLING", "UNINSTALLING", "ERROR", "COMPLETED", "REMOVED"
+    #   resp.associations[0].state_reason.error_code #=> String, one of "ValidationError.InsufficientDiskSpace", "ValidationError.InsufficientMemory", "ValidationError.UnsupportedOperatingSystem", "DeploymentError.InternalServerError", "DeploymentError.WorkspaceUnreachable"
+    #   resp.associations[0].state_reason.error_message #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeImageAssociations AWS API Documentation
+    #
+    # @overload describe_image_associations(params = {})
+    # @param [Hash] params ({})
+    def describe_image_associations(params = {}, options = {})
+      req = build_request(:describe_image_associations, params)
+      req.send_request(options)
+    end
+
     # Describes one or more of your IP access control groups.
     #
     # @option params [Array<String>] :group_ids
@@ -1197,6 +2379,47 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Describes the associations betweens applications and the specified
+    # WorkSpace.
+    #
+    # @option params [required, String] :workspace_id
+    #   The identifier of the WorkSpace.
+    #
+    # @option params [required, Array<String>] :associated_resource_types
+    #   The resource types of the associated resources.
+    #
+    # @return [Types::DescribeWorkspaceAssociationsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeWorkspaceAssociationsResult#associations #associations} => Array&lt;Types::WorkspaceResourceAssociation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_workspace_associations({
+    #     workspace_id: "WorkspaceId", # required
+    #     associated_resource_types: ["APPLICATION"], # required, accepts APPLICATION
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.associations #=> Array
+    #   resp.associations[0].associated_resource_id #=> String
+    #   resp.associations[0].associated_resource_type #=> String, one of "APPLICATION"
+    #   resp.associations[0].created #=> Time
+    #   resp.associations[0].last_updated_time #=> Time
+    #   resp.associations[0].state #=> String, one of "PENDING_INSTALL", "PENDING_INSTALL_DEPLOYMENT", "PENDING_UNINSTALL", "PENDING_UNINSTALL_DEPLOYMENT", "INSTALLING", "UNINSTALLING", "ERROR", "COMPLETED", "REMOVED"
+    #   resp.associations[0].state_reason.error_code #=> String, one of "ValidationError.InsufficientDiskSpace", "ValidationError.InsufficientMemory", "ValidationError.UnsupportedOperatingSystem", "DeploymentError.InternalServerError", "DeploymentError.WorkspaceUnreachable"
+    #   resp.associations[0].state_reason.error_message #=> String
+    #   resp.associations[0].workspace_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeWorkspaceAssociations AWS API Documentation
+    #
+    # @overload describe_workspace_associations(params = {})
+    # @param [Hash] params ({})
+    def describe_workspace_associations(params = {}, options = {})
+      req = build_request(:describe_workspace_associations, params)
+      req.send_request(options)
+    end
+
     # Retrieves a list that describes the available WorkSpace bundles.
     #
     # You can filter the results using either bundle ID or owner, but not
@@ -1210,8 +2433,9 @@ module Aws::WorkSpaces
     #   The owner of the bundles. You cannot combine this parameter with any
     #   other filter.
     #
-    #   Specify `AMAZON` to describe the bundles provided by AWS or null to
-    #   describe the bundles that belong to your account.
+    #   To describe the bundles provided by Amazon Web Services, specify
+    #   `AMAZON`. To describe the bundles that belong to your account, don't
+    #   specify a value.
     #
     # @option params [String] :next_token
     #   The token for the next set of results. (You received this token from a
@@ -1242,8 +2466,11 @@ module Aws::WorkSpaces
     #   resp.bundles[0].image_id #=> String
     #   resp.bundles[0].root_storage.capacity #=> String
     #   resp.bundles[0].user_storage.capacity #=> String
-    #   resp.bundles[0].compute_type.name #=> String, one of "VALUE", "STANDARD", "PERFORMANCE", "POWER", "GRAPHICS", "POWERPRO", "GRAPHICSPRO"
+    #   resp.bundles[0].compute_type.name #=> String, one of "VALUE", "STANDARD", "PERFORMANCE", "POWER", "GRAPHICS", "POWERPRO", "GRAPHICSPRO", "GRAPHICS_G4DN", "GRAPHICSPRO_G4DN"
     #   resp.bundles[0].last_updated_time #=> Time
+    #   resp.bundles[0].creation_time #=> Time
+    #   resp.bundles[0].state #=> String, one of "AVAILABLE", "PENDING", "ERROR"
+    #   resp.bundles[0].bundle_type #=> String, one of "REGULAR", "STANDBY"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeWorkspaceBundles AWS API Documentation
@@ -1262,12 +2489,18 @@ module Aws::WorkSpaces
     #   The identifiers of the directories. If the value is null, all
     #   directories are retrieved.
     #
+    # @option params [Array<String>] :workspace_directory_names
+    #   The names of the WorkSpace directories.
+    #
     # @option params [Integer] :limit
     #   The maximum number of directories to return.
     #
     # @option params [String] :next_token
     #   If you received a `NextToken` from a previous call that was paginated,
     #   provide this token to receive the next set of results.
+    #
+    # @option params [Array<Types::DescribeWorkspaceDirectoriesFilter>] :filters
+    #   The filter condition for the WorkSpaces.
     #
     # @return [Types::DescribeWorkspaceDirectoriesResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1280,8 +2513,15 @@ module Aws::WorkSpaces
     #
     #   resp = client.describe_workspace_directories({
     #     directory_ids: ["DirectoryId"],
+    #     workspace_directory_names: ["WorkspaceDirectoryName"],
     #     limit: 1,
     #     next_token: "PaginationToken",
+    #     filters: [
+    #       {
+    #         name: "USER_IDENTITY_TYPE", # required, accepts USER_IDENTITY_TYPE, WORKSPACE_TYPE
+    #         values: ["DescribeWorkspaceDirectoriesFilterValue"], # required
+    #       },
+    #     ],
     #   })
     #
     # @example Response structure
@@ -1297,7 +2537,7 @@ module Aws::WorkSpaces
     #   resp.directories[0].dns_ip_addresses[0] #=> String
     #   resp.directories[0].customer_user_name #=> String
     #   resp.directories[0].iam_role_id #=> String
-    #   resp.directories[0].directory_type #=> String, one of "SIMPLE_AD", "AD_CONNECTOR"
+    #   resp.directories[0].directory_type #=> String, one of "SIMPLE_AD", "AD_CONNECTOR", "CUSTOMER_MANAGED", "AWS_IAM_IDENTITY_CENTER"
     #   resp.directories[0].workspace_security_group_id #=> String
     #   resp.directories[0].state #=> String, one of "REGISTERING", "REGISTERED", "DEREGISTERING", "DEREGISTERED", "ERROR"
     #   resp.directories[0].workspace_creation_properties.enable_work_docs #=> Boolean
@@ -1306,6 +2546,7 @@ module Aws::WorkSpaces
     #   resp.directories[0].workspace_creation_properties.custom_security_group_id #=> String
     #   resp.directories[0].workspace_creation_properties.user_enabled_as_local_administrator #=> Boolean
     #   resp.directories[0].workspace_creation_properties.enable_maintenance_mode #=> Boolean
+    #   resp.directories[0].workspace_creation_properties.instance_iam_role_arn #=> String
     #   resp.directories[0].ip_group_ids #=> Array
     #   resp.directories[0].ip_group_ids[0] #=> String
     #   resp.directories[0].workspace_access_properties.device_type_windows #=> String, one of "ALLOW", "DENY"
@@ -1315,12 +2556,37 @@ module Aws::WorkSpaces
     #   resp.directories[0].workspace_access_properties.device_type_android #=> String, one of "ALLOW", "DENY"
     #   resp.directories[0].workspace_access_properties.device_type_chrome_os #=> String, one of "ALLOW", "DENY"
     #   resp.directories[0].workspace_access_properties.device_type_zero_client #=> String, one of "ALLOW", "DENY"
+    #   resp.directories[0].workspace_access_properties.device_type_linux #=> String, one of "ALLOW", "DENY"
     #   resp.directories[0].tenancy #=> String, one of "DEDICATED", "SHARED"
     #   resp.directories[0].selfservice_permissions.restart_workspace #=> String, one of "ENABLED", "DISABLED"
     #   resp.directories[0].selfservice_permissions.increase_volume_size #=> String, one of "ENABLED", "DISABLED"
     #   resp.directories[0].selfservice_permissions.change_compute_type #=> String, one of "ENABLED", "DISABLED"
     #   resp.directories[0].selfservice_permissions.switch_running_mode #=> String, one of "ENABLED", "DISABLED"
     #   resp.directories[0].selfservice_permissions.rebuild_workspace #=> String, one of "ENABLED", "DISABLED"
+    #   resp.directories[0].saml_properties.status #=> String, one of "DISABLED", "ENABLED", "ENABLED_WITH_DIRECTORY_LOGIN_FALLBACK"
+    #   resp.directories[0].saml_properties.user_access_url #=> String
+    #   resp.directories[0].saml_properties.relay_state_parameter_name #=> String
+    #   resp.directories[0].certificate_based_auth_properties.status #=> String, one of "DISABLED", "ENABLED"
+    #   resp.directories[0].certificate_based_auth_properties.certificate_authority_arn #=> String
+    #   resp.directories[0].microsoft_entra_config.tenant_id #=> String
+    #   resp.directories[0].microsoft_entra_config.application_config_secret_arn #=> String
+    #   resp.directories[0].workspace_directory_name #=> String
+    #   resp.directories[0].workspace_directory_description #=> String
+    #   resp.directories[0].user_identity_type #=> String, one of "CUSTOMER_MANAGED", "AWS_DIRECTORY_SERVICE", "AWS_IAM_IDENTITY_CENTER"
+    #   resp.directories[0].workspace_type #=> String, one of "PERSONAL", "POOLS"
+    #   resp.directories[0].idc_config.instance_arn #=> String
+    #   resp.directories[0].idc_config.application_arn #=> String
+    #   resp.directories[0].active_directory_config.domain_name #=> String
+    #   resp.directories[0].active_directory_config.service_account_secret_arn #=> String
+    #   resp.directories[0].streaming_properties.streaming_experience_preferred_protocol #=> String, one of "TCP", "UDP"
+    #   resp.directories[0].streaming_properties.user_settings #=> Array
+    #   resp.directories[0].streaming_properties.user_settings[0].action #=> String, one of "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", "CLIPBOARD_COPY_TO_LOCAL_DEVICE", "PRINTING_TO_LOCAL_DEVICE", "SMART_CARD"
+    #   resp.directories[0].streaming_properties.user_settings[0].permission #=> String, one of "ENABLED", "DISABLED"
+    #   resp.directories[0].streaming_properties.user_settings[0].maximum_length #=> Integer
+    #   resp.directories[0].streaming_properties.storage_connectors #=> Array
+    #   resp.directories[0].streaming_properties.storage_connectors[0].connector_type #=> String, one of "HOME_FOLDER"
+    #   resp.directories[0].streaming_properties.storage_connectors[0].status #=> String, one of "ENABLED", "DISABLED"
+    #   resp.directories[0].error_message #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeWorkspaceDirectories AWS API Documentation
@@ -1333,7 +2599,7 @@ module Aws::WorkSpaces
     end
 
     # Describes the permissions that the owner of an image has granted to
-    # other AWS accounts for an image.
+    # other Amazon Web Services accounts for an image.
     #
     # @option params [required, String] :image_id
     #   The identifier of the image.
@@ -1419,6 +2685,11 @@ module Aws::WorkSpaces
     #   resp.images[0].error_message #=> String
     #   resp.images[0].created #=> Time
     #   resp.images[0].owner_account_id #=> String
+    #   resp.images[0].updates.update_available #=> Boolean
+    #   resp.images[0].updates.description #=> String
+    #   resp.images[0].error_details #=> Array
+    #   resp.images[0].error_details[0].error_code #=> String, one of "OutdatedPowershellVersion", "OfficeInstalled", "PCoIPAgentInstalled", "WindowsUpdatesEnabled", "AutoMountDisabled", "WorkspacesBYOLAccountNotFound", "WorkspacesBYOLAccountDisabled", "DHCPDisabled", "DiskFreeSpace", "AdditionalDrivesAttached", "OSNotSupported", "DomainJoined", "AzureDomainJoined", "FirewallEnabled", "VMWareToolsInstalled", "DiskSizeExceeded", "IncompatiblePartitioning", "PendingReboot", "AutoLogonEnabled", "RealTimeUniversalDisabled", "MultipleBootPartition", "Requires64BitOS", "ZeroRearmCount", "InPlaceUpgrade", "AntiVirusInstalled", "UEFINotSupported", "UnknownError", "AppXPackagesInstalled", "ReservedStorageInUse"
+    #   resp.images[0].error_details[0].error_message #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeWorkspaceImages AWS API Documentation
@@ -1496,6 +2767,9 @@ module Aws::WorkSpaces
     #   If you received a `NextToken` from a previous call that was paginated,
     #   provide this token to receive the next set of results.
     #
+    # @option params [String] :workspace_name
+    #   The name of the user-decoupled WorkSpace.
+    #
     # @return [Types::DescribeWorkspacesResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DescribeWorkspacesResult#workspaces #workspaces} => Array&lt;Types::Workspace&gt;
@@ -1512,6 +2786,7 @@ module Aws::WorkSpaces
     #     bundle_id: "BundleId",
     #     limit: 1,
     #     next_token: "PaginationToken",
+    #     workspace_name: "WorkspaceName",
     #   })
     #
     # @example Response structure
@@ -1530,14 +2805,29 @@ module Aws::WorkSpaces
     #   resp.workspaces[0].volume_encryption_key #=> String
     #   resp.workspaces[0].user_volume_encryption_enabled #=> Boolean
     #   resp.workspaces[0].root_volume_encryption_enabled #=> Boolean
-    #   resp.workspaces[0].workspace_properties.running_mode #=> String, one of "AUTO_STOP", "ALWAYS_ON"
+    #   resp.workspaces[0].workspace_name #=> String
+    #   resp.workspaces[0].workspace_properties.running_mode #=> String, one of "AUTO_STOP", "ALWAYS_ON", "MANUAL"
     #   resp.workspaces[0].workspace_properties.running_mode_auto_stop_timeout_in_minutes #=> Integer
     #   resp.workspaces[0].workspace_properties.root_volume_size_gib #=> Integer
     #   resp.workspaces[0].workspace_properties.user_volume_size_gib #=> Integer
-    #   resp.workspaces[0].workspace_properties.compute_type_name #=> String, one of "VALUE", "STANDARD", "PERFORMANCE", "POWER", "GRAPHICS", "POWERPRO", "GRAPHICSPRO"
+    #   resp.workspaces[0].workspace_properties.compute_type_name #=> String, one of "VALUE", "STANDARD", "PERFORMANCE", "POWER", "GRAPHICS", "POWERPRO", "GRAPHICSPRO", "GRAPHICS_G4DN", "GRAPHICSPRO_G4DN"
+    #   resp.workspaces[0].workspace_properties.protocols #=> Array
+    #   resp.workspaces[0].workspace_properties.protocols[0] #=> String, one of "PCOIP", "WSP"
+    #   resp.workspaces[0].workspace_properties.operating_system_name #=> String, one of "AMAZON_LINUX_2", "UBUNTU_18_04", "UBUNTU_20_04", "UBUNTU_22_04", "UNKNOWN", "WINDOWS_10", "WINDOWS_11", "WINDOWS_7", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "RHEL_8"
     #   resp.workspaces[0].modification_states #=> Array
     #   resp.workspaces[0].modification_states[0].resource #=> String, one of "ROOT_VOLUME", "USER_VOLUME", "COMPUTE_TYPE"
     #   resp.workspaces[0].modification_states[0].state #=> String, one of "UPDATE_INITIATED", "UPDATE_IN_PROGRESS"
+    #   resp.workspaces[0].related_workspaces #=> Array
+    #   resp.workspaces[0].related_workspaces[0].workspace_id #=> String
+    #   resp.workspaces[0].related_workspaces[0].region #=> String
+    #   resp.workspaces[0].related_workspaces[0].state #=> String, one of "PENDING", "AVAILABLE", "IMPAIRED", "UNHEALTHY", "REBOOTING", "STARTING", "REBUILDING", "RESTORING", "MAINTENANCE", "ADMIN_MAINTENANCE", "TERMINATING", "TERMINATED", "SUSPENDED", "UPDATING", "STOPPING", "STOPPED", "ERROR"
+    #   resp.workspaces[0].related_workspaces[0].type #=> String, one of "PRIMARY", "STANDBY"
+    #   resp.workspaces[0].data_replication_settings.data_replication #=> String, one of "NO_REPLICATION", "PRIMARY_AS_SOURCE"
+    #   resp.workspaces[0].data_replication_settings.recovery_snapshot_time #=> Time
+    #   resp.workspaces[0].standby_workspaces_properties #=> Array
+    #   resp.workspaces[0].standby_workspaces_properties[0].standby_workspace_id #=> String
+    #   resp.workspaces[0].standby_workspaces_properties[0].data_replication #=> String, one of "NO_REPLICATION", "PRIMARY_AS_SOURCE"
+    #   resp.workspaces[0].standby_workspaces_properties[0].recovery_snapshot_time #=> Time
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeWorkspaces AWS API Documentation
@@ -1589,9 +2879,133 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Retrieves a list that describes the streaming sessions for a specified
+    # pool.
+    #
+    # @option params [required, String] :pool_id
+    #   The identifier of the pool.
+    #
+    # @option params [String] :user_id
+    #   The identifier of the user.
+    #
+    # @option params [Integer] :limit
+    #   The maximum number of items to return.
+    #
+    # @option params [String] :next_token
+    #   If you received a `NextToken` from a previous call that was paginated,
+    #   provide this token to receive the next set of results.
+    #
+    # @return [Types::DescribeWorkspacesPoolSessionsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeWorkspacesPoolSessionsResult#sessions #sessions} => Array&lt;Types::WorkspacesPoolSession&gt;
+    #   * {Types::DescribeWorkspacesPoolSessionsResult#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_workspaces_pool_sessions({
+    #     pool_id: "WorkspacesPoolId", # required
+    #     user_id: "WorkspacesPoolUserId",
+    #     limit: 1,
+    #     next_token: "PaginationToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.sessions #=> Array
+    #   resp.sessions[0].authentication_type #=> String, one of "SAML"
+    #   resp.sessions[0].connection_state #=> String, one of "CONNECTED", "NOT_CONNECTED"
+    #   resp.sessions[0].session_id #=> String
+    #   resp.sessions[0].instance_id #=> String
+    #   resp.sessions[0].pool_id #=> String
+    #   resp.sessions[0].expiration_time #=> Time
+    #   resp.sessions[0].network_access_configuration.eni_private_ip_address #=> String
+    #   resp.sessions[0].network_access_configuration.eni_id #=> String
+    #   resp.sessions[0].start_time #=> Time
+    #   resp.sessions[0].user_id #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeWorkspacesPoolSessions AWS API Documentation
+    #
+    # @overload describe_workspaces_pool_sessions(params = {})
+    # @param [Hash] params ({})
+    def describe_workspaces_pool_sessions(params = {}, options = {})
+      req = build_request(:describe_workspaces_pool_sessions, params)
+      req.send_request(options)
+    end
+
+    # Describes the specified WorkSpaces Pools.
+    #
+    # @option params [Array<String>] :pool_ids
+    #   The identifier of the WorkSpaces Pools.
+    #
+    # @option params [Array<Types::DescribeWorkspacesPoolsFilter>] :filters
+    #   The filter conditions for the WorkSpaces Pool to return.
+    #
+    # @option params [Integer] :limit
+    #   The maximum number of items to return.
+    #
+    # @option params [String] :next_token
+    #   If you received a `NextToken` from a previous call that was paginated,
+    #   provide this token to receive the next set of results.
+    #
+    # @return [Types::DescribeWorkspacesPoolsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeWorkspacesPoolsResult#workspaces_pools #workspaces_pools} => Array&lt;Types::WorkspacesPool&gt;
+    #   * {Types::DescribeWorkspacesPoolsResult#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_workspaces_pools({
+    #     pool_ids: ["WorkspacesPoolId"],
+    #     filters: [
+    #       {
+    #         name: "PoolName", # required, accepts PoolName
+    #         values: ["DescribeWorkspacesPoolsFilterValue"], # required
+    #         operator: "EQUALS", # required, accepts EQUALS, NOTEQUALS, CONTAINS, NOTCONTAINS
+    #       },
+    #     ],
+    #     limit: 1,
+    #     next_token: "PaginationToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.workspaces_pools #=> Array
+    #   resp.workspaces_pools[0].pool_id #=> String
+    #   resp.workspaces_pools[0].pool_arn #=> String
+    #   resp.workspaces_pools[0].capacity_status.available_user_sessions #=> Integer
+    #   resp.workspaces_pools[0].capacity_status.desired_user_sessions #=> Integer
+    #   resp.workspaces_pools[0].capacity_status.actual_user_sessions #=> Integer
+    #   resp.workspaces_pools[0].capacity_status.active_user_sessions #=> Integer
+    #   resp.workspaces_pools[0].pool_name #=> String
+    #   resp.workspaces_pools[0].description #=> String
+    #   resp.workspaces_pools[0].state #=> String, one of "CREATING", "DELETING", "RUNNING", "STARTING", "STOPPED", "STOPPING", "UPDATING"
+    #   resp.workspaces_pools[0].created_at #=> Time
+    #   resp.workspaces_pools[0].bundle_id #=> String
+    #   resp.workspaces_pools[0].directory_id #=> String
+    #   resp.workspaces_pools[0].errors #=> Array
+    #   resp.workspaces_pools[0].errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_IS_MISSING", "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "WORKSPACES_POOL_STOPPED", "WORKSPACES_POOL_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR", "DOMAIN_JOIN_ERROR_SECRET_ACTION_PERMISSION_IS_MISSING", "DOMAIN_JOIN_ERROR_SECRET_DECRYPTION_FAILURE", "DOMAIN_JOIN_ERROR_SECRET_STATE_INVALID", "DOMAIN_JOIN_ERROR_SECRET_NOT_FOUND", "DOMAIN_JOIN_ERROR_SECRET_VALUE_KEY_NOT_FOUND", "DOMAIN_JOIN_ERROR_SECRET_INVALID", "BUNDLE_NOT_FOUND", "DIRECTORY_NOT_FOUND", "INSUFFICIENT_PERMISSIONS_ERROR", "DEFAULT_OU_IS_MISSING"
+    #   resp.workspaces_pools[0].errors[0].error_message #=> String
+    #   resp.workspaces_pools[0].application_settings.status #=> String, one of "DISABLED", "ENABLED"
+    #   resp.workspaces_pools[0].application_settings.settings_group #=> String
+    #   resp.workspaces_pools[0].application_settings.s3_bucket_name #=> String
+    #   resp.workspaces_pools[0].timeout_settings.disconnect_timeout_in_seconds #=> Integer
+    #   resp.workspaces_pools[0].timeout_settings.idle_disconnect_timeout_in_seconds #=> Integer
+    #   resp.workspaces_pools[0].timeout_settings.max_user_duration_in_seconds #=> Integer
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DescribeWorkspacesPools AWS API Documentation
+    #
+    # @overload describe_workspaces_pools(params = {})
+    # @param [Hash] params ({})
+    def describe_workspaces_pools(params = {}, options = {})
+      req = build_request(:describe_workspaces_pools, params)
+      req.send_request(options)
+    end
+
     # Disassociates a connection alias from a directory. Disassociating a
     # connection alias disables cross-Region redirection between two
-    # directories in different AWS Regions. For more information, see [
+    # directories in different Regions. For more information, see [
     # Cross-Region Redirection for Amazon WorkSpaces][1].
     #
     # <note markdown="1"> Before performing this operation, call [ DescribeConnectionAliases][2]
@@ -1652,11 +3066,252 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
-    # Imports the specified Windows 10 Bring Your Own License (BYOL) image
-    # into Amazon WorkSpaces. The image must be an already licensed Amazon
-    # EC2 image that is in your AWS account, and you must own the image. For
-    # more information about creating BYOL images, see [ Bring Your Own
-    # Windows Desktop Licenses][1].
+    # Disassociates the specified application from a WorkSpace.
+    #
+    # @option params [required, String] :workspace_id
+    #   The identifier of the WorkSpace.
+    #
+    # @option params [required, String] :application_id
+    #   The identifier of the application.
+    #
+    # @return [Types::DisassociateWorkspaceApplicationResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DisassociateWorkspaceApplicationResult#association #association} => Types::WorkspaceResourceAssociation
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.disassociate_workspace_application({
+    #     workspace_id: "WorkspaceId", # required
+    #     application_id: "WorkSpaceApplicationId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.association.associated_resource_id #=> String
+    #   resp.association.associated_resource_type #=> String, one of "APPLICATION"
+    #   resp.association.created #=> Time
+    #   resp.association.last_updated_time #=> Time
+    #   resp.association.state #=> String, one of "PENDING_INSTALL", "PENDING_INSTALL_DEPLOYMENT", "PENDING_UNINSTALL", "PENDING_UNINSTALL_DEPLOYMENT", "INSTALLING", "UNINSTALLING", "ERROR", "COMPLETED", "REMOVED"
+    #   resp.association.state_reason.error_code #=> String, one of "ValidationError.InsufficientDiskSpace", "ValidationError.InsufficientMemory", "ValidationError.UnsupportedOperatingSystem", "DeploymentError.InternalServerError", "DeploymentError.WorkspaceUnreachable"
+    #   resp.association.state_reason.error_message #=> String
+    #   resp.association.workspace_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/DisassociateWorkspaceApplication AWS API Documentation
+    #
+    # @overload disassociate_workspace_application(params = {})
+    # @param [Hash] params ({})
+    def disassociate_workspace_application(params = {}, options = {})
+      req = build_request(:disassociate_workspace_application, params)
+      req.send_request(options)
+    end
+
+    # Retrieves account link information.
+    #
+    # @option params [String] :link_id
+    #   The identifier of the account to link.
+    #
+    # @option params [String] :linked_account_id
+    #   The identifier of the account link
+    #
+    # @return [Types::GetAccountLinkResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetAccountLinkResult#account_link #account_link} => Types::AccountLink
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_account_link({
+    #     link_id: "LinkId",
+    #     linked_account_id: "AwsAccount",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.account_link.account_link_id #=> String
+    #   resp.account_link.account_link_status #=> String, one of "LINKED", "LINKING_FAILED", "LINK_NOT_FOUND", "PENDING_ACCEPTANCE_BY_TARGET_ACCOUNT", "REJECTED"
+    #   resp.account_link.source_account_id #=> String
+    #   resp.account_link.target_account_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/GetAccountLink AWS API Documentation
+    #
+    # @overload get_account_link(params = {})
+    # @param [Hash] params ({})
+    def get_account_link(params = {}, options = {})
+      req = build_request(:get_account_link, params)
+      req.send_request(options)
+    end
+
+    # Imports client branding. Client branding allows you to customize your
+    # WorkSpace's client login portal. You can tailor your login portal
+    # company logo, the support email address, support link, link to reset
+    # password, and a custom message for users trying to sign in.
+    #
+    # After you import client branding, the default branding experience for
+    # the specified platform type is replaced with the imported experience
+    #
+    # <note markdown="1"> * You must specify at least one platform type when importing client
+    #   branding.
+    #
+    # * You can import up to 6 MB of data with each request. If your request
+    #   exceeds this limit, you can import client branding for different
+    #   platform types using separate requests.
+    #
+    # * In each platform type, the `SupportEmail` and `SupportLink`
+    #   parameters are mutually exclusive. You can specify only one
+    #   parameter for each platform type, but not both.
+    #
+    # * Imported data can take up to a minute to appear in the WorkSpaces
+    #   client.
+    #
+    #  </note>
+    #
+    # @option params [required, String] :resource_id
+    #   The directory identifier of the WorkSpace for which you want to import
+    #   client branding.
+    #
+    # @option params [Types::DefaultImportClientBrandingAttributes] :device_type_windows
+    #   The branding information to import for Windows devices.
+    #
+    # @option params [Types::DefaultImportClientBrandingAttributes] :device_type_osx
+    #   The branding information to import for macOS devices.
+    #
+    # @option params [Types::DefaultImportClientBrandingAttributes] :device_type_android
+    #   The branding information to import for Android devices.
+    #
+    # @option params [Types::IosImportClientBrandingAttributes] :device_type_ios
+    #   The branding information to import for iOS devices.
+    #
+    # @option params [Types::DefaultImportClientBrandingAttributes] :device_type_linux
+    #   The branding information to import for Linux devices.
+    #
+    # @option params [Types::DefaultImportClientBrandingAttributes] :device_type_web
+    #   The branding information to import for web access.
+    #
+    # @return [Types::ImportClientBrandingResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ImportClientBrandingResult#device_type_windows #device_type_windows} => Types::DefaultClientBrandingAttributes
+    #   * {Types::ImportClientBrandingResult#device_type_osx #device_type_osx} => Types::DefaultClientBrandingAttributes
+    #   * {Types::ImportClientBrandingResult#device_type_android #device_type_android} => Types::DefaultClientBrandingAttributes
+    #   * {Types::ImportClientBrandingResult#device_type_ios #device_type_ios} => Types::IosClientBrandingAttributes
+    #   * {Types::ImportClientBrandingResult#device_type_linux #device_type_linux} => Types::DefaultClientBrandingAttributes
+    #   * {Types::ImportClientBrandingResult#device_type_web #device_type_web} => Types::DefaultClientBrandingAttributes
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.import_client_branding({
+    #     resource_id: "DirectoryId", # required
+    #     device_type_windows: {
+    #       logo: "data",
+    #       support_email: "ClientEmail",
+    #       support_link: "ClientUrl",
+    #       forgot_password_link: "ClientUrl",
+    #       login_message: {
+    #         "ClientLocale" => "ClientLoginMessage",
+    #       },
+    #     },
+    #     device_type_osx: {
+    #       logo: "data",
+    #       support_email: "ClientEmail",
+    #       support_link: "ClientUrl",
+    #       forgot_password_link: "ClientUrl",
+    #       login_message: {
+    #         "ClientLocale" => "ClientLoginMessage",
+    #       },
+    #     },
+    #     device_type_android: {
+    #       logo: "data",
+    #       support_email: "ClientEmail",
+    #       support_link: "ClientUrl",
+    #       forgot_password_link: "ClientUrl",
+    #       login_message: {
+    #         "ClientLocale" => "ClientLoginMessage",
+    #       },
+    #     },
+    #     device_type_ios: {
+    #       logo: "data",
+    #       logo_2x: "data",
+    #       logo_3x: "data",
+    #       support_email: "ClientEmail",
+    #       support_link: "ClientUrl",
+    #       forgot_password_link: "ClientUrl",
+    #       login_message: {
+    #         "ClientLocale" => "ClientLoginMessage",
+    #       },
+    #     },
+    #     device_type_linux: {
+    #       logo: "data",
+    #       support_email: "ClientEmail",
+    #       support_link: "ClientUrl",
+    #       forgot_password_link: "ClientUrl",
+    #       login_message: {
+    #         "ClientLocale" => "ClientLoginMessage",
+    #       },
+    #     },
+    #     device_type_web: {
+    #       logo: "data",
+    #       support_email: "ClientEmail",
+    #       support_link: "ClientUrl",
+    #       forgot_password_link: "ClientUrl",
+    #       login_message: {
+    #         "ClientLocale" => "ClientLoginMessage",
+    #       },
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.device_type_windows.logo_url #=> String
+    #   resp.device_type_windows.support_email #=> String
+    #   resp.device_type_windows.support_link #=> String
+    #   resp.device_type_windows.forgot_password_link #=> String
+    #   resp.device_type_windows.login_message #=> Hash
+    #   resp.device_type_windows.login_message["ClientLocale"] #=> String
+    #   resp.device_type_osx.logo_url #=> String
+    #   resp.device_type_osx.support_email #=> String
+    #   resp.device_type_osx.support_link #=> String
+    #   resp.device_type_osx.forgot_password_link #=> String
+    #   resp.device_type_osx.login_message #=> Hash
+    #   resp.device_type_osx.login_message["ClientLocale"] #=> String
+    #   resp.device_type_android.logo_url #=> String
+    #   resp.device_type_android.support_email #=> String
+    #   resp.device_type_android.support_link #=> String
+    #   resp.device_type_android.forgot_password_link #=> String
+    #   resp.device_type_android.login_message #=> Hash
+    #   resp.device_type_android.login_message["ClientLocale"] #=> String
+    #   resp.device_type_ios.logo_url #=> String
+    #   resp.device_type_ios.logo_2x_url #=> String
+    #   resp.device_type_ios.logo_3x_url #=> String
+    #   resp.device_type_ios.support_email #=> String
+    #   resp.device_type_ios.support_link #=> String
+    #   resp.device_type_ios.forgot_password_link #=> String
+    #   resp.device_type_ios.login_message #=> Hash
+    #   resp.device_type_ios.login_message["ClientLocale"] #=> String
+    #   resp.device_type_linux.logo_url #=> String
+    #   resp.device_type_linux.support_email #=> String
+    #   resp.device_type_linux.support_link #=> String
+    #   resp.device_type_linux.forgot_password_link #=> String
+    #   resp.device_type_linux.login_message #=> Hash
+    #   resp.device_type_linux.login_message["ClientLocale"] #=> String
+    #   resp.device_type_web.logo_url #=> String
+    #   resp.device_type_web.support_email #=> String
+    #   resp.device_type_web.support_link #=> String
+    #   resp.device_type_web.forgot_password_link #=> String
+    #   resp.device_type_web.login_message #=> Hash
+    #   resp.device_type_web.login_message["ClientLocale"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/ImportClientBranding AWS API Documentation
+    #
+    # @overload import_client_branding(params = {})
+    # @param [Hash] params ({})
+    def import_client_branding(params = {}, options = {})
+      req = build_request(:import_client_branding, params)
+      req.send_request(options)
+    end
+
+    # Imports the specified Windows 10 or 11 Bring Your Own License (BYOL)
+    # image into Amazon WorkSpaces. The image must be an already licensed
+    # Amazon EC2 image that is in your Amazon Web Services account, and you
+    # must own the image. For more information about creating BYOL images,
+    # see [ Bring Your Own Windows Desktop Licenses][1].
     #
     #
     #
@@ -1668,13 +3323,25 @@ module Aws::WorkSpaces
     # @option params [required, String] :ingestion_process
     #   The ingestion process to be used when importing the image, depending
     #   on which protocol you want to use for your BYOL Workspace image,
-    #   either PCoIP or WorkSpaces Streaming Protocol (WSP). To use WSP,
-    #   specify a value that ends in `_WSP`. To use PCoIP, specify a value
-    #   that does not end in `_WSP`.
+    #   either PCoIP, DCV, or bring your own protocol (BYOP). To use WSP,
+    #   specify a value that ends in `_DCV`. To use PCoIP, specify a value
+    #   that does not end in `_DCV`. To use BYOP, specify a value that ends in
+    #   `_BYOP`.
     #
     #   For non-GPU-enabled bundles (bundles other than Graphics or
-    #   GraphicsPro), specify `BYOL_REGULAR` or `BYOL_REGULAR_WSP`, depending
-    #   on the protocol.
+    #   GraphicsPro), specify `BYOL_REGULAR`, `BYOL_REGULAR_DCV`, or
+    #   `BYOL_REGULAR_BYOP`, depending on the protocol.
+    #
+    #   <note markdown="1"> The `BYOL_REGULAR_BYOP` and `BYOL_GRAPHICS_G4DN_BYOP` values are only
+    #   supported by Amazon WorkSpaces Core. Contact your account team to be
+    #   allow-listed to use these values. For more information, see [Amazon
+    #   WorkSpaces Core][1].
+    #
+    #    </note>
+    #
+    #
+    #
+    #   [1]: http://aws.amazon.com/workspaces/core/
     #
     # @option params [required, String] :image_name
     #   The name of the WorkSpace image.
@@ -1687,12 +3354,17 @@ module Aws::WorkSpaces
     #
     # @option params [Array<String>] :applications
     #   If specified, the version of Microsoft Office to subscribe to. Valid
-    #   only for Windows 10 BYOL images. For more information about
+    #   only for Windows 10 and 11 BYOL images. For more information about
     #   subscribing to Office for BYOL images, see [ Bring Your Own Windows
     #   Desktop Licenses][1].
     #
-    #   <note markdown="1"> Although this parameter is an array, only one item is allowed at this
-    #   time.
+    #   <note markdown="1"> * Although this parameter is an array, only one item is allowed at
+    #     this time.
+    #
+    #   * During the image import process, non-GPU DCV (formerly WSP)
+    #     WorkSpaces with Windows 11 support only `Microsoft_Office_2019`. GPU
+    #     DCV (formerly WSP) WorkSpaces with Windows 11 do not support Office
+    #     installation.
     #
     #    </note>
     #
@@ -1708,7 +3380,7 @@ module Aws::WorkSpaces
     #
     #   resp = client.import_workspace_image({
     #     ec2_image_id: "Ec2ImageId", # required
-    #     ingestion_process: "BYOL_REGULAR", # required, accepts BYOL_REGULAR, BYOL_GRAPHICS, BYOL_GRAPHICSPRO, BYOL_REGULAR_WSP
+    #     ingestion_process: "BYOL_REGULAR", # required, accepts BYOL_REGULAR, BYOL_GRAPHICS, BYOL_GRAPHICSPRO, BYOL_GRAPHICS_G4DN, BYOL_REGULAR_WSP, BYOL_GRAPHICS_G4DN_WSP, BYOL_REGULAR_BYOP, BYOL_GRAPHICS_G4DN_BYOP
     #     image_name: "WorkspaceImageName", # required
     #     image_description: "WorkspaceImageDescription", # required
     #     tags: [
@@ -1733,13 +3405,58 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Lists all account links.
+    #
+    # @option params [Array<String>] :link_status_filter
+    #   Filters the account based on their link status.
+    #
+    # @option params [String] :next_token
+    #   The token to use to retrieve the next page of results. This value is
+    #   null when there are no more results to return.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of accounts to return.
+    #
+    # @return [Types::ListAccountLinksResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListAccountLinksResult#account_links #account_links} => Array&lt;Types::AccountLink&gt;
+    #   * {Types::ListAccountLinksResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_account_links({
+    #     link_status_filter: ["LINKED"], # accepts LINKED, LINKING_FAILED, LINK_NOT_FOUND, PENDING_ACCEPTANCE_BY_TARGET_ACCOUNT, REJECTED
+    #     next_token: "PaginationToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.account_links #=> Array
+    #   resp.account_links[0].account_link_id #=> String
+    #   resp.account_links[0].account_link_status #=> String, one of "LINKED", "LINKING_FAILED", "LINK_NOT_FOUND", "PENDING_ACCEPTANCE_BY_TARGET_ACCOUNT", "REJECTED"
+    #   resp.account_links[0].source_account_id #=> String
+    #   resp.account_links[0].target_account_id #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/ListAccountLinks AWS API Documentation
+    #
+    # @overload list_account_links(params = {})
+    # @param [Hash] params ({})
+    def list_account_links(params = {}, options = {})
+      req = build_request(:list_account_links, params)
+      req.send_request(options)
+    end
+
     # Retrieves a list of IP address ranges, specified as IPv4 CIDR blocks,
     # that you can use for the network management interface when you enable
     # Bring Your Own License (BYOL).
     #
-    # This operation can be run only by AWS accounts that are enabled for
-    # BYOL. If your account isn't enabled for BYOL, you'll receive an
-    # `AccessDeniedException` error.
+    # This operation can be run only by Amazon Web Services accounts that
+    # are enabled for BYOL. If your account isn't enabled for BYOL, you'll
+    # receive an `AccessDeniedException` error.
     #
     # The management network interface is connected to a secure Amazon
     # WorkSpaces management network. It is used for interactive streaming of
@@ -1868,6 +3585,41 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Modifies the properties of the certificate-based authentication you
+    # want to use with your WorkSpaces.
+    #
+    # @option params [required, String] :resource_id
+    #   The resource identifiers, in the form of directory IDs.
+    #
+    # @option params [Types::CertificateBasedAuthProperties] :certificate_based_auth_properties
+    #   The properties of the certificate-based authentication.
+    #
+    # @option params [Array<String>] :properties_to_delete
+    #   The properties of the certificate-based authentication you want to
+    #   delete.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.modify_certificate_based_auth_properties({
+    #     resource_id: "DirectoryId", # required
+    #     certificate_based_auth_properties: {
+    #       status: "DISABLED", # accepts DISABLED, ENABLED
+    #       certificate_authority_arn: "CertificateAuthorityArn",
+    #     },
+    #     properties_to_delete: ["CERTIFICATE_BASED_AUTH_PROPERTIES_CERTIFICATE_AUTHORITY_ARN"], # accepts CERTIFICATE_BASED_AUTH_PROPERTIES_CERTIFICATE_AUTHORITY_ARN
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/ModifyCertificateBasedAuthProperties AWS API Documentation
+    #
+    # @overload modify_certificate_based_auth_properties(params = {})
+    # @param [Hash] params ({})
+    def modify_certificate_based_auth_properties(params = {}, options = {})
+      req = build_request(:modify_certificate_based_auth_properties, params)
+      req.send_request(options)
+    end
+
     # Modifies the properties of the specified Amazon WorkSpaces clients.
     #
     # @option params [required, String] :resource_id
@@ -1884,6 +3636,7 @@ module Aws::WorkSpaces
     #     resource_id: "NonEmptyString", # required
     #     client_properties: { # required
     #       reconnect_enabled: "ENABLED", # accepts ENABLED, DISABLED
+    #       log_upload_enabled: "ENABLED", # accepts ENABLED, DISABLED
     #     },
     #   })
     #
@@ -1893,6 +3646,51 @@ module Aws::WorkSpaces
     # @param [Hash] params ({})
     def modify_client_properties(params = {}, options = {})
       req = build_request(:modify_client_properties, params)
+      req.send_request(options)
+    end
+
+    # Modifies multiple properties related to SAML 2.0 authentication,
+    # including the enablement status, user access URL, and relay state
+    # parameter name that are used for configuring federation with an SAML
+    # 2.0 identity provider.
+    #
+    # @option params [required, String] :resource_id
+    #   The directory identifier for which you want to configure SAML
+    #   properties.
+    #
+    # @option params [Types::SamlProperties] :saml_properties
+    #   The properties for configuring SAML 2.0 authentication.
+    #
+    # @option params [Array<String>] :properties_to_delete
+    #   The SAML properties to delete as part of your request.
+    #
+    #   Specify one of the following options:
+    #
+    #   * `SAML_PROPERTIES_USER_ACCESS_URL` to delete the user access URL.
+    #
+    #   * `SAML_PROPERTIES_RELAY_STATE_PARAMETER_NAME` to delete the relay
+    #     state parameter name.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.modify_saml_properties({
+    #     resource_id: "DirectoryId", # required
+    #     saml_properties: {
+    #       status: "DISABLED", # accepts DISABLED, ENABLED, ENABLED_WITH_DIRECTORY_LOGIN_FALLBACK
+    #       user_access_url: "SamlUserAccessUrl",
+    #       relay_state_parameter_name: "NonEmptyString",
+    #     },
+    #     properties_to_delete: ["SAML_PROPERTIES_USER_ACCESS_URL"], # accepts SAML_PROPERTIES_USER_ACCESS_URL, SAML_PROPERTIES_RELAY_STATE_PARAMETER_NAME
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/ModifySamlProperties AWS API Documentation
+    #
+    # @overload modify_saml_properties(params = {})
+    # @param [Hash] params ({})
+    def modify_saml_properties(params = {}, options = {})
+      req = build_request(:modify_saml_properties, params)
       req.send_request(options)
     end
 
@@ -1934,6 +3732,47 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Modifies the specified streaming properties.
+    #
+    # @option params [required, String] :resource_id
+    #   The identifier of the resource.
+    #
+    # @option params [Types::StreamingProperties] :streaming_properties
+    #   The streaming properties to configure.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.modify_streaming_properties({
+    #     resource_id: "DirectoryId", # required
+    #     streaming_properties: {
+    #       streaming_experience_preferred_protocol: "TCP", # accepts TCP, UDP
+    #       user_settings: [
+    #         {
+    #           action: "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", # required, accepts CLIPBOARD_COPY_FROM_LOCAL_DEVICE, CLIPBOARD_COPY_TO_LOCAL_DEVICE, PRINTING_TO_LOCAL_DEVICE, SMART_CARD
+    #           permission: "ENABLED", # required, accepts ENABLED, DISABLED
+    #           maximum_length: 1,
+    #         },
+    #       ],
+    #       storage_connectors: [
+    #         {
+    #           connector_type: "HOME_FOLDER", # required, accepts HOME_FOLDER
+    #           status: "ENABLED", # required, accepts ENABLED, DISABLED
+    #         },
+    #       ],
+    #     },
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/ModifyStreamingProperties AWS API Documentation
+    #
+    # @overload modify_streaming_properties(params = {})
+    # @param [Hash] params ({})
+    def modify_streaming_properties(params = {}, options = {})
+      req = build_request(:modify_streaming_properties, params)
+      req.send_request(options)
+    end
+
     # Specifies which devices and operating systems users can use to access
     # their WorkSpaces. For more information, see [ Control Device
     # Access][1].
@@ -1963,6 +3802,7 @@ module Aws::WorkSpaces
     #       device_type_android: "ALLOW", # accepts ALLOW, DENY
     #       device_type_chrome_os: "ALLOW", # accepts ALLOW, DENY
     #       device_type_zero_client: "ALLOW", # accepts ALLOW, DENY
+    #       device_type_linux: "ALLOW", # accepts ALLOW, DENY
     #     },
     #   })
     #
@@ -1996,6 +3836,7 @@ module Aws::WorkSpaces
     #       custom_security_group_id: "SecurityGroupId",
     #       user_enabled_as_local_administrator: false,
     #       enable_maintenance_mode: false,
+    #       instance_iam_role_arn: "ARN",
     #     },
     #   })
     #
@@ -2012,15 +3853,25 @@ module Aws::WorkSpaces
     # about how to modify the size of the root and user volumes, see [
     # Modify a WorkSpace][1].
     #
+    # <note markdown="1"> The `MANUAL` running mode value is only supported by Amazon WorkSpaces
+    # Core. Contact your account team to be allow-listed to use this value.
+    # For more information, see [Amazon WorkSpaces Core][2].
+    #
+    #  </note>
+    #
     #
     #
     # [1]: https://docs.aws.amazon.com/workspaces/latest/adminguide/modify-workspaces.html
+    # [2]: http://aws.amazon.com/workspaces/core/
     #
     # @option params [required, String] :workspace_id
     #   The identifier of the WorkSpace.
     #
-    # @option params [required, Types::WorkspaceProperties] :workspace_properties
+    # @option params [Types::WorkspaceProperties] :workspace_properties
     #   The properties of the WorkSpace.
+    #
+    # @option params [String] :data_replication
+    #   Indicates the data replication status.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -2028,13 +3879,16 @@ module Aws::WorkSpaces
     #
     #   resp = client.modify_workspace_properties({
     #     workspace_id: "WorkspaceId", # required
-    #     workspace_properties: { # required
-    #       running_mode: "AUTO_STOP", # accepts AUTO_STOP, ALWAYS_ON
+    #     workspace_properties: {
+    #       running_mode: "AUTO_STOP", # accepts AUTO_STOP, ALWAYS_ON, MANUAL
     #       running_mode_auto_stop_timeout_in_minutes: 1,
     #       root_volume_size_gib: 1,
     #       user_volume_size_gib: 1,
-    #       compute_type_name: "VALUE", # accepts VALUE, STANDARD, PERFORMANCE, POWER, GRAPHICS, POWERPRO, GRAPHICSPRO
+    #       compute_type_name: "VALUE", # accepts VALUE, STANDARD, PERFORMANCE, POWER, GRAPHICS, POWERPRO, GRAPHICSPRO, GRAPHICS_G4DN, GRAPHICSPRO_G4DN
+    #       protocols: ["PCOIP"], # accepts PCOIP, WSP
+    #       operating_system_name: "AMAZON_LINUX_2", # accepts AMAZON_LINUX_2, UBUNTU_18_04, UBUNTU_20_04, UBUNTU_22_04, UNKNOWN, WINDOWS_10, WINDOWS_11, WINDOWS_7, WINDOWS_SERVER_2016, WINDOWS_SERVER_2019, WINDOWS_SERVER_2022, RHEL_8
     #     },
+    #     data_replication: "NO_REPLICATION", # accepts NO_REPLICATION, PRIMARY_AS_SOURCE
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/ModifyWorkspaceProperties AWS API Documentation
@@ -2080,8 +3934,10 @@ module Aws::WorkSpaces
 
     # Reboots the specified WorkSpaces.
     #
-    # You cannot reboot a WorkSpace unless its state is `AVAILABLE` or
-    # `UNHEALTHY`.
+    # You cannot reboot a WorkSpace unless its state is `AVAILABLE`,
+    # `UNHEALTHY`, or `REBOOTING`. Reboot a WorkSpace in the `REBOOTING`
+    # state only if your WorkSpace has been stuck in the `REBOOTING` state
+    # for over 20 minutes.
     #
     # This operation is asynchronous and returns before the WorkSpaces have
     # rebooted.
@@ -2179,7 +4035,7 @@ module Aws::WorkSpaces
     #
     # [1]: https://docs.aws.amazon.com/workspaces/latest/adminguide/workspaces-access-control.html#create-default-role
     #
-    # @option params [required, String] :directory_id
+    # @option params [String] :directory_id
     #   The identifier of the directory. You cannot register a directory if it
     #   does not have a status of Active. If the directory does not have a
     #   status of Active, you will receive an InvalidResourceStateException
@@ -2195,7 +4051,7 @@ module Aws::WorkSpaces
     #   conditions are not met, you will receive an
     #   OperationNotSupportedException error.
     #
-    # @option params [required, Boolean] :enable_work_docs
+    # @option params [Boolean] :enable_work_docs
     #   Indicates whether Amazon WorkDocs is enabled or disabled. If you have
     #   enabled this parameter and WorkDocs is not available in the Region,
     #   you will receive an OperationNotSupportedException error. Set
@@ -2207,10 +4063,10 @@ module Aws::WorkSpaces
     # @option params [String] :tenancy
     #   Indicates whether your WorkSpace directory is dedicated or shared. To
     #   use Bring Your Own License (BYOL) images, this value must be set to
-    #   `DEDICATED` and your AWS account must be enabled for BYOL. If your
-    #   account has not been enabled for BYOL, you will receive an
-    #   InvalidParameterValuesException error. For more information about BYOL
-    #   images, see [Bring Your Own Windows Desktop Images][1].
+    #   `DEDICATED` and your Amazon Web Services account must be enabled for
+    #   BYOL. If your account has not been enabled for BYOL, you will receive
+    #   an InvalidParameterValuesException error. For more information about
+    #   BYOL images, see [Bring Your Own Windows Desktop Images][1].
     #
     #
     #
@@ -2219,14 +4075,39 @@ module Aws::WorkSpaces
     # @option params [Array<Types::Tag>] :tags
     #   The tags associated with the directory.
     #
-    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    # @option params [String] :workspace_directory_name
+    #   The name of the directory to register.
+    #
+    # @option params [String] :workspace_directory_description
+    #   Description of the directory to register.
+    #
+    # @option params [String] :user_identity_type
+    #   The type of identity management the user is using.
+    #
+    # @option params [String] :idc_instance_arn
+    #   The Amazon Resource Name (ARN) of the identity center instance.
+    #
+    # @option params [Types::MicrosoftEntraConfig] :microsoft_entra_config
+    #   The details about Microsoft Entra config.
+    #
+    # @option params [String] :workspace_type
+    #   Indicates whether the directory's WorkSpace type is personal or
+    #   pools.
+    #
+    # @option params [Types::ActiveDirectoryConfig] :active_directory_config
+    #   The active directory config of the directory.
+    #
+    # @return [Types::RegisterWorkspaceDirectoryResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::RegisterWorkspaceDirectoryResult#directory_id #directory_id} => String
+    #   * {Types::RegisterWorkspaceDirectoryResult#state #state} => String
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.register_workspace_directory({
-    #     directory_id: "DirectoryId", # required
+    #     directory_id: "DirectoryId",
     #     subnet_ids: ["SubnetId"],
-    #     enable_work_docs: false, # required
+    #     enable_work_docs: false,
     #     enable_self_service: false,
     #     tenancy: "DEDICATED", # accepts DEDICATED, SHARED
     #     tags: [
@@ -2235,7 +4116,25 @@ module Aws::WorkSpaces
     #         value: "TagValue",
     #       },
     #     ],
+    #     workspace_directory_name: "WorkspaceDirectoryName",
+    #     workspace_directory_description: "WorkspaceDirectoryDescription",
+    #     user_identity_type: "CUSTOMER_MANAGED", # accepts CUSTOMER_MANAGED, AWS_DIRECTORY_SERVICE, AWS_IAM_IDENTITY_CENTER
+    #     idc_instance_arn: "ARN",
+    #     microsoft_entra_config: {
+    #       tenant_id: "MicrosoftEntraConfigTenantId",
+    #       application_config_secret_arn: "SecretsManagerArn",
+    #     },
+    #     workspace_type: "PERSONAL", # accepts PERSONAL, POOLS
+    #     active_directory_config: {
+    #       domain_name: "DomainName", # required
+    #       service_account_secret_arn: "SecretsManagerArn", # required
+    #     },
     #   })
+    #
+    # @example Response structure
+    #
+    #   resp.directory_id #=> String
+    #   resp.state #=> String, one of "REGISTERING", "REGISTERED", "DEREGISTERING", "DEREGISTERED", "ERROR"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/RegisterWorkspaceDirectory AWS API Documentation
     #
@@ -2243,6 +4142,41 @@ module Aws::WorkSpaces
     # @param [Hash] params ({})
     def register_workspace_directory(params = {}, options = {})
       req = build_request(:register_workspace_directory, params)
+      req.send_request(options)
+    end
+
+    # Rejects the account link invitation.
+    #
+    # @option params [required, String] :link_id
+    #   The identifier of the account link
+    #
+    # @option params [String] :client_token
+    #   The client token of the account link invitation to reject.
+    #
+    # @return [Types::RejectAccountLinkInvitationResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::RejectAccountLinkInvitationResult#account_link #account_link} => Types::AccountLink
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.reject_account_link_invitation({
+    #     link_id: "LinkId", # required
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.account_link.account_link_id #=> String
+    #   resp.account_link.account_link_status #=> String, one of "LINKED", "LINKING_FAILED", "LINK_NOT_FOUND", "PENDING_ACCEPTANCE_BY_TARGET_ACCOUNT", "REJECTED"
+    #   resp.account_link.source_account_id #=> String
+    #   resp.account_link.target_account_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/RejectAccountLinkInvitation AWS API Documentation
+    #
+    # @overload reject_account_link_invitation(params = {})
+    # @param [Hash] params ({})
+    def reject_account_link_invitation(params = {}, options = {})
+      req = build_request(:reject_account_link_invitation, params)
       req.send_request(options)
     end
 
@@ -2311,7 +4245,7 @@ module Aws::WorkSpaces
     # Starts the specified WorkSpaces.
     #
     # You cannot start a WorkSpace unless it has a running mode of
-    # `AutoStop` and a state of `STOPPED`.
+    # `AutoStop` or `Manual` and a state of `STOPPED`.
     #
     # @option params [required, Array<Types::StartRequest>] :start_workspace_requests
     #   The WorkSpaces to start. You can specify up to 25 WorkSpaces.
@@ -2346,10 +4280,36 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Starts the specified pool.
+    #
+    # You cannot start a pool unless it has a running mode of `AutoStop` and
+    # a state of `STOPPED`.
+    #
+    # @option params [required, String] :pool_id
+    #   The identifier of the pool.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_workspaces_pool({
+    #     pool_id: "WorkspacesPoolId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/StartWorkspacesPool AWS API Documentation
+    #
+    # @overload start_workspaces_pool(params = {})
+    # @param [Hash] params ({})
+    def start_workspaces_pool(params = {}, options = {})
+      req = build_request(:start_workspaces_pool, params)
+      req.send_request(options)
+    end
+
     # Stops the specified WorkSpaces.
     #
     # You cannot stop a WorkSpace unless it has a running mode of `AutoStop`
-    # and a state of `AVAILABLE`, `IMPAIRED`, `UNHEALTHY`, or `ERROR`.
+    # or `Manual` and a state of `AVAILABLE`, `IMPAIRED`, `UNHEALTHY`, or
+    # `ERROR`.
     #
     # @option params [required, Array<Types::StopRequest>] :stop_workspace_requests
     #   The WorkSpaces to stop. You can specify up to 25 WorkSpaces.
@@ -2384,11 +4344,37 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Stops the specified pool.
+    #
+    # You cannot stop a WorkSpace pool unless it has a running mode of
+    # `AutoStop` and a state of `AVAILABLE`, `IMPAIRED`, `UNHEALTHY`, or
+    # `ERROR`.
+    #
+    # @option params [required, String] :pool_id
+    #   The identifier of the pool.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.stop_workspaces_pool({
+    #     pool_id: "WorkspacesPoolId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/StopWorkspacesPool AWS API Documentation
+    #
+    # @overload stop_workspaces_pool(params = {})
+    # @param [Hash] params ({})
+    def stop_workspaces_pool(params = {}, options = {})
+      req = build_request(:stop_workspaces_pool, params)
+      req.send_request(options)
+    end
+
     # Terminates the specified WorkSpaces.
     #
     # Terminating a WorkSpace is a permanent action and cannot be undone.
     # The user's data is destroyed. If you need to archive any user data,
-    # contact AWS Support before terminating the WorkSpace.
+    # contact Amazon Web Services Support before terminating the WorkSpace.
     #
     # You can terminate a WorkSpace that is in any state except `SUSPENDED`.
     #
@@ -2404,8 +4390,8 @@ module Aws::WorkSpaces
     # use with WorkSpaces. If there are no WorkSpaces being used with your
     # Simple AD or AD Connector directory for 30 consecutive days, this
     # directory will be automatically deregistered for use with Amazon
-    # WorkSpaces, and you will be charged for this directory as per the [AWS
-    # Directory Services pricing terms][2].
+    # WorkSpaces, and you will be charged for this directory as per the
+    # [Directory Service pricing terms][2].
     #
     #  To delete empty directories, see [ Delete the Directory for Your
     # WorkSpaces][3]. If you delete your Simple AD or AD Connector
@@ -2453,6 +4439,85 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Terminates the specified pool.
+    #
+    # @option params [required, String] :pool_id
+    #   The identifier of the pool.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.terminate_workspaces_pool({
+    #     pool_id: "WorkspacesPoolId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/TerminateWorkspacesPool AWS API Documentation
+    #
+    # @overload terminate_workspaces_pool(params = {})
+    # @param [Hash] params ({})
+    def terminate_workspaces_pool(params = {}, options = {})
+      req = build_request(:terminate_workspaces_pool, params)
+      req.send_request(options)
+    end
+
+    # Terminates the pool session.
+    #
+    # @option params [required, String] :session_id
+    #   The identifier of the pool session.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.terminate_workspaces_pool_session({
+    #     session_id: "AmazonUuid", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/TerminateWorkspacesPoolSession AWS API Documentation
+    #
+    # @overload terminate_workspaces_pool_session(params = {})
+    # @param [Hash] params ({})
+    def terminate_workspaces_pool_session(params = {}, options = {})
+      req = build_request(:terminate_workspaces_pool_session, params)
+      req.send_request(options)
+    end
+
+    # Updates a Amazon Connect client add-in. Use this action to update the
+    # name and endpoint URL of a Amazon Connect client add-in.
+    #
+    # @option params [required, String] :add_in_id
+    #   The identifier of the client add-in to update.
+    #
+    # @option params [required, String] :resource_id
+    #   The directory identifier for which the client add-in is configured.
+    #
+    # @option params [String] :name
+    #   The name of the client add-in.
+    #
+    # @option params [String] :url
+    #   The endpoint URL of the Amazon Connect client add-in.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_connect_client_add_in({
+    #     add_in_id: "AmazonUuid", # required
+    #     resource_id: "DirectoryId", # required
+    #     name: "AddInName",
+    #     url: "AddInUrl",
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/UpdateConnectClientAddIn AWS API Documentation
+    #
+    # @overload update_connect_client_add_in(params = {})
+    # @param [Hash] params ({})
+    def update_connect_client_add_in(params = {}, options = {})
+      req = build_request(:update_connect_client_add_in, params)
+      req.send_request(options)
+    end
+
     # Shares or unshares a connection alias with one account by specifying
     # whether that account has permission to associate the connection alias
     # with a directory. If the association permission is granted, the
@@ -2485,7 +4550,7 @@ module Aws::WorkSpaces
     #
     # @option params [required, Types::ConnectionAliasPermission] :connection_alias_permission
     #   Indicates whether to share or unshare the connection alias with the
-    #   specified AWS account.
+    #   specified Amazon Web Services account.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -2540,22 +4605,57 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
-    # Shares or unshares an image with one account in the same AWS Region by
-    # specifying whether that account has permission to copy the image. If
-    # the copy image permission is granted, the image is shared with that
-    # account. If the copy image permission is revoked, the image is
-    # unshared with the account.
+    # Updates a WorkSpace bundle with a new image. For more information
+    # about updating WorkSpace bundles, see [ Update a Custom WorkSpaces
+    # Bundle][1].
+    #
+    # Existing WorkSpaces aren't automatically updated when you update the
+    # bundle that they're based on. To update existing WorkSpaces that are
+    # based on a bundle that you've updated, you must either rebuild the
+    # WorkSpaces or delete and recreate them.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/workspaces/latest/adminguide/update-custom-bundle.html
+    #
+    # @option params [String] :bundle_id
+    #   The identifier of the bundle.
+    #
+    # @option params [String] :image_id
+    #   The identifier of the image.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_workspace_bundle({
+    #     bundle_id: "BundleId",
+    #     image_id: "WorkspaceImageId",
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/UpdateWorkspaceBundle AWS API Documentation
+    #
+    # @overload update_workspace_bundle(params = {})
+    # @param [Hash] params ({})
+    def update_workspace_bundle(params = {}, options = {})
+      req = build_request(:update_workspace_bundle, params)
+      req.send_request(options)
+    end
+
+    # Shares or unshares an image with one account in the same Amazon Web
+    # Services Region by specifying whether that account has permission to
+    # copy the image. If the copy image permission is granted, the image is
+    # shared with that account. If the copy image permission is revoked, the
+    # image is unshared with the account.
     #
     # After an image has been shared, the recipient account can copy the
-    # image to other AWS Regions as needed.
+    # image to other Regions as needed.
     #
-    # <note markdown="1"> In the China (Ningxia) Region, you can copy images only within the
+    # In the China (Ningxia) Region, you can copy images only within the
     # same Region.
     #
-    #  In the AWS GovCloud (US-West) Region, to copy images to and from other
-    # AWS Regions, contact AWS Support.
-    #
-    #  </note>
+    # In Amazon Web Services GovCloud (US), to copy images to and from other
+    # Regions, contact Amazon Web Services Support.
     #
     # For more information about sharing images, see [ Share or Unshare a
     # Custom WorkSpaces Image][1].
@@ -2563,10 +4663,11 @@ module Aws::WorkSpaces
     # <note markdown="1"> * To delete an image that has been shared, you must unshare the image
     #   before you delete it.
     #
-    # * Sharing Bring Your Own License (BYOL) images across AWS accounts
-    #   isn't supported at this time in the AWS GovCloud (US-West) Region.
-    #   To share BYOL images across accounts in the AWS GovCloud (US-West)
-    #   Region, contact AWS Support.
+    # * Sharing Bring Your Own License (BYOL) images across Amazon Web
+    #   Services accounts isn't supported at this time in Amazon Web
+    #   Services GovCloud (US). To share BYOL images across accounts in
+    #   Amazon Web Services GovCloud (US), contact Amazon Web Services
+    #   Support.
     #
     #  </note>
     #
@@ -2582,10 +4683,11 @@ module Aws::WorkSpaces
     #   after an image has been shared.
     #
     # @option params [required, String] :shared_account_id
-    #   The identifier of the AWS account to share or unshare the image with.
+    #   The identifier of the Amazon Web Services account to share or unshare
+    #   the image with.
     #
     #   Before sharing the image, confirm that you are sharing to the correct
-    #   AWS account ID.
+    #   Amazon Web Services account ID.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -2606,20 +4708,106 @@ module Aws::WorkSpaces
       req.send_request(options)
     end
 
+    # Updates the specified pool.
+    #
+    # @option params [required, String] :pool_id
+    #   The identifier of the specified pool to update.
+    #
+    # @option params [String] :description
+    #   Describes the specified pool to update.
+    #
+    # @option params [String] :bundle_id
+    #   The identifier of the bundle.
+    #
+    # @option params [String] :directory_id
+    #   The identifier of the directory.
+    #
+    # @option params [Types::Capacity] :capacity
+    #   The desired capacity for the pool.
+    #
+    # @option params [Types::ApplicationSettingsRequest] :application_settings
+    #   The persistent application settings for users in the pool.
+    #
+    # @option params [Types::TimeoutSettings] :timeout_settings
+    #   Indicates the timeout settings of the specified pool.
+    #
+    # @return [Types::UpdateWorkspacesPoolResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateWorkspacesPoolResult#workspaces_pool #workspaces_pool} => Types::WorkspacesPool
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_workspaces_pool({
+    #     pool_id: "WorkspacesPoolId", # required
+    #     description: "UpdateDescription",
+    #     bundle_id: "BundleId",
+    #     directory_id: "DirectoryId",
+    #     capacity: {
+    #       desired_user_sessions: 1, # required
+    #     },
+    #     application_settings: {
+    #       status: "DISABLED", # required, accepts DISABLED, ENABLED
+    #       settings_group: "SettingsGroup",
+    #     },
+    #     timeout_settings: {
+    #       disconnect_timeout_in_seconds: 1,
+    #       idle_disconnect_timeout_in_seconds: 1,
+    #       max_user_duration_in_seconds: 1,
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.workspaces_pool.pool_id #=> String
+    #   resp.workspaces_pool.pool_arn #=> String
+    #   resp.workspaces_pool.capacity_status.available_user_sessions #=> Integer
+    #   resp.workspaces_pool.capacity_status.desired_user_sessions #=> Integer
+    #   resp.workspaces_pool.capacity_status.actual_user_sessions #=> Integer
+    #   resp.workspaces_pool.capacity_status.active_user_sessions #=> Integer
+    #   resp.workspaces_pool.pool_name #=> String
+    #   resp.workspaces_pool.description #=> String
+    #   resp.workspaces_pool.state #=> String, one of "CREATING", "DELETING", "RUNNING", "STARTING", "STOPPED", "STOPPING", "UPDATING"
+    #   resp.workspaces_pool.created_at #=> Time
+    #   resp.workspaces_pool.bundle_id #=> String
+    #   resp.workspaces_pool.directory_id #=> String
+    #   resp.workspaces_pool.errors #=> Array
+    #   resp.workspaces_pool.errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_IS_MISSING", "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "WORKSPACES_POOL_STOPPED", "WORKSPACES_POOL_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR", "DOMAIN_JOIN_ERROR_SECRET_ACTION_PERMISSION_IS_MISSING", "DOMAIN_JOIN_ERROR_SECRET_DECRYPTION_FAILURE", "DOMAIN_JOIN_ERROR_SECRET_STATE_INVALID", "DOMAIN_JOIN_ERROR_SECRET_NOT_FOUND", "DOMAIN_JOIN_ERROR_SECRET_VALUE_KEY_NOT_FOUND", "DOMAIN_JOIN_ERROR_SECRET_INVALID", "BUNDLE_NOT_FOUND", "DIRECTORY_NOT_FOUND", "INSUFFICIENT_PERMISSIONS_ERROR", "DEFAULT_OU_IS_MISSING"
+    #   resp.workspaces_pool.errors[0].error_message #=> String
+    #   resp.workspaces_pool.application_settings.status #=> String, one of "DISABLED", "ENABLED"
+    #   resp.workspaces_pool.application_settings.settings_group #=> String
+    #   resp.workspaces_pool.application_settings.s3_bucket_name #=> String
+    #   resp.workspaces_pool.timeout_settings.disconnect_timeout_in_seconds #=> Integer
+    #   resp.workspaces_pool.timeout_settings.idle_disconnect_timeout_in_seconds #=> Integer
+    #   resp.workspaces_pool.timeout_settings.max_user_duration_in_seconds #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workspaces-2015-04-08/UpdateWorkspacesPool AWS API Documentation
+    #
+    # @overload update_workspaces_pool(params = {})
+    # @param [Hash] params ({})
+    def update_workspaces_pool(params = {}, options = {})
+      req = build_request(:update_workspaces_pool, params)
+      req.send_request(options)
+    end
+
     # @!endgroup
 
     # @param params ({})
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::WorkSpaces')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-workspaces'
-      context[:gem_version] = '1.49.0'
+      context[:gem_version] = '1.121.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

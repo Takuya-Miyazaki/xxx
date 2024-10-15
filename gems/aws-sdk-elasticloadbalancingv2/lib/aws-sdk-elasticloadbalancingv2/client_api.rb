@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::ElasticLoadBalancingV2
   # @api private
@@ -13,7 +14,7 @@ module Aws::ElasticLoadBalancingV2
 
     include Seahorse::Model
 
-    ALPNPolicyNotSupportedException = Shapes::StructureShape.new(name: 'ALPNPolicyNotSupportedException')
+    ALPNPolicyNotSupportedException = Shapes::StructureShape.new(name: 'ALPNPolicyNotSupportedException', error: {"code"=>"ALPNPolicyNotFound", "httpStatusCode"=>400, "senderFault"=>true})
     Action = Shapes::StructureShape.new(name: 'Action')
     ActionOrder = Shapes::IntegerShape.new(name: 'ActionOrder')
     ActionTypeEnum = Shapes::StringShape.new(name: 'ActionTypeEnum')
@@ -22,10 +23,15 @@ module Aws::ElasticLoadBalancingV2
     AddListenerCertificatesOutput = Shapes::StructureShape.new(name: 'AddListenerCertificatesOutput')
     AddTagsInput = Shapes::StructureShape.new(name: 'AddTagsInput')
     AddTagsOutput = Shapes::StructureShape.new(name: 'AddTagsOutput')
+    AddTrustStoreRevocationsInput = Shapes::StructureShape.new(name: 'AddTrustStoreRevocationsInput')
+    AddTrustStoreRevocationsOutput = Shapes::StructureShape.new(name: 'AddTrustStoreRevocationsOutput')
+    AdministrativeOverride = Shapes::StructureShape.new(name: 'AdministrativeOverride')
     AllocationId = Shapes::StringShape.new(name: 'AllocationId')
-    AllocationIdNotFoundException = Shapes::StructureShape.new(name: 'AllocationIdNotFoundException')
+    AllocationIdNotFoundException = Shapes::StructureShape.new(name: 'AllocationIdNotFoundException', error: {"code"=>"AllocationIdNotFound", "httpStatusCode"=>400, "senderFault"=>true})
     AlpnPolicyName = Shapes::ListShape.new(name: 'AlpnPolicyName')
     AlpnPolicyValue = Shapes::StringShape.new(name: 'AlpnPolicyValue')
+    AnomalyDetection = Shapes::StructureShape.new(name: 'AnomalyDetection')
+    AnomalyResultEnum = Shapes::StringShape.new(name: 'AnomalyResultEnum')
     AuthenticateCognitoActionAuthenticationRequestExtraParams = Shapes::MapShape.new(name: 'AuthenticateCognitoActionAuthenticationRequestExtraParams')
     AuthenticateCognitoActionAuthenticationRequestParamName = Shapes::StringShape.new(name: 'AuthenticateCognitoActionAuthenticationRequestParamName')
     AuthenticateCognitoActionAuthenticationRequestParamValue = Shapes::StringShape.new(name: 'AuthenticateCognitoActionAuthenticationRequestParamValue')
@@ -53,13 +59,14 @@ module Aws::ElasticLoadBalancingV2
     AuthenticateOidcActionUseExistingClientSecret = Shapes::BooleanShape.new(name: 'AuthenticateOidcActionUseExistingClientSecret')
     AuthenticateOidcActionUserInfoEndpoint = Shapes::StringShape.new(name: 'AuthenticateOidcActionUserInfoEndpoint')
     AvailabilityZone = Shapes::StructureShape.new(name: 'AvailabilityZone')
-    AvailabilityZoneNotSupportedException = Shapes::StructureShape.new(name: 'AvailabilityZoneNotSupportedException')
+    AvailabilityZoneNotSupportedException = Shapes::StructureShape.new(name: 'AvailabilityZoneNotSupportedException', error: {"code"=>"AvailabilityZoneNotSupported", "httpStatusCode"=>400, "senderFault"=>true})
     AvailabilityZones = Shapes::ListShape.new(name: 'AvailabilityZones')
+    CaCertificatesBundleNotFoundException = Shapes::StructureShape.new(name: 'CaCertificatesBundleNotFoundException', error: {"code"=>"CaCertificatesBundleNotFound", "httpStatusCode"=>400, "senderFault"=>true})
     CanonicalHostedZoneId = Shapes::StringShape.new(name: 'CanonicalHostedZoneId')
     Certificate = Shapes::StructureShape.new(name: 'Certificate')
     CertificateArn = Shapes::StringShape.new(name: 'CertificateArn')
     CertificateList = Shapes::ListShape.new(name: 'CertificateList')
-    CertificateNotFoundException = Shapes::StructureShape.new(name: 'CertificateNotFoundException')
+    CertificateNotFoundException = Shapes::StructureShape.new(name: 'CertificateNotFoundException', error: {"code"=>"CertificateNotFound", "httpStatusCode"=>400, "senderFault"=>true})
     Cipher = Shapes::StructureShape.new(name: 'Cipher')
     CipherName = Shapes::StringShape.new(name: 'CipherName')
     CipherPriority = Shapes::IntegerShape.new(name: 'CipherPriority')
@@ -73,22 +80,31 @@ module Aws::ElasticLoadBalancingV2
     CreateRuleOutput = Shapes::StructureShape.new(name: 'CreateRuleOutput')
     CreateTargetGroupInput = Shapes::StructureShape.new(name: 'CreateTargetGroupInput')
     CreateTargetGroupOutput = Shapes::StructureShape.new(name: 'CreateTargetGroupOutput')
+    CreateTrustStoreInput = Shapes::StructureShape.new(name: 'CreateTrustStoreInput')
+    CreateTrustStoreOutput = Shapes::StructureShape.new(name: 'CreateTrustStoreOutput')
     CreatedTime = Shapes::TimestampShape.new(name: 'CreatedTime')
     CustomerOwnedIpv4Pool = Shapes::StringShape.new(name: 'CustomerOwnedIpv4Pool')
     DNSName = Shapes::StringShape.new(name: 'DNSName')
     Default = Shapes::BooleanShape.new(name: 'Default')
+    DeleteAssociationSameAccountException = Shapes::StructureShape.new(name: 'DeleteAssociationSameAccountException', error: {"code"=>"DeleteAssociationSameAccount", "httpStatusCode"=>400, "senderFault"=>true})
     DeleteListenerInput = Shapes::StructureShape.new(name: 'DeleteListenerInput')
     DeleteListenerOutput = Shapes::StructureShape.new(name: 'DeleteListenerOutput')
     DeleteLoadBalancerInput = Shapes::StructureShape.new(name: 'DeleteLoadBalancerInput')
     DeleteLoadBalancerOutput = Shapes::StructureShape.new(name: 'DeleteLoadBalancerOutput')
     DeleteRuleInput = Shapes::StructureShape.new(name: 'DeleteRuleInput')
     DeleteRuleOutput = Shapes::StructureShape.new(name: 'DeleteRuleOutput')
+    DeleteSharedTrustStoreAssociationInput = Shapes::StructureShape.new(name: 'DeleteSharedTrustStoreAssociationInput')
+    DeleteSharedTrustStoreAssociationOutput = Shapes::StructureShape.new(name: 'DeleteSharedTrustStoreAssociationOutput')
     DeleteTargetGroupInput = Shapes::StructureShape.new(name: 'DeleteTargetGroupInput')
     DeleteTargetGroupOutput = Shapes::StructureShape.new(name: 'DeleteTargetGroupOutput')
+    DeleteTrustStoreInput = Shapes::StructureShape.new(name: 'DeleteTrustStoreInput')
+    DeleteTrustStoreOutput = Shapes::StructureShape.new(name: 'DeleteTrustStoreOutput')
     DeregisterTargetsInput = Shapes::StructureShape.new(name: 'DeregisterTargetsInput')
     DeregisterTargetsOutput = Shapes::StructureShape.new(name: 'DeregisterTargetsOutput')
     DescribeAccountLimitsInput = Shapes::StructureShape.new(name: 'DescribeAccountLimitsInput')
     DescribeAccountLimitsOutput = Shapes::StructureShape.new(name: 'DescribeAccountLimitsOutput')
+    DescribeListenerAttributesInput = Shapes::StructureShape.new(name: 'DescribeListenerAttributesInput')
+    DescribeListenerAttributesOutput = Shapes::StructureShape.new(name: 'DescribeListenerAttributesOutput')
     DescribeListenerCertificatesInput = Shapes::StructureShape.new(name: 'DescribeListenerCertificatesInput')
     DescribeListenerCertificatesOutput = Shapes::StructureShape.new(name: 'DescribeListenerCertificatesOutput')
     DescribeListenersInput = Shapes::StructureShape.new(name: 'DescribeListenersInput')
@@ -108,47 +124,73 @@ module Aws::ElasticLoadBalancingV2
     DescribeTargetGroupsInput = Shapes::StructureShape.new(name: 'DescribeTargetGroupsInput')
     DescribeTargetGroupsOutput = Shapes::StructureShape.new(name: 'DescribeTargetGroupsOutput')
     DescribeTargetHealthInput = Shapes::StructureShape.new(name: 'DescribeTargetHealthInput')
+    DescribeTargetHealthInputIncludeEnum = Shapes::StringShape.new(name: 'DescribeTargetHealthInputIncludeEnum')
     DescribeTargetHealthOutput = Shapes::StructureShape.new(name: 'DescribeTargetHealthOutput')
+    DescribeTrustStoreAssociationsInput = Shapes::StructureShape.new(name: 'DescribeTrustStoreAssociationsInput')
+    DescribeTrustStoreAssociationsOutput = Shapes::StructureShape.new(name: 'DescribeTrustStoreAssociationsOutput')
+    DescribeTrustStoreRevocation = Shapes::StructureShape.new(name: 'DescribeTrustStoreRevocation')
+    DescribeTrustStoreRevocationResponse = Shapes::ListShape.new(name: 'DescribeTrustStoreRevocationResponse')
+    DescribeTrustStoreRevocationsInput = Shapes::StructureShape.new(name: 'DescribeTrustStoreRevocationsInput')
+    DescribeTrustStoreRevocationsOutput = Shapes::StructureShape.new(name: 'DescribeTrustStoreRevocationsOutput')
+    DescribeTrustStoresInput = Shapes::StructureShape.new(name: 'DescribeTrustStoresInput')
+    DescribeTrustStoresOutput = Shapes::StructureShape.new(name: 'DescribeTrustStoresOutput')
     Description = Shapes::StringShape.new(name: 'Description')
-    DuplicateListenerException = Shapes::StructureShape.new(name: 'DuplicateListenerException')
-    DuplicateLoadBalancerNameException = Shapes::StructureShape.new(name: 'DuplicateLoadBalancerNameException')
-    DuplicateTagKeysException = Shapes::StructureShape.new(name: 'DuplicateTagKeysException')
-    DuplicateTargetGroupNameException = Shapes::StructureShape.new(name: 'DuplicateTargetGroupNameException')
+    DuplicateListenerException = Shapes::StructureShape.new(name: 'DuplicateListenerException', error: {"code"=>"DuplicateListener", "httpStatusCode"=>400, "senderFault"=>true})
+    DuplicateLoadBalancerNameException = Shapes::StructureShape.new(name: 'DuplicateLoadBalancerNameException', error: {"code"=>"DuplicateLoadBalancerName", "httpStatusCode"=>400, "senderFault"=>true})
+    DuplicateTagKeysException = Shapes::StructureShape.new(name: 'DuplicateTagKeysException', error: {"code"=>"DuplicateTagKeys", "httpStatusCode"=>400, "senderFault"=>true})
+    DuplicateTargetGroupNameException = Shapes::StructureShape.new(name: 'DuplicateTargetGroupNameException', error: {"code"=>"DuplicateTargetGroupName", "httpStatusCode"=>400, "senderFault"=>true})
+    DuplicateTrustStoreNameException = Shapes::StructureShape.new(name: 'DuplicateTrustStoreNameException', error: {"code"=>"DuplicateTrustStoreName", "httpStatusCode"=>400, "senderFault"=>true})
+    EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic = Shapes::StringShape.new(name: 'EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic')
+    EnforceSecurityGroupInboundRulesOnPrivateLinkTrafficEnum = Shapes::StringShape.new(name: 'EnforceSecurityGroupInboundRulesOnPrivateLinkTrafficEnum')
     FixedResponseActionConfig = Shapes::StructureShape.new(name: 'FixedResponseActionConfig')
     FixedResponseActionContentType = Shapes::StringShape.new(name: 'FixedResponseActionContentType')
     FixedResponseActionMessage = Shapes::StringShape.new(name: 'FixedResponseActionMessage')
     FixedResponseActionStatusCode = Shapes::StringShape.new(name: 'FixedResponseActionStatusCode')
     ForwardActionConfig = Shapes::StructureShape.new(name: 'ForwardActionConfig')
+    GetResourcePolicyInput = Shapes::StructureShape.new(name: 'GetResourcePolicyInput')
+    GetResourcePolicyOutput = Shapes::StructureShape.new(name: 'GetResourcePolicyOutput')
+    GetTrustStoreCaCertificatesBundleInput = Shapes::StructureShape.new(name: 'GetTrustStoreCaCertificatesBundleInput')
+    GetTrustStoreCaCertificatesBundleOutput = Shapes::StructureShape.new(name: 'GetTrustStoreCaCertificatesBundleOutput')
+    GetTrustStoreRevocationContentInput = Shapes::StructureShape.new(name: 'GetTrustStoreRevocationContentInput')
+    GetTrustStoreRevocationContentOutput = Shapes::StructureShape.new(name: 'GetTrustStoreRevocationContentOutput')
     GrpcCode = Shapes::StringShape.new(name: 'GrpcCode')
     HealthCheckEnabled = Shapes::BooleanShape.new(name: 'HealthCheckEnabled')
     HealthCheckIntervalSeconds = Shapes::IntegerShape.new(name: 'HealthCheckIntervalSeconds')
     HealthCheckPort = Shapes::StringShape.new(name: 'HealthCheckPort')
     HealthCheckThresholdCount = Shapes::IntegerShape.new(name: 'HealthCheckThresholdCount')
     HealthCheckTimeoutSeconds = Shapes::IntegerShape.new(name: 'HealthCheckTimeoutSeconds')
-    HealthUnavailableException = Shapes::StructureShape.new(name: 'HealthUnavailableException')
+    HealthUnavailableException = Shapes::StructureShape.new(name: 'HealthUnavailableException', error: {"code"=>"HealthUnavailable", "httpStatusCode"=>500})
     HostHeaderConditionConfig = Shapes::StructureShape.new(name: 'HostHeaderConditionConfig')
     HttpCode = Shapes::StringShape.new(name: 'HttpCode')
     HttpHeaderConditionConfig = Shapes::StructureShape.new(name: 'HttpHeaderConditionConfig')
     HttpHeaderConditionName = Shapes::StringShape.new(name: 'HttpHeaderConditionName')
     HttpRequestMethodConditionConfig = Shapes::StructureShape.new(name: 'HttpRequestMethodConditionConfig')
     IPv6Address = Shapes::StringShape.new(name: 'IPv6Address')
-    IncompatibleProtocolsException = Shapes::StructureShape.new(name: 'IncompatibleProtocolsException')
-    InvalidConfigurationRequestException = Shapes::StructureShape.new(name: 'InvalidConfigurationRequestException')
-    InvalidLoadBalancerActionException = Shapes::StructureShape.new(name: 'InvalidLoadBalancerActionException')
-    InvalidSchemeException = Shapes::StructureShape.new(name: 'InvalidSchemeException')
-    InvalidSecurityGroupException = Shapes::StructureShape.new(name: 'InvalidSecurityGroupException')
-    InvalidSubnetException = Shapes::StructureShape.new(name: 'InvalidSubnetException')
-    InvalidTargetException = Shapes::StructureShape.new(name: 'InvalidTargetException')
+    IgnoreClientCertificateExpiry = Shapes::BooleanShape.new(name: 'IgnoreClientCertificateExpiry')
+    IncompatibleProtocolsException = Shapes::StructureShape.new(name: 'IncompatibleProtocolsException', error: {"code"=>"IncompatibleProtocols", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidCaCertificatesBundleException = Shapes::StructureShape.new(name: 'InvalidCaCertificatesBundleException', error: {"code"=>"InvalidCaCertificatesBundle", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidConfigurationRequestException = Shapes::StructureShape.new(name: 'InvalidConfigurationRequestException', error: {"code"=>"InvalidConfigurationRequest", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidLoadBalancerActionException = Shapes::StructureShape.new(name: 'InvalidLoadBalancerActionException', error: {"code"=>"InvalidLoadBalancerAction", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidRevocationContentException = Shapes::StructureShape.new(name: 'InvalidRevocationContentException', error: {"code"=>"InvalidRevocationContent", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidSchemeException = Shapes::StructureShape.new(name: 'InvalidSchemeException', error: {"code"=>"InvalidScheme", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidSecurityGroupException = Shapes::StructureShape.new(name: 'InvalidSecurityGroupException', error: {"code"=>"InvalidSecurityGroup", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidSubnetException = Shapes::StructureShape.new(name: 'InvalidSubnetException', error: {"code"=>"InvalidSubnet", "httpStatusCode"=>400, "senderFault"=>true})
+    InvalidTargetException = Shapes::StructureShape.new(name: 'InvalidTargetException', error: {"code"=>"InvalidTarget", "httpStatusCode"=>400, "senderFault"=>true})
     IpAddress = Shapes::StringShape.new(name: 'IpAddress')
     IpAddressType = Shapes::StringShape.new(name: 'IpAddressType')
     IsDefault = Shapes::BooleanShape.new(name: 'IsDefault')
     Limit = Shapes::StructureShape.new(name: 'Limit')
     Limits = Shapes::ListShape.new(name: 'Limits')
+    ListOfDescribeTargetHealthIncludeOptions = Shapes::ListShape.new(name: 'ListOfDescribeTargetHealthIncludeOptions')
     ListOfString = Shapes::ListShape.new(name: 'ListOfString')
     Listener = Shapes::StructureShape.new(name: 'Listener')
     ListenerArn = Shapes::StringShape.new(name: 'ListenerArn')
     ListenerArns = Shapes::ListShape.new(name: 'ListenerArns')
-    ListenerNotFoundException = Shapes::StructureShape.new(name: 'ListenerNotFoundException')
+    ListenerAttribute = Shapes::StructureShape.new(name: 'ListenerAttribute')
+    ListenerAttributeKey = Shapes::StringShape.new(name: 'ListenerAttributeKey')
+    ListenerAttributeValue = Shapes::StringShape.new(name: 'ListenerAttributeValue')
+    ListenerAttributes = Shapes::ListShape.new(name: 'ListenerAttributes')
+    ListenerNotFoundException = Shapes::StructureShape.new(name: 'ListenerNotFoundException', error: {"code"=>"ListenerNotFound", "httpStatusCode"=>400, "senderFault"=>true})
     Listeners = Shapes::ListShape.new(name: 'Listeners')
     LoadBalancer = Shapes::StructureShape.new(name: 'LoadBalancer')
     LoadBalancerAddress = Shapes::StructureShape.new(name: 'LoadBalancerAddress')
@@ -161,15 +203,20 @@ module Aws::ElasticLoadBalancingV2
     LoadBalancerAttributes = Shapes::ListShape.new(name: 'LoadBalancerAttributes')
     LoadBalancerName = Shapes::StringShape.new(name: 'LoadBalancerName')
     LoadBalancerNames = Shapes::ListShape.new(name: 'LoadBalancerNames')
-    LoadBalancerNotFoundException = Shapes::StructureShape.new(name: 'LoadBalancerNotFoundException')
+    LoadBalancerNotFoundException = Shapes::StructureShape.new(name: 'LoadBalancerNotFoundException', error: {"code"=>"LoadBalancerNotFound", "httpStatusCode"=>400, "senderFault"=>true})
     LoadBalancerSchemeEnum = Shapes::StringShape.new(name: 'LoadBalancerSchemeEnum')
     LoadBalancerState = Shapes::StructureShape.new(name: 'LoadBalancerState')
     LoadBalancerStateEnum = Shapes::StringShape.new(name: 'LoadBalancerStateEnum')
     LoadBalancerTypeEnum = Shapes::StringShape.new(name: 'LoadBalancerTypeEnum')
     LoadBalancers = Shapes::ListShape.new(name: 'LoadBalancers')
+    Location = Shapes::StringShape.new(name: 'Location')
     Marker = Shapes::StringShape.new(name: 'Marker')
     Matcher = Shapes::StructureShape.new(name: 'Matcher')
     Max = Shapes::StringShape.new(name: 'Max')
+    MitigationInEffectEnum = Shapes::StringShape.new(name: 'MitigationInEffectEnum')
+    Mode = Shapes::StringShape.new(name: 'Mode')
+    ModifyListenerAttributesInput = Shapes::StructureShape.new(name: 'ModifyListenerAttributesInput')
+    ModifyListenerAttributesOutput = Shapes::StructureShape.new(name: 'ModifyListenerAttributesOutput')
     ModifyListenerInput = Shapes::StructureShape.new(name: 'ModifyListenerInput')
     ModifyListenerOutput = Shapes::StructureShape.new(name: 'ModifyListenerOutput')
     ModifyLoadBalancerAttributesInput = Shapes::StructureShape.new(name: 'ModifyLoadBalancerAttributesInput')
@@ -180,14 +227,20 @@ module Aws::ElasticLoadBalancingV2
     ModifyTargetGroupAttributesOutput = Shapes::StructureShape.new(name: 'ModifyTargetGroupAttributesOutput')
     ModifyTargetGroupInput = Shapes::StructureShape.new(name: 'ModifyTargetGroupInput')
     ModifyTargetGroupOutput = Shapes::StructureShape.new(name: 'ModifyTargetGroupOutput')
+    ModifyTrustStoreInput = Shapes::StructureShape.new(name: 'ModifyTrustStoreInput')
+    ModifyTrustStoreOutput = Shapes::StructureShape.new(name: 'ModifyTrustStoreOutput')
+    MutualAuthenticationAttributes = Shapes::StructureShape.new(name: 'MutualAuthenticationAttributes')
     Name = Shapes::StringShape.new(name: 'Name')
-    OperationNotPermittedException = Shapes::StructureShape.new(name: 'OperationNotPermittedException')
+    NumberOfCaCertificates = Shapes::IntegerShape.new(name: 'NumberOfCaCertificates')
+    NumberOfRevokedEntries = Shapes::IntegerShape.new(name: 'NumberOfRevokedEntries')
+    OperationNotPermittedException = Shapes::StructureShape.new(name: 'OperationNotPermittedException', error: {"code"=>"OperationNotPermitted", "httpStatusCode"=>400, "senderFault"=>true})
     OutpostId = Shapes::StringShape.new(name: 'OutpostId')
     PageSize = Shapes::IntegerShape.new(name: 'PageSize')
     Path = Shapes::StringShape.new(name: 'Path')
     PathPatternConditionConfig = Shapes::StructureShape.new(name: 'PathPatternConditionConfig')
+    Policy = Shapes::StringShape.new(name: 'Policy')
     Port = Shapes::IntegerShape.new(name: 'Port')
-    PriorityInUseException = Shapes::StructureShape.new(name: 'PriorityInUseException')
+    PriorityInUseException = Shapes::StructureShape.new(name: 'PriorityInUseException', error: {"code"=>"PriorityInUse", "httpStatusCode"=>400, "senderFault"=>true})
     PrivateIPv4Address = Shapes::StringShape.new(name: 'PrivateIPv4Address')
     ProtocolEnum = Shapes::StringShape.new(name: 'ProtocolEnum')
     ProtocolVersion = Shapes::StringShape.new(name: 'ProtocolVersion')
@@ -207,20 +260,33 @@ module Aws::ElasticLoadBalancingV2
     RemoveListenerCertificatesOutput = Shapes::StructureShape.new(name: 'RemoveListenerCertificatesOutput')
     RemoveTagsInput = Shapes::StructureShape.new(name: 'RemoveTagsInput')
     RemoveTagsOutput = Shapes::StructureShape.new(name: 'RemoveTagsOutput')
+    RemoveTrustStoreRevocationsInput = Shapes::StructureShape.new(name: 'RemoveTrustStoreRevocationsInput')
+    RemoveTrustStoreRevocationsOutput = Shapes::StructureShape.new(name: 'RemoveTrustStoreRevocationsOutput')
     ResourceArn = Shapes::StringShape.new(name: 'ResourceArn')
     ResourceArns = Shapes::ListShape.new(name: 'ResourceArns')
-    ResourceInUseException = Shapes::StructureShape.new(name: 'ResourceInUseException')
+    ResourceInUseException = Shapes::StructureShape.new(name: 'ResourceInUseException', error: {"code"=>"ResourceInUse", "httpStatusCode"=>400, "senderFault"=>true})
+    ResourceNotFoundException = Shapes::StructureShape.new(name: 'ResourceNotFoundException', error: {"code"=>"ResourceNotFound", "httpStatusCode"=>400, "senderFault"=>true})
+    RevocationContent = Shapes::StructureShape.new(name: 'RevocationContent')
+    RevocationContentNotFoundException = Shapes::StructureShape.new(name: 'RevocationContentNotFoundException', error: {"code"=>"RevocationContentNotFound", "httpStatusCode"=>400, "senderFault"=>true})
+    RevocationContents = Shapes::ListShape.new(name: 'RevocationContents')
+    RevocationId = Shapes::IntegerShape.new(name: 'RevocationId')
+    RevocationIdNotFoundException = Shapes::StructureShape.new(name: 'RevocationIdNotFoundException', error: {"code"=>"RevocationIdNotFound", "httpStatusCode"=>400, "senderFault"=>true})
+    RevocationIds = Shapes::ListShape.new(name: 'RevocationIds')
+    RevocationType = Shapes::StringShape.new(name: 'RevocationType')
     Rule = Shapes::StructureShape.new(name: 'Rule')
     RuleArn = Shapes::StringShape.new(name: 'RuleArn')
     RuleArns = Shapes::ListShape.new(name: 'RuleArns')
     RuleCondition = Shapes::StructureShape.new(name: 'RuleCondition')
     RuleConditionList = Shapes::ListShape.new(name: 'RuleConditionList')
-    RuleNotFoundException = Shapes::StructureShape.new(name: 'RuleNotFoundException')
+    RuleNotFoundException = Shapes::StructureShape.new(name: 'RuleNotFoundException', error: {"code"=>"RuleNotFound", "httpStatusCode"=>400, "senderFault"=>true})
     RulePriority = Shapes::IntegerShape.new(name: 'RulePriority')
     RulePriorityList = Shapes::ListShape.new(name: 'RulePriorityList')
     RulePriorityPair = Shapes::StructureShape.new(name: 'RulePriorityPair')
     Rules = Shapes::ListShape.new(name: 'Rules')
-    SSLPolicyNotFoundException = Shapes::StructureShape.new(name: 'SSLPolicyNotFoundException')
+    S3Bucket = Shapes::StringShape.new(name: 'S3Bucket')
+    S3Key = Shapes::StringShape.new(name: 'S3Key')
+    S3ObjectVersion = Shapes::StringShape.new(name: 'S3ObjectVersion')
+    SSLPolicyNotFoundException = Shapes::StructureShape.new(name: 'SSLPolicyNotFoundException', error: {"code"=>"SSLPolicyNotFound", "httpStatusCode"=>400, "senderFault"=>true})
     SecurityGroupId = Shapes::StringShape.new(name: 'SecurityGroupId')
     SecurityGroups = Shapes::ListShape.new(name: 'SecurityGroups')
     SetIpAddressTypeInput = Shapes::StructureShape.new(name: 'SetIpAddressTypeInput')
@@ -244,7 +310,7 @@ module Aws::ElasticLoadBalancingV2
     SubnetId = Shapes::StringShape.new(name: 'SubnetId')
     SubnetMapping = Shapes::StructureShape.new(name: 'SubnetMapping')
     SubnetMappings = Shapes::ListShape.new(name: 'SubnetMappings')
-    SubnetNotFoundException = Shapes::StructureShape.new(name: 'SubnetNotFoundException')
+    SubnetNotFoundException = Shapes::StructureShape.new(name: 'SubnetNotFoundException', error: {"code"=>"SubnetNotFound", "httpStatusCode"=>400, "senderFault"=>true})
     Subnets = Shapes::ListShape.new(name: 'Subnets')
     Tag = Shapes::StructureShape.new(name: 'Tag')
     TagDescription = Shapes::StructureShape.new(name: 'TagDescription')
@@ -253,20 +319,23 @@ module Aws::ElasticLoadBalancingV2
     TagKeys = Shapes::ListShape.new(name: 'TagKeys')
     TagList = Shapes::ListShape.new(name: 'TagList')
     TagValue = Shapes::StringShape.new(name: 'TagValue')
+    TargetAdministrativeOverrideReasonEnum = Shapes::StringShape.new(name: 'TargetAdministrativeOverrideReasonEnum')
+    TargetAdministrativeOverrideStateEnum = Shapes::StringShape.new(name: 'TargetAdministrativeOverrideStateEnum')
     TargetDescription = Shapes::StructureShape.new(name: 'TargetDescription')
     TargetDescriptions = Shapes::ListShape.new(name: 'TargetDescriptions')
     TargetGroup = Shapes::StructureShape.new(name: 'TargetGroup')
     TargetGroupArn = Shapes::StringShape.new(name: 'TargetGroupArn')
     TargetGroupArns = Shapes::ListShape.new(name: 'TargetGroupArns')
-    TargetGroupAssociationLimitException = Shapes::StructureShape.new(name: 'TargetGroupAssociationLimitException')
+    TargetGroupAssociationLimitException = Shapes::StructureShape.new(name: 'TargetGroupAssociationLimitException', error: {"code"=>"TargetGroupAssociationLimit", "httpStatusCode"=>400, "senderFault"=>true})
     TargetGroupAttribute = Shapes::StructureShape.new(name: 'TargetGroupAttribute')
     TargetGroupAttributeKey = Shapes::StringShape.new(name: 'TargetGroupAttributeKey')
     TargetGroupAttributeValue = Shapes::StringShape.new(name: 'TargetGroupAttributeValue')
     TargetGroupAttributes = Shapes::ListShape.new(name: 'TargetGroupAttributes')
+    TargetGroupIpAddressTypeEnum = Shapes::StringShape.new(name: 'TargetGroupIpAddressTypeEnum')
     TargetGroupList = Shapes::ListShape.new(name: 'TargetGroupList')
     TargetGroupName = Shapes::StringShape.new(name: 'TargetGroupName')
     TargetGroupNames = Shapes::ListShape.new(name: 'TargetGroupNames')
-    TargetGroupNotFoundException = Shapes::StructureShape.new(name: 'TargetGroupNotFoundException')
+    TargetGroupNotFoundException = Shapes::StructureShape.new(name: 'TargetGroupNotFoundException', error: {"code"=>"TargetGroupNotFound", "httpStatusCode"=>400, "senderFault"=>true})
     TargetGroupStickinessConfig = Shapes::StructureShape.new(name: 'TargetGroupStickinessConfig')
     TargetGroupStickinessDurationSeconds = Shapes::IntegerShape.new(name: 'TargetGroupStickinessDurationSeconds')
     TargetGroupStickinessEnabled = Shapes::BooleanShape.new(name: 'TargetGroupStickinessEnabled')
@@ -280,17 +349,37 @@ module Aws::ElasticLoadBalancingV2
     TargetHealthStateEnum = Shapes::StringShape.new(name: 'TargetHealthStateEnum')
     TargetId = Shapes::StringShape.new(name: 'TargetId')
     TargetTypeEnum = Shapes::StringShape.new(name: 'TargetTypeEnum')
-    TooManyActionsException = Shapes::StructureShape.new(name: 'TooManyActionsException')
-    TooManyCertificatesException = Shapes::StructureShape.new(name: 'TooManyCertificatesException')
-    TooManyListenersException = Shapes::StructureShape.new(name: 'TooManyListenersException')
-    TooManyLoadBalancersException = Shapes::StructureShape.new(name: 'TooManyLoadBalancersException')
-    TooManyRegistrationsForTargetIdException = Shapes::StructureShape.new(name: 'TooManyRegistrationsForTargetIdException')
-    TooManyRulesException = Shapes::StructureShape.new(name: 'TooManyRulesException')
-    TooManyTagsException = Shapes::StructureShape.new(name: 'TooManyTagsException')
-    TooManyTargetGroupsException = Shapes::StructureShape.new(name: 'TooManyTargetGroupsException')
-    TooManyTargetsException = Shapes::StructureShape.new(name: 'TooManyTargetsException')
-    TooManyUniqueTargetGroupsPerLoadBalancerException = Shapes::StructureShape.new(name: 'TooManyUniqueTargetGroupsPerLoadBalancerException')
-    UnsupportedProtocolException = Shapes::StructureShape.new(name: 'UnsupportedProtocolException')
+    TooManyActionsException = Shapes::StructureShape.new(name: 'TooManyActionsException', error: {"code"=>"TooManyActions", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyCertificatesException = Shapes::StructureShape.new(name: 'TooManyCertificatesException', error: {"code"=>"TooManyCertificates", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyListenersException = Shapes::StructureShape.new(name: 'TooManyListenersException', error: {"code"=>"TooManyListeners", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyLoadBalancersException = Shapes::StructureShape.new(name: 'TooManyLoadBalancersException', error: {"code"=>"TooManyLoadBalancers", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyRegistrationsForTargetIdException = Shapes::StructureShape.new(name: 'TooManyRegistrationsForTargetIdException', error: {"code"=>"TooManyRegistrationsForTargetId", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyRulesException = Shapes::StructureShape.new(name: 'TooManyRulesException', error: {"code"=>"TooManyRules", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyTagsException = Shapes::StructureShape.new(name: 'TooManyTagsException', error: {"code"=>"TooManyTags", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyTargetGroupsException = Shapes::StructureShape.new(name: 'TooManyTargetGroupsException', error: {"code"=>"TooManyTargetGroups", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyTargetsException = Shapes::StructureShape.new(name: 'TooManyTargetsException', error: {"code"=>"TooManyTargets", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyTrustStoreRevocationEntriesException = Shapes::StructureShape.new(name: 'TooManyTrustStoreRevocationEntriesException', error: {"code"=>"TooManyTrustStoreRevocationEntries", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyTrustStoresException = Shapes::StructureShape.new(name: 'TooManyTrustStoresException', error: {"code"=>"TooManyTrustStores", "httpStatusCode"=>400, "senderFault"=>true})
+    TooManyUniqueTargetGroupsPerLoadBalancerException = Shapes::StructureShape.new(name: 'TooManyUniqueTargetGroupsPerLoadBalancerException', error: {"code"=>"TooManyUniqueTargetGroupsPerLoadBalancer", "httpStatusCode"=>400, "senderFault"=>true})
+    TotalRevokedEntries = Shapes::IntegerShape.new(name: 'TotalRevokedEntries')
+    TrustStore = Shapes::StructureShape.new(name: 'TrustStore')
+    TrustStoreArn = Shapes::StringShape.new(name: 'TrustStoreArn')
+    TrustStoreArns = Shapes::ListShape.new(name: 'TrustStoreArns')
+    TrustStoreAssociation = Shapes::StructureShape.new(name: 'TrustStoreAssociation')
+    TrustStoreAssociationNotFoundException = Shapes::StructureShape.new(name: 'TrustStoreAssociationNotFoundException', error: {"code"=>"AssociationNotFound", "httpStatusCode"=>400, "senderFault"=>true})
+    TrustStoreAssociationResourceArn = Shapes::StringShape.new(name: 'TrustStoreAssociationResourceArn')
+    TrustStoreAssociationStatusEnum = Shapes::StringShape.new(name: 'TrustStoreAssociationStatusEnum')
+    TrustStoreAssociations = Shapes::ListShape.new(name: 'TrustStoreAssociations')
+    TrustStoreInUseException = Shapes::StructureShape.new(name: 'TrustStoreInUseException', error: {"code"=>"TrustStoreInUse", "httpStatusCode"=>400, "senderFault"=>true})
+    TrustStoreName = Shapes::StringShape.new(name: 'TrustStoreName')
+    TrustStoreNames = Shapes::ListShape.new(name: 'TrustStoreNames')
+    TrustStoreNotFoundException = Shapes::StructureShape.new(name: 'TrustStoreNotFoundException', error: {"code"=>"TrustStoreNotFound", "httpStatusCode"=>400, "senderFault"=>true})
+    TrustStoreNotReadyException = Shapes::StructureShape.new(name: 'TrustStoreNotReadyException', error: {"code"=>"TrustStoreNotReady", "httpStatusCode"=>400, "senderFault"=>true})
+    TrustStoreRevocation = Shapes::StructureShape.new(name: 'TrustStoreRevocation')
+    TrustStoreRevocations = Shapes::ListShape.new(name: 'TrustStoreRevocations')
+    TrustStoreStatus = Shapes::StringShape.new(name: 'TrustStoreStatus')
+    TrustStores = Shapes::ListShape.new(name: 'TrustStores')
+    UnsupportedProtocolException = Shapes::StructureShape.new(name: 'UnsupportedProtocolException', error: {"code"=>"UnsupportedProtocol", "httpStatusCode"=>400, "senderFault"=>true})
     VpcId = Shapes::StringShape.new(name: 'VpcId')
     ZoneName = Shapes::StringShape.new(name: 'ZoneName')
 
@@ -321,9 +410,25 @@ module Aws::ElasticLoadBalancingV2
 
     AddTagsOutput.struct_class = Types::AddTagsOutput
 
+    AddTrustStoreRevocationsInput.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, required: true, location_name: "TrustStoreArn"))
+    AddTrustStoreRevocationsInput.add_member(:revocation_contents, Shapes::ShapeRef.new(shape: RevocationContents, location_name: "RevocationContents"))
+    AddTrustStoreRevocationsInput.struct_class = Types::AddTrustStoreRevocationsInput
+
+    AddTrustStoreRevocationsOutput.add_member(:trust_store_revocations, Shapes::ShapeRef.new(shape: TrustStoreRevocations, location_name: "TrustStoreRevocations"))
+    AddTrustStoreRevocationsOutput.struct_class = Types::AddTrustStoreRevocationsOutput
+
+    AdministrativeOverride.add_member(:state, Shapes::ShapeRef.new(shape: TargetAdministrativeOverrideStateEnum, location_name: "State"))
+    AdministrativeOverride.add_member(:reason, Shapes::ShapeRef.new(shape: TargetAdministrativeOverrideReasonEnum, location_name: "Reason"))
+    AdministrativeOverride.add_member(:description, Shapes::ShapeRef.new(shape: Description, location_name: "Description"))
+    AdministrativeOverride.struct_class = Types::AdministrativeOverride
+
     AllocationIdNotFoundException.struct_class = Types::AllocationIdNotFoundException
 
     AlpnPolicyName.member = Shapes::ShapeRef.new(shape: AlpnPolicyValue)
+
+    AnomalyDetection.add_member(:result, Shapes::ShapeRef.new(shape: AnomalyResultEnum, location_name: "Result"))
+    AnomalyDetection.add_member(:mitigation_in_effect, Shapes::ShapeRef.new(shape: MitigationInEffectEnum, location_name: "MitigationInEffect"))
+    AnomalyDetection.struct_class = Types::AnomalyDetection
 
     AuthenticateCognitoActionAuthenticationRequestExtraParams.key = Shapes::ShapeRef.new(shape: AuthenticateCognitoActionAuthenticationRequestParamName)
     AuthenticateCognitoActionAuthenticationRequestExtraParams.value = Shapes::ShapeRef.new(shape: AuthenticateCognitoActionAuthenticationRequestParamValue)
@@ -365,6 +470,8 @@ module Aws::ElasticLoadBalancingV2
 
     AvailabilityZones.member = Shapes::ShapeRef.new(shape: AvailabilityZone)
 
+    CaCertificatesBundleNotFoundException.struct_class = Types::CaCertificatesBundleNotFoundException
+
     Certificate.add_member(:certificate_arn, Shapes::ShapeRef.new(shape: CertificateArn, location_name: "CertificateArn"))
     Certificate.add_member(:is_default, Shapes::ShapeRef.new(shape: Default, location_name: "IsDefault"))
     Certificate.struct_class = Types::Certificate
@@ -387,6 +494,7 @@ module Aws::ElasticLoadBalancingV2
     CreateListenerInput.add_member(:default_actions, Shapes::ShapeRef.new(shape: Actions, required: true, location_name: "DefaultActions"))
     CreateListenerInput.add_member(:alpn_policy, Shapes::ShapeRef.new(shape: AlpnPolicyName, location_name: "AlpnPolicy"))
     CreateListenerInput.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
+    CreateListenerInput.add_member(:mutual_authentication, Shapes::ShapeRef.new(shape: MutualAuthenticationAttributes, location_name: "MutualAuthentication"))
     CreateListenerInput.struct_class = Types::CreateListenerInput
 
     CreateListenerOutput.add_member(:listeners, Shapes::ShapeRef.new(shape: Listeners, location_name: "Listeners"))
@@ -432,10 +540,23 @@ module Aws::ElasticLoadBalancingV2
     CreateTargetGroupInput.add_member(:matcher, Shapes::ShapeRef.new(shape: Matcher, location_name: "Matcher"))
     CreateTargetGroupInput.add_member(:target_type, Shapes::ShapeRef.new(shape: TargetTypeEnum, location_name: "TargetType"))
     CreateTargetGroupInput.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
+    CreateTargetGroupInput.add_member(:ip_address_type, Shapes::ShapeRef.new(shape: TargetGroupIpAddressTypeEnum, location_name: "IpAddressType"))
     CreateTargetGroupInput.struct_class = Types::CreateTargetGroupInput
 
     CreateTargetGroupOutput.add_member(:target_groups, Shapes::ShapeRef.new(shape: TargetGroups, location_name: "TargetGroups"))
     CreateTargetGroupOutput.struct_class = Types::CreateTargetGroupOutput
+
+    CreateTrustStoreInput.add_member(:name, Shapes::ShapeRef.new(shape: TrustStoreName, required: true, location_name: "Name"))
+    CreateTrustStoreInput.add_member(:ca_certificates_bundle_s3_bucket, Shapes::ShapeRef.new(shape: S3Bucket, required: true, location_name: "CaCertificatesBundleS3Bucket"))
+    CreateTrustStoreInput.add_member(:ca_certificates_bundle_s3_key, Shapes::ShapeRef.new(shape: S3Key, required: true, location_name: "CaCertificatesBundleS3Key"))
+    CreateTrustStoreInput.add_member(:ca_certificates_bundle_s3_object_version, Shapes::ShapeRef.new(shape: S3ObjectVersion, location_name: "CaCertificatesBundleS3ObjectVersion"))
+    CreateTrustStoreInput.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
+    CreateTrustStoreInput.struct_class = Types::CreateTrustStoreInput
+
+    CreateTrustStoreOutput.add_member(:trust_stores, Shapes::ShapeRef.new(shape: TrustStores, location_name: "TrustStores"))
+    CreateTrustStoreOutput.struct_class = Types::CreateTrustStoreOutput
+
+    DeleteAssociationSameAccountException.struct_class = Types::DeleteAssociationSameAccountException
 
     DeleteListenerInput.add_member(:listener_arn, Shapes::ShapeRef.new(shape: ListenerArn, required: true, location_name: "ListenerArn"))
     DeleteListenerInput.struct_class = Types::DeleteListenerInput
@@ -452,10 +573,21 @@ module Aws::ElasticLoadBalancingV2
 
     DeleteRuleOutput.struct_class = Types::DeleteRuleOutput
 
+    DeleteSharedTrustStoreAssociationInput.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, required: true, location_name: "TrustStoreArn"))
+    DeleteSharedTrustStoreAssociationInput.add_member(:resource_arn, Shapes::ShapeRef.new(shape: ResourceArn, required: true, location_name: "ResourceArn"))
+    DeleteSharedTrustStoreAssociationInput.struct_class = Types::DeleteSharedTrustStoreAssociationInput
+
+    DeleteSharedTrustStoreAssociationOutput.struct_class = Types::DeleteSharedTrustStoreAssociationOutput
+
     DeleteTargetGroupInput.add_member(:target_group_arn, Shapes::ShapeRef.new(shape: TargetGroupArn, required: true, location_name: "TargetGroupArn"))
     DeleteTargetGroupInput.struct_class = Types::DeleteTargetGroupInput
 
     DeleteTargetGroupOutput.struct_class = Types::DeleteTargetGroupOutput
+
+    DeleteTrustStoreInput.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, required: true, location_name: "TrustStoreArn"))
+    DeleteTrustStoreInput.struct_class = Types::DeleteTrustStoreInput
+
+    DeleteTrustStoreOutput.struct_class = Types::DeleteTrustStoreOutput
 
     DeregisterTargetsInput.add_member(:target_group_arn, Shapes::ShapeRef.new(shape: TargetGroupArn, required: true, location_name: "TargetGroupArn"))
     DeregisterTargetsInput.add_member(:targets, Shapes::ShapeRef.new(shape: TargetDescriptions, required: true, location_name: "Targets"))
@@ -470,6 +602,12 @@ module Aws::ElasticLoadBalancingV2
     DescribeAccountLimitsOutput.add_member(:limits, Shapes::ShapeRef.new(shape: Limits, location_name: "Limits"))
     DescribeAccountLimitsOutput.add_member(:next_marker, Shapes::ShapeRef.new(shape: Marker, location_name: "NextMarker"))
     DescribeAccountLimitsOutput.struct_class = Types::DescribeAccountLimitsOutput
+
+    DescribeListenerAttributesInput.add_member(:listener_arn, Shapes::ShapeRef.new(shape: ListenerArn, required: true, location_name: "ListenerArn"))
+    DescribeListenerAttributesInput.struct_class = Types::DescribeListenerAttributesInput
+
+    DescribeListenerAttributesOutput.add_member(:attributes, Shapes::ShapeRef.new(shape: ListenerAttributes, location_name: "Attributes"))
+    DescribeListenerAttributesOutput.struct_class = Types::DescribeListenerAttributesOutput
 
     DescribeListenerCertificatesInput.add_member(:listener_arn, Shapes::ShapeRef.new(shape: ListenerArn, required: true, location_name: "ListenerArn"))
     DescribeListenerCertificatesInput.add_member(:marker, Shapes::ShapeRef.new(shape: Marker, location_name: "Marker"))
@@ -519,6 +657,7 @@ module Aws::ElasticLoadBalancingV2
     DescribeSSLPoliciesInput.add_member(:names, Shapes::ShapeRef.new(shape: SslPolicyNames, location_name: "Names"))
     DescribeSSLPoliciesInput.add_member(:marker, Shapes::ShapeRef.new(shape: Marker, location_name: "Marker"))
     DescribeSSLPoliciesInput.add_member(:page_size, Shapes::ShapeRef.new(shape: PageSize, location_name: "PageSize"))
+    DescribeSSLPoliciesInput.add_member(:load_balancer_type, Shapes::ShapeRef.new(shape: LoadBalancerTypeEnum, location_name: "LoadBalancerType"))
     DescribeSSLPoliciesInput.struct_class = Types::DescribeSSLPoliciesInput
 
     DescribeSSLPoliciesOutput.add_member(:ssl_policies, Shapes::ShapeRef.new(shape: SslPolicies, location_name: "SslPolicies"))
@@ -550,10 +689,48 @@ module Aws::ElasticLoadBalancingV2
 
     DescribeTargetHealthInput.add_member(:target_group_arn, Shapes::ShapeRef.new(shape: TargetGroupArn, required: true, location_name: "TargetGroupArn"))
     DescribeTargetHealthInput.add_member(:targets, Shapes::ShapeRef.new(shape: TargetDescriptions, location_name: "Targets"))
+    DescribeTargetHealthInput.add_member(:include, Shapes::ShapeRef.new(shape: ListOfDescribeTargetHealthIncludeOptions, location_name: "Include"))
     DescribeTargetHealthInput.struct_class = Types::DescribeTargetHealthInput
 
     DescribeTargetHealthOutput.add_member(:target_health_descriptions, Shapes::ShapeRef.new(shape: TargetHealthDescriptions, location_name: "TargetHealthDescriptions"))
     DescribeTargetHealthOutput.struct_class = Types::DescribeTargetHealthOutput
+
+    DescribeTrustStoreAssociationsInput.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, required: true, location_name: "TrustStoreArn"))
+    DescribeTrustStoreAssociationsInput.add_member(:marker, Shapes::ShapeRef.new(shape: Marker, location_name: "Marker"))
+    DescribeTrustStoreAssociationsInput.add_member(:page_size, Shapes::ShapeRef.new(shape: PageSize, location_name: "PageSize"))
+    DescribeTrustStoreAssociationsInput.struct_class = Types::DescribeTrustStoreAssociationsInput
+
+    DescribeTrustStoreAssociationsOutput.add_member(:trust_store_associations, Shapes::ShapeRef.new(shape: TrustStoreAssociations, location_name: "TrustStoreAssociations"))
+    DescribeTrustStoreAssociationsOutput.add_member(:next_marker, Shapes::ShapeRef.new(shape: Marker, location_name: "NextMarker"))
+    DescribeTrustStoreAssociationsOutput.struct_class = Types::DescribeTrustStoreAssociationsOutput
+
+    DescribeTrustStoreRevocation.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, location_name: "TrustStoreArn"))
+    DescribeTrustStoreRevocation.add_member(:revocation_id, Shapes::ShapeRef.new(shape: RevocationId, location_name: "RevocationId"))
+    DescribeTrustStoreRevocation.add_member(:revocation_type, Shapes::ShapeRef.new(shape: RevocationType, location_name: "RevocationType"))
+    DescribeTrustStoreRevocation.add_member(:number_of_revoked_entries, Shapes::ShapeRef.new(shape: NumberOfRevokedEntries, location_name: "NumberOfRevokedEntries"))
+    DescribeTrustStoreRevocation.struct_class = Types::DescribeTrustStoreRevocation
+
+    DescribeTrustStoreRevocationResponse.member = Shapes::ShapeRef.new(shape: DescribeTrustStoreRevocation)
+
+    DescribeTrustStoreRevocationsInput.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, required: true, location_name: "TrustStoreArn"))
+    DescribeTrustStoreRevocationsInput.add_member(:revocation_ids, Shapes::ShapeRef.new(shape: RevocationIds, location_name: "RevocationIds"))
+    DescribeTrustStoreRevocationsInput.add_member(:marker, Shapes::ShapeRef.new(shape: Marker, location_name: "Marker"))
+    DescribeTrustStoreRevocationsInput.add_member(:page_size, Shapes::ShapeRef.new(shape: PageSize, location_name: "PageSize"))
+    DescribeTrustStoreRevocationsInput.struct_class = Types::DescribeTrustStoreRevocationsInput
+
+    DescribeTrustStoreRevocationsOutput.add_member(:trust_store_revocations, Shapes::ShapeRef.new(shape: DescribeTrustStoreRevocationResponse, location_name: "TrustStoreRevocations"))
+    DescribeTrustStoreRevocationsOutput.add_member(:next_marker, Shapes::ShapeRef.new(shape: Marker, location_name: "NextMarker"))
+    DescribeTrustStoreRevocationsOutput.struct_class = Types::DescribeTrustStoreRevocationsOutput
+
+    DescribeTrustStoresInput.add_member(:trust_store_arns, Shapes::ShapeRef.new(shape: TrustStoreArns, location_name: "TrustStoreArns"))
+    DescribeTrustStoresInput.add_member(:names, Shapes::ShapeRef.new(shape: TrustStoreNames, location_name: "Names"))
+    DescribeTrustStoresInput.add_member(:marker, Shapes::ShapeRef.new(shape: Marker, location_name: "Marker"))
+    DescribeTrustStoresInput.add_member(:page_size, Shapes::ShapeRef.new(shape: PageSize, location_name: "PageSize"))
+    DescribeTrustStoresInput.struct_class = Types::DescribeTrustStoresInput
+
+    DescribeTrustStoresOutput.add_member(:trust_stores, Shapes::ShapeRef.new(shape: TrustStores, location_name: "TrustStores"))
+    DescribeTrustStoresOutput.add_member(:next_marker, Shapes::ShapeRef.new(shape: Marker, location_name: "NextMarker"))
+    DescribeTrustStoresOutput.struct_class = Types::DescribeTrustStoresOutput
 
     DuplicateListenerException.struct_class = Types::DuplicateListenerException
 
@@ -563,6 +740,8 @@ module Aws::ElasticLoadBalancingV2
 
     DuplicateTargetGroupNameException.struct_class = Types::DuplicateTargetGroupNameException
 
+    DuplicateTrustStoreNameException.struct_class = Types::DuplicateTrustStoreNameException
+
     FixedResponseActionConfig.add_member(:message_body, Shapes::ShapeRef.new(shape: FixedResponseActionMessage, location_name: "MessageBody"))
     FixedResponseActionConfig.add_member(:status_code, Shapes::ShapeRef.new(shape: FixedResponseActionStatusCode, required: true, location_name: "StatusCode"))
     FixedResponseActionConfig.add_member(:content_type, Shapes::ShapeRef.new(shape: FixedResponseActionContentType, location_name: "ContentType"))
@@ -571,6 +750,25 @@ module Aws::ElasticLoadBalancingV2
     ForwardActionConfig.add_member(:target_groups, Shapes::ShapeRef.new(shape: TargetGroupList, location_name: "TargetGroups"))
     ForwardActionConfig.add_member(:target_group_stickiness_config, Shapes::ShapeRef.new(shape: TargetGroupStickinessConfig, location_name: "TargetGroupStickinessConfig"))
     ForwardActionConfig.struct_class = Types::ForwardActionConfig
+
+    GetResourcePolicyInput.add_member(:resource_arn, Shapes::ShapeRef.new(shape: ResourceArn, required: true, location_name: "ResourceArn"))
+    GetResourcePolicyInput.struct_class = Types::GetResourcePolicyInput
+
+    GetResourcePolicyOutput.add_member(:policy, Shapes::ShapeRef.new(shape: Policy, location_name: "Policy"))
+    GetResourcePolicyOutput.struct_class = Types::GetResourcePolicyOutput
+
+    GetTrustStoreCaCertificatesBundleInput.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, required: true, location_name: "TrustStoreArn"))
+    GetTrustStoreCaCertificatesBundleInput.struct_class = Types::GetTrustStoreCaCertificatesBundleInput
+
+    GetTrustStoreCaCertificatesBundleOutput.add_member(:location, Shapes::ShapeRef.new(shape: Location, location_name: "Location"))
+    GetTrustStoreCaCertificatesBundleOutput.struct_class = Types::GetTrustStoreCaCertificatesBundleOutput
+
+    GetTrustStoreRevocationContentInput.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, required: true, location_name: "TrustStoreArn"))
+    GetTrustStoreRevocationContentInput.add_member(:revocation_id, Shapes::ShapeRef.new(shape: RevocationId, required: true, location_name: "RevocationId"))
+    GetTrustStoreRevocationContentInput.struct_class = Types::GetTrustStoreRevocationContentInput
+
+    GetTrustStoreRevocationContentOutput.add_member(:location, Shapes::ShapeRef.new(shape: Location, location_name: "Location"))
+    GetTrustStoreRevocationContentOutput.struct_class = Types::GetTrustStoreRevocationContentOutput
 
     HealthUnavailableException.struct_class = Types::HealthUnavailableException
 
@@ -586,9 +784,13 @@ module Aws::ElasticLoadBalancingV2
 
     IncompatibleProtocolsException.struct_class = Types::IncompatibleProtocolsException
 
+    InvalidCaCertificatesBundleException.struct_class = Types::InvalidCaCertificatesBundleException
+
     InvalidConfigurationRequestException.struct_class = Types::InvalidConfigurationRequestException
 
     InvalidLoadBalancerActionException.struct_class = Types::InvalidLoadBalancerActionException
+
+    InvalidRevocationContentException.struct_class = Types::InvalidRevocationContentException
 
     InvalidSchemeException.struct_class = Types::InvalidSchemeException
 
@@ -604,6 +806,8 @@ module Aws::ElasticLoadBalancingV2
 
     Limits.member = Shapes::ShapeRef.new(shape: Limit)
 
+    ListOfDescribeTargetHealthIncludeOptions.member = Shapes::ShapeRef.new(shape: DescribeTargetHealthInputIncludeEnum)
+
     ListOfString.member = Shapes::ShapeRef.new(shape: StringValue)
 
     Listener.add_member(:listener_arn, Shapes::ShapeRef.new(shape: ListenerArn, location_name: "ListenerArn"))
@@ -614,9 +818,16 @@ module Aws::ElasticLoadBalancingV2
     Listener.add_member(:ssl_policy, Shapes::ShapeRef.new(shape: SslPolicyName, location_name: "SslPolicy"))
     Listener.add_member(:default_actions, Shapes::ShapeRef.new(shape: Actions, location_name: "DefaultActions"))
     Listener.add_member(:alpn_policy, Shapes::ShapeRef.new(shape: AlpnPolicyName, location_name: "AlpnPolicy"))
+    Listener.add_member(:mutual_authentication, Shapes::ShapeRef.new(shape: MutualAuthenticationAttributes, location_name: "MutualAuthentication"))
     Listener.struct_class = Types::Listener
 
     ListenerArns.member = Shapes::ShapeRef.new(shape: ListenerArn)
+
+    ListenerAttribute.add_member(:key, Shapes::ShapeRef.new(shape: ListenerAttributeKey, location_name: "Key"))
+    ListenerAttribute.add_member(:value, Shapes::ShapeRef.new(shape: ListenerAttributeValue, location_name: "Value"))
+    ListenerAttribute.struct_class = Types::ListenerAttribute
+
+    ListenerAttributes.member = Shapes::ShapeRef.new(shape: ListenerAttribute)
 
     ListenerNotFoundException.struct_class = Types::ListenerNotFoundException
 
@@ -635,6 +846,7 @@ module Aws::ElasticLoadBalancingV2
     LoadBalancer.add_member(:security_groups, Shapes::ShapeRef.new(shape: SecurityGroups, location_name: "SecurityGroups"))
     LoadBalancer.add_member(:ip_address_type, Shapes::ShapeRef.new(shape: IpAddressType, location_name: "IpAddressType"))
     LoadBalancer.add_member(:customer_owned_ipv_4_pool, Shapes::ShapeRef.new(shape: CustomerOwnedIpv4Pool, location_name: "CustomerOwnedIpv4Pool"))
+    LoadBalancer.add_member(:enforce_security_group_inbound_rules_on_private_link_traffic, Shapes::ShapeRef.new(shape: EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic, location_name: "EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic"))
     LoadBalancer.struct_class = Types::LoadBalancer
 
     LoadBalancerAddress.add_member(:ip_address, Shapes::ShapeRef.new(shape: IpAddress, location_name: "IpAddress"))
@@ -667,6 +879,13 @@ module Aws::ElasticLoadBalancingV2
     Matcher.add_member(:grpc_code, Shapes::ShapeRef.new(shape: GrpcCode, location_name: "GrpcCode"))
     Matcher.struct_class = Types::Matcher
 
+    ModifyListenerAttributesInput.add_member(:listener_arn, Shapes::ShapeRef.new(shape: ListenerArn, required: true, location_name: "ListenerArn"))
+    ModifyListenerAttributesInput.add_member(:attributes, Shapes::ShapeRef.new(shape: ListenerAttributes, required: true, location_name: "Attributes"))
+    ModifyListenerAttributesInput.struct_class = Types::ModifyListenerAttributesInput
+
+    ModifyListenerAttributesOutput.add_member(:attributes, Shapes::ShapeRef.new(shape: ListenerAttributes, location_name: "Attributes"))
+    ModifyListenerAttributesOutput.struct_class = Types::ModifyListenerAttributesOutput
+
     ModifyListenerInput.add_member(:listener_arn, Shapes::ShapeRef.new(shape: ListenerArn, required: true, location_name: "ListenerArn"))
     ModifyListenerInput.add_member(:port, Shapes::ShapeRef.new(shape: Port, location_name: "Port"))
     ModifyListenerInput.add_member(:protocol, Shapes::ShapeRef.new(shape: ProtocolEnum, location_name: "Protocol"))
@@ -674,6 +893,7 @@ module Aws::ElasticLoadBalancingV2
     ModifyListenerInput.add_member(:certificates, Shapes::ShapeRef.new(shape: CertificateList, location_name: "Certificates"))
     ModifyListenerInput.add_member(:default_actions, Shapes::ShapeRef.new(shape: Actions, location_name: "DefaultActions"))
     ModifyListenerInput.add_member(:alpn_policy, Shapes::ShapeRef.new(shape: AlpnPolicyName, location_name: "AlpnPolicy"))
+    ModifyListenerInput.add_member(:mutual_authentication, Shapes::ShapeRef.new(shape: MutualAuthenticationAttributes, location_name: "MutualAuthentication"))
     ModifyListenerInput.struct_class = Types::ModifyListenerInput
 
     ModifyListenerOutput.add_member(:listeners, Shapes::ShapeRef.new(shape: Listeners, location_name: "Listeners"))
@@ -715,6 +935,21 @@ module Aws::ElasticLoadBalancingV2
 
     ModifyTargetGroupOutput.add_member(:target_groups, Shapes::ShapeRef.new(shape: TargetGroups, location_name: "TargetGroups"))
     ModifyTargetGroupOutput.struct_class = Types::ModifyTargetGroupOutput
+
+    ModifyTrustStoreInput.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, required: true, location_name: "TrustStoreArn"))
+    ModifyTrustStoreInput.add_member(:ca_certificates_bundle_s3_bucket, Shapes::ShapeRef.new(shape: S3Bucket, required: true, location_name: "CaCertificatesBundleS3Bucket"))
+    ModifyTrustStoreInput.add_member(:ca_certificates_bundle_s3_key, Shapes::ShapeRef.new(shape: S3Key, required: true, location_name: "CaCertificatesBundleS3Key"))
+    ModifyTrustStoreInput.add_member(:ca_certificates_bundle_s3_object_version, Shapes::ShapeRef.new(shape: S3ObjectVersion, location_name: "CaCertificatesBundleS3ObjectVersion"))
+    ModifyTrustStoreInput.struct_class = Types::ModifyTrustStoreInput
+
+    ModifyTrustStoreOutput.add_member(:trust_stores, Shapes::ShapeRef.new(shape: TrustStores, location_name: "TrustStores"))
+    ModifyTrustStoreOutput.struct_class = Types::ModifyTrustStoreOutput
+
+    MutualAuthenticationAttributes.add_member(:mode, Shapes::ShapeRef.new(shape: Mode, location_name: "Mode"))
+    MutualAuthenticationAttributes.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, location_name: "TrustStoreArn"))
+    MutualAuthenticationAttributes.add_member(:ignore_client_certificate_expiry, Shapes::ShapeRef.new(shape: IgnoreClientCertificateExpiry, location_name: "IgnoreClientCertificateExpiry"))
+    MutualAuthenticationAttributes.add_member(:trust_store_association_status, Shapes::ShapeRef.new(shape: TrustStoreAssociationStatusEnum, location_name: "TrustStoreAssociationStatus"))
+    MutualAuthenticationAttributes.struct_class = Types::MutualAuthenticationAttributes
 
     OperationNotPermittedException.struct_class = Types::OperationNotPermittedException
 
@@ -758,9 +993,31 @@ module Aws::ElasticLoadBalancingV2
 
     RemoveTagsOutput.struct_class = Types::RemoveTagsOutput
 
+    RemoveTrustStoreRevocationsInput.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, required: true, location_name: "TrustStoreArn"))
+    RemoveTrustStoreRevocationsInput.add_member(:revocation_ids, Shapes::ShapeRef.new(shape: RevocationIds, required: true, location_name: "RevocationIds"))
+    RemoveTrustStoreRevocationsInput.struct_class = Types::RemoveTrustStoreRevocationsInput
+
+    RemoveTrustStoreRevocationsOutput.struct_class = Types::RemoveTrustStoreRevocationsOutput
+
     ResourceArns.member = Shapes::ShapeRef.new(shape: ResourceArn)
 
     ResourceInUseException.struct_class = Types::ResourceInUseException
+
+    ResourceNotFoundException.struct_class = Types::ResourceNotFoundException
+
+    RevocationContent.add_member(:s3_bucket, Shapes::ShapeRef.new(shape: S3Bucket, location_name: "S3Bucket"))
+    RevocationContent.add_member(:s3_key, Shapes::ShapeRef.new(shape: S3Key, location_name: "S3Key"))
+    RevocationContent.add_member(:s3_object_version, Shapes::ShapeRef.new(shape: S3ObjectVersion, location_name: "S3ObjectVersion"))
+    RevocationContent.add_member(:revocation_type, Shapes::ShapeRef.new(shape: RevocationType, location_name: "RevocationType"))
+    RevocationContent.struct_class = Types::RevocationContent
+
+    RevocationContentNotFoundException.struct_class = Types::RevocationContentNotFoundException
+
+    RevocationContents.member = Shapes::ShapeRef.new(shape: RevocationContent)
+
+    RevocationIdNotFoundException.struct_class = Types::RevocationIdNotFoundException
+
+    RevocationIds.member = Shapes::ShapeRef.new(shape: RevocationId)
 
     Rule.add_member(:rule_arn, Shapes::ShapeRef.new(shape: RuleArn, location_name: "RuleArn"))
     Rule.add_member(:priority, Shapes::ShapeRef.new(shape: String, location_name: "Priority"))
@@ -812,9 +1069,11 @@ module Aws::ElasticLoadBalancingV2
 
     SetSecurityGroupsInput.add_member(:load_balancer_arn, Shapes::ShapeRef.new(shape: LoadBalancerArn, required: true, location_name: "LoadBalancerArn"))
     SetSecurityGroupsInput.add_member(:security_groups, Shapes::ShapeRef.new(shape: SecurityGroups, required: true, location_name: "SecurityGroups"))
+    SetSecurityGroupsInput.add_member(:enforce_security_group_inbound_rules_on_private_link_traffic, Shapes::ShapeRef.new(shape: EnforceSecurityGroupInboundRulesOnPrivateLinkTrafficEnum, location_name: "EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic"))
     SetSecurityGroupsInput.struct_class = Types::SetSecurityGroupsInput
 
     SetSecurityGroupsOutput.add_member(:security_group_ids, Shapes::ShapeRef.new(shape: SecurityGroups, location_name: "SecurityGroupIds"))
+    SetSecurityGroupsOutput.add_member(:enforce_security_group_inbound_rules_on_private_link_traffic, Shapes::ShapeRef.new(shape: EnforceSecurityGroupInboundRulesOnPrivateLinkTrafficEnum, location_name: "EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic"))
     SetSecurityGroupsOutput.struct_class = Types::SetSecurityGroupsOutput
 
     SetSubnetsInput.add_member(:load_balancer_arn, Shapes::ShapeRef.new(shape: LoadBalancerArn, required: true, location_name: "LoadBalancerArn"))
@@ -835,6 +1094,7 @@ module Aws::ElasticLoadBalancingV2
     SslPolicy.add_member(:ssl_protocols, Shapes::ShapeRef.new(shape: SslProtocols, location_name: "SslProtocols"))
     SslPolicy.add_member(:ciphers, Shapes::ShapeRef.new(shape: Ciphers, location_name: "Ciphers"))
     SslPolicy.add_member(:name, Shapes::ShapeRef.new(shape: SslPolicyName, location_name: "Name"))
+    SslPolicy.add_member(:supported_load_balancer_types, Shapes::ShapeRef.new(shape: ListOfString, location_name: "SupportedLoadBalancerTypes"))
     SslPolicy.struct_class = Types::SslPolicy
 
     SslPolicyNames.member = Shapes::ShapeRef.new(shape: SslPolicyName)
@@ -891,6 +1151,7 @@ module Aws::ElasticLoadBalancingV2
     TargetGroup.add_member(:load_balancer_arns, Shapes::ShapeRef.new(shape: LoadBalancerArns, location_name: "LoadBalancerArns"))
     TargetGroup.add_member(:target_type, Shapes::ShapeRef.new(shape: TargetTypeEnum, location_name: "TargetType"))
     TargetGroup.add_member(:protocol_version, Shapes::ShapeRef.new(shape: ProtocolVersion, location_name: "ProtocolVersion"))
+    TargetGroup.add_member(:ip_address_type, Shapes::ShapeRef.new(shape: TargetGroupIpAddressTypeEnum, location_name: "IpAddressType"))
     TargetGroup.struct_class = Types::TargetGroup
 
     TargetGroupArns.member = Shapes::ShapeRef.new(shape: TargetGroupArn)
@@ -927,6 +1188,8 @@ module Aws::ElasticLoadBalancingV2
     TargetHealthDescription.add_member(:target, Shapes::ShapeRef.new(shape: TargetDescription, location_name: "Target"))
     TargetHealthDescription.add_member(:health_check_port, Shapes::ShapeRef.new(shape: HealthCheckPort, location_name: "HealthCheckPort"))
     TargetHealthDescription.add_member(:target_health, Shapes::ShapeRef.new(shape: TargetHealth, location_name: "TargetHealth"))
+    TargetHealthDescription.add_member(:anomaly_detection, Shapes::ShapeRef.new(shape: AnomalyDetection, location_name: "AnomalyDetection"))
+    TargetHealthDescription.add_member(:administrative_override, Shapes::ShapeRef.new(shape: AdministrativeOverride, location_name: "AdministrativeOverride"))
     TargetHealthDescription.struct_class = Types::TargetHealthDescription
 
     TargetHealthDescriptions.member = Shapes::ShapeRef.new(shape: TargetHealthDescription)
@@ -949,7 +1212,45 @@ module Aws::ElasticLoadBalancingV2
 
     TooManyTargetsException.struct_class = Types::TooManyTargetsException
 
+    TooManyTrustStoreRevocationEntriesException.struct_class = Types::TooManyTrustStoreRevocationEntriesException
+
+    TooManyTrustStoresException.struct_class = Types::TooManyTrustStoresException
+
     TooManyUniqueTargetGroupsPerLoadBalancerException.struct_class = Types::TooManyUniqueTargetGroupsPerLoadBalancerException
+
+    TrustStore.add_member(:name, Shapes::ShapeRef.new(shape: TrustStoreName, location_name: "Name"))
+    TrustStore.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, location_name: "TrustStoreArn"))
+    TrustStore.add_member(:status, Shapes::ShapeRef.new(shape: TrustStoreStatus, location_name: "Status"))
+    TrustStore.add_member(:number_of_ca_certificates, Shapes::ShapeRef.new(shape: NumberOfCaCertificates, location_name: "NumberOfCaCertificates"))
+    TrustStore.add_member(:total_revoked_entries, Shapes::ShapeRef.new(shape: TotalRevokedEntries, location_name: "TotalRevokedEntries"))
+    TrustStore.struct_class = Types::TrustStore
+
+    TrustStoreArns.member = Shapes::ShapeRef.new(shape: TrustStoreArn)
+
+    TrustStoreAssociation.add_member(:resource_arn, Shapes::ShapeRef.new(shape: TrustStoreAssociationResourceArn, location_name: "ResourceArn"))
+    TrustStoreAssociation.struct_class = Types::TrustStoreAssociation
+
+    TrustStoreAssociationNotFoundException.struct_class = Types::TrustStoreAssociationNotFoundException
+
+    TrustStoreAssociations.member = Shapes::ShapeRef.new(shape: TrustStoreAssociation)
+
+    TrustStoreInUseException.struct_class = Types::TrustStoreInUseException
+
+    TrustStoreNames.member = Shapes::ShapeRef.new(shape: TrustStoreName)
+
+    TrustStoreNotFoundException.struct_class = Types::TrustStoreNotFoundException
+
+    TrustStoreNotReadyException.struct_class = Types::TrustStoreNotReadyException
+
+    TrustStoreRevocation.add_member(:trust_store_arn, Shapes::ShapeRef.new(shape: TrustStoreArn, location_name: "TrustStoreArn"))
+    TrustStoreRevocation.add_member(:revocation_id, Shapes::ShapeRef.new(shape: RevocationId, location_name: "RevocationId"))
+    TrustStoreRevocation.add_member(:revocation_type, Shapes::ShapeRef.new(shape: RevocationType, location_name: "RevocationType"))
+    TrustStoreRevocation.add_member(:number_of_revoked_entries, Shapes::ShapeRef.new(shape: NumberOfRevokedEntries, location_name: "NumberOfRevokedEntries"))
+    TrustStoreRevocation.struct_class = Types::TrustStoreRevocation
+
+    TrustStoreRevocations.member = Shapes::ShapeRef.new(shape: TrustStoreRevocation)
+
+    TrustStores.member = Shapes::ShapeRef.new(shape: TrustStore)
 
     UnsupportedProtocolException.struct_class = Types::UnsupportedProtocolException
 
@@ -961,8 +1262,10 @@ module Aws::ElasticLoadBalancingV2
 
       api.metadata = {
         "apiVersion" => "2015-12-01",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "elasticloadbalancing",
         "protocol" => "query",
+        "protocols" => ["query"],
         "serviceAbbreviation" => "Elastic Load Balancing v2",
         "serviceFullName" => "Elastic Load Balancing",
         "serviceId" => "Elastic Load Balancing v2",
@@ -992,6 +1295,21 @@ module Aws::ElasticLoadBalancingV2
         o.errors << Shapes::ShapeRef.new(shape: TooManyTagsException)
         o.errors << Shapes::ShapeRef.new(shape: LoadBalancerNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: TargetGroupNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: ListenerNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: RuleNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+      end)
+
+      api.add_operation(:add_trust_store_revocations, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "AddTrustStoreRevocations"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: AddTrustStoreRevocationsInput)
+        o.output = Shapes::ShapeRef.new(shape: AddTrustStoreRevocationsOutput)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidRevocationContentException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyTrustStoreRevocationEntriesException)
+        o.errors << Shapes::ShapeRef.new(shape: RevocationContentNotFoundException)
       end)
 
       api.add_operation(:create_listener, Seahorse::Model::Operation.new.tap do |o|
@@ -1018,6 +1336,8 @@ module Aws::ElasticLoadBalancingV2
         o.errors << Shapes::ShapeRef.new(shape: TooManyUniqueTargetGroupsPerLoadBalancerException)
         o.errors << Shapes::ShapeRef.new(shape: ALPNPolicyNotSupportedException)
         o.errors << Shapes::ShapeRef.new(shape: TooManyTagsException)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotReadyException)
       end)
 
       api.add_operation(:create_load_balancer, Seahorse::Model::Operation.new.tap do |o|
@@ -1076,6 +1396,20 @@ module Aws::ElasticLoadBalancingV2
         o.errors << Shapes::ShapeRef.new(shape: TooManyTagsException)
       end)
 
+      api.add_operation(:create_trust_store, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "CreateTrustStore"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: CreateTrustStoreInput)
+        o.output = Shapes::ShapeRef.new(shape: CreateTrustStoreOutput)
+        o.errors << Shapes::ShapeRef.new(shape: DuplicateTrustStoreNameException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyTrustStoresException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidCaCertificatesBundleException)
+        o.errors << Shapes::ShapeRef.new(shape: CaCertificatesBundleNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyTagsException)
+        o.errors << Shapes::ShapeRef.new(shape: DuplicateTagKeysException)
+      end)
+
       api.add_operation(:delete_listener, Seahorse::Model::Operation.new.tap do |o|
         o.name = "DeleteListener"
         o.http_method = "POST"
@@ -1083,6 +1417,7 @@ module Aws::ElasticLoadBalancingV2
         o.input = Shapes::ShapeRef.new(shape: DeleteListenerInput)
         o.output = Shapes::ShapeRef.new(shape: DeleteListenerOutput)
         o.errors << Shapes::ShapeRef.new(shape: ListenerNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceInUseException)
       end)
 
       api.add_operation(:delete_load_balancer, Seahorse::Model::Operation.new.tap do |o|
@@ -1106,6 +1441,17 @@ module Aws::ElasticLoadBalancingV2
         o.errors << Shapes::ShapeRef.new(shape: OperationNotPermittedException)
       end)
 
+      api.add_operation(:delete_shared_trust_store_association, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DeleteSharedTrustStoreAssociation"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DeleteSharedTrustStoreAssociationInput)
+        o.output = Shapes::ShapeRef.new(shape: DeleteSharedTrustStoreAssociationOutput)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: DeleteAssociationSameAccountException)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreAssociationNotFoundException)
+      end)
+
       api.add_operation(:delete_target_group, Seahorse::Model::Operation.new.tap do |o|
         o.name = "DeleteTargetGroup"
         o.http_method = "POST"
@@ -1113,6 +1459,16 @@ module Aws::ElasticLoadBalancingV2
         o.input = Shapes::ShapeRef.new(shape: DeleteTargetGroupInput)
         o.output = Shapes::ShapeRef.new(shape: DeleteTargetGroupOutput)
         o.errors << Shapes::ShapeRef.new(shape: ResourceInUseException)
+      end)
+
+      api.add_operation(:delete_trust_store, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DeleteTrustStore"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DeleteTrustStoreInput)
+        o.output = Shapes::ShapeRef.new(shape: DeleteTrustStoreOutput)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreInUseException)
       end)
 
       api.add_operation(:deregister_targets, Seahorse::Model::Operation.new.tap do |o|
@@ -1133,6 +1489,15 @@ module Aws::ElasticLoadBalancingV2
         o.output = Shapes::ShapeRef.new(shape: DescribeAccountLimitsOutput)
       end)
 
+      api.add_operation(:describe_listener_attributes, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeListenerAttributes"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeListenerAttributesInput)
+        o.output = Shapes::ShapeRef.new(shape: DescribeListenerAttributesOutput)
+        o.errors << Shapes::ShapeRef.new(shape: ListenerNotFoundException)
+      end)
+
       api.add_operation(:describe_listener_certificates, Seahorse::Model::Operation.new.tap do |o|
         o.name = "DescribeListenerCertificates"
         o.http_method = "POST"
@@ -1140,6 +1505,11 @@ module Aws::ElasticLoadBalancingV2
         o.input = Shapes::ShapeRef.new(shape: DescribeListenerCertificatesInput)
         o.output = Shapes::ShapeRef.new(shape: DescribeListenerCertificatesOutput)
         o.errors << Shapes::ShapeRef.new(shape: ListenerNotFoundException)
+        o[:pager] = Aws::Pager.new(
+          tokens: {
+            "next_marker" => "marker"
+          }
+        )
       end)
 
       api.add_operation(:describe_listeners, Seahorse::Model::Operation.new.tap do |o|
@@ -1190,6 +1560,11 @@ module Aws::ElasticLoadBalancingV2
         o.errors << Shapes::ShapeRef.new(shape: ListenerNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: RuleNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: UnsupportedProtocolException)
+        o[:pager] = Aws::Pager.new(
+          tokens: {
+            "next_marker" => "marker"
+          }
+        )
       end)
 
       api.add_operation(:describe_ssl_policies, Seahorse::Model::Operation.new.tap do |o|
@@ -1211,6 +1586,7 @@ module Aws::ElasticLoadBalancingV2
         o.errors << Shapes::ShapeRef.new(shape: TargetGroupNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: ListenerNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: RuleNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
       end)
 
       api.add_operation(:describe_target_group_attributes, Seahorse::Model::Operation.new.tap do |o|
@@ -1248,6 +1624,80 @@ module Aws::ElasticLoadBalancingV2
         o.errors << Shapes::ShapeRef.new(shape: HealthUnavailableException)
       end)
 
+      api.add_operation(:describe_trust_store_associations, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeTrustStoreAssociations"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeTrustStoreAssociationsInput)
+        o.output = Shapes::ShapeRef.new(shape: DescribeTrustStoreAssociationsOutput)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "page_size",
+          tokens: {
+            "next_marker" => "marker"
+          }
+        )
+      end)
+
+      api.add_operation(:describe_trust_store_revocations, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeTrustStoreRevocations"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeTrustStoreRevocationsInput)
+        o.output = Shapes::ShapeRef.new(shape: DescribeTrustStoreRevocationsOutput)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: RevocationIdNotFoundException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "page_size",
+          tokens: {
+            "next_marker" => "marker"
+          }
+        )
+      end)
+
+      api.add_operation(:describe_trust_stores, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeTrustStores"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeTrustStoresInput)
+        o.output = Shapes::ShapeRef.new(shape: DescribeTrustStoresOutput)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "page_size",
+          tokens: {
+            "next_marker" => "marker"
+          }
+        )
+      end)
+
+      api.add_operation(:get_resource_policy, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "GetResourcePolicy"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: GetResourcePolicyInput)
+        o.output = Shapes::ShapeRef.new(shape: GetResourcePolicyOutput)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
+      end)
+
+      api.add_operation(:get_trust_store_ca_certificates_bundle, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "GetTrustStoreCaCertificatesBundle"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: GetTrustStoreCaCertificatesBundleInput)
+        o.output = Shapes::ShapeRef.new(shape: GetTrustStoreCaCertificatesBundleOutput)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+      end)
+
+      api.add_operation(:get_trust_store_revocation_content, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "GetTrustStoreRevocationContent"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: GetTrustStoreRevocationContentInput)
+        o.output = Shapes::ShapeRef.new(shape: GetTrustStoreRevocationContentOutput)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: RevocationIdNotFoundException)
+      end)
+
       api.add_operation(:modify_listener, Seahorse::Model::Operation.new.tap do |o|
         o.name = "ModifyListener"
         o.http_method = "POST"
@@ -1271,6 +1721,18 @@ module Aws::ElasticLoadBalancingV2
         o.errors << Shapes::ShapeRef.new(shape: InvalidLoadBalancerActionException)
         o.errors << Shapes::ShapeRef.new(shape: TooManyUniqueTargetGroupsPerLoadBalancerException)
         o.errors << Shapes::ShapeRef.new(shape: ALPNPolicyNotSupportedException)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotReadyException)
+      end)
+
+      api.add_operation(:modify_listener_attributes, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ModifyListenerAttributes"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: ModifyListenerAttributesInput)
+        o.output = Shapes::ShapeRef.new(shape: ModifyListenerAttributesOutput)
+        o.errors << Shapes::ShapeRef.new(shape: ListenerNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidConfigurationRequestException)
       end)
 
       api.add_operation(:modify_load_balancer_attributes, Seahorse::Model::Operation.new.tap do |o|
@@ -1322,6 +1784,17 @@ module Aws::ElasticLoadBalancingV2
         o.errors << Shapes::ShapeRef.new(shape: InvalidConfigurationRequestException)
       end)
 
+      api.add_operation(:modify_trust_store, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ModifyTrustStore"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: ModifyTrustStoreInput)
+        o.output = Shapes::ShapeRef.new(shape: ModifyTrustStoreOutput)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidCaCertificatesBundleException)
+        o.errors << Shapes::ShapeRef.new(shape: CaCertificatesBundleNotFoundException)
+      end)
+
       api.add_operation(:register_targets, Seahorse::Model::Operation.new.tap do |o|
         o.name = "RegisterTargets"
         o.http_method = "POST"
@@ -1355,6 +1828,17 @@ module Aws::ElasticLoadBalancingV2
         o.errors << Shapes::ShapeRef.new(shape: ListenerNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: RuleNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: TooManyTagsException)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+      end)
+
+      api.add_operation(:remove_trust_store_revocations, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "RemoveTrustStoreRevocations"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: RemoveTrustStoreRevocationsInput)
+        o.output = Shapes::ShapeRef.new(shape: RemoveTrustStoreRevocationsOutput)
+        o.errors << Shapes::ShapeRef.new(shape: TrustStoreNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: RevocationIdNotFoundException)
       end)
 
       api.add_operation(:set_ip_address_type, Seahorse::Model::Operation.new.tap do |o|

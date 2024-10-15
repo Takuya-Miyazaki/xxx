@@ -38,26 +38,26 @@ module Aws
         end
 
         let(:ten_meg_file) do
-          Tempfile.new('one-meg-file').tap do |f|
+          Tempfile.new('ten-meg-file').tap do |f|
             10.times { f.write(one_mb) }
             f.rewind
           end
         end
 
-        let(:seventeen_meg_file) do
-          Tempfile.new('one-meg-file').tap do |f|
-            17.times { f.write(one_mb) }
+        let(:one_hundred_seventeen_meg_file) do
+          Tempfile.new('one-hundred-seventeen-meg-file').tap do |f|
+            117.times { f.write(one_mb) }
             f.rewind
           end
         end
 
         it 'uploads objects with custom options without mutating them' do
           options = {}.freeze
-          expect(client).to receive(:put_object).with(
+          expect(client).to receive(:put_object).with({
             bucket: 'bucket',
             key: 'key',
             body: one_meg_file
-          )
+          })
           object.upload_file(one_meg_file, options)
         end
 
@@ -70,21 +70,21 @@ module Aws
 
         context 'small objects' do
           it 'uploads small objects using Client#put_object' do
-            expect(client).to receive(:put_object).with(
+            expect(client).to receive(:put_object).with({
               bucket: 'bucket',
               key: 'key',
               body: ten_meg_file
-            )
+            })
             object.upload_file(ten_meg_file)
           end
 
           it 'reports progress for small objects' do
-            expect(client).to receive(:put_object).with(
+            expect(client).to receive(:put_object).with({
               bucket: 'bucket',
               key: 'key',
               body: ten_meg_file,
               on_chunk_sent: instance_of(Proc)
-            ) do |args|
+            }) do |args|
               args[:on_chunk_sent].call(ten_meg_file, ten_meg_file.size, ten_meg_file.size)
             end
             callback = proc do |bytes, totals|
@@ -95,14 +95,14 @@ module Aws
           end
 
           it 'accepts an alternative multipart file threshold' do
-            expect(client).to receive(:put_object).with(
+            expect(client).to receive(:put_object).with({
               bucket: 'bucket',
               key: 'key',
-              body: seventeen_meg_file
-            )
+              body: one_hundred_seventeen_meg_file
+            })
             object.upload_file(
-              seventeen_meg_file,
-              multipart_threshold: 20 * one_meg
+              one_hundred_seventeen_meg_file,
+              multipart_threshold: 200 * one_meg
             )
           end
 
@@ -110,17 +110,26 @@ module Aws
             file = double('file')
             expect(File).to receive(:open)
               .with(ten_meg_file.path, 'rb').and_yield(file)
-            expect(client).to receive(:put_object).with(
+            expect(client).to receive(:put_object).with({
               bucket: 'bucket',
               key: 'key',
               body: file
-            )
+            })
             object.upload_file(ten_meg_file.path)
+          end
+
+          it 'does not fail when given :thread_count' do
+            expect(client).to receive(:put_object).with({
+              bucket: 'bucket',
+              key: 'key',
+              body: ten_meg_file
+            })
+            object.upload_file(ten_meg_file, thread_count: 1)
           end
         end
 
         context 'large objects' do
-          it 'uses multipart APIs for objects >= 15MB' do
+          it 'uses multipart APIs for objects >= 100MB' do
             client.stub_responses(:create_multipart_upload, upload_id: 'id')
             client.stub_responses(:upload_part, etag: 'etag')
             expect(client).to receive(:complete_multipart_upload).with(
@@ -132,25 +141,63 @@ module Aws
                   { etag: 'etag', part_number: 1 },
                   { etag: 'etag', part_number: 2 },
                   { etag: 'etag', part_number: 3 },
-                  { etag: 'etag', part_number: 4 }
+                  { etag: 'etag', part_number: 4 },
+                  { etag: 'etag', part_number: 5 },
+                  { etag: 'etag', part_number: 6 },
+                  { etag: 'etag', part_number: 7 },
+                  { etag: 'etag', part_number: 8 },
+                  { etag: 'etag', part_number: 9 },
+                  { etag: 'etag', part_number: 10 },
+                  { etag: 'etag', part_number: 11 },
+                  { etag: 'etag', part_number: 12 },
+                  { etag: 'etag', part_number: 13 },
+                  { etag: 'etag', part_number: 14 },
+                  { etag: 'etag', part_number: 15 },
+                  { etag: 'etag', part_number: 16 },
+                  { etag: 'etag', part_number: 17 },
+                  { etag: 'etag', part_number: 18 },
+                  { etag: 'etag', part_number: 19 },
+                  { etag: 'etag', part_number: 20 },
+                  { etag: 'etag', part_number: 21 },
+                  { etag: 'etag', part_number: 22 },
+                  { etag: 'etag', part_number: 23 },
+                  { etag: 'etag', part_number: 24 }
                 ]
               }
             )
-            object.upload_file(seventeen_meg_file, content_type: 'text/plain')
+            object.upload_file(one_hundred_seventeen_meg_file, content_type: 'text/plain')
           end
 
           it 'reports progress for multipart uploads' do
+            thread = double(value: nil)
+            allow(Thread).to receive(:new).and_yield.and_return(thread)
+
             client.stub_responses(:create_multipart_upload, upload_id: 'id')
             client.stub_responses(:complete_multipart_upload)
-            expect(client).to receive(:upload_part).exactly(4).times do |args|
+            expect(client).to receive(:upload_part).exactly(24).times do |args|
               args[:on_chunk_sent].call(args[:body], args[:body].size, args[:body].size)
               double(etag: 'etag')
             end
             callback = proc do |bytes, totals|
-              expect(bytes.size).to eq(4)
-              expect(totals.size).to eq(4)
+              expect(bytes.size).to eq(24)
+              expect(totals.size).to eq(24)
             end
-            object.upload_file(seventeen_meg_file, content_type: 'text/plain', progress_callback: callback)
+            object.upload_file(one_hundred_seventeen_meg_file, content_type: 'text/plain', progress_callback: callback)
+          end
+
+          it 'defaults to THREAD_COUNT without the thread_count option' do
+            expect(Thread).to receive(:new).exactly(S3::MultipartFileUploader::THREAD_COUNT).times.and_return(double(value: nil))
+            client.stub_responses(:create_multipart_upload, upload_id: 'id')
+            client.stub_responses(:complete_multipart_upload)
+            object.upload_file(one_hundred_seventeen_meg_file)
+          end
+
+          it 'respects the thread_count option' do
+            custom_thread_count = 20
+            expect(Thread).to receive(:new).exactly(custom_thread_count).times.and_return(double(value: nil))
+            client.stub_responses(:create_multipart_upload, upload_id: 'id')
+            client.stub_responses(:complete_multipart_upload)
+            object.upload_file(one_hundred_seventeen_meg_file, thread_count: custom_thread_count)
           end
 
           it 'raises an error if the multipart threshold is too small' do
@@ -180,11 +227,15 @@ module Aws
             )
 
             expect do
-              object.upload_file(seventeen_meg_file)
+              object.upload_file(one_hundred_seventeen_meg_file)
             end.to raise_error('multipart upload failed: part 3 failed')
           end
 
           it 'reports when it is unable to abort a failed multipart upload' do
+            allow(Thread).to receive(:new) do |_, &block|
+              double(value: block.call)
+            end
+
             client.stub_responses(
               :upload_part,
               [
@@ -198,9 +249,9 @@ module Aws
               :abort_multipart_upload,
               [RuntimeError.new('network-error')]
             )
-            expect { object.upload_file(seventeen_meg_file) }.to raise_error(
+            expect { object.upload_file(one_hundred_seventeen_meg_file) }.to raise_error(
               S3::MultipartUploadError,
-              'failed to abort multipart upload: network-error'
+              /failed to abort multipart upload: network-error. Multipart upload failed: part failed/
             )
           end
         end

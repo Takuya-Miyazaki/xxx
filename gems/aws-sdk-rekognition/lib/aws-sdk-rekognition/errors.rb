@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -28,21 +28,26 @@ module Aws::Rekognition
   #
   # ## Error Classes
   # * {AccessDeniedException}
+  # * {ConflictException}
   # * {HumanLoopQuotaExceededException}
   # * {IdempotentParameterMismatchException}
   # * {ImageTooLargeException}
   # * {InternalServerError}
   # * {InvalidImageFormatException}
+  # * {InvalidManifestException}
   # * {InvalidPaginationTokenException}
   # * {InvalidParameterException}
+  # * {InvalidPolicyRevisionIdException}
   # * {InvalidS3ObjectException}
   # * {LimitExceededException}
+  # * {MalformedPolicyDocumentException}
   # * {ProvisionedThroughputExceededException}
   # * {ResourceAlreadyExistsException}
   # * {ResourceInUseException}
   # * {ResourceNotFoundException}
   # * {ResourceNotReadyException}
   # * {ServiceQuotaExceededException}
+  # * {SessionNotFoundException}
   # * {ThrottlingException}
   # * {VideoTooLargeException}
   #
@@ -57,6 +62,16 @@ module Aws::Rekognition
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::Rekognition::Types::AccessDeniedException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ConflictException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Rekognition::Types::ConflictException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -127,6 +142,16 @@ module Aws::Rekognition
       end
     end
 
+    class InvalidManifestException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Rekognition::Types::InvalidManifestException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
     class InvalidPaginationTokenException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -147,6 +172,16 @@ module Aws::Rekognition
       end
     end
 
+    class InvalidPolicyRevisionIdException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Rekognition::Types::InvalidPolicyRevisionIdException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
     class InvalidS3ObjectException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -162,6 +197,16 @@ module Aws::Rekognition
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::Rekognition::Types::LimitExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class MalformedPolicyDocumentException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Rekognition::Types::MalformedPolicyDocumentException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -222,6 +267,16 @@ module Aws::Rekognition
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::Rekognition::Types::ServiceQuotaExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class SessionNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Rekognition::Types::SessionNotFoundException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

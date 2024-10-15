@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::IoTJobsDataPlane
   # @api private
@@ -153,8 +154,10 @@ module Aws::IoTJobsDataPlane
 
       api.metadata = {
         "apiVersion" => "2017-09-29",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "data.jobs.iot",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceFullName" => "AWS IoT Jobs Data Plane",
         "serviceId" => "IoT Jobs Data Plane",
         "signatureVersion" => "v4",

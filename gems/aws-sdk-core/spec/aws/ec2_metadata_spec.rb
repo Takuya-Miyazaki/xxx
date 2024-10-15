@@ -20,6 +20,66 @@ module Aws
       token_value
     end
 
+    context 'endpoint configuration' do
+      let(:endpoint) { 'http://123.123.123.123:9001' }
+
+      it 'uses endpoint with a scheme and custom port' do
+        token = stub_get_token
+        client = EC2Metadata.new(endpoint: endpoint)
+        stub_request(
+          :get, "#{endpoint}/latest/meta-data/foo"
+        ).with(
+          headers: { 'x-aws-ec2-metadata-token' => token }
+        )
+        client.get(metadata_path)
+      end
+
+      it 'uses endpoint without a scheme and a configured port' do
+        uri = URI(endpoint)
+        token = stub_get_token
+        client = EC2Metadata.new(endpoint: uri.hostname, port: uri.port)
+        stub_request(
+          :get, "#{endpoint}/latest/meta-data/foo"
+        ).with(
+          headers: { 'x-aws-ec2-metadata-token' => token }
+        )
+        client.get(metadata_path)
+      end
+
+      it 'endpoint takes precedence over endpoint mode' do
+        token = stub_get_token
+        client = EC2Metadata.new(
+          endpoint_mode: 'IPv6',
+          endpoint: endpoint
+        )
+        stub_request(
+          :get, "#{endpoint}/latest/meta-data/foo"
+        ).with(
+          headers: { 'x-aws-ec2-metadata-token' => token }
+        )
+        client.get(metadata_path)
+      end
+    end
+
+    context 'endpoint mode configuration' do
+      it 'defaults to ipv4' do
+        client = EC2Metadata.new
+        expect(client.instance_variable_get(:@endpoint))
+          .to eq('http://169.254.169.254')
+      end
+
+      it 'can be configured to use ipv6 mode' do
+        client = EC2Metadata.new(endpoint_mode: 'IPv6')
+        expect(client.instance_variable_get(:@endpoint))
+          .to eq('http://[fd00:ec2::254]')
+      end
+
+      it 'raises with an unknown mode' do
+        expect { EC2Metadata.new(endpoint_mode: 'IPv69') }
+          .to raise_error(ArgumentError)
+      end
+    end
+
     describe '#get' do
       it 'fetches a token before getting metadata' do
         token = stub_get_token

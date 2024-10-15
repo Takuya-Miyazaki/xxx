@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -42,7 +42,7 @@ module Aws::IAM
 
     # The stable and unique string identifying the policy.
     #
-    # For more information about IDs, see [IAM Identifiers][1] in the *IAM
+    # For more information about IDs, see [IAM identifiers][1] in the *IAM
     # User Guide*.
     #
     #
@@ -55,7 +55,7 @@ module Aws::IAM
 
     # The path to the policy.
     #
-    # For more information about paths, see [IAM Identifiers][1] in the *IAM
+    # For more information about paths, see [IAM identifiers][1] in the *IAM
     # User Guide*.
     #
     #
@@ -84,7 +84,7 @@ module Aws::IAM
     # to set the permissions boundary.
     #
     # For more information about permissions boundaries, see [Permissions
-    # Boundaries for IAM Identities ][1] in the *IAM User Guide*.
+    # boundaries for IAM identities ][1] in the *IAM User Guide*.
     #
     #
     #
@@ -137,6 +137,18 @@ module Aws::IAM
       data[:update_date]
     end
 
+    # A list of tags that are attached to the instance profile. For more
+    # information about tagging, see [Tagging IAM resources][1] in the *IAM
+    # User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html
+    # @return [Array<Types::Tag>]
+    def tags
+      data[:tags]
+    end
+
     # @!endgroup
 
     # @return [Client]
@@ -151,7 +163,9 @@ module Aws::IAM
     #
     # @return [self]
     def load
-      resp = @client.get_policy(policy_arn: @arn)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_policy(policy_arn: @arn)
+      end
       @data = resp.policy
       self
     end
@@ -266,7 +280,9 @@ module Aws::IAM
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -292,7 +308,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def attach_group(options = {})
       options = options.merge(policy_arn: @arn)
-      resp = @client.attach_group_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.attach_group_policy(options)
+      end
       resp.data
     end
 
@@ -316,7 +334,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def attach_role(options = {})
       options = options.merge(policy_arn: @arn)
-      resp = @client.attach_role_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.attach_role_policy(options)
+      end
       resp.data
     end
 
@@ -341,7 +361,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def attach_user(options = {})
       options = options.merge(policy_arn: @arn)
-      resp = @client.attach_user_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.attach_user_policy(options)
+      end
       resp.data
     end
 
@@ -356,12 +378,17 @@ module Aws::IAM
     #   The JSON policy document that you want to use as the content for this
     #   new version of the policy.
     #
-    #   You must provide policies in JSON format in IAM. However, for AWS
+    #   You must provide policies in JSON format in IAM. However, for
     #   CloudFormation templates formatted in YAML, you can provide the policy
-    #   in JSON or YAML format. AWS CloudFormation always converts a YAML
-    #   policy to JSON format before submitting it to IAM.
+    #   in JSON or YAML format. CloudFormation always converts a YAML policy
+    #   to JSON format before submitting it to IAM.
     #
-    #   The [regex pattern][1] used to validate this parameter is a string of
+    #   The maximum length of the policy document that you can pass in this
+    #   operation, including whitespace, is listed below. To view the maximum
+    #   character counts of a managed policy with no whitespaces, see [IAM and
+    #   STS character quotas][1].
+    #
+    #   The [regex pattern][2] used to validate this parameter is a string of
     #   characters consisting of the following:
     #
     #   * Any printable ASCII character ranging from the space character
@@ -375,7 +402,8 @@ module Aws::IAM
     #
     #
     #
-    #   [1]: http://wikipedia.org/wiki/regex
+    #   [1]: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html#reference_iam-quotas-entity-length
+    #   [2]: http://wikipedia.org/wiki/regex
     # @option options [Boolean] :set_as_default
     #   Specifies whether to set this version as the policy's default
     #   version.
@@ -385,7 +413,7 @@ module Aws::IAM
     #   for the IAM users, groups, and roles that the policy is attached to.
     #
     #   For more information about managed policy versions, see [Versioning
-    #   for Managed Policies][1] in the *IAM User Guide*.
+    #   for managed policies][1] in the *IAM User Guide*.
     #
     #
     #
@@ -393,7 +421,9 @@ module Aws::IAM
     # @return [PolicyVersion]
     def create_version(options = {})
       options = options.merge(policy_arn: @arn)
-      resp = @client.create_policy_version(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.create_policy_version(options)
+      end
       PolicyVersion.new(
         arn: @arn,
         version_id: resp.data.policy_version.version_id,
@@ -408,7 +438,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(policy_arn: @arn)
-      resp = @client.delete_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_policy(options)
+      end
       resp.data
     end
 
@@ -433,7 +465,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def detach_group(options = {})
       options = options.merge(policy_arn: @arn)
-      resp = @client.detach_group_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.detach_group_policy(options)
+      end
       resp.data
     end
 
@@ -458,7 +492,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def detach_role(options = {})
       options = options.merge(policy_arn: @arn)
-      resp = @client.detach_role_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.detach_role_policy(options)
+      end
       resp.data
     end
 
@@ -483,7 +519,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def detach_user(options = {})
       options = options.merge(policy_arn: @arn)
-      resp = @client.detach_user_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.detach_user_policy(options)
+      end
       resp.data
     end
 
@@ -528,7 +566,9 @@ module Aws::IAM
           policy_arn: @arn,
           entity_filter: "Group"
         )
-        resp = @client.list_entities_for_policy(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_entities_for_policy(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.policy_groups.each do |p|
@@ -583,7 +623,9 @@ module Aws::IAM
           policy_arn: @arn,
           entity_filter: "Role"
         )
-        resp = @client.list_entities_for_policy(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_entities_for_policy(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.policy_roles.each do |p|
@@ -638,7 +680,9 @@ module Aws::IAM
           policy_arn: @arn,
           entity_filter: "User"
         )
-        resp = @client.list_entities_for_policy(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_entities_for_policy(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.policy_users.each do |p|
@@ -675,7 +719,9 @@ module Aws::IAM
     def versions(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(policy_arn: @arn)
-        resp = @client.list_policy_versions(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_policy_versions(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.versions.each do |v|

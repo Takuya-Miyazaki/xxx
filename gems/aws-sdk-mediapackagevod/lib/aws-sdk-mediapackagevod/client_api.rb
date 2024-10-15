@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::MediaPackageVod
   # @api private
@@ -21,6 +22,9 @@ module Aws::MediaPackageVod
     Authorization = Shapes::StructureShape.new(name: 'Authorization')
     CmafEncryption = Shapes::StructureShape.new(name: 'CmafEncryption')
     CmafPackage = Shapes::StructureShape.new(name: 'CmafPackage')
+    ConfigureLogsParameters = Shapes::StructureShape.new(name: 'ConfigureLogsParameters')
+    ConfigureLogsRequest = Shapes::StructureShape.new(name: 'ConfigureLogsRequest')
+    ConfigureLogsResponse = Shapes::StructureShape.new(name: 'ConfigureLogsResponse')
     CreateAssetRequest = Shapes::StructureShape.new(name: 'CreateAssetRequest')
     CreateAssetResponse = Shapes::StructureShape.new(name: 'CreateAssetResponse')
     CreatePackagingConfigurationRequest = Shapes::StructureShape.new(name: 'CreatePackagingConfigurationRequest')
@@ -42,7 +46,9 @@ module Aws::MediaPackageVod
     DescribePackagingConfigurationResponse = Shapes::StructureShape.new(name: 'DescribePackagingConfigurationResponse')
     DescribePackagingGroupRequest = Shapes::StructureShape.new(name: 'DescribePackagingGroupRequest')
     DescribePackagingGroupResponse = Shapes::StructureShape.new(name: 'DescribePackagingGroupResponse')
+    EgressAccessLogs = Shapes::StructureShape.new(name: 'EgressAccessLogs')
     EgressEndpoint = Shapes::StructureShape.new(name: 'EgressEndpoint')
+    EncryptionContractConfiguration = Shapes::StructureShape.new(name: 'EncryptionContractConfiguration')
     EncryptionMethod = Shapes::StringShape.new(name: 'EncryptionMethod')
     ForbiddenException = Shapes::StructureShape.new(name: 'ForbiddenException')
     HlsEncryption = Shapes::StructureShape.new(name: 'HlsEncryption')
@@ -70,7 +76,10 @@ module Aws::MediaPackageVod
     PackagingGroupCreateParameters = Shapes::StructureShape.new(name: 'PackagingGroupCreateParameters')
     PackagingGroupList = Shapes::StructureShape.new(name: 'PackagingGroupList')
     PackagingGroupUpdateParameters = Shapes::StructureShape.new(name: 'PackagingGroupUpdateParameters')
+    PresetSpeke20Audio = Shapes::StringShape.new(name: 'PresetSpeke20Audio')
+    PresetSpeke20Video = Shapes::StringShape.new(name: 'PresetSpeke20Video')
     Profile = Shapes::StringShape.new(name: 'Profile')
+    ScteMarkersSource = Shapes::StringShape.new(name: 'ScteMarkersSource')
     SegmentTemplateFormat = Shapes::StringShape.new(name: 'SegmentTemplateFormat')
     ServiceUnavailableException = Shapes::StructureShape.new(name: 'ServiceUnavailableException')
     SpekeKeyProvider = Shapes::StructureShape.new(name: 'SpekeKeyProvider')
@@ -138,13 +147,31 @@ module Aws::MediaPackageVod
     Authorization.add_member(:secrets_role_arn, Shapes::ShapeRef.new(shape: __string, required: true, location_name: "secretsRoleArn"))
     Authorization.struct_class = Types::Authorization
 
+    CmafEncryption.add_member(:constant_initialization_vector, Shapes::ShapeRef.new(shape: __string, location_name: "constantInitializationVector"))
     CmafEncryption.add_member(:speke_key_provider, Shapes::ShapeRef.new(shape: SpekeKeyProvider, required: true, location_name: "spekeKeyProvider"))
     CmafEncryption.struct_class = Types::CmafEncryption
 
     CmafPackage.add_member(:encryption, Shapes::ShapeRef.new(shape: CmafEncryption, location_name: "encryption"))
     CmafPackage.add_member(:hls_manifests, Shapes::ShapeRef.new(shape: __listOfHlsManifest, required: true, location_name: "hlsManifests"))
+    CmafPackage.add_member(:include_encoder_configuration_in_segments, Shapes::ShapeRef.new(shape: __boolean, location_name: "includeEncoderConfigurationInSegments"))
     CmafPackage.add_member(:segment_duration_seconds, Shapes::ShapeRef.new(shape: __integer, location_name: "segmentDurationSeconds"))
     CmafPackage.struct_class = Types::CmafPackage
+
+    ConfigureLogsParameters.add_member(:egress_access_logs, Shapes::ShapeRef.new(shape: EgressAccessLogs, location_name: "egressAccessLogs"))
+    ConfigureLogsParameters.struct_class = Types::ConfigureLogsParameters
+
+    ConfigureLogsRequest.add_member(:egress_access_logs, Shapes::ShapeRef.new(shape: EgressAccessLogs, location_name: "egressAccessLogs"))
+    ConfigureLogsRequest.add_member(:id, Shapes::ShapeRef.new(shape: __string, required: true, location: "uri", location_name: "id"))
+    ConfigureLogsRequest.struct_class = Types::ConfigureLogsRequest
+
+    ConfigureLogsResponse.add_member(:arn, Shapes::ShapeRef.new(shape: __string, location_name: "arn"))
+    ConfigureLogsResponse.add_member(:authorization, Shapes::ShapeRef.new(shape: Authorization, location_name: "authorization"))
+    ConfigureLogsResponse.add_member(:created_at, Shapes::ShapeRef.new(shape: __string, location_name: "createdAt"))
+    ConfigureLogsResponse.add_member(:domain_name, Shapes::ShapeRef.new(shape: __string, location_name: "domainName"))
+    ConfigureLogsResponse.add_member(:egress_access_logs, Shapes::ShapeRef.new(shape: EgressAccessLogs, location_name: "egressAccessLogs"))
+    ConfigureLogsResponse.add_member(:id, Shapes::ShapeRef.new(shape: __string, location_name: "id"))
+    ConfigureLogsResponse.add_member(:tags, Shapes::ShapeRef.new(shape: Tags, location_name: "tags"))
+    ConfigureLogsResponse.struct_class = Types::ConfigureLogsResponse
 
     CreateAssetRequest.add_member(:id, Shapes::ShapeRef.new(shape: __string, required: true, location_name: "id"))
     CreateAssetRequest.add_member(:packaging_group_id, Shapes::ShapeRef.new(shape: __string, required: true, location_name: "packagingGroupId"))
@@ -176,6 +203,7 @@ module Aws::MediaPackageVod
 
     CreatePackagingConfigurationResponse.add_member(:arn, Shapes::ShapeRef.new(shape: __string, location_name: "arn"))
     CreatePackagingConfigurationResponse.add_member(:cmaf_package, Shapes::ShapeRef.new(shape: CmafPackage, location_name: "cmafPackage"))
+    CreatePackagingConfigurationResponse.add_member(:created_at, Shapes::ShapeRef.new(shape: __string, location_name: "createdAt"))
     CreatePackagingConfigurationResponse.add_member(:dash_package, Shapes::ShapeRef.new(shape: DashPackage, location_name: "dashPackage"))
     CreatePackagingConfigurationResponse.add_member(:hls_package, Shapes::ShapeRef.new(shape: HlsPackage, location_name: "hlsPackage"))
     CreatePackagingConfigurationResponse.add_member(:id, Shapes::ShapeRef.new(shape: __string, location_name: "id"))
@@ -185,13 +213,16 @@ module Aws::MediaPackageVod
     CreatePackagingConfigurationResponse.struct_class = Types::CreatePackagingConfigurationResponse
 
     CreatePackagingGroupRequest.add_member(:authorization, Shapes::ShapeRef.new(shape: Authorization, location_name: "authorization"))
+    CreatePackagingGroupRequest.add_member(:egress_access_logs, Shapes::ShapeRef.new(shape: EgressAccessLogs, location_name: "egressAccessLogs"))
     CreatePackagingGroupRequest.add_member(:id, Shapes::ShapeRef.new(shape: __string, required: true, location_name: "id"))
     CreatePackagingGroupRequest.add_member(:tags, Shapes::ShapeRef.new(shape: Tags, location_name: "tags"))
     CreatePackagingGroupRequest.struct_class = Types::CreatePackagingGroupRequest
 
     CreatePackagingGroupResponse.add_member(:arn, Shapes::ShapeRef.new(shape: __string, location_name: "arn"))
     CreatePackagingGroupResponse.add_member(:authorization, Shapes::ShapeRef.new(shape: Authorization, location_name: "authorization"))
+    CreatePackagingGroupResponse.add_member(:created_at, Shapes::ShapeRef.new(shape: __string, location_name: "createdAt"))
     CreatePackagingGroupResponse.add_member(:domain_name, Shapes::ShapeRef.new(shape: __string, location_name: "domainName"))
+    CreatePackagingGroupResponse.add_member(:egress_access_logs, Shapes::ShapeRef.new(shape: EgressAccessLogs, location_name: "egressAccessLogs"))
     CreatePackagingGroupResponse.add_member(:id, Shapes::ShapeRef.new(shape: __string, location_name: "id"))
     CreatePackagingGroupResponse.add_member(:tags, Shapes::ShapeRef.new(shape: Tags, location_name: "tags"))
     CreatePackagingGroupResponse.struct_class = Types::CreatePackagingGroupResponse
@@ -203,11 +234,14 @@ module Aws::MediaPackageVod
     DashManifest.add_member(:manifest_name, Shapes::ShapeRef.new(shape: __string, location_name: "manifestName"))
     DashManifest.add_member(:min_buffer_time_seconds, Shapes::ShapeRef.new(shape: __integer, location_name: "minBufferTimeSeconds"))
     DashManifest.add_member(:profile, Shapes::ShapeRef.new(shape: Profile, location_name: "profile"))
+    DashManifest.add_member(:scte_markers_source, Shapes::ShapeRef.new(shape: ScteMarkersSource, location_name: "scteMarkersSource"))
     DashManifest.add_member(:stream_selection, Shapes::ShapeRef.new(shape: StreamSelection, location_name: "streamSelection"))
     DashManifest.struct_class = Types::DashManifest
 
     DashPackage.add_member(:dash_manifests, Shapes::ShapeRef.new(shape: __listOfDashManifest, required: true, location_name: "dashManifests"))
     DashPackage.add_member(:encryption, Shapes::ShapeRef.new(shape: DashEncryption, location_name: "encryption"))
+    DashPackage.add_member(:include_encoder_configuration_in_segments, Shapes::ShapeRef.new(shape: __boolean, location_name: "includeEncoderConfigurationInSegments"))
+    DashPackage.add_member(:include_iframe_only_stream, Shapes::ShapeRef.new(shape: __boolean, location_name: "includeIframeOnlyStream"))
     DashPackage.add_member(:period_triggers, Shapes::ShapeRef.new(shape: __listOf__PeriodTriggersElement, location_name: "periodTriggers"))
     DashPackage.add_member(:segment_duration_seconds, Shapes::ShapeRef.new(shape: __integer, location_name: "segmentDurationSeconds"))
     DashPackage.add_member(:segment_template_format, Shapes::ShapeRef.new(shape: SegmentTemplateFormat, location_name: "segmentTemplateFormat"))
@@ -247,6 +281,7 @@ module Aws::MediaPackageVod
 
     DescribePackagingConfigurationResponse.add_member(:arn, Shapes::ShapeRef.new(shape: __string, location_name: "arn"))
     DescribePackagingConfigurationResponse.add_member(:cmaf_package, Shapes::ShapeRef.new(shape: CmafPackage, location_name: "cmafPackage"))
+    DescribePackagingConfigurationResponse.add_member(:created_at, Shapes::ShapeRef.new(shape: __string, location_name: "createdAt"))
     DescribePackagingConfigurationResponse.add_member(:dash_package, Shapes::ShapeRef.new(shape: DashPackage, location_name: "dashPackage"))
     DescribePackagingConfigurationResponse.add_member(:hls_package, Shapes::ShapeRef.new(shape: HlsPackage, location_name: "hlsPackage"))
     DescribePackagingConfigurationResponse.add_member(:id, Shapes::ShapeRef.new(shape: __string, location_name: "id"))
@@ -258,16 +293,27 @@ module Aws::MediaPackageVod
     DescribePackagingGroupRequest.add_member(:id, Shapes::ShapeRef.new(shape: __string, required: true, location: "uri", location_name: "id"))
     DescribePackagingGroupRequest.struct_class = Types::DescribePackagingGroupRequest
 
+    DescribePackagingGroupResponse.add_member(:approximate_asset_count, Shapes::ShapeRef.new(shape: __integer, location_name: "approximateAssetCount"))
     DescribePackagingGroupResponse.add_member(:arn, Shapes::ShapeRef.new(shape: __string, location_name: "arn"))
     DescribePackagingGroupResponse.add_member(:authorization, Shapes::ShapeRef.new(shape: Authorization, location_name: "authorization"))
+    DescribePackagingGroupResponse.add_member(:created_at, Shapes::ShapeRef.new(shape: __string, location_name: "createdAt"))
     DescribePackagingGroupResponse.add_member(:domain_name, Shapes::ShapeRef.new(shape: __string, location_name: "domainName"))
+    DescribePackagingGroupResponse.add_member(:egress_access_logs, Shapes::ShapeRef.new(shape: EgressAccessLogs, location_name: "egressAccessLogs"))
     DescribePackagingGroupResponse.add_member(:id, Shapes::ShapeRef.new(shape: __string, location_name: "id"))
     DescribePackagingGroupResponse.add_member(:tags, Shapes::ShapeRef.new(shape: Tags, location_name: "tags"))
     DescribePackagingGroupResponse.struct_class = Types::DescribePackagingGroupResponse
 
+    EgressAccessLogs.add_member(:log_group_name, Shapes::ShapeRef.new(shape: __string, location_name: "logGroupName"))
+    EgressAccessLogs.struct_class = Types::EgressAccessLogs
+
     EgressEndpoint.add_member(:packaging_configuration_id, Shapes::ShapeRef.new(shape: __string, location_name: "packagingConfigurationId"))
+    EgressEndpoint.add_member(:status, Shapes::ShapeRef.new(shape: __string, location_name: "status"))
     EgressEndpoint.add_member(:url, Shapes::ShapeRef.new(shape: __string, location_name: "url"))
     EgressEndpoint.struct_class = Types::EgressEndpoint
+
+    EncryptionContractConfiguration.add_member(:preset_speke_20_audio, Shapes::ShapeRef.new(shape: PresetSpeke20Audio, required: true, location_name: "presetSpeke20Audio"))
+    EncryptionContractConfiguration.add_member(:preset_speke_20_video, Shapes::ShapeRef.new(shape: PresetSpeke20Video, required: true, location_name: "presetSpeke20Video"))
+    EncryptionContractConfiguration.struct_class = Types::EncryptionContractConfiguration
 
     ForbiddenException.add_member(:message, Shapes::ShapeRef.new(shape: __string, location_name: "message"))
     ForbiddenException.struct_class = Types::ForbiddenException
@@ -287,6 +333,7 @@ module Aws::MediaPackageVod
 
     HlsPackage.add_member(:encryption, Shapes::ShapeRef.new(shape: HlsEncryption, location_name: "encryption"))
     HlsPackage.add_member(:hls_manifests, Shapes::ShapeRef.new(shape: __listOfHlsManifest, required: true, location_name: "hlsManifests"))
+    HlsPackage.add_member(:include_dvb_subtitles, Shapes::ShapeRef.new(shape: __boolean, location_name: "includeDvbSubtitles"))
     HlsPackage.add_member(:segment_duration_seconds, Shapes::ShapeRef.new(shape: __integer, location_name: "segmentDurationSeconds"))
     HlsPackage.add_member(:use_audio_rendition_group, Shapes::ShapeRef.new(shape: __boolean, location_name: "useAudioRenditionGroup"))
     HlsPackage.struct_class = Types::HlsPackage
@@ -343,6 +390,7 @@ module Aws::MediaPackageVod
 
     PackagingConfiguration.add_member(:arn, Shapes::ShapeRef.new(shape: __string, location_name: "arn"))
     PackagingConfiguration.add_member(:cmaf_package, Shapes::ShapeRef.new(shape: CmafPackage, location_name: "cmafPackage"))
+    PackagingConfiguration.add_member(:created_at, Shapes::ShapeRef.new(shape: __string, location_name: "createdAt"))
     PackagingConfiguration.add_member(:dash_package, Shapes::ShapeRef.new(shape: DashPackage, location_name: "dashPackage"))
     PackagingConfiguration.add_member(:hls_package, Shapes::ShapeRef.new(shape: HlsPackage, location_name: "hlsPackage"))
     PackagingConfiguration.add_member(:id, Shapes::ShapeRef.new(shape: __string, location_name: "id"))
@@ -364,14 +412,18 @@ module Aws::MediaPackageVod
     PackagingConfigurationList.add_member(:packaging_configurations, Shapes::ShapeRef.new(shape: __listOfPackagingConfiguration, location_name: "packagingConfigurations"))
     PackagingConfigurationList.struct_class = Types::PackagingConfigurationList
 
+    PackagingGroup.add_member(:approximate_asset_count, Shapes::ShapeRef.new(shape: __integer, location_name: "approximateAssetCount"))
     PackagingGroup.add_member(:arn, Shapes::ShapeRef.new(shape: __string, location_name: "arn"))
     PackagingGroup.add_member(:authorization, Shapes::ShapeRef.new(shape: Authorization, location_name: "authorization"))
+    PackagingGroup.add_member(:created_at, Shapes::ShapeRef.new(shape: __string, location_name: "createdAt"))
     PackagingGroup.add_member(:domain_name, Shapes::ShapeRef.new(shape: __string, location_name: "domainName"))
+    PackagingGroup.add_member(:egress_access_logs, Shapes::ShapeRef.new(shape: EgressAccessLogs, location_name: "egressAccessLogs"))
     PackagingGroup.add_member(:id, Shapes::ShapeRef.new(shape: __string, location_name: "id"))
     PackagingGroup.add_member(:tags, Shapes::ShapeRef.new(shape: Tags, location_name: "tags"))
     PackagingGroup.struct_class = Types::PackagingGroup
 
     PackagingGroupCreateParameters.add_member(:authorization, Shapes::ShapeRef.new(shape: Authorization, location_name: "authorization"))
+    PackagingGroupCreateParameters.add_member(:egress_access_logs, Shapes::ShapeRef.new(shape: EgressAccessLogs, location_name: "egressAccessLogs"))
     PackagingGroupCreateParameters.add_member(:id, Shapes::ShapeRef.new(shape: __string, required: true, location_name: "id"))
     PackagingGroupCreateParameters.add_member(:tags, Shapes::ShapeRef.new(shape: Tags, location_name: "tags"))
     PackagingGroupCreateParameters.struct_class = Types::PackagingGroupCreateParameters
@@ -386,6 +438,7 @@ module Aws::MediaPackageVod
     ServiceUnavailableException.add_member(:message, Shapes::ShapeRef.new(shape: __string, location_name: "message"))
     ServiceUnavailableException.struct_class = Types::ServiceUnavailableException
 
+    SpekeKeyProvider.add_member(:encryption_contract_configuration, Shapes::ShapeRef.new(shape: EncryptionContractConfiguration, location_name: "encryptionContractConfiguration"))
     SpekeKeyProvider.add_member(:role_arn, Shapes::ShapeRef.new(shape: __string, required: true, location_name: "roleArn"))
     SpekeKeyProvider.add_member(:system_ids, Shapes::ShapeRef.new(shape: __listOf__string, required: true, location_name: "systemIds"))
     SpekeKeyProvider.add_member(:url, Shapes::ShapeRef.new(shape: __string, required: true, location_name: "url"))
@@ -420,9 +473,12 @@ module Aws::MediaPackageVod
     UpdatePackagingGroupRequest.add_member(:id, Shapes::ShapeRef.new(shape: __string, required: true, location: "uri", location_name: "id"))
     UpdatePackagingGroupRequest.struct_class = Types::UpdatePackagingGroupRequest
 
+    UpdatePackagingGroupResponse.add_member(:approximate_asset_count, Shapes::ShapeRef.new(shape: __integer, location_name: "approximateAssetCount"))
     UpdatePackagingGroupResponse.add_member(:arn, Shapes::ShapeRef.new(shape: __string, location_name: "arn"))
     UpdatePackagingGroupResponse.add_member(:authorization, Shapes::ShapeRef.new(shape: Authorization, location_name: "authorization"))
+    UpdatePackagingGroupResponse.add_member(:created_at, Shapes::ShapeRef.new(shape: __string, location_name: "createdAt"))
     UpdatePackagingGroupResponse.add_member(:domain_name, Shapes::ShapeRef.new(shape: __string, location_name: "domainName"))
+    UpdatePackagingGroupResponse.add_member(:egress_access_logs, Shapes::ShapeRef.new(shape: EgressAccessLogs, location_name: "egressAccessLogs"))
     UpdatePackagingGroupResponse.add_member(:id, Shapes::ShapeRef.new(shape: __string, location_name: "id"))
     UpdatePackagingGroupResponse.add_member(:tags, Shapes::ShapeRef.new(shape: Tags, location_name: "tags"))
     UpdatePackagingGroupResponse.struct_class = Types::UpdatePackagingGroupResponse
@@ -466,6 +522,20 @@ module Aws::MediaPackageVod
         "signingName" => "mediapackage-vod",
         "uid" => "mediapackage-vod-2018-11-07",
       }
+
+      api.add_operation(:configure_logs, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ConfigureLogs"
+        o.http_method = "PUT"
+        o.http_request_uri = "/packaging_groups/{id}/configure_logs"
+        o.input = Shapes::ShapeRef.new(shape: ConfigureLogsRequest)
+        o.output = Shapes::ShapeRef.new(shape: ConfigureLogsResponse)
+        o.errors << Shapes::ShapeRef.new(shape: UnprocessableEntityException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServerErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: ForbiddenException)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: ServiceUnavailableException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+      end)
 
       api.add_operation(:create_asset, Seahorse::Model::Operation.new.tap do |o|
         o.name = "CreateAsset"

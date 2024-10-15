@@ -1,6 +1,378 @@
 Unreleased Changes
 ------------------
 
+1.126.0 (2024-10-07)
+------------------
+
+* Feature - Add validation pattern to S3KeyPrefix on the EnableLogging API
+
+1.125.0 (2024-09-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.124.0 (2024-09-23)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.123.0 (2024-09-20)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.122.0 (2024-09-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.121.0 (2024-09-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.120.0 (2024-09-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.119.0 (2024-07-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.118.0 (2024-06-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.117.0 (2024-06-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.116.0 (2024-06-12)
+------------------
+
+* Feature - Updates to remove DC1 and DS2 node types.
+
+1.115.0 (2024-06-05)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.114.0 (2024-05-13)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.113.0 (2024-04-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.112.0 (2024-04-16)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.111.0 (2024-04-12)
+------------------
+
+* Feature - Adds support for Amazon Redshift DescribeClusterSnapshots API to include Snapshot ARN response field.
+
+1.110.0 (2024-03-06)
+------------------
+
+* Feature - Update for documentation only. Covers port ranges, definition updates for data sharing, and definition updates to cluster-snapshot documentation.
+
+1.109.0 (2024-02-07)
+------------------
+
+* Feature - LisRecommendations API to fetch Amazon Redshift Advisor recommendations.
+
+1.108.0 (2024-01-26)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.107.0 (2023-11-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.106.0 (2023-11-27)
+------------------
+
+* Feature - This release adds support for multi-data warehouse writes through data sharing.
+
+1.105.0 (2023-11-22)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.104.0 (2023-11-17)
+------------------
+
+* Feature - Updated SDK for Amazon Redshift, which you can use to configure a connection with IAM Identity Center to manage access to databases. With these, you can create a connection through a managed application. You can also change a managed application, delete it, or get information about an existing one.
+
+1.103.0 (2023-11-15)
+------------------
+
+* Feature - The custom domain name SDK for Amazon Redshift provisioned clusters is updated with additional required parameters for modify and delete operations. Additionally, users can provide domain names with longer top-level domains.
+
+1.102.0 (2023-11-01)
+------------------
+
+* Feature - Added support for Multi-AZ deployments for Provisioned RA3 clusters that provide 99.99% SLA availability.
+
+1.101.0 (2023-10-27)
+------------------
+
+* Feature - added support to create a dual stack cluster
+
+1.100.0 (2023-10-26)
+------------------
+
+* Feature - Add Redshift APIs GetResourcePolicy, DeleteResourcePolicy, PutResourcePolicy and DescribeInboundIntegrations for the new Amazon Redshift Zero-ETL integration feature, which can be used to control data ingress into Redshift namespace, and view inbound integrations.
+
+1.99.0 (2023-10-16)
+------------------
+
+* Feature - Added support for managing credentials of provisioned cluster admin using AWS Secrets Manager.
+
+1.98.0 (2023-09-27)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.97.0 (2023-07-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.96.0 (2023-07-06)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.95.0 (2023-06-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.94.0 (2023-06-20)
+------------------
+
+* Feature - Added support for custom domain names for Redshift Provisioned clusters. This feature enables customers to create a custom domain name and use ACM to generate fully secure connections to it.
+
+1.93.0 (2023-06-15)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.92.0 (2023-05-31)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.91.0 (2023-02-24)
+------------------
+
+* Feature - Documentation updates for Redshift API bringing it in line with IAM best practices.
+
+1.90.0 (2023-02-03)
+------------------
+
+* Feature - Corrects descriptions of the parameters for the API operations RestoreFromClusterSnapshot, RestoreTableFromClusterSnapshot, and CreateCluster.
+
+1.89.0 (2023-02-02)
+------------------
+
+* Feature - Enabled FIPS endpoints for GovCloud (US) regions in SDK.
+
+1.88.0 (2023-01-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+* Issue - Replace runtime endpoint resolution approach with generated ruby code.
+
+1.87.0 (2022-10-27)
+------------------
+
+* Feature - This release clarifies use for the ElasticIp parameter of the CreateCluster and RestoreFromClusterSnapshot APIs.
+
+1.86.0 (2022-10-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.85.0 (2022-09-09)
+------------------
+
+* Feature - This release updates documentation for AQUA features and other description updates.
+
+1.84.0 (2022-07-11)
+------------------
+
+* Feature - This release adds a new --snapshot-arn field for describe-cluster-snapshots, describe-node-configuration-options, restore-from-cluster-snapshot, authorize-snapshot-acsess, and revoke-snapshot-acsess APIs. It allows customers to give a Redshift snapshot ARN or a Redshift Serverless ARN as input.
+
+1.83.0 (2022-06-08)
+------------------
+
+* Feature - Adds new API GetClusterCredentialsWithIAM to return temporary credentials.
+
+1.82.0 (2022-05-06)
+------------------
+
+* Feature - Introduces new field 'LoadSampleData' in CreateCluster operation. Customers can now specify 'LoadSampleData' option during creation of a cluster, which results in loading of sample data in the cluster that is created.
+
+1.81.0 (2022-04-19)
+------------------
+
+* Feature - Introduces new fields for LogDestinationType and LogExports on EnableLogging requests and Enable/Disable/DescribeLogging responses. Customers can now select CloudWatch Logs as a destination for their Audit Logs.
+
+1.80.0 (2022-03-23)
+------------------
+
+* Feature - This release adds a new [--encrypted | --no-encrypted] field in restore-from-cluster-snapshot API. Customers can now restore an unencrypted snapshot to a cluster encrypted with AWS Managed Key or their own KMS key.
+
+1.79.0 (2022-02-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.78.0 (2022-02-17)
+------------------
+
+* Feature - SDK release for Cross region datasharing and cost-control for cross region datasharing
+
+1.77.0 (2022-02-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.76.0 (2021-12-21)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.75.0 (2021-12-20)
+------------------
+
+* Feature - This release adds API support for managed Redshift datashares. Customers can now interact with a Redshift datashare that is managed by a different service, such as AWS Data Exchange.
+
+1.74.0 (2021-11-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.73.0 (2021-11-23)
+------------------
+
+* Feature - This release adds support for reserved node exchange with restore/resize
+
+1.72.0 (2021-11-19)
+------------------
+
+* Feature - Added support of default IAM role for CreateCluster, RestoreFromClusterSnapshot and ModifyClusterIamRoles APIs
+
+1.71.0 (2021-11-04)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.70.0 (2021-10-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.69.0 (2021-09-01)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.68.0 (2021-08-03)
+------------------
+
+* Feature - API support for Redshift Data Sharing feature.
+
+1.67.0 (2021-07-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.66.0 (2021-07-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.65.0 (2021-07-13)
+------------------
+
+* Feature - Release new APIs to support new Redshift feature - Authentication Profile
+
+1.64.0 (2021-06-28)
+------------------
+
+* Feature - Added InvalidClusterStateFault to the DisableLogging API, thrown when calling the API on a non available cluster.
+
+1.63.0 (2021-06-10)
+------------------
+
+* Feature - Added InvalidClusterStateFault to the ModifyAquaConfiguration API, thrown when calling the API on a non available cluster.
+
+1.62.0 (2021-04-21)
+------------------
+
+* Feature - Add operations: AddPartner, DescribePartners, DeletePartner, and UpdatePartnerStatus to support tracking integration status with data partners.
+
+1.61.0 (2021-04-13)
+------------------
+
+* Feature - Added support to enable AQUA in Amazon Redshift clusters.
+
+1.60.0 (2021-04-09)
+------------------
+
+* Feature - Add support for case sensitive table level restore
+
+1.59.0 (2021-03-31)
+------------------
+
+* Feature - Enable customers to share access to their Redshift clusters from other VPCs (including VPCs from other accounts).
+
+1.58.0 (2021-03-23)
+------------------
+
+* Feature - Removed APIs to control AQUA on clusters.
+
+1.57.0 (2021-03-22)
+------------------
+
+* Feature - Added support to enable AQUA in Amazon Redshift clusters.
+
+1.56.0 (2021-03-18)
+------------------
+
+* Feature - Add new fields for additional information about VPC endpoint for clusters with reallocation enabled, and a new field for total storage capacity for all clusters.
+
+1.55.0 (2021-03-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.54.0 (2021-02-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.53.0 (2021-01-22)
+------------------
+
+* Feature - Update VPC endpoint field names.
+
 1.52.0 (2020-12-09)
 ------------------
 

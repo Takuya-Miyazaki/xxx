@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-kms/types'
-require_relative 'aws-sdk-kms/client_api'
-require_relative 'aws-sdk-kms/client'
-require_relative 'aws-sdk-kms/errors'
-require_relative 'aws-sdk-kms/resource'
-require_relative 'aws-sdk-kms/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:kms)
 
 # This module provides support for AWS Key Management Service. This module is available in the
 # `aws-sdk-kms` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-kms/customizations'
 #
 # @!group service
 module Aws::KMS
+  autoload :Types, 'aws-sdk-kms/types'
+  autoload :ClientApi, 'aws-sdk-kms/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-kms/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-kms/client'
+  autoload :Errors, 'aws-sdk-kms/errors'
+  autoload :Resource, 'aws-sdk-kms/resource'
+  autoload :EndpointParameters, 'aws-sdk-kms/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-kms/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-kms/endpoints'
 
-  GEM_VERSION = '1.41.0'
+  GEM_VERSION = '1.94.0'
 
 end
+
+require_relative 'aws-sdk-kms/customizations'

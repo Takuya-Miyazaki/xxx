@@ -4,11 +4,13 @@
     "apiVersion":"2013-01-01",
     "endpointPrefix":"cloudsearch",
     "protocol":"query",
+    "protocols":["query"],
     "serviceFullName":"Amazon CloudSearch",
     "serviceId":"CloudSearch",
     "signatureVersion":"v4",
     "uid":"cloudsearch-2013-01-01",
-    "xmlNamespace":"http://cloudsearch.amazonaws.com/doc/2013-01-01/"
+    "xmlNamespace":"http://cloudsearch.amazonaws.com/doc/2013-01-01/",
+    "auth":["aws.auth#sigv4"]
   },
   "operations":{
     "BuildSuggesters":{
@@ -25,7 +27,8 @@
       "errors":[
         {"shape":"BaseException"},
         {"shape":"InternalException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
       ]
     },
     "CreateDomain":{
@@ -42,7 +45,9 @@
       "errors":[
         {"shape":"BaseException"},
         {"shape":"InternalException"},
-        {"shape":"LimitExceededException"}
+        {"shape":"LimitExceededException"},
+        {"shape":"ResourceAlreadyExistsException"},
+        {"shape":"ValidationException"}
       ]
     },
     "DefineAnalysisScheme":{
@@ -61,7 +66,8 @@
         {"shape":"InternalException"},
         {"shape":"LimitExceededException"},
         {"shape":"InvalidTypeException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
       ]
     },
     "DefineExpression":{
@@ -80,7 +86,8 @@
         {"shape":"InternalException"},
         {"shape":"LimitExceededException"},
         {"shape":"InvalidTypeException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
       ]
     },
     "DefineIndexField":{
@@ -99,7 +106,8 @@
         {"shape":"InternalException"},
         {"shape":"LimitExceededException"},
         {"shape":"InvalidTypeException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
       ]
     },
     "DefineSuggester":{
@@ -118,7 +126,8 @@
         {"shape":"InternalException"},
         {"shape":"LimitExceededException"},
         {"shape":"InvalidTypeException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
       ]
     },
     "DeleteAnalysisScheme":{
@@ -136,7 +145,8 @@
         {"shape":"BaseException"},
         {"shape":"InternalException"},
         {"shape":"InvalidTypeException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
       ]
     },
     "DeleteDomain":{
@@ -170,7 +180,8 @@
         {"shape":"BaseException"},
         {"shape":"InternalException"},
         {"shape":"InvalidTypeException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
       ]
     },
     "DeleteIndexField":{
@@ -188,7 +199,8 @@
         {"shape":"BaseException"},
         {"shape":"InternalException"},
         {"shape":"InvalidTypeException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
       ]
     },
     "DeleteSuggester":{
@@ -206,7 +218,8 @@
         {"shape":"BaseException"},
         {"shape":"InternalException"},
         {"shape":"InvalidTypeException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
       ]
     },
     "DescribeAnalysisSchemes":{
@@ -380,7 +393,8 @@
       "errors":[
         {"shape":"BaseException"},
         {"shape":"InternalException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
       ]
     },
     "ListDomainNames":{
@@ -455,7 +469,8 @@
         {"shape":"InternalException"},
         {"shape":"LimitExceededException"},
         {"shape":"ResourceNotFoundException"},
-        {"shape":"InvalidTypeException"}
+        {"shape":"InvalidTypeException"},
+        {"shape":"ValidationException"}
       ]
     },
     "UpdateServiceAccessPolicies":{
@@ -474,7 +489,8 @@
         {"shape":"InternalException"},
         {"shape":"LimitExceededException"},
         {"shape":"ResourceNotFoundException"},
-        {"shape":"InvalidTypeException"}
+        {"shape":"InvalidTypeException"},
+        {"shape":"ValidationException"}
       ]
     }
   },
@@ -1330,10 +1346,25 @@
         "search.medium",
         "search.large",
         "search.xlarge",
-        "search.2xlarge"
+        "search.2xlarge",
+        "search.previousgeneration.small",
+        "search.previousgeneration.large",
+        "search.previousgeneration.xlarge",
+        "search.previousgeneration.2xlarge"
       ]
     },
     "PolicyDocument":{"type":"string"},
+    "ResourceAlreadyExistsException":{
+      "type":"structure",
+      "members":{
+      },
+      "error":{
+        "code":"ResourceAlreadyExists",
+        "httpStatusCode":409,
+        "senderFault":true
+      },
+      "exception":true
+    },
     "ResourceNotFoundException":{
       "type":"structure",
       "members":{

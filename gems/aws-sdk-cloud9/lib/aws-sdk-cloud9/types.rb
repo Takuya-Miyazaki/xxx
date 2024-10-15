@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -28,30 +28,11 @@ module Aws::Cloud9
     #
     class ConflictException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass CreateEnvironmentEC2Request
-    #   data as a hash:
-    #
-    #       {
-    #         name: "EnvironmentName", # required
-    #         description: "EnvironmentDescription",
-    #         client_request_token: "ClientRequestToken",
-    #         instance_type: "InstanceType", # required
-    #         subnet_id: "SubnetId",
-    #         automatic_stop_time_minutes: 1,
-    #         owner_arn: "UserArn",
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #         connection_type: "CONNECT_SSH", # accepts CONNECT_SSH, CONNECT_SSM
-    #       }
-    #
     # @!attribute [rw] name
     #   The name of the environment to create.
     #
-    #   This name is visible to other AWS IAM users in the same AWS account.
+    #   This name is visible to other IAM users in the same Amazon Web
+    #   Services account.
     #   @return [String]
     #
     # @!attribute [rw] description
@@ -59,7 +40,7 @@ module Aws::Cloud9
     #   @return [String]
     #
     # @!attribute [rw] client_request_token
-    #   A unique, case-sensitive string that helps AWS Cloud9 to ensure this
+    #   A unique, case-sensitive string that helps Cloud9 to ensure this
     #   operation completes no more than one time.
     #
     #   For more information, see [Client Tokens][1] in the *Amazon EC2 API
@@ -67,7 +48,7 @@ module Aws::Cloud9
     #
     #
     #
-    #   [1]: http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html
     #   @return [String]
     #
     # @!attribute [rw] instance_type
@@ -76,8 +57,52 @@ module Aws::Cloud9
     #   @return [String]
     #
     # @!attribute [rw] subnet_id
-    #   The ID of the subnet in Amazon VPC that AWS Cloud9 will use to
+    #   The ID of the subnet in Amazon VPC that Cloud9 will use to
     #   communicate with the Amazon EC2 instance.
+    #   @return [String]
+    #
+    # @!attribute [rw] image_id
+    #   The identifier for the Amazon Machine Image (AMI) that's used to
+    #   create the EC2 instance. To choose an AMI for the instance, you must
+    #   specify a valid AMI alias or a valid Amazon EC2 Systems Manager
+    #   (SSM) path.
+    #
+    #   From December 04, 2023, you will be required to include the
+    #   `imageId` parameter for the `CreateEnvironmentEC2` action. This
+    #   change will be reflected across all direct methods of communicating
+    #   with the API, such as Amazon Web Services SDK, Amazon Web Services
+    #   CLI and Amazon Web Services CloudFormation. This change will only
+    #   affect direct API consumers, and not Cloud9 console users.
+    #
+    #   We recommend using Amazon Linux 2023 as the AMI to create your
+    #   environment as it is fully supported.
+    #
+    #   Since Ubuntu 18.04 has ended standard support as of May 31, 2023, we
+    #   recommend you choose Ubuntu 22.04.
+    #
+    #   <b>AMI aliases </b>
+    #
+    #   * Amazon Linux 2: `amazonlinux-2-x86_64`
+    #
+    #   * Amazon Linux 2023 (recommended): `amazonlinux-2023-x86_64`
+    #
+    #   * Ubuntu 18.04: `ubuntu-18.04-x86_64`
+    #
+    #   * Ubuntu 22.04: `ubuntu-22.04-x86_64`
+    #
+    #   **SSM paths**
+    #
+    #   * Amazon Linux 2:
+    #     `resolve:ssm:/aws/service/cloud9/amis/amazonlinux-2-x86_64`
+    #
+    #   * Amazon Linux 2023 (recommended):
+    #     `resolve:ssm:/aws/service/cloud9/amis/amazonlinux-2023-x86_64`
+    #
+    #   * Ubuntu 18.04:
+    #     `resolve:ssm:/aws/service/cloud9/amis/ubuntu-18.04-x86_64`
+    #
+    #   * Ubuntu 22.04:
+    #     `resolve:ssm:/aws/service/cloud9/amis/ubuntu-22.04-x86_64`
     #   @return [String]
     #
     # @!attribute [rw] automatic_stop_time_minutes
@@ -87,19 +112,34 @@ module Aws::Cloud9
     #
     # @!attribute [rw] owner_arn
     #   The Amazon Resource Name (ARN) of the environment owner. This ARN
-    #   can be the ARN of any AWS IAM principal. If this value is not
-    #   specified, the ARN defaults to this environment's creator.
+    #   can be the ARN of any IAM principal. If this value is not specified,
+    #   the ARN defaults to this environment's creator.
     #   @return [String]
     #
     # @!attribute [rw] tags
-    #   An array of key-value pairs that will be associated with the new AWS
+    #   An array of key-value pairs that will be associated with the new
     #   Cloud9 development environment.
     #   @return [Array<Types::Tag>]
     #
     # @!attribute [rw] connection_type
     #   The connection type used for connecting to an Amazon EC2
-    #   environment.
+    #   environment. Valid values are `CONNECT_SSH` (default) and
+    #   `CONNECT_SSM` (connected through Amazon EC2 Systems Manager).
+    #
+    #   For more information, see [Accessing no-ingress EC2 instances with
+    #   Amazon EC2 Systems Manager][1] in the *Cloud9 User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/cloud9/latest/user-guide/ec2-ssm.html
     #   @return [String]
+    #
+    # @!attribute [rw] dry_run
+    #   Checks whether you have the required permissions for the action,
+    #   without actually making the request, and provides an error response.
+    #   If you have the required permissions, the error response is
+    #   `DryRunOperation`. Otherwise, it is `UnauthorizedOperation`.
+    #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloud9-2017-09-23/CreateEnvironmentEC2Request AWS API Documentation
     #
@@ -109,11 +149,13 @@ module Aws::Cloud9
       :client_request_token,
       :instance_type,
       :subnet_id,
+      :image_id,
       :automatic_stop_time_minutes,
       :owner_arn,
       :tags,
-      :connection_type)
-      SENSITIVE = [:description]
+      :connection_type,
+      :dry_run)
+      SENSITIVE = [:description, :tags]
       include Aws::Structure
     end
 
@@ -129,15 +171,6 @@ module Aws::Cloud9
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateEnvironmentMembershipRequest
-    #   data as a hash:
-    #
-    #       {
-    #         environment_id: "EnvironmentId", # required
-    #         user_arn: "UserArn", # required
-    #         permissions: "read-write", # required, accepts read-write, read-only
-    #       }
-    #
     # @!attribute [rw] environment_id
     #   The ID of the environment that contains the environment member you
     #   want to add.
@@ -152,9 +185,9 @@ module Aws::Cloud9
     #   The type of environment member permissions you want to associate
     #   with this environment member. Available values include:
     #
-    #   * `read-only`\: Has read-only access to the environment.
+    #   * `read-only`: Has read-only access to the environment.
     #
-    #   * `read-write`\: Has read-write access to the environment.
+    #   * `read-write`: Has read-write access to the environment.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloud9-2017-09-23/CreateEnvironmentMembershipRequest AWS API Documentation
@@ -179,14 +212,6 @@ module Aws::Cloud9
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteEnvironmentMembershipRequest
-    #   data as a hash:
-    #
-    #       {
-    #         environment_id: "EnvironmentId", # required
-    #         user_arn: "UserArn", # required
-    #       }
-    #
     # @!attribute [rw] environment_id
     #   The ID of the environment to delete the environment member from.
     #   @return [String]
@@ -209,13 +234,6 @@ module Aws::Cloud9
     #
     class DeleteEnvironmentMembershipResult < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteEnvironmentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         environment_id: "EnvironmentId", # required
-    #       }
-    #
     # @!attribute [rw] environment_id
     #   The ID of the environment to delete.
     #   @return [String]
@@ -232,17 +250,6 @@ module Aws::Cloud9
     #
     class DeleteEnvironmentResult < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DescribeEnvironmentMembershipsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         user_arn: "UserArn",
-    #         environment_id: "EnvironmentId",
-    #         permissions: ["owner"], # accepts owner, read-write, read-only
-    #         next_token: "String",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] user_arn
     #   The Amazon Resource Name (ARN) of an individual environment member
     #   to get information about. If no value is specified, information
@@ -258,11 +265,11 @@ module Aws::Cloud9
     #   The type of environment member permissions to get information about.
     #   Available values include:
     #
-    #   * `owner`\: Owns the environment.
+    #   * `owner`: Owns the environment.
     #
-    #   * `read-only`\: Has read-only access to the environment.
+    #   * `read-only`: Has read-only access to the environment.
     #
-    #   * `read-write`\: Has read-write access to the environment.
+    #   * `read-write`: Has read-write access to the environment.
     #
     #   If no value is specified, information about all environment members
     #   are returned.
@@ -314,13 +321,6 @@ module Aws::Cloud9
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeEnvironmentStatusRequest
-    #   data as a hash:
-    #
-    #       {
-    #         environment_id: "EnvironmentId", # required
-    #       }
-    #
     # @!attribute [rw] environment_id
     #   The ID of the environment to get status information about.
     #   @return [String]
@@ -336,19 +336,19 @@ module Aws::Cloud9
     # @!attribute [rw] status
     #   The status of the environment. Available values include:
     #
-    #   * `connecting`\: The environment is connecting.
+    #   * `connecting`: The environment is connecting.
     #
-    #   * `creating`\: The environment is being created.
+    #   * `creating`: The environment is being created.
     #
-    #   * `deleting`\: The environment is being deleted.
+    #   * `deleting`: The environment is being deleted.
     #
-    #   * `error`\: The environment is in an error state.
+    #   * `error`: The environment is in an error state.
     #
-    #   * `ready`\: The environment is ready.
+    #   * `ready`: The environment is ready.
     #
-    #   * `stopped`\: The environment is stopped.
+    #   * `stopped`: The environment is stopped.
     #
-    #   * `stopping`\: The environment is stopping.
+    #   * `stopping`: The environment is stopping.
     #   @return [String]
     #
     # @!attribute [rw] message
@@ -364,13 +364,6 @@ module Aws::Cloud9
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeEnvironmentsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         environment_ids: ["EnvironmentId"], # required
-    #       }
-    #
     # @!attribute [rw] environment_ids
     #   The IDs of individual environments to get information about.
     #   @return [Array<String>]
@@ -395,7 +388,7 @@ module Aws::Cloud9
       include Aws::Structure
     end
 
-    # Information about an AWS Cloud9 development environment.
+    # Information about an Cloud9 development environment.
     #
     # @!attribute [rw] id
     #   The ID of the environment.
@@ -412,15 +405,15 @@ module Aws::Cloud9
     # @!attribute [rw] type
     #   The type of environment. Valid values include the following:
     #
-    #   * `ec2`\: An Amazon Elastic Compute Cloud (Amazon EC2) instance
+    #   * `ec2`: An Amazon Elastic Compute Cloud (Amazon EC2) instance
     #     connects to the environment.
     #
-    #   * `ssh`\: Your own server connects to the environment.
+    #   * `ssh`: Your own server connects to the environment.
     #   @return [String]
     #
     # @!attribute [rw] connection_type
     #   The connection type used for connecting to an Amazon EC2
-    #   environment.
+    #   environment. `CONNECT_SSH` is selected by default.
     #   @return [String]
     #
     # @!attribute [rw] arn
@@ -435,6 +428,31 @@ module Aws::Cloud9
     #   The state of the environment in its creation or deletion lifecycle.
     #   @return [Types::EnvironmentLifecycle]
     #
+    # @!attribute [rw] managed_credentials_status
+    #   Describes the status of Amazon Web Services managed temporary
+    #   credentials for the Cloud9 environment. Available values are:
+    #
+    #   * `ENABLED_ON_CREATE`
+    #
+    #   * `ENABLED_BY_OWNER`
+    #
+    #   * `DISABLED_BY_DEFAULT`
+    #
+    #   * `DISABLED_BY_OWNER`
+    #
+    #   * `DISABLED_BY_COLLABORATOR`
+    #
+    #   * `PENDING_REMOVAL_BY_COLLABORATOR`
+    #
+    #   * `PENDING_REMOVAL_BY_OWNER`
+    #
+    #   * `FAILED_REMOVAL_BY_COLLABORATOR`
+    #
+    #   * `ENABLED_BY_OWNER`
+    #
+    #   * `DISABLED_BY_DEFAULT`
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloud9-2017-09-23/Environment AWS API Documentation
     #
     class Environment < Struct.new(
@@ -445,26 +463,27 @@ module Aws::Cloud9
       :connection_type,
       :arn,
       :owner_arn,
-      :lifecycle)
+      :lifecycle,
+      :managed_credentials_status)
       SENSITIVE = [:description]
       include Aws::Structure
     end
 
     # Information about the current creation or deletion lifecycle state of
-    # an AWS Cloud9 development environment.
+    # an Cloud9 development environment.
     #
     # @!attribute [rw] status
     #   The current creation or deletion lifecycle state of the environment.
     #
-    #   * `CREATING`\: The environment is in the process of being created.
+    #   * `CREATING`: The environment is in the process of being created.
     #
-    #   * `CREATED`\: The environment was successfully created.
+    #   * `CREATED`: The environment was successfully created.
     #
-    #   * `CREATE_FAILED`\: The environment failed to be created.
+    #   * `CREATE_FAILED`: The environment failed to be created.
     #
-    #   * `DELETING`\: The environment is in the process of being deleted.
+    #   * `DELETING`: The environment is in the process of being deleted.
     #
-    #   * `DELETE_FAILED`\: The environment failed to delete.
+    #   * `DELETE_FAILED`: The environment failed to delete.
     #   @return [String]
     #
     # @!attribute [rw] reason
@@ -474,7 +493,7 @@ module Aws::Cloud9
     #
     # @!attribute [rw] failure_resource
     #   If the environment failed to delete, the Amazon Resource Name (ARN)
-    #   of the related AWS resource.
+    #   of the related Amazon Web Services resource.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloud9-2017-09-23/EnvironmentLifecycle AWS API Documentation
@@ -487,22 +506,22 @@ module Aws::Cloud9
       include Aws::Structure
     end
 
-    # Information about an environment member for an AWS Cloud9 development
+    # Information about an environment member for an Cloud9 development
     # environment.
     #
     # @!attribute [rw] permissions
     #   The type of environment member permissions associated with this
     #   environment member. Available values include:
     #
-    #   * `owner`\: Owns the environment.
+    #   * `owner`: Owns the environment.
     #
-    #   * `read-only`\: Has read-only access to the environment.
+    #   * `read-only`: Has read-only access to the environment.
     #
-    #   * `read-write`\: Has read-write access to the environment.
+    #   * `read-write`: Has read-write access to the environment.
     #   @return [String]
     #
     # @!attribute [rw] user_id
-    #   The user ID in AWS Identity and Access Management (AWS IAM) of the
+    #   The user ID in Identity and Access Management (IAM) of the
     #   environment member.
     #   @return [String]
     #
@@ -549,14 +568,6 @@ module Aws::Cloud9
     #
     class LimitExceededException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass ListEnvironmentsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "String",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   During a previous call, if there are more than 25 items in the list,
     #   only the first 25 items are returned, along with a unique string
@@ -600,16 +611,9 @@ module Aws::Cloud9
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "EnvironmentArn", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
-    #   The Amazon Resource Name (ARN) of the AWS Cloud9 development
-    #   environment to get the tags for.
+    #   The Amazon Resource Name (ARN) of the Cloud9 development environment
+    #   to get the tags for.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloud9-2017-09-23/ListTagsForResourceRequest AWS API Documentation
@@ -621,15 +625,14 @@ module Aws::Cloud9
     end
 
     # @!attribute [rw] tags
-    #   The list of tags associated with the AWS Cloud9 development
-    #   environment.
+    #   The list of tags associated with the Cloud9 development environment.
     #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloud9-2017-09-23/ListTagsForResourceResponse AWS API Documentation
     #
     class ListTagsForResourceResponse < Struct.new(
       :tags)
-      SENSITIVE = []
+      SENSITIVE = [:tags]
       include Aws::Structure
     end
 
@@ -639,20 +642,12 @@ module Aws::Cloud9
     #
     class NotFoundException < Aws::EmptyStructure; end
 
-    # Metadata that is associated with AWS resources. In particular, a
-    # name-value pair that can be associated with an AWS Cloud9 development
-    # environment. There are two types of tags: *user tags* and *system
-    # tags*. A user tag is created by the user. A system tag is
-    # automatically created by AWS services. A system tag is prefixed with
-    # "aws:" and cannot be modified by the user.
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey", # required
-    #         value: "TagValue", # required
-    #       }
+    # Metadata that is associated with Amazon Web Services resources. In
+    # particular, a name-value pair that can be associated with an Cloud9
+    # development environment. There are two types of tags: *user tags* and
+    # *system tags*. A user tag is created by the user. A system tag is
+    # automatically created by Amazon Web Services services. A system tag is
+    # prefixed with `"aws:"` and cannot be modified by the user.
     #
     # @!attribute [rw] key
     #   The **name** part of a tag.
@@ -667,31 +662,17 @@ module Aws::Cloud9
     class Tag < Struct.new(
       :key,
       :value)
-      SENSITIVE = []
+      SENSITIVE = [:key, :value]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "EnvironmentArn", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] resource_arn
-    #   The Amazon Resource Name (ARN) of the AWS Cloud9 development
-    #   environment to add tags to.
+    #   The Amazon Resource Name (ARN) of the Cloud9 development environment
+    #   to add tags to.
     #   @return [String]
     #
     # @!attribute [rw] tags
-    #   The list of tags to add to the given AWS Cloud9 development
-    #   environment.
+    #   The list of tags to add to the given Cloud9 development environment.
     #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloud9-2017-09-23/TagResourceRequest AWS API Documentation
@@ -699,7 +680,7 @@ module Aws::Cloud9
     class TagResourceRequest < Struct.new(
       :resource_arn,
       :tags)
-      SENSITIVE = []
+      SENSITIVE = [:tags]
       include Aws::Structure
     end
 
@@ -713,21 +694,13 @@ module Aws::Cloud9
     #
     class TooManyRequestsException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "EnvironmentArn", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
-    #   The Amazon Resource Name (ARN) of the AWS Cloud9 development
-    #   environment to remove tags from.
+    #   The Amazon Resource Name (ARN) of the Cloud9 development environment
+    #   to remove tags from.
     #   @return [String]
     #
     # @!attribute [rw] tag_keys
-    #   The tag names of the tags to remove from the given AWS Cloud9
+    #   The tag names of the tags to remove from the given Cloud9
     #   development environment.
     #   @return [Array<String>]
     #
@@ -736,7 +709,7 @@ module Aws::Cloud9
     class UntagResourceRequest < Struct.new(
       :resource_arn,
       :tag_keys)
-      SENSITIVE = []
+      SENSITIVE = [:tag_keys]
       include Aws::Structure
     end
 
@@ -744,15 +717,6 @@ module Aws::Cloud9
     #
     class UntagResourceResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UpdateEnvironmentMembershipRequest
-    #   data as a hash:
-    #
-    #       {
-    #         environment_id: "EnvironmentId", # required
-    #         user_arn: "UserArn", # required
-    #         permissions: "read-write", # required, accepts read-write, read-only
-    #       }
-    #
     # @!attribute [rw] environment_id
     #   The ID of the environment for the environment member whose settings
     #   you want to change.
@@ -767,9 +731,9 @@ module Aws::Cloud9
     #   The replacement type of environment member permissions you want to
     #   associate with this environment member. Available values include:
     #
-    #   * `read-only`\: Has read-only access to the environment.
+    #   * `read-only`: Has read-only access to the environment.
     #
-    #   * `read-write`\: Has read-write access to the environment.
+    #   * `read-write`: Has read-write access to the environment.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloud9-2017-09-23/UpdateEnvironmentMembershipRequest AWS API Documentation
@@ -795,15 +759,6 @@ module Aws::Cloud9
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateEnvironmentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         environment_id: "EnvironmentId", # required
-    #         name: "EnvironmentName",
-    #         description: "EnvironmentDescription",
-    #       }
-    #
     # @!attribute [rw] environment_id
     #   The ID of the environment to change settings.
     #   @return [String]
@@ -816,12 +771,30 @@ module Aws::Cloud9
     #   Any new or replacement description for the environment.
     #   @return [String]
     #
+    # @!attribute [rw] managed_credentials_action
+    #   Allows the environment owner to turn on or turn off the Amazon Web
+    #   Services managed temporary credentials for an Cloud9 environment by
+    #   using one of the following values:
+    #
+    #   * `ENABLE`
+    #
+    #   * `DISABLE`
+    #
+    #   <note markdown="1"> Only the environment owner can change the status of managed
+    #   temporary credentials. An `AccessDeniedException` is thrown if an
+    #   attempt to turn on or turn off managed temporary credentials is made
+    #   by an account that's not the environment owner.
+    #
+    #    </note>
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloud9-2017-09-23/UpdateEnvironmentRequest AWS API Documentation
     #
     class UpdateEnvironmentRequest < Struct.new(
       :environment_id,
       :name,
-      :description)
+      :description,
+      :managed_credentials_action)
       SENSITIVE = [:description]
       include Aws::Structure
     end
@@ -832,3 +805,4 @@ module Aws::Cloud9
 
   end
 end
+

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -78,6 +78,126 @@ module Aws::SESV2
     #
     class BadRequestException < Aws::EmptyStructure; end
 
+    # Represents a single metric data query to include in a batch.
+    #
+    # @!attribute [rw] id
+    #   The query identifier.
+    #   @return [String]
+    #
+    # @!attribute [rw] namespace
+    #   The query namespace - e.g. `VDM`
+    #   @return [String]
+    #
+    # @!attribute [rw] metric
+    #   The queried metric. This can be one of the following:
+    #
+    #   * `SEND` – Emails sent eligible for tracking in the VDM dashboard.
+    #     This excludes emails sent to the mailbox simulator and emails
+    #     addressed to more than one recipient.
+    #
+    #   * `COMPLAINT` – Complaints received for your account. This excludes
+    #     complaints from the mailbox simulator, those originating from your
+    #     account-level suppression list (if enabled), and those for emails
+    #     addressed to more than one recipient
+    #
+    #   * `PERMANENT_BOUNCE` – Permanent bounces - i.e. feedback received
+    #     for emails sent to non-existent mailboxes. Excludes bounces from
+    #     the mailbox simulator, those originating from your account-level
+    #     suppression list (if enabled), and those for emails addressed to
+    #     more than one recipient.
+    #
+    #   * `TRANSIENT_BOUNCE` – Transient bounces - i.e. feedback received
+    #     for delivery failures excluding issues with non-existent
+    #     mailboxes. Excludes bounces from the mailbox simulator, and those
+    #     for emails addressed to more than one recipient.
+    #
+    #   * `OPEN` – Unique open events for emails including open trackers.
+    #     Excludes opens for emails addressed to more than one recipient.
+    #
+    #   * `CLICK` – Unique click events for emails including wrapped links.
+    #     Excludes clicks for emails addressed to more than one recipient.
+    #
+    #   * `DELIVERY` – Successful deliveries for email sending attempts.
+    #     Excludes deliveries to the mailbox simulator and for emails
+    #     addressed to more than one recipient.
+    #
+    #   * `DELIVERY_OPEN` – Successful deliveries for email sending
+    #     attempts. Excludes deliveries to the mailbox simulator, for emails
+    #     addressed to more than one recipient, and emails without open
+    #     trackers.
+    #
+    #   * `DELIVERY_CLICK` – Successful deliveries for email sending
+    #     attempts. Excludes deliveries to the mailbox simulator, for emails
+    #     addressed to more than one recipient, and emails without click
+    #     trackers.
+    #
+    #   * `DELIVERY_COMPLAINT` – Successful deliveries for email sending
+    #     attempts. Excludes deliveries to the mailbox simulator, for emails
+    #     addressed to more than one recipient, and emails addressed to
+    #     recipients hosted by ISPs with which Amazon SES does not have a
+    #     feedback loop agreement.
+    #   @return [String]
+    #
+    # @!attribute [rw] dimensions
+    #   An object that contains mapping between `MetricDimensionName` and
+    #   `MetricDimensionValue` to filter metrics by.
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] start_date
+    #   Represents the start date for the query interval.
+    #   @return [Time]
+    #
+    # @!attribute [rw] end_date
+    #   Represents the end date for the query interval.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/BatchGetMetricDataQuery AWS API Documentation
+    #
+    class BatchGetMetricDataQuery < Struct.new(
+      :id,
+      :namespace,
+      :metric,
+      :dimensions,
+      :start_date,
+      :end_date)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Represents a request to retrieve a batch of metric data.
+    #
+    # @!attribute [rw] queries
+    #   A list of queries for metrics to be retrieved.
+    #   @return [Array<Types::BatchGetMetricDataQuery>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/BatchGetMetricDataRequest AWS API Documentation
+    #
+    class BatchGetMetricDataRequest < Struct.new(
+      :queries)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Represents the result of processing your metric data batch request
+    #
+    # @!attribute [rw] results
+    #   A list of successfully retrieved `MetricDataResult`.
+    #   @return [Array<Types::MetricDataResult>]
+    #
+    # @!attribute [rw] errors
+    #   A list of `MetricDataError` encountered while processing your metric
+    #   data batch request.
+    #   @return [Array<Types::MetricDataError>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/BatchGetMetricDataResponse AWS API Documentation
+    #
+    class BatchGetMetricDataResponse < Struct.new(
+      :results,
+      :errors)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # An object that contains information about a blacklisting event that
     # impacts one of the dedicated IP addresses that is associated with your
     # account.
@@ -87,8 +207,7 @@ module Aws::SESV2
     #   @return [String]
     #
     # @!attribute [rw] listing_time
-    #   The time when the blacklisting event occurred, shown in Unix time
-    #   format.
+    #   The time when the blacklisting event occurred.
     #   @return [Time]
     #
     # @!attribute [rw] description
@@ -107,20 +226,6 @@ module Aws::SESV2
     end
 
     # Represents the body of the email message.
-    #
-    # @note When making an API call, you may pass Body
-    #   data as a hash:
-    #
-    #       {
-    #         text: {
-    #           data: "MessageData", # required
-    #           charset: "Charset",
-    #         },
-    #         html: {
-    #           data: "MessageData", # required
-    #           charset: "Charset",
-    #         },
-    #       }
     #
     # @!attribute [rw] text
     #   An object that represents the version of the message that is
@@ -143,19 +248,36 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # Information about a `Bounce` event.
+    #
+    # @!attribute [rw] bounce_type
+    #   The type of the bounce, as determined by SES. Can be one of
+    #   `UNDETERMINED`, `TRANSIENT`, or `PERMANENT`
+    #   @return [String]
+    #
+    # @!attribute [rw] bounce_sub_type
+    #   The subtype of the bounce, as determined by SES.
+    #   @return [String]
+    #
+    # @!attribute [rw] diagnostic_code
+    #   The status code issued by the reporting Message Transfer Authority
+    #   (MTA). This field only appears if a delivery status notification
+    #   (DSN) was attached to the bounce and the `Diagnostic-Code` was
+    #   provided in the DSN.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/Bounce AWS API Documentation
+    #
+    class Bounce < Struct.new(
+      :bounce_type,
+      :bounce_sub_type,
+      :diagnostic_code)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # An object that contains the body of the message. You can specify a
     # template message.
-    #
-    # @note When making an API call, you may pass BulkEmailContent
-    #   data as a hash:
-    #
-    #       {
-    #         template: {
-    #           template_name: "EmailTemplateName",
-    #           template_arn: "AmazonResourceName",
-    #           template_data: "EmailTemplateData",
-    #         },
-    #       }
     #
     # @!attribute [rw] template
     #   The template to use for the bulk email message.
@@ -169,28 +291,6 @@ module Aws::SESV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BulkEmailEntry
-    #   data as a hash:
-    #
-    #       {
-    #         destination: { # required
-    #           to_addresses: ["EmailAddress"],
-    #           cc_addresses: ["EmailAddress"],
-    #           bcc_addresses: ["EmailAddress"],
-    #         },
-    #         replacement_tags: [
-    #           {
-    #             name: "MessageTagName", # required
-    #             value: "MessageTagValue", # required
-    #           },
-    #         ],
-    #         replacement_email_content: {
-    #           replacement_template: {
-    #             replacement_template_data: "EmailTemplateData",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] destination
     #   Represents the destination of the message, consisting of To:, CC:,
     #   and BCC: fields.
@@ -222,12 +322,36 @@ module Aws::SESV2
     #   The `ReplacementEmailContent` associated with a `BulkEmailEntry`.
     #   @return [Types::ReplacementEmailContent]
     #
+    # @!attribute [rw] replacement_headers
+    #   The list of message headers associated with the `BulkEmailEntry`
+    #   data type.
+    #
+    #   * Headers Not Present in `BulkEmailEntry`: If a header is specified
+    #     in [ `Template` ][1] but not in `BulkEmailEntry`, the header from
+    #     `Template` will be added to the outgoing email.
+    #
+    #   * Headers Present in `BulkEmailEntry`: If a header is specified in
+    #     `BulkEmailEntry`, it takes precedence over any header of the same
+    #     name specified in [ `Template` ][1]:
+    #
+    #     * If the header is also defined within `Template`, the value from
+    #       `BulkEmailEntry` will replace the header's value in the email.
+    #
+    #     * If the header is not defined within `Template`, it will simply
+    #       be added to the email as specified in `BulkEmailEntry`.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/ses/latest/APIReference-V2/API_Template.html
+    #   @return [Array<Types::MessageHeader>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/BulkEmailEntry AWS API Documentation
     #
     class BulkEmailEntry < Struct.new(
       :destination,
       :replacement_tags,
-      :replacement_email_content)
+      :replacement_email_content,
+      :replacement_headers)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -313,22 +437,30 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # Represents a request to cancel an export job using the export job ID.
+    #
+    # @!attribute [rw] job_id
+    #   The export job ID.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/CancelExportJobRequest AWS API Documentation
+    #
+    class CancelExportJobRequest < Struct.new(
+      :job_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An HTTP 200 response if the request succeeds, or an error message if
+    # the request fails.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/CancelExportJobResponse AWS API Documentation
+    #
+    class CancelExportJobResponse < Aws::EmptyStructure; end
+
     # An object that defines an Amazon CloudWatch destination for email
     # events. You can use Amazon CloudWatch to monitor and gain insights on
     # your email sending metrics.
-    #
-    # @note When making an API call, you may pass CloudWatchDestination
-    #   data as a hash:
-    #
-    #       {
-    #         dimension_configurations: [ # required
-    #           {
-    #             dimension_name: "DimensionName", # required
-    #             dimension_value_source: "MESSAGE_TAG", # required, accepts MESSAGE_TAG, EMAIL_HEADER, LINK_TAG
-    #             default_dimension_value: "DefaultDimensionValue", # required
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] dimension_configurations
     #   An array of objects that define the dimensions to use when you send
@@ -346,15 +478,6 @@ module Aws::SESV2
     # An object that defines the dimension configuration to use when you
     # send email events to Amazon CloudWatch.
     #
-    # @note When making an API call, you may pass CloudWatchDimensionConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         dimension_name: "DimensionName", # required
-    #         dimension_value_source: "MESSAGE_TAG", # required, accepts MESSAGE_TAG, EMAIL_HEADER, LINK_TAG
-    #         default_dimension_value: "DefaultDimensionValue", # required
-    #       }
-    #
     # @!attribute [rw] dimension_name
     #   The name of an Amazon CloudWatch dimension associated with an email
     #   sending metric. The name has to meet the following criteria:
@@ -367,11 +490,11 @@ module Aws::SESV2
     #
     # @!attribute [rw] dimension_value_source
     #   The location where the Amazon SES API v2 finds the value of a
-    #   dimension to publish to Amazon CloudWatch. If you want to use the
-    #   message tags that you specify using an `X-SES-MESSAGE-TAGS` header
-    #   or a parameter to the `SendEmail` or `SendRawEmail` API, choose
-    #   `messageTag`. If you want to use your own email headers, choose
-    #   `emailHeader`. If you want to use link tags, choose `linkTags`.
+    #   dimension to publish to Amazon CloudWatch. To use the message tags
+    #   that you specify using an `X-SES-MESSAGE-TAGS` header or a parameter
+    #   to the `SendEmail` or `SendRawEmail` API, choose `messageTag`. To
+    #   use your own email headers, choose `emailHeader`. To use link tags,
+    #   choose `linkTags`.
     #   @return [String]
     #
     # @!attribute [rw] default_dimension_value
@@ -379,8 +502,8 @@ module Aws::SESV2
     #   CloudWatch if you don't provide the value of the dimension when you
     #   send an email. This value has to meet the following criteria:
     #
-    #   * It can only contain ASCII letters (a–z, A–Z), numbers (0–9),
-    #     underscores (\_), or dashes (-).
+    #   * Can only contain ASCII letters (a–z, A–Z), numbers (0–9),
+    #     underscores (\_), or dashes (-), at signs (@), and periods (.).
     #
     #   * It can contain no more than 256 characters.
     #   @return [String]
@@ -391,6 +514,29 @@ module Aws::SESV2
       :dimension_name,
       :dimension_value_source,
       :default_dimension_value)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about a `Complaint` event.
+    #
+    # @!attribute [rw] complaint_sub_type
+    #   Can either be `null` or `OnAccountSuppressionList`. If the value is
+    #   `OnAccountSuppressionList`, SES accepted the message, but didn't
+    #   attempt to send it because it was on the account-level suppression
+    #   list.
+    #   @return [String]
+    #
+    # @!attribute [rw] complaint_feedback_type
+    #   The value of the `Feedback-Type` field from the feedback report
+    #   received from the ISP.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/Complaint AWS API Documentation
+    #
+    class Complaint < Struct.new(
+      :complaint_sub_type,
+      :complaint_feedback_type)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -466,21 +612,13 @@ module Aws::SESV2
 
     # An object that contains details about the action of a contact list.
     #
-    # @note When making an API call, you may pass ContactListDestination
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #         contact_list_import_action: "DELETE", # required, accepts DELETE, PUT
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list.
     #   @return [String]
     #
     # @!attribute [rw] contact_list_import_action
-    #   &gt;The type of action that you want to perform on the addresses.
-    #   Acceptable values:
+    #   &gt;The type of action to perform on the addresses. The following
+    #   are the possible values:
     #
     #   * PUT: add the addresses to the contact list. If the record already
     #     exists, it will override it with the new value.
@@ -499,14 +637,6 @@ module Aws::SESV2
 
     # An object that represents the content of the email, and optionally a
     # character set specification.
-    #
-    # @note When making an API call, you may pass Content
-    #   data as a hash:
-    #
-    #       {
-    #         data: "MessageData", # required
-    #         charset: "Charset",
-    #       }
     #
     # @!attribute [rw] data
     #   The content of the message itself.
@@ -531,40 +661,8 @@ module Aws::SESV2
 
     # A request to add an event destination to a configuration set.
     #
-    # @note When making an API call, you may pass CreateConfigurationSetEventDestinationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #         event_destination_name: "EventDestinationName", # required
-    #         event_destination: { # required
-    #           enabled: false,
-    #           matching_event_types: ["SEND"], # accepts SEND, REJECT, BOUNCE, COMPLAINT, DELIVERY, OPEN, CLICK, RENDERING_FAILURE, DELIVERY_DELAY, SUBSCRIPTION
-    #           kinesis_firehose_destination: {
-    #             iam_role_arn: "AmazonResourceName", # required
-    #             delivery_stream_arn: "AmazonResourceName", # required
-    #           },
-    #           cloud_watch_destination: {
-    #             dimension_configurations: [ # required
-    #               {
-    #                 dimension_name: "DimensionName", # required
-    #                 dimension_value_source: "MESSAGE_TAG", # required, accepts MESSAGE_TAG, EMAIL_HEADER, LINK_TAG
-    #                 default_dimension_value: "DefaultDimensionValue", # required
-    #               },
-    #             ],
-    #           },
-    #           sns_destination: {
-    #             topic_arn: "AmazonResourceName", # required
-    #           },
-    #           pinpoint_destination: {
-    #             application_arn: "AmazonResourceName",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set that you want to add an event
-    #   destination to.
+    #   The name of the configuration set .
     #   @return [String]
     #
     # @!attribute [rw] event_destination_name
@@ -595,38 +693,10 @@ module Aws::SESV2
 
     # A request to create a configuration set.
     #
-    # @note When making an API call, you may pass CreateConfigurationSetRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #         tracking_options: {
-    #           custom_redirect_domain: "CustomRedirectDomain", # required
-    #         },
-    #         delivery_options: {
-    #           tls_policy: "REQUIRE", # accepts REQUIRE, OPTIONAL
-    #           sending_pool_name: "PoolName",
-    #         },
-    #         reputation_options: {
-    #           reputation_metrics_enabled: false,
-    #           last_fresh_start: Time.now,
-    #         },
-    #         sending_options: {
-    #           sending_enabled: false,
-    #         },
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #         suppression_options: {
-    #           suppressed_reasons: ["BOUNCE"], # accepts BOUNCE, COMPLAINT
-    #         },
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set.
+    #   The name of the configuration set. The name can contain up to 64
+    #   alphanumeric characters, including letters, numbers, hyphens (-) and
+    #   underscores (\_) only.
     #   @return [String]
     #
     # @!attribute [rw] tracking_options
@@ -650,14 +720,19 @@ module Aws::SESV2
     #   @return [Types::SendingOptions]
     #
     # @!attribute [rw] tags
-    #   An array of objects that define the tags (keys and values) that you
-    #   want to associate with the configuration set.
+    #   An array of objects that define the tags (keys and values) to
+    #   associate with the configuration set.
     #   @return [Array<Types::Tag>]
     #
     # @!attribute [rw] suppression_options
     #   An object that contains information about the suppression list
     #   preferences for your account.
     #   @return [Types::SuppressionOptions]
+    #
+    # @!attribute [rw] vdm_options
+    #   An object that defines the VDM options for emails that you send
+    #   using the configuration set.
+    #   @return [Types::VdmOptions]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/CreateConfigurationSetRequest AWS API Documentation
     #
@@ -668,7 +743,8 @@ module Aws::SESV2
       :reputation_options,
       :sending_options,
       :tags,
-      :suppression_options)
+      :suppression_options,
+      :vdm_options)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -680,28 +756,6 @@ module Aws::SESV2
     #
     class CreateConfigurationSetResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass CreateContactListRequest
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #         topics: [
-    #           {
-    #             topic_name: "TopicName", # required
-    #             display_name: "DisplayName", # required
-    #             description: "Description",
-    #             default_subscription_status: "OPT_IN", # required, accepts OPT_IN, OPT_OUT
-    #           },
-    #         ],
-    #         description: "Description",
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list.
     #   @return [String]
@@ -734,22 +788,6 @@ module Aws::SESV2
     #
     class CreateContactListResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass CreateContactRequest
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #         email_address: "EmailAddress", # required
-    #         topic_preferences: [
-    #           {
-    #             topic_name: "TopicName", # required
-    #             subscription_status: "OPT_IN", # required, accepts OPT_IN, OPT_OUT
-    #           },
-    #         ],
-    #         unsubscribe_all: false,
-    #         attributes_data: "AttributesData",
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list to which the contact should be added.
     #   @return [String]
@@ -790,18 +828,6 @@ module Aws::SESV2
 
     # Represents a request to create a custom verification email template.
     #
-    # @note When making an API call, you may pass CreateCustomVerificationEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "EmailTemplateName", # required
-    #         from_email_address: "EmailAddress", # required
-    #         template_subject: "EmailTemplateSubject", # required
-    #         template_content: "TemplateContent", # required
-    #         success_redirection_url: "SuccessRedirectionURL", # required
-    #         failure_redirection_url: "FailureRedirectionURL", # required
-    #       }
-    #
     # @!attribute [rw] template_name
     #   The name of the custom verification email template.
     #   @return [String]
@@ -818,12 +844,12 @@ module Aws::SESV2
     #   The content of the custom verification email. The total size of the
     #   email must be less than 10 MB. The message body may contain HTML,
     #   with some limitations. For more information, see [Custom
-    #   Verification Email Frequently Asked Questions][1] in the *Amazon SES
+    #   verification email frequently asked questions][1] in the *Amazon SES
     #   Developer Guide*.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-email-verify-address-custom.html#custom-verification-emails-faq
+    #   [1]: https://docs.aws.amazon.com/ses/latest/dg/creating-identities.html#send-email-verify-address-custom-faq
     #   @return [String]
     #
     # @!attribute [rw] success_redirection_url
@@ -858,19 +884,6 @@ module Aws::SESV2
 
     # A request to create a new dedicated IP pool.
     #
-    # @note When making an API call, you may pass CreateDedicatedIpPoolRequest
-    #   data as a hash:
-    #
-    #       {
-    #         pool_name: "PoolName", # required
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] pool_name
     #   The name of the dedicated IP pool.
     #   @return [String]
@@ -880,11 +893,16 @@ module Aws::SESV2
     #   associate with the pool.
     #   @return [Array<Types::Tag>]
     #
+    # @!attribute [rw] scaling_mode
+    #   The type of scaling mode.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/CreateDedicatedIpPoolRequest AWS API Documentation
     #
     class CreateDedicatedIpPoolRequest < Struct.new(
       :pool_name,
-      :tags)
+      :tags,
+      :scaling_mode)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -906,46 +924,6 @@ module Aws::SESV2
     # complete. When the test is complete, you can use the
     # `GetDeliverabilityTestReport` operation to view the results of the
     # test.
-    #
-    # @note When making an API call, you may pass CreateDeliverabilityTestReportRequest
-    #   data as a hash:
-    #
-    #       {
-    #         report_name: "ReportName",
-    #         from_email_address: "EmailAddress", # required
-    #         content: { # required
-    #           simple: {
-    #             subject: { # required
-    #               data: "MessageData", # required
-    #               charset: "Charset",
-    #             },
-    #             body: { # required
-    #               text: {
-    #                 data: "MessageData", # required
-    #                 charset: "Charset",
-    #               },
-    #               html: {
-    #                 data: "MessageData", # required
-    #                 charset: "Charset",
-    #               },
-    #             },
-    #           },
-    #           raw: {
-    #             data: "data", # required
-    #           },
-    #           template: {
-    #             template_name: "EmailTemplateName",
-    #             template_arn: "AmazonResourceName",
-    #             template_data: "EmailTemplateData",
-    #           },
-    #         },
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] report_name
     #   A unique name that helps you to identify the predictive inbox
@@ -1012,17 +990,8 @@ module Aws::SESV2
     #
     # [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization-identity-owner-tasks-management.html
     #
-    # @note When making an API call, you may pass CreateEmailIdentityPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #         policy_name: "PolicyName", # required
-    #         policy: "Policy", # required
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The email identity for which you want to create a policy.
+    #   The email identity.
     #   @return [String]
     #
     # @!attribute [rw] policy_name
@@ -1064,37 +1033,20 @@ module Aws::SESV2
     # A request to begin the verification process for an email identity (an
     # email address or domain).
     #
-    # @note When making an API call, you may pass CreateEmailIdentityRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #         dkim_signing_attributes: {
-    #           domain_signing_selector: "Selector", # required
-    #           domain_signing_private_key: "PrivateKey", # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The email address or domain that you want to verify.
+    #   The email address or domain to verify.
     #   @return [String]
     #
     # @!attribute [rw] tags
-    #   An array of objects that define the tags (keys and values) that you
-    #   want to associate with the email identity.
+    #   An array of objects that define the tags (keys and values) to
+    #   associate with the email identity.
     #   @return [Array<Types::Tag>]
     #
     # @!attribute [rw] dkim_signing_attributes
     #   If your request includes this object, Amazon SES configures the
     #   identity to use Bring Your Own DKIM (BYODKIM) for DKIM
-    #   authentication purposes, as opposed to the default method, [Easy
-    #   DKIM][1].
+    #   authentication purposes, or, configures the key length to be used
+    #   for [Easy DKIM][1].
     #
     #   You can only specify this object if the email identity is a domain,
     #   as opposed to an address.
@@ -1104,12 +1056,19 @@ module Aws::SESV2
     #   [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/easy-dkim.html
     #   @return [Types::DkimSigningAttributes]
     #
+    # @!attribute [rw] configuration_set_name
+    #   The configuration set to use by default when sending from this
+    #   identity. Note that any configuration set defined in the email
+    #   sending request takes precedence.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/CreateEmailIdentityRequest AWS API Documentation
     #
     class CreateEmailIdentityRequest < Struct.new(
       :email_identity,
       :tags,
-      :dkim_signing_attributes)
+      :dkim_signing_attributes,
+      :configuration_set_name)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1120,7 +1079,8 @@ module Aws::SESV2
     # If the email identity is an email address, this object is empty.
     #
     # @!attribute [rw] identity_type
-    #   The email identity type.
+    #   The email identity type. Note: the `MANAGED_DOMAIN` identity type is
+    #   not supported.
     #   @return [String]
     #
     # @!attribute [rw] verified_for_sending_status
@@ -1155,20 +1115,8 @@ module Aws::SESV2
     #
     # [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-personalized-email-api.html
     #
-    # @note When making an API call, you may pass CreateEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "EmailTemplateName", # required
-    #         template_content: { # required
-    #           subject: "EmailTemplateSubject",
-    #           text: "EmailTemplateText",
-    #           html: "EmailTemplateHtml",
-    #         },
-    #       }
-    #
     # @!attribute [rw] template_name
-    #   The name of the template you want to create.
+    #   The name of the template.
     #   @return [String]
     #
     # @!attribute [rw] template_content
@@ -1192,27 +1140,43 @@ module Aws::SESV2
     #
     class CreateEmailTemplateResponse < Aws::EmptyStructure; end
 
-    # Represents a request to create an import job from a data source for a
+    # Represents a request to create an export job from a data source to a
     # data destination.
     #
-    # @note When making an API call, you may pass CreateImportJobRequest
-    #   data as a hash:
+    # @!attribute [rw] export_data_source
+    #   The data source for the export job.
+    #   @return [Types::ExportDataSource]
     #
-    #       {
-    #         import_destination: { # required
-    #           suppression_list_destination: {
-    #             suppression_list_import_action: "DELETE", # required, accepts DELETE, PUT
-    #           },
-    #           contact_list_destination: {
-    #             contact_list_name: "ContactListName", # required
-    #             contact_list_import_action: "DELETE", # required, accepts DELETE, PUT
-    #           },
-    #         },
-    #         import_data_source: { # required
-    #           s3_url: "S3Url", # required
-    #           data_format: "CSV", # required, accepts CSV, JSON
-    #         },
-    #       }
+    # @!attribute [rw] export_destination
+    #   The destination for the export job.
+    #   @return [Types::ExportDestination]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/CreateExportJobRequest AWS API Documentation
+    #
+    class CreateExportJobRequest < Struct.new(
+      :export_data_source,
+      :export_destination)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An HTTP 200 response if the request succeeds, or an error message if
+    # the request fails.
+    #
+    # @!attribute [rw] job_id
+    #   A string that represents the export job ID.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/CreateExportJobResponse AWS API Documentation
+    #
+    class CreateExportJobResponse < Struct.new(
+      :job_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Represents a request to create an import job from a data source for a
+    # data destination.
     #
     # @!attribute [rw] import_destination
     #   The destination for the import job.
@@ -1310,6 +1274,50 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # An object containing additional settings for your VDM configuration as
+    # applicable to the Dashboard.
+    #
+    # @!attribute [rw] engagement_metrics
+    #   Specifies the status of your VDM engagement metrics collection. Can
+    #   be one of the following:
+    #
+    #   * `ENABLED` – Amazon SES enables engagement metrics for your
+    #     account.
+    #
+    #   * `DISABLED` – Amazon SES disables engagement metrics for your
+    #     account.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/DashboardAttributes AWS API Documentation
+    #
+    class DashboardAttributes < Struct.new(
+      :engagement_metrics)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object containing additional settings for your VDM configuration as
+    # applicable to the Dashboard.
+    #
+    # @!attribute [rw] engagement_metrics
+    #   Specifies the status of your VDM engagement metrics collection. Can
+    #   be one of the following:
+    #
+    #   * `ENABLED` – Amazon SES enables engagement metrics for the
+    #     configuration set.
+    #
+    #   * `DISABLED` – Amazon SES disables engagement metrics for the
+    #     configuration set.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/DashboardOptions AWS API Documentation
+    #
+    class DashboardOptions < Struct.new(
+      :engagement_metrics)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Contains information about a dedicated IP address that is associated
     # with your Amazon SES account.
     #
@@ -1358,23 +1366,40 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # Contains information about a dedicated IP pool.
+    #
+    # @!attribute [rw] pool_name
+    #   The name of the dedicated IP pool.
+    #   @return [String]
+    #
+    # @!attribute [rw] scaling_mode
+    #   The type of the dedicated IP pool.
+    #
+    #   * `STANDARD` – A dedicated IP pool where you can control which IPs
+    #     are part of the pool.
+    #
+    #   * `MANAGED` – A dedicated IP pool where the reputation and number of
+    #     IPs are automatically managed by Amazon SES.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/DedicatedIpPool AWS API Documentation
+    #
+    class DedicatedIpPool < Struct.new(
+      :pool_name,
+      :scaling_mode)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # A request to delete an event destination from a configuration set.
-    #
-    # @note When making an API call, you may pass DeleteConfigurationSetEventDestinationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #         event_destination_name: "EventDestinationName", # required
-    #       }
     #
     # @!attribute [rw] configuration_set_name
     #   The name of the configuration set that contains the event
-    #   destination that you want to delete.
+    #   destination to delete.
     #   @return [String]
     #
     # @!attribute [rw] event_destination_name
-    #   The name of the event destination that you want to delete.
+    #   The name of the event destination to delete.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/DeleteConfigurationSetEventDestinationRequest AWS API Documentation
@@ -1395,15 +1420,8 @@ module Aws::SESV2
 
     # A request to delete a configuration set.
     #
-    # @note When making an API call, you may pass DeleteConfigurationSetRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set that you want to delete.
+    #   The name of the configuration set.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/DeleteConfigurationSetRequest AWS API Documentation
@@ -1421,13 +1439,6 @@ module Aws::SESV2
     #
     class DeleteConfigurationSetResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteContactListRequest
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list.
     #   @return [String]
@@ -1444,14 +1455,6 @@ module Aws::SESV2
     #
     class DeleteContactListResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteContactRequest
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #         email_address: "EmailAddress", # required
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list from which the contact should be
     #   removed.
@@ -1477,13 +1480,6 @@ module Aws::SESV2
     # Represents a request to delete an existing custom verification email
     # template.
     #
-    # @note When making an API call, you may pass DeleteCustomVerificationEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "EmailTemplateName", # required
-    #       }
-    #
     # @!attribute [rw] template_name
     #   The name of the custom verification email template that you want to
     #   delete.
@@ -1505,13 +1501,6 @@ module Aws::SESV2
     class DeleteCustomVerificationEmailTemplateResponse < Aws::EmptyStructure; end
 
     # A request to delete a dedicated IP pool.
-    #
-    # @note When making an API call, you may pass DeleteDedicatedIpPoolRequest
-    #   data as a hash:
-    #
-    #       {
-    #         pool_name: "PoolName", # required
-    #       }
     #
     # @!attribute [rw] pool_name
     #   The name of the dedicated IP pool that you want to delete.
@@ -1541,16 +1530,8 @@ module Aws::SESV2
     #
     # [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization-identity-owner-tasks-management.html
     #
-    # @note When making an API call, you may pass DeleteEmailIdentityPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #         policy_name: "PolicyName", # required
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The email identity for which you want to delete a policy.
+    #   The email identity.
     #   @return [String]
     #
     # @!attribute [rw] policy_name
@@ -1581,16 +1562,8 @@ module Aws::SESV2
     # can restore your ability to send email by completing the verification
     # process for the identity again.
     #
-    # @note When making an API call, you may pass DeleteEmailIdentityRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The identity (that is, the email address or domain) that you want to
-    #   delete.
+    #   The identity (that is, the email address or domain) to delete.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/DeleteEmailIdentityRequest AWS API Documentation
@@ -1615,13 +1588,6 @@ module Aws::SESV2
     #
     # [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-personalized-email-api.html
     #
-    # @note When making an API call, you may pass DeleteEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "EmailTemplateName", # required
-    #       }
-    #
     # @!attribute [rw] template_name
     #   The name of the template to be deleted.
     #   @return [String]
@@ -1643,13 +1609,6 @@ module Aws::SESV2
 
     # A request to remove an email address from the suppression list for
     # your account.
-    #
-    # @note When making an API call, you may pass DeleteSuppressedDestinationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_address: "EmailAddress", # required
-    #       }
     #
     # @!attribute [rw] email_address
     #   The suppressed email destination to remove from the account
@@ -1695,7 +1654,7 @@ module Aws::SESV2
     #
     # @!attribute [rw] create_date
     #   The date and time when the predictive inbox placement test was
-    #   created, in Unix time format.
+    #   created.
     #   @return [Time]
     #
     # @!attribute [rw] deliverability_test_status
@@ -1722,14 +1681,6 @@ module Aws::SESV2
 
     # Used to associate a configuration set with a dedicated IP pool.
     #
-    # @note When making an API call, you may pass DeliveryOptions
-    #   data as a hash:
-    #
-    #       {
-    #         tls_policy: "REQUIRE", # accepts REQUIRE, OPTIONAL
-    #         sending_pool_name: "PoolName",
-    #       }
-    #
     # @!attribute [rw] tls_policy
     #   Specifies whether messages that use the configuration set are
     #   required to use Transport Layer Security (TLS). If the value is
@@ -1739,8 +1690,8 @@ module Aws::SESV2
     #   @return [String]
     #
     # @!attribute [rw] sending_pool_name
-    #   The name of the dedicated IP pool that you want to associate with
-    #   the configuration set.
+    #   The name of the dedicated IP pool to associate with the
+    #   configuration set.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/DeliveryOptions AWS API Documentation
@@ -1754,14 +1705,20 @@ module Aws::SESV2
 
     # An object that describes the recipients for an email.
     #
-    # @note When making an API call, you may pass Destination
-    #   data as a hash:
+    # <note markdown="1"> Amazon SES does not support the SMTPUTF8 extension, as described in
+    # [RFC6531][1]. For this reason, the *local part* of a destination email
+    # address (the part of the email address that precedes the @ sign) may
+    # only contain [7-bit ASCII characters][2]. If the *domain part* of an
+    # address (the part after the @ sign) contains non-ASCII characters,
+    # they must be encoded using Punycode, as described in [RFC3492][3].
     #
-    #       {
-    #         to_addresses: ["EmailAddress"],
-    #         cc_addresses: ["EmailAddress"],
-    #         bcc_addresses: ["EmailAddress"],
-    #       }
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://tools.ietf.org/html/rfc6531
+    # [2]: https://en.wikipedia.org/wiki/Email_address#Local-part
+    # [3]: https://tools.ietf.org/html/rfc3492.html
     #
     # @!attribute [rw] to_addresses
     #   An array that contains the email addresses of the "To" recipients
@@ -1856,7 +1813,7 @@ module Aws::SESV2
     #
     # @!attribute [rw] signing_attributes_origin
     #   A string that indicates how DKIM was configured for the identity.
-    #   There are two possible values:
+    #   These are the possible values:
     #
     #   * `AWS_SES` – Indicates that DKIM was configured for the identity by
     #     using [Easy DKIM][1].
@@ -1869,45 +1826,61 @@ module Aws::SESV2
     #   [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/easy-dkim.html
     #   @return [String]
     #
+    # @!attribute [rw] next_signing_key_length
+    #   \[Easy DKIM\] The key length of the future DKIM key pair to be
+    #   generated. This can be changed at most once per day.
+    #   @return [String]
+    #
+    # @!attribute [rw] current_signing_key_length
+    #   \[Easy DKIM\] The key length of the DKIM key pair in use.
+    #   @return [String]
+    #
+    # @!attribute [rw] last_key_generation_timestamp
+    #   \[Easy DKIM\] The last time a key pair was generated for this
+    #   identity.
+    #   @return [Time]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/DkimAttributes AWS API Documentation
     #
     class DkimAttributes < Struct.new(
       :signing_enabled,
       :status,
       :tokens,
-      :signing_attributes_origin)
+      :signing_attributes_origin,
+      :next_signing_key_length,
+      :current_signing_key_length,
+      :last_key_generation_timestamp)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # An object that contains information about the tokens used for setting
-    # up Bring Your Own DKIM (BYODKIM).
-    #
-    # @note When making an API call, you may pass DkimSigningAttributes
-    #   data as a hash:
-    #
-    #       {
-    #         domain_signing_selector: "Selector", # required
-    #         domain_signing_private_key: "PrivateKey", # required
-    #       }
+    # An object that contains configuration for Bring Your Own DKIM
+    # (BYODKIM), or, for Easy DKIM
     #
     # @!attribute [rw] domain_signing_selector
-    #   A string that's used to identify a public key in the DNS
-    #   configuration for a domain.
+    #   \[Bring Your Own DKIM\] A string that's used to identify a public
+    #   key in the DNS configuration for a domain.
     #   @return [String]
     #
     # @!attribute [rw] domain_signing_private_key
-    #   A private key that's used to generate a DKIM signature.
+    #   \[Bring Your Own DKIM\] A private key that's used to generate a
+    #   DKIM signature.
     #
-    #   The private key must use 1024-bit RSA encryption, and must be
-    #   encoded using base64 encoding.
+    #   The private key must use 1024 or 2048-bit RSA encryption, and must
+    #   be encoded using base64 encoding.
+    #   @return [String]
+    #
+    # @!attribute [rw] next_signing_key_length
+    #   \[Easy DKIM\] The key length of the future DKIM key pair to be
+    #   generated. This can be changed at most once per day.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/DkimSigningAttributes AWS API Documentation
     #
     class DkimSigningAttributes < Struct.new(
       :domain_signing_selector,
-      :domain_signing_private_key)
+      :domain_signing_private_key,
+      :next_signing_key_length)
       SENSITIVE = [:domain_signing_private_key]
       include Aws::Structure
     end
@@ -1940,17 +1913,15 @@ module Aws::SESV2
     #   @return [Array<String>]
     #
     # @!attribute [rw] first_seen_date_time
-    #   The first time, in Unix time format, when the email message was
-    #   delivered to any recipient's inbox. This value can help you
-    #   determine how long it took for a campaign to deliver an email
-    #   message.
+    #   The first time when the email message was delivered to any
+    #   recipient's inbox. This value can help you determine how long it
+    #   took for a campaign to deliver an email message.
     #   @return [Time]
     #
     # @!attribute [rw] last_seen_date_time
-    #   The last time, in Unix time format, when the email message was
-    #   delivered to any recipient's inbox. This value can help you
-    #   determine how long it took for a campaign to deliver an email
-    #   message.
+    #   The last time when the email message was delivered to any
+    #   recipient's inbox. This value can help you determine how long it
+    #   took for a campaign to deliver an email message.
     #   @return [Time]
     #
     # @!attribute [rw] inbox_count
@@ -2020,26 +1991,15 @@ module Aws::SESV2
     # access to reputation, inbox placement, and other metrics for the
     # domain.
     #
-    # @note When making an API call, you may pass DomainDeliverabilityTrackingOption
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "Domain",
-    #         subscription_start_date: Time.now,
-    #         inbox_placement_tracking_option: {
-    #           global: false,
-    #           tracked_isps: ["IspName"],
-    #         },
-    #       }
-    #
     # @!attribute [rw] domain
-    #   A verified domain that’s associated with your AWS account and
-    #   currently has an active Deliverability dashboard subscription.
+    #   A verified domain that’s associated with your Amazon Web Services
+    #   account and currently has an active Deliverability dashboard
+    #   subscription.
     #   @return [String]
     #
     # @!attribute [rw] subscription_start_date
-    #   The date, in Unix time format, when you enabled the Deliverability
-    #   dashboard for the domain.
+    #   The date when you enabled the Deliverability dashboard for the
+    #   domain.
     #   @return [Time]
     #
     # @!attribute [rw] inbox_placement_tracking_option
@@ -2108,36 +2068,6 @@ module Aws::SESV2
     # which you specify a complete MIME-formatted message. Raw messages can
     # include attachments and custom headers.
     #
-    # @note When making an API call, you may pass EmailContent
-    #   data as a hash:
-    #
-    #       {
-    #         simple: {
-    #           subject: { # required
-    #             data: "MessageData", # required
-    #             charset: "Charset",
-    #           },
-    #           body: { # required
-    #             text: {
-    #               data: "MessageData", # required
-    #               charset: "Charset",
-    #             },
-    #             html: {
-    #               data: "MessageData", # required
-    #               charset: "Charset",
-    #             },
-    #           },
-    #         },
-    #         raw: {
-    #           data: "data", # required
-    #         },
-    #         template: {
-    #           template_name: "EmailTemplateName",
-    #           template_arn: "AmazonResourceName",
-    #           template_data: "EmailTemplateData",
-    #         },
-    #       }
-    #
     # @!attribute [rw] simple
     #   The simple email message. The message consists of a subject and a
     #   message body.
@@ -2157,7 +2087,10 @@ module Aws::SESV2
     #   * If you include attachments, they must be in a file format that the
     #     Amazon SES API v2 supports.
     #
-    #   * The entire message must be Base64 encoded.
+    #   * The raw data of the message needs to base64-encoded if you are
+    #     accessing Amazon SES directly through the HTTPS interface. If you
+    #     are accessing Amazon SES using an Amazon Web Services SDK, the SDK
+    #     takes care of the base 64-encoding for you.
     #
     #   * If any of the MIME parts in your message contain content that is
     #     outside of the 7-bit ASCII character range, you should encode that
@@ -2186,17 +2119,33 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # An email's insights contain metadata and delivery information about a
+    # specific email.
+    #
+    # @!attribute [rw] destination
+    #   The recipient of the email.
+    #   @return [String]
+    #
+    # @!attribute [rw] isp
+    #   The recipient's ISP (e.g., `Gmail`, `Yahoo`, etc.).
+    #   @return [String]
+    #
+    # @!attribute [rw] events
+    #   A list of events associated with the sent email.
+    #   @return [Array<Types::InsightsEvent>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/EmailInsights AWS API Documentation
+    #
+    class EmailInsights < Struct.new(
+      :destination,
+      :isp,
+      :events)
+      SENSITIVE = [:destination]
+      include Aws::Structure
+    end
+
     # The content of the email, composed of a subject line, an HTML part,
     # and a text-only part.
-    #
-    # @note When making an API call, you may pass EmailTemplateContent
-    #   data as a hash:
-    #
-    #       {
-    #         subject: "EmailTemplateSubject",
-    #         text: "EmailTemplateText",
-    #         html: "EmailTemplateHtml",
-    #       }
     #
     # @!attribute [rw] subject
     #   The subject line of the email.
@@ -2240,6 +2189,23 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # An object that defines an Amazon EventBridge destination for email
+    # events. You can use Amazon EventBridge to send notifications when
+    # certain email events occur.
+    #
+    # @!attribute [rw] event_bus_arn
+    #   The Amazon Resource Name (ARN) of the Amazon EventBridge bus to
+    #   publish email events to. Only the default bus is supported.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/EventBridgeDestination AWS API Documentation
+    #
+    class EventBridgeDestination < Struct.new(
+      :event_bus_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # In the Amazon SES API v2, *events* include message sends, deliveries,
     # opens, clicks, bounces, complaints and delivery delays. *Event
     # destinations* are places that you can send information about these
@@ -2265,6 +2231,54 @@ module Aws::SESV2
     # @!attribute [rw] matching_event_types
     #   The types of events that Amazon SES sends to the specified event
     #   destinations.
+    #
+    #   * `SEND` - The send request was successful and SES will attempt to
+    #     deliver the message to the recipient’s mail server. (If
+    #     account-level or global suppression is being used, SES will still
+    #     count it as a send, but delivery is suppressed.)
+    #
+    #   * `REJECT` - SES accepted the email, but determined that it
+    #     contained a virus and didn’t attempt to deliver it to the
+    #     recipient’s mail server.
+    #
+    #   * `BOUNCE` - (*Hard bounce*) The recipient's mail server
+    #     permanently rejected the email. (*Soft bounces* are only included
+    #     when SES fails to deliver the email after retrying for a period of
+    #     time.)
+    #
+    #   * `COMPLAINT` - The email was successfully delivered to the
+    #     recipient’s mail server, but the recipient marked it as spam.
+    #
+    #   * `DELIVERY` - SES successfully delivered the email to the
+    #     recipient's mail server.
+    #
+    #   * `OPEN` - The recipient received the message and opened it in their
+    #     email client.
+    #
+    #   * `CLICK` - The recipient clicked one or more links in the email.
+    #
+    #   * `RENDERING_FAILURE` - The email wasn't sent because of a template
+    #     rendering issue. This event type can occur when template data is
+    #     missing, or when there is a mismatch between template parameters
+    #     and data. (This event type only occurs when you send email using
+    #     the [ `SendTemplatedEmail` ][1] or [ `SendBulkTemplatedEmail` ][2]
+    #     API operations.)
+    #
+    #   * `DELIVERY_DELAY` - The email couldn't be delivered to the
+    #     recipient’s mail server because a temporary issue occurred.
+    #     Delivery delays can occur, for example, when the recipient's
+    #     inbox is full, or when the receiving email server experiences a
+    #     transient issue.
+    #
+    #   * `SUBSCRIPTION` - The email was successfully delivered, but the
+    #     recipient updated their subscription preferences by clicking on an
+    #     *unsubscribe* link as part of your [subscription management][3].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/ses/latest/APIReference/API_SendTemplatedEmail.html
+    #   [2]: https://docs.aws.amazon.com/ses/latest/APIReference/API_SendBulkTemplatedEmail.html
+    #   [3]: https://docs.aws.amazon.com/ses/latest/dg/sending-email-subscription-management.html
     #   @return [Array<String>]
     #
     # @!attribute [rw] kinesis_firehose_destination
@@ -2281,9 +2295,15 @@ module Aws::SESV2
     #
     # @!attribute [rw] sns_destination
     #   An object that defines an Amazon SNS destination for email events.
-    #   You can use Amazon SNS to send notification when certain email
+    #   You can use Amazon SNS to send notifications when certain email
     #   events occur.
     #   @return [Types::SnsDestination]
+    #
+    # @!attribute [rw] event_bridge_destination
+    #   An object that defines an Amazon EventBridge destination for email
+    #   events. You can use Amazon EventBridge to send notifications when
+    #   certain email events occur.
+    #   @return [Types::EventBridgeDestination]
     #
     # @!attribute [rw] pinpoint_destination
     #   An object that defines an Amazon Pinpoint project destination for
@@ -2307,6 +2327,7 @@ module Aws::SESV2
       :kinesis_firehose_destination,
       :cloud_watch_destination,
       :sns_destination,
+      :event_bridge_destination,
       :pinpoint_destination)
       SENSITIVE = []
       include Aws::Structure
@@ -2316,33 +2337,6 @@ module Aws::SESV2
     # which services receive events from emails sent using the configuration
     # set that the event destination is associated with. Also defines the
     # types of events that are sent to the event destination.
-    #
-    # @note When making an API call, you may pass EventDestinationDefinition
-    #   data as a hash:
-    #
-    #       {
-    #         enabled: false,
-    #         matching_event_types: ["SEND"], # accepts SEND, REJECT, BOUNCE, COMPLAINT, DELIVERY, OPEN, CLICK, RENDERING_FAILURE, DELIVERY_DELAY, SUBSCRIPTION
-    #         kinesis_firehose_destination: {
-    #           iam_role_arn: "AmazonResourceName", # required
-    #           delivery_stream_arn: "AmazonResourceName", # required
-    #         },
-    #         cloud_watch_destination: {
-    #           dimension_configurations: [ # required
-    #             {
-    #               dimension_name: "DimensionName", # required
-    #               dimension_value_source: "MESSAGE_TAG", # required, accepts MESSAGE_TAG, EMAIL_HEADER, LINK_TAG
-    #               default_dimension_value: "DefaultDimensionValue", # required
-    #             },
-    #           ],
-    #         },
-    #         sns_destination: {
-    #           topic_arn: "AmazonResourceName", # required
-    #         },
-    #         pinpoint_destination: {
-    #           application_arn: "AmazonResourceName",
-    #         },
-    #       }
     #
     # @!attribute [rw] enabled
     #   If `true`, the event destination is enabled. When the event
@@ -2373,9 +2367,15 @@ module Aws::SESV2
     #
     # @!attribute [rw] sns_destination
     #   An object that defines an Amazon SNS destination for email events.
-    #   You can use Amazon SNS to send notification when certain email
+    #   You can use Amazon SNS to send notifications when certain email
     #   events occur.
     #   @return [Types::SnsDestination]
+    #
+    # @!attribute [rw] event_bridge_destination
+    #   An object that defines an Amazon EventBridge destination for email
+    #   events. You can use Amazon EventBridge to send notifications when
+    #   certain email events occur.
+    #   @return [Types::EventBridgeDestination]
     #
     # @!attribute [rw] pinpoint_destination
     #   An object that defines an Amazon Pinpoint project destination for
@@ -2398,20 +2398,217 @@ module Aws::SESV2
       :kinesis_firehose_destination,
       :cloud_watch_destination,
       :sns_destination,
+      :event_bridge_destination,
       :pinpoint_destination)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # An object that contains the failure details about an import job.
+    # Contains a `Bounce` object if the event type is `BOUNCE`. Contains a
+    # `Complaint` object if the event type is `COMPLAINT`.
+    #
+    # @!attribute [rw] bounce
+    #   Information about a `Bounce` event.
+    #   @return [Types::Bounce]
+    #
+    # @!attribute [rw] complaint
+    #   Information about a `Complaint` event.
+    #   @return [Types::Complaint]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/EventDetails AWS API Documentation
+    #
+    class EventDetails < Struct.new(
+      :bounce,
+      :complaint)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object that contains details about the data source of the export
+    # job. It can only contain one of `MetricsDataSource` or
+    # `MessageInsightsDataSource` object.
+    #
+    # @!attribute [rw] metrics_data_source
+    #   An object that contains details about the data source for the
+    #   metrics export.
+    #   @return [Types::MetricsDataSource]
+    #
+    # @!attribute [rw] message_insights_data_source
+    #   An object that contains filters applied when performing the Message
+    #   Insights export.
+    #   @return [Types::MessageInsightsDataSource]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ExportDataSource AWS API Documentation
+    #
+    class ExportDataSource < Struct.new(
+      :metrics_data_source,
+      :message_insights_data_source)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object that contains details about the destination of the export
+    # job.
+    #
+    # @!attribute [rw] data_format
+    #   The data format of the final export job file, can be one of the
+    #   following:
+    #
+    #   * `CSV` - A comma-separated values file.
+    #
+    #   * `JSON` - A Json file.
+    #   @return [String]
+    #
+    # @!attribute [rw] s3_url
+    #   An Amazon S3 pre-signed URL that points to the generated export
+    #   file.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ExportDestination AWS API Documentation
+    #
+    class ExportDestination < Struct.new(
+      :data_format,
+      :s3_url)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # A summary of the export job.
+    #
+    # @!attribute [rw] job_id
+    #   The export job ID.
+    #   @return [String]
+    #
+    # @!attribute [rw] export_source_type
+    #   The source type of the export job.
+    #   @return [String]
+    #
+    # @!attribute [rw] job_status
+    #   The status of the export job.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_timestamp
+    #   The timestamp of when the export job was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] completed_timestamp
+    #   The timestamp of when the export job was completed.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ExportJobSummary AWS API Documentation
+    #
+    class ExportJobSummary < Struct.new(
+      :job_id,
+      :export_source_type,
+      :job_status,
+      :created_timestamp,
+      :completed_timestamp)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object that contains a mapping between a `Metric` and
+    # `MetricAggregation`.
+    #
+    # @!attribute [rw] name
+    #   The metric to export, can be one of the following:
+    #
+    #   * `SEND` - Emails sent eligible for tracking in the VDM dashboard.
+    #     This excludes emails sent to the mailbox simulator and emails
+    #     addressed to more than one recipient.
+    #
+    #   * `COMPLAINT` - Complaints received for your account. This excludes
+    #     complaints from the mailbox simulator, those originating from your
+    #     account-level suppression list (if enabled), and those for emails
+    #     addressed to more than one recipient
+    #
+    #   * `PERMANENT_BOUNCE` - Permanent bounces - i.e., feedback received
+    #     for emails sent to non-existent mailboxes. Excludes bounces from
+    #     the mailbox simulator, those originating from your account-level
+    #     suppression list (if enabled), and those for emails addressed to
+    #     more than one recipient.
+    #
+    #   * `TRANSIENT_BOUNCE` - Transient bounces - i.e., feedback received
+    #     for delivery failures excluding issues with non-existent
+    #     mailboxes. Excludes bounces from the mailbox simulator, and those
+    #     for emails addressed to more than one recipient.
+    #
+    #   * `OPEN` - Unique open events for emails including open trackers.
+    #     Excludes opens for emails addressed to more than one recipient.
+    #
+    #   * `CLICK` - Unique click events for emails including wrapped links.
+    #     Excludes clicks for emails addressed to more than one recipient.
+    #
+    #   * `DELIVERY` - Successful deliveries for email sending attempts.
+    #     Excludes deliveries to the mailbox simulator and for emails
+    #     addressed to more than one recipient.
+    #
+    #   * `DELIVERY_OPEN` - Successful deliveries for email sending
+    #     attempts. Excludes deliveries to the mailbox simulator, for emails
+    #     addressed to more than one recipient, and emails without open
+    #     trackers.
+    #
+    #   * `DELIVERY_CLICK` - Successful deliveries for email sending
+    #     attempts. Excludes deliveries to the mailbox simulator, for emails
+    #     addressed to more than one recipient, and emails without click
+    #     trackers.
+    #
+    #   * `DELIVERY_COMPLAINT` - Successful deliveries for email sending
+    #     attempts. Excludes deliveries to the mailbox simulator, for emails
+    #     addressed to more than one recipient, and emails addressed to
+    #     recipients hosted by ISPs with which Amazon SES does not have a
+    #     feedback loop agreement.
+    #   @return [String]
+    #
+    # @!attribute [rw] aggregation
+    #   The aggregation to apply to a metric, can be one of the following:
+    #
+    #   * `VOLUME` - The volume of events for this metric.
+    #
+    #   * `RATE` - The rate for this metric relative to the `SEND` metric
+    #     volume.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ExportMetric AWS API Documentation
+    #
+    class ExportMetric < Struct.new(
+      :name,
+      :aggregation)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Statistics about the execution of an export job.
+    #
+    # @!attribute [rw] processed_records_count
+    #   The number of records that were processed to generate the final
+    #   export file.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] exported_records_count
+    #   The number of records that were exported to the final export file.
+    #
+    #   This value might not be available for all export source types
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ExportStatistics AWS API Documentation
+    #
+    class ExportStatistics < Struct.new(
+      :processed_records_count,
+      :exported_records_count)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object that contains the failure details about a job.
     #
     # @!attribute [rw] failed_records_s3_url
-    #   An Amazon S3 presigned URL that contains all the failed records and
+    #   An Amazon S3 pre-signed URL that contains all the failed records and
     #   related information.
     #   @return [String]
     #
     # @!attribute [rw] error_message
-    #   A message about why the import job failed.
+    #   A message about why the job failed.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/FailureInfo AWS API Documentation
@@ -2433,7 +2630,7 @@ module Aws::SESV2
     class GetAccountRequest < Aws::EmptyStructure; end
 
     # A list of details about the email-sending capabilities of your Amazon
-    # SES account in the current AWS Region.
+    # SES account in the current Amazon Web Services Region.
     #
     # @!attribute [rw] dedicated_ip_auto_warmup_enabled
     #   Indicates whether or not the automatic warm-up feature is enabled
@@ -2459,14 +2656,11 @@ module Aws::SESV2
     #
     # @!attribute [rw] production_access_enabled
     #   Indicates whether or not your account has production access in the
-    #   current AWS Region.
+    #   current Amazon Web Services Region.
     #
     #   If the value is `false`, then your account is in the *sandbox*. When
     #   your account is in the sandbox, you can only send email to verified
-    #   identities. Additionally, the maximum number of emails you can send
-    #   in a 24-hour period (your sending quota) is 200, and the maximum
-    #   number of emails you can send per second (your maximum sending rate)
-    #   is 1.
+    #   identities.
     #
     #   If the value is `true`, then your account has production access.
     #   When your account has production access, you can send email to any
@@ -2476,23 +2670,28 @@ module Aws::SESV2
     #
     # @!attribute [rw] send_quota
     #   An object that contains information about the per-day and per-second
-    #   sending limits for your Amazon SES account in the current AWS
-    #   Region.
+    #   sending limits for your Amazon SES account in the current Amazon Web
+    #   Services Region.
     #   @return [Types::SendQuota]
     #
     # @!attribute [rw] sending_enabled
     #   Indicates whether or not email sending is enabled for your Amazon
-    #   SES account in the current AWS Region.
+    #   SES account in the current Amazon Web Services Region.
     #   @return [Boolean]
     #
     # @!attribute [rw] suppression_attributes
     #   An object that contains information about the email address
-    #   suppression preferences for your account in the current AWS Region.
+    #   suppression preferences for your account in the current Amazon Web
+    #   Services Region.
     #   @return [Types::SuppressionAttributes]
     #
     # @!attribute [rw] details
     #   An object that defines your account details.
     #   @return [Types::AccountDetails]
+    #
+    # @!attribute [rw] vdm_attributes
+    #   The VDM attributes that apply to your Amazon SES account.
+    #   @return [Types::VdmAttributes]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetAccountResponse AWS API Documentation
     #
@@ -2503,20 +2702,14 @@ module Aws::SESV2
       :send_quota,
       :sending_enabled,
       :suppression_attributes,
-      :details)
+      :details,
+      :vdm_attributes)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # A request to retrieve a list of the blacklists that your dedicated IP
     # addresses appear on.
-    #
-    # @note When making an API call, you may pass GetBlacklistReportsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         blacklist_item_names: ["BlacklistItemName"], # required
-    #       }
     #
     # @!attribute [rw] blacklist_item_names
     #   A list of IP addresses that you want to retrieve blacklist
@@ -2550,13 +2743,6 @@ module Aws::SESV2
     # A request to obtain information about the event destinations for a
     # configuration set.
     #
-    # @note When making an API call, you may pass GetConfigurationSetEventDestinationsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
     #   The name of the configuration set that contains the event
     #   destination.
@@ -2587,16 +2773,8 @@ module Aws::SESV2
 
     # A request to obtain information about a configuration set.
     #
-    # @note When making an API call, you may pass GetConfigurationSetRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set that you want to obtain more
-    #   information about.
+    #   The name of the configuration set.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetConfigurationSetRequest AWS API Documentation
@@ -2643,6 +2821,11 @@ module Aws::SESV2
     #   preferences for your account.
     #   @return [Types::SuppressionOptions]
     #
+    # @!attribute [rw] vdm_options
+    #   An object that contains information about the VDM preferences for
+    #   your configuration set.
+    #   @return [Types::VdmOptions]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetConfigurationSetResponse AWS API Documentation
     #
     class GetConfigurationSetResponse < Struct.new(
@@ -2652,18 +2835,12 @@ module Aws::SESV2
       :reputation_options,
       :sending_options,
       :tags,
-      :suppression_options)
+      :suppression_options,
+      :vdm_options)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetContactListRequest
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list.
     #   @return [String]
@@ -2714,20 +2891,12 @@ module Aws::SESV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetContactRequest
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #         email_address: "EmailAddress", # required
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list to which the contact belongs.
     #   @return [String]
     #
     # @!attribute [rw] email_address
-    #   The contact's email addres.
+    #   The contact's email address.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetContactRequest AWS API Documentation
@@ -2744,7 +2913,7 @@ module Aws::SESV2
     #   @return [String]
     #
     # @!attribute [rw] email_address
-    #   The contact's email addres.
+    #   The contact's email address.
     #   @return [String]
     #
     # @!attribute [rw] topic_preferences
@@ -2791,13 +2960,6 @@ module Aws::SESV2
 
     # Represents a request to retrieve an existing custom verification email
     # template.
-    #
-    # @note When making an API call, you may pass GetCustomVerificationEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "EmailTemplateName", # required
-    #       }
     #
     # @!attribute [rw] template_name
     #   The name of the custom verification email template that you want to
@@ -2853,19 +3015,40 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # A request to obtain more information about a dedicated IP pool.
+    #
+    # @!attribute [rw] pool_name
+    #   The name of the dedicated IP pool to retrieve.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetDedicatedIpPoolRequest AWS API Documentation
+    #
+    class GetDedicatedIpPoolRequest < Struct.new(
+      :pool_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The following element is returned by the service.
+    #
+    # @!attribute [rw] dedicated_ip_pool
+    #   An object that contains information about a dedicated IP pool.
+    #   @return [Types::DedicatedIpPool]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetDedicatedIpPoolResponse AWS API Documentation
+    #
+    class GetDedicatedIpPoolResponse < Struct.new(
+      :dedicated_ip_pool)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # A request to obtain more information about a dedicated IP address.
-    #
-    # @note When making an API call, you may pass GetDedicatedIpRequest
-    #   data as a hash:
-    #
-    #       {
-    #         ip: "Ip", # required
-    #       }
     #
     # @!attribute [rw] ip
     #   The IP address that you want to obtain more information about. The
     #   value you specify has to be a dedicated IP address that's
-    #   assocaited with your AWS account.
+    #   assocaited with your Amazon Web Services account.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetDedicatedIpRequest AWS API Documentation
@@ -2891,15 +3074,6 @@ module Aws::SESV2
     end
 
     # A request to obtain more information about dedicated IP pools.
-    #
-    # @note When making an API call, you may pass GetDedicatedIpsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         pool_name: "PoolName",
-    #         next_token: "NextToken",
-    #         page_size: 1,
-    #       }
     #
     # @!attribute [rw] pool_name
     #   The name of the IP pool that the dedicated IP address is associated
@@ -2931,11 +3105,11 @@ module Aws::SESV2
     end
 
     # Information about the dedicated IP addresses that are associated with
-    # your AWS account.
+    # your Amazon Web Services account.
     #
     # @!attribute [rw] dedicated_ips
-    #   A list of dedicated IP addresses that are associated with your AWS
-    #   account.
+    #   A list of dedicated IP addresses that are associated with your
+    #   Amazon Web Services account.
     #   @return [Array<Types::DedicatedIp>]
     #
     # @!attribute [rw] next_token
@@ -2955,16 +3129,16 @@ module Aws::SESV2
     end
 
     # Retrieve information about the status of the Deliverability dashboard
-    # for your AWS account. When the Deliverability dashboard is enabled,
-    # you gain access to reputation, deliverability, and other metrics for
-    # your domains. You also gain the ability to perform predictive inbox
-    # placement tests.
+    # for your Amazon Web Services account. When the Deliverability
+    # dashboard is enabled, you gain access to reputation, deliverability,
+    # and other metrics for your domains. You also gain the ability to
+    # perform predictive inbox placement tests.
     #
     # When you use the Deliverability dashboard, you pay a monthly
     # subscription charge, in addition to any other fees that you accrue by
-    # using Amazon SES and other AWS services. For more information about
-    # the features and cost of a Deliverability dashboard subscription, see
-    # [Amazon Pinpoint Pricing][1].
+    # using Amazon SES and other Amazon Web Services services. For more
+    # information about the features and cost of a Deliverability dashboard
+    # subscription, see [Amazon Pinpoint Pricing][1].
     #
     #
     #
@@ -2984,11 +3158,11 @@ module Aws::SESV2
     #   @return [Boolean]
     #
     # @!attribute [rw] subscription_expiry_date
-    #   The date, in Unix time format, when your current subscription to the
-    #   Deliverability dashboard is scheduled to expire, if your
-    #   subscription is scheduled to expire at the end of the current
-    #   calendar month. This value is null if you have an active
-    #   subscription that isn’t due to expire at the end of the month.
+    #   The date when your current subscription to the Deliverability
+    #   dashboard is scheduled to expire, if your subscription is scheduled
+    #   to expire at the end of the current calendar month. This value is
+    #   null if you have an active subscription that isn’t due to expire at
+    #   the end of the month.
     #   @return [Time]
     #
     # @!attribute [rw] account_status
@@ -3025,13 +3199,6 @@ module Aws::SESV2
 
     # A request to retrieve the results of a predictive inbox placement
     # test.
-    #
-    # @note When making an API call, you may pass GetDeliverabilityTestReportRequest
-    #   data as a hash:
-    #
-    #       {
-    #         report_id: "ReportId", # required
-    #       }
     #
     # @!attribute [rw] report_id
     #   A unique string that identifies the predictive inbox placement test.
@@ -3091,13 +3258,6 @@ module Aws::SESV2
     # using a domain that the Deliverability dashboard is enabled for
     # (`PutDeliverabilityDashboardOption` operation).
     #
-    # @note When making an API call, you may pass GetDomainDeliverabilityCampaignRequest
-    #   data as a hash:
-    #
-    #       {
-    #         campaign_id: "CampaignId", # required
-    #       }
-    #
     # @!attribute [rw] campaign_id
     #   The unique identifier for the campaign. The Deliverability dashboard
     #   automatically generates and assigns this identifier to a campaign.
@@ -3129,15 +3289,6 @@ module Aws::SESV2
     end
 
     # A request to obtain deliverability metrics for a domain.
-    #
-    # @note When making an API call, you may pass GetDomainStatisticsReportRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "Identity", # required
-    #         start_date: Time.now, # required
-    #         end_date: Time.now, # required
-    #       }
     #
     # @!attribute [rw] domain
     #   The domain that you want to obtain deliverability metrics for.
@@ -3190,15 +3341,8 @@ module Aws::SESV2
 
     # A request to return the policies of an email identity.
     #
-    # @note When making an API call, you may pass GetEmailIdentityPoliciesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The email identity that you want to retrieve policies for.
+    #   The email identity.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetEmailIdentityPoliciesRequest AWS API Documentation
@@ -3225,15 +3369,8 @@ module Aws::SESV2
 
     # A request to return details about an email identity.
     #
-    # @note When making an API call, you may pass GetEmailIdentityRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The email identity that you want to retrieve details for.
+    #   The email identity.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetEmailIdentityRequest AWS API Documentation
@@ -3247,7 +3384,8 @@ module Aws::SESV2
     # Details about an email identity.
     #
     # @!attribute [rw] identity_type
-    #   The email identity type.
+    #   The email identity type. Note: the `MANAGED_DOMAIN` identity type is
+    #   not supported.
     #   @return [String]
     #
     # @!attribute [rw] feedback_forwarding_status
@@ -3294,6 +3432,34 @@ module Aws::SESV2
     #   associated with the email identity.
     #   @return [Array<Types::Tag>]
     #
+    # @!attribute [rw] configuration_set_name
+    #   The configuration set used by default when sending from this
+    #   identity.
+    #   @return [String]
+    #
+    # @!attribute [rw] verification_status
+    #   The verification status of the identity. The status can be one of
+    #   the following:
+    #
+    #   * `PENDING` – The verification process was initiated, but Amazon SES
+    #     hasn't yet been able to verify the identity.
+    #
+    #   * `SUCCESS` – The verification process completed successfully.
+    #
+    #   * `FAILED` – The verification process failed.
+    #
+    #   * `TEMPORARY_FAILURE` – A temporary issue is preventing Amazon SES
+    #     from determining the verification status of the identity.
+    #
+    #   * `NOT_STARTED` – The verification process hasn't been initiated
+    #     for the identity.
+    #   @return [String]
+    #
+    # @!attribute [rw] verification_info
+    #   An object that contains additional information about the
+    #   verification status for the identity.
+    #   @return [Types::VerificationInfo]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetEmailIdentityResponse AWS API Documentation
     #
     class GetEmailIdentityResponse < Struct.new(
@@ -3303,7 +3469,10 @@ module Aws::SESV2
       :dkim_attributes,
       :mail_from_attributes,
       :policies,
-      :tags)
+      :tags,
+      :configuration_set_name,
+      :verification_status,
+      :verification_info)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3312,15 +3481,8 @@ module Aws::SESV2
     # the subject line, HTML part and text part) for the template you
     # specify.
     #
-    # @note When making an API call, you may pass GetEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "EmailTemplateName", # required
-    #       }
-    #
     # @!attribute [rw] template_name
-    #   The name of the template you want to retrieve.
+    #   The name of the template.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetEmailTemplateRequest AWS API Documentation
@@ -3334,7 +3496,7 @@ module Aws::SESV2
     # The following element is returned by the service.
     #
     # @!attribute [rw] template_name
-    #   The name of the template you want to retrieve.
+    #   The name of the template.
     #   @return [String]
     #
     # @!attribute [rw] template_content
@@ -3351,15 +3513,78 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # Represents a request to retrieve information about an export job using
+    # the export job ID.
+    #
+    # @!attribute [rw] job_id
+    #   The export job ID.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetExportJobRequest AWS API Documentation
+    #
+    class GetExportJobRequest < Struct.new(
+      :job_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An HTTP 200 response if the request succeeds, or an error message if
+    # the request fails.
+    #
+    # @!attribute [rw] job_id
+    #   The export job ID.
+    #   @return [String]
+    #
+    # @!attribute [rw] export_source_type
+    #   The type of source of the export job.
+    #   @return [String]
+    #
+    # @!attribute [rw] job_status
+    #   The status of the export job.
+    #   @return [String]
+    #
+    # @!attribute [rw] export_destination
+    #   The destination of the export job.
+    #   @return [Types::ExportDestination]
+    #
+    # @!attribute [rw] export_data_source
+    #   The data source of the export job.
+    #   @return [Types::ExportDataSource]
+    #
+    # @!attribute [rw] created_timestamp
+    #   The timestamp of when the export job was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] completed_timestamp
+    #   The timestamp of when the export job was completed.
+    #   @return [Time]
+    #
+    # @!attribute [rw] failure_info
+    #   The failure details about an export job.
+    #   @return [Types::FailureInfo]
+    #
+    # @!attribute [rw] statistics
+    #   The statistics about the export job.
+    #   @return [Types::ExportStatistics]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetExportJobResponse AWS API Documentation
+    #
+    class GetExportJobResponse < Struct.new(
+      :job_id,
+      :export_source_type,
+      :job_status,
+      :export_destination,
+      :export_data_source,
+      :created_timestamp,
+      :completed_timestamp,
+      :failure_info,
+      :statistics)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Represents a request for information about an import job using the
     # import job ID.
-    #
-    # @note When making an API call, you may pass GetImportJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         job_id: "JobId", # required
-    #       }
     #
     # @!attribute [rw] job_id
     #   The ID of the import job.
@@ -3429,15 +3654,62 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # A request to return information about a message.
+    #
+    # @!attribute [rw] message_id
+    #   A `MessageId` is a unique identifier for a message, and is returned
+    #   when sending emails through Amazon SES.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetMessageInsightsRequest AWS API Documentation
+    #
+    class GetMessageInsightsRequest < Struct.new(
+      :message_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about a message.
+    #
+    # @!attribute [rw] message_id
+    #   A unique identifier for the message.
+    #   @return [String]
+    #
+    # @!attribute [rw] from_email_address
+    #   The from address used to send the message.
+    #   @return [String]
+    #
+    # @!attribute [rw] subject
+    #   The subject line of the message.
+    #   @return [String]
+    #
+    # @!attribute [rw] email_tags
+    #   A list of tags, in the form of name/value pairs, that were applied
+    #   to the email you sent, along with Amazon SES [Auto-Tags][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/ses/latest/dg/monitor-using-event-publishing.html
+    #   @return [Array<Types::MessageTag>]
+    #
+    # @!attribute [rw] insights
+    #   A set of insights associated with the message.
+    #   @return [Array<Types::EmailInsights>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GetMessageInsightsResponse AWS API Documentation
+    #
+    class GetMessageInsightsResponse < Struct.new(
+      :message_id,
+      :from_email_address,
+      :subject,
+      :email_tags,
+      :insights)
+      SENSITIVE = [:from_email_address, :subject]
+      include Aws::Structure
+    end
+
     # A request to retrieve information about an email address that's on
     # the suppression list for your account.
-    #
-    # @note When making an API call, you may pass GetSuppressedDestinationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_address: "EmailAddress", # required
-    #       }
     #
     # @!attribute [rw] email_address
     #   The email address that's on the account suppression list.
@@ -3465,18 +3737,55 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # An object containing additional settings for your VDM configuration as
+    # applicable to the Guardian.
+    #
+    # @!attribute [rw] optimized_shared_delivery
+    #   Specifies the status of your VDM optimized shared delivery. Can be
+    #   one of the following:
+    #
+    #   * `ENABLED` – Amazon SES enables optimized shared delivery for your
+    #     account.
+    #
+    #   * `DISABLED` – Amazon SES disables optimized shared delivery for
+    #     your account.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GuardianAttributes AWS API Documentation
+    #
+    class GuardianAttributes < Struct.new(
+      :optimized_shared_delivery)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object containing additional settings for your VDM configuration as
+    # applicable to the Guardian.
+    #
+    # @!attribute [rw] optimized_shared_delivery
+    #   Specifies the status of your VDM optimized shared delivery. Can be
+    #   one of the following:
+    #
+    #   * `ENABLED` – Amazon SES enables optimized shared delivery for the
+    #     configuration set.
+    #
+    #   * `DISABLED` – Amazon SES disables optimized shared delivery for the
+    #     configuration set.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/GuardianOptions AWS API Documentation
+    #
+    class GuardianOptions < Struct.new(
+      :optimized_shared_delivery)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Information about an email identity.
     #
     # @!attribute [rw] identity_type
-    #   The email identity type. The identity type can be one of the
-    #   following:
-    #
-    #   * `EMAIL_ADDRESS` – The identity is an email address.
-    #
-    #   * `DOMAIN` – The identity is a domain.
-    #
-    #   * `MANAGED_DOMAIN` – The identity is a domain that is managed by
-    #     AWS.
+    #   The email identity type. Note: the `MANAGED_DOMAIN` type is not
+    #   supported for email identity types.
     #   @return [String]
     #
     # @!attribute [rw] identity_name
@@ -3492,26 +3801,37 @@ module Aws::SESV2
     #   SES to send email from that identity.
     #   @return [Boolean]
     #
+    # @!attribute [rw] verification_status
+    #   The verification status of the identity. The status can be one of
+    #   the following:
+    #
+    #   * `PENDING` – The verification process was initiated, but Amazon SES
+    #     hasn't yet been able to verify the identity.
+    #
+    #   * `SUCCESS` – The verification process completed successfully.
+    #
+    #   * `FAILED` – The verification process failed.
+    #
+    #   * `TEMPORARY_FAILURE` – A temporary issue is preventing Amazon SES
+    #     from determining the verification status of the identity.
+    #
+    #   * `NOT_STARTED` – The verification process hasn't been initiated
+    #     for the identity.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/IdentityInfo AWS API Documentation
     #
     class IdentityInfo < Struct.new(
       :identity_type,
       :identity_name,
-      :sending_enabled)
+      :sending_enabled,
+      :verification_status)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # An object that contains details about the data source of the import
     # job.
-    #
-    # @note When making an API call, you may pass ImportDataSource
-    #   data as a hash:
-    #
-    #       {
-    #         s3_url: "S3Url", # required
-    #         data_format: "CSV", # required, accepts CSV, JSON
-    #       }
     #
     # @!attribute [rw] s3_url
     #   An Amazon S3 URL in the format
@@ -3533,19 +3853,6 @@ module Aws::SESV2
 
     # An object that contains details about the resource destination the
     # import job is going to target.
-    #
-    # @note When making an API call, you may pass ImportDestination
-    #   data as a hash:
-    #
-    #       {
-    #         suppression_list_destination: {
-    #           suppression_list_import_action: "DELETE", # required, accepts DELETE, PUT
-    #         },
-    #         contact_list_destination: {
-    #           contact_list_name: "ContactListName", # required
-    #           contact_list_import_action: "DELETE", # required, accepts DELETE, PUT
-    #         },
-    #       }
     #
     # @!attribute [rw] suppression_list_destination
     #   An object that contains the action of the import job towards
@@ -3569,7 +3876,7 @@ module Aws::SESV2
     # A summary of the import job.
     #
     # @!attribute [rw] job_id
-    #   A string that represents the import job ID.
+    #   A string that represents a job ID.
     #   @return [String]
     #
     # @!attribute [rw] import_destination
@@ -3578,12 +3885,29 @@ module Aws::SESV2
     #   @return [Types::ImportDestination]
     #
     # @!attribute [rw] job_status
-    #   The status of the import job.
+    #   The status of a job.
+    #
+    #   * `CREATED` – Job has just been created.
+    #
+    #   * `PROCESSING` – Job is processing.
+    #
+    #   * `ERROR` – An error occurred during processing.
+    #
+    #   * `COMPLETED` – Job has completed processing successfully.
     #   @return [String]
     #
     # @!attribute [rw] created_timestamp
     #   The date and time when the import job was created.
     #   @return [Time]
+    #
+    # @!attribute [rw] processed_records_count
+    #   The current number of records processed.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] failed_records_count
+    #   The number of records that failed processing because of invalid
+    #   input or other reasons.
+    #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ImportJobSummary AWS API Documentation
     #
@@ -3591,23 +3915,17 @@ module Aws::SESV2
       :job_id,
       :import_destination,
       :job_status,
-      :created_timestamp)
+      :created_timestamp,
+      :processed_records_count,
+      :failed_records_count)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # An object that contains information about the inbox placement data
-    # settings for a verified domain that’s associated with your AWS
-    # account. This data is available only if you enabled the Deliverability
-    # dashboard for the domain.
-    #
-    # @note When making an API call, you may pass InboxPlacementTrackingOption
-    #   data as a hash:
-    #
-    #       {
-    #         global: false,
-    #         tracked_isps: ["IspName"],
-    #       }
+    # settings for a verified domain that’s associated with your Amazon Web
+    # Services account. This data is available only if you enabled the
+    # Deliverability dashboard for the domain.
     #
     # @!attribute [rw] global
     #   Specifies whether inbox placement data is being tracked for the
@@ -3627,6 +3945,64 @@ module Aws::SESV2
       SENSITIVE = []
       include Aws::Structure
     end
+
+    # An object containing details about a specific event.
+    #
+    # @!attribute [rw] timestamp
+    #   The timestamp of the event.
+    #   @return [Time]
+    #
+    # @!attribute [rw] type
+    #   The type of event:
+    #
+    #   * `SEND` - The send request was successful and SES will attempt to
+    #     deliver the message to the recipient’s mail server. (If
+    #     account-level or global suppression is being used, SES will still
+    #     count it as a send, but delivery is suppressed.)
+    #
+    #   * `DELIVERY` - SES successfully delivered the email to the
+    #     recipient's mail server. Excludes deliveries to the mailbox
+    #     simulator, and those from emails addressed to more than one
+    #     recipient.
+    #
+    #   * `BOUNCE` - Feedback received for delivery failures. Additional
+    #     details about the bounce are provided in the `Details` object.
+    #     Excludes bounces from the mailbox simulator, and those from emails
+    #     addressed to more than one recipient.
+    #
+    #   * `COMPLAINT` - Complaint received for the email. Additional details
+    #     about the complaint are provided in the `Details` object. This
+    #     excludes complaints from the mailbox simulator, those originating
+    #     from your account-level suppression list (if enabled), and those
+    #     from emails addressed to more than one recipient.
+    #
+    #   * `OPEN` - Open event for emails including open trackers. Excludes
+    #     opens for emails addressed to more than one recipient.
+    #
+    #   * `CLICK` - Click event for emails including wrapped links. Excludes
+    #     clicks for emails addressed to more than one recipient.
+    #   @return [String]
+    #
+    # @!attribute [rw] details
+    #   Details about bounce or complaint events.
+    #   @return [Types::EventDetails]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/InsightsEvent AWS API Documentation
+    #
+    class InsightsEvent < Struct.new(
+      :timestamp,
+      :type,
+      :details)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The request couldn't be processed because an error occurred with the
+    # Amazon SES API v2.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/InternalServiceErrorException AWS API Documentation
+    #
+    class InternalServiceErrorException < Aws::EmptyStructure; end
 
     # The specified request includes an invalid or expired token.
     #
@@ -3660,14 +4036,6 @@ module Aws::SESV2
     # email events. You can use Amazon Kinesis Data Firehose to stream data
     # to other services, such as Amazon S3 and Amazon Redshift.
     #
-    # @note When making an API call, you may pass KinesisFirehoseDestination
-    #   data as a hash:
-    #
-    #       {
-    #         iam_role_arn: "AmazonResourceName", # required
-    #         delivery_stream_arn: "AmazonResourceName", # required
-    #       }
-    #
     # @!attribute [rw] iam_role_arn
     #   The Amazon Resource Name (ARN) of the IAM role that the Amazon SES
     #   API v2 uses to send email events to the Amazon Kinesis Data Firehose
@@ -3695,15 +4063,7 @@ module Aws::SESV2
     class LimitExceededException < Aws::EmptyStructure; end
 
     # A request to obtain a list of configuration sets for your Amazon SES
-    # account in the current AWS Region.
-    #
-    # @note When making an API call, you may pass ListConfigurationSetsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         page_size: 1,
-    #       }
+    # account in the current Amazon Web Services Region.
     #
     # @!attribute [rw] next_token
     #   A token returned from a previous call to `ListConfigurationSets` to
@@ -3727,11 +4087,11 @@ module Aws::SESV2
     end
 
     # A list of configuration sets in your Amazon SES account in the current
-    # AWS Region.
+    # Amazon Web Services Region.
     #
     # @!attribute [rw] configuration_sets
     #   An array that contains all of the configuration sets in your Amazon
-    #   SES account in the current AWS Region.
+    #   SES account in the current Amazon Web Services Region.
     #   @return [Array<String>]
     #
     # @!attribute [rw] next_token
@@ -3750,14 +4110,6 @@ module Aws::SESV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListContactListsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         page_size: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] page_size
     #   Maximum number of contact lists to return at once. Use this
     #   parameter to paginate results. If additional contact lists exist
@@ -3804,17 +4156,6 @@ module Aws::SESV2
 
     # A filter that can be applied to a list of contacts.
     #
-    # @note When making an API call, you may pass ListContactsFilter
-    #   data as a hash:
-    #
-    #       {
-    #         filtered_status: "OPT_IN", # accepts OPT_IN, OPT_OUT
-    #         topic_filter: {
-    #           topic_name: "TopicName",
-    #           use_default_if_preference_unavailable: false,
-    #         },
-    #       }
-    #
     # @!attribute [rw] filtered_status
     #   The status by which you are filtering: `OPT_IN` or `OPT_OUT`.
     #   @return [String]
@@ -3832,22 +4173,6 @@ module Aws::SESV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListContactsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #         filter: {
-    #           filtered_status: "OPT_IN", # accepts OPT_IN, OPT_OUT
-    #           topic_filter: {
-    #             topic_name: "TopicName",
-    #             use_default_if_preference_unavailable: false,
-    #           },
-    #         },
-    #         page_size: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list.
     #   @return [String]
@@ -3906,14 +4231,6 @@ module Aws::SESV2
     # Represents a request to list the existing custom verification email
     # templates for your account.
     #
-    # @note When making an API call, you may pass ListCustomVerificationEmailTemplatesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         page_size: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   A token returned from a previous call to
     #   `ListCustomVerificationEmailTemplates` to indicate the position in
@@ -3965,14 +4282,6 @@ module Aws::SESV2
 
     # A request to obtain a list of dedicated IP pools.
     #
-    # @note When making an API call, you may pass ListDedicatedIpPoolsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         page_size: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   A token returned from a previous call to `ListDedicatedIpPools` to
     #   indicate the position in the list of dedicated IP pools.
@@ -3998,7 +4307,7 @@ module Aws::SESV2
     #
     # @!attribute [rw] dedicated_ip_pools
     #   A list of all of the dedicated IP pools that are associated with
-    #   your AWS account in the current Region.
+    #   your Amazon Web Services account in the current Region.
     #   @return [Array<String>]
     #
     # @!attribute [rw] next_token
@@ -4019,14 +4328,6 @@ module Aws::SESV2
 
     # A request to list all of the predictive inbox placement tests that
     # you've performed.
-    #
-    # @note When making an API call, you may pass ListDeliverabilityTestReportsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         page_size: 1,
-    #       }
     #
     # @!attribute [rw] next_token
     #   A token returned from a previous call to
@@ -4085,26 +4386,14 @@ module Aws::SESV2
     # is available for a domain only if you enabled the Deliverability
     # dashboard.
     #
-    # @note When making an API call, you may pass ListDomainDeliverabilityCampaignsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         start_date: Time.now, # required
-    #         end_date: Time.now, # required
-    #         subscribed_domain: "Domain", # required
-    #         next_token: "NextToken",
-    #         page_size: 1,
-    #       }
-    #
     # @!attribute [rw] start_date
-    #   The first day, in Unix time format, that you want to obtain
-    #   deliverability data for.
+    #   The first day that you want to obtain deliverability data for.
     #   @return [Time]
     #
     # @!attribute [rw] end_date
-    #   The last day, in Unix time format, that you want to obtain
-    #   deliverability data for. This value has to be less than or equal to
-    #   30 days after the value of the `StartDate` parameter.
+    #   The last day that you want to obtain deliverability data for. This
+    #   value has to be less than or equal to 30 days after the value of the
+    #   `StartDate` parameter.
     #   @return [Time]
     #
     # @!attribute [rw] subscribed_domain
@@ -4162,18 +4451,10 @@ module Aws::SESV2
       include Aws::Structure
     end
 
-    # A request to list all of the email identities associated with your AWS
-    # account. This list includes identities that you've already verified,
-    # identities that are unverified, and identities that were verified in
-    # the past, but are no longer verified.
-    #
-    # @note When making an API call, you may pass ListEmailIdentitiesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         page_size: 1,
-    #       }
+    # A request to list all of the email identities associated with your
+    # Amazon Web Services account. This list includes identities that
+    # you've already verified, identities that are unverified, and
+    # identities that were verified in the past, but are no longer verified.
     #
     # @!attribute [rw] next_token
     #   A token returned from a previous call to `ListEmailIdentities` to
@@ -4205,7 +4486,7 @@ module Aws::SESV2
     #
     # @!attribute [rw] email_identities
     #   An array that includes all of the email identities associated with
-    #   your AWS account.
+    #   your Amazon Web Services account.
     #   @return [Array<Types::IdentityInfo>]
     #
     # @!attribute [rw] next_token
@@ -4225,20 +4506,12 @@ module Aws::SESV2
     end
 
     # Represents a request to list the email templates present in your
-    # Amazon SES account in the current AWS Region. For more information,
-    # see the [Amazon SES Developer Guide][1].
+    # Amazon SES account in the current Amazon Web Services Region. For more
+    # information, see the [Amazon SES Developer Guide][1].
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-personalized-email-api.html
-    #
-    # @note When making an API call, you may pass ListEmailTemplatesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         page_size: 1,
-    #       }
     #
     # @!attribute [rw] next_token
     #   A token returned from a previous call to `ListEmailTemplates` to
@@ -4252,7 +4525,7 @@ module Aws::SESV2
     #   `NextToken` element, which you can use to obtain additional results.
     #
     #   The value you specify has to be at least 1, and can be no more than
-    #   10.
+    #   100.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ListEmailTemplatesRequest AWS API Documentation
@@ -4286,17 +4559,67 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # Represents a request to list all export jobs with filters.
+    #
+    # @!attribute [rw] next_token
+    #   The pagination token returned from a previous call to
+    #   `ListExportJobs` to indicate the position in the list of export
+    #   jobs.
+    #   @return [String]
+    #
+    # @!attribute [rw] page_size
+    #   Maximum number of export jobs to return at once. Use this parameter
+    #   to paginate results. If additional export jobs exist beyond the
+    #   specified limit, the `NextToken` element is sent in the response.
+    #   Use the `NextToken` value in subsequent calls to `ListExportJobs` to
+    #   retrieve additional export jobs.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] export_source_type
+    #   A value used to list export jobs that have a certain
+    #   `ExportSourceType`.
+    #   @return [String]
+    #
+    # @!attribute [rw] job_status
+    #   A value used to list export jobs that have a certain `JobStatus`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ListExportJobsRequest AWS API Documentation
+    #
+    class ListExportJobsRequest < Struct.new(
+      :next_token,
+      :page_size,
+      :export_source_type,
+      :job_status)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An HTTP 200 response if the request succeeds, or an error message if
+    # the request fails.
+    #
+    # @!attribute [rw] export_jobs
+    #   A list of the export job summaries.
+    #   @return [Array<Types::ExportJobSummary>]
+    #
+    # @!attribute [rw] next_token
+    #   A string token indicating that there might be additional export jobs
+    #   available to be listed. Use this token to a subsequent call to
+    #   `ListExportJobs` with the same parameters to retrieve the next page
+    #   of export jobs.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ListExportJobsResponse AWS API Documentation
+    #
+    class ListExportJobsResponse < Struct.new(
+      :export_jobs,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Represents a request to list all of the import jobs for a data
     # destination within the specified maximum number of import jobs.
-    #
-    # @note When making an API call, you may pass ListImportJobsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         import_destination_type: "SUPPRESSION_LIST", # accepts SUPPRESSION_LIST, CONTACT_LIST
-    #         next_token: "NextToken",
-    #         page_size: 1,
-    #       }
     #
     # @!attribute [rw] import_destination_type
     #   The destination of the import job, which can be used to list import
@@ -4354,14 +4677,6 @@ module Aws::SESV2
     # An object used to specify a list or topic to which an email belongs,
     # which will be used when a contact chooses to unsubscribe.
     #
-    # @note When making an API call, you may pass ListManagementOptions
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #         topic_name: "TopicName",
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list.
     #   @return [String]
@@ -4379,19 +4694,66 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # Represents a request to list the existing recommendations for your
+    # account.
+    #
+    # @!attribute [rw] filter
+    #   Filters applied when retrieving recommendations. Can eiter be an
+    #   individual filter, or combinations of `STATUS` and `IMPACT` or
+    #   `STATUS` and `TYPE`
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] next_token
+    #   A token returned from a previous call to `ListRecommendations` to
+    #   indicate the position in the list of recommendations.
+    #   @return [String]
+    #
+    # @!attribute [rw] page_size
+    #   The number of results to show in a single call to
+    #   `ListRecommendations`. If the number of results is larger than the
+    #   number you specified in this parameter, then the response includes a
+    #   `NextToken` element, which you can use to obtain additional results.
+    #
+    #   The value you specify has to be at least 1, and can be no more than
+    #   100.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ListRecommendationsRequest AWS API Documentation
+    #
+    class ListRecommendationsRequest < Struct.new(
+      :filter,
+      :next_token,
+      :page_size)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains the response to your request to retrieve the list of
+    # recommendations for your account.
+    #
+    # @!attribute [rw] recommendations
+    #   The recommendations applicable to your account.
+    #   @return [Array<Types::Recommendation>]
+    #
+    # @!attribute [rw] next_token
+    #   A string token indicating that there might be additional
+    #   recommendations available to be listed. Use the token provided in
+    #   the `ListRecommendationsResponse` to use in the subsequent call to
+    #   `ListRecommendations` with the same parameters to retrieve the next
+    #   page of recommendations.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/ListRecommendationsResponse AWS API Documentation
+    #
+    class ListRecommendationsResponse < Struct.new(
+      :recommendations,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # A request to obtain a list of email destinations that are on the
     # suppression list for your account.
-    #
-    # @note When making an API call, you may pass ListSuppressedDestinationsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         reasons: ["BOUNCE"], # accepts BOUNCE, COMPLAINT
-    #         start_date: Time.now,
-    #         end_date: Time.now,
-    #         next_token: "NextToken",
-    #         page_size: 1,
-    #       }
     #
     # @!attribute [rw] reasons
     #   The factors that caused the email address to be added to .
@@ -4400,14 +4762,13 @@ module Aws::SESV2
     # @!attribute [rw] start_date
     #   Used to filter the list of suppressed email destinations so that it
     #   only includes addresses that were added to the list after a specific
-    #   date. The date that you specify should be in Unix time format.
+    #   date.
     #   @return [Time]
     #
     # @!attribute [rw] end_date
     #   Used to filter the list of suppressed email destinations so that it
     #   only includes addresses that were added to the list before a
-    #   specific date. The date that you specify should be in Unix time
-    #   format.
+    #   specific date.
     #   @return [Time]
     #
     # @!attribute [rw] next_token
@@ -4459,13 +4820,6 @@ module Aws::SESV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "AmazonResourceName", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the resource that you want to
     #   retrieve tag information for.
@@ -4518,12 +4872,12 @@ module Aws::SESV2
     #   @return [String]
     #
     # @!attribute [rw] behavior_on_mx_failure
-    #   The action that you want to take if the required MX record can't be
-    #   found when you send an email. When you set this value to
-    #   `UseDefaultValue`, the mail is sent using *amazonses.com* as the
-    #   MAIL FROM domain. When you set this value to `RejectMessage`, the
-    #   Amazon SES API v2 returns a `MailFromDomainNotVerified` error, and
-    #   doesn't attempt to deliver the email.
+    #   The action to take if the required MX record can't be found when
+    #   you send an email. When you set this value to `USE_DEFAULT_VALUE`,
+    #   the mail is sent using *amazonses.com* as the MAIL FROM domain. When
+    #   you set this value to `REJECT_MESSAGE`, the Amazon SES API v2
+    #   returns a `MailFromDomainNotVerified` error, and doesn't attempt to
+    #   deliver the email.
     #
     #   These behaviors are taken when the custom MAIL FROM domain
     #   configuration is in the `Pending`, `Failed`, and `TemporaryFailure`
@@ -4549,26 +4903,6 @@ module Aws::SESV2
     # Represents the email message that you're sending. The `Message`
     # object consists of a subject line and a message body.
     #
-    # @note When making an API call, you may pass Message
-    #   data as a hash:
-    #
-    #       {
-    #         subject: { # required
-    #           data: "MessageData", # required
-    #           charset: "Charset",
-    #         },
-    #         body: { # required
-    #           text: {
-    #             data: "MessageData", # required
-    #             charset: "Charset",
-    #           },
-    #           html: {
-    #             data: "MessageData", # required
-    #             charset: "Charset",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] subject
     #   The subject line of the email. The subject line can only contain
     #   7-bit ASCII characters. However, you can specify non-ASCII
@@ -4585,12 +4919,146 @@ module Aws::SESV2
     #   message, a text-only version of the message, or both.
     #   @return [Types::Body]
     #
+    # @!attribute [rw] headers
+    #   The list of message headers that will be added to the email message.
+    #   @return [Array<Types::MessageHeader>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/Message AWS API Documentation
     #
     class Message < Struct.new(
       :subject,
-      :body)
+      :body,
+      :headers)
       SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains the name and value of a message header that you add to an
+    # email.
+    #
+    # @!attribute [rw] name
+    #   The name of the message header. The message header name has to meet
+    #   the following criteria:
+    #
+    #   * Can contain any printable ASCII character (33 - 126) except for
+    #     colon (:).
+    #
+    #   * Can contain no more than 126 characters.
+    #   @return [String]
+    #
+    # @!attribute [rw] value
+    #   The value of the message header. The message header value has to
+    #   meet the following criteria:
+    #
+    #   * Can contain any printable ASCII character.
+    #
+    #   * Can contain no more than 870 characters.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/MessageHeader AWS API Documentation
+    #
+    class MessageHeader < Struct.new(
+      :name,
+      :value)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object that contains filters applied when performing the Message
+    # Insights export.
+    #
+    # @!attribute [rw] start_date
+    #   Represents the start date for the export interval as a timestamp.
+    #   The start date is inclusive.
+    #   @return [Time]
+    #
+    # @!attribute [rw] end_date
+    #   Represents the end date for the export interval as a timestamp. The
+    #   end date is inclusive.
+    #   @return [Time]
+    #
+    # @!attribute [rw] include
+    #   Filters for results to be included in the export file.
+    #   @return [Types::MessageInsightsFilters]
+    #
+    # @!attribute [rw] exclude
+    #   Filters for results to be excluded from the export file.
+    #   @return [Types::MessageInsightsFilters]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of results.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/MessageInsightsDataSource AWS API Documentation
+    #
+    class MessageInsightsDataSource < Struct.new(
+      :start_date,
+      :end_date,
+      :include,
+      :exclude,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object containing Message Insights filters.
+    #
+    # If you specify multiple filters, the filters are joined by AND.
+    #
+    # If you specify multiple values for a filter, the values are joined by
+    # OR. Filter values are case-sensitive.
+    #
+    # `FromEmailAddress`, `Destination`, and `Subject` filters support
+    # partial match. A partial match is performed by using the `*` wildcard
+    # character placed at the beginning (suffix match), the end (prefix
+    # match) or both ends of the string (contains match). In order to match
+    # the literal characters `*` or ``, they must be escaped using the ``
+    # character. If no wildcard character is present, an exact match is
+    # performed.
+    #
+    # @!attribute [rw] from_email_address
+    #   The from address used to send the message.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] destination
+    #   The recipient's email address.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] subject
+    #   The subject line of the message.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] isp
+    #   The recipient's ISP (e.g., `Gmail`, `Yahoo`, etc.).
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] last_delivery_event
+    #   The last delivery-related event for the email, where the ordering is
+    #   as follows: `SEND` &lt; `BOUNCE` &lt; `DELIVERY` &lt; `COMPLAINT`.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] last_engagement_event
+    #   The last engagement-related event for the email, where the ordering
+    #   is as follows: `OPEN` &lt; `CLICK`.
+    #
+    #   Engagement events are only available if [Engagement tracking][1] is
+    #   enabled.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/ses/latest/dg/vdm-settings.html
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/MessageInsightsFilters AWS API Documentation
+    #
+    class MessageInsightsFilters < Struct.new(
+      :from_email_address,
+      :destination,
+      :subject,
+      :isp,
+      :last_delivery_event,
+      :last_engagement_event)
+      SENSITIVE = [:from_email_address, :destination, :subject]
       include Aws::Structure
     end
 
@@ -4602,14 +5070,6 @@ module Aws::SESV2
 
     # Contains the name and value of a tag that you apply to an email. You
     # can use message tags when you publish email sending events.
-    #
-    # @note When making an API call, you may pass MessageTag
-    #   data as a hash:
-    #
-    #       {
-    #         name: "MessageTagName", # required
-    #         value: "MessageTagValue", # required
-    #       }
     #
     # @!attribute [rw] name
     #   The name of the message tag. The message tag name has to meet the
@@ -4636,6 +5096,98 @@ module Aws::SESV2
     class MessageTag < Struct.new(
       :name,
       :value)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An error corresponding to the unsuccessful processing of a single
+    # metric data query.
+    #
+    # @!attribute [rw] id
+    #   The query identifier.
+    #   @return [String]
+    #
+    # @!attribute [rw] code
+    #   The query error code. Can be one of:
+    #
+    #   * `INTERNAL_FAILURE` – Amazon SES has failed to process one of the
+    #     queries.
+    #
+    #   * `ACCESS_DENIED` – You have insufficient access to retrieve metrics
+    #     based on the given query.
+    #   @return [String]
+    #
+    # @!attribute [rw] message
+    #   The error message associated with the current query error.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/MetricDataError AWS API Documentation
+    #
+    class MetricDataError < Struct.new(
+      :id,
+      :code,
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The result of a single metric data query.
+    #
+    # @!attribute [rw] id
+    #   The query identifier.
+    #   @return [String]
+    #
+    # @!attribute [rw] timestamps
+    #   A list of timestamps for the metric data results.
+    #   @return [Array<Time>]
+    #
+    # @!attribute [rw] values
+    #   A list of values (cumulative / sum) for the metric data results.
+    #   @return [Array<Integer>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/MetricDataResult AWS API Documentation
+    #
+    class MetricDataResult < Struct.new(
+      :id,
+      :timestamps,
+      :values)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object that contains details about the data source for the metrics
+    # export.
+    #
+    # @!attribute [rw] dimensions
+    #   An object that contains a mapping between a `MetricDimensionName`
+    #   and `MetricDimensionValue` to filter metrics by. Must contain a
+    #   least 1 dimension but no more than 3 unique ones.
+    #   @return [Hash<String,Array<String>>]
+    #
+    # @!attribute [rw] namespace
+    #   The metrics namespace - e.g., `VDM`.
+    #   @return [String]
+    #
+    # @!attribute [rw] metrics
+    #   A list of `ExportMetric` objects to export.
+    #   @return [Array<Types::ExportMetric>]
+    #
+    # @!attribute [rw] start_date
+    #   Represents the start date for the export interval as a timestamp.
+    #   @return [Time]
+    #
+    # @!attribute [rw] end_date
+    #   Represents the end date for the export interval as a timestamp.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/MetricsDataSource AWS API Documentation
+    #
+    class MetricsDataSource < Struct.new(
+      :dimensions,
+      :namespace,
+      :metrics,
+      :start_date,
+      :end_date)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -4685,16 +5237,9 @@ module Aws::SESV2
     #
     # [1]: https://docs.aws.amazon.com/pinpoint/latest/userguide/analytics-transactional-messages.html
     #
-    # @note When making an API call, you may pass PinpointDestination
-    #   data as a hash:
-    #
-    #       {
-    #         application_arn: "AmazonResourceName",
-    #       }
-    #
     # @!attribute [rw] application_arn
-    #   The Amazon Resource Name (ARN) of the Amazon Pinpoint project that
-    #   you want to send email events to.
+    #   The Amazon Resource Name (ARN) of the Amazon Pinpoint project to
+    #   send email events to.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PinpointDestination AWS API Documentation
@@ -4747,18 +5292,11 @@ module Aws::SESV2
     # A request to enable or disable the automatic IP address warm-up
     # feature.
     #
-    # @note When making an API call, you may pass PutAccountDedicatedIpWarmupAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         auto_warmup_enabled: false,
-    #       }
-    #
     # @!attribute [rw] auto_warmup_enabled
     #   Enables or disables the automatic warm-up feature for dedicated IP
     #   addresses that are associated with your Amazon SES account in the
-    #   current AWS Region. Set to `true` to enable the automatic warm-up
-    #   feature, or set to `false` to disable it.
+    #   current Amazon Web Services Region. Set to `true` to enable the
+    #   automatic warm-up feature, or set to `false` to disable it.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutAccountDedicatedIpWarmupAttributesRequest AWS API Documentation
@@ -4777,18 +5315,6 @@ module Aws::SESV2
     class PutAccountDedicatedIpWarmupAttributesResponse < Aws::EmptyStructure; end
 
     # A request to submit new account details.
-    #
-    # @note When making an API call, you may pass PutAccountDetailsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         mail_type: "MARKETING", # required, accepts MARKETING, TRANSACTIONAL
-    #         website_url: "WebsiteURL", # required
-    #         contact_language: "EN", # accepts EN, JA
-    #         use_case_description: "UseCaseDescription", # required
-    #         additional_contact_email_addresses: ["AdditionalContactEmailAddress"],
-    #         production_access_enabled: false,
-    #       }
     #
     # @!attribute [rw] mail_type
     #   The type of email your account will send.
@@ -4814,14 +5340,11 @@ module Aws::SESV2
     #
     # @!attribute [rw] production_access_enabled
     #   Indicates whether or not your account should have production access
-    #   in the current AWS Region.
+    #   in the current Amazon Web Services Region.
     #
     #   If the value is `false`, then your account is in the *sandbox*. When
     #   your account is in the sandbox, you can only send email to verified
-    #   identities. Additionally, the maximum number of emails you can send
-    #   in a 24-hour period (your sending quota) is 200, and the maximum
-    #   number of emails you can send per second (your maximum sending rate)
-    #   is 1.
+    #   identities.
     #
     #   If the value is `true`, then your account has production access.
     #   When your account has production access, you can send email to any
@@ -4851,20 +5374,14 @@ module Aws::SESV2
 
     # A request to change the ability of your account to send email.
     #
-    # @note When making an API call, you may pass PutAccountSendingAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         sending_enabled: false,
-    #       }
-    #
     # @!attribute [rw] sending_enabled
     #   Enables or disables your account's ability to send email. Set to
     #   `true` to enable email sending, or set to `false` to disable email
     #   sending.
     #
-    #   <note markdown="1"> If AWS paused your account's ability to send email, you can't use
-    #   this operation to resume your account's ability to send email.
+    #   <note markdown="1"> If Amazon Web Services paused your account's ability to send email,
+    #   you can't use this operation to resume your account's ability to
+    #   send email.
     #
     #    </note>
     #   @return [Boolean]
@@ -4885,13 +5402,6 @@ module Aws::SESV2
     class PutAccountSendingAttributesResponse < Aws::EmptyStructure; end
 
     # A request to change your account's suppression preferences.
-    #
-    # @note When making an API call, you may pass PutAccountSuppressionAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         suppressed_reasons: ["BOUNCE"], # accepts BOUNCE, COMPLAINT
-    #       }
     #
     # @!attribute [rw] suppressed_reasons
     #   A list that contains the reasons that email addresses will be
@@ -4922,20 +5432,30 @@ module Aws::SESV2
     #
     class PutAccountSuppressionAttributesResponse < Aws::EmptyStructure; end
 
+    # A request to submit new account VDM attributes.
+    #
+    # @!attribute [rw] vdm_attributes
+    #   The VDM attributes that you wish to apply to your Amazon SES
+    #   account.
+    #   @return [Types::VdmAttributes]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutAccountVdmAttributesRequest AWS API Documentation
+    #
+    class PutAccountVdmAttributesRequest < Struct.new(
+      :vdm_attributes)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutAccountVdmAttributesResponse AWS API Documentation
+    #
+    class PutAccountVdmAttributesResponse < Aws::EmptyStructure; end
+
     # A request to associate a configuration set with a dedicated IP pool.
     #
-    # @note When making an API call, you may pass PutConfigurationSetDeliveryOptionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #         tls_policy: "REQUIRE", # accepts REQUIRE, OPTIONAL
-    #         sending_pool_name: "SendingPoolName",
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set that you want to associate with a
-    #   dedicated IP pool.
+    #   The name of the configuration set to associate with a dedicated IP
+    #   pool.
     #   @return [String]
     #
     # @!attribute [rw] tls_policy
@@ -4947,8 +5467,8 @@ module Aws::SESV2
     #   @return [String]
     #
     # @!attribute [rw] sending_pool_name
-    #   The name of the dedicated IP pool that you want to associate with
-    #   the configuration set.
+    #   The name of the dedicated IP pool to associate with the
+    #   configuration set.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutConfigurationSetDeliveryOptionsRequest AWS API Documentation
@@ -4971,17 +5491,8 @@ module Aws::SESV2
     # A request to enable or disable tracking of reputation metrics for a
     # configuration set.
     #
-    # @note When making an API call, you may pass PutConfigurationSetReputationOptionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #         reputation_metrics_enabled: false,
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set that you want to enable or disable
-    #   reputation metric tracking for.
+    #   The name of the configuration set.
     #   @return [String]
     #
     # @!attribute [rw] reputation_metrics_enabled
@@ -5009,17 +5520,9 @@ module Aws::SESV2
     # A request to enable or disable the ability of Amazon SES to send
     # emails that use a specific configuration set.
     #
-    # @note When making an API call, you may pass PutConfigurationSetSendingOptionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #         sending_enabled: false,
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set that you want to enable or disable
-    #   email sending for.
+    #   The name of the configuration set to enable or disable email sending
+    #   for.
     #   @return [String]
     #
     # @!attribute [rw] sending_enabled
@@ -5046,17 +5549,9 @@ module Aws::SESV2
     # A request to change the account suppression list preferences for a
     # specific configuration set.
     #
-    # @note When making an API call, you may pass PutConfigurationSetSuppressionOptionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #         suppressed_reasons: ["BOUNCE"], # accepts BOUNCE, COMPLAINT
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set that you want to change the
-    #   suppression list preferences for.
+    #   The name of the configuration set to change the suppression list
+    #   preferences for.
     #   @return [String]
     #
     # @!attribute [rw] suppressed_reasons
@@ -5092,28 +5587,29 @@ module Aws::SESV2
     # A request to add a custom domain for tracking open and click events to
     # a configuration set.
     #
-    # @note When making an API call, you may pass PutConfigurationSetTrackingOptionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #         custom_redirect_domain: "CustomRedirectDomain",
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set that you want to add a custom
-    #   tracking domain to.
+    #   The name of the configuration set.
     #   @return [String]
     #
     # @!attribute [rw] custom_redirect_domain
-    #   The domain that you want to use to track open and click events.
+    #   The domain to use to track open and click events.
+    #   @return [String]
+    #
+    # @!attribute [rw] https_policy
+    #   The https policy to use for tracking open and click events. If the
+    #   value is OPTIONAL or HttpsPolicy is not specified, the open trackers
+    #   use HTTP and click tracker use the original protocol of the link. If
+    #   the value is REQUIRE, both open and click tracker uses HTTPS and if
+    #   the value is REQUIRE\_OPEN\_ONLY open tracker uses HTTPS and link
+    #   tracker is same as original protocol of the link.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutConfigurationSetTrackingOptionsRequest AWS API Documentation
     #
     class PutConfigurationSetTrackingOptionsRequest < Struct.new(
       :configuration_set_name,
-      :custom_redirect_domain)
+      :custom_redirect_domain,
+      :https_policy)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -5125,20 +5621,38 @@ module Aws::SESV2
     #
     class PutConfigurationSetTrackingOptionsResponse < Aws::EmptyStructure; end
 
+    # A request to add specific VDM settings to a configuration set.
+    #
+    # @!attribute [rw] configuration_set_name
+    #   The name of the configuration set.
+    #   @return [String]
+    #
+    # @!attribute [rw] vdm_options
+    #   The VDM options to apply to the configuration set.
+    #   @return [Types::VdmOptions]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutConfigurationSetVdmOptionsRequest AWS API Documentation
+    #
+    class PutConfigurationSetVdmOptionsRequest < Struct.new(
+      :configuration_set_name,
+      :vdm_options)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An HTTP 200 response if the request succeeds, or an error message if
+    # the request fails.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutConfigurationSetVdmOptionsResponse AWS API Documentation
+    #
+    class PutConfigurationSetVdmOptionsResponse < Aws::EmptyStructure; end
+
     # A request to move a dedicated IP address to a dedicated IP pool.
-    #
-    # @note When making an API call, you may pass PutDedicatedIpInPoolRequest
-    #   data as a hash:
-    #
-    #       {
-    #         ip: "Ip", # required
-    #         destination_pool_name: "PoolName", # required
-    #       }
     #
     # @!attribute [rw] ip
     #   The IP address that you want to move to the dedicated IP pool. The
     #   value you specify has to be a dedicated IP address that's
-    #   associated with your AWS account.
+    #   associated with your Amazon Web Services account.
     #   @return [String]
     #
     # @!attribute [rw] destination_pool_name
@@ -5162,17 +5676,40 @@ module Aws::SESV2
     #
     class PutDedicatedIpInPoolResponse < Aws::EmptyStructure; end
 
+    # A request to convert a dedicated IP pool to a different scaling mode.
+    #
+    # @!attribute [rw] pool_name
+    #   The name of the dedicated IP pool.
+    #   @return [String]
+    #
+    # @!attribute [rw] scaling_mode
+    #   The scaling mode to apply to the dedicated IP pool.
+    #
+    #   <note markdown="1"> Changing the scaling mode from `MANAGED` to `STANDARD` is not
+    #   supported.
+    #
+    #    </note>
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutDedicatedIpPoolScalingAttributesRequest AWS API Documentation
+    #
+    class PutDedicatedIpPoolScalingAttributesRequest < Struct.new(
+      :pool_name,
+      :scaling_mode)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An HTTP 200 response if the request succeeds, or an error message if
+    # the request fails.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutDedicatedIpPoolScalingAttributesResponse AWS API Documentation
+    #
+    class PutDedicatedIpPoolScalingAttributesResponse < Aws::EmptyStructure; end
+
     # A request to change the warm-up attributes for a dedicated IP address.
     # This operation is useful when you want to resume the warm-up process
     # for an existing IP address.
-    #
-    # @note When making an API call, you may pass PutDedicatedIpWarmupAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         ip: "Ip", # required
-    #         warmup_percentage: 1, # required
-    #       }
     #
     # @!attribute [rw] ip
     #   The dedicated IP address that you want to update the warm-up
@@ -5208,30 +5745,13 @@ module Aws::SESV2
     #
     # When you use the Deliverability dashboard, you pay a monthly
     # subscription charge, in addition to any other fees that you accrue by
-    # using Amazon SES and other AWS services. For more information about
-    # the features and cost of a Deliverability dashboard subscription, see
-    # [Amazon Pinpoint Pricing][1].
+    # using Amazon SES and other Amazon Web Services services. For more
+    # information about the features and cost of a Deliverability dashboard
+    # subscription, see [Amazon Pinpoint Pricing][1].
     #
     #
     #
     # [1]: http://aws.amazon.com/pinpoint/pricing/
-    #
-    # @note When making an API call, you may pass PutDeliverabilityDashboardOptionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dashboard_enabled: false, # required
-    #         subscribed_domains: [
-    #           {
-    #             domain: "Domain",
-    #             subscription_start_date: Time.now,
-    #             inbox_placement_tracking_option: {
-    #               global: false,
-    #               tracked_isps: ["IspName"],
-    #             },
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] dashboard_enabled
     #   Specifies whether to enable the Deliverability dashboard. To enable
@@ -5259,19 +5779,37 @@ module Aws::SESV2
     #
     class PutDeliverabilityDashboardOptionResponse < Aws::EmptyStructure; end
 
+    # A request to associate a configuration set with an email identity.
+    #
+    # @!attribute [rw] email_identity
+    #   The email address or domain to associate with a configuration set.
+    #   @return [String]
+    #
+    # @!attribute [rw] configuration_set_name
+    #   The configuration set to associate with an email identity.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutEmailIdentityConfigurationSetAttributesRequest AWS API Documentation
+    #
+    class PutEmailIdentityConfigurationSetAttributesRequest < Struct.new(
+      :email_identity,
+      :configuration_set_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # If the action is successful, the service sends back an HTTP 200
+    # response with an empty HTTP body.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutEmailIdentityConfigurationSetAttributesResponse AWS API Documentation
+    #
+    class PutEmailIdentityConfigurationSetAttributesResponse < Aws::EmptyStructure; end
+
     # A request to enable or disable DKIM signing of email that you send
     # from an email identity.
     #
-    # @note When making an API call, you may pass PutEmailIdentityDkimAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #         signing_enabled: false,
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The email identity that you want to change the DKIM settings for.
+    #   The email identity.
     #   @return [String]
     #
     # @!attribute [rw] signing_enabled
@@ -5300,25 +5838,13 @@ module Aws::SESV2
 
     # A request to change the DKIM attributes for an email identity.
     #
-    # @note When making an API call, you may pass PutEmailIdentityDkimSigningAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #         signing_attributes_origin: "AWS_SES", # required, accepts AWS_SES, EXTERNAL
-    #         signing_attributes: {
-    #           domain_signing_selector: "Selector", # required
-    #           domain_signing_private_key: "PrivateKey", # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The email identity that you want to configure DKIM for.
+    #   The email identity.
     #   @return [String]
     #
     # @!attribute [rw] signing_attributes_origin
-    #   The method that you want to use to configure DKIM for the identity.
-    #   There are two possible values:
+    #   The method to use to configure DKIM for the identity. There are the
+    #   following possible values:
     #
     #   * `AWS_SES` – Configure DKIM for the identity by using [Easy
     #     DKIM][1].
@@ -5333,9 +5859,13 @@ module Aws::SESV2
     #
     # @!attribute [rw] signing_attributes
     #   An object that contains information about the private key and
-    #   selector that you want to use to configure DKIM for the identity.
-    #   This object is only required if you want to configure Bring Your Own
-    #   DKIM (BYODKIM) for the identity.
+    #   selector that you want to use to configure DKIM for the identity for
+    #   Bring Your Own DKIM (BYODKIM) for the identity, or, configures the
+    #   key length to be used for [Easy DKIM][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/easy-dkim.html
     #   @return [Types::DkimSigningAttributes]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/PutEmailIdentityDkimSigningAttributesRequest AWS API Documentation
@@ -5422,17 +5952,8 @@ module Aws::SESV2
     # A request to set the attributes that control how bounce and complaint
     # events are processed.
     #
-    # @note When making an API call, you may pass PutEmailIdentityFeedbackAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #         email_forwarding_enabled: false,
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The email identity that you want to configure bounce and complaint
-    #   feedback forwarding for.
+    #   The email identity.
     #   @return [String]
     #
     # @!attribute [rw] email_forwarding_enabled
@@ -5469,18 +5990,8 @@ module Aws::SESV2
     # A request to configure the custom MAIL FROM domain for a verified
     # identity.
     #
-    # @note When making an API call, you may pass PutEmailIdentityMailFromAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #         mail_from_domain: "MailFromDomainName",
-    #         behavior_on_mx_failure: "USE_DEFAULT_VALUE", # accepts USE_DEFAULT_VALUE, REJECT_MESSAGE
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The verified email identity that you want to set up the custom MAIL
-    #   FROM domain for.
+    #   The verified email identity.
     #   @return [String]
     #
     # @!attribute [rw] mail_from_domain
@@ -5496,12 +6007,12 @@ module Aws::SESV2
     #   @return [String]
     #
     # @!attribute [rw] behavior_on_mx_failure
-    #   The action that you want to take if the required MX record isn't
-    #   found when you send an email. When you set this value to
-    #   `UseDefaultValue`, the mail is sent using *amazonses.com* as the
-    #   MAIL FROM domain. When you set this value to `RejectMessage`, the
-    #   Amazon SES API v2 returns a `MailFromDomainNotVerified` error, and
-    #   doesn't attempt to deliver the email.
+    #   The action to take if the required MX record isn't found when you
+    #   send an email. When you set this value to `UseDefaultValue`, the
+    #   mail is sent using *amazonses.com* as the MAIL FROM domain. When you
+    #   set this value to `RejectMessage`, the Amazon SES API v2 returns a
+    #   `MailFromDomainNotVerified` error, and doesn't attempt to deliver
+    #   the email.
     #
     #   These behaviors are taken when the custom MAIL FROM domain
     #   configuration is in the `Pending`, `Failed`, and `TemporaryFailure`
@@ -5527,14 +6038,6 @@ module Aws::SESV2
 
     # A request to add an email destination to the suppression list for your
     # account.
-    #
-    # @note When making an API call, you may pass PutSuppressedDestinationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_address: "EmailAddress", # required
-    #         reason: "BOUNCE", # required, accepts BOUNCE, COMPLAINT
-    #       }
     #
     # @!attribute [rw] email_address
     #   The email address that should be added to the suppression list for
@@ -5564,13 +6067,6 @@ module Aws::SESV2
 
     # Represents the raw content of an email message.
     #
-    # @note When making an API call, you may pass RawMessage
-    #   data as a hash:
-    #
-    #       {
-    #         data: "data", # required
-    #       }
-    #
     # @!attribute [rw] data
     #   The raw email message. The message has to meet the following
     #   criteria:
@@ -5584,7 +6080,10 @@ module Aws::SESV2
     #
     #   * Attachments must be in a file format that the Amazon SES supports.
     #
-    #   * The entire message must be Base64 encoded.
+    #   * The raw data of the message needs to base64-encoded if you are
+    #     accessing Amazon SES directly through the HTTPS interface. If you
+    #     are accessing Amazon SES using an Amazon Web Services SDK, the SDK
+    #     takes care of the base 64-encoding for you.
     #
     #   * If any of the MIME parts in your message contain content that is
     #     outside of the 7-bit ASCII character range, you should encode that
@@ -5607,18 +6106,57 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # A recommendation generated for your account.
+    #
+    # @!attribute [rw] resource_arn
+    #   The resource affected by the recommendation, with values like
+    #   `arn:aws:ses:us-east-1:123456789012:identity/example.com`.
+    #   @return [String]
+    #
+    # @!attribute [rw] type
+    #   The recommendation type, with values like `DKIM`, `SPF`, `DMARC` or
+    #   `BIMI`.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   The recommendation description / disambiguator - e.g. `DKIM1` and
+    #   `DKIM2` are different recommendations about your DKIM setup.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The recommendation status, with values like `OPEN` or `FIXED`.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_timestamp
+    #   The first time this issue was encountered and the recommendation was
+    #   generated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_timestamp
+    #   The last time the recommendation was updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] impact
+    #   The recommendation impact, with values like `HIGH` or `LOW`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/Recommendation AWS API Documentation
+    #
+    class Recommendation < Struct.new(
+      :resource_arn,
+      :type,
+      :description,
+      :status,
+      :created_timestamp,
+      :last_updated_timestamp,
+      :impact)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The `ReplaceEmailContent` object to be used for a specific
     # `BulkEmailEntry`. The `ReplacementTemplate` can be specified within
     # this object.
-    #
-    # @note When making an API call, you may pass ReplacementEmailContent
-    #   data as a hash:
-    #
-    #       {
-    #         replacement_template: {
-    #           replacement_template_data: "EmailTemplateData",
-    #         },
-    #       }
     #
     # @!attribute [rw] replacement_template
     #   The `ReplacementTemplate` associated with `ReplacementEmailContent`.
@@ -5634,13 +6172,6 @@ module Aws::SESV2
 
     # An object which contains `ReplacementTemplateData` to be used for a
     # specific `BulkEmailEntry`.
-    #
-    # @note When making an API call, you may pass ReplacementTemplate
-    #   data as a hash:
-    #
-    #       {
-    #         replacement_template_data: "EmailTemplateData",
-    #       }
     #
     # @!attribute [rw] replacement_template_data
     #   A list of replacement values to apply to the template. This
@@ -5658,15 +6189,8 @@ module Aws::SESV2
     end
 
     # Enable or disable collection of reputation metrics for emails that you
-    # send using this configuration set in the current AWS Region.
-    #
-    # @note When making an API call, you may pass ReputationOptions
-    #   data as a hash:
-    #
-    #       {
-    #         reputation_metrics_enabled: false,
-    #         last_fresh_start: Time.now,
-    #       }
+    # send using this configuration set in the current Amazon Web Services
+    # Region.
     #
     # @!attribute [rw] reputation_metrics_enabled
     #   If `true`, tracking of reputation metrics is enabled for the
@@ -5722,6 +6246,31 @@ module Aws::SESV2
       include Aws::Structure
     end
 
+    # An object that contains information about the start of authority (SOA)
+    # record associated with the identity.
+    #
+    # @!attribute [rw] primary_name_server
+    #   Primary name server specified in the SOA record.
+    #   @return [String]
+    #
+    # @!attribute [rw] admin_email
+    #   Administrative contact email from the SOA record.
+    #   @return [String]
+    #
+    # @!attribute [rw] serial_number
+    #   Serial number from the SOA record.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/SOARecord AWS API Documentation
+    #
+    class SOARecord < Struct.new(
+      :primary_name_server,
+      :admin_email,
+      :serial_number)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Represents a request to send email messages to multiple destinations
     # using Amazon SES. For more information, see the [Amazon SES Developer
     # Guide][1].
@@ -5730,54 +6279,9 @@ module Aws::SESV2
     #
     # [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-personalized-email-api.html
     #
-    # @note When making an API call, you may pass SendBulkEmailRequest
-    #   data as a hash:
-    #
-    #       {
-    #         from_email_address: "EmailAddress",
-    #         from_email_address_identity_arn: "AmazonResourceName",
-    #         reply_to_addresses: ["EmailAddress"],
-    #         feedback_forwarding_email_address: "EmailAddress",
-    #         feedback_forwarding_email_address_identity_arn: "AmazonResourceName",
-    #         default_email_tags: [
-    #           {
-    #             name: "MessageTagName", # required
-    #             value: "MessageTagValue", # required
-    #           },
-    #         ],
-    #         default_content: { # required
-    #           template: {
-    #             template_name: "EmailTemplateName",
-    #             template_arn: "AmazonResourceName",
-    #             template_data: "EmailTemplateData",
-    #           },
-    #         },
-    #         bulk_email_entries: [ # required
-    #           {
-    #             destination: { # required
-    #               to_addresses: ["EmailAddress"],
-    #               cc_addresses: ["EmailAddress"],
-    #               bcc_addresses: ["EmailAddress"],
-    #             },
-    #             replacement_tags: [
-    #               {
-    #                 name: "MessageTagName", # required
-    #                 value: "MessageTagValue", # required
-    #               },
-    #             ],
-    #             replacement_email_content: {
-    #               replacement_template: {
-    #                 replacement_template_data: "EmailTemplateData",
-    #               },
-    #             },
-    #           },
-    #         ],
-    #         configuration_set_name: "ConfigurationSetName",
-    #       }
-    #
     # @!attribute [rw] from_email_address
-    #   The email address that you want to use as the "From" address for
-    #   the email. The address that you specify has to be verified.
+    #   The email address to use as the "From" address for the email. The
+    #   address that you specify has to be verified.
     #   @return [String]
     #
     # @!attribute [rw] from_email_address_identity_arn
@@ -5849,8 +6353,7 @@ module Aws::SESV2
     #   @return [Array<Types::BulkEmailEntry>]
     #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set that you want to use when sending
-    #   the email.
+    #   The name of the configuration set to use when sending the email.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/SendBulkEmailRequest AWS API Documentation
@@ -5872,7 +6375,8 @@ module Aws::SESV2
     # The following data is returned in JSON format by the service.
     #
     # @!attribute [rw] bulk_email_entry_results
-    #   A list of `BulkMailEntry` objects.
+    #   One object per intended recipient. Check each response object and
+    #   retry any messages with a failure status.
     #   @return [Array<Types::BulkEmailEntryResult>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/SendBulkEmailResponse AWS API Documentation
@@ -5885,15 +6389,6 @@ module Aws::SESV2
 
     # Represents a request to send a custom verification email to a
     # specified recipient.
-    #
-    # @note When making an API call, you may pass SendCustomVerificationEmailRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_address: "EmailAddress", # required
-    #         template_name: "EmailTemplateName", # required
-    #         configuration_set_name: "ConfigurationSetName",
-    #       }
     #
     # @!attribute [rw] email_address
     #   The email address to verify.
@@ -5941,62 +6436,9 @@ module Aws::SESV2
     #
     # [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-email-formatted.html
     #
-    # @note When making an API call, you may pass SendEmailRequest
-    #   data as a hash:
-    #
-    #       {
-    #         from_email_address: "EmailAddress",
-    #         from_email_address_identity_arn: "AmazonResourceName",
-    #         destination: {
-    #           to_addresses: ["EmailAddress"],
-    #           cc_addresses: ["EmailAddress"],
-    #           bcc_addresses: ["EmailAddress"],
-    #         },
-    #         reply_to_addresses: ["EmailAddress"],
-    #         feedback_forwarding_email_address: "EmailAddress",
-    #         feedback_forwarding_email_address_identity_arn: "AmazonResourceName",
-    #         content: { # required
-    #           simple: {
-    #             subject: { # required
-    #               data: "MessageData", # required
-    #               charset: "Charset",
-    #             },
-    #             body: { # required
-    #               text: {
-    #                 data: "MessageData", # required
-    #                 charset: "Charset",
-    #               },
-    #               html: {
-    #                 data: "MessageData", # required
-    #                 charset: "Charset",
-    #               },
-    #             },
-    #           },
-    #           raw: {
-    #             data: "data", # required
-    #           },
-    #           template: {
-    #             template_name: "EmailTemplateName",
-    #             template_arn: "AmazonResourceName",
-    #             template_data: "EmailTemplateData",
-    #           },
-    #         },
-    #         email_tags: [
-    #           {
-    #             name: "MessageTagName", # required
-    #             value: "MessageTagValue", # required
-    #           },
-    #         ],
-    #         configuration_set_name: "ConfigurationSetName",
-    #         list_management_options: {
-    #           contact_list_name: "ContactListName", # required
-    #           topic_name: "TopicName",
-    #         },
-    #       }
-    #
     # @!attribute [rw] from_email_address
-    #   The email address that you want to use as the "From" address for
-    #   the email. The address that you specify has to be verified.
+    #   The email address to use as the "From" address for the email. The
+    #   address that you specify has to be verified.
     #   @return [String]
     #
     # @!attribute [rw] from_email_address_identity_arn
@@ -6061,7 +6503,7 @@ module Aws::SESV2
     #
     # @!attribute [rw] content
     #   An object that contains the body of the message. You can send either
-    #   a Simple message Raw message or a template Message.
+    #   a Simple message, Raw message, or a Templated message.
     #   @return [Types::EmailContent]
     #
     # @!attribute [rw] email_tags
@@ -6072,8 +6514,7 @@ module Aws::SESV2
     #   @return [Array<Types::MessageTag>]
     #
     # @!attribute [rw] configuration_set_name
-    #   The name of the configuration set that you want to use when sending
-    #   the email.
+    #   The name of the configuration set to use when sending the email.
     #   @return [String]
     #
     # @!attribute [rw] list_management_options
@@ -6106,9 +6547,10 @@ module Aws::SESV2
     #   message is accepted.
     #
     #   <note markdown="1"> It's possible for Amazon SES to accept a message without sending
-    #   it. This can happen when the message that you're trying to send has
-    #   an attachment contains a virus, or when you send a templated email
-    #   that contains invalid personalization content, for example.
+    #   it. For example, this can happen when the message that you're
+    #   trying to send has an attachment that contains a virus, or when you
+    #   send a templated email that contains invalid personalization
+    #   content.
     #
     #    </note>
     #   @return [String]
@@ -6122,23 +6564,26 @@ module Aws::SESV2
     end
 
     # An object that contains information about the per-day and per-second
-    # sending limits for your Amazon SES account in the current AWS Region.
+    # sending limits for your Amazon SES account in the current Amazon Web
+    # Services Region.
     #
     # @!attribute [rw] max_24_hour_send
-    #   The maximum number of emails that you can send in the current AWS
-    #   Region over a 24-hour period. This value is also called your
-    #   *sending quota*.
+    #   The maximum number of emails that you can send in the current Amazon
+    #   Web Services Region over a 24-hour period. A value of -1 signifies
+    #   an unlimited quota. (This value is also referred to as your *sending
+    #   quota*.)
     #   @return [Float]
     #
     # @!attribute [rw] max_send_rate
     #   The maximum number of emails that you can send per second in the
-    #   current AWS Region. This value is also called your *maximum sending
-    #   rate* or your *maximum TPS (transactions per second) rate*.
+    #   current Amazon Web Services Region. This value is also called your
+    #   *maximum sending rate* or your *maximum TPS (transactions per
+    #   second) rate*.
     #   @return [Float]
     #
     # @!attribute [rw] sent_last_24_hours
     #   The number of emails sent from your Amazon SES account in the
-    #   current AWS Region over the past 24 hours.
+    #   current Amazon Web Services Region over the past 24 hours.
     #   @return [Float]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/SendQuota AWS API Documentation
@@ -6152,14 +6597,7 @@ module Aws::SESV2
     end
 
     # Used to enable or disable email sending for messages that use this
-    # configuration set in the current AWS Region.
-    #
-    # @note When making an API call, you may pass SendingOptions
-    #   data as a hash:
-    #
-    #       {
-    #         sending_enabled: false,
-    #       }
+    # configuration set in the current Amazon Web Services Region.
     #
     # @!attribute [rw] sending_enabled
     #   If `true`, email sending is enabled for the configuration set. If
@@ -6182,20 +6620,13 @@ module Aws::SESV2
     class SendingPausedException < Aws::EmptyStructure; end
 
     # An object that defines an Amazon SNS destination for email events. You
-    # can use Amazon SNS to send notification when certain email events
+    # can use Amazon SNS to send notifications when certain email events
     # occur.
     #
-    # @note When making an API call, you may pass SnsDestination
-    #   data as a hash:
-    #
-    #       {
-    #         topic_arn: "AmazonResourceName", # required
-    #       }
-    #
     # @!attribute [rw] topic_arn
-    #   The Amazon Resource Name (ARN) of the Amazon SNS topic that you want
-    #   to publish email events to. For more information about Amazon SNS
-    #   topics, see the [Amazon SNS Developer Guide][1].
+    #   The Amazon Resource Name (ARN) of the Amazon SNS topic to publish
+    #   email events to. For more information about Amazon SNS topics, see
+    #   the [Amazon SNS Developer Guide][1].
     #
     #
     #
@@ -6293,7 +6724,8 @@ module Aws::SESV2
     end
 
     # An object that contains information about the email address
-    # suppression preferences for your account in the current AWS Region.
+    # suppression preferences for your account in the current Amazon Web
+    # Services Region.
     #
     # @!attribute [rw] suppressed_reasons
     #   A list that contains the reasons that email addresses will be
@@ -6319,16 +6751,9 @@ module Aws::SESV2
 
     # An object that contains details about the action of suppression list.
     #
-    # @note When making an API call, you may pass SuppressionListDestination
-    #   data as a hash:
-    #
-    #       {
-    #         suppression_list_import_action: "DELETE", # required, accepts DELETE, PUT
-    #       }
-    #
     # @!attribute [rw] suppression_list_import_action
-    #   The type of action that you want to perform on the address.
-    #   Acceptable values:
+    #   The type of action to perform on the address. The following are
+    #   possible values:
     #
     #   * PUT: add the addresses to the suppression list. If the record
     #     already exists, it will override it with the new value.
@@ -6346,13 +6771,6 @@ module Aws::SESV2
 
     # An object that contains information about the suppression list
     # preferences for your account.
-    #
-    # @note When making an API call, you may pass SuppressionOptions
-    #   data as a hash:
-    #
-    #       {
-    #         suppressed_reasons: ["BOUNCE"], # accepts BOUNCE, COMPLAINT
-    #       }
     #
     # @!attribute [rw] suppressed_reasons
     #   A list that contains the reasons that email addresses are
@@ -6396,24 +6814,17 @@ module Aws::SESV2
     # * For each associated resource, each tag key must be unique and it can
     #   have only one value.
     #
-    # * The `aws:` prefix is reserved for use by AWS; you can’t use it in
-    #   any tag keys or values that you define. In addition, you can't edit
-    #   or remove tag keys or values that use this prefix. Tags that use
-    #   this prefix don’t count against the limit of 50 tags per resource.
+    # * The `aws:` prefix is reserved for use by Amazon Web Services; you
+    #   can’t use it in any tag keys or values that you define. In addition,
+    #   you can't edit or remove tag keys or values that use this prefix.
+    #   Tags that use this prefix don’t count against the limit of 50 tags
+    #   per resource.
     #
     # * You can associate tags with public or shared resources, but the tags
-    #   are available only for your AWS account, not any other accounts that
-    #   share the resource. In addition, the tags are available only for
-    #   resources that are located in the specified AWS Region for your AWS
-    #   account.
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey", # required
-    #         value: "TagValue", # required
-    #       }
+    #   are available only for your Amazon Web Services account, not any
+    #   other accounts that share the resource. In addition, the tags are
+    #   available only for resources that are located in the specified
+    #   Amazon Web Services Region for your Amazon Web Services account.
     #
     # @!attribute [rw] key
     #   One part of a key-value pair that defines a tag. The maximum length
@@ -6437,19 +6848,6 @@ module Aws::SESV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "AmazonResourceName", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the resource that you want to add
     #   one or more tags to.
@@ -6481,15 +6879,6 @@ module Aws::SESV2
     # that you want to define, save, and reuse in email messages that you
     # send.
     #
-    # @note When making an API call, you may pass Template
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "EmailTemplateName",
-    #         template_arn: "AmazonResourceName",
-    #         template_data: "EmailTemplateData",
-    #       }
-    #
     # @!attribute [rw] template_name
     #   The name of the template. You will refer to this name when you send
     #   email using the `SendTemplatedEmail` or `SendBulkTemplatedEmail`
@@ -6507,12 +6896,17 @@ module Aws::SESV2
     #   defines the value to use for that variable.
     #   @return [String]
     #
+    # @!attribute [rw] headers
+    #   The list of message headers that will be added to the email message.
+    #   @return [Array<Types::MessageHeader>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/Template AWS API Documentation
     #
     class Template < Struct.new(
       :template_name,
       :template_arn,
-      :template_data)
+      :template_data,
+      :headers)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -6520,16 +6914,8 @@ module Aws::SESV2
     # &gt;Represents a request to create a preview of the MIME content of an
     # email when provided with a template and a set of replacement data.
     #
-    # @note When making an API call, you may pass TestRenderEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "EmailTemplateName", # required
-    #         template_data: "EmailTemplateData", # required
-    #       }
-    #
     # @!attribute [rw] template_name
-    #   The name of the template that you want to render.
+    #   The name of the template.
     #   @return [String]
     #
     # @!attribute [rw] template_data
@@ -6573,16 +6959,6 @@ module Aws::SESV2
     # An interest group, theme, or label within a list. Lists can have
     # multiple topics.
     #
-    # @note When making an API call, you may pass Topic
-    #   data as a hash:
-    #
-    #       {
-    #         topic_name: "TopicName", # required
-    #         display_name: "DisplayName", # required
-    #         description: "Description",
-    #         default_subscription_status: "OPT_IN", # required, accepts OPT_IN, OPT_OUT
-    #       }
-    #
     # @!attribute [rw] topic_name
     #   The name of the topic.
     #   @return [String]
@@ -6614,14 +6990,6 @@ module Aws::SESV2
 
     # Used for filtering by a specific topic preference.
     #
-    # @note When making an API call, you may pass TopicFilter
-    #   data as a hash:
-    #
-    #       {
-    #         topic_name: "TopicName",
-    #         use_default_if_preference_unavailable: false,
-    #       }
-    #
     # @!attribute [rw] topic_name
     #   The name of a topic on which you wish to apply the filter.
     #   @return [String]
@@ -6643,14 +7011,6 @@ module Aws::SESV2
 
     # The contact's preference for being opted-in to or opted-out of a
     # topic.
-    #
-    # @note When making an API call, you may pass TopicPreference
-    #   data as a hash:
-    #
-    #       {
-    #         topic_name: "TopicName", # required
-    #         subscription_status: "OPT_IN", # required, accepts OPT_IN, OPT_OUT
-    #       }
     #
     # @!attribute [rw] topic_name
     #   The name of the topic.
@@ -6676,37 +7036,27 @@ module Aws::SESV2
     # If your email contains links, those links are changed slightly in
     # order to track when recipients click them.
     #
-    # These images and links include references to a domain operated by AWS.
-    # You can optionally configure the Amazon SES to use a domain that you
-    # operate for these images and links.
-    #
-    # @note When making an API call, you may pass TrackingOptions
-    #   data as a hash:
-    #
-    #       {
-    #         custom_redirect_domain: "CustomRedirectDomain", # required
-    #       }
+    # These images and links include references to a domain operated by
+    # Amazon Web Services. You can optionally configure the Amazon SES to
+    # use a domain that you operate for these images and links.
     #
     # @!attribute [rw] custom_redirect_domain
-    #   The domain that you want to use for tracking open and click events.
+    #   The domain to use for tracking open and click events.
+    #   @return [String]
+    #
+    # @!attribute [rw] https_policy
+    #   The https policy to use for tracking open and click events.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/TrackingOptions AWS API Documentation
     #
     class TrackingOptions < Struct.new(
-      :custom_redirect_domain)
+      :custom_redirect_domain,
+      :https_policy)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "AmazonResourceName", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the resource that you want to
     #   remove one or more tags from.
@@ -6739,44 +7089,13 @@ module Aws::SESV2
     # A request to change the settings for an event destination for a
     # configuration set.
     #
-    # @note When making an API call, you may pass UpdateConfigurationSetEventDestinationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_set_name: "ConfigurationSetName", # required
-    #         event_destination_name: "EventDestinationName", # required
-    #         event_destination: { # required
-    #           enabled: false,
-    #           matching_event_types: ["SEND"], # accepts SEND, REJECT, BOUNCE, COMPLAINT, DELIVERY, OPEN, CLICK, RENDERING_FAILURE, DELIVERY_DELAY, SUBSCRIPTION
-    #           kinesis_firehose_destination: {
-    #             iam_role_arn: "AmazonResourceName", # required
-    #             delivery_stream_arn: "AmazonResourceName", # required
-    #           },
-    #           cloud_watch_destination: {
-    #             dimension_configurations: [ # required
-    #               {
-    #                 dimension_name: "DimensionName", # required
-    #                 dimension_value_source: "MESSAGE_TAG", # required, accepts MESSAGE_TAG, EMAIL_HEADER, LINK_TAG
-    #                 default_dimension_value: "DefaultDimensionValue", # required
-    #               },
-    #             ],
-    #           },
-    #           sns_destination: {
-    #             topic_arn: "AmazonResourceName", # required
-    #           },
-    #           pinpoint_destination: {
-    #             application_arn: "AmazonResourceName",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] configuration_set_name
     #   The name of the configuration set that contains the event
-    #   destination that you want to modify.
+    #   destination to modify.
     #   @return [String]
     #
     # @!attribute [rw] event_destination_name
-    #   The name of the event destination that you want to modify.
+    #   The name of the event destination.
     #   @return [String]
     #
     # @!attribute [rw] event_destination
@@ -6800,22 +7119,6 @@ module Aws::SESV2
     #
     class UpdateConfigurationSetEventDestinationResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UpdateContactListRequest
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #         topics: [
-    #           {
-    #             topic_name: "TopicName", # required
-    #             display_name: "DisplayName", # required
-    #             description: "Description",
-    #             default_subscription_status: "OPT_IN", # required, accepts OPT_IN, OPT_OUT
-    #           },
-    #         ],
-    #         description: "Description",
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list.
     #   @return [String]
@@ -6843,28 +7146,12 @@ module Aws::SESV2
     #
     class UpdateContactListResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UpdateContactRequest
-    #   data as a hash:
-    #
-    #       {
-    #         contact_list_name: "ContactListName", # required
-    #         email_address: "EmailAddress", # required
-    #         topic_preferences: [
-    #           {
-    #             topic_name: "TopicName", # required
-    #             subscription_status: "OPT_IN", # required, accepts OPT_IN, OPT_OUT
-    #           },
-    #         ],
-    #         unsubscribe_all: false,
-    #         attributes_data: "AttributesData",
-    #       }
-    #
     # @!attribute [rw] contact_list_name
     #   The name of the contact list.
     #   @return [String]
     #
     # @!attribute [rw] email_address
-    #   The contact's email addres.
+    #   The contact's email address.
     #   @return [String]
     #
     # @!attribute [rw] topic_preferences
@@ -6900,18 +7187,6 @@ module Aws::SESV2
     # Represents a request to update an existing custom verification email
     # template.
     #
-    # @note When making an API call, you may pass UpdateCustomVerificationEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "EmailTemplateName", # required
-    #         from_email_address: "EmailAddress", # required
-    #         template_subject: "EmailTemplateSubject", # required
-    #         template_content: "TemplateContent", # required
-    #         success_redirection_url: "SuccessRedirectionURL", # required
-    #         failure_redirection_url: "FailureRedirectionURL", # required
-    #       }
-    #
     # @!attribute [rw] template_name
     #   The name of the custom verification email template that you want to
     #   update.
@@ -6929,12 +7204,12 @@ module Aws::SESV2
     #   The content of the custom verification email. The total size of the
     #   email must be less than 10 MB. The message body may contain HTML,
     #   with some limitations. For more information, see [Custom
-    #   Verification Email Frequently Asked Questions][1] in the *Amazon SES
+    #   verification email frequently asked questions][1] in the *Amazon SES
     #   Developer Guide*.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-email-verify-address-custom.html#custom-verification-emails-faq
+    #   [1]: https://docs.aws.amazon.com/ses/latest/dg/creating-identities.html#send-email-verify-address-custom-faq
     #   @return [String]
     #
     # @!attribute [rw] success_redirection_url
@@ -6976,17 +7251,8 @@ module Aws::SESV2
     #
     # [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/sending-authorization-identity-owner-tasks-management.html
     #
-    # @note When making an API call, you may pass UpdateEmailIdentityPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         email_identity: "Identity", # required
-    #         policy_name: "PolicyName", # required
-    #         policy: "Policy", # required
-    #       }
-    #
     # @!attribute [rw] email_identity
-    #   The email identity for which you want to update policy.
+    #   The email identity.
     #   @return [String]
     #
     # @!attribute [rw] policy_name
@@ -7032,20 +7298,8 @@ module Aws::SESV2
     #
     # [1]: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-personalized-email-api.html
     #
-    # @note When making an API call, you may pass UpdateEmailTemplateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         template_name: "EmailTemplateName", # required
-    #         template_content: { # required
-    #           subject: "EmailTemplateSubject",
-    #           text: "EmailTemplateText",
-    #           html: "EmailTemplateHtml",
-    #         },
-    #       }
-    #
     # @!attribute [rw] template_name
-    #   The name of the template you want to update.
+    #   The name of the template.
     #   @return [String]
     #
     # @!attribute [rw] template_content
@@ -7068,6 +7322,110 @@ module Aws::SESV2
     # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/UpdateEmailTemplateResponse AWS API Documentation
     #
     class UpdateEmailTemplateResponse < Aws::EmptyStructure; end
+
+    # The VDM attributes that apply to your Amazon SES account.
+    #
+    # @!attribute [rw] vdm_enabled
+    #   Specifies the status of your VDM configuration. Can be one of the
+    #   following:
+    #
+    #   * `ENABLED` – Amazon SES enables VDM for your account.
+    #
+    #   * `DISABLED` – Amazon SES disables VDM for your account.
+    #   @return [String]
+    #
+    # @!attribute [rw] dashboard_attributes
+    #   Specifies additional settings for your VDM configuration as
+    #   applicable to the Dashboard.
+    #   @return [Types::DashboardAttributes]
+    #
+    # @!attribute [rw] guardian_attributes
+    #   Specifies additional settings for your VDM configuration as
+    #   applicable to the Guardian.
+    #   @return [Types::GuardianAttributes]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/VdmAttributes AWS API Documentation
+    #
+    class VdmAttributes < Struct.new(
+      :vdm_enabled,
+      :dashboard_attributes,
+      :guardian_attributes)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object that defines the VDM settings that apply to emails that you
+    # send using the configuration set.
+    #
+    # @!attribute [rw] dashboard_options
+    #   Specifies additional settings for your VDM configuration as
+    #   applicable to the Dashboard.
+    #   @return [Types::DashboardOptions]
+    #
+    # @!attribute [rw] guardian_options
+    #   Specifies additional settings for your VDM configuration as
+    #   applicable to the Guardian.
+    #   @return [Types::GuardianOptions]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/VdmOptions AWS API Documentation
+    #
+    class VdmOptions < Struct.new(
+      :dashboard_options,
+      :guardian_options)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An object that contains additional information about the verification
+    # status for the identity.
+    #
+    # @!attribute [rw] last_checked_timestamp
+    #   The last time a verification attempt was made for this identity.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_success_timestamp
+    #   The last time a successful verification was made for this identity.
+    #   @return [Time]
+    #
+    # @!attribute [rw] error_type
+    #   Provides the reason for the failure describing why Amazon SES was
+    #   not able to successfully verify the identity. Below are the possible
+    #   values:
+    #
+    #   * `INVALID_VALUE` – Amazon SES was able to find the record, but the
+    #     value contained within the record was invalid. Ensure you have
+    #     published the correct values for the record.
+    #
+    #   * `TYPE_NOT_FOUND` – The queried hostname exists but does not have
+    #     the requested type of DNS record. Ensure that you have published
+    #     the correct type of DNS record.
+    #
+    #   * `HOST_NOT_FOUND` – The queried hostname does not exist or was not
+    #     reachable at the time of the request. Ensure that you have
+    #     published the required DNS record(s).
+    #
+    #   * `SERVICE_ERROR` – A temporary issue is preventing Amazon SES from
+    #     determining the verification status of the domain.
+    #
+    #   * `DNS_SERVER_ERROR` – The DNS server encountered an issue and was
+    #     unable to complete the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] soa_record
+    #   An object that contains information about the start of authority
+    #   (SOA) record associated with the identity.
+    #   @return [Types::SOARecord]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/sesv2-2019-09-27/VerificationInfo AWS API Documentation
+    #
+    class VerificationInfo < Struct.new(
+      :last_checked_timestamp,
+      :last_success_timestamp,
+      :error_type,
+      :soa_record)
+      SENSITIVE = []
+      include Aws::Structure
+    end
 
     # An object that contains information about the amount of email that was
     # delivered to recipients.
@@ -7104,3 +7462,4 @@ module Aws::SESV2
 
   end
 end
+

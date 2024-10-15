@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::AugmentedAIRuntime
   # @api private
@@ -45,7 +46,7 @@ module Aws::AugmentedAIRuntime
     StopHumanLoopResponse = Shapes::StructureShape.new(name: 'StopHumanLoopResponse')
     String = Shapes::StringShape.new(name: 'String')
     ThrottlingException = Shapes::StructureShape.new(name: 'ThrottlingException')
-    Timestamp = Shapes::TimestampShape.new(name: 'Timestamp')
+    Timestamp = Shapes::TimestampShape.new(name: 'Timestamp', timestampFormat: "iso8601")
     ValidationException = Shapes::StructureShape.new(name: 'ValidationException')
 
     ConflictException.add_member(:message, Shapes::ShapeRef.new(shape: FailureReason, location_name: "Message"))
@@ -138,9 +139,10 @@ module Aws::AugmentedAIRuntime
 
       api.metadata = {
         "apiVersion" => "2019-11-07",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "a2i-runtime.sagemaker",
-        "jsonVersion" => "1.1",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceFullName" => "Amazon Augmented AI Runtime",
         "serviceId" => "SageMaker A2I Runtime",
         "signatureVersion" => "v4",

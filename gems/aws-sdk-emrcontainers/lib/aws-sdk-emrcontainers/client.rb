@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:emrcontainers)
 
 module Aws::EMRContainers
   # An API client for EMRContainers.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::EMRContainers
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::EMRContainers::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::EMRContainers
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::EMRContainers
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::EMRContainers
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::EMRContainers
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::EMRContainers
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::EMRContainers
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::EMRContainers
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::EMRContainers::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::EMRContainers::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -363,9 +483,113 @@ module Aws::EMRContainers
       req.send_request(options)
     end
 
+    # Creates a job template. Job template stores values of StartJobRun API
+    # request in a template and can be used to start a job run. Job template
+    # allows two use cases: avoid repeating recurring StartJobRun API
+    # request values, enforcing certain values in StartJobRun API request.
+    #
+    # @option params [required, String] :name
+    #   The specified name of the job template.
+    #
+    # @option params [required, String] :client_token
+    #   The client token of the job template.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [required, Types::JobTemplateData] :job_template_data
+    #   The job template data which holds values of StartJobRun API request.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   The tags that are associated with the job template.
+    #
+    # @option params [String] :kms_key_arn
+    #   The KMS key ARN used to encrypt the job template.
+    #
+    # @return [Types::CreateJobTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateJobTemplateResponse#id #id} => String
+    #   * {Types::CreateJobTemplateResponse#name #name} => String
+    #   * {Types::CreateJobTemplateResponse#arn #arn} => String
+    #   * {Types::CreateJobTemplateResponse#created_at #created_at} => Time
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_job_template({
+    #     name: "ResourceNameString", # required
+    #     client_token: "ClientToken", # required
+    #     job_template_data: { # required
+    #       execution_role_arn: "ParametricIAMRoleArn", # required
+    #       release_label: "ParametricReleaseLabel", # required
+    #       configuration_overrides: {
+    #         application_configuration: [
+    #           {
+    #             classification: "String1024", # required
+    #             properties: {
+    #               "String1024" => "String1024",
+    #             },
+    #             configurations: {
+    #               # recursive ConfigurationList
+    #             },
+    #           },
+    #         ],
+    #         monitoring_configuration: {
+    #           persistent_app_ui: "TemplateParameter",
+    #           cloud_watch_monitoring_configuration: {
+    #             log_group_name: "TemplateParameter",
+    #             log_stream_name_prefix: "String256",
+    #           },
+    #           s3_monitoring_configuration: {
+    #             log_uri: "UriString",
+    #           },
+    #         },
+    #       },
+    #       job_driver: { # required
+    #         spark_submit_job_driver: {
+    #           entry_point: "EntryPointPath", # required
+    #           entry_point_arguments: ["EntryPointArgument"],
+    #           spark_submit_parameters: "SparkSubmitParameters",
+    #         },
+    #         spark_sql_job_driver: {
+    #           entry_point: "EntryPointPath",
+    #           spark_sql_parameters: "SparkSqlParameters",
+    #         },
+    #       },
+    #       parameter_configuration: {
+    #         "TemplateParameterName" => {
+    #           type: "NUMBER", # accepts NUMBER, STRING
+    #           default_value: "String1024",
+    #         },
+    #       },
+    #       job_tags: {
+    #         "String128" => "StringEmpty256",
+    #       },
+    #     },
+    #     tags: {
+    #       "String128" => "StringEmpty256",
+    #     },
+    #     kms_key_arn: "KmsKeyArn",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #   resp.name #=> String
+    #   resp.arn #=> String
+    #   resp.created_at #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/CreateJobTemplate AWS API Documentation
+    #
+    # @overload create_job_template(params = {})
+    # @param [Hash] params ({})
+    def create_job_template(params = {}, options = {})
+      req = build_request(:create_job_template, params)
+      req.send_request(options)
+    end
+
     # Creates a managed endpoint. A managed endpoint is a gateway that
-    # connects EMR Studio to Amazon EMR on EKS so that EMR Studio can
-    # communicate with your virtual cluster.
+    # connects Amazon EMR Studio to Amazon EMR on EKS so that Amazon EMR
+    # Studio can communicate with your virtual cluster.
     #
     # @option params [required, String] :name
     #   The name of the managed endpoint.
@@ -382,8 +606,9 @@ module Aws::EMRContainers
     # @option params [required, String] :execution_role_arn
     #   The ARN of the execution role.
     #
-    # @option params [required, String] :certificate_arn
-    #   The certificate ARN of the managed endpoint.
+    # @option params [String] :certificate_arn
+    #   The certificate ARN provided by users for the managed endpoint. This
+    #   field is under deprecation and will be removed in future releases.
     #
     # @option params [Types::ConfigurationOverrides] :configuration_overrides
     #   The configuration settings that will be used to override existing
@@ -413,7 +638,7 @@ module Aws::EMRContainers
     #     type: "EndpointType", # required
     #     release_label: "ReleaseLabel", # required
     #     execution_role_arn: "IAMRoleArn", # required
-    #     certificate_arn: "ACMCertArn", # required
+    #     certificate_arn: "ACMCertArn",
     #     configuration_overrides: {
     #       application_configuration: [
     #         {
@@ -434,6 +659,10 @@ module Aws::EMRContainers
     #         },
     #         s3_monitoring_configuration: {
     #           log_uri: "UriString", # required
+    #         },
+    #         container_log_rotation_configuration: {
+    #           rotation_size: "RotationSize", # required
+    #           max_files_to_keep: 1, # required
     #         },
     #       },
     #     },
@@ -459,6 +688,80 @@ module Aws::EMRContainers
       req.send_request(options)
     end
 
+    # Creates a security configuration. Security configurations in Amazon
+    # EMR on EKS are templates for different security setups. You can use
+    # security configurations to configure the Lake Formation integration
+    # setup. You can also create a security configuration to re-use a
+    # security setup each time you create a virtual cluster.
+    #
+    # @option params [required, String] :client_token
+    #   The client idempotency token to use when creating the security
+    #   configuration.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [required, String] :name
+    #   The name of the security configuration.
+    #
+    # @option params [required, Types::SecurityConfigurationData] :security_configuration_data
+    #   Security configuration input for the request.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   The tags to add to the security configuration.
+    #
+    # @return [Types::CreateSecurityConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateSecurityConfigurationResponse#id #id} => String
+    #   * {Types::CreateSecurityConfigurationResponse#name #name} => String
+    #   * {Types::CreateSecurityConfigurationResponse#arn #arn} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_security_configuration({
+    #     client_token: "ClientToken", # required
+    #     name: "ResourceNameString", # required
+    #     security_configuration_data: { # required
+    #       authorization_configuration: {
+    #         lake_formation_configuration: {
+    #           authorized_session_tag_value: "SessionTagValue",
+    #           secure_namespace_info: {
+    #             cluster_id: "ClusterId",
+    #             namespace: "KubernetesNamespace",
+    #           },
+    #           query_engine_role_arn: "IAMRoleArn",
+    #         },
+    #         encryption_configuration: {
+    #           in_transit_encryption_configuration: {
+    #             tls_certificate_configuration: {
+    #               certificate_provider_type: "PEM", # accepts PEM
+    #               public_certificate_secret_arn: "SecretsManagerArn",
+    #               private_certificate_secret_arn: "SecretsManagerArn",
+    #             },
+    #           },
+    #         },
+    #       },
+    #     },
+    #     tags: {
+    #       "String128" => "StringEmpty256",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #   resp.name #=> String
+    #   resp.arn #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/CreateSecurityConfiguration AWS API Documentation
+    #
+    # @overload create_security_configuration(params = {})
+    # @param [Hash] params ({})
+    def create_security_configuration(params = {}, options = {})
+      req = build_request(:create_security_configuration, params)
+      req.send_request(options)
+    end
+
     # Creates a virtual cluster. Virtual cluster is a managed entity on
     # Amazon EMR on EKS. You can create, describe, list and delete virtual
     # clusters. They do not consume any additional resource in your system.
@@ -481,6 +784,9 @@ module Aws::EMRContainers
     # @option params [Hash<String,String>] :tags
     #   The tags assigned to the virtual cluster.
     #
+    # @option params [String] :security_configuration_id
+    #   The ID of the security configuration.
+    #
     # @return [Types::CreateVirtualClusterResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateVirtualClusterResponse#id #id} => String
@@ -493,10 +799,10 @@ module Aws::EMRContainers
     #     name: "ResourceNameString", # required
     #     container_provider: { # required
     #       type: "EKS", # required, accepts EKS
-    #       id: "String256", # required
+    #       id: "ClusterId", # required
     #       info: {
     #         eks_info: {
-    #           namespace: "String256",
+    #           namespace: "KubernetesNamespace",
     #         },
     #       },
     #     },
@@ -504,6 +810,7 @@ module Aws::EMRContainers
     #     tags: {
     #       "String128" => "StringEmpty256",
     #     },
+    #     security_configuration_id: "ResourceIdString",
     #   })
     #
     # @example Response structure
@@ -521,9 +828,40 @@ module Aws::EMRContainers
       req.send_request(options)
     end
 
+    # Deletes a job template. Job template stores values of StartJobRun API
+    # request in a template and can be used to start a job run. Job template
+    # allows two use cases: avoid repeating recurring StartJobRun API
+    # request values, enforcing certain values in StartJobRun API request.
+    #
+    # @option params [required, String] :id
+    #   The ID of the job template that will be deleted.
+    #
+    # @return [Types::DeleteJobTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteJobTemplateResponse#id #id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_job_template({
+    #     id: "ResourceIdString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/DeleteJobTemplate AWS API Documentation
+    #
+    # @overload delete_job_template(params = {})
+    # @param [Hash] params ({})
+    def delete_job_template(params = {}, options = {})
+      req = build_request(:delete_job_template, params)
+      req.send_request(options)
+    end
+
     # Deletes a managed endpoint. A managed endpoint is a gateway that
-    # connects EMR Studio to Amazon EMR on EKS so that EMR Studio can
-    # communicate with your virtual cluster.
+    # connects Amazon EMR Studio to Amazon EMR on EKS so that Amazon EMR
+    # Studio can communicate with your virtual cluster.
     #
     # @option params [required, String] :id
     #   The ID of the managed endpoint.
@@ -630,10 +968,14 @@ module Aws::EMRContainers
     #   resp.job_run.configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_group_name #=> String
     #   resp.job_run.configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_stream_name_prefix #=> String
     #   resp.job_run.configuration_overrides.monitoring_configuration.s3_monitoring_configuration.log_uri #=> String
+    #   resp.job_run.configuration_overrides.monitoring_configuration.container_log_rotation_configuration.rotation_size #=> String
+    #   resp.job_run.configuration_overrides.monitoring_configuration.container_log_rotation_configuration.max_files_to_keep #=> Integer
     #   resp.job_run.job_driver.spark_submit_job_driver.entry_point #=> String
     #   resp.job_run.job_driver.spark_submit_job_driver.entry_point_arguments #=> Array
     #   resp.job_run.job_driver.spark_submit_job_driver.entry_point_arguments[0] #=> String
     #   resp.job_run.job_driver.spark_submit_job_driver.spark_submit_parameters #=> String
+    #   resp.job_run.job_driver.spark_sql_job_driver.entry_point #=> String
+    #   resp.job_run.job_driver.spark_sql_job_driver.spark_sql_parameters #=> String
     #   resp.job_run.created_at #=> Time
     #   resp.job_run.created_by #=> String
     #   resp.job_run.finished_at #=> Time
@@ -641,6 +983,8 @@ module Aws::EMRContainers
     #   resp.job_run.failure_reason #=> String, one of "INTERNAL_ERROR", "USER_ERROR", "VALIDATION_ERROR", "CLUSTER_UNAVAILABLE"
     #   resp.job_run.tags #=> Hash
     #   resp.job_run.tags["String128"] #=> String
+    #   resp.job_run.retry_policy_configuration.max_attempts #=> Integer
+    #   resp.job_run.retry_policy_execution.current_attempt_count #=> Integer
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/DescribeJobRun AWS API Documentation
     #
@@ -651,9 +995,72 @@ module Aws::EMRContainers
       req.send_request(options)
     end
 
+    # Displays detailed information about a specified job template. Job
+    # template stores values of StartJobRun API request in a template and
+    # can be used to start a job run. Job template allows two use cases:
+    # avoid repeating recurring StartJobRun API request values, enforcing
+    # certain values in StartJobRun API request.
+    #
+    # @option params [required, String] :id
+    #   The ID of the job template that will be described.
+    #
+    # @return [Types::DescribeJobTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeJobTemplateResponse#job_template #job_template} => Types::JobTemplate
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_job_template({
+    #     id: "ResourceIdString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.job_template.name #=> String
+    #   resp.job_template.id #=> String
+    #   resp.job_template.arn #=> String
+    #   resp.job_template.created_at #=> Time
+    #   resp.job_template.created_by #=> String
+    #   resp.job_template.tags #=> Hash
+    #   resp.job_template.tags["String128"] #=> String
+    #   resp.job_template.job_template_data.execution_role_arn #=> String
+    #   resp.job_template.job_template_data.release_label #=> String
+    #   resp.job_template.job_template_data.configuration_overrides.application_configuration #=> Array
+    #   resp.job_template.job_template_data.configuration_overrides.application_configuration[0].classification #=> String
+    #   resp.job_template.job_template_data.configuration_overrides.application_configuration[0].properties #=> Hash
+    #   resp.job_template.job_template_data.configuration_overrides.application_configuration[0].properties["String1024"] #=> String
+    #   resp.job_template.job_template_data.configuration_overrides.application_configuration[0].configurations #=> Types::ConfigurationList
+    #   resp.job_template.job_template_data.configuration_overrides.monitoring_configuration.persistent_app_ui #=> String
+    #   resp.job_template.job_template_data.configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_group_name #=> String
+    #   resp.job_template.job_template_data.configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_stream_name_prefix #=> String
+    #   resp.job_template.job_template_data.configuration_overrides.monitoring_configuration.s3_monitoring_configuration.log_uri #=> String
+    #   resp.job_template.job_template_data.job_driver.spark_submit_job_driver.entry_point #=> String
+    #   resp.job_template.job_template_data.job_driver.spark_submit_job_driver.entry_point_arguments #=> Array
+    #   resp.job_template.job_template_data.job_driver.spark_submit_job_driver.entry_point_arguments[0] #=> String
+    #   resp.job_template.job_template_data.job_driver.spark_submit_job_driver.spark_submit_parameters #=> String
+    #   resp.job_template.job_template_data.job_driver.spark_sql_job_driver.entry_point #=> String
+    #   resp.job_template.job_template_data.job_driver.spark_sql_job_driver.spark_sql_parameters #=> String
+    #   resp.job_template.job_template_data.parameter_configuration #=> Hash
+    #   resp.job_template.job_template_data.parameter_configuration["TemplateParameterName"].type #=> String, one of "NUMBER", "STRING"
+    #   resp.job_template.job_template_data.parameter_configuration["TemplateParameterName"].default_value #=> String
+    #   resp.job_template.job_template_data.job_tags #=> Hash
+    #   resp.job_template.job_template_data.job_tags["String128"] #=> String
+    #   resp.job_template.kms_key_arn #=> String
+    #   resp.job_template.decryption_error #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/DescribeJobTemplate AWS API Documentation
+    #
+    # @overload describe_job_template(params = {})
+    # @param [Hash] params ({})
+    def describe_job_template(params = {}, options = {})
+      req = build_request(:describe_job_template, params)
+      req.send_request(options)
+    end
+
     # Displays detailed information about a managed endpoint. A managed
-    # endpoint is a gateway that connects EMR Studio to Amazon EMR on EKS so
-    # that EMR Studio can communicate with your virtual cluster.
+    # endpoint is a gateway that connects Amazon EMR Studio to Amazon EMR on
+    # EKS so that Amazon EMR Studio can communicate with your virtual
+    # cluster.
     #
     # @option params [required, String] :id
     #   This output displays ID of the managed endpoint.
@@ -683,6 +1090,8 @@ module Aws::EMRContainers
     #   resp.endpoint.release_label #=> String
     #   resp.endpoint.execution_role_arn #=> String
     #   resp.endpoint.certificate_arn #=> String
+    #   resp.endpoint.certificate_authority.certificate_arn #=> String
+    #   resp.endpoint.certificate_authority.certificate_data #=> String
     #   resp.endpoint.configuration_overrides.application_configuration #=> Array
     #   resp.endpoint.configuration_overrides.application_configuration[0].classification #=> String
     #   resp.endpoint.configuration_overrides.application_configuration[0].properties #=> Hash
@@ -692,11 +1101,15 @@ module Aws::EMRContainers
     #   resp.endpoint.configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_group_name #=> String
     #   resp.endpoint.configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_stream_name_prefix #=> String
     #   resp.endpoint.configuration_overrides.monitoring_configuration.s3_monitoring_configuration.log_uri #=> String
+    #   resp.endpoint.configuration_overrides.monitoring_configuration.container_log_rotation_configuration.rotation_size #=> String
+    #   resp.endpoint.configuration_overrides.monitoring_configuration.container_log_rotation_configuration.max_files_to_keep #=> Integer
     #   resp.endpoint.server_url #=> String
     #   resp.endpoint.created_at #=> Time
     #   resp.endpoint.security_group #=> String
     #   resp.endpoint.subnet_ids #=> Array
     #   resp.endpoint.subnet_ids[0] #=> String
+    #   resp.endpoint.state_details #=> String
+    #   resp.endpoint.failure_reason #=> String, one of "INTERNAL_ERROR", "USER_ERROR", "VALIDATION_ERROR", "CLUSTER_UNAVAILABLE"
     #   resp.endpoint.tags #=> Hash
     #   resp.endpoint.tags["String128"] #=> String
     #
@@ -706,6 +1119,52 @@ module Aws::EMRContainers
     # @param [Hash] params ({})
     def describe_managed_endpoint(params = {}, options = {})
       req = build_request(:describe_managed_endpoint, params)
+      req.send_request(options)
+    end
+
+    # Displays detailed information about a specified security
+    # configuration. Security configurations in Amazon EMR on EKS are
+    # templates for different security setups. You can use security
+    # configurations to configure the Lake Formation integration setup. You
+    # can also create a security configuration to re-use a security setup
+    # each time you create a virtual cluster.
+    #
+    # @option params [required, String] :id
+    #   The ID of the security configuration.
+    #
+    # @return [Types::DescribeSecurityConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeSecurityConfigurationResponse#security_configuration #security_configuration} => Types::SecurityConfiguration
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_security_configuration({
+    #     id: "ResourceIdString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.security_configuration.id #=> String
+    #   resp.security_configuration.name #=> String
+    #   resp.security_configuration.arn #=> String
+    #   resp.security_configuration.created_at #=> Time
+    #   resp.security_configuration.created_by #=> String
+    #   resp.security_configuration.security_configuration_data.authorization_configuration.lake_formation_configuration.authorized_session_tag_value #=> String
+    #   resp.security_configuration.security_configuration_data.authorization_configuration.lake_formation_configuration.secure_namespace_info.cluster_id #=> String
+    #   resp.security_configuration.security_configuration_data.authorization_configuration.lake_formation_configuration.secure_namespace_info.namespace #=> String
+    #   resp.security_configuration.security_configuration_data.authorization_configuration.lake_formation_configuration.query_engine_role_arn #=> String
+    #   resp.security_configuration.security_configuration_data.authorization_configuration.encryption_configuration.in_transit_encryption_configuration.tls_certificate_configuration.certificate_provider_type #=> String, one of "PEM"
+    #   resp.security_configuration.security_configuration_data.authorization_configuration.encryption_configuration.in_transit_encryption_configuration.tls_certificate_configuration.public_certificate_secret_arn #=> String
+    #   resp.security_configuration.security_configuration_data.authorization_configuration.encryption_configuration.in_transit_encryption_configuration.tls_certificate_configuration.private_certificate_secret_arn #=> String
+    #   resp.security_configuration.tags #=> Hash
+    #   resp.security_configuration.tags["String128"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/DescribeSecurityConfiguration AWS API Documentation
+    #
+    # @overload describe_security_configuration(params = {})
+    # @param [Hash] params ({})
+    def describe_security_configuration(params = {}, options = {})
+      req = build_request(:describe_security_configuration, params)
       req.send_request(options)
     end
 
@@ -742,6 +1201,7 @@ module Aws::EMRContainers
     #   resp.virtual_cluster.created_at #=> Time
     #   resp.virtual_cluster.tags #=> Hash
     #   resp.virtual_cluster.tags["String128"] #=> String
+    #   resp.virtual_cluster.security_configuration_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/DescribeVirtualCluster AWS API Documentation
     #
@@ -749,6 +1209,68 @@ module Aws::EMRContainers
     # @param [Hash] params ({})
     def describe_virtual_cluster(params = {}, options = {})
       req = build_request(:describe_virtual_cluster, params)
+      req.send_request(options)
+    end
+
+    # Generate a session token to connect to a managed endpoint.
+    #
+    # @option params [required, String] :endpoint_identifier
+    #   The ARN of the managed endpoint for which the request is submitted.
+    #
+    # @option params [required, String] :virtual_cluster_identifier
+    #   The ARN of the Virtual Cluster which the Managed Endpoint belongs to.
+    #
+    # @option params [required, String] :execution_role_arn
+    #   The IAM Execution Role ARN that will be used by the job run.
+    #
+    # @option params [required, String] :credential_type
+    #   Type of the token requested. Currently supported and default value of
+    #   this field is “TOKEN.”
+    #
+    # @option params [Integer] :duration_in_seconds
+    #   Duration in seconds for which the session token is valid. The default
+    #   duration is 15 minutes and the maximum is 12 hours.
+    #
+    # @option params [String] :log_context
+    #   String identifier used to separate sections of the execution logs
+    #   uploaded to S3.
+    #
+    # @option params [String] :client_token
+    #   The client idempotency token of the job run request.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Types::GetManagedEndpointSessionCredentialsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetManagedEndpointSessionCredentialsResponse#id #id} => String
+    #   * {Types::GetManagedEndpointSessionCredentialsResponse#credentials #credentials} => Types::Credentials
+    #   * {Types::GetManagedEndpointSessionCredentialsResponse#expires_at #expires_at} => Time
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_managed_endpoint_session_credentials({
+    #     endpoint_identifier: "String2048", # required
+    #     virtual_cluster_identifier: "String2048", # required
+    #     execution_role_arn: "IAMRoleArn", # required
+    #     credential_type: "CredentialType", # required
+    #     duration_in_seconds: 1,
+    #     log_context: "LogContext",
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #   resp.credentials.token #=> String
+    #   resp.expires_at #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/GetManagedEndpointSessionCredentials AWS API Documentation
+    #
+    # @overload get_managed_endpoint_session_credentials(params = {})
+    # @param [Hash] params ({})
+    def get_managed_endpoint_session_credentials(params = {}, options = {})
+      req = build_request(:get_managed_endpoint_session_credentials, params)
       req.send_request(options)
     end
 
@@ -816,10 +1338,14 @@ module Aws::EMRContainers
     #   resp.job_runs[0].configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_group_name #=> String
     #   resp.job_runs[0].configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_stream_name_prefix #=> String
     #   resp.job_runs[0].configuration_overrides.monitoring_configuration.s3_monitoring_configuration.log_uri #=> String
+    #   resp.job_runs[0].configuration_overrides.monitoring_configuration.container_log_rotation_configuration.rotation_size #=> String
+    #   resp.job_runs[0].configuration_overrides.monitoring_configuration.container_log_rotation_configuration.max_files_to_keep #=> Integer
     #   resp.job_runs[0].job_driver.spark_submit_job_driver.entry_point #=> String
     #   resp.job_runs[0].job_driver.spark_submit_job_driver.entry_point_arguments #=> Array
     #   resp.job_runs[0].job_driver.spark_submit_job_driver.entry_point_arguments[0] #=> String
     #   resp.job_runs[0].job_driver.spark_submit_job_driver.spark_submit_parameters #=> String
+    #   resp.job_runs[0].job_driver.spark_sql_job_driver.entry_point #=> String
+    #   resp.job_runs[0].job_driver.spark_sql_job_driver.spark_sql_parameters #=> String
     #   resp.job_runs[0].created_at #=> Time
     #   resp.job_runs[0].created_by #=> String
     #   resp.job_runs[0].finished_at #=> Time
@@ -827,6 +1353,8 @@ module Aws::EMRContainers
     #   resp.job_runs[0].failure_reason #=> String, one of "INTERNAL_ERROR", "USER_ERROR", "VALIDATION_ERROR", "CLUSTER_UNAVAILABLE"
     #   resp.job_runs[0].tags #=> Hash
     #   resp.job_runs[0].tags["String128"] #=> String
+    #   resp.job_runs[0].retry_policy_configuration.max_attempts #=> Integer
+    #   resp.job_runs[0].retry_policy_execution.current_attempt_count #=> Integer
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/ListJobRuns AWS API Documentation
@@ -838,9 +1366,89 @@ module Aws::EMRContainers
       req.send_request(options)
     end
 
+    # Lists job templates based on a set of parameters. Job template stores
+    # values of StartJobRun API request in a template and can be used to
+    # start a job run. Job template allows two use cases: avoid repeating
+    # recurring StartJobRun API request values, enforcing certain values in
+    # StartJobRun API request.
+    #
+    # @option params [Time,DateTime,Date,Integer,String] :created_after
+    #   The date and time after which the job templates were created.
+    #
+    # @option params [Time,DateTime,Date,Integer,String] :created_before
+    #   The date and time before which the job templates were created.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of job templates that can be listed.
+    #
+    # @option params [String] :next_token
+    #   The token for the next set of job templates to return.
+    #
+    # @return [Types::ListJobTemplatesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListJobTemplatesResponse#templates #templates} => Array&lt;Types::JobTemplate&gt;
+    #   * {Types::ListJobTemplatesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_job_templates({
+    #     created_after: Time.now,
+    #     created_before: Time.now,
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.templates #=> Array
+    #   resp.templates[0].name #=> String
+    #   resp.templates[0].id #=> String
+    #   resp.templates[0].arn #=> String
+    #   resp.templates[0].created_at #=> Time
+    #   resp.templates[0].created_by #=> String
+    #   resp.templates[0].tags #=> Hash
+    #   resp.templates[0].tags["String128"] #=> String
+    #   resp.templates[0].job_template_data.execution_role_arn #=> String
+    #   resp.templates[0].job_template_data.release_label #=> String
+    #   resp.templates[0].job_template_data.configuration_overrides.application_configuration #=> Array
+    #   resp.templates[0].job_template_data.configuration_overrides.application_configuration[0].classification #=> String
+    #   resp.templates[0].job_template_data.configuration_overrides.application_configuration[0].properties #=> Hash
+    #   resp.templates[0].job_template_data.configuration_overrides.application_configuration[0].properties["String1024"] #=> String
+    #   resp.templates[0].job_template_data.configuration_overrides.application_configuration[0].configurations #=> Types::ConfigurationList
+    #   resp.templates[0].job_template_data.configuration_overrides.monitoring_configuration.persistent_app_ui #=> String
+    #   resp.templates[0].job_template_data.configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_group_name #=> String
+    #   resp.templates[0].job_template_data.configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_stream_name_prefix #=> String
+    #   resp.templates[0].job_template_data.configuration_overrides.monitoring_configuration.s3_monitoring_configuration.log_uri #=> String
+    #   resp.templates[0].job_template_data.job_driver.spark_submit_job_driver.entry_point #=> String
+    #   resp.templates[0].job_template_data.job_driver.spark_submit_job_driver.entry_point_arguments #=> Array
+    #   resp.templates[0].job_template_data.job_driver.spark_submit_job_driver.entry_point_arguments[0] #=> String
+    #   resp.templates[0].job_template_data.job_driver.spark_submit_job_driver.spark_submit_parameters #=> String
+    #   resp.templates[0].job_template_data.job_driver.spark_sql_job_driver.entry_point #=> String
+    #   resp.templates[0].job_template_data.job_driver.spark_sql_job_driver.spark_sql_parameters #=> String
+    #   resp.templates[0].job_template_data.parameter_configuration #=> Hash
+    #   resp.templates[0].job_template_data.parameter_configuration["TemplateParameterName"].type #=> String, one of "NUMBER", "STRING"
+    #   resp.templates[0].job_template_data.parameter_configuration["TemplateParameterName"].default_value #=> String
+    #   resp.templates[0].job_template_data.job_tags #=> Hash
+    #   resp.templates[0].job_template_data.job_tags["String128"] #=> String
+    #   resp.templates[0].kms_key_arn #=> String
+    #   resp.templates[0].decryption_error #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/ListJobTemplates AWS API Documentation
+    #
+    # @overload list_job_templates(params = {})
+    # @param [Hash] params ({})
+    def list_job_templates(params = {}, options = {})
+      req = build_request(:list_job_templates, params)
+      req.send_request(options)
+    end
+
     # Lists managed endpoints based on a set of parameters. A managed
-    # endpoint is a gateway that connects EMR Studio to Amazon EMR on EKS so
-    # that EMR Studio can communicate with your virtual cluster.
+    # endpoint is a gateway that connects Amazon EMR Studio to Amazon EMR on
+    # EKS so that Amazon EMR Studio can communicate with your virtual
+    # cluster.
     #
     # @option params [required, String] :virtual_cluster_id
     #   The ID of the virtual cluster.
@@ -894,6 +1502,8 @@ module Aws::EMRContainers
     #   resp.endpoints[0].release_label #=> String
     #   resp.endpoints[0].execution_role_arn #=> String
     #   resp.endpoints[0].certificate_arn #=> String
+    #   resp.endpoints[0].certificate_authority.certificate_arn #=> String
+    #   resp.endpoints[0].certificate_authority.certificate_data #=> String
     #   resp.endpoints[0].configuration_overrides.application_configuration #=> Array
     #   resp.endpoints[0].configuration_overrides.application_configuration[0].classification #=> String
     #   resp.endpoints[0].configuration_overrides.application_configuration[0].properties #=> Hash
@@ -903,11 +1513,15 @@ module Aws::EMRContainers
     #   resp.endpoints[0].configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_group_name #=> String
     #   resp.endpoints[0].configuration_overrides.monitoring_configuration.cloud_watch_monitoring_configuration.log_stream_name_prefix #=> String
     #   resp.endpoints[0].configuration_overrides.monitoring_configuration.s3_monitoring_configuration.log_uri #=> String
+    #   resp.endpoints[0].configuration_overrides.monitoring_configuration.container_log_rotation_configuration.rotation_size #=> String
+    #   resp.endpoints[0].configuration_overrides.monitoring_configuration.container_log_rotation_configuration.max_files_to_keep #=> Integer
     #   resp.endpoints[0].server_url #=> String
     #   resp.endpoints[0].created_at #=> Time
     #   resp.endpoints[0].security_group #=> String
     #   resp.endpoints[0].subnet_ids #=> Array
     #   resp.endpoints[0].subnet_ids[0] #=> String
+    #   resp.endpoints[0].state_details #=> String
+    #   resp.endpoints[0].failure_reason #=> String, one of "INTERNAL_ERROR", "USER_ERROR", "VALIDATION_ERROR", "CLUSTER_UNAVAILABLE"
     #   resp.endpoints[0].tags #=> Hash
     #   resp.endpoints[0].tags["String128"] #=> String
     #   resp.next_token #=> String
@@ -918,6 +1532,69 @@ module Aws::EMRContainers
     # @param [Hash] params ({})
     def list_managed_endpoints(params = {}, options = {})
       req = build_request(:list_managed_endpoints, params)
+      req.send_request(options)
+    end
+
+    # Lists security configurations based on a set of parameters. Security
+    # configurations in Amazon EMR on EKS are templates for different
+    # security setups. You can use security configurations to configure the
+    # Lake Formation integration setup. You can also create a security
+    # configuration to re-use a security setup each time you create a
+    # virtual cluster.
+    #
+    # @option params [Time,DateTime,Date,Integer,String] :created_after
+    #   The date and time after which the security configuration was created.
+    #
+    # @option params [Time,DateTime,Date,Integer,String] :created_before
+    #   The date and time before which the security configuration was created.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of security configurations the operation can list.
+    #
+    # @option params [String] :next_token
+    #   The token for the next set of security configurations to return.
+    #
+    # @return [Types::ListSecurityConfigurationsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListSecurityConfigurationsResponse#security_configurations #security_configurations} => Array&lt;Types::SecurityConfiguration&gt;
+    #   * {Types::ListSecurityConfigurationsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_security_configurations({
+    #     created_after: Time.now,
+    #     created_before: Time.now,
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.security_configurations #=> Array
+    #   resp.security_configurations[0].id #=> String
+    #   resp.security_configurations[0].name #=> String
+    #   resp.security_configurations[0].arn #=> String
+    #   resp.security_configurations[0].created_at #=> Time
+    #   resp.security_configurations[0].created_by #=> String
+    #   resp.security_configurations[0].security_configuration_data.authorization_configuration.lake_formation_configuration.authorized_session_tag_value #=> String
+    #   resp.security_configurations[0].security_configuration_data.authorization_configuration.lake_formation_configuration.secure_namespace_info.cluster_id #=> String
+    #   resp.security_configurations[0].security_configuration_data.authorization_configuration.lake_formation_configuration.secure_namespace_info.namespace #=> String
+    #   resp.security_configurations[0].security_configuration_data.authorization_configuration.lake_formation_configuration.query_engine_role_arn #=> String
+    #   resp.security_configurations[0].security_configuration_data.authorization_configuration.encryption_configuration.in_transit_encryption_configuration.tls_certificate_configuration.certificate_provider_type #=> String, one of "PEM"
+    #   resp.security_configurations[0].security_configuration_data.authorization_configuration.encryption_configuration.in_transit_encryption_configuration.tls_certificate_configuration.public_certificate_secret_arn #=> String
+    #   resp.security_configurations[0].security_configuration_data.authorization_configuration.encryption_configuration.in_transit_encryption_configuration.tls_certificate_configuration.private_certificate_secret_arn #=> String
+    #   resp.security_configurations[0].tags #=> Hash
+    #   resp.security_configurations[0].tags["String128"] #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/ListSecurityConfigurations AWS API Documentation
+    #
+    # @overload list_security_configurations(params = {})
+    # @param [Hash] params ({})
+    def list_security_configurations(params = {}, options = {})
+      req = build_request(:list_security_configurations, params)
       req.send_request(options)
     end
 
@@ -962,8 +1639,8 @@ module Aws::EMRContainers
     #   The container provider ID of the virtual cluster.
     #
     # @option params [String] :container_provider_type
-    #   The container provider type of the virtual cluster. EKS is the only
-    #   supported type as of now.
+    #   The container provider type of the virtual cluster. Amazon EKS is the
+    #   only supported type as of now.
     #
     # @option params [Time,DateTime,Date,Integer,String] :created_after
     #   The date and time after which the virtual clusters are created.
@@ -979,6 +1656,12 @@ module Aws::EMRContainers
     #
     # @option params [String] :next_token
     #   The token for the next set of virtual clusters to return.
+    #
+    # @option params [Boolean] :eks_access_entry_integrated
+    #   Optional Boolean that specifies whether the operation should return
+    #   the virtual clusters that have the access entry integration enabled or
+    #   disabled. If not specified, the operation returns all applicable
+    #   virtual clusters.
     #
     # @return [Types::ListVirtualClustersResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -997,6 +1680,7 @@ module Aws::EMRContainers
     #     states: ["RUNNING"], # accepts RUNNING, TERMINATING, TERMINATED, ARRESTED
     #     max_results: 1,
     #     next_token: "NextToken",
+    #     eks_access_entry_integrated: false,
     #   })
     #
     # @example Response structure
@@ -1012,6 +1696,7 @@ module Aws::EMRContainers
     #   resp.virtual_clusters[0].created_at #=> Time
     #   resp.virtual_clusters[0].tags #=> Hash
     #   resp.virtual_clusters[0].tags["String128"] #=> String
+    #   resp.virtual_clusters[0].security_configuration_id #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/emr-containers-2020-10-01/ListVirtualClusters AWS API Documentation
@@ -1039,13 +1724,13 @@ module Aws::EMRContainers
     #   **A suitable default value is auto-generated.** You should normally
     #   not need to pass this option.**
     #
-    # @option params [required, String] :execution_role_arn
+    # @option params [String] :execution_role_arn
     #   The execution role ARN for the job run.
     #
-    # @option params [required, String] :release_label
+    # @option params [String] :release_label
     #   The Amazon EMR release version to use for the job run.
     #
-    # @option params [required, Types::JobDriver] :job_driver
+    # @option params [Types::JobDriver] :job_driver
     #   The job driver for the job run.
     #
     # @option params [Types::ConfigurationOverrides] :configuration_overrides
@@ -1053,6 +1738,15 @@ module Aws::EMRContainers
     #
     # @option params [Hash<String,String>] :tags
     #   The tags assigned to job runs.
+    #
+    # @option params [String] :job_template_id
+    #   The job template ID to be used to start the job run.
+    #
+    # @option params [Hash<String,String>] :job_template_parameters
+    #   The values of job template parameters to start a job run.
+    #
+    # @option params [Types::RetryPolicyConfiguration] :retry_policy_configuration
+    #   The retry policy configuration for the job run.
     #
     # @return [Types::StartJobRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1067,13 +1761,17 @@ module Aws::EMRContainers
     #     name: "ResourceNameString",
     #     virtual_cluster_id: "ResourceIdString", # required
     #     client_token: "ClientToken", # required
-    #     execution_role_arn: "IAMRoleArn", # required
-    #     release_label: "ReleaseLabel", # required
-    #     job_driver: { # required
+    #     execution_role_arn: "IAMRoleArn",
+    #     release_label: "ReleaseLabel",
+    #     job_driver: {
     #       spark_submit_job_driver: {
     #         entry_point: "EntryPointPath", # required
     #         entry_point_arguments: ["EntryPointArgument"],
     #         spark_submit_parameters: "SparkSubmitParameters",
+    #       },
+    #       spark_sql_job_driver: {
+    #         entry_point: "EntryPointPath",
+    #         spark_sql_parameters: "SparkSqlParameters",
     #       },
     #     },
     #     configuration_overrides: {
@@ -1097,10 +1795,21 @@ module Aws::EMRContainers
     #         s3_monitoring_configuration: {
     #           log_uri: "UriString", # required
     #         },
+    #         container_log_rotation_configuration: {
+    #           rotation_size: "RotationSize", # required
+    #           max_files_to_keep: 1, # required
+    #         },
     #       },
     #     },
     #     tags: {
     #       "String128" => "StringEmpty256",
+    #     },
+    #     job_template_id: "ResourceIdString",
+    #     job_template_parameters: {
+    #       "TemplateParameterName" => "String1024",
+    #     },
+    #     retry_policy_configuration: {
+    #       max_attempts: 1, # required
     #     },
     #   })
     #
@@ -1120,16 +1829,17 @@ module Aws::EMRContainers
       req.send_request(options)
     end
 
-    # Assigns tags to resources. A tag is a label that you assign to an AWS
-    # resource. Each tag consists of a key and an optional value, both of
-    # which you define. Tags enable you to categorize your AWS resources by
-    # attributes such as purpose, owner, or environment. When you have many
-    # resources of the same type, you can quickly identify a specific
-    # resource based on the tags you've assigned to it. For example, you
-    # can define a set of tags for your Amazon EMR on EKS clusters to help
-    # you track each cluster's owner and stack level. We recommend that you
-    # devise a consistent set of tag keys for each resource type. You can
-    # then search and filter the resources based on the tags that you add.
+    # Assigns tags to resources. A tag is a label that you assign to an
+    # Amazon Web Services resource. Each tag consists of a key and an
+    # optional value, both of which you define. Tags enable you to
+    # categorize your Amazon Web Services resources by attributes such as
+    # purpose, owner, or environment. When you have many resources of the
+    # same type, you can quickly identify a specific resource based on the
+    # tags you've assigned to it. For example, you can define a set of tags
+    # for your Amazon EMR on EKS clusters to help you track each cluster's
+    # owner and stack level. We recommend that you devise a consistent set
+    # of tag keys for each resource type. You can then search and filter the
+    # resources based on the tags that you add.
     #
     # @option params [required, String] :resource_arn
     #   The ARN of resources.
@@ -1189,14 +1899,19 @@ module Aws::EMRContainers
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::EMRContainers')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-emrcontainers'
-      context[:gem_version] = '1.0.0'
+      context[:gem_version] = '1.48.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::Glacier
   # @api private
@@ -603,9 +604,11 @@ module Aws::Glacier
 
       api.metadata = {
         "apiVersion" => "2012-06-01",
+        "auth" => ["aws.auth#sigv4"],
         "checksumFormat" => "sha256",
         "endpointPrefix" => "glacier",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceFullName" => "Amazon Glacier",
         "serviceId" => "Glacier",
         "signatureVersion" => "v4",

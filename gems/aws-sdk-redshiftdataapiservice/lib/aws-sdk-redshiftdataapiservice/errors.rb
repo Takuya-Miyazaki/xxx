@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -27,8 +27,13 @@ module Aws::RedshiftDataAPIService
   # See {Seahorse::Client::RequestContext} for more information.
   #
   # ## Error Classes
+  # * {ActiveSessionsExceededException}
+  # * {ActiveStatementsExceededException}
+  # * {BatchExecuteStatementException}
+  # * {DatabaseConnectionException}
   # * {ExecuteStatementException}
   # * {InternalServerException}
+  # * {QueryTimeoutException}
   # * {ResourceNotFoundException}
   # * {ValidationException}
   #
@@ -37,6 +42,71 @@ module Aws::RedshiftDataAPIService
   module Errors
 
     extend Aws::Errors::DynamicErrors
+
+    class ActiveSessionsExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::RedshiftDataAPIService::Types::ActiveSessionsExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ActiveStatementsExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::RedshiftDataAPIService::Types::ActiveStatementsExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class BatchExecuteStatementException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::RedshiftDataAPIService::Types::BatchExecuteStatementException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+
+      # @return [String]
+      def statement_id
+        @data[:statement_id]
+      end
+    end
+
+    class DatabaseConnectionException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::RedshiftDataAPIService::Types::DatabaseConnectionException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
 
     class ExecuteStatementException < ServiceError
 
@@ -63,6 +133,21 @@ module Aws::RedshiftDataAPIService
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::RedshiftDataAPIService::Types::InternalServerException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class QueryTimeoutException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::RedshiftDataAPIService::Types::QueryTimeoutException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

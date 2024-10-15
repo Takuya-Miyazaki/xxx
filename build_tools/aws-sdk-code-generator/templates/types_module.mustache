@@ -18,6 +18,13 @@ module {{module_name}}
       {{/members}}
       SENSITIVE = {{sensitive_params}}
       include Aws::Structure
+      {{#union?}}
+      include Aws::Structure::Union
+
+      {{#members}}
+      class {{member_class_name}} < {{class_name}}; end
+      {{/members}}
+      {{/union?}}
     end
     {{/empty?}}
     {{/structures}}
@@ -44,3 +51,7 @@ module {{module_name}}
 
   end
 end
+
+{{#types_customizations}}
+require "{{.}}"
+{{/types_customizations}}

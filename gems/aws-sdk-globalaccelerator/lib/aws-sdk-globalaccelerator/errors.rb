@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -32,6 +32,7 @@ module Aws::GlobalAccelerator
   # * {AccessDeniedException}
   # * {AssociatedEndpointGroupFoundException}
   # * {AssociatedListenerFoundException}
+  # * {AttachmentNotFoundException}
   # * {ByoipCidrNotFoundException}
   # * {ConflictException}
   # * {EndpointAlreadyExistsException}
@@ -45,6 +46,7 @@ module Aws::GlobalAccelerator
   # * {InvalidPortRangeException}
   # * {LimitExceededException}
   # * {ListenerNotFoundException}
+  # * {TransactionInProgressException}
   #
   # Additionally, error classes are dynamically generated for service errors based on the error code
   # if they are not defined above.
@@ -117,6 +119,21 @@ module Aws::GlobalAccelerator
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::GlobalAccelerator::Types::AssociatedListenerFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class AttachmentNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::GlobalAccelerator::Types::AttachmentNotFoundException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -312,6 +329,21 @@ module Aws::GlobalAccelerator
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::GlobalAccelerator::Types::ListenerNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class TransactionInProgressException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::GlobalAccelerator::Types::TransactionInProgressException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

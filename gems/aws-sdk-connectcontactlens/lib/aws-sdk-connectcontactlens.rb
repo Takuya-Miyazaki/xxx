@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-connectcontactlens/types'
-require_relative 'aws-sdk-connectcontactlens/client_api'
-require_relative 'aws-sdk-connectcontactlens/client'
-require_relative 'aws-sdk-connectcontactlens/errors'
-require_relative 'aws-sdk-connectcontactlens/resource'
-require_relative 'aws-sdk-connectcontactlens/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:connectcontactlens)
 
 # This module provides support for Amazon Connect Contact Lens. This module is available in the
 # `aws-sdk-connectcontactlens` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-connectcontactlens/customizations'
 #
 # @!group service
 module Aws::ConnectContactLens
+  autoload :Types, 'aws-sdk-connectcontactlens/types'
+  autoload :ClientApi, 'aws-sdk-connectcontactlens/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-connectcontactlens/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-connectcontactlens/client'
+  autoload :Errors, 'aws-sdk-connectcontactlens/errors'
+  autoload :Resource, 'aws-sdk-connectcontactlens/resource'
+  autoload :EndpointParameters, 'aws-sdk-connectcontactlens/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-connectcontactlens/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-connectcontactlens/endpoints'
 
-  GEM_VERSION = '1.0.0'
+  GEM_VERSION = '1.37.0'
 
 end
+
+require_relative 'aws-sdk-connectcontactlens/customizations'

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -30,33 +30,41 @@ module Aws::IAM
       data[:minimum_password_length]
     end
 
-    # Specifies whether to require symbols for IAM user passwords.
+    # Specifies whether IAM user passwords must contain at least one of the
+    # following symbols:
+    #
+    # ! @ # $ % ^ &amp; * ( ) \_ + - = \[ \] \\\{ \\} \| '
     # @return [Boolean]
     def require_symbols
       data[:require_symbols]
     end
 
-    # Specifies whether to require numbers for IAM user passwords.
+    # Specifies whether IAM user passwords must contain at least one numeric
+    # character (0 to 9).
     # @return [Boolean]
     def require_numbers
       data[:require_numbers]
     end
 
-    # Specifies whether to require uppercase characters for IAM user
-    # passwords.
+    # Specifies whether IAM user passwords must contain at least one
+    # uppercase character (A to Z).
     # @return [Boolean]
     def require_uppercase_characters
       data[:require_uppercase_characters]
     end
 
-    # Specifies whether to require lowercase characters for IAM user
-    # passwords.
+    # Specifies whether IAM user passwords must contain at least one
+    # lowercase character (a to z).
     # @return [Boolean]
     def require_lowercase_characters
       data[:require_lowercase_characters]
     end
 
     # Specifies whether IAM users are allowed to change their own password.
+    # Gives IAM users permissions to `iam:ChangePassword` for only their
+    # user and to the `iam:GetAccountPasswordPolicy` action. This option
+    # does not attach a permissions policy to each user, rather the
+    # permissions are applied at the account-level for all users by IAM.
     # @return [Boolean]
     def allow_users_to_change_password
       data[:allow_users_to_change_password]
@@ -84,7 +92,11 @@ module Aws::IAM
     end
 
     # Specifies whether IAM users are prevented from setting a new password
-    # after their password has expired.
+    # via the Amazon Web Services Management Console after their password
+    # has expired. The IAM user cannot access the console until an
+    # administrator resets the password. IAM users with `iam:ChangePassword`
+    # permission and active access keys can reset their own expired console
+    # password using the CLI or API.
     # @return [Boolean]
     def hard_expiry
       data[:hard_expiry]
@@ -104,7 +116,9 @@ module Aws::IAM
     #
     # @return [self]
     def load
-      resp = @client.get_account_password_policy
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_account_password_policy
+      end
       @data = resp.password_policy
       self
     end
@@ -219,7 +233,9 @@ module Aws::IAM
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -230,7 +246,9 @@ module Aws::IAM
     # @param [Hash] options ({})
     # @return [EmptyStructure]
     def delete(options = {})
-      resp = @client.delete_account_password_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_account_password_policy(options)
+      end
       resp.data
     end
 
@@ -284,9 +302,10 @@ module Aws::IAM
     #   uses the default value of `false`. The result is that passwords do not
     #   require at least one lowercase character.
     # @option options [Boolean] :allow_users_to_change_password
-    #   Allows all IAM users in your account to use the AWS Management Console
-    #   to change their own passwords. For more information, see [Letting IAM
-    #   Users Change Their Own Passwords][1] in the *IAM User Guide*.
+    #   Allows all IAM users in your account to use the Amazon Web Services
+    #   Management Console to change their own passwords. For more
+    #   information, see [Permitting IAM users to change their own
+    #   passwords][1] in the *IAM User Guide*.
     #
     #   If you do not specify a value for this parameter, then the operation
     #   uses the default value of `false`. The result is that IAM users in the
@@ -295,7 +314,7 @@ module Aws::IAM
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/IAM/latest/UserGuide/HowToPwdIAMUser.html
+    #   [1]: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_enable-user-change.html
     # @option options [Integer] :max_password_age
     #   The number of days that an IAM user password is valid.
     #
@@ -310,17 +329,31 @@ module Aws::IAM
     #   uses the default value of `0`. The result is that IAM users are not
     #   prevented from reusing previous passwords.
     # @option options [Boolean] :hard_expiry
-    #   Prevents IAM users from setting a new password after their password
-    #   has expired. The IAM user cannot be accessed until an administrator
-    #   resets the password.
+    #   Prevents IAM users who are accessing the account via the Amazon Web
+    #   Services Management Console from setting a new console password after
+    #   their password has expired. The IAM user cannot access the console
+    #   until an administrator resets the password.
     #
     #   If you do not specify a value for this parameter, then the operation
     #   uses the default value of `false`. The result is that IAM users can
     #   change their passwords after they expire and continue to sign in as
     #   the user.
+    #
+    #   <note markdown="1"> In the Amazon Web Services Management Console, the custom password
+    #   policy option **Allow users to change their own password** gives IAM
+    #   users permissions to `iam:ChangePassword` for only their user and to
+    #   the `iam:GetAccountPasswordPolicy` action. This option does not attach
+    #   a permissions policy to each user, rather the permissions are applied
+    #   at the account-level for all users by IAM. IAM users with
+    #   `iam:ChangePassword` permission and active access keys can reset their
+    #   own expired console password using the CLI or API.
+    #
+    #    </note>
     # @return [EmptyStructure]
     def update(options = {})
-      resp = @client.update_account_password_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.update_account_password_policy(options)
+      end
       resp.data
     end
 

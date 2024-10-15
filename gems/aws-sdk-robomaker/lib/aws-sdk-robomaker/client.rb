@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:robomaker)
 
 module Aws::RoboMaker
   # An API client for RoboMaker.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::RoboMaker
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::RoboMaker::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::RoboMaker
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::RoboMaker
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::RoboMaker
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::RoboMaker
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::RoboMaker
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::RoboMaker
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::RoboMaker
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::RoboMaker::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::RoboMaker::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -327,7 +447,19 @@ module Aws::RoboMaker
 
     # @!group API Operations
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Deletes one or more worlds in a batch operation.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, Array<String>] :worlds
     #   A list of Amazon Resource Names (arns) that correspond to worlds to
@@ -357,7 +489,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Describes one or more simulation jobs.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, Array<String>] :jobs
     #   A list of Amazon Resource Names (ARNs) of simulation jobs to describe.
@@ -382,7 +526,7 @@ module Aws::RoboMaker
     #   resp.jobs[0].last_started_at #=> Time
     #   resp.jobs[0].last_updated_at #=> Time
     #   resp.jobs[0].failure_behavior #=> String, one of "Fail", "Continue"
-    #   resp.jobs[0].failure_code #=> String, one of "InternalServiceError", "RobotApplicationCrash", "SimulationApplicationCrash", "BadPermissionsRobotApplication", "BadPermissionsSimulationApplication", "BadPermissionsS3Object", "BadPermissionsS3Output", "BadPermissionsCloudwatchLogs", "SubnetIpLimitExceeded", "ENILimitExceeded", "BadPermissionsUserCredentials", "InvalidBundleRobotApplication", "InvalidBundleSimulationApplication", "InvalidS3Resource", "LimitExceeded", "MismatchedEtag", "RobotApplicationVersionMismatchedEtag", "SimulationApplicationVersionMismatchedEtag", "ResourceNotFound", "RequestThrottled", "BatchTimedOut", "BatchCanceled", "InvalidInput", "WrongRegionS3Bucket", "WrongRegionS3Output", "WrongRegionRobotApplication", "WrongRegionSimulationApplication"
+    #   resp.jobs[0].failure_code #=> String, one of "InternalServiceError", "RobotApplicationCrash", "SimulationApplicationCrash", "RobotApplicationHealthCheckFailure", "SimulationApplicationHealthCheckFailure", "BadPermissionsRobotApplication", "BadPermissionsSimulationApplication", "BadPermissionsS3Object", "BadPermissionsS3Output", "BadPermissionsCloudwatchLogs", "SubnetIpLimitExceeded", "ENILimitExceeded", "BadPermissionsUserCredentials", "InvalidBundleRobotApplication", "InvalidBundleSimulationApplication", "InvalidS3Resource", "ThrottlingError", "LimitExceeded", "MismatchedEtag", "RobotApplicationVersionMismatchedEtag", "SimulationApplicationVersionMismatchedEtag", "ResourceNotFound", "RequestThrottled", "BatchTimedOut", "BatchCanceled", "InvalidInput", "WrongRegionS3Bucket", "WrongRegionS3Output", "WrongRegionRobotApplication", "WrongRegionSimulationApplication", "UploadContentMismatchError"
     #   resp.jobs[0].failure_reason #=> String
     #   resp.jobs[0].client_request_token #=> String
     #   resp.jobs[0].output_location.s3_bucket #=> String
@@ -403,6 +547,20 @@ module Aws::RoboMaker
     #   resp.jobs[0].robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.jobs[0].robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.jobs[0].robot_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.jobs[0].robot_applications[0].launch_config.command #=> Array
+    #   resp.jobs[0].robot_applications[0].launch_config.command[0] #=> String
+    #   resp.jobs[0].robot_applications[0].upload_configurations #=> Array
+    #   resp.jobs[0].robot_applications[0].upload_configurations[0].name #=> String
+    #   resp.jobs[0].robot_applications[0].upload_configurations[0].path #=> String
+    #   resp.jobs[0].robot_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
+    #   resp.jobs[0].robot_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.jobs[0].robot_applications[0].tools #=> Array
+    #   resp.jobs[0].robot_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.jobs[0].robot_applications[0].tools[0].name #=> String
+    #   resp.jobs[0].robot_applications[0].tools[0].command #=> String
+    #   resp.jobs[0].robot_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.jobs[0].robot_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.jobs[0].robot_applications[0].use_default_tools #=> Boolean
     #   resp.jobs[0].simulation_applications #=> Array
     #   resp.jobs[0].simulation_applications[0].application #=> String
     #   resp.jobs[0].simulation_applications[0].application_version #=> String
@@ -415,14 +573,30 @@ module Aws::RoboMaker
     #   resp.jobs[0].simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.jobs[0].simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.jobs[0].simulation_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.jobs[0].simulation_applications[0].launch_config.command #=> Array
+    #   resp.jobs[0].simulation_applications[0].launch_config.command[0] #=> String
+    #   resp.jobs[0].simulation_applications[0].upload_configurations #=> Array
+    #   resp.jobs[0].simulation_applications[0].upload_configurations[0].name #=> String
+    #   resp.jobs[0].simulation_applications[0].upload_configurations[0].path #=> String
+    #   resp.jobs[0].simulation_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
     #   resp.jobs[0].simulation_applications[0].world_configs #=> Array
     #   resp.jobs[0].simulation_applications[0].world_configs[0].world #=> String
+    #   resp.jobs[0].simulation_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.jobs[0].simulation_applications[0].tools #=> Array
+    #   resp.jobs[0].simulation_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.jobs[0].simulation_applications[0].tools[0].name #=> String
+    #   resp.jobs[0].simulation_applications[0].tools[0].command #=> String
+    #   resp.jobs[0].simulation_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.jobs[0].simulation_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.jobs[0].simulation_applications[0].use_default_tools #=> Boolean
     #   resp.jobs[0].data_sources #=> Array
     #   resp.jobs[0].data_sources[0].name #=> String
     #   resp.jobs[0].data_sources[0].s3_bucket #=> String
     #   resp.jobs[0].data_sources[0].s3_keys #=> Array
     #   resp.jobs[0].data_sources[0].s3_keys[0].s3_key #=> String
     #   resp.jobs[0].data_sources[0].s3_keys[0].etag #=> String
+    #   resp.jobs[0].data_sources[0].type #=> String, one of "Prefix", "Archive", "File"
+    #   resp.jobs[0].data_sources[0].destination #=> String
     #   resp.jobs[0].tags #=> Hash
     #   resp.jobs[0].tags["TagKey"] #=> String
     #   resp.jobs[0].vpc_config.subnets #=> Array
@@ -435,6 +609,8 @@ module Aws::RoboMaker
     #   resp.jobs[0].network_interface.private_ip_address #=> String
     #   resp.jobs[0].network_interface.public_ip_address #=> String
     #   resp.jobs[0].compute.simulation_unit_limit #=> Integer
+    #   resp.jobs[0].compute.compute_type #=> String, one of "CPU", "GPU_AND_CPU"
+    #   resp.jobs[0].compute.gpu_unit_limit #=> Integer
     #   resp.unprocessed_jobs #=> Array
     #   resp.unprocessed_jobs[0] #=> String
     #
@@ -447,7 +623,14 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][1] page.
+    #
     # Cancels the specified deployment job.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [required, String] :job
     #   The deployment job ARN to cancel.
@@ -469,7 +652,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Cancels the specified simulation job.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :job
     #   The simulation job ARN to cancel.
@@ -491,9 +686,21 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Cancels a simulation job batch. When you cancel a simulation job
     # batch, you are also cancelling all of the active simulation jobs
     # created as part of the batch.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :batch
     #   The id of the batch to cancel.
@@ -515,7 +722,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Cancels the specified export job.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :job
     #   The Amazon Resource Name (arn) of the world export job to cancel.
@@ -537,7 +756,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Cancels the specified world generator job.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :job
     #   The Amazon Resource Name (arn) of the world generator job to cancel.
@@ -559,13 +790,25 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported and will throw an error if used. For
+    # more information, see the January 31, 2022 update in the [Support
+    # policy][2] page.
+    #
     # Deploys a specific version of a robot application to robots in a
     # fleet.
     #
     # The robot application must have a numbered `applicationVersion` for
     # consistency reasons. To create a new version, use
     # `CreateRobotApplicationVersion` or see [Creating a Robot Application
-    # Version][1].
+    # Version][3].
     #
     # <note markdown="1"> After 90 days, deployment jobs expire and will be deleted. They will
     # no longer be accessible.
@@ -574,7 +817,9 @@ module Aws::RoboMaker
     #
     #
     #
-    # [1]: https://docs.aws.amazon.com/robomaker/latest/dg/create-robot-application-version.html
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-january2022
+    # [3]: https://docs.aws.amazon.com/robomaker/latest/dg/create-robot-application-version.html
     #
     # @option params [Types::DeploymentConfig] :deployment_config
     #   The requested deployment configuration.
@@ -658,7 +903,7 @@ module Aws::RoboMaker
     #   resp.deployment_application_configs[0].launch_config.environment_variables #=> Hash
     #   resp.deployment_application_configs[0].launch_config.environment_variables["EnvironmentVariableKey"] #=> String
     #   resp.failure_reason #=> String
-    #   resp.failure_code #=> String, one of "ResourceNotFound", "EnvironmentSetupError", "EtagMismatch", "FailureThresholdBreached", "RobotDeploymentAborted", "RobotDeploymentNoResponse", "RobotAgentConnectionTimeout", "GreengrassDeploymentFailed", "InvalidGreengrassGroup", "MissingRobotArchitecture", "MissingRobotApplicationArchitecture", "MissingRobotDeploymentResource", "GreengrassGroupVersionDoesNotExist", "LambdaDeleted", "ExtractingBundleFailure", "PreLaunchFileFailure", "PostLaunchFileFailure", "BadPermissionError", "DownloadConditionFailed", "InternalServerError"
+    #   resp.failure_code #=> String, one of "ResourceNotFound", "EnvironmentSetupError", "EtagMismatch", "FailureThresholdBreached", "RobotDeploymentAborted", "RobotDeploymentNoResponse", "RobotAgentConnectionTimeout", "GreengrassDeploymentFailed", "InvalidGreengrassGroup", "MissingRobotArchitecture", "MissingRobotApplicationArchitecture", "MissingRobotDeploymentResource", "GreengrassGroupVersionDoesNotExist", "LambdaDeleted", "ExtractingBundleFailure", "PreLaunchFileFailure", "PostLaunchFileFailure", "BadPermissionError", "DownloadConditionFailed", "BadLambdaAssociated", "InternalServerError", "RobotApplicationDoesNotExist", "DeploymentFleetDoesNotExist", "FleetDeploymentTimeout"
     #   resp.created_at #=> Time
     #   resp.deployment_config.concurrent_deployment_percentage #=> Integer
     #   resp.deployment_config.failure_threshold_percentage #=> Integer
@@ -678,8 +923,25 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported and will throw an error if used. For
+    # more information, see the January 31, 2022 update in the [Support
+    # policy][2] page.
+    #
     # Creates a fleet, a logical group of robots running the same robot
     # application.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-january2022
     #
     # @option params [required, String] :name
     #   The name of the fleet.
@@ -721,7 +983,24 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported and will throw an error if used. For
+    # more information, see the January 31, 2022 update in the [Support
+    # policy][2] page.
+    #
     # Creates a robot.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-january2022
     #
     # @option params [required, String] :name
     #   The name for the robot.
@@ -775,21 +1054,36 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Creates a robot application.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :name
     #   The name of the robot application.
     #
-    # @option params [required, Array<Types::SourceConfig>] :sources
+    # @option params [Array<Types::SourceConfig>] :sources
     #   The sources of the robot application.
     #
     # @option params [required, Types::RobotSoftwareSuite] :robot_software_suite
-    #   The robot software suite (ROS distribuition) used by the robot
-    #   application.
+    #   The robot software suite used by the robot application.
     #
     # @option params [Hash<String,String>] :tags
     #   A map that contains tag keys and tag values that are attached to the
     #   robot application.
+    #
+    # @option params [Types::Environment] :environment
+    #   The object that contains that URI of the Docker image that you use for
+    #   your robot application.
     #
     # @return [Types::CreateRobotApplicationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -801,12 +1095,13 @@ module Aws::RoboMaker
     #   * {Types::CreateRobotApplicationResponse#last_updated_at #last_updated_at} => Time
     #   * {Types::CreateRobotApplicationResponse#revision_id #revision_id} => String
     #   * {Types::CreateRobotApplicationResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::CreateRobotApplicationResponse#environment #environment} => Types::Environment
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.create_robot_application({
     #     name: "Name", # required
-    #     sources: [ # required
+    #     sources: [
     #       {
     #         s3_bucket: "S3Bucket",
     #         s3_key: "S3Key",
@@ -814,11 +1109,14 @@ module Aws::RoboMaker
     #       },
     #     ],
     #     robot_software_suite: { # required
-    #       name: "ROS", # accepts ROS, ROS2
-    #       version: "Kinetic", # accepts Kinetic, Melodic, Dashing
+    #       name: "ROS", # accepts ROS, ROS2, General
+    #       version: "Kinetic", # accepts Kinetic, Melodic, Dashing, Foxy
     #     },
     #     tags: {
     #       "TagKey" => "TagValue",
+    #     },
+    #     environment: {
+    #       uri: "RepositoryUrl",
     #     },
     #   })
     #
@@ -832,12 +1130,13 @@ module Aws::RoboMaker
     #   resp.sources[0].s3_key #=> String
     #   resp.sources[0].etag #=> String
     #   resp.sources[0].architecture #=> String, one of "X86_64", "ARM64", "ARMHF"
-    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2"
-    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing"
+    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2", "General"
+    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing", "Foxy"
     #   resp.last_updated_at #=> Time
     #   resp.revision_id #=> String
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
+    #   resp.environment.uri #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/CreateRobotApplication AWS API Documentation
     #
@@ -848,7 +1147,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Creates a version of a robot application.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :application
     #   The application information for the robot application.
@@ -857,6 +1168,14 @@ module Aws::RoboMaker
     #   The current revision id for the robot application. If you provide a
     #   value and it matches the latest revision ID, a new version will be
     #   created.
+    #
+    # @option params [Array<String>] :s3_etags
+    #   The Amazon S3 identifier for the zip file bundle that you use for your
+    #   robot application.
+    #
+    # @option params [String] :image_digest
+    #   A SHA256 identifier for the Docker image that you use for your robot
+    #   application.
     #
     # @return [Types::CreateRobotApplicationVersionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -867,12 +1186,15 @@ module Aws::RoboMaker
     #   * {Types::CreateRobotApplicationVersionResponse#robot_software_suite #robot_software_suite} => Types::RobotSoftwareSuite
     #   * {Types::CreateRobotApplicationVersionResponse#last_updated_at #last_updated_at} => Time
     #   * {Types::CreateRobotApplicationVersionResponse#revision_id #revision_id} => String
+    #   * {Types::CreateRobotApplicationVersionResponse#environment #environment} => Types::Environment
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.create_robot_application_version({
     #     application: "Arn", # required
     #     current_revision_id: "RevisionId",
+    #     s3_etags: ["S3Etag"],
+    #     image_digest: "ImageDigest",
     #   })
     #
     # @example Response structure
@@ -885,10 +1207,11 @@ module Aws::RoboMaker
     #   resp.sources[0].s3_key #=> String
     #   resp.sources[0].etag #=> String
     #   resp.sources[0].architecture #=> String, one of "X86_64", "ARM64", "ARMHF"
-    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2"
-    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing"
+    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2", "General"
+    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing", "Foxy"
     #   resp.last_updated_at #=> Time
     #   resp.revision_id #=> String
+    #   resp.environment.uri #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/CreateRobotApplicationVersion AWS API Documentation
     #
@@ -899,26 +1222,41 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Creates a simulation application.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :name
     #   The name of the simulation application.
     #
-    # @option params [required, Array<Types::SourceConfig>] :sources
+    # @option params [Array<Types::SourceConfig>] :sources
     #   The sources of the simulation application.
     #
     # @option params [required, Types::SimulationSoftwareSuite] :simulation_software_suite
     #   The simulation software suite used by the simulation application.
     #
     # @option params [required, Types::RobotSoftwareSuite] :robot_software_suite
-    #   The robot software suite (ROS distribution) used by the simulation
-    #   application.
+    #   The robot software suite used by the simulation application.
     #
     # @option params [Types::RenderingEngine] :rendering_engine
     #   The rendering engine for the simulation application.
     #
     # @option params [Hash<String,String>] :tags
     #   A map that contains tag keys and tag values that are attached to the
+    #   simulation application.
+    #
+    # @option params [Types::Environment] :environment
+    #   The object that contains the Docker image URI used to create your
     #   simulation application.
     #
     # @return [Types::CreateSimulationApplicationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -933,12 +1271,13 @@ module Aws::RoboMaker
     #   * {Types::CreateSimulationApplicationResponse#last_updated_at #last_updated_at} => Time
     #   * {Types::CreateSimulationApplicationResponse#revision_id #revision_id} => String
     #   * {Types::CreateSimulationApplicationResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::CreateSimulationApplicationResponse#environment #environment} => Types::Environment
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.create_simulation_application({
     #     name: "Name", # required
-    #     sources: [ # required
+    #     sources: [
     #       {
     #         s3_bucket: "S3Bucket",
     #         s3_key: "S3Key",
@@ -946,12 +1285,12 @@ module Aws::RoboMaker
     #       },
     #     ],
     #     simulation_software_suite: { # required
-    #       name: "Gazebo", # accepts Gazebo, RosbagPlay
+    #       name: "Gazebo", # accepts Gazebo, RosbagPlay, SimulationRuntime
     #       version: "SimulationSoftwareSuiteVersionType",
     #     },
     #     robot_software_suite: { # required
-    #       name: "ROS", # accepts ROS, ROS2
-    #       version: "Kinetic", # accepts Kinetic, Melodic, Dashing
+    #       name: "ROS", # accepts ROS, ROS2, General
+    #       version: "Kinetic", # accepts Kinetic, Melodic, Dashing, Foxy
     #     },
     #     rendering_engine: {
     #       name: "OGRE", # accepts OGRE
@@ -959,6 +1298,9 @@ module Aws::RoboMaker
     #     },
     #     tags: {
     #       "TagKey" => "TagValue",
+    #     },
+    #     environment: {
+    #       uri: "RepositoryUrl",
     #     },
     #   })
     #
@@ -972,16 +1314,17 @@ module Aws::RoboMaker
     #   resp.sources[0].s3_key #=> String
     #   resp.sources[0].etag #=> String
     #   resp.sources[0].architecture #=> String, one of "X86_64", "ARM64", "ARMHF"
-    #   resp.simulation_software_suite.name #=> String, one of "Gazebo", "RosbagPlay"
+    #   resp.simulation_software_suite.name #=> String, one of "Gazebo", "RosbagPlay", "SimulationRuntime"
     #   resp.simulation_software_suite.version #=> String
-    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2"
-    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing"
+    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2", "General"
+    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing", "Foxy"
     #   resp.rendering_engine.name #=> String, one of "OGRE"
     #   resp.rendering_engine.version #=> String
     #   resp.last_updated_at #=> Time
     #   resp.revision_id #=> String
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
+    #   resp.environment.uri #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/CreateSimulationApplication AWS API Documentation
     #
@@ -992,7 +1335,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Creates a simulation application with a specific revision id.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :application
     #   The application information for the simulation application.
@@ -1001,6 +1356,14 @@ module Aws::RoboMaker
     #   The current revision id for the simulation application. If you provide
     #   a value and it matches the latest revision ID, a new version will be
     #   created.
+    #
+    # @option params [Array<String>] :s3_etags
+    #   The Amazon S3 eTag identifier for the zip file bundle that you use to
+    #   create the simulation application.
+    #
+    # @option params [String] :image_digest
+    #   The SHA256 digest used to identify the Docker image URI used to
+    #   created the simulation application.
     #
     # @return [Types::CreateSimulationApplicationVersionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1013,12 +1376,15 @@ module Aws::RoboMaker
     #   * {Types::CreateSimulationApplicationVersionResponse#rendering_engine #rendering_engine} => Types::RenderingEngine
     #   * {Types::CreateSimulationApplicationVersionResponse#last_updated_at #last_updated_at} => Time
     #   * {Types::CreateSimulationApplicationVersionResponse#revision_id #revision_id} => String
+    #   * {Types::CreateSimulationApplicationVersionResponse#environment #environment} => Types::Environment
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.create_simulation_application_version({
     #     application: "Arn", # required
     #     current_revision_id: "RevisionId",
+    #     s3_etags: ["S3Etag"],
+    #     image_digest: "ImageDigest",
     #   })
     #
     # @example Response structure
@@ -1031,14 +1397,15 @@ module Aws::RoboMaker
     #   resp.sources[0].s3_key #=> String
     #   resp.sources[0].etag #=> String
     #   resp.sources[0].architecture #=> String, one of "X86_64", "ARM64", "ARMHF"
-    #   resp.simulation_software_suite.name #=> String, one of "Gazebo", "RosbagPlay"
+    #   resp.simulation_software_suite.name #=> String, one of "Gazebo", "RosbagPlay", "SimulationRuntime"
     #   resp.simulation_software_suite.version #=> String
-    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2"
-    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing"
+    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2", "General"
+    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing", "Foxy"
     #   resp.rendering_engine.name #=> String, one of "OGRE"
     #   resp.rendering_engine.version #=> String
     #   resp.last_updated_at #=> Time
     #   resp.revision_id #=> String
+    #   resp.environment.uri #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/CreateSimulationApplicationVersion AWS API Documentation
     #
@@ -1049,12 +1416,24 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Creates a simulation job.
     #
     # <note markdown="1"> After 90 days, simulation jobs expire and will be deleted. They will
     # no longer be accessible.
     #
     #  </note>
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :client_request_token
     #   Unique, case-sensitive identifier that you provide to ensure the
@@ -1084,7 +1463,8 @@ module Aws::RoboMaker
     #
     #   Continue
     #
-    #   : Restart the simulation job in the same host instance.
+    #   : Leaves the instance running for its maximum timeout duration after a
+    #     `4XX` error code.
     #
     #   Fail
     #
@@ -1149,7 +1529,7 @@ module Aws::RoboMaker
     #       s3_prefix: "S3Key",
     #     },
     #     logging_config: {
-    #       record_all_ros_topics: false, # required
+    #       record_all_ros_topics: false,
     #     },
     #     max_job_duration_in_seconds: 1, # required
     #     iam_role: "IamRole", # required
@@ -1159,8 +1539,8 @@ module Aws::RoboMaker
     #         application: "Arn", # required
     #         application_version: "Version",
     #         launch_config: { # required
-    #           package_name: "Command", # required
-    #           launch_file: "Command", # required
+    #           package_name: "Command",
+    #           launch_file: "Command",
     #           environment_variables: {
     #             "EnvironmentVariableKey" => "EnvironmentVariableValue",
     #           },
@@ -1174,7 +1554,26 @@ module Aws::RoboMaker
     #             ],
     #           },
     #           stream_ui: false,
+    #           command: ["NonEmptyString"],
     #         },
+    #         upload_configurations: [
+    #           {
+    #             name: "Name", # required
+    #             path: "Path", # required
+    #             upload_behavior: "UPLOAD_ON_TERMINATE", # required, accepts UPLOAD_ON_TERMINATE, UPLOAD_ROLLING_AUTO_REMOVE
+    #           },
+    #         ],
+    #         use_default_upload_configurations: false,
+    #         tools: [
+    #           {
+    #             stream_ui: false,
+    #             name: "Name", # required
+    #             command: "UnrestrictedCommand", # required
+    #             stream_output_to_cloud_watch: false,
+    #             exit_behavior: "FAIL", # accepts FAIL, RESTART
+    #           },
+    #         ],
+    #         use_default_tools: false,
     #       },
     #     ],
     #     simulation_applications: [
@@ -1182,8 +1581,8 @@ module Aws::RoboMaker
     #         application: "Arn", # required
     #         application_version: "Version",
     #         launch_config: { # required
-    #           package_name: "Command", # required
-    #           launch_file: "Command", # required
+    #           package_name: "Command",
+    #           launch_file: "Command",
     #           environment_variables: {
     #             "EnvironmentVariableKey" => "EnvironmentVariableValue",
     #           },
@@ -1197,19 +1596,40 @@ module Aws::RoboMaker
     #             ],
     #           },
     #           stream_ui: false,
+    #           command: ["NonEmptyString"],
     #         },
+    #         upload_configurations: [
+    #           {
+    #             name: "Name", # required
+    #             path: "Path", # required
+    #             upload_behavior: "UPLOAD_ON_TERMINATE", # required, accepts UPLOAD_ON_TERMINATE, UPLOAD_ROLLING_AUTO_REMOVE
+    #           },
+    #         ],
     #         world_configs: [
     #           {
     #             world: "Arn",
     #           },
     #         ],
+    #         use_default_upload_configurations: false,
+    #         tools: [
+    #           {
+    #             stream_ui: false,
+    #             name: "Name", # required
+    #             command: "UnrestrictedCommand", # required
+    #             stream_output_to_cloud_watch: false,
+    #             exit_behavior: "FAIL", # accepts FAIL, RESTART
+    #           },
+    #         ],
+    #         use_default_tools: false,
     #       },
     #     ],
     #     data_sources: [
     #       {
     #         name: "Name", # required
     #         s3_bucket: "S3Bucket", # required
-    #         s3_keys: ["S3Key"], # required
+    #         s3_keys: ["S3KeyOrPrefix"], # required
+    #         type: "Prefix", # accepts Prefix, Archive, File
+    #         destination: "Path",
     #       },
     #     ],
     #     tags: {
@@ -1222,6 +1642,8 @@ module Aws::RoboMaker
     #     },
     #     compute: {
     #       simulation_unit_limit: 1,
+    #       compute_type: "CPU", # accepts CPU, GPU_AND_CPU
+    #       gpu_unit_limit: 1,
     #     },
     #   })
     #
@@ -1232,7 +1654,7 @@ module Aws::RoboMaker
     #   resp.last_started_at #=> Time
     #   resp.last_updated_at #=> Time
     #   resp.failure_behavior #=> String, one of "Fail", "Continue"
-    #   resp.failure_code #=> String, one of "InternalServiceError", "RobotApplicationCrash", "SimulationApplicationCrash", "BadPermissionsRobotApplication", "BadPermissionsSimulationApplication", "BadPermissionsS3Object", "BadPermissionsS3Output", "BadPermissionsCloudwatchLogs", "SubnetIpLimitExceeded", "ENILimitExceeded", "BadPermissionsUserCredentials", "InvalidBundleRobotApplication", "InvalidBundleSimulationApplication", "InvalidS3Resource", "LimitExceeded", "MismatchedEtag", "RobotApplicationVersionMismatchedEtag", "SimulationApplicationVersionMismatchedEtag", "ResourceNotFound", "RequestThrottled", "BatchTimedOut", "BatchCanceled", "InvalidInput", "WrongRegionS3Bucket", "WrongRegionS3Output", "WrongRegionRobotApplication", "WrongRegionSimulationApplication"
+    #   resp.failure_code #=> String, one of "InternalServiceError", "RobotApplicationCrash", "SimulationApplicationCrash", "RobotApplicationHealthCheckFailure", "SimulationApplicationHealthCheckFailure", "BadPermissionsRobotApplication", "BadPermissionsSimulationApplication", "BadPermissionsS3Object", "BadPermissionsS3Output", "BadPermissionsCloudwatchLogs", "SubnetIpLimitExceeded", "ENILimitExceeded", "BadPermissionsUserCredentials", "InvalidBundleRobotApplication", "InvalidBundleSimulationApplication", "InvalidS3Resource", "ThrottlingError", "LimitExceeded", "MismatchedEtag", "RobotApplicationVersionMismatchedEtag", "SimulationApplicationVersionMismatchedEtag", "ResourceNotFound", "RequestThrottled", "BatchTimedOut", "BatchCanceled", "InvalidInput", "WrongRegionS3Bucket", "WrongRegionS3Output", "WrongRegionRobotApplication", "WrongRegionSimulationApplication", "UploadContentMismatchError"
     #   resp.client_request_token #=> String
     #   resp.output_location.s3_bucket #=> String
     #   resp.output_location.s3_prefix #=> String
@@ -1252,6 +1674,20 @@ module Aws::RoboMaker
     #   resp.robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.robot_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.robot_applications[0].launch_config.command #=> Array
+    #   resp.robot_applications[0].launch_config.command[0] #=> String
+    #   resp.robot_applications[0].upload_configurations #=> Array
+    #   resp.robot_applications[0].upload_configurations[0].name #=> String
+    #   resp.robot_applications[0].upload_configurations[0].path #=> String
+    #   resp.robot_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
+    #   resp.robot_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.robot_applications[0].tools #=> Array
+    #   resp.robot_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.robot_applications[0].tools[0].name #=> String
+    #   resp.robot_applications[0].tools[0].command #=> String
+    #   resp.robot_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.robot_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.robot_applications[0].use_default_tools #=> Boolean
     #   resp.simulation_applications #=> Array
     #   resp.simulation_applications[0].application #=> String
     #   resp.simulation_applications[0].application_version #=> String
@@ -1264,14 +1700,30 @@ module Aws::RoboMaker
     #   resp.simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.simulation_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.simulation_applications[0].launch_config.command #=> Array
+    #   resp.simulation_applications[0].launch_config.command[0] #=> String
+    #   resp.simulation_applications[0].upload_configurations #=> Array
+    #   resp.simulation_applications[0].upload_configurations[0].name #=> String
+    #   resp.simulation_applications[0].upload_configurations[0].path #=> String
+    #   resp.simulation_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
     #   resp.simulation_applications[0].world_configs #=> Array
     #   resp.simulation_applications[0].world_configs[0].world #=> String
+    #   resp.simulation_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.simulation_applications[0].tools #=> Array
+    #   resp.simulation_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.simulation_applications[0].tools[0].name #=> String
+    #   resp.simulation_applications[0].tools[0].command #=> String
+    #   resp.simulation_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.simulation_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.simulation_applications[0].use_default_tools #=> Boolean
     #   resp.data_sources #=> Array
     #   resp.data_sources[0].name #=> String
     #   resp.data_sources[0].s3_bucket #=> String
     #   resp.data_sources[0].s3_keys #=> Array
     #   resp.data_sources[0].s3_keys[0].s3_key #=> String
     #   resp.data_sources[0].s3_keys[0].etag #=> String
+    #   resp.data_sources[0].type #=> String, one of "Prefix", "Archive", "File"
+    #   resp.data_sources[0].destination #=> String
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
     #   resp.vpc_config.subnets #=> Array
@@ -1281,6 +1733,8 @@ module Aws::RoboMaker
     #   resp.vpc_config.vpc_id #=> String
     #   resp.vpc_config.assign_public_ip #=> Boolean
     #   resp.compute.simulation_unit_limit #=> Integer
+    #   resp.compute.compute_type #=> String, one of "CPU", "GPU_AND_CPU"
+    #   resp.compute.gpu_unit_limit #=> Integer
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/CreateSimulationJob AWS API Documentation
     #
@@ -1291,7 +1745,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Creates a world export job.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :client_request_token
     #   Unique, case-sensitive identifier that you provide to ensure the
@@ -1363,7 +1829,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Creates worlds using the specified template.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :client_request_token
     #   Unique, case-sensitive identifier that you provide to ensure the
@@ -1440,7 +1918,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Creates a world template.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :client_request_token
     #   Unique, case-sensitive identifier that you provide to ensure the
@@ -1500,7 +1990,23 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][2] page.
+    #
     # Deletes a fleet.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [required, String] :fleet
     #   The Amazon Resource Name (ARN) of the fleet.
@@ -1522,7 +2028,23 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][2] page.
+    #
     # Deletes a robot.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [required, String] :robot
     #   The Amazon Resource Name (ARN) of the robot.
@@ -1544,7 +2066,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Deletes a robot application.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :application
     #   The Amazon Resource Name (ARN) of the the robot application.
@@ -1570,7 +2104,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Deletes a simulation application.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :application
     #   The application information for the simulation application to delete.
@@ -1596,7 +2142,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Deletes a world template.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :template
     #   The Amazon Resource Name (arn) of the world template you want to
@@ -1619,7 +2177,23 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][2] page.
+    #
     # Deregisters a robot.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [required, String] :fleet
     #   The Amazon Resource Name (ARN) of the fleet.
@@ -1653,7 +2227,23 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][2] page.
+    #
     # Describes a deployment job.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [required, String] :job
     #   The Amazon Resource Name (ARN) of the deployment job.
@@ -1698,7 +2288,7 @@ module Aws::RoboMaker
     #   resp.deployment_application_configs[0].launch_config.environment_variables #=> Hash
     #   resp.deployment_application_configs[0].launch_config.environment_variables["EnvironmentVariableKey"] #=> String
     #   resp.failure_reason #=> String
-    #   resp.failure_code #=> String, one of "ResourceNotFound", "EnvironmentSetupError", "EtagMismatch", "FailureThresholdBreached", "RobotDeploymentAborted", "RobotDeploymentNoResponse", "RobotAgentConnectionTimeout", "GreengrassDeploymentFailed", "InvalidGreengrassGroup", "MissingRobotArchitecture", "MissingRobotApplicationArchitecture", "MissingRobotDeploymentResource", "GreengrassGroupVersionDoesNotExist", "LambdaDeleted", "ExtractingBundleFailure", "PreLaunchFileFailure", "PostLaunchFileFailure", "BadPermissionError", "DownloadConditionFailed", "InternalServerError"
+    #   resp.failure_code #=> String, one of "ResourceNotFound", "EnvironmentSetupError", "EtagMismatch", "FailureThresholdBreached", "RobotDeploymentAborted", "RobotDeploymentNoResponse", "RobotAgentConnectionTimeout", "GreengrassDeploymentFailed", "InvalidGreengrassGroup", "MissingRobotArchitecture", "MissingRobotApplicationArchitecture", "MissingRobotDeploymentResource", "GreengrassGroupVersionDoesNotExist", "LambdaDeleted", "ExtractingBundleFailure", "PreLaunchFileFailure", "PostLaunchFileFailure", "BadPermissionError", "DownloadConditionFailed", "BadLambdaAssociated", "InternalServerError", "RobotApplicationDoesNotExist", "DeploymentFleetDoesNotExist", "FleetDeploymentTimeout"
     #   resp.created_at #=> Time
     #   resp.robot_deployment_summary #=> Array
     #   resp.robot_deployment_summary[0].arn #=> String
@@ -1710,7 +2300,7 @@ module Aws::RoboMaker
     #   resp.robot_deployment_summary[0].progress_detail.estimated_time_remaining_seconds #=> Integer
     #   resp.robot_deployment_summary[0].progress_detail.target_resource #=> String
     #   resp.robot_deployment_summary[0].failure_reason #=> String
-    #   resp.robot_deployment_summary[0].failure_code #=> String, one of "ResourceNotFound", "EnvironmentSetupError", "EtagMismatch", "FailureThresholdBreached", "RobotDeploymentAborted", "RobotDeploymentNoResponse", "RobotAgentConnectionTimeout", "GreengrassDeploymentFailed", "InvalidGreengrassGroup", "MissingRobotArchitecture", "MissingRobotApplicationArchitecture", "MissingRobotDeploymentResource", "GreengrassGroupVersionDoesNotExist", "LambdaDeleted", "ExtractingBundleFailure", "PreLaunchFileFailure", "PostLaunchFileFailure", "BadPermissionError", "DownloadConditionFailed", "InternalServerError"
+    #   resp.robot_deployment_summary[0].failure_code #=> String, one of "ResourceNotFound", "EnvironmentSetupError", "EtagMismatch", "FailureThresholdBreached", "RobotDeploymentAborted", "RobotDeploymentNoResponse", "RobotAgentConnectionTimeout", "GreengrassDeploymentFailed", "InvalidGreengrassGroup", "MissingRobotArchitecture", "MissingRobotApplicationArchitecture", "MissingRobotDeploymentResource", "GreengrassGroupVersionDoesNotExist", "LambdaDeleted", "ExtractingBundleFailure", "PreLaunchFileFailure", "PostLaunchFileFailure", "BadPermissionError", "DownloadConditionFailed", "BadLambdaAssociated", "InternalServerError", "RobotApplicationDoesNotExist", "DeploymentFleetDoesNotExist", "FleetDeploymentTimeout"
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
     #
@@ -1723,7 +2313,23 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][2] page.
+    #
     # Describes a fleet.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [required, String] :fleet
     #   The Amazon Resource Name (ARN) of the fleet.
@@ -1775,7 +2381,23 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][2] page.
+    #
     # Describes a robot.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [required, String] :robot
     #   The Amazon Resource Name (ARN) of the robot to be described.
@@ -1822,7 +2444,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Describes a robot application.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :application
     #   The Amazon Resource Name (ARN) of the robot application.
@@ -1840,6 +2474,8 @@ module Aws::RoboMaker
     #   * {Types::DescribeRobotApplicationResponse#revision_id #revision_id} => String
     #   * {Types::DescribeRobotApplicationResponse#last_updated_at #last_updated_at} => Time
     #   * {Types::DescribeRobotApplicationResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::DescribeRobotApplicationResponse#environment #environment} => Types::Environment
+    #   * {Types::DescribeRobotApplicationResponse#image_digest #image_digest} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -1858,12 +2494,14 @@ module Aws::RoboMaker
     #   resp.sources[0].s3_key #=> String
     #   resp.sources[0].etag #=> String
     #   resp.sources[0].architecture #=> String, one of "X86_64", "ARM64", "ARMHF"
-    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2"
-    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing"
+    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2", "General"
+    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing", "Foxy"
     #   resp.revision_id #=> String
     #   resp.last_updated_at #=> Time
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
+    #   resp.environment.uri #=> String
+    #   resp.image_digest #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/DescribeRobotApplication AWS API Documentation
     #
@@ -1874,7 +2512,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Describes a simulation application.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :application
     #   The application information for the simulation application.
@@ -1894,6 +2544,8 @@ module Aws::RoboMaker
     #   * {Types::DescribeSimulationApplicationResponse#revision_id #revision_id} => String
     #   * {Types::DescribeSimulationApplicationResponse#last_updated_at #last_updated_at} => Time
     #   * {Types::DescribeSimulationApplicationResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::DescribeSimulationApplicationResponse#environment #environment} => Types::Environment
+    #   * {Types::DescribeSimulationApplicationResponse#image_digest #image_digest} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -1912,16 +2564,18 @@ module Aws::RoboMaker
     #   resp.sources[0].s3_key #=> String
     #   resp.sources[0].etag #=> String
     #   resp.sources[0].architecture #=> String, one of "X86_64", "ARM64", "ARMHF"
-    #   resp.simulation_software_suite.name #=> String, one of "Gazebo", "RosbagPlay"
+    #   resp.simulation_software_suite.name #=> String, one of "Gazebo", "RosbagPlay", "SimulationRuntime"
     #   resp.simulation_software_suite.version #=> String
-    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2"
-    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing"
+    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2", "General"
+    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing", "Foxy"
     #   resp.rendering_engine.name #=> String, one of "OGRE"
     #   resp.rendering_engine.version #=> String
     #   resp.revision_id #=> String
     #   resp.last_updated_at #=> Time
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
+    #   resp.environment.uri #=> String
+    #   resp.image_digest #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/DescribeSimulationApplication AWS API Documentation
     #
@@ -1932,7 +2586,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Describes a simulation job.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :job
     #   The Amazon Resource Name (ARN) of the simulation job to be described.
@@ -1975,7 +2641,7 @@ module Aws::RoboMaker
     #   resp.last_started_at #=> Time
     #   resp.last_updated_at #=> Time
     #   resp.failure_behavior #=> String, one of "Fail", "Continue"
-    #   resp.failure_code #=> String, one of "InternalServiceError", "RobotApplicationCrash", "SimulationApplicationCrash", "BadPermissionsRobotApplication", "BadPermissionsSimulationApplication", "BadPermissionsS3Object", "BadPermissionsS3Output", "BadPermissionsCloudwatchLogs", "SubnetIpLimitExceeded", "ENILimitExceeded", "BadPermissionsUserCredentials", "InvalidBundleRobotApplication", "InvalidBundleSimulationApplication", "InvalidS3Resource", "LimitExceeded", "MismatchedEtag", "RobotApplicationVersionMismatchedEtag", "SimulationApplicationVersionMismatchedEtag", "ResourceNotFound", "RequestThrottled", "BatchTimedOut", "BatchCanceled", "InvalidInput", "WrongRegionS3Bucket", "WrongRegionS3Output", "WrongRegionRobotApplication", "WrongRegionSimulationApplication"
+    #   resp.failure_code #=> String, one of "InternalServiceError", "RobotApplicationCrash", "SimulationApplicationCrash", "RobotApplicationHealthCheckFailure", "SimulationApplicationHealthCheckFailure", "BadPermissionsRobotApplication", "BadPermissionsSimulationApplication", "BadPermissionsS3Object", "BadPermissionsS3Output", "BadPermissionsCloudwatchLogs", "SubnetIpLimitExceeded", "ENILimitExceeded", "BadPermissionsUserCredentials", "InvalidBundleRobotApplication", "InvalidBundleSimulationApplication", "InvalidS3Resource", "ThrottlingError", "LimitExceeded", "MismatchedEtag", "RobotApplicationVersionMismatchedEtag", "SimulationApplicationVersionMismatchedEtag", "ResourceNotFound", "RequestThrottled", "BatchTimedOut", "BatchCanceled", "InvalidInput", "WrongRegionS3Bucket", "WrongRegionS3Output", "WrongRegionRobotApplication", "WrongRegionSimulationApplication", "UploadContentMismatchError"
     #   resp.failure_reason #=> String
     #   resp.client_request_token #=> String
     #   resp.output_location.s3_bucket #=> String
@@ -1996,6 +2662,20 @@ module Aws::RoboMaker
     #   resp.robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.robot_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.robot_applications[0].launch_config.command #=> Array
+    #   resp.robot_applications[0].launch_config.command[0] #=> String
+    #   resp.robot_applications[0].upload_configurations #=> Array
+    #   resp.robot_applications[0].upload_configurations[0].name #=> String
+    #   resp.robot_applications[0].upload_configurations[0].path #=> String
+    #   resp.robot_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
+    #   resp.robot_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.robot_applications[0].tools #=> Array
+    #   resp.robot_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.robot_applications[0].tools[0].name #=> String
+    #   resp.robot_applications[0].tools[0].command #=> String
+    #   resp.robot_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.robot_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.robot_applications[0].use_default_tools #=> Boolean
     #   resp.simulation_applications #=> Array
     #   resp.simulation_applications[0].application #=> String
     #   resp.simulation_applications[0].application_version #=> String
@@ -2008,14 +2688,30 @@ module Aws::RoboMaker
     #   resp.simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.simulation_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.simulation_applications[0].launch_config.command #=> Array
+    #   resp.simulation_applications[0].launch_config.command[0] #=> String
+    #   resp.simulation_applications[0].upload_configurations #=> Array
+    #   resp.simulation_applications[0].upload_configurations[0].name #=> String
+    #   resp.simulation_applications[0].upload_configurations[0].path #=> String
+    #   resp.simulation_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
     #   resp.simulation_applications[0].world_configs #=> Array
     #   resp.simulation_applications[0].world_configs[0].world #=> String
+    #   resp.simulation_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.simulation_applications[0].tools #=> Array
+    #   resp.simulation_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.simulation_applications[0].tools[0].name #=> String
+    #   resp.simulation_applications[0].tools[0].command #=> String
+    #   resp.simulation_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.simulation_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.simulation_applications[0].use_default_tools #=> Boolean
     #   resp.data_sources #=> Array
     #   resp.data_sources[0].name #=> String
     #   resp.data_sources[0].s3_bucket #=> String
     #   resp.data_sources[0].s3_keys #=> Array
     #   resp.data_sources[0].s3_keys[0].s3_key #=> String
     #   resp.data_sources[0].s3_keys[0].etag #=> String
+    #   resp.data_sources[0].type #=> String, one of "Prefix", "Archive", "File"
+    #   resp.data_sources[0].destination #=> String
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
     #   resp.vpc_config.subnets #=> Array
@@ -2028,6 +2724,8 @@ module Aws::RoboMaker
     #   resp.network_interface.private_ip_address #=> String
     #   resp.network_interface.public_ip_address #=> String
     #   resp.compute.simulation_unit_limit #=> Integer
+    #   resp.compute.compute_type #=> String, one of "CPU", "GPU_AND_CPU"
+    #   resp.compute.gpu_unit_limit #=> Integer
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/DescribeSimulationJob AWS API Documentation
     #
@@ -2038,7 +2736,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Describes a simulation job batch.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :batch
     #   The id of the batch to describe.
@@ -2095,6 +2805,20 @@ module Aws::RoboMaker
     #   resp.failed_requests[0].request.robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.failed_requests[0].request.robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.failed_requests[0].request.robot_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.failed_requests[0].request.robot_applications[0].launch_config.command #=> Array
+    #   resp.failed_requests[0].request.robot_applications[0].launch_config.command[0] #=> String
+    #   resp.failed_requests[0].request.robot_applications[0].upload_configurations #=> Array
+    #   resp.failed_requests[0].request.robot_applications[0].upload_configurations[0].name #=> String
+    #   resp.failed_requests[0].request.robot_applications[0].upload_configurations[0].path #=> String
+    #   resp.failed_requests[0].request.robot_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
+    #   resp.failed_requests[0].request.robot_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.failed_requests[0].request.robot_applications[0].tools #=> Array
+    #   resp.failed_requests[0].request.robot_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.failed_requests[0].request.robot_applications[0].tools[0].name #=> String
+    #   resp.failed_requests[0].request.robot_applications[0].tools[0].command #=> String
+    #   resp.failed_requests[0].request.robot_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.failed_requests[0].request.robot_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.failed_requests[0].request.robot_applications[0].use_default_tools #=> Boolean
     #   resp.failed_requests[0].request.simulation_applications #=> Array
     #   resp.failed_requests[0].request.simulation_applications[0].application #=> String
     #   resp.failed_requests[0].request.simulation_applications[0].application_version #=> String
@@ -2107,23 +2831,41 @@ module Aws::RoboMaker
     #   resp.failed_requests[0].request.simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.failed_requests[0].request.simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.failed_requests[0].request.simulation_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.failed_requests[0].request.simulation_applications[0].launch_config.command #=> Array
+    #   resp.failed_requests[0].request.simulation_applications[0].launch_config.command[0] #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].upload_configurations #=> Array
+    #   resp.failed_requests[0].request.simulation_applications[0].upload_configurations[0].name #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].upload_configurations[0].path #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
     #   resp.failed_requests[0].request.simulation_applications[0].world_configs #=> Array
     #   resp.failed_requests[0].request.simulation_applications[0].world_configs[0].world #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.failed_requests[0].request.simulation_applications[0].tools #=> Array
+    #   resp.failed_requests[0].request.simulation_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.failed_requests[0].request.simulation_applications[0].tools[0].name #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].tools[0].command #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.failed_requests[0].request.simulation_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.failed_requests[0].request.simulation_applications[0].use_default_tools #=> Boolean
     #   resp.failed_requests[0].request.data_sources #=> Array
     #   resp.failed_requests[0].request.data_sources[0].name #=> String
     #   resp.failed_requests[0].request.data_sources[0].s3_bucket #=> String
     #   resp.failed_requests[0].request.data_sources[0].s3_keys #=> Array
     #   resp.failed_requests[0].request.data_sources[0].s3_keys[0] #=> String
+    #   resp.failed_requests[0].request.data_sources[0].type #=> String, one of "Prefix", "Archive", "File"
+    #   resp.failed_requests[0].request.data_sources[0].destination #=> String
     #   resp.failed_requests[0].request.vpc_config.subnets #=> Array
     #   resp.failed_requests[0].request.vpc_config.subnets[0] #=> String
     #   resp.failed_requests[0].request.vpc_config.security_groups #=> Array
     #   resp.failed_requests[0].request.vpc_config.security_groups[0] #=> String
     #   resp.failed_requests[0].request.vpc_config.assign_public_ip #=> Boolean
     #   resp.failed_requests[0].request.compute.simulation_unit_limit #=> Integer
+    #   resp.failed_requests[0].request.compute.compute_type #=> String, one of "CPU", "GPU_AND_CPU"
+    #   resp.failed_requests[0].request.compute.gpu_unit_limit #=> Integer
     #   resp.failed_requests[0].request.tags #=> Hash
     #   resp.failed_requests[0].request.tags["TagKey"] #=> String
     #   resp.failed_requests[0].failure_reason #=> String
-    #   resp.failed_requests[0].failure_code #=> String, one of "InternalServiceError", "RobotApplicationCrash", "SimulationApplicationCrash", "BadPermissionsRobotApplication", "BadPermissionsSimulationApplication", "BadPermissionsS3Object", "BadPermissionsS3Output", "BadPermissionsCloudwatchLogs", "SubnetIpLimitExceeded", "ENILimitExceeded", "BadPermissionsUserCredentials", "InvalidBundleRobotApplication", "InvalidBundleSimulationApplication", "InvalidS3Resource", "LimitExceeded", "MismatchedEtag", "RobotApplicationVersionMismatchedEtag", "SimulationApplicationVersionMismatchedEtag", "ResourceNotFound", "RequestThrottled", "BatchTimedOut", "BatchCanceled", "InvalidInput", "WrongRegionS3Bucket", "WrongRegionS3Output", "WrongRegionRobotApplication", "WrongRegionSimulationApplication"
+    #   resp.failed_requests[0].failure_code #=> String, one of "InternalServiceError", "RobotApplicationCrash", "SimulationApplicationCrash", "RobotApplicationHealthCheckFailure", "SimulationApplicationHealthCheckFailure", "BadPermissionsRobotApplication", "BadPermissionsSimulationApplication", "BadPermissionsS3Object", "BadPermissionsS3Output", "BadPermissionsCloudwatchLogs", "SubnetIpLimitExceeded", "ENILimitExceeded", "BadPermissionsUserCredentials", "InvalidBundleRobotApplication", "InvalidBundleSimulationApplication", "InvalidS3Resource", "ThrottlingError", "LimitExceeded", "MismatchedEtag", "RobotApplicationVersionMismatchedEtag", "SimulationApplicationVersionMismatchedEtag", "ResourceNotFound", "RequestThrottled", "BatchTimedOut", "BatchCanceled", "InvalidInput", "WrongRegionS3Bucket", "WrongRegionS3Output", "WrongRegionRobotApplication", "WrongRegionSimulationApplication", "UploadContentMismatchError"
     #   resp.failed_requests[0].failed_at #=> Time
     #   resp.pending_requests #=> Array
     #   resp.pending_requests[0].output_location.s3_bucket #=> String
@@ -2145,6 +2887,20 @@ module Aws::RoboMaker
     #   resp.pending_requests[0].robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.pending_requests[0].robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.pending_requests[0].robot_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.pending_requests[0].robot_applications[0].launch_config.command #=> Array
+    #   resp.pending_requests[0].robot_applications[0].launch_config.command[0] #=> String
+    #   resp.pending_requests[0].robot_applications[0].upload_configurations #=> Array
+    #   resp.pending_requests[0].robot_applications[0].upload_configurations[0].name #=> String
+    #   resp.pending_requests[0].robot_applications[0].upload_configurations[0].path #=> String
+    #   resp.pending_requests[0].robot_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
+    #   resp.pending_requests[0].robot_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.pending_requests[0].robot_applications[0].tools #=> Array
+    #   resp.pending_requests[0].robot_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.pending_requests[0].robot_applications[0].tools[0].name #=> String
+    #   resp.pending_requests[0].robot_applications[0].tools[0].command #=> String
+    #   resp.pending_requests[0].robot_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.pending_requests[0].robot_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.pending_requests[0].robot_applications[0].use_default_tools #=> Boolean
     #   resp.pending_requests[0].simulation_applications #=> Array
     #   resp.pending_requests[0].simulation_applications[0].application #=> String
     #   resp.pending_requests[0].simulation_applications[0].application_version #=> String
@@ -2157,19 +2913,37 @@ module Aws::RoboMaker
     #   resp.pending_requests[0].simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.pending_requests[0].simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.pending_requests[0].simulation_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.pending_requests[0].simulation_applications[0].launch_config.command #=> Array
+    #   resp.pending_requests[0].simulation_applications[0].launch_config.command[0] #=> String
+    #   resp.pending_requests[0].simulation_applications[0].upload_configurations #=> Array
+    #   resp.pending_requests[0].simulation_applications[0].upload_configurations[0].name #=> String
+    #   resp.pending_requests[0].simulation_applications[0].upload_configurations[0].path #=> String
+    #   resp.pending_requests[0].simulation_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
     #   resp.pending_requests[0].simulation_applications[0].world_configs #=> Array
     #   resp.pending_requests[0].simulation_applications[0].world_configs[0].world #=> String
+    #   resp.pending_requests[0].simulation_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.pending_requests[0].simulation_applications[0].tools #=> Array
+    #   resp.pending_requests[0].simulation_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.pending_requests[0].simulation_applications[0].tools[0].name #=> String
+    #   resp.pending_requests[0].simulation_applications[0].tools[0].command #=> String
+    #   resp.pending_requests[0].simulation_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.pending_requests[0].simulation_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.pending_requests[0].simulation_applications[0].use_default_tools #=> Boolean
     #   resp.pending_requests[0].data_sources #=> Array
     #   resp.pending_requests[0].data_sources[0].name #=> String
     #   resp.pending_requests[0].data_sources[0].s3_bucket #=> String
     #   resp.pending_requests[0].data_sources[0].s3_keys #=> Array
     #   resp.pending_requests[0].data_sources[0].s3_keys[0] #=> String
+    #   resp.pending_requests[0].data_sources[0].type #=> String, one of "Prefix", "Archive", "File"
+    #   resp.pending_requests[0].data_sources[0].destination #=> String
     #   resp.pending_requests[0].vpc_config.subnets #=> Array
     #   resp.pending_requests[0].vpc_config.subnets[0] #=> String
     #   resp.pending_requests[0].vpc_config.security_groups #=> Array
     #   resp.pending_requests[0].vpc_config.security_groups[0] #=> String
     #   resp.pending_requests[0].vpc_config.assign_public_ip #=> Boolean
     #   resp.pending_requests[0].compute.simulation_unit_limit #=> Integer
+    #   resp.pending_requests[0].compute.compute_type #=> String, one of "CPU", "GPU_AND_CPU"
+    #   resp.pending_requests[0].compute.gpu_unit_limit #=> Integer
     #   resp.pending_requests[0].tags #=> Hash
     #   resp.pending_requests[0].tags["TagKey"] #=> String
     #   resp.created_requests #=> Array
@@ -2183,6 +2957,7 @@ module Aws::RoboMaker
     #   resp.created_requests[0].robot_application_names[0] #=> String
     #   resp.created_requests[0].data_source_names #=> Array
     #   resp.created_requests[0].data_source_names[0] #=> String
+    #   resp.created_requests[0].compute_type #=> String, one of "CPU", "GPU_AND_CPU"
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
     #
@@ -2195,7 +2970,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Describes a world.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :world
     #   The Amazon Resource Name (arn) of the world you want to describe.
@@ -2207,6 +2994,7 @@ module Aws::RoboMaker
     #   * {Types::DescribeWorldResponse#template #template} => String
     #   * {Types::DescribeWorldResponse#created_at #created_at} => Time
     #   * {Types::DescribeWorldResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::DescribeWorldResponse#world_description_body #world_description_body} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -2222,6 +3010,7 @@ module Aws::RoboMaker
     #   resp.created_at #=> Time
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
+    #   resp.world_description_body #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/DescribeWorld AWS API Documentation
     #
@@ -2232,7 +3021,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Describes a world export job.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :job
     #   The Amazon Resource Name (arn) of the world export job to describe.
@@ -2281,7 +3082,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Describes a world generation job.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :job
     #   The Amazon Resource Name (arn) of the world generation job to
@@ -2340,7 +3153,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Describes a world template.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :template
     #   The Amazon Resource Name (arn) of the world template you want to
@@ -2354,6 +3179,7 @@ module Aws::RoboMaker
     #   * {Types::DescribeWorldTemplateResponse#created_at #created_at} => Time
     #   * {Types::DescribeWorldTemplateResponse#last_updated_at #last_updated_at} => Time
     #   * {Types::DescribeWorldTemplateResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::DescribeWorldTemplateResponse#version #version} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -2370,6 +3196,7 @@ module Aws::RoboMaker
     #   resp.last_updated_at #=> Time
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
+    #   resp.version #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/DescribeWorldTemplate AWS API Documentation
     #
@@ -2380,7 +3207,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Gets the world template body.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :template
     #   The Amazon Resource Name (arn) of the world template.
@@ -2412,8 +3251,24 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][2] page.
+    #
     # Returns a list of deployment jobs for a fleet. You can optionally
     # provide filters to retrieve specific deployment jobs.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [Array<Types::Filter>] :filters
     #   Optional filters to limit results.
@@ -2483,7 +3338,7 @@ module Aws::RoboMaker
     #   resp.deployment_jobs[0].deployment_config.download_condition_file.key #=> String
     #   resp.deployment_jobs[0].deployment_config.download_condition_file.etag #=> String
     #   resp.deployment_jobs[0].failure_reason #=> String
-    #   resp.deployment_jobs[0].failure_code #=> String, one of "ResourceNotFound", "EnvironmentSetupError", "EtagMismatch", "FailureThresholdBreached", "RobotDeploymentAborted", "RobotDeploymentNoResponse", "RobotAgentConnectionTimeout", "GreengrassDeploymentFailed", "InvalidGreengrassGroup", "MissingRobotArchitecture", "MissingRobotApplicationArchitecture", "MissingRobotDeploymentResource", "GreengrassGroupVersionDoesNotExist", "LambdaDeleted", "ExtractingBundleFailure", "PreLaunchFileFailure", "PostLaunchFileFailure", "BadPermissionError", "DownloadConditionFailed", "InternalServerError"
+    #   resp.deployment_jobs[0].failure_code #=> String, one of "ResourceNotFound", "EnvironmentSetupError", "EtagMismatch", "FailureThresholdBreached", "RobotDeploymentAborted", "RobotDeploymentNoResponse", "RobotAgentConnectionTimeout", "GreengrassDeploymentFailed", "InvalidGreengrassGroup", "MissingRobotArchitecture", "MissingRobotApplicationArchitecture", "MissingRobotDeploymentResource", "GreengrassGroupVersionDoesNotExist", "LambdaDeleted", "ExtractingBundleFailure", "PreLaunchFileFailure", "PostLaunchFileFailure", "BadPermissionError", "DownloadConditionFailed", "BadLambdaAssociated", "InternalServerError", "RobotApplicationDoesNotExist", "DeploymentFleetDoesNotExist", "FleetDeploymentTimeout"
     #   resp.deployment_jobs[0].created_at #=> Time
     #   resp.next_token #=> String
     #
@@ -2496,8 +3351,24 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][2] page.
+    #
     # Returns a list of fleets. You can optionally provide filters to
     # retrieve specific fleets.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [String] :next_token
     #   If the previous paginated request did not return all of the remaining
@@ -2568,8 +3439,20 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Returns a list of robot application. You can optionally provide
     # filters to retrieve specific robot applications.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :version_qualifier
     #   The version qualifier of the robot application.
@@ -2625,8 +3508,8 @@ module Aws::RoboMaker
     #   resp.robot_application_summaries[0].arn #=> String
     #   resp.robot_application_summaries[0].version #=> String
     #   resp.robot_application_summaries[0].last_updated_at #=> Time
-    #   resp.robot_application_summaries[0].robot_software_suite.name #=> String, one of "ROS", "ROS2"
-    #   resp.robot_application_summaries[0].robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing"
+    #   resp.robot_application_summaries[0].robot_software_suite.name #=> String, one of "ROS", "ROS2", "General"
+    #   resp.robot_application_summaries[0].robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing", "Foxy"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/ListRobotApplications AWS API Documentation
@@ -2638,8 +3521,24 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][2] page.
+    #
     # Returns a list of robots. You can optionally provide filters to
     # retrieve specific robots.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [String] :next_token
     #   If the previous paginated request did not return all of the remaining
@@ -2710,8 +3609,20 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Returns a list of simulation applications. You can optionally provide
     # filters to retrieve specific simulation applications.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :version_qualifier
     #   The version qualifier of the simulation application.
@@ -2768,9 +3679,9 @@ module Aws::RoboMaker
     #   resp.simulation_application_summaries[0].arn #=> String
     #   resp.simulation_application_summaries[0].version #=> String
     #   resp.simulation_application_summaries[0].last_updated_at #=> Time
-    #   resp.simulation_application_summaries[0].robot_software_suite.name #=> String, one of "ROS", "ROS2"
-    #   resp.simulation_application_summaries[0].robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing"
-    #   resp.simulation_application_summaries[0].simulation_software_suite.name #=> String, one of "Gazebo", "RosbagPlay"
+    #   resp.simulation_application_summaries[0].robot_software_suite.name #=> String, one of "ROS", "ROS2", "General"
+    #   resp.simulation_application_summaries[0].robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing", "Foxy"
+    #   resp.simulation_application_summaries[0].simulation_software_suite.name #=> String, one of "Gazebo", "RosbagPlay", "SimulationRuntime"
     #   resp.simulation_application_summaries[0].simulation_software_suite.version #=> String
     #   resp.next_token #=> String
     #
@@ -2783,8 +3694,20 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Returns a list simulation job batches. You can optionally provide
     # filters to retrieve specific simulation batch jobs.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :next_token
     #   If the previous paginated request did not return all of the remaining
@@ -2845,8 +3768,20 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Returns a list of simulation jobs. You can optionally provide filters
     # to retrieve specific simulation jobs.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :next_token
     #   If the previous paginated request did not return all of the remaining
@@ -2907,6 +3842,7 @@ module Aws::RoboMaker
     #   resp.simulation_job_summaries[0].robot_application_names[0] #=> String
     #   resp.simulation_job_summaries[0].data_source_names #=> Array
     #   resp.simulation_job_summaries[0].data_source_names[0] #=> String
+    #   resp.simulation_job_summaries[0].compute_type #=> String, one of "CPU", "GPU_AND_CPU"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/ListSimulationJobs AWS API Documentation
@@ -2918,7 +3854,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Lists all tags on a AWS RoboMaker resource.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :resource_arn
     #   The AWS RoboMaker Amazon Resource Name (ARN) with tags to be listed.
@@ -2947,7 +3895,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Lists world export jobs.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :next_token
     #   If the previous paginated request did not return all of the remaining
@@ -2998,6 +3958,8 @@ module Aws::RoboMaker
     #   resp.world_export_job_summaries[0].created_at #=> Time
     #   resp.world_export_job_summaries[0].worlds #=> Array
     #   resp.world_export_job_summaries[0].worlds[0] #=> String
+    #   resp.world_export_job_summaries[0].output_location.s3_bucket #=> String
+    #   resp.world_export_job_summaries[0].output_location.s3_prefix #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/ListWorldExportJobs AWS API Documentation
@@ -3009,7 +3971,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Lists world generator jobs.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :next_token
     #   If the previous paginated request did not return all of the remaining
@@ -3075,7 +4049,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Lists world templates.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :next_token
     #   If the previous paginated request did not return all of the remaining
@@ -3115,6 +4101,7 @@ module Aws::RoboMaker
     #   resp.template_summaries[0].created_at #=> Time
     #   resp.template_summaries[0].last_updated_at #=> Time
     #   resp.template_summaries[0].name #=> String
+    #   resp.template_summaries[0].version #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/ListWorldTemplates AWS API Documentation
@@ -3126,7 +4113,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Lists worlds.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :next_token
     #   If the previous paginated request did not return all of the remaining
@@ -3186,7 +4185,24 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Registers a robot with a fleet.
+    #
+    # This API is no longer supported and will throw an error if used. For
+    # more information, see the January 31, 2022 update in the [Support
+    # policy][2] page.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-january2022
     #
     # @option params [required, String] :fleet
     #   The Amazon Resource Name (ARN) of the fleet.
@@ -3220,7 +4236,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Restarts a running simulation job.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :job
     #   The Amazon Resource Name (ARN) of the simulation job.
@@ -3242,8 +4270,20 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Starts a new simulation job batch. The batch is defined using one or
     # more `SimulationJobRequest` objects.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [String] :client_request_token
     #   Unique, case-sensitive identifier that you provide to ensure the
@@ -3291,7 +4331,7 @@ module Aws::RoboMaker
     #           s3_prefix: "S3Key",
     #         },
     #         logging_config: {
-    #           record_all_ros_topics: false, # required
+    #           record_all_ros_topics: false,
     #         },
     #         max_job_duration_in_seconds: 1, # required
     #         iam_role: "IamRole",
@@ -3302,8 +4342,8 @@ module Aws::RoboMaker
     #             application: "Arn", # required
     #             application_version: "Version",
     #             launch_config: { # required
-    #               package_name: "Command", # required
-    #               launch_file: "Command", # required
+    #               package_name: "Command",
+    #               launch_file: "Command",
     #               environment_variables: {
     #                 "EnvironmentVariableKey" => "EnvironmentVariableValue",
     #               },
@@ -3317,7 +4357,26 @@ module Aws::RoboMaker
     #                 ],
     #               },
     #               stream_ui: false,
+    #               command: ["NonEmptyString"],
     #             },
+    #             upload_configurations: [
+    #               {
+    #                 name: "Name", # required
+    #                 path: "Path", # required
+    #                 upload_behavior: "UPLOAD_ON_TERMINATE", # required, accepts UPLOAD_ON_TERMINATE, UPLOAD_ROLLING_AUTO_REMOVE
+    #               },
+    #             ],
+    #             use_default_upload_configurations: false,
+    #             tools: [
+    #               {
+    #                 stream_ui: false,
+    #                 name: "Name", # required
+    #                 command: "UnrestrictedCommand", # required
+    #                 stream_output_to_cloud_watch: false,
+    #                 exit_behavior: "FAIL", # accepts FAIL, RESTART
+    #               },
+    #             ],
+    #             use_default_tools: false,
     #           },
     #         ],
     #         simulation_applications: [
@@ -3325,8 +4384,8 @@ module Aws::RoboMaker
     #             application: "Arn", # required
     #             application_version: "Version",
     #             launch_config: { # required
-    #               package_name: "Command", # required
-    #               launch_file: "Command", # required
+    #               package_name: "Command",
+    #               launch_file: "Command",
     #               environment_variables: {
     #                 "EnvironmentVariableKey" => "EnvironmentVariableValue",
     #               },
@@ -3340,19 +4399,40 @@ module Aws::RoboMaker
     #                 ],
     #               },
     #               stream_ui: false,
+    #               command: ["NonEmptyString"],
     #             },
+    #             upload_configurations: [
+    #               {
+    #                 name: "Name", # required
+    #                 path: "Path", # required
+    #                 upload_behavior: "UPLOAD_ON_TERMINATE", # required, accepts UPLOAD_ON_TERMINATE, UPLOAD_ROLLING_AUTO_REMOVE
+    #               },
+    #             ],
     #             world_configs: [
     #               {
     #                 world: "Arn",
     #               },
     #             ],
+    #             use_default_upload_configurations: false,
+    #             tools: [
+    #               {
+    #                 stream_ui: false,
+    #                 name: "Name", # required
+    #                 command: "UnrestrictedCommand", # required
+    #                 stream_output_to_cloud_watch: false,
+    #                 exit_behavior: "FAIL", # accepts FAIL, RESTART
+    #               },
+    #             ],
+    #             use_default_tools: false,
     #           },
     #         ],
     #         data_sources: [
     #           {
     #             name: "Name", # required
     #             s3_bucket: "S3Bucket", # required
-    #             s3_keys: ["S3Key"], # required
+    #             s3_keys: ["S3KeyOrPrefix"], # required
+    #             type: "Prefix", # accepts Prefix, Archive, File
+    #             destination: "Path",
     #           },
     #         ],
     #         vpc_config: {
@@ -3362,6 +4442,8 @@ module Aws::RoboMaker
     #         },
     #         compute: {
     #           simulation_unit_limit: 1,
+    #           compute_type: "CPU", # accepts CPU, GPU_AND_CPU
+    #           gpu_unit_limit: 1,
     #         },
     #         tags: {
     #           "TagKey" => "TagValue",
@@ -3403,6 +4485,20 @@ module Aws::RoboMaker
     #   resp.failed_requests[0].request.robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.failed_requests[0].request.robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.failed_requests[0].request.robot_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.failed_requests[0].request.robot_applications[0].launch_config.command #=> Array
+    #   resp.failed_requests[0].request.robot_applications[0].launch_config.command[0] #=> String
+    #   resp.failed_requests[0].request.robot_applications[0].upload_configurations #=> Array
+    #   resp.failed_requests[0].request.robot_applications[0].upload_configurations[0].name #=> String
+    #   resp.failed_requests[0].request.robot_applications[0].upload_configurations[0].path #=> String
+    #   resp.failed_requests[0].request.robot_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
+    #   resp.failed_requests[0].request.robot_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.failed_requests[0].request.robot_applications[0].tools #=> Array
+    #   resp.failed_requests[0].request.robot_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.failed_requests[0].request.robot_applications[0].tools[0].name #=> String
+    #   resp.failed_requests[0].request.robot_applications[0].tools[0].command #=> String
+    #   resp.failed_requests[0].request.robot_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.failed_requests[0].request.robot_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.failed_requests[0].request.robot_applications[0].use_default_tools #=> Boolean
     #   resp.failed_requests[0].request.simulation_applications #=> Array
     #   resp.failed_requests[0].request.simulation_applications[0].application #=> String
     #   resp.failed_requests[0].request.simulation_applications[0].application_version #=> String
@@ -3415,23 +4511,41 @@ module Aws::RoboMaker
     #   resp.failed_requests[0].request.simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.failed_requests[0].request.simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.failed_requests[0].request.simulation_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.failed_requests[0].request.simulation_applications[0].launch_config.command #=> Array
+    #   resp.failed_requests[0].request.simulation_applications[0].launch_config.command[0] #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].upload_configurations #=> Array
+    #   resp.failed_requests[0].request.simulation_applications[0].upload_configurations[0].name #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].upload_configurations[0].path #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
     #   resp.failed_requests[0].request.simulation_applications[0].world_configs #=> Array
     #   resp.failed_requests[0].request.simulation_applications[0].world_configs[0].world #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.failed_requests[0].request.simulation_applications[0].tools #=> Array
+    #   resp.failed_requests[0].request.simulation_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.failed_requests[0].request.simulation_applications[0].tools[0].name #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].tools[0].command #=> String
+    #   resp.failed_requests[0].request.simulation_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.failed_requests[0].request.simulation_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.failed_requests[0].request.simulation_applications[0].use_default_tools #=> Boolean
     #   resp.failed_requests[0].request.data_sources #=> Array
     #   resp.failed_requests[0].request.data_sources[0].name #=> String
     #   resp.failed_requests[0].request.data_sources[0].s3_bucket #=> String
     #   resp.failed_requests[0].request.data_sources[0].s3_keys #=> Array
     #   resp.failed_requests[0].request.data_sources[0].s3_keys[0] #=> String
+    #   resp.failed_requests[0].request.data_sources[0].type #=> String, one of "Prefix", "Archive", "File"
+    #   resp.failed_requests[0].request.data_sources[0].destination #=> String
     #   resp.failed_requests[0].request.vpc_config.subnets #=> Array
     #   resp.failed_requests[0].request.vpc_config.subnets[0] #=> String
     #   resp.failed_requests[0].request.vpc_config.security_groups #=> Array
     #   resp.failed_requests[0].request.vpc_config.security_groups[0] #=> String
     #   resp.failed_requests[0].request.vpc_config.assign_public_ip #=> Boolean
     #   resp.failed_requests[0].request.compute.simulation_unit_limit #=> Integer
+    #   resp.failed_requests[0].request.compute.compute_type #=> String, one of "CPU", "GPU_AND_CPU"
+    #   resp.failed_requests[0].request.compute.gpu_unit_limit #=> Integer
     #   resp.failed_requests[0].request.tags #=> Hash
     #   resp.failed_requests[0].request.tags["TagKey"] #=> String
     #   resp.failed_requests[0].failure_reason #=> String
-    #   resp.failed_requests[0].failure_code #=> String, one of "InternalServiceError", "RobotApplicationCrash", "SimulationApplicationCrash", "BadPermissionsRobotApplication", "BadPermissionsSimulationApplication", "BadPermissionsS3Object", "BadPermissionsS3Output", "BadPermissionsCloudwatchLogs", "SubnetIpLimitExceeded", "ENILimitExceeded", "BadPermissionsUserCredentials", "InvalidBundleRobotApplication", "InvalidBundleSimulationApplication", "InvalidS3Resource", "LimitExceeded", "MismatchedEtag", "RobotApplicationVersionMismatchedEtag", "SimulationApplicationVersionMismatchedEtag", "ResourceNotFound", "RequestThrottled", "BatchTimedOut", "BatchCanceled", "InvalidInput", "WrongRegionS3Bucket", "WrongRegionS3Output", "WrongRegionRobotApplication", "WrongRegionSimulationApplication"
+    #   resp.failed_requests[0].failure_code #=> String, one of "InternalServiceError", "RobotApplicationCrash", "SimulationApplicationCrash", "RobotApplicationHealthCheckFailure", "SimulationApplicationHealthCheckFailure", "BadPermissionsRobotApplication", "BadPermissionsSimulationApplication", "BadPermissionsS3Object", "BadPermissionsS3Output", "BadPermissionsCloudwatchLogs", "SubnetIpLimitExceeded", "ENILimitExceeded", "BadPermissionsUserCredentials", "InvalidBundleRobotApplication", "InvalidBundleSimulationApplication", "InvalidS3Resource", "ThrottlingError", "LimitExceeded", "MismatchedEtag", "RobotApplicationVersionMismatchedEtag", "SimulationApplicationVersionMismatchedEtag", "ResourceNotFound", "RequestThrottled", "BatchTimedOut", "BatchCanceled", "InvalidInput", "WrongRegionS3Bucket", "WrongRegionS3Output", "WrongRegionRobotApplication", "WrongRegionSimulationApplication", "UploadContentMismatchError"
     #   resp.failed_requests[0].failed_at #=> Time
     #   resp.pending_requests #=> Array
     #   resp.pending_requests[0].output_location.s3_bucket #=> String
@@ -3453,6 +4567,20 @@ module Aws::RoboMaker
     #   resp.pending_requests[0].robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.pending_requests[0].robot_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.pending_requests[0].robot_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.pending_requests[0].robot_applications[0].launch_config.command #=> Array
+    #   resp.pending_requests[0].robot_applications[0].launch_config.command[0] #=> String
+    #   resp.pending_requests[0].robot_applications[0].upload_configurations #=> Array
+    #   resp.pending_requests[0].robot_applications[0].upload_configurations[0].name #=> String
+    #   resp.pending_requests[0].robot_applications[0].upload_configurations[0].path #=> String
+    #   resp.pending_requests[0].robot_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
+    #   resp.pending_requests[0].robot_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.pending_requests[0].robot_applications[0].tools #=> Array
+    #   resp.pending_requests[0].robot_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.pending_requests[0].robot_applications[0].tools[0].name #=> String
+    #   resp.pending_requests[0].robot_applications[0].tools[0].command #=> String
+    #   resp.pending_requests[0].robot_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.pending_requests[0].robot_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.pending_requests[0].robot_applications[0].use_default_tools #=> Boolean
     #   resp.pending_requests[0].simulation_applications #=> Array
     #   resp.pending_requests[0].simulation_applications[0].application #=> String
     #   resp.pending_requests[0].simulation_applications[0].application_version #=> String
@@ -3465,19 +4593,37 @@ module Aws::RoboMaker
     #   resp.pending_requests[0].simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].application_port #=> Integer
     #   resp.pending_requests[0].simulation_applications[0].launch_config.port_forwarding_config.port_mappings[0].enable_on_public_ip #=> Boolean
     #   resp.pending_requests[0].simulation_applications[0].launch_config.stream_ui #=> Boolean
+    #   resp.pending_requests[0].simulation_applications[0].launch_config.command #=> Array
+    #   resp.pending_requests[0].simulation_applications[0].launch_config.command[0] #=> String
+    #   resp.pending_requests[0].simulation_applications[0].upload_configurations #=> Array
+    #   resp.pending_requests[0].simulation_applications[0].upload_configurations[0].name #=> String
+    #   resp.pending_requests[0].simulation_applications[0].upload_configurations[0].path #=> String
+    #   resp.pending_requests[0].simulation_applications[0].upload_configurations[0].upload_behavior #=> String, one of "UPLOAD_ON_TERMINATE", "UPLOAD_ROLLING_AUTO_REMOVE"
     #   resp.pending_requests[0].simulation_applications[0].world_configs #=> Array
     #   resp.pending_requests[0].simulation_applications[0].world_configs[0].world #=> String
+    #   resp.pending_requests[0].simulation_applications[0].use_default_upload_configurations #=> Boolean
+    #   resp.pending_requests[0].simulation_applications[0].tools #=> Array
+    #   resp.pending_requests[0].simulation_applications[0].tools[0].stream_ui #=> Boolean
+    #   resp.pending_requests[0].simulation_applications[0].tools[0].name #=> String
+    #   resp.pending_requests[0].simulation_applications[0].tools[0].command #=> String
+    #   resp.pending_requests[0].simulation_applications[0].tools[0].stream_output_to_cloud_watch #=> Boolean
+    #   resp.pending_requests[0].simulation_applications[0].tools[0].exit_behavior #=> String, one of "FAIL", "RESTART"
+    #   resp.pending_requests[0].simulation_applications[0].use_default_tools #=> Boolean
     #   resp.pending_requests[0].data_sources #=> Array
     #   resp.pending_requests[0].data_sources[0].name #=> String
     #   resp.pending_requests[0].data_sources[0].s3_bucket #=> String
     #   resp.pending_requests[0].data_sources[0].s3_keys #=> Array
     #   resp.pending_requests[0].data_sources[0].s3_keys[0] #=> String
+    #   resp.pending_requests[0].data_sources[0].type #=> String, one of "Prefix", "Archive", "File"
+    #   resp.pending_requests[0].data_sources[0].destination #=> String
     #   resp.pending_requests[0].vpc_config.subnets #=> Array
     #   resp.pending_requests[0].vpc_config.subnets[0] #=> String
     #   resp.pending_requests[0].vpc_config.security_groups #=> Array
     #   resp.pending_requests[0].vpc_config.security_groups[0] #=> String
     #   resp.pending_requests[0].vpc_config.assign_public_ip #=> Boolean
     #   resp.pending_requests[0].compute.simulation_unit_limit #=> Integer
+    #   resp.pending_requests[0].compute.compute_type #=> String, one of "CPU", "GPU_AND_CPU"
+    #   resp.pending_requests[0].compute.gpu_unit_limit #=> Integer
     #   resp.pending_requests[0].tags #=> Hash
     #   resp.pending_requests[0].tags["TagKey"] #=> String
     #   resp.created_requests #=> Array
@@ -3491,6 +4637,7 @@ module Aws::RoboMaker
     #   resp.created_requests[0].robot_application_names[0] #=> String
     #   resp.created_requests[0].data_source_names #=> Array
     #   resp.created_requests[0].data_source_names[0] #=> String
+    #   resp.created_requests[0].compute_type #=> String, one of "CPU", "GPU_AND_CPU"
     #   resp.tags #=> Hash
     #   resp.tags["TagKey"] #=> String
     #
@@ -3503,8 +4650,24 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
+    # This API is no longer supported. For more information, see the May 2,
+    # 2022 update in the [Support policy][2] page.
+    #
     # Syncrhonizes robots in a fleet to the latest deployment. This is
     # helpful if robots were added after a deployment.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/chapter-support-policy.html#software-support-policy-may2022
     #
     # @option params [required, String] :client_request_token
     #   Unique, case-sensitive identifier that you provide to ensure the
@@ -3555,7 +4718,7 @@ module Aws::RoboMaker
     #   resp.deployment_application_configs[0].launch_config.environment_variables #=> Hash
     #   resp.deployment_application_configs[0].launch_config.environment_variables["EnvironmentVariableKey"] #=> String
     #   resp.failure_reason #=> String
-    #   resp.failure_code #=> String, one of "ResourceNotFound", "EnvironmentSetupError", "EtagMismatch", "FailureThresholdBreached", "RobotDeploymentAborted", "RobotDeploymentNoResponse", "RobotAgentConnectionTimeout", "GreengrassDeploymentFailed", "InvalidGreengrassGroup", "MissingRobotArchitecture", "MissingRobotApplicationArchitecture", "MissingRobotDeploymentResource", "GreengrassGroupVersionDoesNotExist", "LambdaDeleted", "ExtractingBundleFailure", "PreLaunchFileFailure", "PostLaunchFileFailure", "BadPermissionError", "DownloadConditionFailed", "InternalServerError"
+    #   resp.failure_code #=> String, one of "ResourceNotFound", "EnvironmentSetupError", "EtagMismatch", "FailureThresholdBreached", "RobotDeploymentAborted", "RobotDeploymentNoResponse", "RobotAgentConnectionTimeout", "GreengrassDeploymentFailed", "InvalidGreengrassGroup", "MissingRobotArchitecture", "MissingRobotApplicationArchitecture", "MissingRobotDeploymentResource", "GreengrassGroupVersionDoesNotExist", "LambdaDeleted", "ExtractingBundleFailure", "PreLaunchFileFailure", "PostLaunchFileFailure", "BadPermissionError", "DownloadConditionFailed", "BadLambdaAssociated", "InternalServerError", "RobotApplicationDoesNotExist", "DeploymentFleetDoesNotExist", "FleetDeploymentTimeout"
     #   resp.created_at #=> Time
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/SyncDeploymentJob AWS API Documentation
@@ -3567,18 +4730,27 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Adds or edits tags for a AWS RoboMaker resource.
     #
     # Each tag consists of a tag key and a tag value. Tag keys and tag
     # values are both required, but tag values can be empty strings.
     #
     # For information about the rules that apply to tag keys and tag values,
-    # see [User-Defined Tag Restrictions][1] in the *AWS Billing and Cost
+    # see [User-Defined Tag Restrictions][2] in the *AWS Billing and Cost
     # Management User Guide*.
     #
     #
     #
-    # [1]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/allocation-tag-restrictions.html
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/allocation-tag-restrictions.html
     #
     # @option params [required, String] :resource_arn
     #   The Amazon Resource Name (ARN) of the AWS RoboMaker resource you are
@@ -3608,14 +4780,23 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Removes the specified tags from the specified AWS RoboMaker resource.
     #
     # To remove a tag, specify the tag key. To change the tag value of an
-    # existing tag key, use [ `TagResource` ][1].
+    # existing tag key, use [ `TagResource` ][2].
     #
     #
     #
-    # [1]: https://docs.aws.amazon.com/robomaker/latest/dg/API_TagResource.html
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
+    # [2]: https://docs.aws.amazon.com/robomaker/latest/dg/API_TagResource.html
     #
     # @option params [required, String] :resource_arn
     #   The Amazon Resource Name (ARN) of the AWS RoboMaker resource you are
@@ -3643,20 +4824,35 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Updates a robot application.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :application
     #   The application information for the robot application.
     #
-    # @option params [required, Array<Types::SourceConfig>] :sources
+    # @option params [Array<Types::SourceConfig>] :sources
     #   The sources of the robot application.
     #
     # @option params [required, Types::RobotSoftwareSuite] :robot_software_suite
-    #   The robot software suite (ROS distribution) used by the robot
-    #   application.
+    #   The robot software suite used by the robot application.
     #
     # @option params [String] :current_revision_id
     #   The revision id for the robot application.
+    #
+    # @option params [Types::Environment] :environment
+    #   The object that contains the Docker image URI for your robot
+    #   application.
     #
     # @return [Types::UpdateRobotApplicationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -3667,12 +4863,13 @@ module Aws::RoboMaker
     #   * {Types::UpdateRobotApplicationResponse#robot_software_suite #robot_software_suite} => Types::RobotSoftwareSuite
     #   * {Types::UpdateRobotApplicationResponse#last_updated_at #last_updated_at} => Time
     #   * {Types::UpdateRobotApplicationResponse#revision_id #revision_id} => String
+    #   * {Types::UpdateRobotApplicationResponse#environment #environment} => Types::Environment
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.update_robot_application({
     #     application: "Arn", # required
-    #     sources: [ # required
+    #     sources: [
     #       {
     #         s3_bucket: "S3Bucket",
     #         s3_key: "S3Key",
@@ -3680,10 +4877,13 @@ module Aws::RoboMaker
     #       },
     #     ],
     #     robot_software_suite: { # required
-    #       name: "ROS", # accepts ROS, ROS2
-    #       version: "Kinetic", # accepts Kinetic, Melodic, Dashing
+    #       name: "ROS", # accepts ROS, ROS2, General
+    #       version: "Kinetic", # accepts Kinetic, Melodic, Dashing, Foxy
     #     },
     #     current_revision_id: "RevisionId",
+    #     environment: {
+    #       uri: "RepositoryUrl",
+    #     },
     #   })
     #
     # @example Response structure
@@ -3696,10 +4896,11 @@ module Aws::RoboMaker
     #   resp.sources[0].s3_key #=> String
     #   resp.sources[0].etag #=> String
     #   resp.sources[0].architecture #=> String, one of "X86_64", "ARM64", "ARMHF"
-    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2"
-    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing"
+    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2", "General"
+    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing", "Foxy"
     #   resp.last_updated_at #=> Time
     #   resp.revision_id #=> String
+    #   resp.environment.uri #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/UpdateRobotApplication AWS API Documentation
     #
@@ -3710,25 +4911,41 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Updates a simulation application.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :application
     #   The application information for the simulation application.
     #
-    # @option params [required, Array<Types::SourceConfig>] :sources
+    # @option params [Array<Types::SourceConfig>] :sources
     #   The sources of the simulation application.
     #
     # @option params [required, Types::SimulationSoftwareSuite] :simulation_software_suite
     #   The simulation software suite used by the simulation application.
     #
     # @option params [required, Types::RobotSoftwareSuite] :robot_software_suite
-    #   Information about the robot software suite (ROS distribution).
+    #   Information about the robot software suite.
     #
     # @option params [Types::RenderingEngine] :rendering_engine
     #   The rendering engine for the simulation application.
     #
     # @option params [String] :current_revision_id
     #   The revision id for the robot application.
+    #
+    # @option params [Types::Environment] :environment
+    #   The object that contains the Docker image URI for your simulation
+    #   application.
     #
     # @return [Types::UpdateSimulationApplicationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -3741,12 +4958,13 @@ module Aws::RoboMaker
     #   * {Types::UpdateSimulationApplicationResponse#rendering_engine #rendering_engine} => Types::RenderingEngine
     #   * {Types::UpdateSimulationApplicationResponse#last_updated_at #last_updated_at} => Time
     #   * {Types::UpdateSimulationApplicationResponse#revision_id #revision_id} => String
+    #   * {Types::UpdateSimulationApplicationResponse#environment #environment} => Types::Environment
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.update_simulation_application({
     #     application: "Arn", # required
-    #     sources: [ # required
+    #     sources: [
     #       {
     #         s3_bucket: "S3Bucket",
     #         s3_key: "S3Key",
@@ -3754,18 +4972,21 @@ module Aws::RoboMaker
     #       },
     #     ],
     #     simulation_software_suite: { # required
-    #       name: "Gazebo", # accepts Gazebo, RosbagPlay
+    #       name: "Gazebo", # accepts Gazebo, RosbagPlay, SimulationRuntime
     #       version: "SimulationSoftwareSuiteVersionType",
     #     },
     #     robot_software_suite: { # required
-    #       name: "ROS", # accepts ROS, ROS2
-    #       version: "Kinetic", # accepts Kinetic, Melodic, Dashing
+    #       name: "ROS", # accepts ROS, ROS2, General
+    #       version: "Kinetic", # accepts Kinetic, Melodic, Dashing, Foxy
     #     },
     #     rendering_engine: {
     #       name: "OGRE", # accepts OGRE
     #       version: "RenderingEngineVersionType",
     #     },
     #     current_revision_id: "RevisionId",
+    #     environment: {
+    #       uri: "RepositoryUrl",
+    #     },
     #   })
     #
     # @example Response structure
@@ -3778,14 +4999,15 @@ module Aws::RoboMaker
     #   resp.sources[0].s3_key #=> String
     #   resp.sources[0].etag #=> String
     #   resp.sources[0].architecture #=> String, one of "X86_64", "ARM64", "ARMHF"
-    #   resp.simulation_software_suite.name #=> String, one of "Gazebo", "RosbagPlay"
+    #   resp.simulation_software_suite.name #=> String, one of "Gazebo", "RosbagPlay", "SimulationRuntime"
     #   resp.simulation_software_suite.version #=> String
-    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2"
-    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing"
+    #   resp.robot_software_suite.name #=> String, one of "ROS", "ROS2", "General"
+    #   resp.robot_software_suite.version #=> String, one of "Kinetic", "Melodic", "Dashing", "Foxy"
     #   resp.rendering_engine.name #=> String, one of "OGRE"
     #   resp.rendering_engine.version #=> String
     #   resp.last_updated_at #=> Time
     #   resp.revision_id #=> String
+    #   resp.environment.uri #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/robomaker-2018-06-29/UpdateSimulationApplication AWS API Documentation
     #
@@ -3796,7 +5018,19 @@ module Aws::RoboMaker
       req.send_request(options)
     end
 
+    # End of support notice: On September 10, 2025, Amazon Web Services will
+    # discontinue support for Amazon Web Services RoboMaker. After September
+    # 10, 2025, you will no longer be able to access the Amazon Web Services
+    # RoboMaker console or Amazon Web Services RoboMaker resources. For more
+    # information on transitioning to Batch to help run containerized
+    # simulations, visit
+    # [https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/][1].
+    #
     # Updates a world template.
+    #
+    #
+    #
+    # [1]: https://aws.amazon.com/blogs/hpc/run-simulations-using-multiple-containers-in-a-single-aws-batch-job/
     #
     # @option params [required, String] :template
     #   The Amazon Resource Name (arn) of the world template to update.
@@ -3851,14 +5085,19 @@ module Aws::RoboMaker
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::RoboMaker')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-robomaker'
-      context[:gem_version] = '1.31.0'
+      context[:gem_version] = '1.77.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

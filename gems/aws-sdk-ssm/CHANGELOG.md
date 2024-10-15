@@ -1,6 +1,408 @@
 Unreleased Changes
 ------------------
 
+1.182.0 (2024-09-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.181.0 (2024-09-23)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.180.0 (2024-09-20)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.179.0 (2024-09-17)
+------------------
+
+* Feature - Support for additional levels of cross-account, cross-Region organizational units in Automation. Various documentation updates.
+
+1.178.0 (2024-09-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.177.0 (2024-09-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.176.0 (2024-09-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.175.0 (2024-08-09)
+------------------
+
+* Feature - Systems Manager doc-only updates for August 2024.
+
+1.174.0 (2024-08-02)
+------------------
+
+* Feature - Add v2 smoke tests and smithy smokeTests trait for SDK testing.
+
+1.173.0 (2024-07-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.172.0 (2024-06-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.171.0 (2024-06-24)
+------------------
+
+* Feature - Add sensitive trait to SSM IPAddress property for CloudTrail redaction
+
+1.170.0 (2024-06-05)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.169.0 (2024-05-13)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.168.0 (2024-04-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.167.0 (2024-04-24)
+------------------
+
+* Feature - Add SSM DescribeInstanceProperties API to public AWS SDK.
+
+1.166.0 (2024-03-12)
+------------------
+
+* Feature - March 2024 doc-only updates for Systems Manager.
+
+1.165.0 (2024-02-21)
+------------------
+
+* Feature - This release adds support for sharing Systems Manager parameters with other AWS accounts.
+
+1.164.0 (2024-01-31)
+------------------
+
+* Feature - This release adds an optional Duration parameter to StateManager Associations. This allows customers to specify how long an apply-only-on-cron association execution should run. Once the specified Duration is out all the ongoing cancellable commands or automations are cancelled.
+
+1.163.0 (2024-01-26)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.162.0 (2023-11-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.161.0 (2023-11-22)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.160.0 (2023-11-16)
+------------------
+
+* Feature - This release introduces the ability to filter automation execution steps which have parent steps. In addition, runbook variable information is returned by GetAutomationExecution and parent step information is returned by the DescribeAutomationStepExecutions API.
+
+1.159.0 (2023-10-20)
+------------------
+
+* Feature - This release introduces a new API: DeleteOpsItem. This allows deletion of an OpsItem.
+
+1.158.0 (2023-09-27)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.157.0 (2023-09-25)
+------------------
+
+* Feature - This release updates the enum values for ResourceType in SSM DescribeInstanceInformation input and ConnectionStatus in GetConnectionStatus output.
+
+1.156.0 (2023-07-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.155.0 (2023-07-06)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.154.0 (2023-06-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.153.0 (2023-06-27)
+------------------
+
+* Feature - Systems Manager doc-only update for June 2023.
+
+1.152.0 (2023-06-15)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.151.0 (2023-05-31)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.150.0 (2023-03-22)
+------------------
+
+* Feature - This Patch Manager release supports creating, updating, and deleting Patch Baselines for AmazonLinux2023, AlmaLinux.
+
+1.149.0 (2023-02-22)
+------------------
+
+* Feature - Document only update for Feb 2023
+
+1.148.0 (2023-01-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+* Issue - Replace runtime endpoint resolution approach with generated ruby code.
+
+1.147.0 (2023-01-04)
+------------------
+
+* Feature - Adding support for QuickSetup Document Type in Systems Manager
+
+1.146.0 (2022-12-21)
+------------------
+
+* Feature - Doc-only updates for December 2022.
+
+1.145.0 (2022-11-16)
+------------------
+
+* Feature - This release adds support for cross account access in CreateOpsItem, UpdateOpsItem and GetOpsItem. It introduces new APIs to setup resource policies for SSM resources: PutResourcePolicy, GetResourcePolicies and DeleteResourcePolicy.
+
+1.144.0 (2022-11-07)
+------------------
+
+* Feature - This release includes support for applying a CloudWatch alarm to multi account multi region Systems Manager Automation
+
+1.143.0 (2022-10-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.142.0 (2022-10-13)
+------------------
+
+* Feature - Support of AmazonLinux2022 by Patch Manager
+
+1.141.0 (2022-09-26)
+------------------
+
+* Feature - This release includes support for applying a CloudWatch alarm to Systems Manager capabilities like Automation, Run Command, State Manager, and Maintenance Windows.
+
+1.140.0 (2022-09-23)
+------------------
+
+* Feature - This release adds new SSM document types ConformancePackTemplate and CloudFormation
+
+1.139.0 (2022-09-08)
+------------------
+
+* Feature - This release adds support for Systems Manager State Manager Association tagging.
+
+1.138.0 (2022-07-27)
+------------------
+
+* Feature - Adding doc updates for OpsCenter support in Service Setting actions.
+
+1.137.0 (2022-05-04)
+------------------
+
+* Feature - This release adds the TargetMaps parameter in SSM State Manager API.
+
+1.136.0 (2022-04-29)
+------------------
+
+* Feature - Update the StartChangeRequestExecution, adding TargetMaps to the Runbook parameter
+
+1.135.0 (2022-04-19)
+------------------
+
+* Feature - Added offset support for specifying the number of days to wait after the date and time specified by a CRON expression when creating SSM association.
+
+1.134.0 (2022-03-25)
+------------------
+
+* Feature - This Patch Manager release supports creating, updating, and deleting Patch Baselines for Rocky Linux OS.
+
+1.133.0 (2022-03-23)
+------------------
+
+* Feature - Update AddTagsToResource, ListTagsForResource, and RemoveTagsFromResource APIs to reflect the support for tagging Automation resources. Includes other minor documentation updates.
+
+1.132.0 (2022-02-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.131.0 (2022-02-16)
+------------------
+
+* Feature - Assorted ticket fixes and updates for AWS Systems Manager.
+
+1.130.0 (2022-02-11)
+------------------
+
+* Feature - Documentation updates for AWS Systems Manager.
+
+1.129.0 (2022-02-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.128.0 (2022-01-13)
+------------------
+
+* Feature - AWS Systems Manager adds category support for DescribeDocument API
+
+1.127.0 (2021-12-21)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.126.0 (2021-11-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.125.0 (2021-11-29)
+------------------
+
+* Feature - Added two new attributes to DescribeInstanceInformation called SourceId and SourceType along with new string filters SourceIds and SourceTypes to filter instance records.
+
+1.124.0 (2021-11-22)
+------------------
+
+* Feature - Adds new parameter to CreateActivation API . This parameter is for "internal use only".
+
+1.123.0 (2021-11-15)
+------------------
+
+* Feature - Adds support for Session Reason and Max Session Duration for Systems Manager Session Manager.
+
+1.122.0 (2021-11-12)
+------------------
+
+* Feature - This Patch Manager release supports creating Patch Baselines for RaspberryPi OS (formerly Raspbian)
+
+1.121.0 (2021-11-04)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.120.0 (2021-10-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.119.0 (2021-10-01)
+------------------
+
+* Feature - When "AutoApprovable" is true for a Change Template, then specifying --auto-approve (boolean) in Start-Change-Request-Execution will create a change request that bypasses approver review. (except for change calendar restrictions)
+
+1.118.0 (2021-09-23)
+------------------
+
+* Feature - Added cutoff behavior support for preventing new task invocations from starting when the maintenance window cutoff time is reached.
+
+1.117.0 (2021-09-01)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.116.0 (2021-08-24)
+------------------
+
+* Feature - Updated Parameter Store property for logging improvements.
+
+1.115.0 (2021-08-09)
+------------------
+
+* Feature - Documentation updates for AWS Systems Manager.
+
+1.114.0 (2021-07-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.113.0 (2021-07-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.112.0 (2021-07-13)
+------------------
+
+* Feature - Changes to OpsCenter APIs to support a new feature, operational insights.
+
+1.111.0 (2021-06-03)
+------------------
+
+* Feature - Documentation updates for ssm to fix customer reported issue
+
+1.110.0 (2021-05-10)
+------------------
+
+* Feature - This release adds new APIs to associate, disassociate and list related items in SSM OpsCenter; and this release adds DisplayName as a version-level attribute for SSM Documents and introduces two new document types: ProblemAnalysis, ProblemAnalysisTemplate.
+
+1.109.0 (2021-05-06)
+------------------
+
+* Feature - SSM feature release - ChangeCalendar integration with StateManager.
+
+1.108.0 (2021-04-06)
+------------------
+
+* Feature - Supports removing a label or labels from a parameter, enables ScheduledEndTime and ChangeDetails for StartChangeRequestExecution API, supports critical/security/other noncompliant count for patch API.
+
+1.107.0 (2021-03-24)
+------------------
+
+* Feature - This release allows SSM Explorer customers to enable OpsData sources across their organization when creating a resource data sync.
+
+1.106.0 (2021-03-10)
+------------------
+
+* Feature - Systems Manager support for tagging OpsMetadata.
+
+1.105.0 (2021-03-01)
+------------------
+
+* Feature - Add Support for Patch Manger Baseline Override parameter.
+
+1.104.0 (2021-02-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.103.0 (2021-01-22)
+------------------
+
+* Feature - Documentation updates for the ListDocumentFilters API action.
+
 1.102.0 (2021-01-12)
 ------------------
 

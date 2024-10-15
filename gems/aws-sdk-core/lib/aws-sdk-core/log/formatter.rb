@@ -26,6 +26,8 @@ module Aws
     #
     # You can put any of these placeholders into you pattern.
     #
+    #   * `:region` - The region configured for the client.
+    #
     #   * `:client_class` - The name of the client class.
     #
     #   * `:operation` - The name of the client request method.
@@ -97,7 +99,7 @@ module Aws
       # @return [String]
       attr_reader :pattern
 
-      # Given a resopnse, this will format a log message and return it as a
+      # Given a response, this will format a log message and return it as a
       #   string according to {#pattern}.
       # @param [Seahorse::Client::Response] response
       # @return [String]
@@ -115,6 +117,10 @@ module Aws
       end
 
       private
+
+      def _region(response)
+        response.context.config.region
+      end
 
       def _client_class(response)
         response.context.client.class.name

@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::ApplicationInsights
   # @api private
@@ -14,12 +15,18 @@ module Aws::ApplicationInsights
     include Seahorse::Model
 
     AccessDeniedException = Shapes::StructureShape.new(name: 'AccessDeniedException')
+    AccountId = Shapes::StringShape.new(name: 'AccountId')
+    AddWorkloadRequest = Shapes::StructureShape.new(name: 'AddWorkloadRequest')
+    AddWorkloadResponse = Shapes::StructureShape.new(name: 'AddWorkloadResponse')
     AffectedResource = Shapes::StringShape.new(name: 'AffectedResource')
     AmazonResourceName = Shapes::StringShape.new(name: 'AmazonResourceName')
     ApplicationComponent = Shapes::StructureShape.new(name: 'ApplicationComponent')
     ApplicationComponentList = Shapes::ListShape.new(name: 'ApplicationComponentList')
     ApplicationInfo = Shapes::StructureShape.new(name: 'ApplicationInfo')
     ApplicationInfoList = Shapes::ListShape.new(name: 'ApplicationInfoList')
+    AttachMissingPermission = Shapes::BooleanShape.new(name: 'AttachMissingPermission')
+    AutoConfigEnabled = Shapes::BooleanShape.new(name: 'AutoConfigEnabled')
+    AutoCreate = Shapes::BooleanShape.new(name: 'AutoCreate')
     BadRequestException = Shapes::StructureShape.new(name: 'BadRequestException')
     CWEMonitorEnabled = Shapes::BooleanShape.new(name: 'CWEMonitorEnabled')
     CloudWatchEventDetailType = Shapes::StringShape.new(name: 'CloudWatchEventDetailType')
@@ -69,7 +76,10 @@ module Aws::ApplicationInsights
     DescribeProblemObservationsResponse = Shapes::StructureShape.new(name: 'DescribeProblemObservationsResponse')
     DescribeProblemRequest = Shapes::StructureShape.new(name: 'DescribeProblemRequest')
     DescribeProblemResponse = Shapes::StructureShape.new(name: 'DescribeProblemResponse')
+    DescribeWorkloadRequest = Shapes::StructureShape.new(name: 'DescribeWorkloadRequest')
+    DescribeWorkloadResponse = Shapes::StructureShape.new(name: 'DescribeWorkloadResponse')
     DetectedWorkload = Shapes::MapShape.new(name: 'DetectedWorkload')
+    DiscoveryType = Shapes::StringShape.new(name: 'DiscoveryType')
     EbsCause = Shapes::StringShape.new(name: 'EbsCause')
     EbsEvent = Shapes::StringShape.new(name: 'EbsEvent')
     EbsRequestId = Shapes::StringShape.new(name: 'EbsRequestId')
@@ -81,6 +91,7 @@ module Aws::ApplicationInsights
     Feedback = Shapes::MapShape.new(name: 'Feedback')
     FeedbackKey = Shapes::StringShape.new(name: 'FeedbackKey')
     FeedbackValue = Shapes::StringShape.new(name: 'FeedbackValue')
+    GroupingType = Shapes::StringShape.new(name: 'GroupingType')
     HealthEventArn = Shapes::StringShape.new(name: 'HealthEventArn')
     HealthEventDescription = Shapes::StringShape.new(name: 'HealthEventDescription')
     HealthEventTypeCategory = Shapes::StringShape.new(name: 'HealthEventTypeCategory')
@@ -88,6 +99,7 @@ module Aws::ApplicationInsights
     HealthService = Shapes::StringShape.new(name: 'HealthService')
     Insights = Shapes::StringShape.new(name: 'Insights')
     InternalServerException = Shapes::StructureShape.new(name: 'InternalServerException')
+    LastRecurrenceTime = Shapes::TimestampShape.new(name: 'LastRecurrenceTime')
     LifeCycle = Shapes::StringShape.new(name: 'LifeCycle')
     LineTime = Shapes::TimestampShape.new(name: 'LineTime')
     ListApplicationsRequest = Shapes::StructureShape.new(name: 'ListApplicationsRequest')
@@ -104,6 +116,8 @@ module Aws::ApplicationInsights
     ListProblemsResponse = Shapes::StructureShape.new(name: 'ListProblemsResponse')
     ListTagsForResourceRequest = Shapes::StructureShape.new(name: 'ListTagsForResourceRequest')
     ListTagsForResourceResponse = Shapes::StructureShape.new(name: 'ListTagsForResourceResponse')
+    ListWorkloadsRequest = Shapes::StructureShape.new(name: 'ListWorkloadsRequest')
+    ListWorkloadsResponse = Shapes::StructureShape.new(name: 'ListWorkloadsResponse')
     LogFilter = Shapes::StringShape.new(name: 'LogFilter')
     LogGroup = Shapes::StringShape.new(name: 'LogGroup')
     LogPattern = Shapes::StructureShape.new(name: 'LogPattern')
@@ -132,9 +146,14 @@ module Aws::ApplicationInsights
     ProblemList = Shapes::ListShape.new(name: 'ProblemList')
     RdsEventCategories = Shapes::StringShape.new(name: 'RdsEventCategories')
     RdsEventMessage = Shapes::StringShape.new(name: 'RdsEventMessage')
+    RecommendationType = Shapes::StringShape.new(name: 'RecommendationType')
+    RecurringCount = Shapes::IntegerShape.new(name: 'RecurringCount')
     RelatedObservations = Shapes::StructureShape.new(name: 'RelatedObservations')
     Remarks = Shapes::StringShape.new(name: 'Remarks')
     RemoveSNSTopic = Shapes::BooleanShape.new(name: 'RemoveSNSTopic')
+    RemoveWorkloadRequest = Shapes::StructureShape.new(name: 'RemoveWorkloadRequest')
+    RemoveWorkloadResponse = Shapes::StructureShape.new(name: 'RemoveWorkloadResponse')
+    ResolutionMethod = Shapes::StringShape.new(name: 'ResolutionMethod')
     ResourceARN = Shapes::StringShape.new(name: 'ResourceARN')
     ResourceGroupName = Shapes::StringShape.new(name: 'ResourceGroupName')
     ResourceInUseException = Shapes::StructureShape.new(name: 'ResourceInUseException')
@@ -173,9 +192,20 @@ module Aws::ApplicationInsights
     UpdateComponentResponse = Shapes::StructureShape.new(name: 'UpdateComponentResponse')
     UpdateLogPatternRequest = Shapes::StructureShape.new(name: 'UpdateLogPatternRequest')
     UpdateLogPatternResponse = Shapes::StructureShape.new(name: 'UpdateLogPatternResponse')
+    UpdateProblemRequest = Shapes::StructureShape.new(name: 'UpdateProblemRequest')
+    UpdateProblemResponse = Shapes::StructureShape.new(name: 'UpdateProblemResponse')
+    UpdateStatus = Shapes::StringShape.new(name: 'UpdateStatus')
+    UpdateWorkloadRequest = Shapes::StructureShape.new(name: 'UpdateWorkloadRequest')
+    UpdateWorkloadResponse = Shapes::StructureShape.new(name: 'UpdateWorkloadResponse')
     ValidationException = Shapes::StructureShape.new(name: 'ValidationException')
     Value = Shapes::FloatShape.new(name: 'Value')
+    Visibility = Shapes::StringShape.new(name: 'Visibility')
+    Workload = Shapes::StructureShape.new(name: 'Workload')
+    WorkloadConfiguration = Shapes::StructureShape.new(name: 'WorkloadConfiguration')
+    WorkloadId = Shapes::StringShape.new(name: 'WorkloadId')
+    WorkloadList = Shapes::ListShape.new(name: 'WorkloadList')
     WorkloadMetaData = Shapes::MapShape.new(name: 'WorkloadMetaData')
+    WorkloadName = Shapes::StringShape.new(name: 'WorkloadName')
     XRayErrorPercent = Shapes::IntegerShape.new(name: 'XRayErrorPercent')
     XRayFaultPercent = Shapes::IntegerShape.new(name: 'XRayFaultPercent')
     XRayNodeName = Shapes::StringShape.new(name: 'XRayNodeName')
@@ -186,6 +216,15 @@ module Aws::ApplicationInsights
 
     AccessDeniedException.add_member(:message, Shapes::ShapeRef.new(shape: ErrorMsg, location_name: "Message"))
     AccessDeniedException.struct_class = Types::AccessDeniedException
+
+    AddWorkloadRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
+    AddWorkloadRequest.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, required: true, location_name: "ComponentName"))
+    AddWorkloadRequest.add_member(:workload_configuration, Shapes::ShapeRef.new(shape: WorkloadConfiguration, required: true, location_name: "WorkloadConfiguration"))
+    AddWorkloadRequest.struct_class = Types::AddWorkloadRequest
+
+    AddWorkloadResponse.add_member(:workload_id, Shapes::ShapeRef.new(shape: WorkloadId, location_name: "WorkloadId"))
+    AddWorkloadResponse.add_member(:workload_configuration, Shapes::ShapeRef.new(shape: WorkloadConfiguration, location_name: "WorkloadConfiguration"))
+    AddWorkloadResponse.struct_class = Types::AddWorkloadResponse
 
     ApplicationComponent.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, location_name: "ComponentName"))
     ApplicationComponent.add_member(:component_remarks, Shapes::ShapeRef.new(shape: Remarks, location_name: "ComponentRemarks"))
@@ -198,12 +237,16 @@ module Aws::ApplicationInsights
 
     ApplicationComponentList.member = Shapes::ShapeRef.new(shape: ApplicationComponent)
 
+    ApplicationInfo.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ApplicationInfo.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, location_name: "ResourceGroupName"))
     ApplicationInfo.add_member(:life_cycle, Shapes::ShapeRef.new(shape: LifeCycle, location_name: "LifeCycle"))
     ApplicationInfo.add_member(:ops_item_sns_topic_arn, Shapes::ShapeRef.new(shape: OpsItemSNSTopicArn, location_name: "OpsItemSNSTopicArn"))
     ApplicationInfo.add_member(:ops_center_enabled, Shapes::ShapeRef.new(shape: OpsCenterEnabled, location_name: "OpsCenterEnabled"))
     ApplicationInfo.add_member(:cwe_monitor_enabled, Shapes::ShapeRef.new(shape: CWEMonitorEnabled, location_name: "CWEMonitorEnabled"))
     ApplicationInfo.add_member(:remarks, Shapes::ShapeRef.new(shape: Remarks, location_name: "Remarks"))
+    ApplicationInfo.add_member(:auto_config_enabled, Shapes::ShapeRef.new(shape: AutoConfigEnabled, location_name: "AutoConfigEnabled"))
+    ApplicationInfo.add_member(:discovery_type, Shapes::ShapeRef.new(shape: DiscoveryType, location_name: "DiscoveryType"))
+    ApplicationInfo.add_member(:attach_missing_permission, Shapes::ShapeRef.new(shape: AttachMissingPermission, location_name: "AttachMissingPermission"))
     ApplicationInfo.struct_class = Types::ApplicationInfo
 
     ApplicationInfoList.member = Shapes::ShapeRef.new(shape: ApplicationInfo)
@@ -211,6 +254,8 @@ module Aws::ApplicationInsights
     BadRequestException.add_member(:message, Shapes::ShapeRef.new(shape: ErrorMsg, location_name: "Message"))
     BadRequestException.struct_class = Types::BadRequestException
 
+    ConfigurationEvent.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, location_name: "ResourceGroupName"))
+    ConfigurationEvent.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ConfigurationEvent.add_member(:monitored_resource_arn, Shapes::ShapeRef.new(shape: ConfigurationEventMonitoredResourceARN, location_name: "MonitoredResourceARN"))
     ConfigurationEvent.add_member(:event_status, Shapes::ShapeRef.new(shape: ConfigurationEventStatus, location_name: "EventStatus"))
     ConfigurationEvent.add_member(:event_resource_type, Shapes::ShapeRef.new(shape: ConfigurationEventResourceType, location_name: "EventResourceType"))
@@ -221,11 +266,15 @@ module Aws::ApplicationInsights
 
     ConfigurationEventList.member = Shapes::ShapeRef.new(shape: ConfigurationEvent)
 
-    CreateApplicationRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
+    CreateApplicationRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, location_name: "ResourceGroupName"))
     CreateApplicationRequest.add_member(:ops_center_enabled, Shapes::ShapeRef.new(shape: OpsCenterEnabled, location_name: "OpsCenterEnabled"))
     CreateApplicationRequest.add_member(:cwe_monitor_enabled, Shapes::ShapeRef.new(shape: CWEMonitorEnabled, location_name: "CWEMonitorEnabled"))
     CreateApplicationRequest.add_member(:ops_item_sns_topic_arn, Shapes::ShapeRef.new(shape: OpsItemSNSTopicArn, location_name: "OpsItemSNSTopicArn"))
     CreateApplicationRequest.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
+    CreateApplicationRequest.add_member(:auto_config_enabled, Shapes::ShapeRef.new(shape: AutoConfigEnabled, location_name: "AutoConfigEnabled"))
+    CreateApplicationRequest.add_member(:auto_create, Shapes::ShapeRef.new(shape: AutoCreate, location_name: "AutoCreate"))
+    CreateApplicationRequest.add_member(:grouping_type, Shapes::ShapeRef.new(shape: GroupingType, location_name: "GroupingType"))
+    CreateApplicationRequest.add_member(:attach_missing_permission, Shapes::ShapeRef.new(shape: AttachMissingPermission, location_name: "AttachMissingPermission"))
     CreateApplicationRequest.struct_class = Types::CreateApplicationRequest
 
     CreateApplicationResponse.add_member(:application_info, Shapes::ShapeRef.new(shape: ApplicationInfo, location_name: "ApplicationInfo"))
@@ -268,6 +317,7 @@ module Aws::ApplicationInsights
     DeleteLogPatternResponse.struct_class = Types::DeleteLogPatternResponse
 
     DescribeApplicationRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
+    DescribeApplicationRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     DescribeApplicationRequest.struct_class = Types::DescribeApplicationRequest
 
     DescribeApplicationResponse.add_member(:application_info, Shapes::ShapeRef.new(shape: ApplicationInfo, location_name: "ApplicationInfo"))
@@ -276,6 +326,8 @@ module Aws::ApplicationInsights
     DescribeComponentConfigurationRecommendationRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
     DescribeComponentConfigurationRecommendationRequest.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, required: true, location_name: "ComponentName"))
     DescribeComponentConfigurationRecommendationRequest.add_member(:tier, Shapes::ShapeRef.new(shape: Tier, required: true, location_name: "Tier"))
+    DescribeComponentConfigurationRecommendationRequest.add_member(:workload_name, Shapes::ShapeRef.new(shape: WorkloadName, location_name: "WorkloadName"))
+    DescribeComponentConfigurationRecommendationRequest.add_member(:recommendation_type, Shapes::ShapeRef.new(shape: RecommendationType, location_name: "RecommendationType"))
     DescribeComponentConfigurationRecommendationRequest.struct_class = Types::DescribeComponentConfigurationRecommendationRequest
 
     DescribeComponentConfigurationRecommendationResponse.add_member(:component_configuration, Shapes::ShapeRef.new(shape: ComponentConfiguration, location_name: "ComponentConfiguration"))
@@ -283,6 +335,7 @@ module Aws::ApplicationInsights
 
     DescribeComponentConfigurationRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
     DescribeComponentConfigurationRequest.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, required: true, location_name: "ComponentName"))
+    DescribeComponentConfigurationRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     DescribeComponentConfigurationRequest.struct_class = Types::DescribeComponentConfigurationRequest
 
     DescribeComponentConfigurationResponse.add_member(:monitor, Shapes::ShapeRef.new(shape: Monitor, location_name: "Monitor"))
@@ -292,6 +345,7 @@ module Aws::ApplicationInsights
 
     DescribeComponentRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
     DescribeComponentRequest.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, required: true, location_name: "ComponentName"))
+    DescribeComponentRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     DescribeComponentRequest.struct_class = Types::DescribeComponentRequest
 
     DescribeComponentResponse.add_member(:application_component, Shapes::ShapeRef.new(shape: ApplicationComponent, location_name: "ApplicationComponent"))
@@ -301,29 +355,45 @@ module Aws::ApplicationInsights
     DescribeLogPatternRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
     DescribeLogPatternRequest.add_member(:pattern_set_name, Shapes::ShapeRef.new(shape: LogPatternSetName, required: true, location_name: "PatternSetName"))
     DescribeLogPatternRequest.add_member(:pattern_name, Shapes::ShapeRef.new(shape: LogPatternName, required: true, location_name: "PatternName"))
+    DescribeLogPatternRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     DescribeLogPatternRequest.struct_class = Types::DescribeLogPatternRequest
 
     DescribeLogPatternResponse.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, location_name: "ResourceGroupName"))
+    DescribeLogPatternResponse.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     DescribeLogPatternResponse.add_member(:log_pattern, Shapes::ShapeRef.new(shape: LogPattern, location_name: "LogPattern"))
     DescribeLogPatternResponse.struct_class = Types::DescribeLogPatternResponse
 
     DescribeObservationRequest.add_member(:observation_id, Shapes::ShapeRef.new(shape: ObservationId, required: true, location_name: "ObservationId"))
+    DescribeObservationRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     DescribeObservationRequest.struct_class = Types::DescribeObservationRequest
 
     DescribeObservationResponse.add_member(:observation, Shapes::ShapeRef.new(shape: Observation, location_name: "Observation"))
     DescribeObservationResponse.struct_class = Types::DescribeObservationResponse
 
     DescribeProblemObservationsRequest.add_member(:problem_id, Shapes::ShapeRef.new(shape: ProblemId, required: true, location_name: "ProblemId"))
+    DescribeProblemObservationsRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     DescribeProblemObservationsRequest.struct_class = Types::DescribeProblemObservationsRequest
 
     DescribeProblemObservationsResponse.add_member(:related_observations, Shapes::ShapeRef.new(shape: RelatedObservations, location_name: "RelatedObservations"))
     DescribeProblemObservationsResponse.struct_class = Types::DescribeProblemObservationsResponse
 
     DescribeProblemRequest.add_member(:problem_id, Shapes::ShapeRef.new(shape: ProblemId, required: true, location_name: "ProblemId"))
+    DescribeProblemRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     DescribeProblemRequest.struct_class = Types::DescribeProblemRequest
 
     DescribeProblemResponse.add_member(:problem, Shapes::ShapeRef.new(shape: Problem, location_name: "Problem"))
     DescribeProblemResponse.struct_class = Types::DescribeProblemResponse
+
+    DescribeWorkloadRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
+    DescribeWorkloadRequest.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, required: true, location_name: "ComponentName"))
+    DescribeWorkloadRequest.add_member(:workload_id, Shapes::ShapeRef.new(shape: WorkloadId, required: true, location_name: "WorkloadId"))
+    DescribeWorkloadRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
+    DescribeWorkloadRequest.struct_class = Types::DescribeWorkloadRequest
+
+    DescribeWorkloadResponse.add_member(:workload_id, Shapes::ShapeRef.new(shape: WorkloadId, location_name: "WorkloadId"))
+    DescribeWorkloadResponse.add_member(:workload_remarks, Shapes::ShapeRef.new(shape: Remarks, location_name: "WorkloadRemarks"))
+    DescribeWorkloadResponse.add_member(:workload_configuration, Shapes::ShapeRef.new(shape: WorkloadConfiguration, location_name: "WorkloadConfiguration"))
+    DescribeWorkloadResponse.struct_class = Types::DescribeWorkloadResponse
 
     DetectedWorkload.key = Shapes::ShapeRef.new(shape: Tier)
     DetectedWorkload.value = Shapes::ShapeRef.new(shape: WorkloadMetaData)
@@ -336,6 +406,7 @@ module Aws::ApplicationInsights
 
     ListApplicationsRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: MaxEntities, location_name: "MaxResults"))
     ListApplicationsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
+    ListApplicationsRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ListApplicationsRequest.struct_class = Types::ListApplicationsRequest
 
     ListApplicationsResponse.add_member(:application_info_list, Shapes::ShapeRef.new(shape: ApplicationInfoList, location_name: "ApplicationInfoList"))
@@ -345,6 +416,7 @@ module Aws::ApplicationInsights
     ListComponentsRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
     ListComponentsRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: MaxEntities, location_name: "MaxResults"))
     ListComponentsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
+    ListComponentsRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ListComponentsRequest.struct_class = Types::ListComponentsRequest
 
     ListComponentsResponse.add_member(:application_component_list, Shapes::ShapeRef.new(shape: ApplicationComponentList, location_name: "ApplicationComponentList"))
@@ -357,6 +429,7 @@ module Aws::ApplicationInsights
     ListConfigurationHistoryRequest.add_member(:event_status, Shapes::ShapeRef.new(shape: ConfigurationEventStatus, location_name: "EventStatus"))
     ListConfigurationHistoryRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: MaxEntities, location_name: "MaxResults"))
     ListConfigurationHistoryRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
+    ListConfigurationHistoryRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ListConfigurationHistoryRequest.struct_class = Types::ListConfigurationHistoryRequest
 
     ListConfigurationHistoryResponse.add_member(:event_list, Shapes::ShapeRef.new(shape: ConfigurationEventList, location_name: "EventList"))
@@ -366,9 +439,11 @@ module Aws::ApplicationInsights
     ListLogPatternSetsRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
     ListLogPatternSetsRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: MaxEntities, location_name: "MaxResults"))
     ListLogPatternSetsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
+    ListLogPatternSetsRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ListLogPatternSetsRequest.struct_class = Types::ListLogPatternSetsRequest
 
     ListLogPatternSetsResponse.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, location_name: "ResourceGroupName"))
+    ListLogPatternSetsResponse.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ListLogPatternSetsResponse.add_member(:log_pattern_sets, Shapes::ShapeRef.new(shape: LogPatternSetList, location_name: "LogPatternSets"))
     ListLogPatternSetsResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
     ListLogPatternSetsResponse.struct_class = Types::ListLogPatternSetsResponse
@@ -377,22 +452,29 @@ module Aws::ApplicationInsights
     ListLogPatternsRequest.add_member(:pattern_set_name, Shapes::ShapeRef.new(shape: LogPatternSetName, location_name: "PatternSetName"))
     ListLogPatternsRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: MaxEntities, location_name: "MaxResults"))
     ListLogPatternsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
+    ListLogPatternsRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ListLogPatternsRequest.struct_class = Types::ListLogPatternsRequest
 
     ListLogPatternsResponse.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, location_name: "ResourceGroupName"))
+    ListLogPatternsResponse.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ListLogPatternsResponse.add_member(:log_patterns, Shapes::ShapeRef.new(shape: LogPatternList, location_name: "LogPatterns"))
     ListLogPatternsResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
     ListLogPatternsResponse.struct_class = Types::ListLogPatternsResponse
 
+    ListProblemsRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ListProblemsRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, location_name: "ResourceGroupName"))
     ListProblemsRequest.add_member(:start_time, Shapes::ShapeRef.new(shape: StartTime, location_name: "StartTime"))
     ListProblemsRequest.add_member(:end_time, Shapes::ShapeRef.new(shape: EndTime, location_name: "EndTime"))
     ListProblemsRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: MaxEntities, location_name: "MaxResults"))
     ListProblemsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
+    ListProblemsRequest.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, location_name: "ComponentName"))
+    ListProblemsRequest.add_member(:visibility, Shapes::ShapeRef.new(shape: Visibility, location_name: "Visibility"))
     ListProblemsRequest.struct_class = Types::ListProblemsRequest
 
     ListProblemsResponse.add_member(:problem_list, Shapes::ShapeRef.new(shape: ProblemList, location_name: "ProblemList"))
     ListProblemsResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
+    ListProblemsResponse.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, location_name: "ResourceGroupName"))
+    ListProblemsResponse.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     ListProblemsResponse.struct_class = Types::ListProblemsResponse
 
     ListTagsForResourceRequest.add_member(:resource_arn, Shapes::ShapeRef.new(shape: AmazonResourceName, required: true, location_name: "ResourceARN"))
@@ -400,6 +482,17 @@ module Aws::ApplicationInsights
 
     ListTagsForResourceResponse.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
     ListTagsForResourceResponse.struct_class = Types::ListTagsForResourceResponse
+
+    ListWorkloadsRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
+    ListWorkloadsRequest.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, required: true, location_name: "ComponentName"))
+    ListWorkloadsRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: MaxEntities, location_name: "MaxResults"))
+    ListWorkloadsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
+    ListWorkloadsRequest.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
+    ListWorkloadsRequest.struct_class = Types::ListWorkloadsRequest
+
+    ListWorkloadsResponse.add_member(:workload_list, Shapes::ShapeRef.new(shape: WorkloadList, location_name: "WorkloadList"))
+    ListWorkloadsResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: PaginationToken, location_name: "NextToken"))
+    ListWorkloadsResponse.struct_class = Types::ListWorkloadsResponse
 
     LogPattern.add_member(:pattern_set_name, Shapes::ShapeRef.new(shape: LogPatternSetName, location_name: "PatternSetName"))
     LogPattern.add_member(:pattern_name, Shapes::ShapeRef.new(shape: LogPatternName, location_name: "PatternName"))
@@ -468,14 +561,26 @@ module Aws::ApplicationInsights
     Problem.add_member(:start_time, Shapes::ShapeRef.new(shape: StartTime, location_name: "StartTime"))
     Problem.add_member(:end_time, Shapes::ShapeRef.new(shape: EndTime, location_name: "EndTime"))
     Problem.add_member(:severity_level, Shapes::ShapeRef.new(shape: SeverityLevel, location_name: "SeverityLevel"))
+    Problem.add_member(:account_id, Shapes::ShapeRef.new(shape: AccountId, location_name: "AccountId"))
     Problem.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, location_name: "ResourceGroupName"))
     Problem.add_member(:feedback, Shapes::ShapeRef.new(shape: Feedback, location_name: "Feedback"))
+    Problem.add_member(:recurring_count, Shapes::ShapeRef.new(shape: RecurringCount, location_name: "RecurringCount"))
+    Problem.add_member(:last_recurrence_time, Shapes::ShapeRef.new(shape: LastRecurrenceTime, location_name: "LastRecurrenceTime"))
+    Problem.add_member(:visibility, Shapes::ShapeRef.new(shape: Visibility, location_name: "Visibility"))
+    Problem.add_member(:resolution_method, Shapes::ShapeRef.new(shape: ResolutionMethod, location_name: "ResolutionMethod"))
     Problem.struct_class = Types::Problem
 
     ProblemList.member = Shapes::ShapeRef.new(shape: Problem)
 
     RelatedObservations.add_member(:observation_list, Shapes::ShapeRef.new(shape: ObservationList, location_name: "ObservationList"))
     RelatedObservations.struct_class = Types::RelatedObservations
+
+    RemoveWorkloadRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
+    RemoveWorkloadRequest.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, required: true, location_name: "ComponentName"))
+    RemoveWorkloadRequest.add_member(:workload_id, Shapes::ShapeRef.new(shape: WorkloadId, required: true, location_name: "WorkloadId"))
+    RemoveWorkloadRequest.struct_class = Types::RemoveWorkloadRequest
+
+    RemoveWorkloadResponse.struct_class = Types::RemoveWorkloadResponse
 
     ResourceInUseException.add_member(:message, Shapes::ShapeRef.new(shape: ErrorMsg, location_name: "Message"))
     ResourceInUseException.struct_class = Types::ResourceInUseException
@@ -517,6 +622,8 @@ module Aws::ApplicationInsights
     UpdateApplicationRequest.add_member(:cwe_monitor_enabled, Shapes::ShapeRef.new(shape: CWEMonitorEnabled, location_name: "CWEMonitorEnabled"))
     UpdateApplicationRequest.add_member(:ops_item_sns_topic_arn, Shapes::ShapeRef.new(shape: OpsItemSNSTopicArn, location_name: "OpsItemSNSTopicArn"))
     UpdateApplicationRequest.add_member(:remove_sns_topic, Shapes::ShapeRef.new(shape: RemoveSNSTopic, location_name: "RemoveSNSTopic"))
+    UpdateApplicationRequest.add_member(:auto_config_enabled, Shapes::ShapeRef.new(shape: AutoConfigEnabled, location_name: "AutoConfigEnabled"))
+    UpdateApplicationRequest.add_member(:attach_missing_permission, Shapes::ShapeRef.new(shape: AttachMissingPermission, location_name: "AttachMissingPermission"))
     UpdateApplicationRequest.struct_class = Types::UpdateApplicationRequest
 
     UpdateApplicationResponse.add_member(:application_info, Shapes::ShapeRef.new(shape: ApplicationInfo, location_name: "ApplicationInfo"))
@@ -527,6 +634,7 @@ module Aws::ApplicationInsights
     UpdateComponentConfigurationRequest.add_member(:monitor, Shapes::ShapeRef.new(shape: Monitor, location_name: "Monitor"))
     UpdateComponentConfigurationRequest.add_member(:tier, Shapes::ShapeRef.new(shape: Tier, location_name: "Tier"))
     UpdateComponentConfigurationRequest.add_member(:component_configuration, Shapes::ShapeRef.new(shape: ComponentConfiguration, location_name: "ComponentConfiguration"))
+    UpdateComponentConfigurationRequest.add_member(:auto_config_enabled, Shapes::ShapeRef.new(shape: AutoConfigEnabled, location_name: "AutoConfigEnabled"))
     UpdateComponentConfigurationRequest.struct_class = Types::UpdateComponentConfigurationRequest
 
     UpdateComponentConfigurationResponse.struct_class = Types::UpdateComponentConfigurationResponse
@@ -550,8 +658,39 @@ module Aws::ApplicationInsights
     UpdateLogPatternResponse.add_member(:log_pattern, Shapes::ShapeRef.new(shape: LogPattern, location_name: "LogPattern"))
     UpdateLogPatternResponse.struct_class = Types::UpdateLogPatternResponse
 
+    UpdateProblemRequest.add_member(:problem_id, Shapes::ShapeRef.new(shape: ProblemId, required: true, location_name: "ProblemId"))
+    UpdateProblemRequest.add_member(:update_status, Shapes::ShapeRef.new(shape: UpdateStatus, location_name: "UpdateStatus"))
+    UpdateProblemRequest.add_member(:visibility, Shapes::ShapeRef.new(shape: Visibility, location_name: "Visibility"))
+    UpdateProblemRequest.struct_class = Types::UpdateProblemRequest
+
+    UpdateProblemResponse.struct_class = Types::UpdateProblemResponse
+
+    UpdateWorkloadRequest.add_member(:resource_group_name, Shapes::ShapeRef.new(shape: ResourceGroupName, required: true, location_name: "ResourceGroupName"))
+    UpdateWorkloadRequest.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, required: true, location_name: "ComponentName"))
+    UpdateWorkloadRequest.add_member(:workload_id, Shapes::ShapeRef.new(shape: WorkloadId, location_name: "WorkloadId"))
+    UpdateWorkloadRequest.add_member(:workload_configuration, Shapes::ShapeRef.new(shape: WorkloadConfiguration, required: true, location_name: "WorkloadConfiguration"))
+    UpdateWorkloadRequest.struct_class = Types::UpdateWorkloadRequest
+
+    UpdateWorkloadResponse.add_member(:workload_id, Shapes::ShapeRef.new(shape: WorkloadId, location_name: "WorkloadId"))
+    UpdateWorkloadResponse.add_member(:workload_configuration, Shapes::ShapeRef.new(shape: WorkloadConfiguration, location_name: "WorkloadConfiguration"))
+    UpdateWorkloadResponse.struct_class = Types::UpdateWorkloadResponse
+
     ValidationException.add_member(:message, Shapes::ShapeRef.new(shape: ErrorMsg, location_name: "Message"))
     ValidationException.struct_class = Types::ValidationException
+
+    Workload.add_member(:workload_id, Shapes::ShapeRef.new(shape: WorkloadId, location_name: "WorkloadId"))
+    Workload.add_member(:component_name, Shapes::ShapeRef.new(shape: ComponentName, location_name: "ComponentName"))
+    Workload.add_member(:workload_name, Shapes::ShapeRef.new(shape: WorkloadName, location_name: "WorkloadName"))
+    Workload.add_member(:tier, Shapes::ShapeRef.new(shape: Tier, location_name: "Tier"))
+    Workload.add_member(:workload_remarks, Shapes::ShapeRef.new(shape: Remarks, location_name: "WorkloadRemarks"))
+    Workload.struct_class = Types::Workload
+
+    WorkloadConfiguration.add_member(:workload_name, Shapes::ShapeRef.new(shape: WorkloadName, location_name: "WorkloadName"))
+    WorkloadConfiguration.add_member(:tier, Shapes::ShapeRef.new(shape: Tier, location_name: "Tier"))
+    WorkloadConfiguration.add_member(:configuration, Shapes::ShapeRef.new(shape: ComponentConfiguration, location_name: "Configuration"))
+    WorkloadConfiguration.struct_class = Types::WorkloadConfiguration
+
+    WorkloadList.member = Shapes::ShapeRef.new(shape: Workload)
 
     WorkloadMetaData.key = Shapes::ShapeRef.new(shape: MetaDataKey)
     WorkloadMetaData.value = Shapes::ShapeRef.new(shape: MetaDataValue)
@@ -564,9 +703,11 @@ module Aws::ApplicationInsights
 
       api.metadata = {
         "apiVersion" => "2018-11-25",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "applicationinsights",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceAbbreviation" => "Application Insights",
         "serviceFullName" => "Amazon CloudWatch Application Insights",
         "serviceId" => "Application Insights",
@@ -575,6 +716,18 @@ module Aws::ApplicationInsights
         "targetPrefix" => "EC2WindowsBarleyService",
         "uid" => "application-insights-2018-11-25",
       }
+
+      api.add_operation(:add_workload, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "AddWorkload"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: AddWorkloadRequest)
+        o.output = Shapes::ShapeRef.new(shape: AddWorkloadResponse)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceInUseException)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: ValidationException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServerException)
+      end)
 
       api.add_operation(:create_application, Seahorse::Model::Operation.new.tap do |o|
         o.name = "CreateApplication"
@@ -737,6 +890,17 @@ module Aws::ApplicationInsights
         o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
       end)
 
+      api.add_operation(:describe_workload, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeWorkload"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeWorkloadRequest)
+        o.output = Shapes::ShapeRef.new(shape: DescribeWorkloadResponse)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: ValidationException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServerException)
+      end)
+
       api.add_operation(:list_applications, Seahorse::Model::Operation.new.tap do |o|
         o.name = "ListApplications"
         o.http_method = "POST"
@@ -848,6 +1012,34 @@ module Aws::ApplicationInsights
         o.errors << Shapes::ShapeRef.new(shape: ValidationException)
       end)
 
+      api.add_operation(:list_workloads, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ListWorkloads"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: ListWorkloadsRequest)
+        o.output = Shapes::ShapeRef.new(shape: ListWorkloadsResponse)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: ValidationException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServerException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_results",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
+      api.add_operation(:remove_workload, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "RemoveWorkload"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: RemoveWorkloadRequest)
+        o.output = Shapes::ShapeRef.new(shape: RemoveWorkloadResponse)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: ValidationException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServerException)
+      end)
+
       api.add_operation(:tag_resource, Seahorse::Model::Operation.new.tap do |o|
         o.name = "TagResource"
         o.http_method = "POST"
@@ -901,6 +1093,7 @@ module Aws::ApplicationInsights
         o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: ValidationException)
         o.errors << Shapes::ShapeRef.new(shape: InternalServerException)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceInUseException)
       end)
 
       api.add_operation(:update_log_pattern, Seahorse::Model::Operation.new.tap do |o|
@@ -910,6 +1103,28 @@ module Aws::ApplicationInsights
         o.input = Shapes::ShapeRef.new(shape: UpdateLogPatternRequest)
         o.output = Shapes::ShapeRef.new(shape: UpdateLogPatternResponse)
         o.errors << Shapes::ShapeRef.new(shape: ResourceInUseException)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: ValidationException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServerException)
+      end)
+
+      api.add_operation(:update_problem, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "UpdateProblem"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: UpdateProblemRequest)
+        o.output = Shapes::ShapeRef.new(shape: UpdateProblemResponse)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServerException)
+        o.errors << Shapes::ShapeRef.new(shape: ValidationException)
+        o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
+      end)
+
+      api.add_operation(:update_workload, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "UpdateWorkload"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: UpdateWorkloadRequest)
+        o.output = Shapes::ShapeRef.new(shape: UpdateWorkloadResponse)
         o.errors << Shapes::ShapeRef.new(shape: ResourceNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: ValidationException)
         o.errors << Shapes::ShapeRef.new(shape: InternalServerException)

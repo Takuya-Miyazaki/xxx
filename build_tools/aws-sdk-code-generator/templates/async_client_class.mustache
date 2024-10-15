@@ -3,11 +3,9 @@
 {{#generated_src_warning}}
 {{generated_src_warning}}
 {{/generated_src_warning}}
-if RUBY_VERSION >= '2.1'
-  begin
-    require 'http/2'
-  rescue LoadError; end
-end
+begin
+  require 'http/2'
+rescue LoadError; end
 {{#plugin_requires}}
 require '{{.}}'
 {{/plugin_requires}}
@@ -68,11 +66,11 @@ module {{module_name}}
 
       {{#eventstream_input}}
       req.context[:input_event_stream_handler] = input_event_stream_handler
-      req.handlers.add(Aws::Binary::EncodeHandler, priority: 95)
+      req.handlers.add(Aws::Binary::EncodeHandler, priority: 55)
       {{/eventstream_input}}
       {{#eventstream_output}}
       req.context[:output_event_stream_handler] = output_event_stream_handler
-      req.handlers.add(Aws::Binary::DecodeHandler, priority: 95)
+      req.handlers.add(Aws::Binary::DecodeHandler, priority: 55)
       {{/eventstream_output}}
 
       req.send_request(options{{{block_option}}})
@@ -85,13 +83,18 @@ module {{module_name}}
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('{{module_name}}')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
         http_response: Seahorse::Client::Http::AsyncResponse.new,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = '{{gem_name}}'
       context[:gem_version] = '{{gem_version}}'
       Seahorse::Client::Request.new(handlers, context)

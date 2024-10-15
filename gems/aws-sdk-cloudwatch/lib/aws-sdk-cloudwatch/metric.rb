@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -63,10 +63,12 @@ module Aws::CloudWatch
     #
     # @return [self]
     def load
-      resp = @client.list_metrics(
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.list_metrics(
         metric_name: @name,
         namespace: @namespace
       )
+      end
       @data = resp.metrics[0]
       self
     end
@@ -181,7 +183,9 @@ module Aws::CloudWatch
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -300,7 +304,9 @@ module Aws::CloudWatch
         namespace: @namespace,
         metric_name: @name
       )
-      resp = @client.get_metric_statistics(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_metric_statistics(options)
+      end
       resp.data
     end
 
@@ -351,6 +357,7 @@ module Aws::CloudWatch
     #         label: "MetricLabel",
     #         return_data: false,
     #         period: 1,
+    #         account_id: "AccountId",
     #       },
     #     ],
     #     tags: [
@@ -364,6 +371,9 @@ module Aws::CloudWatch
     # @param [Hash] options ({})
     # @option options [required, String] :alarm_name
     #   The name for the alarm. This name must be unique within the Region.
+    #
+    #   The name must contain only UTF-8 characters, and can't contain ASCII
+    #   control characters
     # @option options [String] :alarm_description
     #   The description for the alarm.
     # @option options [Boolean] :actions_enabled
@@ -372,70 +382,208 @@ module Aws::CloudWatch
     # @option options [Array<String>] :ok_actions
     #   The actions to execute when this alarm transitions to an `OK` state
     #   from any other state. Each action is specified as an Amazon Resource
-    #   Name (ARN).
+    #   Name (ARN). Valid values:
     #
-    #   Valid Values: `arn:aws:automate:region:ec2:stop` \|
-    #   `arn:aws:automate:region:ec2:terminate` \|
-    #   `arn:aws:automate:region:ec2:recover` \|
-    #   `arn:aws:automate:region:ec2:reboot` \|
-    #   `arn:aws:sns:region:account-id:sns-topic-name ` \|
-    #   `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
-    #   `
+    #   **EC2 actions:**
     #
-    #   Valid Values (for use with IAM roles):
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #   * `arn:aws:automate:region:ec2:stop`
+    #
+    #   * `arn:aws:automate:region:ec2:terminate`
+    #
+    #   * `arn:aws:automate:region:ec2:reboot`
+    #
+    #   * `arn:aws:automate:region:ec2:recover`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Recover/1.0`
+    #
+    #   **Autoscaling action:**
+    #
+    #   * `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
+    #     `
+    #
+    #   ^
+    #
+    #   **Lambda actions:**
+    #
+    #   * Invoke the latest version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name `
+    #
+    #   * Invoke a specific version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:version-number
+    #     `
+    #
+    #   * Invoke a function by using an alias Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:alias-name
+    #     `
+    #
+    #   **SNS notification action:**
+    #
+    #   * `arn:aws:sns:region:account-id:sns-topic-name `
+    #
+    #   ^
+    #
+    #   **SSM integration actions:**
+    #
+    #   * `arn:aws:ssm:region:account-id:opsitem:severity#CATEGORY=category-name
+    #     `
+    #
+    #   * `arn:aws:ssm-incidents::account-id:responseplan/response-plan-name `
     # @option options [Array<String>] :alarm_actions
     #   The actions to execute when this alarm transitions to the `ALARM`
     #   state from any other state. Each action is specified as an Amazon
-    #   Resource Name (ARN).
+    #   Resource Name (ARN). Valid values:
     #
-    #   Valid Values: `arn:aws:automate:region:ec2:stop` \|
-    #   `arn:aws:automate:region:ec2:terminate` \|
-    #   `arn:aws:automate:region:ec2:recover` \|
-    #   `arn:aws:automate:region:ec2:reboot` \|
-    #   `arn:aws:sns:region:account-id:sns-topic-name ` \|
-    #   `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
-    #   ` \| `arn:aws:ssm:region:account-id:opsitem:severity `
+    #   **EC2 actions:**
     #
-    #   Valid Values (for use with IAM roles):
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #   * `arn:aws:automate:region:ec2:stop`
+    #
+    #   * `arn:aws:automate:region:ec2:terminate`
+    #
+    #   * `arn:aws:automate:region:ec2:reboot`
+    #
+    #   * `arn:aws:automate:region:ec2:recover`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Recover/1.0`
+    #
+    #   **Autoscaling action:**
+    #
+    #   * `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
+    #     `
+    #
+    #   ^
+    #
+    #   **Lambda actions:**
+    #
+    #   * Invoke the latest version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name `
+    #
+    #   * Invoke a specific version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:version-number
+    #     `
+    #
+    #   * Invoke a function by using an alias Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:alias-name
+    #     `
+    #
+    #   **SNS notification action:**
+    #
+    #   * `arn:aws:sns:region:account-id:sns-topic-name `
+    #
+    #   ^
+    #
+    #   **SSM integration actions:**
+    #
+    #   * `arn:aws:ssm:region:account-id:opsitem:severity#CATEGORY=category-name
+    #     `
+    #
+    #   * `arn:aws:ssm-incidents::account-id:responseplan/response-plan-name `
     # @option options [Array<String>] :insufficient_data_actions
     #   The actions to execute when this alarm transitions to the
     #   `INSUFFICIENT_DATA` state from any other state. Each action is
-    #   specified as an Amazon Resource Name (ARN).
+    #   specified as an Amazon Resource Name (ARN). Valid values:
     #
-    #   Valid Values: `arn:aws:automate:region:ec2:stop` \|
-    #   `arn:aws:automate:region:ec2:terminate` \|
-    #   `arn:aws:automate:region:ec2:recover` \|
-    #   `arn:aws:automate:region:ec2:reboot` \|
-    #   `arn:aws:sns:region:account-id:sns-topic-name ` \|
-    #   `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
-    #   `
+    #   **EC2 actions:**
     #
-    #   Valid Values (for use with IAM roles):
-    #   `>arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #   * `arn:aws:automate:region:ec2:stop`
+    #
+    #   * `arn:aws:automate:region:ec2:terminate`
+    #
+    #   * `arn:aws:automate:region:ec2:reboot`
+    #
+    #   * `arn:aws:automate:region:ec2:recover`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Recover/1.0`
+    #
+    #   **Autoscaling action:**
+    #
+    #   * `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
+    #     `
+    #
+    #   ^
+    #
+    #   **Lambda actions:**
+    #
+    #   * Invoke the latest version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name `
+    #
+    #   * Invoke a specific version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:version-number
+    #     `
+    #
+    #   * Invoke a function by using an alias Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:alias-name
+    #     `
+    #
+    #   **SNS notification action:**
+    #
+    #   * `arn:aws:sns:region:account-id:sns-topic-name `
+    #
+    #   ^
+    #
+    #   **SSM integration actions:**
+    #
+    #   * `arn:aws:ssm:region:account-id:opsitem:severity#CATEGORY=category-name
+    #     `
+    #
+    #   * `arn:aws:ssm-incidents::account-id:responseplan/response-plan-name `
     # @option options [String] :statistic
     #   The statistic for the metric specified in `MetricName`, other than
     #   percentile. For percentile statistics, use `ExtendedStatistic`. When
     #   you call `PutMetricAlarm` and specify a `MetricName`, you must specify
     #   either `Statistic` or `ExtendedStatistic,` but not both.
     # @option options [String] :extended_statistic
-    #   The percentile statistic for the metric specified in `MetricName`.
-    #   Specify a value between p0.0 and p100. When you call `PutMetricAlarm`
-    #   and specify a `MetricName`, you must specify either `Statistic` or
-    #   `ExtendedStatistic,` but not both.
+    #   The extended statistic for the metric specified in `MetricName`. When
+    #   you call `PutMetricAlarm` and specify a `MetricName`, you must specify
+    #   either `Statistic` or `ExtendedStatistic` but not both.
+    #
+    #   If you specify `ExtendedStatistic`, the following are valid values:
+    #
+    #   * `p90`
+    #
+    #   * `tm90`
+    #
+    #   * `tc90`
+    #
+    #   * `ts90`
+    #
+    #   * `wm90`
+    #
+    #   * `IQM`
+    #
+    #   * `PR(n:m)` where n and m are values of the metric
+    #
+    #   * `TC(X%:X%)` where X is between 10 and 90 inclusive.
+    #
+    #   * `TM(X%:X%)` where X is between 10 and 90 inclusive.
+    #
+    #   * `TS(X%:X%)` where X is between 10 and 90 inclusive.
+    #
+    #   * `WM(X%:X%)` where X is between 10 and 90 inclusive.
+    #
+    #   For more information about these extended statistics, see [CloudWatch
+    #   statistics definitions][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html
     # @option options [Array<Types::Dimension>] :dimensions
     #   The dimensions for the metric specified in `MetricName`.
     # @option options [Integer] :period
@@ -472,6 +620,9 @@ module Aws::CloudWatch
     #   You can also specify a unit when you create a custom metric. Units
     #   help provide conceptual meaning to your data. Metric data points that
     #   specify a unit of measure, such as Percent, are aggregated separately.
+    #   If you are creating an alarm based on a metric math expression, you
+    #   can specify the unit for each metric (if needed) within the objects in
+    #   the `Metrics` array.
     #
     #   If you don't specify `Unit`, CloudWatch retrieves all unit types that
     #   have been published for the metric and attempts to evaluate the alarm.
@@ -480,7 +631,7 @@ module Aws::CloudWatch
     #
     #   However, if the metric is published with multiple types of units and
     #   you don't specify a unit, the alarm's behavior is not defined and it
-    #   behaves predictably.
+    #   behaves unpredictably.
     #
     #   We recommend omitting `Unit` so that you don't inadvertently specify
     #   an incorrect unit that is not published for this metric. Doing so
@@ -525,6 +676,13 @@ module Aws::CloudWatch
     #
     #   Valid Values: `breaching | notBreaching | ignore | missing`
     #
+    #   <note markdown="1"> Alarms that evaluate metrics in the `AWS/DynamoDB` namespace always
+    #   `ignore` missing data even if you choose a different option for
+    #   `TreatMissingData`. When an `AWS/DynamoDB` metric has missing data,
+    #   alarms that evaluate that metric remain in their current state.
+    #
+    #    </note>
+    #
     #
     #
     #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data
@@ -557,17 +715,19 @@ module Aws::CloudWatch
     #   [MetricDataQuery][1].
     #
     #   If you use the `Metrics` parameter, you cannot include the
-    #   `MetricName`, `Dimensions`, `Period`, `Namespace`, `Statistic`, or
-    #   `ExtendedStatistic` parameters of `PutMetricAlarm` in the same
-    #   operation. Instead, you retrieve the metrics you are using in your
-    #   math expression as part of the `Metrics` array.
+    #   `Namespace`, `MetricName`, `Dimensions`, `Period`, `Unit`,
+    #   `Statistic`, or `ExtendedStatistic` parameters of `PutMetricAlarm` in
+    #   the same operation. Instead, you retrieve the metrics you are using in
+    #   your math expression as part of the `Metrics` array.
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.html
     # @option options [Array<Types::Tag>] :tags
     #   A list of key-value pairs to associate with the alarm. You can
-    #   associate as many as 50 tags with an alarm.
+    #   associate as many as 50 tags with an alarm. To be able to associate
+    #   tags with the alarm when you create the alarm, you must have the
+    #   `cloudwatch:TagResource` permission.
     #
     #   Tags can help you organize and categorize your resources. You can also
     #   use them to scope user permissions by granting a user permission to
@@ -596,7 +756,9 @@ module Aws::CloudWatch
         namespace: @namespace,
         metric_name: @name
       )
-      @client.put_metric_alarm(options)
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.put_metric_alarm(options)
+      end
       Alarm.new(
         name: options[:alarm_name],
         client: @client
@@ -632,15 +794,17 @@ module Aws::CloudWatch
     #   })
     # @param [Hash] options ({})
     # @option options [required, Array<Types::MetricDatum>] :metric_data
-    #   The data for the metric. The array can include no more than 20 metrics
-    #   per call.
+    #   The data for the metric. The array can include no more than 1000
+    #   metrics per call.
     # @return [EmptyStructure]
     def put_data(options = {})
       options = Aws::Util.deep_merge(options,
         namespace: @namespace,
         metric_data: [{ metric_name: @name }]
       )
-      resp = @client.put_metric_data(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.put_metric_data(options)
+      end
       resp.data
     end
 
@@ -683,7 +847,9 @@ module Aws::CloudWatch
           namespace: @namespace,
           metric_name: @name
         )
-        resp = @client.describe_alarms_for_metric(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.describe_alarms_for_metric(options)
+        end
         resp.data.metric_alarms.each do |m|
           batch << Alarm.new(
             name: m.alarm_name,

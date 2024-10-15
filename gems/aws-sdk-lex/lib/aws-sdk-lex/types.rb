@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -15,20 +15,6 @@ module Aws::Lex
     # be set automatically by Amazon Lex when an intent is fulfilled, or it
     # can be set at runtime using the `PutContent`, `PutText`, or
     # `PutSession` operation.
-    #
-    # @note When making an API call, you may pass ActiveContext
-    #   data as a hash:
-    #
-    #       {
-    #         name: "ActiveContextName", # required
-    #         time_to_live: { # required
-    #           time_to_live_in_seconds: 1,
-    #           turns_to_live: 1,
-    #         },
-    #         parameters: { # required
-    #           "ParameterName" => "Text",
-    #         },
-    #       }
     #
     # @!attribute [rw] name
     #   The name of the context.
@@ -49,19 +35,11 @@ module Aws::Lex
       :name,
       :time_to_live,
       :parameters)
-      SENSITIVE = []
+      SENSITIVE = [:parameters]
       include Aws::Structure
     end
 
     # The length of time or number of turns that a context remains active.
-    #
-    # @note When making an API call, you may pass ActiveContextTimeToLive
-    #   data as a hash:
-    #
-    #       {
-    #         time_to_live_in_seconds: 1,
-    #         turns_to_live: 1,
-    #       }
     #
     # @!attribute [rw] time_to_live_in_seconds
     #   The number of seconds that the context should be active after it is
@@ -150,15 +128,6 @@ module Aws::Lex
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteSessionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         bot_name: "BotName", # required
-    #         bot_alias: "BotAlias", # required
-    #         user_id: "UserId", # required
-    #       }
-    #
     # @!attribute [rw] bot_name
     #   The name of the bot that contains the session data.
     #   @return [String]
@@ -235,21 +204,6 @@ module Aws::Lex
     # action takes place. Use the `DialogAction` data type to set the
     # interaction to a specific state, or to return the interaction to a
     # previous state.
-    #
-    # @note When making an API call, you may pass DialogAction
-    #   data as a hash:
-    #
-    #       {
-    #         type: "ElicitIntent", # required, accepts ElicitIntent, ConfirmIntent, ElicitSlot, Close, Delegate
-    #         intent_name: "IntentName",
-    #         slots: {
-    #           "String" => "String",
-    #         },
-    #         slot_to_elicit: "String",
-    #         fulfillment_state: "Fulfilled", # accepts Fulfilled, Failed, ReadyForFulfillment
-    #         message: "Text",
-    #         message_format: "PlainText", # accepts PlainText, CustomPayload, SSML, Composite
-    #       }
     #
     # @!attribute [rw] type
     #   The next action that the bot should take in its interaction with the
@@ -369,16 +323,6 @@ module Aws::Lex
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSessionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         bot_name: "BotName", # required
-    #         bot_alias: "BotAlias", # required
-    #         user_id: "UserId", # required
-    #         checkpoint_label_filter: "IntentSummaryCheckpointLabel",
-    #       }
-    #
     # @!attribute [rw] bot_name
     #   The name of the bot that contains the session data.
     #   @return [String]
@@ -477,21 +421,6 @@ module Aws::Lex
     # information to get the current state of an intent so that you can
     # process the intent, or so that you can return the intent to its
     # previous state.
-    #
-    # @note When making an API call, you may pass IntentSummary
-    #   data as a hash:
-    #
-    #       {
-    #         intent_name: "IntentName",
-    #         checkpoint_label: "IntentSummaryCheckpointLabel",
-    #         slots: {
-    #           "String" => "String",
-    #         },
-    #         confirmation_status: "None", # accepts None, Confirmed, Denied
-    #         dialog_action_type: "ElicitIntent", # required, accepts ElicitIntent, ConfirmIntent, ElicitSlot, Close, Delegate
-    #         fulfillment_state: "Fulfilled", # accepts Fulfilled, Failed, ReadyForFulfillment
-    #         slot_to_elicit: "String",
-    #       }
     #
     # @!attribute [rw] intent_name
     #   The name of the intent.
@@ -649,21 +578,6 @@ module Aws::Lex
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PostContentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         bot_name: "BotName", # required
-    #         bot_alias: "BotAlias", # required
-    #         user_id: "UserId", # required
-    #         session_attributes: "AttributesString",
-    #         request_attributes: "AttributesString",
-    #         content_type: "HttpContentType", # required
-    #         accept: "Accept",
-    #         input_stream: "data", # required
-    #         active_contexts: "ActiveContextsString",
-    #       }
-    #
     # @!attribute [rw] bot_name
     #   Name of the Amazon Lex bot.
     #   @return [String]
@@ -890,6 +804,11 @@ module Aws::Lex
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   You can only use this field in the de-DE, en-AU, en-GB, en-US,
+    #   es-419, es-ES, es-US, fr-CA, fr-FR, and it-IT locales. In all other
+    #   locales, the `message` field is null. You should use the
+    #   `encodedMessage` field instead.
+    #
     #   The message to convey to the user. The message can come from the
     #   bot's configuration or from a Lambda function.
     #
@@ -909,6 +828,31 @@ module Aws::Lex
     #
     #   If the Lambda function returns a message, Amazon Lex passes it to
     #   the client in its response.
+    #   @return [String]
+    #
+    # @!attribute [rw] encoded_message
+    #   The message to convey to the user. The message can come from the
+    #   bot's configuration or from a Lambda function.
+    #
+    #   If the intent is not configured with a Lambda function, or if the
+    #   Lambda function returned `Delegate` as the `dialogAction.type` in
+    #   its response, Amazon Lex decides on the next course of action and
+    #   selects an appropriate message from the bot's configuration based
+    #   on the current interaction context. For example, if Amazon Lex
+    #   isn't able to understand user input, it uses a clarification prompt
+    #   message.
+    #
+    #   When you create an intent you can assign messages to groups. When
+    #   messages are assigned to groups Amazon Lex returns one message from
+    #   each group in the response. The message field is an escaped JSON
+    #   string containing the messages. For more information about the
+    #   structure of the JSON string returned, see msg-prompts-formats.
+    #
+    #   If the Lambda function returns a message, Amazon Lex passes it to
+    #   the client in its response.
+    #
+    #   The `encodedMessage` field is base-64 encoded. You must decode the
+    #   field before you can use the value.
     #   @return [String]
     #
     # @!attribute [rw] message_format
@@ -981,11 +925,29 @@ module Aws::Lex
     # @!attribute [rw] input_transcript
     #   The text used to process the request.
     #
+    #   You can use this field only in the de-DE, en-AU, en-GB, en-US,
+    #   es-419, es-ES, es-US, fr-CA, fr-FR, and it-IT locales. In all other
+    #   locales, the `inputTranscript` field is null. You should use the
+    #   `encodedInputTranscript` field instead.
+    #
     #   If the input was an audio stream, the `inputTranscript` field
     #   contains the text extracted from the audio stream. This is the text
     #   that is actually processed to recognize intents and slot values. You
     #   can use this information to determine if Amazon Lex is correctly
     #   processing the audio that you send.
+    #   @return [String]
+    #
+    # @!attribute [rw] encoded_input_transcript
+    #   The text used to process the request.
+    #
+    #   If the input was an audio stream, the `encodedInputTranscript` field
+    #   contains the text extracted from the audio stream. This is the text
+    #   that is actually processed to recognize intents and slot values. You
+    #   can use this information to determine if Amazon Lex is correctly
+    #   processing the audio that you send.
+    #
+    #   The `encodedInputTranscript` field is base-64 encoded. You must
+    #   decode the field before you can use the value.
     #   @return [String]
     #
     # @!attribute [rw] audio_stream
@@ -1029,46 +991,20 @@ module Aws::Lex
       :session_attributes,
       :sentiment_response,
       :message,
+      :encoded_message,
       :message_format,
       :dialog_state,
       :slot_to_elicit,
       :input_transcript,
+      :encoded_input_transcript,
       :audio_stream,
       :bot_version,
       :session_id,
       :active_contexts)
-      SENSITIVE = [:message, :active_contexts]
+      SENSITIVE = [:message, :encoded_message, :encoded_input_transcript, :active_contexts]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PostTextRequest
-    #   data as a hash:
-    #
-    #       {
-    #         bot_name: "BotName", # required
-    #         bot_alias: "BotAlias", # required
-    #         user_id: "UserId", # required
-    #         session_attributes: {
-    #           "String" => "String",
-    #         },
-    #         request_attributes: {
-    #           "String" => "String",
-    #         },
-    #         input_text: "Text", # required
-    #         active_contexts: [
-    #           {
-    #             name: "ActiveContextName", # required
-    #             time_to_live: { # required
-    #               time_to_live_in_seconds: 1,
-    #               turns_to_live: 1,
-    #             },
-    #             parameters: { # required
-    #               "ParameterName" => "Text",
-    #             },
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] bot_name
     #   The name of the Amazon Lex bot.
     #   @return [String]
@@ -1380,55 +1316,6 @@ module Aws::Lex
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutSessionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         bot_name: "BotName", # required
-    #         bot_alias: "BotAlias", # required
-    #         user_id: "UserId", # required
-    #         session_attributes: {
-    #           "String" => "String",
-    #         },
-    #         dialog_action: {
-    #           type: "ElicitIntent", # required, accepts ElicitIntent, ConfirmIntent, ElicitSlot, Close, Delegate
-    #           intent_name: "IntentName",
-    #           slots: {
-    #             "String" => "String",
-    #           },
-    #           slot_to_elicit: "String",
-    #           fulfillment_state: "Fulfilled", # accepts Fulfilled, Failed, ReadyForFulfillment
-    #           message: "Text",
-    #           message_format: "PlainText", # accepts PlainText, CustomPayload, SSML, Composite
-    #         },
-    #         recent_intent_summary_view: [
-    #           {
-    #             intent_name: "IntentName",
-    #             checkpoint_label: "IntentSummaryCheckpointLabel",
-    #             slots: {
-    #               "String" => "String",
-    #             },
-    #             confirmation_status: "None", # accepts None, Confirmed, Denied
-    #             dialog_action_type: "ElicitIntent", # required, accepts ElicitIntent, ConfirmIntent, ElicitSlot, Close, Delegate
-    #             fulfillment_state: "Fulfilled", # accepts Fulfilled, Failed, ReadyForFulfillment
-    #             slot_to_elicit: "String",
-    #           },
-    #         ],
-    #         accept: "Accept",
-    #         active_contexts: [
-    #           {
-    #             name: "ActiveContextName", # required
-    #             time_to_live: { # required
-    #               time_to_live_in_seconds: 1,
-    #               turns_to_live: 1,
-    #             },
-    #             parameters: { # required
-    #               "ParameterName" => "Text",
-    #             },
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] bot_name
     #   The name of the bot that contains the session data.
     #   @return [String]
@@ -1563,6 +1450,18 @@ module Aws::Lex
     #
     # @!attribute [rw] message
     #   The next message that should be presented to the user.
+    #
+    #   You can only use this field in the de-DE, en-AU, en-GB, en-US,
+    #   es-419, es-ES, es-US, fr-CA, fr-FR, and it-IT locales. In all other
+    #   locales, the `message` field is null. You should use the
+    #   `encodedMessage` field instead.
+    #   @return [String]
+    #
+    # @!attribute [rw] encoded_message
+    #   The next message that should be presented to the user.
+    #
+    #   The `encodedMessage` field is base-64 encoded. You must decode the
+    #   field before you can use the value.
     #   @return [String]
     #
     # @!attribute [rw] message_format
@@ -1625,13 +1524,14 @@ module Aws::Lex
       :slots,
       :session_attributes,
       :message,
+      :encoded_message,
       :message_format,
       :dialog_state,
       :slot_to_elicit,
       :audio_stream,
       :session_id,
       :active_contexts)
-      SENSITIVE = [:message, :active_contexts]
+      SENSITIVE = [:message, :encoded_message, :active_contexts]
       include Aws::Structure
     end
 
@@ -1714,3 +1614,4 @@ module Aws::Lex
 
   end
 end
+

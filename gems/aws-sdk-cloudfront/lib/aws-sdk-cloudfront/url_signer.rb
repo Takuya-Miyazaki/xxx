@@ -12,7 +12,7 @@ module Aws
     #
     #     signer = Aws::CloudFront::UrlSigner.new(
     #       key_pair_id: "cf-keypair-id",
-    #       private_key_path: "./cf_private_key.pem"
+    #       private_key_path: "./unit_test_dummy_key"
     #     )
     #     url = signer.signed_url(url,
     #       policy: policy.to_json
@@ -33,8 +33,8 @@ module Aws
           policy: params[:policy]
         )
 
-        start_flag = URI.parse(uri).query ? '&' : '?'
-        signature = signed_content.map{ |k, v| "#{k}=#{v}" }.join('&').gsub("\n", '')
+        start_flag = uri.include?('?') ? '&' : '?'
+        signature = signed_content.map{ |k, v| "#{k}=#{v}" }.join('&').delete("\n")
         uri = "#{uri}#{start_flag}#{signature}"
 
         if scheme == 'rtmp'

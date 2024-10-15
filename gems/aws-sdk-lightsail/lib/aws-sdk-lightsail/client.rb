@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:lightsail)
 
 module Aws::Lightsail
   # An API client for Lightsail.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::Lightsail
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::Lightsail::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::Lightsail
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::Lightsail
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::Lightsail
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::Lightsail
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::Lightsail
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::Lightsail
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +341,112 @@ module Aws::Lightsail
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::Lightsail::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::Lightsail::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -357,13 +474,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -388,11 +505,11 @@ module Aws::Lightsail
     # Use the `CreateCertificate` action to create a certificate that you
     # can attach to your distribution.
     #
-    # Only certificates created in the `us-east-1` AWS Region can be
-    # attached to Lightsail distributions. Lightsail distributions are
-    # global resources that can reference an origin in any AWS Region, and
-    # distribute its content globally. However, all distributions are
-    # located in the `us-east-1` Region.
+    # Only certificates created in the `us-east-1` Amazon Web Services
+    # Region can be attached to Lightsail distributions. Lightsail
+    # distributions are global resources that can reference an origin in any
+    # Amazon Web Services Region, and distribute its content globally.
+    # However, all distributions are located in the `us-east-1` Region.
     #
     # @option params [required, String] :distribution_name
     #   The name of the distribution that the certificate will be attached to.
@@ -432,13 +549,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -458,21 +575,27 @@ module Aws::Lightsail
     #
     # The `attach disk` operation supports tag-based access control via
     # resource tags applied to the resource identified by `disk name`. For
-    # more information, see the [Lightsail Dev Guide][1].
+    # more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :disk_name
-    #   The unique Lightsail disk name (e.g., `my-disk`).
+    #   The unique Lightsail disk name (`my-disk`).
     #
     # @option params [required, String] :instance_name
     #   The name of the Lightsail instance where you want to utilize the
     #   storage disk.
     #
     # @option params [required, String] :disk_path
-    #   The disk path to expose to the instance (e.g., `/dev/xvdf`).
+    #   The disk path to expose to the instance (`/dev/xvdf`).
+    #
+    # @option params [Boolean] :auto_mounting
+    #   A Boolean value used to determine the automatic mounting of a storage
+    #   volume to a virtual computer. The default value is `False`.
+    #
+    #   This value only applies to Lightsail for Research resources.
     #
     # @return [Types::AttachDiskResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -484,6 +607,7 @@ module Aws::Lightsail
     #     disk_name: "ResourceName", # required
     #     instance_name: "ResourceName", # required
     #     disk_path: "NonEmptyString", # required
+    #     auto_mounting: false,
     #   })
     #
     # @example Response structure
@@ -491,13 +615,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -519,12 +643,12 @@ module Aws::Lightsail
     #
     # The `attach instances to load balancer` operation supports tag-based
     # access control via resource tags applied to the resource identified by
-    # `load balancer name`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `load balancer name`. For more information, see the [Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :load_balancer_name
     #   The name of the load balancer.
@@ -556,13 +680,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -590,12 +714,12 @@ module Aws::Lightsail
     #
     # The `AttachLoadBalancerTlsCertificate` operation supports tag-based
     # access control via resource tags applied to the resource identified by
-    # `load balancer name`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `load balancer name`. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :load_balancer_name
     #   The name of the load balancer to which you want to associate the
@@ -620,13 +744,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -665,13 +789,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -690,12 +814,12 @@ module Aws::Lightsail
     #
     # The `CloseInstancePublicPorts` action supports tag-based access
     # control via resource tags applied to the resource identified by
-    # `instanceName`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `instanceName`. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, Types::PortInfo] :port_info
     #   An object to describe the ports to close for the specified instance.
@@ -713,7 +837,7 @@ module Aws::Lightsail
     #     port_info: { # required
     #       from_port: 1,
     #       to_port: 1,
-    #       protocol: "tcp", # accepts tcp, all, udp, icmp
+    #       protocol: "tcp", # accepts tcp, all, udp, icmp, icmpv6
     #       cidrs: ["string"],
     #       ipv6_cidrs: ["string"],
     #       cidr_list_aliases: ["string"],
@@ -725,13 +849,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -749,8 +873,8 @@ module Aws::Lightsail
     # Copies a manual snapshot of an instance or disk as another manual
     # snapshot, or copies an automatic snapshot of an instance or disk as a
     # manual snapshot. This operation can also be used to copy a manual or
-    # automatic snapshot of an instance or a disk from one AWS Region to
-    # another in Amazon Lightsail.
+    # automatic snapshot of an instance or a disk from one Amazon Web
+    # Services Region to another in Amazon Lightsail.
     #
     # When copying a *manual snapshot*, be sure to define the `source
     # region`, `source snapshot name`, and `target snapshot name`
@@ -778,8 +902,8 @@ module Aws::Lightsail
     #   Constraint:
     #
     #   * Define this parameter only when copying an automatic snapshot as a
-    #     manual snapshot. For more information, see the [Lightsail Dev
-    #     Guide][1].
+    #     manual snapshot. For more information, see the [Amazon Lightsail
+    #     Developer Guide][1].
     #
     #   ^
     #
@@ -801,8 +925,8 @@ module Aws::Lightsail
     #     latest restorable auto snapshot` parameters are mutually exclusive.
     #
     #   * Define this parameter only when copying an automatic snapshot as a
-    #     manual snapshot. For more information, see the [Lightsail Dev
-    #     Guide][1].
+    #     manual snapshot. For more information, see the [Amazon Lightsail
+    #     Developer Guide][1].
     #
     #
     #
@@ -819,8 +943,8 @@ module Aws::Lightsail
     #     date` parameters are mutually exclusive.
     #
     #   * Define this parameter only when copying an automatic snapshot as a
-    #     manual snapshot. For more information, see the [Lightsail Dev
-    #     Guide][1].
+    #     manual snapshot. For more information, see the [Amazon Lightsail
+    #     Developer Guide][1].
     #
     #
     #
@@ -830,8 +954,8 @@ module Aws::Lightsail
     #   The name of the new manual snapshot to be created as a copy.
     #
     # @option params [required, String] :source_region
-    #   The AWS Region where the source manual or automatic snapshot is
-    #   located.
+    #   The Amazon Web Services Region where the source manual or automatic
+    #   snapshot is located.
     #
     # @return [Types::CopySnapshotResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -845,7 +969,7 @@ module Aws::Lightsail
     #     restore_date: "string",
     #     use_latest_restorable_auto_snapshot: false,
     #     target_snapshot_name: "ResourceName", # required
-    #     source_region: "us-east-1", # required, accepts us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, ca-central-1, ap-south-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, ap-northeast-2
+    #     source_region: "us-east-1", # required, accepts us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, ca-central-1, ap-south-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, ap-northeast-2, eu-north-1
     #   })
     #
     # @example Response structure
@@ -853,13 +977,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -874,34 +998,236 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Creates an SSL/TLS certificate for a Amazon Lightsail content delivery
-    # network (CDN) distribution.
+    # Creates an Amazon Lightsail bucket.
     #
-    # After the certificate is created, use the
-    # `AttachCertificateToDistribution` action to attach the certificate to
-    # your distribution.
+    # A bucket is a cloud storage resource available in the Lightsail object
+    # storage service. Use buckets to store objects such as data and its
+    # descriptive metadata. For more information about buckets, see [Buckets
+    # in Amazon Lightsail][1] in the *Amazon Lightsail Developer Guide*.
     #
-    # Only certificates created in the `us-east-1` AWS Region can be
-    # attached to Lightsail distributions. Lightsail distributions are
-    # global resources that can reference an origin in any AWS Region, and
-    # distribute its content globally. However, all distributions are
-    # located in the `us-east-1` Region.
+    #
+    #
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/buckets-in-amazon-lightsail
+    #
+    # @option params [required, String] :bucket_name
+    #   The name for the bucket.
+    #
+    #   For more information about bucket names, see [Bucket naming rules in
+    #   Amazon Lightsail][1] in the *Amazon Lightsail Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/bucket-naming-rules-in-amazon-lightsail
+    #
+    # @option params [required, String] :bundle_id
+    #   The ID of the bundle to use for the bucket.
+    #
+    #   A bucket bundle specifies the monthly cost, storage space, and data
+    #   transfer quota for a bucket.
+    #
+    #   Use the [GetBucketBundles][1] action to get a list of bundle IDs that
+    #   you can specify.
+    #
+    #   Use the [UpdateBucketBundle][2] action to change the bundle after the
+    #   bucket is created.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBucketBundles.html
+    #   [2]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_UpdateBucketBundle.html
+    #
+    # @option params [Array<Types::Tag>] :tags
+    #   The tag keys and optional values to add to the bucket during creation.
+    #
+    #   Use the [TagResource][1] action to tag the bucket after it's created.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_TagResource.html
+    #
+    # @option params [Boolean] :enable_object_versioning
+    #   A Boolean value that indicates whether to enable versioning of objects
+    #   in the bucket.
+    #
+    #   For more information about versioning, see [Enabling and suspending
+    #   object versioning in a bucket in Amazon Lightsail][1] in the *Amazon
+    #   Lightsail Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-managing-bucket-object-versioning
+    #
+    # @return [Types::CreateBucketResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateBucketResult#bucket #bucket} => Types::Bucket
+    #   * {Types::CreateBucketResult#operations #operations} => Array&lt;Types::Operation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_bucket({
+    #     bucket_name: "BucketName", # required
+    #     bundle_id: "NonEmptyString", # required
+    #     tags: [
+    #       {
+    #         key: "TagKey",
+    #         value: "TagValue",
+    #       },
+    #     ],
+    #     enable_object_versioning: false,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.bucket.resource_type #=> String
+    #   resp.bucket.access_rules.get_object #=> String, one of "public", "private"
+    #   resp.bucket.access_rules.allow_public_overrides #=> Boolean
+    #   resp.bucket.arn #=> String
+    #   resp.bucket.bundle_id #=> String
+    #   resp.bucket.created_at #=> Time
+    #   resp.bucket.url #=> String
+    #   resp.bucket.location.availability_zone #=> String
+    #   resp.bucket.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.bucket.name #=> String
+    #   resp.bucket.support_code #=> String
+    #   resp.bucket.tags #=> Array
+    #   resp.bucket.tags[0].key #=> String
+    #   resp.bucket.tags[0].value #=> String
+    #   resp.bucket.object_versioning #=> String
+    #   resp.bucket.able_to_update_bundle #=> Boolean
+    #   resp.bucket.readonly_access_accounts #=> Array
+    #   resp.bucket.readonly_access_accounts[0] #=> String
+    #   resp.bucket.resources_receiving_access #=> Array
+    #   resp.bucket.resources_receiving_access[0].name #=> String
+    #   resp.bucket.resources_receiving_access[0].resource_type #=> String
+    #   resp.bucket.state.code #=> String
+    #   resp.bucket.state.message #=> String
+    #   resp.bucket.access_log_config.enabled #=> Boolean
+    #   resp.bucket.access_log_config.destination #=> String
+    #   resp.bucket.access_log_config.prefix #=> String
+    #   resp.operations #=> Array
+    #   resp.operations[0].id #=> String
+    #   resp.operations[0].resource_name #=> String
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operations[0].created_at #=> Time
+    #   resp.operations[0].location.availability_zone #=> String
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operations[0].is_terminal #=> Boolean
+    #   resp.operations[0].operation_details #=> String
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operations[0].status_changed_at #=> Time
+    #   resp.operations[0].error_code #=> String
+    #   resp.operations[0].error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/CreateBucket AWS API Documentation
+    #
+    # @overload create_bucket(params = {})
+    # @param [Hash] params ({})
+    def create_bucket(params = {}, options = {})
+      req = build_request(:create_bucket, params)
+      req.send_request(options)
+    end
+
+    # Creates a new access key for the specified Amazon Lightsail bucket.
+    # Access keys consist of an access key ID and corresponding secret
+    # access key.
+    #
+    # Access keys grant full programmatic access to the specified bucket and
+    # its objects. You can have a maximum of two access keys per bucket. Use
+    # the [GetBucketAccessKeys][1] action to get a list of current access
+    # keys for a specific bucket. For more information about access keys,
+    # see [Creating access keys for a bucket in Amazon Lightsail][2] in the
+    # *Amazon Lightsail Developer Guide*.
+    #
+    # The `secretAccessKey` value is returned only in response to the
+    # `CreateBucketAccessKey` action. You can get a secret access key only
+    # when you first create an access key; you cannot get the secret access
+    # key later. If you lose the secret access key, you must create a new
+    # access key.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBucketAccessKeys.html
+    # [2]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-creating-bucket-access-keys
+    #
+    # @option params [required, String] :bucket_name
+    #   The name of the bucket that the new access key will belong to, and
+    #   grant access to.
+    #
+    # @return [Types::CreateBucketAccessKeyResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateBucketAccessKeyResult#access_key #access_key} => Types::AccessKey
+    #   * {Types::CreateBucketAccessKeyResult#operations #operations} => Array&lt;Types::Operation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_bucket_access_key({
+    #     bucket_name: "BucketName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.access_key.access_key_id #=> String
+    #   resp.access_key.secret_access_key #=> String
+    #   resp.access_key.status #=> String, one of "Active", "Inactive"
+    #   resp.access_key.created_at #=> Time
+    #   resp.access_key.last_used.last_used_date #=> Time
+    #   resp.access_key.last_used.region #=> String
+    #   resp.access_key.last_used.service_name #=> String
+    #   resp.operations #=> Array
+    #   resp.operations[0].id #=> String
+    #   resp.operations[0].resource_name #=> String
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operations[0].created_at #=> Time
+    #   resp.operations[0].location.availability_zone #=> String
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operations[0].is_terminal #=> Boolean
+    #   resp.operations[0].operation_details #=> String
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operations[0].status_changed_at #=> Time
+    #   resp.operations[0].error_code #=> String
+    #   resp.operations[0].error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/CreateBucketAccessKey AWS API Documentation
+    #
+    # @overload create_bucket_access_key(params = {})
+    # @param [Hash] params ({})
+    def create_bucket_access_key(params = {}, options = {})
+      req = build_request(:create_bucket_access_key, params)
+      req.send_request(options)
+    end
+
+    # Creates an SSL/TLS certificate for an Amazon Lightsail content
+    # delivery network (CDN) distribution and a container service.
+    #
+    # After the certificate is valid, use the
+    # `AttachCertificateToDistribution` action to use the certificate and
+    # its domains with your distribution. Or use the
+    # `UpdateContainerService` action to use the certificate and its domains
+    # with your container service.
+    #
+    # Only certificates created in the `us-east-1` Amazon Web Services
+    # Region can be attached to Lightsail distributions. Lightsail
+    # distributions are global resources that can reference an origin in any
+    # Amazon Web Services Region, and distribute its content globally.
+    # However, all distributions are located in the `us-east-1` Region.
     #
     # @option params [required, String] :certificate_name
     #   The name for the certificate.
     #
     # @option params [required, String] :domain_name
-    #   The domain name (e.g., `example.com`) for the certificate.
+    #   The domain name (`example.com`) for the certificate.
     #
     # @option params [Array<String>] :subject_alternative_names
-    #   An array of strings that specify the alternate domains (e.g.,
-    #   `example2.com`) and subdomains (e.g., `blog.example.com`) for the
+    #   An array of strings that specify the alternate domains
+    #   (`example2.com`) and subdomains (`blog.example.com`) for the
     #   certificate.
     #
     #   You can specify a maximum of nine alternate domains (in addition to
     #   the primary domain name).
     #
-    #   Wildcard domain entries (e.g., `*.example.com`) are not supported.
+    #   Wildcard domain entries (`*.example.com`) are not supported.
     #
     # @option params [Array<Types::Tag>] :tags
     #   The tag keys and optional values to add to the certificate during
@@ -945,6 +1271,9 @@ module Aws::Lightsail
     #   resp.certificate.certificate_detail.domain_validation_records[0].resource_record.name #=> String
     #   resp.certificate.certificate_detail.domain_validation_records[0].resource_record.type #=> String
     #   resp.certificate.certificate_detail.domain_validation_records[0].resource_record.value #=> String
+    #   resp.certificate.certificate_detail.domain_validation_records[0].dns_record_creation_state.code #=> String, one of "SUCCEEDED", "STARTED", "FAILED"
+    #   resp.certificate.certificate_detail.domain_validation_records[0].dns_record_creation_state.message #=> String
+    #   resp.certificate.certificate_detail.domain_validation_records[0].validation_status #=> String, one of "PENDING_VALIDATION", "FAILED", "SUCCESS"
     #   resp.certificate.certificate_detail.request_failure_reason #=> String
     #   resp.certificate.certificate_detail.in_use_resource_count #=> Integer
     #   resp.certificate.certificate_detail.key_algorithm #=> String
@@ -959,6 +1288,9 @@ module Aws::Lightsail
     #   resp.certificate.certificate_detail.renewal_summary.domain_validation_records[0].resource_record.name #=> String
     #   resp.certificate.certificate_detail.renewal_summary.domain_validation_records[0].resource_record.type #=> String
     #   resp.certificate.certificate_detail.renewal_summary.domain_validation_records[0].resource_record.value #=> String
+    #   resp.certificate.certificate_detail.renewal_summary.domain_validation_records[0].dns_record_creation_state.code #=> String, one of "SUCCEEDED", "STARTED", "FAILED"
+    #   resp.certificate.certificate_detail.renewal_summary.domain_validation_records[0].dns_record_creation_state.message #=> String
+    #   resp.certificate.certificate_detail.renewal_summary.domain_validation_records[0].validation_status #=> String, one of "PENDING_VALIDATION", "FAILED", "SUCCESS"
     #   resp.certificate.certificate_detail.renewal_summary.renewal_status #=> String, one of "PendingAutoRenewal", "PendingValidation", "Success", "Failed"
     #   resp.certificate.certificate_detail.renewal_summary.renewal_status_reason #=> String
     #   resp.certificate.certificate_detail.renewal_summary.updated_at #=> Time
@@ -974,13 +1306,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -1034,13 +1366,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -1059,10 +1391,11 @@ module Aws::Lightsail
     #
     # A contact method is used to send you notifications about your Amazon
     # Lightsail resources. You can add one email address and one mobile
-    # phone number contact method in each AWS Region. However, SMS text
-    # messaging is not supported in some AWS Regions, and SMS text messages
-    # cannot be sent to some countries/regions. For more information, see
-    # [Notifications in Amazon Lightsail][1].
+    # phone number contact method in each Amazon Web Services Region.
+    # However, SMS text messaging is not supported in some Amazon Web
+    # Services Regions, and SMS text messages cannot be sent to some
+    # countries/regions. For more information, see [Notifications in Amazon
+    # Lightsail][1].
     #
     #
     #
@@ -1072,7 +1405,8 @@ module Aws::Lightsail
     #   The protocol of the contact method, such as `Email` or `SMS` (text
     #   messaging).
     #
-    #   The `SMS` protocol is supported only in the following AWS Regions.
+    #   The `SMS` protocol is supported only in the following Amazon Web
+    #   Services Regions.
     #
     #   * US East (N. Virginia) (`us-east-1`)
     #
@@ -1087,9 +1421,9 @@ module Aws::Lightsail
     #   * Asia Pacific (Sydney) (`ap-southeast-2`)
     #
     #   For a list of countries/regions where SMS text messages can be sent,
-    #   and the latest AWS Regions where SMS text messaging is supported, see
-    #   [Supported Regions and Countries][1] in the *Amazon SNS Developer
-    #   Guide*.
+    #   and the latest Amazon Web Services Regions where SMS text messaging is
+    #   supported, see [Supported Regions and Countries][1] in the *Amazon SNS
+    #   Developer Guide*.
     #
     #   For more information about notifications in Amazon Lightsail, see
     #   [Notifications in Amazon Lightsail][2].
@@ -1131,13 +1465,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -1170,13 +1504,15 @@ module Aws::Lightsail
     #   typically
     #   `https://<ServiceName>.<RandomGUID>.<AWSRegion>.cs.amazonlightsail.com`.
     #   If the name of your container service is `container-service-1`, and
-    #   it's located in the US East (Ohio) AWS region (`us-east-2`), then the
-    #   domain for your container service will be like the following example:
+    #   it's located in the US East (Ohio) Amazon Web Services Region
+    #   (`us-east-2`), then the domain for your container service will be like
+    #   the following example:
     #   `https://container-service-1.ur4EXAMPLE2uq.us-east-2.cs.amazonlightsail.com`
     #
     #   The following are the requirements for container service names:
     #
-    #   * Must be unique within each AWS Region in your Lightsail account.
+    #   * Must be unique within each Amazon Web Services Region in your
+    #     Lightsail account.
     #
     #   * Must contain 1 to 63 characters.
     #
@@ -1208,14 +1544,17 @@ module Aws::Lightsail
     #   number of nodes) of the service.
     #
     # @option params [Array<Types::Tag>] :tags
-    #   The tag keys and optional values for the container service.
+    #   The tag keys and optional values to add to the container service
+    #   during create.
     #
-    #   For more information about tags in Lightsail, see the [Lightsail Dev
-    #   Guide][1].
+    #   Use the `TagResource` action to tag a resource after it's created.
+    #
+    #   For more information about tags in Lightsail, see the [Amazon
+    #   Lightsail Developer Guide][1].
     #
     #
     #
-    #   [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags
+    #   [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags
     #
     # @option params [Hash<String,Array>] :public_domain_names
     #   The public domain names to use with the container service, such as
@@ -1246,6 +1585,19 @@ module Aws::Lightsail
     #   specifies the container that will serve as the public endpoint of the
     #   deployment and its settings, such as the HTTP or HTTPS port to use,
     #   and the health check configuration.
+    #
+    # @option params [Types::PrivateRegistryAccessRequest] :private_registry_access
+    #   An object to describe the configuration for the container service to
+    #   access private container image repositories, such as Amazon Elastic
+    #   Container Registry (Amazon ECR) private repositories.
+    #
+    #   For more information, see [Configuring access to an Amazon ECR private
+    #   repository for an Amazon Lightsail container service][1] in the
+    #   *Amazon Lightsail Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-container-service-ecr-private-repo-access
     #
     # @return [Types::CreateContainerServiceResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1292,6 +1644,11 @@ module Aws::Lightsail
     #         },
     #       },
     #     },
+    #     private_registry_access: {
+    #       ecr_image_puller_role: {
+    #         is_active: false,
+    #       },
+    #     },
     #   })
     #
     # @example Response structure
@@ -1300,14 +1657,16 @@ module Aws::Lightsail
     #   resp.container_service.arn #=> String
     #   resp.container_service.created_at #=> Time
     #   resp.container_service.location.availability_zone #=> String
-    #   resp.container_service.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.container_service.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.container_service.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.container_service.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.container_service.tags #=> Array
     #   resp.container_service.tags[0].key #=> String
     #   resp.container_service.tags[0].value #=> String
     #   resp.container_service.power #=> String, one of "nano", "micro", "small", "medium", "large", "xlarge"
     #   resp.container_service.power_id #=> String
-    #   resp.container_service.state #=> String, one of "PENDING", "READY", "RUNNING", "UPDATING", "DELETING", "DISABLED"
+    #   resp.container_service.state #=> String, one of "PENDING", "READY", "RUNNING", "UPDATING", "DELETING", "DISABLED", "DEPLOYING"
+    #   resp.container_service.state_detail.code #=> String, one of "CREATING_SYSTEM_RESOURCES", "CREATING_NETWORK_INFRASTRUCTURE", "PROVISIONING_CERTIFICATE", "PROVISIONING_SERVICE", "CREATING_DEPLOYMENT", "EVALUATING_HEALTH_CHECK", "ACTIVATING_DEPLOYMENT", "CERTIFICATE_LIMIT_EXCEEDED", "UNKNOWN_ERROR"
+    #   resp.container_service.state_detail.message #=> String
     #   resp.container_service.scale #=> Integer
     #   resp.container_service.current_deployment.version #=> Integer
     #   resp.container_service.current_deployment.state #=> String, one of "ACTIVATING", "ACTIVE", "INACTIVE", "FAILED"
@@ -1354,6 +1713,8 @@ module Aws::Lightsail
     #   resp.container_service.public_domain_names["string"] #=> Array
     #   resp.container_service.public_domain_names["string"][0] #=> String
     #   resp.container_service.url #=> String
+    #   resp.container_service.private_registry_access.ecr_image_puller_role.is_active #=> Boolean
+    #   resp.container_service.private_registry_access.ecr_image_puller_role.principal_arn #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/CreateContainerService AWS API Documentation
     #
@@ -1374,9 +1735,10 @@ module Aws::Lightsail
     # and the health check configuration.
     #
     # You can deploy containers to your container service using container
-    # images from a public registry like Docker Hub, or from your local
-    # machine. For more information, see [Creating container images for your
-    # Amazon Lightsail container services][1] in the *Lightsail Dev Guide*.
+    # images from a public registry such as Amazon ECR Public, or from your
+    # local machine. For more information, see [Creating container images
+    # for your Amazon Lightsail container services][1] in the *Amazon
+    # Lightsail Developer Guide*.
     #
     #
     #
@@ -1433,14 +1795,16 @@ module Aws::Lightsail
     #   resp.container_service.arn #=> String
     #   resp.container_service.created_at #=> Time
     #   resp.container_service.location.availability_zone #=> String
-    #   resp.container_service.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.container_service.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.container_service.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.container_service.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.container_service.tags #=> Array
     #   resp.container_service.tags[0].key #=> String
     #   resp.container_service.tags[0].value #=> String
     #   resp.container_service.power #=> String, one of "nano", "micro", "small", "medium", "large", "xlarge"
     #   resp.container_service.power_id #=> String
-    #   resp.container_service.state #=> String, one of "PENDING", "READY", "RUNNING", "UPDATING", "DELETING", "DISABLED"
+    #   resp.container_service.state #=> String, one of "PENDING", "READY", "RUNNING", "UPDATING", "DELETING", "DISABLED", "DEPLOYING"
+    #   resp.container_service.state_detail.code #=> String, one of "CREATING_SYSTEM_RESOURCES", "CREATING_NETWORK_INFRASTRUCTURE", "PROVISIONING_CERTIFICATE", "PROVISIONING_SERVICE", "CREATING_DEPLOYMENT", "EVALUATING_HEALTH_CHECK", "ACTIVATING_DEPLOYMENT", "CERTIFICATE_LIMIT_EXCEEDED", "UNKNOWN_ERROR"
+    #   resp.container_service.state_detail.message #=> String
     #   resp.container_service.scale #=> Integer
     #   resp.container_service.current_deployment.version #=> Integer
     #   resp.container_service.current_deployment.state #=> String, one of "ACTIVATING", "ACTIVE", "INACTIVE", "FAILED"
@@ -1487,6 +1851,8 @@ module Aws::Lightsail
     #   resp.container_service.public_domain_names["string"] #=> Array
     #   resp.container_service.public_domain_names["string"][0] #=> String
     #   resp.container_service.url #=> String
+    #   resp.container_service.private_registry_access.ecr_image_puller_role.is_active #=> Boolean
+    #   resp.container_service.private_registry_access.ecr_image_puller_role.principal_arn #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/CreateContainerServiceDeployment AWS API Documentation
     #
@@ -1507,9 +1873,9 @@ module Aws::Lightsail
     # in credentials.
     #
     # <note markdown="1"> You can only push container images to the container service registry
-    # of your Lightsail account. You cannot pull container images perform
+    # of your Lightsail account. You cannot pull container images or perform
     # any other container image management actions on the container service
-    # registry of your Lightsail account.
+    # registry.
     #
     #  </note>
     #
@@ -1521,10 +1887,13 @@ module Aws::Lightsail
     # Control (lightsailctl) plugin to push container images to your
     # Lightsail container service. For more information, see [Pushing and
     # managing container images on your Amazon Lightsail container
-    # services](amazon-lightsail-pushing-container-images) in the *Lightsail
-    # Dev Guide*.
+    # services][1] in the *Amazon Lightsail Developer Guide*.
     #
     #  </note>
+    #
+    #
+    #
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-pushing-container-images
     #
     # @return [Types::CreateContainerServiceRegistryLoginResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1547,28 +1916,29 @@ module Aws::Lightsail
     end
 
     # Creates a block storage disk that can be attached to an Amazon
-    # Lightsail instance in the same Availability Zone (e.g., `us-east-2a`).
+    # Lightsail instance in the same Availability Zone (`us-east-2a`).
     #
     # The `create disk` operation supports tag-based access control via
-    # request tags. For more information, see the [Lightsail Dev Guide][1].
+    # request tags. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :disk_name
-    #   The unique Lightsail disk name (e.g., `my-disk`).
+    #   The unique Lightsail disk name (`my-disk`).
     #
     # @option params [required, String] :availability_zone
-    #   The Availability Zone where you want to create the disk (e.g.,
-    #   `us-east-2a`). Use the same Availability Zone as the Lightsail
+    #   The Availability Zone where you want to create the disk
+    #   (`us-east-2a`). Use the same Availability Zone as the Lightsail
     #   instance to which you want to attach the disk.
     #
     #   Use the `get regions` operation to list the Availability Zones where
     #   Lightsail is currently available.
     #
     # @option params [required, Integer] :size_in_gb
-    #   The size of the disk in GB (e.g., `32`).
+    #   The size of the disk in GB (`32`).
     #
     # @option params [Array<Types::Tag>] :tags
     #   The tag keys and optional values to add to the resource during create.
@@ -1597,9 +1967,13 @@ module Aws::Lightsail
     #     ],
     #     add_ons: [
     #       {
-    #         add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot
+    #         add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot, StopInstanceOnIdle
     #         auto_snapshot_add_on_request: {
     #           snapshot_time_of_day: "TimeOfDay",
+    #         },
+    #         stop_instance_on_idle_request: {
+    #           threshold: "string",
+    #           duration: "string",
     #         },
     #       },
     #     ],
@@ -1610,13 +1984,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -1633,23 +2007,23 @@ module Aws::Lightsail
 
     # Creates a block storage disk from a manual or automatic snapshot of a
     # disk. The resulting disk can be attached to an Amazon Lightsail
-    # instance in the same Availability Zone (e.g., `us-east-2a`).
+    # instance in the same Availability Zone (`us-east-2a`).
     #
     # The `create disk from snapshot` operation supports tag-based access
     # control via request tags and resource tags applied to the resource
     # identified by `disk snapshot name`. For more information, see the
-    # [Lightsail Dev Guide][1].
+    # [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :disk_name
-    #   The unique Lightsail disk name (e.g., `my-disk`).
+    #   The unique Lightsail disk name (`my-disk`).
     #
     # @option params [String] :disk_snapshot_name
-    #   The name of the disk snapshot (e.g., `my-snapshot`) from which to
-    #   create the new storage disk.
+    #   The name of the disk snapshot (`my-snapshot`) from which to create the
+    #   new storage disk.
     #
     #   Constraint:
     #
@@ -1660,15 +2034,15 @@ module Aws::Lightsail
     #   ^
     #
     # @option params [required, String] :availability_zone
-    #   The Availability Zone where you want to create the disk (e.g.,
-    #   `us-east-2a`). Choose the same Availability Zone as the Lightsail
+    #   The Availability Zone where you want to create the disk
+    #   (`us-east-2a`). Choose the same Availability Zone as the Lightsail
     #   instance where you want to create the disk.
     #
     #   Use the GetRegions operation to list the Availability Zones where
     #   Lightsail is currently available.
     #
     # @option params [required, Integer] :size_in_gb
-    #   The size of the disk in GB (e.g., `32`).
+    #   The size of the disk in GB (`32`).
     #
     # @option params [Array<Types::Tag>] :tags
     #   The tag keys and optional values to add to the resource during create.
@@ -1690,8 +2064,8 @@ module Aws::Lightsail
     #     parameters are mutually exclusive.
     #
     #   * Define this parameter only when creating a new disk from an
-    #     automatic snapshot. For more information, see the [Lightsail Dev
-    #     Guide][1].
+    #     automatic snapshot. For more information, see the [Amazon Lightsail
+    #     Developer Guide][1].
     #
     #
     #
@@ -1711,8 +2085,8 @@ module Aws::Lightsail
     #     latest restorable auto snapshot` parameters are mutually exclusive.
     #
     #   * Define this parameter only when creating a new disk from an
-    #     automatic snapshot. For more information, see the [Lightsail Dev
-    #     Guide][1].
+    #     automatic snapshot. For more information, see the [Amazon Lightsail
+    #     Developer Guide][1].
     #
     #
     #
@@ -1729,8 +2103,8 @@ module Aws::Lightsail
     #     date` parameters are mutually exclusive.
     #
     #   * Define this parameter only when creating a new disk from an
-    #     automatic snapshot. For more information, see the [Lightsail Dev
-    #     Guide][1].
+    #     automatic snapshot. For more information, see the [Amazon Lightsail
+    #     Developer Guide][1].
     #
     #
     #
@@ -1755,9 +2129,13 @@ module Aws::Lightsail
     #     ],
     #     add_ons: [
     #       {
-    #         add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot
+    #         add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot, StopInstanceOnIdle
     #         auto_snapshot_add_on_request: {
     #           snapshot_time_of_day: "TimeOfDay",
+    #         },
+    #         stop_instance_on_idle_request: {
+    #           threshold: "string",
+    #           duration: "string",
     #         },
     #       },
     #     ],
@@ -1771,13 +2149,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -1819,15 +2197,15 @@ module Aws::Lightsail
     # attach it to a running instance to access the data on the disk.
     #
     # The `create disk snapshot` operation supports tag-based access control
-    # via request tags. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # via request tags. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [String] :disk_name
-    #   The unique name of the source disk (e.g., `Disk-Virginia-1`).
+    #   The unique name of the source disk (`Disk-Virginia-1`).
     #
     #   <note markdown="1"> This parameter cannot be defined together with the `instance name`
     #   parameter. The `disk name` and `instance name` parameters are mutually
@@ -1836,12 +2214,12 @@ module Aws::Lightsail
     #    </note>
     #
     # @option params [required, String] :disk_snapshot_name
-    #   The name of the destination disk snapshot (e.g., `my-disk-snapshot`)
-    #   based on the source disk.
+    #   The name of the destination disk snapshot (`my-disk-snapshot`) based
+    #   on the source disk.
     #
     # @option params [String] :instance_name
-    #   The unique name of the source instance (e.g.,
-    #   `Amazon_Linux-512MB-Virginia-1`). When this is defined, a snapshot of
+    #   The unique name of the source instance
+    #   (`Amazon_Linux-512MB-Virginia-1`). When this is defined, a snapshot of
     #   the instance's system volume is created.
     #
     #   <note markdown="1"> This parameter cannot be defined together with the `disk name`
@@ -1878,13 +2256,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -1916,7 +2294,7 @@ module Aws::Lightsail
     #
     # @option params [required, Types::InputOrigin] :origin
     #   An object that describes the origin resource for the distribution,
-    #   such as a Lightsail instance or load balancer.
+    #   such as a Lightsail instance, bucket, or load balancer.
     #
     #   The distribution pulls, caches, and serves content from the origin.
     #
@@ -1956,6 +2334,20 @@ module Aws::Lightsail
     #
     #   Use the `TagResource` action to tag a resource after it's created.
     #
+    # @option params [String] :certificate_name
+    #   The name of the SSL/TLS certificate that you want to attach to the
+    #   distribution.
+    #
+    #   Use the [GetCertificates][1] action to get a list of certificate names
+    #   that you can specify.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetCertificates.html
+    #
+    # @option params [String] :viewer_minimum_tls_protocol_version
+    #   The minimum TLS protocol version for the SSL/TLS certificate.
+    #
     # @return [Types::CreateDistributionResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateDistributionResult#distribution #distribution} => Types::LightsailDistribution
@@ -1967,8 +2359,9 @@ module Aws::Lightsail
     #     distribution_name: "ResourceName", # required
     #     origin: { # required
     #       name: "ResourceName",
-    #       region_name: "us-east-1", # accepts us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, ca-central-1, ap-south-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, ap-northeast-2
+    #       region_name: "us-east-1", # accepts us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, ca-central-1, ap-south-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, ap-northeast-2, eu-north-1
     #       protocol_policy: "http-only", # accepts http-only, https-only
+    #       response_timeout: 1,
     #     },
     #     default_cache_behavior: { # required
     #       behavior: "dont-cache", # accepts dont-cache, cache
@@ -1999,13 +2392,15 @@ module Aws::Lightsail
     #       },
     #     ],
     #     bundle_id: "string", # required
-    #     ip_address_type: "dualstack", # accepts dualstack, ipv4
+    #     ip_address_type: "dualstack", # accepts dualstack, ipv4, ipv6
     #     tags: [
     #       {
     #         key: "TagKey",
     #         value: "TagValue",
     #       },
     #     ],
+    #     certificate_name: "ResourceName",
+    #     viewer_minimum_tls_protocol_version: "TLSv1.1_2016", # accepts TLSv1.1_2016, TLSv1.2_2018, TLSv1.2_2019, TLSv1.2_2021
     #   })
     #
     # @example Response structure
@@ -2015,8 +2410,8 @@ module Aws::Lightsail
     #   resp.distribution.support_code #=> String
     #   resp.distribution.created_at #=> Time
     #   resp.distribution.location.availability_zone #=> String
-    #   resp.distribution.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.distribution.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.distribution.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.distribution.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.distribution.alternative_domain_names #=> Array
     #   resp.distribution.alternative_domain_names[0] #=> String
     #   resp.distribution.status #=> String
@@ -2025,9 +2420,10 @@ module Aws::Lightsail
     #   resp.distribution.bundle_id #=> String
     #   resp.distribution.certificate_name #=> String
     #   resp.distribution.origin.name #=> String
-    #   resp.distribution.origin.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
-    #   resp.distribution.origin.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.distribution.origin.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.distribution.origin.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.distribution.origin.protocol_policy #=> String, one of "http-only", "https-only"
+    #   resp.distribution.origin.response_timeout #=> Integer
     #   resp.distribution.origin_public_dns #=> String
     #   resp.distribution.default_cache_behavior.behavior #=> String, one of "dont-cache", "cache"
     #   resp.distribution.cache_behavior_settings.default_ttl #=> Integer
@@ -2048,19 +2444,20 @@ module Aws::Lightsail
     #   resp.distribution.cache_behaviors[0].path #=> String
     #   resp.distribution.cache_behaviors[0].behavior #=> String, one of "dont-cache", "cache"
     #   resp.distribution.able_to_update_bundle #=> Boolean
-    #   resp.distribution.ip_address_type #=> String, one of "dualstack", "ipv4"
+    #   resp.distribution.ip_address_type #=> String, one of "dualstack", "ipv4", "ipv6"
     #   resp.distribution.tags #=> Array
     #   resp.distribution.tags[0].key #=> String
     #   resp.distribution.tags[0].value #=> String
+    #   resp.distribution.viewer_minimum_tls_protocol_version #=> String
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -2075,25 +2472,18 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Creates a domain resource for the specified domain (e.g.,
-    # example.com).
+    # Creates a domain resource for the specified domain (example.com).
     #
     # The `create domain` operation supports tag-based access control via
-    # request tags. For more information, see the [Lightsail Dev Guide][1].
+    # request tags. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :domain_name
-    #   The domain name to manage (e.g., `example.com`).
-    #
-    #   <note markdown="1"> You cannot register a new domain name using Lightsail. You must
-    #   register a domain name using Amazon Route 53 or another domain name
-    #   registrar. If you have already registered your domain, you can enter
-    #   its name in this parameter to manage the DNS records for that domain.
-    #
-    #    </note>
+    #   The domain name to manage (`example.com`).
     #
     # @option params [Array<Types::Tag>] :tags
     #   The tag keys and optional values to add to the resource during create.
@@ -2120,13 +2510,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -2148,14 +2538,14 @@ module Aws::Lightsail
     #
     # The `create domain entry` operation supports tag-based access control
     # via resource tags applied to the resource identified by `domain name`.
-    # For more information, see the [Lightsail Dev Guide][1].
+    # For more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :domain_name
-    #   The domain name (e.g., `example.com`) for which you want to create the
+    #   The domain name (`example.com`) for which you want to create the
     #   domain entry.
     #
     # @option params [required, Types::DomainEntry] :domain_entry
@@ -2186,13 +2576,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -2207,17 +2597,62 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
+    # Creates two URLs that are used to access a virtual computer’s
+    # graphical user interface (GUI) session. The primary URL initiates a
+    # web-based NICE DCV session to the virtual computer's application. The
+    # secondary URL initiates a web-based NICE DCV session to the virtual
+    # computer's operating session.
+    #
+    # Use `StartGUISession` to open the session.
+    #
+    # @option params [required, String] :resource_name
+    #   The resource name.
+    #
+    # @return [Types::CreateGUISessionAccessDetailsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateGUISessionAccessDetailsResult#resource_name #resource_name} => String
+    #   * {Types::CreateGUISessionAccessDetailsResult#status #status} => String
+    #   * {Types::CreateGUISessionAccessDetailsResult#percentage_complete #percentage_complete} => Integer
+    #   * {Types::CreateGUISessionAccessDetailsResult#failure_reason #failure_reason} => String
+    #   * {Types::CreateGUISessionAccessDetailsResult#sessions #sessions} => Array&lt;Types::Session&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_gui_session_access_details({
+    #     resource_name: "ResourceName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.resource_name #=> String
+    #   resp.status #=> String, one of "startExpired", "notStarted", "started", "starting", "stopped", "stopping", "settingUpInstance", "failedInstanceCreation", "failedStartingGUISession", "failedStoppingGUISession"
+    #   resp.percentage_complete #=> Integer
+    #   resp.failure_reason #=> String
+    #   resp.sessions #=> Array
+    #   resp.sessions[0].name #=> String
+    #   resp.sessions[0].url #=> String
+    #   resp.sessions[0].is_primary #=> Boolean
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/CreateGUISessionAccessDetails AWS API Documentation
+    #
+    # @overload create_gui_session_access_details(params = {})
+    # @param [Hash] params ({})
+    def create_gui_session_access_details(params = {}, options = {})
+      req = build_request(:create_gui_session_access_details, params)
+      req.send_request(options)
+    end
+
     # Creates a snapshot of a specific virtual private server, or
     # *instance*. You can use a snapshot to create a new instance that is
     # based on that snapshot.
     #
     # The `create instance snapshot` operation supports tag-based access
-    # control via request tags. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # control via request tags. For more information, see the [Amazon
+    # Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :instance_snapshot_name
     #   The name for your new snapshot.
@@ -2252,13 +2687,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -2276,11 +2711,12 @@ module Aws::Lightsail
     # Creates one or more Amazon Lightsail instances.
     #
     # The `create instances` operation supports tag-based access control via
-    # request tags. For more information, see the [Lightsail Dev Guide][1].
+    # request tags. For more information, see the [Lightsail Developer
+    # Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, Array<String>] :instance_names
     #   The names to use for your new Lightsail instances. Separate multiple
@@ -2298,17 +2734,17 @@ module Aws::Lightsail
     #   [1]: http://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetRegions.html
     #
     # @option params [String] :custom_image_name
-    #   (Deprecated) The name for your custom image.
+    #   (Discontinued) The name for your custom image.
     #
     #   <note markdown="1"> In releases prior to June 12, 2017, this parameter was ignored by the
-    #   API. It is now deprecated.
+    #   API. It is now discontinued.
     #
     #    </note>
     #
     # @option params [required, String] :blueprint_id
-    #   The ID for a virtual private server image (e.g., `app_wordpress_4_4`
-    #   or `app_lamp_7_0`). Use the `get blueprints` operation to return a
-    #   list of available images (or *blueprints*).
+    #   The ID for a virtual private server image (`app_wordpress_x_x` or
+    #   `app_lamp_x_x`). Use the `get blueprints` operation to return a list
+    #   of available images (or *blueprints*).
     #
     #   <note markdown="1"> Use active blueprints when creating new instances. Inactive blueprints
     #   are listed to support customers with existing instances and are not
@@ -2320,8 +2756,7 @@ module Aws::Lightsail
     #
     # @option params [required, String] :bundle_id
     #   The bundle of specification information for your virtual private
-    #   server (or *instance*), including the pricing plan (e.g.,
-    #   `micro_1_0`).
+    #   server (or *instance*), including the pricing plan (`medium_x_x`).
     #
     # @option params [String] :user_data
     #   A launch script you can create that configures a server with
@@ -2331,13 +2766,13 @@ module Aws::Lightsail
     #   <note markdown="1"> Depending on the machine image you choose, the command to get software
     #   on your instance varies. Amazon Linux and CentOS use `yum`, Debian and
     #   Ubuntu use `apt-get`, and FreeBSD uses `pkg`. For a complete list, see
-    #   the [Dev Guide][1].
+    #   the [Amazon Lightsail Developer Guide][1].
     #
     #    </note>
     #
     #
     #
-    #   [1]: https://lightsail.aws.amazon.com/ls/docs/getting-started/article/compare-options-choose-lightsail-instance-image
+    #   [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/compare-options-choose-lightsail-instance-image
     #
     # @option params [String] :key_pair_name
     #   The name of your key pair.
@@ -2354,8 +2789,8 @@ module Aws::Lightsail
     # @option params [String] :ip_address_type
     #   The IP address type for the instance.
     #
-    #   The possible values are `ipv4` for IPv4 only, and `dualstack` for IPv4
-    #   and IPv6.
+    #   The possible values are `ipv4` for IPv4 only, `ipv6` for IPv6 only,
+    #   and `dualstack` for IPv4 and IPv6.
     #
     #   The default value is `dualstack`.
     #
@@ -2381,13 +2816,17 @@ module Aws::Lightsail
     #     ],
     #     add_ons: [
     #       {
-    #         add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot
+    #         add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot, StopInstanceOnIdle
     #         auto_snapshot_add_on_request: {
     #           snapshot_time_of_day: "TimeOfDay",
     #         },
+    #         stop_instance_on_idle_request: {
+    #           threshold: "string",
+    #           duration: "string",
+    #         },
     #       },
     #     ],
-    #     ip_address_type: "dualstack", # accepts dualstack, ipv4
+    #     ip_address_type: "dualstack", # accepts dualstack, ipv4, ipv6
     #   })
     #
     # @example Response structure
@@ -2395,13 +2834,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -2422,11 +2861,11 @@ module Aws::Lightsail
     # The `create instances from snapshot` operation supports tag-based
     # access control via request tags and resource tags applied to the
     # resource identified by `instance snapshot name`. For more information,
-    # see the [Lightsail Dev Guide][1].
+    # see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, Array<String>] :instance_names
     #   The names for your new instances.
@@ -2460,8 +2899,7 @@ module Aws::Lightsail
     #
     # @option params [required, String] :bundle_id
     #   The bundle of specification information for your virtual private
-    #   server (or *instance*), including the pricing plan (e.g.,
-    #   `micro_1_0`).
+    #   server (or *instance*), including the pricing plan (`micro_x_x`).
     #
     # @option params [String] :user_data
     #   You can create a launch script that configures a server with
@@ -2470,13 +2908,13 @@ module Aws::Lightsail
     #   <note markdown="1"> Depending on the machine image you choose, the command to get software
     #   on your instance varies. Amazon Linux and CentOS use `yum`, Debian and
     #   Ubuntu use `apt-get`, and FreeBSD uses `pkg`. For a complete list, see
-    #   the [Dev Guide][1].
+    #   the [Amazon Lightsail Developer Guide][1].
     #
     #    </note>
     #
     #
     #
-    #   [1]: https://lightsail.aws.amazon.com/ls/docs/getting-started/article/compare-options-choose-lightsail-instance-image
+    #   [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/compare-options-choose-lightsail-instance-image
     #
     # @option params [String] :key_pair_name
     #   The name for your key pair.
@@ -2493,8 +2931,8 @@ module Aws::Lightsail
     # @option params [String] :ip_address_type
     #   The IP address type for the instance.
     #
-    #   The possible values are `ipv4` for IPv4 only, and `dualstack` for IPv4
-    #   and IPv6.
+    #   The possible values are `ipv4` for IPv4 only, `ipv6` for IPv6 only,
+    #   and `dualstack` for IPv4 and IPv6.
     #
     #   The default value is `dualstack`.
     #
@@ -2509,8 +2947,8 @@ module Aws::Lightsail
     #     snapshot name` parameters are mutually exclusive.
     #
     #   * Define this parameter only when creating a new instance from an
-    #     automatic snapshot. For more information, see the [Lightsail Dev
-    #     Guide][1].
+    #     automatic snapshot. For more information, see the [Amazon Lightsail
+    #     Developer Guide][1].
     #
     #
     #
@@ -2530,8 +2968,8 @@ module Aws::Lightsail
     #     latest restorable auto snapshot` parameters are mutually exclusive.
     #
     #   * Define this parameter only when creating a new instance from an
-    #     automatic snapshot. For more information, see the [Lightsail Dev
-    #     Guide][1].
+    #     automatic snapshot. For more information, see the [Amazon Lightsail
+    #     Developer Guide][1].
     #
     #
     #
@@ -2548,8 +2986,8 @@ module Aws::Lightsail
     #     date` parameters are mutually exclusive.
     #
     #   * Define this parameter only when creating a new instance from an
-    #     automatic snapshot. For more information, see the [Lightsail Dev
-    #     Guide][1].
+    #     automatic snapshot. For more information, see the [Amazon Lightsail
+    #     Developer Guide][1].
     #
     #
     #
@@ -2584,13 +3022,17 @@ module Aws::Lightsail
     #     ],
     #     add_ons: [
     #       {
-    #         add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot
+    #         add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot, StopInstanceOnIdle
     #         auto_snapshot_add_on_request: {
     #           snapshot_time_of_day: "TimeOfDay",
     #         },
+    #         stop_instance_on_idle_request: {
+    #           threshold: "string",
+    #           duration: "string",
+    #         },
     #       },
     #     ],
-    #     ip_address_type: "dualstack", # accepts dualstack, ipv4
+    #     ip_address_type: "dualstack", # accepts dualstack, ipv4, ipv6
     #     source_instance_name: "string",
     #     restore_date: "string",
     #     use_latest_restorable_auto_snapshot: false,
@@ -2601,13 +3043,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -2622,14 +3064,23 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Creates an SSH key pair.
+    # Creates a custom SSH key pair that you can use with an Amazon
+    # Lightsail instance.
+    #
+    # <note markdown="1"> Use the [DownloadDefaultKeyPair][1] action to create a Lightsail
+    # default key pair in an Amazon Web Services Region where a default key
+    # pair does not currently exist.
+    #
+    #  </note>
     #
     # The `create key pair` operation supports tag-based access control via
-    # request tags. For more information, see the [Lightsail Dev Guide][1].
+    # request tags. For more information, see the [Amazon Lightsail
+    # Developer Guide][2].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_DownloadDefaultKeyPair.html
+    # [2]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :key_pair_name
     #   The name for your new key pair.
@@ -2665,8 +3116,8 @@ module Aws::Lightsail
     #   resp.key_pair.support_code #=> String
     #   resp.key_pair.created_at #=> Time
     #   resp.key_pair.location.availability_zone #=> String
-    #   resp.key_pair.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.key_pair.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.key_pair.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.key_pair.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.key_pair.tags #=> Array
     #   resp.key_pair.tags[0].key #=> String
     #   resp.key_pair.tags[0].value #=> String
@@ -2675,13 +3126,13 @@ module Aws::Lightsail
     #   resp.private_key_base_64 #=> String
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -2706,13 +3157,13 @@ module Aws::Lightsail
     # `UpdateLoadBalancerAttribute` operation.
     #
     # The `create load balancer` operation supports tag-based access control
-    # via request tags. For more information, see the [Lightsail Dev
-    # Guide][2].
+    # via request tags. For more information, see the [Amazon Lightsail
+    # Developer Guide][2].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/how-to/article/configure-lightsail-instances-for-load-balancing
-    # [2]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/configure-lightsail-instances-for-load-balancing
+    # [2]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :load_balancer_name
     #   The name of your load balancer.
@@ -2723,7 +3174,7 @@ module Aws::Lightsail
     # @option params [String] :health_check_path
     #   The path you provided to perform the load balancer health check. If
     #   you didn't specify a health check path, Lightsail uses the root path
-    #   of your website (e.g., `"/"`).
+    #   of your website (`"/"`).
     #
     #   You may want to specify a custom health check path other than the root
     #   of your application if your home page loads slowly or has a lot of
@@ -2736,15 +3187,15 @@ module Aws::Lightsail
     #   required (and vice-versa).
     #
     # @option params [String] :certificate_domain_name
-    #   The domain name with which your certificate is associated (e.g.,
-    #   `example.com`).
+    #   The domain name with which your certificate is associated
+    #   (`example.com`).
     #
     #   If you specify `certificateDomainName`, then `certificateName` is
     #   required (and vice-versa).
     #
     # @option params [Array<String>] :certificate_alternative_names
     #   The optional alternative domains and subdomains to use with your
-    #   SSL/TLS certificate (e.g., `www.example.com`, `example.com`,
+    #   SSL/TLS certificate (`www.example.com`, `example.com`,
     #   `m.example.com`, `blog.example.com`).
     #
     # @option params [Array<Types::Tag>] :tags
@@ -2755,10 +3206,25 @@ module Aws::Lightsail
     # @option params [String] :ip_address_type
     #   The IP address type for the load balancer.
     #
-    #   The possible values are `ipv4` for IPv4 only, and `dualstack` for IPv4
-    #   and IPv6.
+    #   The possible values are `ipv4` for IPv4 only, `ipv6` for IPv6 only,
+    #   and `dualstack` for IPv4 and IPv6.
     #
     #   The default value is `dualstack`.
+    #
+    # @option params [String] :tls_policy_name
+    #   The name of the TLS policy to apply to the load balancer.
+    #
+    #   Use the [GetLoadBalancerTlsPolicies][1] action to get a list of TLS
+    #   policy names that you can specify.
+    #
+    #   For more information about load balancer TLS policies, see
+    #   [Configuring TLS security policies on your Amazon Lightsail load
+    #   balancers][2] in the *Amazon Lightsail Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetLoadBalancerTlsPolicies.html
+    #   [2]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configure-load-balancer-tls-security-policy
     #
     # @return [Types::CreateLoadBalancerResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2779,7 +3245,8 @@ module Aws::Lightsail
     #         value: "TagValue",
     #       },
     #     ],
-    #     ip_address_type: "dualstack", # accepts dualstack, ipv4
+    #     ip_address_type: "dualstack", # accepts dualstack, ipv4, ipv6
+    #     tls_policy_name: "string",
     #   })
     #
     # @example Response structure
@@ -2787,13 +3254,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -2808,19 +3275,19 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Creates a Lightsail load balancer TLS certificate.
+    # Creates an SSL/TLS certificate for an Amazon Lightsail load balancer.
     #
     # TLS is just an updated, more secure version of Secure Socket Layer
     # (SSL).
     #
     # The `CreateLoadBalancerTlsCertificate` operation supports tag-based
     # access control via resource tags applied to the resource identified by
-    # `load balancer name`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `load balancer name`. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :load_balancer_name
     #   The load balancer name where you want to create the SSL/TLS
@@ -2840,13 +3307,13 @@ module Aws::Lightsail
     #   [1]: http://docs.aws.amazon.com/acm/latest/userguide/acm-limits.html
     #
     # @option params [required, String] :certificate_domain_name
-    #   The domain name (e.g., `example.com`) for your SSL/TLS certificate.
+    #   The domain name (`example.com`) for your SSL/TLS certificate.
     #
     # @option params [Array<String>] :certificate_alternative_names
     #   An array of strings listing alternative domains and subdomains for
     #   your SSL/TLS certificate. Lightsail will de-dupe the names for you.
     #   You can have a maximum of 9 alternative names (in addition to the 1
-    #   primary domain). We do not support wildcards (e.g., `*.example.com`).
+    #   primary domain). We do not support wildcards (`*.example.com`).
     #
     # @option params [Array<Types::Tag>] :tags
     #   The tag keys and optional values to add to the resource during create.
@@ -2877,13 +3344,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -2901,15 +3368,15 @@ module Aws::Lightsail
     # Creates a new database in Amazon Lightsail.
     #
     # The `create relational database` operation supports tag-based access
-    # control via request tags. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # control via request tags. For more information, see the [Amazon
+    # Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :relational_database_name
-    #   The name to use for your new database.
+    #   The name to use for your new Lightsail database resource.
     #
     #   Constraints:
     #
@@ -2940,43 +3407,114 @@ module Aws::Lightsail
     #   database bundles` operation.
     #
     # @option params [required, String] :master_database_name
-    #   The name of the master database created when the Lightsail database
-    #   resource is created.
+    #   The meaning of this parameter differs according to the database engine
+    #   you use.
+    #
+    #   **MySQL**
+    #
+    #   The name of the database to create when the Lightsail database
+    #   resource is created. If this parameter isn't specified, no database
+    #   is created in the database resource.
     #
     #   Constraints:
     #
-    #   * Must contain from 1 to 64 alphanumeric characters.
+    #   * Must contain 1 to 64 letters or numbers.
     #
-    #   * Cannot be a word reserved by the specified database engine
+    #   * Must begin with a letter. Subsequent characters can be letters,
+    #     underscores, or digits (0- 9).
     #
-    # @option params [required, String] :master_username
-    #   The master user name for your new database.
+    #   * Can't be a word reserved by the specified database engine.
+    #
+    #     For more information about reserved words in MySQL, see the Keywords
+    #     and Reserved Words articles for [MySQL 5.6][1], [MySQL 5.7][2], and
+    #     [MySQL 8.0][3].
+    #
+    #   **PostgreSQL**
+    #
+    #   The name of the database to create when the Lightsail database
+    #   resource is created. If this parameter isn't specified, a database
+    #   named `postgres` is created in the database resource.
     #
     #   Constraints:
     #
-    #   * Master user name is required.
+    #   * Must contain 1 to 63 letters or numbers.
     #
-    #   * Must contain from 1 to 16 alphanumeric characters.
+    #   * Must begin with a letter. Subsequent characters can be letters,
+    #     underscores, or digits (0- 9).
     #
-    #   * The first character must be a letter.
+    #   * Can't be a word reserved by the specified database engine.
     #
-    #   * Cannot be a reserved word for the database engine you choose.
-    #
-    #     For more information about reserved words in MySQL 5.6 or 5.7, see
-    #     the Keywords and Reserved Words articles for [MySQL 5.6][1] or
-    #     [MySQL 5.7][2] respectively.
+    #     For more information about reserved words in PostgreSQL, see the SQL
+    #     Key Words articles for [PostgreSQL 9.6][4], [PostgreSQL 10][5],
+    #     [PostgreSQL 11][6], and [PostgreSQL 12][7].
     #
     #
     #
     #   [1]: https://dev.mysql.com/doc/refman/5.6/en/keywords.html
     #   [2]: https://dev.mysql.com/doc/refman/5.7/en/keywords.html
+    #   [3]: https://dev.mysql.com/doc/refman/8.0/en/keywords.html
+    #   [4]: https://www.postgresql.org/docs/9.6/sql-keywords-appendix.html
+    #   [5]: https://www.postgresql.org/docs/10/sql-keywords-appendix.html
+    #   [6]: https://www.postgresql.org/docs/11/sql-keywords-appendix.html
+    #   [7]: https://www.postgresql.org/docs/12/sql-keywords-appendix.html
+    #
+    # @option params [required, String] :master_username
+    #   The name for the master user.
+    #
+    #   **MySQL**
+    #
+    #   Constraints:
+    #
+    #   * Required for MySQL.
+    #
+    #   * Must be 1 to 16 letters or numbers. Can contain underscores.
+    #
+    #   * First character must be a letter.
+    #
+    #   * Can't be a reserved word for the chosen database engine.
+    #
+    #     For more information about reserved words in MySQL 5.6 or 5.7, see
+    #     the Keywords and Reserved Words articles for [MySQL 5.6][1], [MySQL
+    #     5.7][2], or [MySQL 8.0][3].
+    #
+    #   **PostgreSQL**
+    #
+    #   Constraints:
+    #
+    #   * Required for PostgreSQL.
+    #
+    #   * Must be 1 to 63 letters or numbers. Can contain underscores.
+    #
+    #   * First character must be a letter.
+    #
+    #   * Can't be a reserved word for the chosen database engine.
+    #
+    #     For more information about reserved words in MySQL 5.6 or 5.7, see
+    #     the Keywords and Reserved Words articles for [PostgreSQL 9.6][4],
+    #     [PostgreSQL 10][5], [PostgreSQL 11][6], and [PostgreSQL 12][7].
+    #
+    #
+    #
+    #   [1]: https://dev.mysql.com/doc/refman/5.6/en/keywords.html
+    #   [2]: https://dev.mysql.com/doc/refman/5.7/en/keywords.html
+    #   [3]: https://dev.mysql.com/doc/refman/8.0/en/keywords.html
+    #   [4]: https://www.postgresql.org/docs/9.6/sql-keywords-appendix.html
+    #   [5]: https://www.postgresql.org/docs/10/sql-keywords-appendix.html
+    #   [6]: https://www.postgresql.org/docs/11/sql-keywords-appendix.html
+    #   [7]: https://www.postgresql.org/docs/12/sql-keywords-appendix.html
     #
     # @option params [String] :master_user_password
-    #   The password for the master user of your new database. The password
-    #   can include any printable ASCII character except "/", """, or
-    #   "@".
+    #   The password for the master user. The password can include any
+    #   printable ASCII character except "/", """, or "@". It cannot
+    #   contain spaces.
     #
-    #   Constraints: Must contain 8 to 41 characters.
+    #   **MySQL**
+    #
+    #   Constraints: Must contain from 8 to 41 characters.
+    #
+    #   **PostgreSQL**
+    #
+    #   Constraints: Must contain from 8 to 128 characters.
     #
     # @option params [String] :preferred_backup_window
     #   The daily time range during which automated backups are created for
@@ -2986,7 +3524,7 @@ module Aws::Lightsail
     #   block of time for each AWS Region. For more information about the
     #   preferred backup window time blocks for each region, see the [Working
     #   With Backups][1] guide in the Amazon Relational Database Service
-    #   (Amazon RDS) documentation.
+    #   documentation.
     #
     #   Constraints:
     #
@@ -3066,13 +3604,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3097,14 +3635,14 @@ module Aws::Lightsail
     # The `create relational database from snapshot` operation supports
     # tag-based access control via request tags and resource tags applied to
     # the resource identified by relationalDatabaseSnapshotName. For more
-    # information, see the [Lightsail Dev Guide][1].
+    # information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :relational_database_name
-    #   The name to use for your new database.
+    #   The name to use for your new Lightsail database resource.
     #
     #   Constraints:
     #
@@ -3203,13 +3741,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3229,12 +3767,12 @@ module Aws::Lightsail
     # before deleting a database.
     #
     # The `create relational database snapshot` operation supports tag-based
-    # access control via request tags. For more information, see the
-    # [Lightsail Dev Guide][1].
+    # access control via request tags. For more information, see the [Amazon
+    # Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :relational_database_name
     #   The name of the database on which to base your new snapshot.
@@ -3275,13 +3813,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3325,13 +3863,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3347,7 +3885,7 @@ module Aws::Lightsail
     end
 
     # Deletes an automatic snapshot of an instance or disk. For more
-    # information, see the [Lightsail Dev Guide][1].
+    # information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
@@ -3378,13 +3916,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3396,6 +3934,147 @@ module Aws::Lightsail
     # @param [Hash] params ({})
     def delete_auto_snapshot(params = {}, options = {})
       req = build_request(:delete_auto_snapshot, params)
+      req.send_request(options)
+    end
+
+    # Deletes a Amazon Lightsail bucket.
+    #
+    # <note markdown="1"> When you delete your bucket, the bucket name is released and can be
+    # reused for a new bucket in your account or another Amazon Web Services
+    # account.
+    #
+    #  </note>
+    #
+    # @option params [required, String] :bucket_name
+    #   The name of the bucket to delete.
+    #
+    #   Use the [GetBuckets][1] action to get a list of bucket names that you
+    #   can specify.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBuckets.html
+    #
+    # @option params [Boolean] :force_delete
+    #   A Boolean value that indicates whether to force delete the bucket.
+    #
+    #   You must force delete the bucket if it has one of the following
+    #   conditions:
+    #
+    #   * The bucket is the origin of a distribution.
+    #
+    #   * The bucket has instances that were granted access to it using the
+    #     [SetResourceAccessForBucket][1] action.
+    #
+    #   * The bucket has objects.
+    #
+    #   * The bucket has access keys.
+    #
+    #   Force deleting a bucket might impact other resources that rely on the
+    #   bucket, such as instances, distributions, or software that use the
+    #   issued access keys.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_SetResourceAccessForBucket.html
+    #
+    # @return [Types::DeleteBucketResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteBucketResult#operations #operations} => Array&lt;Types::Operation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_bucket({
+    #     bucket_name: "BucketName", # required
+    #     force_delete: false,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operations #=> Array
+    #   resp.operations[0].id #=> String
+    #   resp.operations[0].resource_name #=> String
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operations[0].created_at #=> Time
+    #   resp.operations[0].location.availability_zone #=> String
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operations[0].is_terminal #=> Boolean
+    #   resp.operations[0].operation_details #=> String
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operations[0].status_changed_at #=> Time
+    #   resp.operations[0].error_code #=> String
+    #   resp.operations[0].error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/DeleteBucket AWS API Documentation
+    #
+    # @overload delete_bucket(params = {})
+    # @param [Hash] params ({})
+    def delete_bucket(params = {}, options = {})
+      req = build_request(:delete_bucket, params)
+      req.send_request(options)
+    end
+
+    # Deletes an access key for the specified Amazon Lightsail bucket.
+    #
+    # We recommend that you delete an access key if the secret access key is
+    # compromised.
+    #
+    # For more information about access keys, see [Creating access keys for
+    # a bucket in Amazon Lightsail][1] in the *Amazon Lightsail Developer
+    # Guide*.
+    #
+    #
+    #
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-creating-bucket-access-keys
+    #
+    # @option params [required, String] :bucket_name
+    #   The name of the bucket that the access key belongs to.
+    #
+    # @option params [required, String] :access_key_id
+    #   The ID of the access key to delete.
+    #
+    #   Use the [GetBucketAccessKeys][1] action to get a list of access key
+    #   IDs that you can specify.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBucketAccessKeys.html
+    #
+    # @return [Types::DeleteBucketAccessKeyResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteBucketAccessKeyResult#operations #operations} => Array&lt;Types::Operation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_bucket_access_key({
+    #     bucket_name: "BucketName", # required
+    #     access_key_id: "NonEmptyString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operations #=> Array
+    #   resp.operations[0].id #=> String
+    #   resp.operations[0].resource_name #=> String
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operations[0].created_at #=> Time
+    #   resp.operations[0].location.availability_zone #=> String
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operations[0].is_terminal #=> Boolean
+    #   resp.operations[0].operation_details #=> String
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operations[0].status_changed_at #=> Time
+    #   resp.operations[0].error_code #=> String
+    #   resp.operations[0].error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/DeleteBucketAccessKey AWS API Documentation
+    #
+    # @overload delete_bucket_access_key(params = {})
+    # @param [Hash] params ({})
+    def delete_bucket_access_key(params = {}, options = {})
+      req = build_request(:delete_bucket_access_key, params)
       req.send_request(options)
     end
 
@@ -3427,13 +4106,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3452,10 +4131,11 @@ module Aws::Lightsail
     #
     # A contact method is used to send you notifications about your Amazon
     # Lightsail resources. You can add one email address and one mobile
-    # phone number contact method in each AWS Region. However, SMS text
-    # messaging is not supported in some AWS Regions, and SMS text messages
-    # cannot be sent to some countries/regions. For more information, see
-    # [Notifications in Amazon Lightsail][1].
+    # phone number contact method in each Amazon Web Services Region.
+    # However, SMS text messaging is not supported in some Amazon Web
+    # Services Regions, and SMS text messages cannot be sent to some
+    # countries/regions. For more information, see [Notifications in Amazon
+    # Lightsail][1].
     #
     #
     #
@@ -3486,13 +4166,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3577,18 +4257,18 @@ module Aws::Lightsail
     #
     # The `delete disk` operation supports tag-based access control via
     # resource tags applied to the resource identified by `disk name`. For
-    # more information, see the [Lightsail Dev Guide][1].
+    # more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :disk_name
-    #   The unique name of the disk you want to delete (e.g., `my-disk`).
+    #   The unique name of the disk you want to delete (`my-disk`).
     #
     # @option params [Boolean] :force_delete_add_ons
-    #   A Boolean value to indicate whether to delete the enabled add-ons for
-    #   the disk.
+    #   A Boolean value to indicate whether to delete all add-ons for the
+    #   disk.
     #
     # @return [Types::DeleteDiskResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -3606,13 +4286,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3639,15 +4319,15 @@ module Aws::Lightsail
     #
     # The `delete disk snapshot` operation supports tag-based access control
     # via resource tags applied to the resource identified by `disk snapshot
-    # name`. For more information, see the [Lightsail Dev Guide][1].
+    # name`. For more information, see the [Amazon Lightsail Developer
+    # Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :disk_snapshot_name
-    #   The name of the disk snapshot you want to delete (e.g.,
-    #   `my-disk-snapshot`).
+    #   The name of the disk snapshot you want to delete (`my-disk-snapshot`).
     #
     # @return [Types::DeleteDiskSnapshotResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -3664,13 +4344,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3708,13 +4388,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -3733,11 +4413,11 @@ module Aws::Lightsail
     #
     # The `delete domain` operation supports tag-based access control via
     # resource tags applied to the resource identified by `domain name`. For
-    # more information, see the [Lightsail Dev Guide][1].
+    # more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :domain_name
     #   The specific domain name to delete.
@@ -3756,13 +4436,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -3781,11 +4461,11 @@ module Aws::Lightsail
     #
     # The `delete domain entry` operation supports tag-based access control
     # via resource tags applied to the resource identified by `domain name`.
-    # For more information, see the [Lightsail Dev Guide][1].
+    # For more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :domain_name
     #   The name of the domain entry to delete.
@@ -3818,13 +4498,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -3843,18 +4523,18 @@ module Aws::Lightsail
     #
     # The `delete instance` operation supports tag-based access control via
     # resource tags applied to the resource identified by `instance name`.
-    # For more information, see the [Lightsail Dev Guide][1].
+    # For more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :instance_name
     #   The name of the instance to delete.
     #
     # @option params [Boolean] :force_delete_add_ons
-    #   A Boolean value to indicate whether to delete the enabled add-ons for
-    #   the disk.
+    #   A Boolean value to indicate whether to delete all add-ons for the
+    #   instance.
     #
     # @return [Types::DeleteInstanceResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -3872,13 +4552,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3898,12 +4578,12 @@ module Aws::Lightsail
     #
     # The `delete instance snapshot` operation supports tag-based access
     # control via resource tags applied to the resource identified by
-    # `instance snapshot name`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `instance snapshot name`. For more information, see the [Amazon
+    # Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :instance_snapshot_name
     #   The name of the snapshot to delete.
@@ -3923,13 +4603,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -3944,18 +4624,36 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Deletes a specific SSH key pair.
+    # Deletes the specified key pair by removing the public key from Amazon
+    # Lightsail.
+    #
+    # You can delete key pairs that were created using the
+    # [ImportKeyPair][1] and [CreateKeyPair][2] actions, as well as the
+    # Lightsail default key pair. A new default key pair will not be created
+    # unless you launch an instance without specifying a custom key pair, or
+    # you call the [DownloadDefaultKeyPair][3] API.
     #
     # The `delete key pair` operation supports tag-based access control via
     # resource tags applied to the resource identified by `key pair name`.
-    # For more information, see the [Lightsail Dev Guide][1].
+    # For more information, see the [Amazon Lightsail Developer Guide][4].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_ImportKeyPair.html
+    # [2]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_CreateKeyPair.html
+    # [3]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_DownloadDefaultKeyPair.html
+    # [4]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :key_pair_name
     #   The name of the key pair to delete.
+    #
+    # @option params [String] :expected_fingerprint
+    #   The RSA fingerprint of the Lightsail default key pair to delete.
+    #
+    #   <note markdown="1"> The `expectedFingerprint` parameter is required only when specifying
+    #   to delete a Lightsail default key pair.
+    #
+    #    </note>
     #
     # @return [Types::DeleteKeyPairResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -3965,19 +4663,20 @@ module Aws::Lightsail
     #
     #   resp = client.delete_key_pair({
     #     key_pair_name: "ResourceName", # required
+    #     expected_fingerprint: "string",
     #   })
     #
     # @example Response structure
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -4005,7 +4704,7 @@ module Aws::Lightsail
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-troubleshooting-browser-based-ssh-rdp-client-connection
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-troubleshooting-browser-based-ssh-rdp-client-connection
     #
     # @option params [required, String] :instance_name
     #   The name of the instance for which you want to reset the host key or
@@ -4026,13 +4725,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4054,11 +4753,12 @@ module Aws::Lightsail
     #
     # The `delete load balancer` operation supports tag-based access control
     # via resource tags applied to the resource identified by `load balancer
-    # name`. For more information, see the [Lightsail Dev Guide][1].
+    # name`. For more information, see the [Amazon Lightsail Developer
+    # Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :load_balancer_name
     #   The name of the load balancer you want to delete.
@@ -4078,13 +4778,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4104,12 +4804,12 @@ module Aws::Lightsail
     #
     # The `DeleteLoadBalancerTlsCertificate` operation supports tag-based
     # access control via resource tags applied to the resource identified by
-    # `load balancer name`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `load balancer name`. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :load_balancer_name
     #   The load balancer name.
@@ -4142,13 +4842,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4167,12 +4867,12 @@ module Aws::Lightsail
     #
     # The `delete relational database` operation supports tag-based access
     # control via resource tags applied to the resource identified by
-    # relationalDatabaseName. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # relationalDatabaseName. For more information, see the [Amazon
+    # Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :relational_database_name
     #   The name of the database that you are deleting.
@@ -4220,13 +4920,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4245,12 +4945,12 @@ module Aws::Lightsail
     #
     # The `delete relational database snapshot` operation supports tag-based
     # access control via resource tags applied to the resource identified by
-    # relationalDatabaseName. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # relationalDatabaseName. For more information, see the [Amazon
+    # Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :relational_database_snapshot_name
     #   The name of the database snapshot that you are deleting.
@@ -4270,13 +4970,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4318,13 +5018,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -4345,15 +5045,15 @@ module Aws::Lightsail
     #
     # The `detach disk` operation supports tag-based access control via
     # resource tags applied to the resource identified by `disk name`. For
-    # more information, see the [Lightsail Dev Guide][1].
+    # more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :disk_name
     #   The unique name of the disk you want to detach from your instance
-    #   (e.g., `my-disk`).
+    #   (`my-disk`).
     #
     # @return [Types::DetachDiskResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4370,13 +5070,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4398,12 +5098,12 @@ module Aws::Lightsail
     #
     # The `detach instances from load balancer` operation supports tag-based
     # access control via resource tags applied to the resource identified by
-    # `load balancer name`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `load balancer name`. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :load_balancer_name
     #   The name of the Lightsail load balancer.
@@ -4428,13 +5128,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4470,13 +5170,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4492,7 +5192,7 @@ module Aws::Lightsail
     end
 
     # Disables an add-on for an Amazon Lightsail resource. For more
-    # information, see the [Lightsail Dev Guide][1].
+    # information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
@@ -4511,7 +5211,7 @@ module Aws::Lightsail
     # @example Request syntax with placeholder values
     #
     #   resp = client.disable_add_on({
-    #     add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot
+    #     add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot, StopInstanceOnIdle
     #     resource_name: "ResourceName", # required
     #   })
     #
@@ -4520,13 +5220,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4541,17 +5241,22 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Downloads the default SSH key pair from the user's account.
+    # Downloads the regional Amazon Lightsail default key pair.
+    #
+    # This action also creates a Lightsail default key pair if a default key
+    # pair does not currently exist in the Amazon Web Services Region.
     #
     # @return [Types::DownloadDefaultKeyPairResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DownloadDefaultKeyPairResult#public_key_base_64 #public_key_base_64} => String
     #   * {Types::DownloadDefaultKeyPairResult#private_key_base_64 #private_key_base_64} => String
+    #   * {Types::DownloadDefaultKeyPairResult#created_at #created_at} => Time
     #
     # @example Response structure
     #
     #   resp.public_key_base_64 #=> String
     #   resp.private_key_base_64 #=> String
+    #   resp.created_at #=> Time
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/DownloadDefaultKeyPair AWS API Documentation
     #
@@ -4563,7 +5268,7 @@ module Aws::Lightsail
     end
 
     # Enables or modifies an add-on for an Amazon Lightsail resource. For
-    # more information, see the [Lightsail Dev Guide][1].
+    # more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
@@ -4585,9 +5290,13 @@ module Aws::Lightsail
     #   resp = client.enable_add_on({
     #     resource_name: "ResourceName", # required
     #     add_on_request: { # required
-    #       add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot
+    #       add_on_type: "AutoSnapshot", # required, accepts AutoSnapshot, StopInstanceOnIdle
     #       auto_snapshot_add_on_request: {
     #         snapshot_time_of_day: "TimeOfDay",
+    #       },
+    #       stop_instance_on_idle_request: {
+    #         threshold: "string",
+    #         duration: "string",
     #       },
     #     },
     #   })
@@ -4597,13 +5306,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4634,7 +5343,8 @@ module Aws::Lightsail
     #
     # The `export snapshot` operation supports tag-based access control via
     # resource tags applied to the resource identified by `source snapshot
-    # name`. For more information, see the [Lightsail Dev Guide][1].
+    # name`. For more information, see the [Amazon Lightsail Developer
+    # Guide][1].
     #
     # <note markdown="1"> Use the `get instance snapshots` or `get disk snapshots` operations to
     # get a list of snapshots that you can export to Amazon EC2.
@@ -4643,7 +5353,7 @@ module Aws::Lightsail
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :source_snapshot_name
     #   The name of the instance or disk snapshot to be exported to Amazon
@@ -4664,13 +5374,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -4772,12 +5482,12 @@ module Aws::Lightsail
     #   resp.alarms[0].arn #=> String
     #   resp.alarms[0].created_at #=> Time
     #   resp.alarms[0].location.availability_zone #=> String
-    #   resp.alarms[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.alarms[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.alarms[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.alarms[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.alarms[0].support_code #=> String
     #   resp.alarms[0].monitored_resource_info.arn #=> String
     #   resp.alarms[0].monitored_resource_info.name #=> String
-    #   resp.alarms[0].monitored_resource_info.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.alarms[0].monitored_resource_info.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.alarms[0].comparison_operator #=> String, one of "GreaterThanOrEqualToThreshold", "GreaterThanThreshold", "LessThanThreshold", "LessThanOrEqualToThreshold"
     #   resp.alarms[0].evaluation_periods #=> Integer
     #   resp.alarms[0].period #=> Integer
@@ -4805,7 +5515,7 @@ module Aws::Lightsail
     end
 
     # Returns the available automatic snapshots for an instance or disk. For
-    # more information, see the [Lightsail Dev Guide][1].
+    # more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
@@ -4830,7 +5540,7 @@ module Aws::Lightsail
     # @example Response structure
     #
     #   resp.resource_name #=> String
-    #   resp.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.auto_snapshots #=> Array
     #   resp.auto_snapshots[0].date #=> String
     #   resp.auto_snapshots[0].created_at #=> Time
@@ -4863,8 +5573,8 @@ module Aws::Lightsail
     #  </note>
     #
     # @option params [Boolean] :include_inactive
-    #   A Boolean value indicating whether to include inactive results in your
-    #   request.
+    #   A Boolean value that indicates whether to include inactive
+    #   (unavailable) blueprints in the response of your request.
     #
     # @option params [String] :page_token
     #   The token to advance to the next page of results from your request.
@@ -4872,6 +5582,12 @@ module Aws::Lightsail
     #   To get a page token, perform an initial `GetBlueprints` request. If
     #   your results are paginated, the response will return a next page token
     #   that you can specify as the page token in a subsequent request.
+    #
+    # @option params [String] :app_category
+    #   Returns a list of blueprints that are specific to Lightsail for
+    #   Research.
+    #
+    #   You must use this parameter to view Lightsail for Research blueprints.
     #
     # @return [Types::GetBlueprintsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4883,6 +5599,7 @@ module Aws::Lightsail
     #   resp = client.get_blueprints({
     #     include_inactive: false,
     #     page_token: "string",
+    #     app_category: "LfR", # accepts LfR
     #   })
     #
     # @example Response structure
@@ -4900,6 +5617,7 @@ module Aws::Lightsail
     #   resp.blueprints[0].product_url #=> String
     #   resp.blueprints[0].license_url #=> String
     #   resp.blueprints[0].platform #=> String, one of "LINUX_UNIX", "WINDOWS"
+    #   resp.blueprints[0].app_category #=> String, one of "LfR"
     #   resp.next_page_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetBlueprints AWS API Documentation
@@ -4911,12 +5629,327 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Returns the list of bundles that are available for purchase. A bundle
-    # describes the specs for your virtual private server (or *instance*).
+    # Returns the existing access key IDs for the specified Amazon Lightsail
+    # bucket.
+    #
+    # This action does not return the secret access key value of an access
+    # key. You can get a secret access key only when you create it from the
+    # response of the [CreateBucketAccessKey][1] action. If you lose the
+    # secret access key, you must create a new access key.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_CreateBucketAccessKey.html
+    #
+    # @option params [required, String] :bucket_name
+    #   The name of the bucket for which to return access keys.
+    #
+    # @return [Types::GetBucketAccessKeysResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetBucketAccessKeysResult#access_keys #access_keys} => Array&lt;Types::AccessKey&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_bucket_access_keys({
+    #     bucket_name: "BucketName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.access_keys #=> Array
+    #   resp.access_keys[0].access_key_id #=> String
+    #   resp.access_keys[0].secret_access_key #=> String
+    #   resp.access_keys[0].status #=> String, one of "Active", "Inactive"
+    #   resp.access_keys[0].created_at #=> Time
+    #   resp.access_keys[0].last_used.last_used_date #=> Time
+    #   resp.access_keys[0].last_used.region #=> String
+    #   resp.access_keys[0].last_used.service_name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetBucketAccessKeys AWS API Documentation
+    #
+    # @overload get_bucket_access_keys(params = {})
+    # @param [Hash] params ({})
+    def get_bucket_access_keys(params = {}, options = {})
+      req = build_request(:get_bucket_access_keys, params)
+      req.send_request(options)
+    end
+
+    # Returns the bundles that you can apply to a Amazon Lightsail bucket.
+    #
+    # The bucket bundle specifies the monthly cost, storage quota, and data
+    # transfer quota for a bucket.
+    #
+    # Use the [UpdateBucketBundle][1] action to update the bundle for a
+    # bucket.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_UpdateBucketBundle.html
     #
     # @option params [Boolean] :include_inactive
-    #   A Boolean value that indicates whether to include inactive bundle
-    #   results in your request.
+    #   A Boolean value that indicates whether to include inactive
+    #   (unavailable) bundles in the response of your request.
+    #
+    # @return [Types::GetBucketBundlesResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetBucketBundlesResult#bundles #bundles} => Array&lt;Types::BucketBundle&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_bucket_bundles({
+    #     include_inactive: false,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.bundles #=> Array
+    #   resp.bundles[0].bundle_id #=> String
+    #   resp.bundles[0].name #=> String
+    #   resp.bundles[0].price #=> Float
+    #   resp.bundles[0].storage_per_month_in_gb #=> Integer
+    #   resp.bundles[0].transfer_per_month_in_gb #=> Integer
+    #   resp.bundles[0].is_active #=> Boolean
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetBucketBundles AWS API Documentation
+    #
+    # @overload get_bucket_bundles(params = {})
+    # @param [Hash] params ({})
+    def get_bucket_bundles(params = {}, options = {})
+      req = build_request(:get_bucket_bundles, params)
+      req.send_request(options)
+    end
+
+    # Returns the data points of a specific metric for an Amazon Lightsail
+    # bucket.
+    #
+    # Metrics report the utilization of a bucket. View and collect metric
+    # data regularly to monitor the number of objects stored in a bucket
+    # (including object versions) and the storage space used by those
+    # objects.
+    #
+    # @option params [required, String] :bucket_name
+    #   The name of the bucket for which to get metric data.
+    #
+    # @option params [required, String] :metric_name
+    #   The metric for which you want to return information.
+    #
+    #   Valid bucket metric names are listed below, along with the most useful
+    #   statistics to include in your request, and the published unit value.
+    #
+    #   <note markdown="1"> These bucket metrics are reported once per day.
+    #
+    #    </note>
+    #
+    #   * <b> <code>BucketSizeBytes</code> </b> - The amount of data in bytes
+    #     stored in a bucket. This value is calculated by summing the size of
+    #     all objects in the bucket (including object versions), including the
+    #     size of all parts for all incomplete multipart uploads to the
+    #     bucket.
+    #
+    #     Statistics: The most useful statistic is `Maximum`.
+    #
+    #     Unit: The published unit is `Bytes`.
+    #
+    #   * <b> <code>NumberOfObjects</code> </b> - The total number of objects
+    #     stored in a bucket. This value is calculated by counting all objects
+    #     in the bucket (including object versions) and the total number of
+    #     parts for all incomplete multipart uploads to the bucket.
+    #
+    #     Statistics: The most useful statistic is `Average`.
+    #
+    #     Unit: The published unit is `Count`.
+    #
+    # @option params [required, Time,DateTime,Date,Integer,String] :start_time
+    #   The timestamp indicating the earliest data to be returned.
+    #
+    # @option params [required, Time,DateTime,Date,Integer,String] :end_time
+    #   The timestamp indicating the latest data to be returned.
+    #
+    # @option params [required, Integer] :period
+    #   The granularity, in seconds, of the returned data points.
+    #
+    #   <note markdown="1"> Bucket storage metrics are reported once per day. Therefore, you
+    #   should specify a period of 86400 seconds, which is the number of
+    #   seconds in a day.
+    #
+    #    </note>
+    #
+    # @option params [required, Array<String>] :statistics
+    #   The statistic for the metric.
+    #
+    #   The following statistics are available:
+    #
+    #   * `Minimum` - The lowest value observed during the specified period.
+    #     Use this value to determine low volumes of activity for your
+    #     application.
+    #
+    #   * `Maximum` - The highest value observed during the specified period.
+    #     Use this value to determine high volumes of activity for your
+    #     application.
+    #
+    #   * `Sum` - The sum of all values submitted for the matching metric. You
+    #     can use this statistic to determine the total volume of a metric.
+    #
+    #   * `Average` - The value of `Sum` / `SampleCount` during the specified
+    #     period. By comparing this statistic with the `Minimum` and `Maximum`
+    #     values, you can determine the full scope of a metric and how close
+    #     the average use is to the `Minimum` and `Maximum` values. This
+    #     comparison helps you to know when to increase or decrease your
+    #     resources.
+    #
+    #   * `SampleCount` - The count, or number, of data points used for the
+    #     statistical calculation.
+    #
+    # @option params [required, String] :unit
+    #   The unit for the metric data request.
+    #
+    #   Valid units depend on the metric data being requested. For the valid
+    #   units with each available metric, see the `metricName` parameter.
+    #
+    # @return [Types::GetBucketMetricDataResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetBucketMetricDataResult#metric_name #metric_name} => String
+    #   * {Types::GetBucketMetricDataResult#metric_data #metric_data} => Array&lt;Types::MetricDatapoint&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_bucket_metric_data({
+    #     bucket_name: "BucketName", # required
+    #     metric_name: "BucketSizeBytes", # required, accepts BucketSizeBytes, NumberOfObjects
+    #     start_time: Time.now, # required
+    #     end_time: Time.now, # required
+    #     period: 1, # required
+    #     statistics: ["Minimum"], # required, accepts Minimum, Maximum, Sum, Average, SampleCount
+    #     unit: "Seconds", # required, accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.metric_name #=> String, one of "BucketSizeBytes", "NumberOfObjects"
+    #   resp.metric_data #=> Array
+    #   resp.metric_data[0].average #=> Float
+    #   resp.metric_data[0].maximum #=> Float
+    #   resp.metric_data[0].minimum #=> Float
+    #   resp.metric_data[0].sample_count #=> Float
+    #   resp.metric_data[0].sum #=> Float
+    #   resp.metric_data[0].timestamp #=> Time
+    #   resp.metric_data[0].unit #=> String, one of "Seconds", "Microseconds", "Milliseconds", "Bytes", "Kilobytes", "Megabytes", "Gigabytes", "Terabytes", "Bits", "Kilobits", "Megabits", "Gigabits", "Terabits", "Percent", "Count", "Bytes/Second", "Kilobytes/Second", "Megabytes/Second", "Gigabytes/Second", "Terabytes/Second", "Bits/Second", "Kilobits/Second", "Megabits/Second", "Gigabits/Second", "Terabits/Second", "Count/Second", "None"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetBucketMetricData AWS API Documentation
+    #
+    # @overload get_bucket_metric_data(params = {})
+    # @param [Hash] params ({})
+    def get_bucket_metric_data(params = {}, options = {})
+      req = build_request(:get_bucket_metric_data, params)
+      req.send_request(options)
+    end
+
+    # Returns information about one or more Amazon Lightsail buckets. The
+    # information returned includes the synchronization status of the Amazon
+    # Simple Storage Service (Amazon S3) account-level block public access
+    # feature for your Lightsail buckets.
+    #
+    # For more information about buckets, see [Buckets in Amazon
+    # Lightsail][1] in the *Amazon Lightsail Developer Guide*.
+    #
+    #
+    #
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/buckets-in-amazon-lightsail
+    #
+    # @option params [String] :bucket_name
+    #   The name of the bucket for which to return information.
+    #
+    #   When omitted, the response includes all of your buckets in the Amazon
+    #   Web Services Region where the request is made.
+    #
+    # @option params [String] :page_token
+    #   The token to advance to the next page of results from your request.
+    #
+    #   To get a page token, perform an initial `GetBuckets` request. If your
+    #   results are paginated, the response will return a next page token that
+    #   you can specify as the page token in a subsequent request.
+    #
+    # @option params [Boolean] :include_connected_resources
+    #   A Boolean value that indicates whether to include Lightsail instances
+    #   that were given access to the bucket using the
+    #   [SetResourceAccessForBucket][1] action.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_SetResourceAccessForBucket.html
+    #
+    # @return [Types::GetBucketsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetBucketsResult#buckets #buckets} => Array&lt;Types::Bucket&gt;
+    #   * {Types::GetBucketsResult#next_page_token #next_page_token} => String
+    #   * {Types::GetBucketsResult#account_level_bpa_sync #account_level_bpa_sync} => Types::AccountLevelBpaSync
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_buckets({
+    #     bucket_name: "BucketName",
+    #     page_token: "string",
+    #     include_connected_resources: false,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.buckets #=> Array
+    #   resp.buckets[0].resource_type #=> String
+    #   resp.buckets[0].access_rules.get_object #=> String, one of "public", "private"
+    #   resp.buckets[0].access_rules.allow_public_overrides #=> Boolean
+    #   resp.buckets[0].arn #=> String
+    #   resp.buckets[0].bundle_id #=> String
+    #   resp.buckets[0].created_at #=> Time
+    #   resp.buckets[0].url #=> String
+    #   resp.buckets[0].location.availability_zone #=> String
+    #   resp.buckets[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.buckets[0].name #=> String
+    #   resp.buckets[0].support_code #=> String
+    #   resp.buckets[0].tags #=> Array
+    #   resp.buckets[0].tags[0].key #=> String
+    #   resp.buckets[0].tags[0].value #=> String
+    #   resp.buckets[0].object_versioning #=> String
+    #   resp.buckets[0].able_to_update_bundle #=> Boolean
+    #   resp.buckets[0].readonly_access_accounts #=> Array
+    #   resp.buckets[0].readonly_access_accounts[0] #=> String
+    #   resp.buckets[0].resources_receiving_access #=> Array
+    #   resp.buckets[0].resources_receiving_access[0].name #=> String
+    #   resp.buckets[0].resources_receiving_access[0].resource_type #=> String
+    #   resp.buckets[0].state.code #=> String
+    #   resp.buckets[0].state.message #=> String
+    #   resp.buckets[0].access_log_config.enabled #=> Boolean
+    #   resp.buckets[0].access_log_config.destination #=> String
+    #   resp.buckets[0].access_log_config.prefix #=> String
+    #   resp.next_page_token #=> String
+    #   resp.account_level_bpa_sync.status #=> String, one of "InSync", "Failed", "NeverSynced", "Defaulted"
+    #   resp.account_level_bpa_sync.last_synced_at #=> Time
+    #   resp.account_level_bpa_sync.message #=> String, one of "DEFAULTED_FOR_SLR_MISSING", "SYNC_ON_HOLD", "DEFAULTED_FOR_SLR_MISSING_ON_HOLD", "Unknown"
+    #   resp.account_level_bpa_sync.bpa_impacts_lightsail #=> Boolean
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetBuckets AWS API Documentation
+    #
+    # @overload get_buckets(params = {})
+    # @param [Hash] params ({})
+    def get_buckets(params = {}, options = {})
+      req = build_request(:get_buckets, params)
+      req.send_request(options)
+    end
+
+    # Returns the bundles that you can apply to an Amazon Lightsail instance
+    # when you create it.
+    #
+    # A bundle describes the specifications of an instance, such as the
+    # monthly cost, amount of memory, the number of vCPUs, amount of storage
+    # space, and monthly network data transfer quota.
+    #
+    # <note markdown="1"> Bundles are referred to as *instance plans* in the Lightsail console.
+    #
+    #  </note>
+    #
+    # @option params [Boolean] :include_inactive
+    #   A Boolean value that indicates whether to include inactive
+    #   (unavailable) bundles in the response of your request.
     #
     # @option params [String] :page_token
     #   The token to advance to the next page of results from your request.
@@ -4924,6 +5957,11 @@ module Aws::Lightsail
     #   To get a page token, perform an initial `GetBundles` request. If your
     #   results are paginated, the response will return a next page token that
     #   you can specify as the page token in a subsequent request.
+    #
+    # @option params [String] :app_category
+    #   Returns a list of bundles that are specific to Lightsail for Research.
+    #
+    #   You must use this parameter to view Lightsail for Research bundles.
     #
     # @return [Types::GetBundlesResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4935,6 +5973,7 @@ module Aws::Lightsail
     #   resp = client.get_bundles({
     #     include_inactive: false,
     #     page_token: "string",
+    #     app_category: "LfR", # accepts LfR
     #   })
     #
     # @example Response structure
@@ -4952,6 +5991,9 @@ module Aws::Lightsail
     #   resp.bundles[0].transfer_per_month_in_gb #=> Integer
     #   resp.bundles[0].supported_platforms #=> Array
     #   resp.bundles[0].supported_platforms[0] #=> String, one of "LINUX_UNIX", "WINDOWS"
+    #   resp.bundles[0].supported_app_categories #=> Array
+    #   resp.bundles[0].supported_app_categories[0] #=> String, one of "LfR"
+    #   resp.bundles[0].public_ipv_4_address_count #=> Integer
     #   resp.next_page_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetBundles AWS API Documentation
@@ -4966,7 +6008,7 @@ module Aws::Lightsail
     # Returns information about one or more Amazon Lightsail SSL/TLS
     # certificates.
     #
-    # <note markdown="1"> To get a summary of a certificate, ommit `includeCertificateDetails`
+    # <note markdown="1"> To get a summary of a certificate, omit `includeCertificateDetails`
     # from your request. The response will include only the certificate
     # Amazon Resource Name (ARN), certificate name, domain name, and tags.
     #
@@ -4979,8 +6021,8 @@ module Aws::Lightsail
     #   `ISSUED` status.
     #
     #   When omitted, the response includes all of your certificates in the
-    #   AWS Region where the request is made, regardless of their current
-    #   status.
+    #   Amazon Web Services Region where the request is made, regardless of
+    #   their current status.
     #
     # @option params [Boolean] :include_certificate_details
     #   Indicates whether to include detailed information about the
@@ -4993,11 +6035,19 @@ module Aws::Lightsail
     #   The name for the certificate for which to return information.
     #
     #   When omitted, the response includes all of your certificates in the
-    #   AWS Region where the request is made.
+    #   Amazon Web Services Region where the request is made.
+    #
+    # @option params [String] :page_token
+    #   The token to advance to the next page of results from your request.
+    #
+    #   To get a page token, perform an initial `GetCertificates` request. If
+    #   your results are paginated, the response will return a next page token
+    #   that you can specify as the page token in a subsequent request.
     #
     # @return [Types::GetCertificatesResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::GetCertificatesResult#certificates #certificates} => Array&lt;Types::CertificateSummary&gt;
+    #   * {Types::GetCertificatesResult#next_page_token #next_page_token} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -5005,6 +6055,7 @@ module Aws::Lightsail
     #     certificate_statuses: ["PENDING_VALIDATION"], # accepts PENDING_VALIDATION, ISSUED, INACTIVE, EXPIRED, VALIDATION_TIMED_OUT, REVOKED, FAILED
     #     include_certificate_details: false,
     #     certificate_name: "CertificateName",
+    #     page_token: "string",
     #   })
     #
     # @example Response structure
@@ -5025,6 +6076,9 @@ module Aws::Lightsail
     #   resp.certificates[0].certificate_detail.domain_validation_records[0].resource_record.name #=> String
     #   resp.certificates[0].certificate_detail.domain_validation_records[0].resource_record.type #=> String
     #   resp.certificates[0].certificate_detail.domain_validation_records[0].resource_record.value #=> String
+    #   resp.certificates[0].certificate_detail.domain_validation_records[0].dns_record_creation_state.code #=> String, one of "SUCCEEDED", "STARTED", "FAILED"
+    #   resp.certificates[0].certificate_detail.domain_validation_records[0].dns_record_creation_state.message #=> String
+    #   resp.certificates[0].certificate_detail.domain_validation_records[0].validation_status #=> String, one of "PENDING_VALIDATION", "FAILED", "SUCCESS"
     #   resp.certificates[0].certificate_detail.request_failure_reason #=> String
     #   resp.certificates[0].certificate_detail.in_use_resource_count #=> Integer
     #   resp.certificates[0].certificate_detail.key_algorithm #=> String
@@ -5039,6 +6093,9 @@ module Aws::Lightsail
     #   resp.certificates[0].certificate_detail.renewal_summary.domain_validation_records[0].resource_record.name #=> String
     #   resp.certificates[0].certificate_detail.renewal_summary.domain_validation_records[0].resource_record.type #=> String
     #   resp.certificates[0].certificate_detail.renewal_summary.domain_validation_records[0].resource_record.value #=> String
+    #   resp.certificates[0].certificate_detail.renewal_summary.domain_validation_records[0].dns_record_creation_state.code #=> String, one of "SUCCEEDED", "STARTED", "FAILED"
+    #   resp.certificates[0].certificate_detail.renewal_summary.domain_validation_records[0].dns_record_creation_state.message #=> String
+    #   resp.certificates[0].certificate_detail.renewal_summary.domain_validation_records[0].validation_status #=> String, one of "PENDING_VALIDATION", "FAILED", "SUCCESS"
     #   resp.certificates[0].certificate_detail.renewal_summary.renewal_status #=> String, one of "PendingAutoRenewal", "PendingValidation", "Success", "Failed"
     #   resp.certificates[0].certificate_detail.renewal_summary.renewal_status_reason #=> String
     #   resp.certificates[0].certificate_detail.renewal_summary.updated_at #=> Time
@@ -5051,6 +6108,7 @@ module Aws::Lightsail
     #   resp.certificates[0].tags #=> Array
     #   resp.certificates[0].tags[0].key #=> String
     #   resp.certificates[0].tags[0].value #=> String
+    #   resp.next_page_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetCertificates AWS API Documentation
     #
@@ -5093,8 +6151,8 @@ module Aws::Lightsail
     #   resp.cloud_formation_stack_records[0].arn #=> String
     #   resp.cloud_formation_stack_records[0].created_at #=> Time
     #   resp.cloud_formation_stack_records[0].location.availability_zone #=> String
-    #   resp.cloud_formation_stack_records[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.cloud_formation_stack_records[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.cloud_formation_stack_records[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.cloud_formation_stack_records[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.cloud_formation_stack_records[0].state #=> String, one of "Started", "Succeeded", "Failed"
     #   resp.cloud_formation_stack_records[0].source_info #=> Array
     #   resp.cloud_formation_stack_records[0].source_info[0].resource_type #=> String, one of "ExportSnapshotRecord"
@@ -5119,10 +6177,11 @@ module Aws::Lightsail
     #
     # A contact method is used to send you notifications about your Amazon
     # Lightsail resources. You can add one email address and one mobile
-    # phone number contact method in each AWS Region. However, SMS text
-    # messaging is not supported in some AWS Regions, and SMS text messages
-    # cannot be sent to some countries/regions. For more information, see
-    # [Notifications in Amazon Lightsail][1].
+    # phone number contact method in each Amazon Web Services Region.
+    # However, SMS text messaging is not supported in some Amazon Web
+    # Services Regions, and SMS text messages cannot be sent to some
+    # countries/regions. For more information, see [Notifications in Amazon
+    # Lightsail][1].
     #
     #
     #
@@ -5155,8 +6214,8 @@ module Aws::Lightsail
     #   resp.contact_methods[0].arn #=> String
     #   resp.contact_methods[0].created_at #=> Time
     #   resp.contact_methods[0].location.availability_zone #=> String
-    #   resp.contact_methods[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.contact_methods[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.contact_methods[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.contact_methods[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.contact_methods[0].support_code #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetContactMethods AWS API Documentation
@@ -5240,7 +6299,7 @@ module Aws::Lightsail
     #
     # <note markdown="1"> Container logs are retained for a certain amount of time. For more
     # information, see [Amazon Lightsail endpoints and quotas][1] in the
-    # *AWS General Reference*.
+    # *Amazon Web Services General Reference*.
     #
     #  </note>
     #
@@ -5363,7 +6422,8 @@ module Aws::Lightsail
     #
     # <note markdown="1"> A set number of deployments are kept before the oldest one is replaced
     # with the newest one. For more information, see [Amazon Lightsail
-    # endpoints and quotas][1] in the *AWS General Reference*.
+    # endpoints and quotas][1] in the *Amazon Web Services General
+    # Reference*.
     #
     #  </note>
     #
@@ -5563,7 +6623,7 @@ module Aws::Lightsail
     #   The name of the container service for which to return information.
     #
     #   When omitted, the response includes all of your container services in
-    #   the AWS Region where the request is made.
+    #   the Amazon Web Services Region where the request is made.
     #
     # @return [Types::ContainerServicesListResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -5582,14 +6642,16 @@ module Aws::Lightsail
     #   resp.container_services[0].arn #=> String
     #   resp.container_services[0].created_at #=> Time
     #   resp.container_services[0].location.availability_zone #=> String
-    #   resp.container_services[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.container_services[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.container_services[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.container_services[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.container_services[0].tags #=> Array
     #   resp.container_services[0].tags[0].key #=> String
     #   resp.container_services[0].tags[0].value #=> String
     #   resp.container_services[0].power #=> String, one of "nano", "micro", "small", "medium", "large", "xlarge"
     #   resp.container_services[0].power_id #=> String
-    #   resp.container_services[0].state #=> String, one of "PENDING", "READY", "RUNNING", "UPDATING", "DELETING", "DISABLED"
+    #   resp.container_services[0].state #=> String, one of "PENDING", "READY", "RUNNING", "UPDATING", "DELETING", "DISABLED", "DEPLOYING"
+    #   resp.container_services[0].state_detail.code #=> String, one of "CREATING_SYSTEM_RESOURCES", "CREATING_NETWORK_INFRASTRUCTURE", "PROVISIONING_CERTIFICATE", "PROVISIONING_SERVICE", "CREATING_DEPLOYMENT", "EVALUATING_HEALTH_CHECK", "ACTIVATING_DEPLOYMENT", "CERTIFICATE_LIMIT_EXCEEDED", "UNKNOWN_ERROR"
+    #   resp.container_services[0].state_detail.message #=> String
     #   resp.container_services[0].scale #=> Integer
     #   resp.container_services[0].current_deployment.version #=> Integer
     #   resp.container_services[0].current_deployment.state #=> String, one of "ACTIVATING", "ACTIVE", "INACTIVE", "FAILED"
@@ -5636,6 +6698,8 @@ module Aws::Lightsail
     #   resp.container_services[0].public_domain_names["string"] #=> Array
     #   resp.container_services[0].public_domain_names["string"][0] #=> String
     #   resp.container_services[0].url #=> String
+    #   resp.container_services[0].private_registry_access.ecr_image_puller_role.is_active #=> Boolean
+    #   resp.container_services[0].private_registry_access.ecr_image_puller_role.principal_arn #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetContainerServices AWS API Documentation
     #
@@ -5646,10 +6710,93 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
+    # Retrieves information about the cost estimate for a specified
+    # resource. A cost estimate will not generate for a resource that has
+    # been deleted.
+    #
+    # @option params [required, String] :resource_name
+    #   The resource name.
+    #
+    # @option params [required, Time,DateTime,Date,Integer,String] :start_time
+    #   The cost estimate start time.
+    #
+    #   Constraints:
+    #
+    #   * Specified in Coordinated Universal Time (UTC).
+    #
+    #   * Specified in the Unix time format.
+    #
+    #     For example, if you want to use a start time of October 1, 2018, at
+    #     8 PM UTC, specify `1538424000` as the start time.
+    #
+    #   You can convert a human-friendly time to Unix time format using a
+    #   converter like [Epoch converter][1].
+    #
+    #
+    #
+    #   [1]: https://www.epochconverter.com/
+    #
+    # @option params [required, Time,DateTime,Date,Integer,String] :end_time
+    #   The cost estimate end time.
+    #
+    #   Constraints:
+    #
+    #   * Specified in Coordinated Universal Time (UTC).
+    #
+    #   * Specified in the Unix time format.
+    #
+    #     For example, if you want to use an end time of October 1, 2018, at 9
+    #     PM UTC, specify `1538427600` as the end time.
+    #
+    #   You can convert a human-friendly time to Unix time format using a
+    #   converter like [Epoch converter][1].
+    #
+    #
+    #
+    #   [1]: https://www.epochconverter.com/
+    #
+    # @return [Types::GetCostEstimateResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetCostEstimateResult#resources_budget_estimate #resources_budget_estimate} => Array&lt;Types::ResourceBudgetEstimate&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_cost_estimate({
+    #     resource_name: "ResourceName", # required
+    #     start_time: Time.now, # required
+    #     end_time: Time.now, # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.resources_budget_estimate #=> Array
+    #   resp.resources_budget_estimate[0].resource_name #=> String
+    #   resp.resources_budget_estimate[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.resources_budget_estimate[0].cost_estimates #=> Array
+    #   resp.resources_budget_estimate[0].cost_estimates[0].usage_type #=> String
+    #   resp.resources_budget_estimate[0].cost_estimates[0].results_by_time #=> Array
+    #   resp.resources_budget_estimate[0].cost_estimates[0].results_by_time[0].usage_cost #=> Float
+    #   resp.resources_budget_estimate[0].cost_estimates[0].results_by_time[0].pricing_unit #=> String, one of "GB", "Hrs", "GB-Mo", "Bundles", "Queries"
+    #   resp.resources_budget_estimate[0].cost_estimates[0].results_by_time[0].unit #=> Float
+    #   resp.resources_budget_estimate[0].cost_estimates[0].results_by_time[0].currency #=> String, one of "USD"
+    #   resp.resources_budget_estimate[0].cost_estimates[0].results_by_time[0].time_period.start #=> Time
+    #   resp.resources_budget_estimate[0].cost_estimates[0].results_by_time[0].time_period.end #=> Time
+    #   resp.resources_budget_estimate[0].start_time #=> Time
+    #   resp.resources_budget_estimate[0].end_time #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetCostEstimate AWS API Documentation
+    #
+    # @overload get_cost_estimate(params = {})
+    # @param [Hash] params ({})
+    def get_cost_estimate(params = {}, options = {})
+      req = build_request(:get_cost_estimate, params)
+      req.send_request(options)
+    end
+
     # Returns information about a specific block storage disk.
     #
     # @option params [required, String] :disk_name
-    #   The name of the disk (e.g., `my-disk`).
+    #   The name of the disk (`my-disk`).
     #
     # @return [Types::GetDiskResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -5668,8 +6815,8 @@ module Aws::Lightsail
     #   resp.disk.support_code #=> String
     #   resp.disk.created_at #=> Time
     #   resp.disk.location.availability_zone #=> String
-    #   resp.disk.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.disk.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.disk.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.disk.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.disk.tags #=> Array
     #   resp.disk.tags[0].key #=> String
     #   resp.disk.tags[0].value #=> String
@@ -5678,6 +6825,8 @@ module Aws::Lightsail
     #   resp.disk.add_ons[0].status #=> String
     #   resp.disk.add_ons[0].snapshot_time_of_day #=> String
     #   resp.disk.add_ons[0].next_snapshot_time_of_day #=> String
+    #   resp.disk.add_ons[0].threshold #=> String
+    #   resp.disk.add_ons[0].duration #=> String
     #   resp.disk.size_in_gb #=> Integer
     #   resp.disk.is_system_disk #=> Boolean
     #   resp.disk.iops #=> Integer
@@ -5687,6 +6836,7 @@ module Aws::Lightsail
     #   resp.disk.is_attached #=> Boolean
     #   resp.disk.attachment_state #=> String
     #   resp.disk.gb_in_use #=> Integer
+    #   resp.disk.auto_mount_status #=> String, one of "Failed", "Pending", "Mounted", "NotMounted"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetDisk AWS API Documentation
     #
@@ -5700,7 +6850,7 @@ module Aws::Lightsail
     # Returns information about a specific block storage disk snapshot.
     #
     # @option params [required, String] :disk_snapshot_name
-    #   The name of the disk snapshot (e.g., `my-disk-snapshot`).
+    #   The name of the disk snapshot (`my-disk-snapshot`).
     #
     # @return [Types::GetDiskSnapshotResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -5719,8 +6869,8 @@ module Aws::Lightsail
     #   resp.disk_snapshot.support_code #=> String
     #   resp.disk_snapshot.created_at #=> Time
     #   resp.disk_snapshot.location.availability_zone #=> String
-    #   resp.disk_snapshot.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.disk_snapshot.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.disk_snapshot.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.disk_snapshot.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.disk_snapshot.tags #=> Array
     #   resp.disk_snapshot.tags[0].key #=> String
     #   resp.disk_snapshot.tags[0].value #=> String
@@ -5771,8 +6921,8 @@ module Aws::Lightsail
     #   resp.disk_snapshots[0].support_code #=> String
     #   resp.disk_snapshots[0].created_at #=> Time
     #   resp.disk_snapshots[0].location.availability_zone #=> String
-    #   resp.disk_snapshots[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.disk_snapshots[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.disk_snapshots[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.disk_snapshots[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.disk_snapshots[0].tags #=> Array
     #   resp.disk_snapshots[0].tags[0].key #=> String
     #   resp.disk_snapshots[0].tags[0].value #=> String
@@ -5824,8 +6974,8 @@ module Aws::Lightsail
     #   resp.disks[0].support_code #=> String
     #   resp.disks[0].created_at #=> Time
     #   resp.disks[0].location.availability_zone #=> String
-    #   resp.disks[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.disks[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.disks[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.disks[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.disks[0].tags #=> Array
     #   resp.disks[0].tags[0].key #=> String
     #   resp.disks[0].tags[0].value #=> String
@@ -5834,6 +6984,8 @@ module Aws::Lightsail
     #   resp.disks[0].add_ons[0].status #=> String
     #   resp.disks[0].add_ons[0].snapshot_time_of_day #=> String
     #   resp.disks[0].add_ons[0].next_snapshot_time_of_day #=> String
+    #   resp.disks[0].add_ons[0].threshold #=> String
+    #   resp.disks[0].add_ons[0].duration #=> String
     #   resp.disks[0].size_in_gb #=> Integer
     #   resp.disks[0].is_system_disk #=> Boolean
     #   resp.disks[0].iops #=> Integer
@@ -5843,6 +6995,7 @@ module Aws::Lightsail
     #   resp.disks[0].is_attached #=> Boolean
     #   resp.disks[0].attachment_state #=> String
     #   resp.disks[0].gb_in_use #=> Integer
+    #   resp.disks[0].auto_mount_status #=> String, one of "Failed", "Pending", "Mounted", "NotMounted"
     #   resp.next_page_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetDisks AWS API Documentation
@@ -5854,11 +7007,11 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Returns the list bundles that can be applied to you Amazon Lightsail
+    # Returns the bundles that can be applied to your Amazon Lightsail
     # content delivery network (CDN) distributions.
     #
     # A distribution bundle specifies the monthly network transfer quota and
-    # monthly cost of your dsitribution.
+    # monthly cost of your distribution.
     #
     # @return [Types::GetDistributionBundlesResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -5945,31 +7098,31 @@ module Aws::Lightsail
     #     received by your Lightsail distribution, for all HTTP methods, and
     #     for both HTTP and HTTPS requests.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `None`.
+    #     `Unit`: The published unit is `None`.
     #
     #   * <b> <code>BytesDownloaded</code> </b> - The number of bytes
     #     downloaded by viewers for GET, HEAD, and OPTIONS requests.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `None`.
+    #     `Unit`: The published unit is `None`.
     #
     #   * <b> <code>BytesUploaded </code> </b> - The number of bytes uploaded
     #     to your origin by your Lightsail distribution, using POST and PUT
     #     requests.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `None`.
+    #     `Unit`: The published unit is `None`.
     #
     #   * <b> <code>TotalErrorRate</code> </b> - The percentage of all viewer
     #     requests for which the response's HTTP status code was 4xx or 5xx.
     #
-    #     `Statistics`\: The most useful statistic is `Average`.
+    #     `Statistics`: The most useful statistic is `Average`.
     #
-    #     `Unit`\: The published unit is `Percent`.
+    #     `Unit`: The published unit is `Percent`.
     #
     #   * <b> <code>4xxErrorRate</code> </b> - The percentage of all viewer
     #     requests for which the response's HTTP status cod was 4xx. In these
@@ -5977,9 +7130,9 @@ module Aws::Lightsail
     #     example, a status code of 404 (Not Found) means that the client
     #     requested an object that could not be found.
     #
-    #     `Statistics`\: The most useful statistic is `Average`.
+    #     `Statistics`: The most useful statistic is `Average`.
     #
-    #     `Unit`\: The published unit is `Percent`.
+    #     `Unit`: The published unit is `Percent`.
     #
     #   * <b> <code>5xxErrorRate</code> </b> - The percentage of all viewer
     #     requests for which the response's HTTP status code was 5xx. In
@@ -5987,9 +7140,9 @@ module Aws::Lightsail
     #     example, a status code of 503 (Service Unavailable) means that the
     #     origin server is currently unavailable.
     #
-    #     `Statistics`\: The most useful statistic is `Average`.
+    #     `Statistics`: The most useful statistic is `Average`.
     #
-    #     `Unit`\: The published unit is `Percent`.
+    #     `Unit`: The published unit is `Percent`.
     #
     # @option params [required, Time,DateTime,Date,Integer,String] :start_time
     #   The start of the time interval for which to get metric data.
@@ -6110,11 +7263,8 @@ module Aws::Lightsail
     # @option params [String] :distribution_name
     #   The name of the distribution for which to return information.
     #
-    #   Use the `GetDistributions` action to get a list of distribution names
-    #   that you can specify.
-    #
     #   When omitted, the response includes all of your distributions in the
-    #   AWS Region where the request is made.
+    #   Amazon Web Services Region where the request is made.
     #
     # @option params [String] :page_token
     #   The token to advance to the next page of results from your request.
@@ -6143,8 +7293,8 @@ module Aws::Lightsail
     #   resp.distributions[0].support_code #=> String
     #   resp.distributions[0].created_at #=> Time
     #   resp.distributions[0].location.availability_zone #=> String
-    #   resp.distributions[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.distributions[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.distributions[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.distributions[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.distributions[0].alternative_domain_names #=> Array
     #   resp.distributions[0].alternative_domain_names[0] #=> String
     #   resp.distributions[0].status #=> String
@@ -6153,9 +7303,10 @@ module Aws::Lightsail
     #   resp.distributions[0].bundle_id #=> String
     #   resp.distributions[0].certificate_name #=> String
     #   resp.distributions[0].origin.name #=> String
-    #   resp.distributions[0].origin.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
-    #   resp.distributions[0].origin.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.distributions[0].origin.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.distributions[0].origin.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.distributions[0].origin.protocol_policy #=> String, one of "http-only", "https-only"
+    #   resp.distributions[0].origin.response_timeout #=> Integer
     #   resp.distributions[0].origin_public_dns #=> String
     #   resp.distributions[0].default_cache_behavior.behavior #=> String, one of "dont-cache", "cache"
     #   resp.distributions[0].cache_behavior_settings.default_ttl #=> Integer
@@ -6176,10 +7327,11 @@ module Aws::Lightsail
     #   resp.distributions[0].cache_behaviors[0].path #=> String
     #   resp.distributions[0].cache_behaviors[0].behavior #=> String, one of "dont-cache", "cache"
     #   resp.distributions[0].able_to_update_bundle #=> Boolean
-    #   resp.distributions[0].ip_address_type #=> String, one of "dualstack", "ipv4"
+    #   resp.distributions[0].ip_address_type #=> String, one of "dualstack", "ipv4", "ipv6"
     #   resp.distributions[0].tags #=> Array
     #   resp.distributions[0].tags[0].key #=> String
     #   resp.distributions[0].tags[0].value #=> String
+    #   resp.distributions[0].viewer_minimum_tls_protocol_version #=> String
     #   resp.next_page_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetDistributions AWS API Documentation
@@ -6213,8 +7365,8 @@ module Aws::Lightsail
     #   resp.domain.support_code #=> String
     #   resp.domain.created_at #=> Time
     #   resp.domain.location.availability_zone #=> String
-    #   resp.domain.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.domain.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.domain.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.domain.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.domain.tags #=> Array
     #   resp.domain.tags[0].key #=> String
     #   resp.domain.tags[0].value #=> String
@@ -6226,6 +7378,10 @@ module Aws::Lightsail
     #   resp.domain.domain_entries[0].type #=> String
     #   resp.domain.domain_entries[0].options #=> Hash
     #   resp.domain.domain_entries[0].options["DomainEntryOptionsKeys"] #=> String
+    #   resp.domain.registered_domain_delegation_info.name_servers_update_state.code #=> String, one of "SUCCEEDED", "PENDING", "FAILED", "STARTED"
+    #   resp.domain.registered_domain_delegation_info.name_servers_update_state.message #=> String
+    #   resp.domain.registered_domain_delegation_info.r53_hosted_zone_deletion_state.code #=> String, one of "SUCCEEDED", "PENDING", "FAILED", "STARTED"
+    #   resp.domain.registered_domain_delegation_info.r53_hosted_zone_deletion_state.message #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetDomain AWS API Documentation
     #
@@ -6264,8 +7420,8 @@ module Aws::Lightsail
     #   resp.domains[0].support_code #=> String
     #   resp.domains[0].created_at #=> Time
     #   resp.domains[0].location.availability_zone #=> String
-    #   resp.domains[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.domains[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.domains[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.domains[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.domains[0].tags #=> Array
     #   resp.domains[0].tags[0].key #=> String
     #   resp.domains[0].tags[0].value #=> String
@@ -6277,6 +7433,10 @@ module Aws::Lightsail
     #   resp.domains[0].domain_entries[0].type #=> String
     #   resp.domains[0].domain_entries[0].options #=> Hash
     #   resp.domains[0].domain_entries[0].options["DomainEntryOptionsKeys"] #=> String
+    #   resp.domains[0].registered_domain_delegation_info.name_servers_update_state.code #=> String, one of "SUCCEEDED", "PENDING", "FAILED", "STARTED"
+    #   resp.domains[0].registered_domain_delegation_info.name_servers_update_state.message #=> String
+    #   resp.domains[0].registered_domain_delegation_info.r53_hosted_zone_deletion_state.code #=> String, one of "SUCCEEDED", "PENDING", "FAILED", "STARTED"
+    #   resp.domains[0].registered_domain_delegation_info.r53_hosted_zone_deletion_state.message #=> String
     #   resp.next_page_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetDomains AWS API Documentation
@@ -6288,12 +7448,16 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Returns the export snapshot record created as a result of the `export
+    # Returns all export snapshot records created as a result of the `export
     # snapshot` operation.
     #
     # An export snapshot record can be used to create a new Amazon EC2
-    # instance and its related resources with the `create cloud formation
-    # stack` operation.
+    # instance and its related resources with the
+    # [CreateCloudFormationStack][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_CreateCloudFormationStack.html
     #
     # @option params [String] :page_token
     #   The token to advance to the next page of results from your request.
@@ -6321,8 +7485,8 @@ module Aws::Lightsail
     #   resp.export_snapshot_records[0].arn #=> String
     #   resp.export_snapshot_records[0].created_at #=> Time
     #   resp.export_snapshot_records[0].location.availability_zone #=> String
-    #   resp.export_snapshot_records[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.export_snapshot_records[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.export_snapshot_records[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.export_snapshot_records[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.export_snapshot_records[0].state #=> String, one of "Started", "Succeeded", "Failed"
     #   resp.export_snapshot_records[0].source_info.resource_type #=> String, one of "InstanceSnapshot", "DiskSnapshot"
     #   resp.export_snapshot_records[0].source_info.created_at #=> Time
@@ -6374,8 +7538,8 @@ module Aws::Lightsail
     #   resp.instance.support_code #=> String
     #   resp.instance.created_at #=> Time
     #   resp.instance.location.availability_zone #=> String
-    #   resp.instance.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.instance.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.instance.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.instance.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.instance.tags #=> Array
     #   resp.instance.tags[0].key #=> String
     #   resp.instance.tags[0].value #=> String
@@ -6387,12 +7551,14 @@ module Aws::Lightsail
     #   resp.instance.add_ons[0].status #=> String
     #   resp.instance.add_ons[0].snapshot_time_of_day #=> String
     #   resp.instance.add_ons[0].next_snapshot_time_of_day #=> String
+    #   resp.instance.add_ons[0].threshold #=> String
+    #   resp.instance.add_ons[0].duration #=> String
     #   resp.instance.is_static_ip #=> Boolean
     #   resp.instance.private_ip_address #=> String
     #   resp.instance.public_ip_address #=> String
     #   resp.instance.ipv6_addresses #=> Array
     #   resp.instance.ipv6_addresses[0] #=> String
-    #   resp.instance.ip_address_type #=> String, one of "dualstack", "ipv4"
+    #   resp.instance.ip_address_type #=> String, one of "dualstack", "ipv4", "ipv6"
     #   resp.instance.hardware.cpu_count #=> Integer
     #   resp.instance.hardware.disks #=> Array
     #   resp.instance.hardware.disks[0].name #=> String
@@ -6400,8 +7566,8 @@ module Aws::Lightsail
     #   resp.instance.hardware.disks[0].support_code #=> String
     #   resp.instance.hardware.disks[0].created_at #=> Time
     #   resp.instance.hardware.disks[0].location.availability_zone #=> String
-    #   resp.instance.hardware.disks[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.instance.hardware.disks[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.instance.hardware.disks[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.instance.hardware.disks[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.instance.hardware.disks[0].tags #=> Array
     #   resp.instance.hardware.disks[0].tags[0].key #=> String
     #   resp.instance.hardware.disks[0].tags[0].value #=> String
@@ -6410,6 +7576,8 @@ module Aws::Lightsail
     #   resp.instance.hardware.disks[0].add_ons[0].status #=> String
     #   resp.instance.hardware.disks[0].add_ons[0].snapshot_time_of_day #=> String
     #   resp.instance.hardware.disks[0].add_ons[0].next_snapshot_time_of_day #=> String
+    #   resp.instance.hardware.disks[0].add_ons[0].threshold #=> String
+    #   resp.instance.hardware.disks[0].add_ons[0].duration #=> String
     #   resp.instance.hardware.disks[0].size_in_gb #=> Integer
     #   resp.instance.hardware.disks[0].is_system_disk #=> Boolean
     #   resp.instance.hardware.disks[0].iops #=> Integer
@@ -6419,12 +7587,13 @@ module Aws::Lightsail
     #   resp.instance.hardware.disks[0].is_attached #=> Boolean
     #   resp.instance.hardware.disks[0].attachment_state #=> String
     #   resp.instance.hardware.disks[0].gb_in_use #=> Integer
+    #   resp.instance.hardware.disks[0].auto_mount_status #=> String, one of "Failed", "Pending", "Mounted", "NotMounted"
     #   resp.instance.hardware.ram_size_in_gb #=> Float
     #   resp.instance.networking.monthly_transfer.gb_per_month_allocated #=> Integer
     #   resp.instance.networking.ports #=> Array
     #   resp.instance.networking.ports[0].from_port #=> Integer
     #   resp.instance.networking.ports[0].to_port #=> Integer
-    #   resp.instance.networking.ports[0].protocol #=> String, one of "tcp", "all", "udp", "icmp"
+    #   resp.instance.networking.ports[0].protocol #=> String, one of "tcp", "all", "udp", "icmp", "icmpv6"
     #   resp.instance.networking.ports[0].access_from #=> String
     #   resp.instance.networking.ports[0].access_type #=> String, one of "Public", "Private"
     #   resp.instance.networking.ports[0].common_name #=> String
@@ -6439,6 +7608,11 @@ module Aws::Lightsail
     #   resp.instance.state.name #=> String
     #   resp.instance.username #=> String
     #   resp.instance.ssh_key_name #=> String
+    #   resp.instance.metadata_options.state #=> String, one of "pending", "applied"
+    #   resp.instance.metadata_options.http_tokens #=> String, one of "optional", "required"
+    #   resp.instance.metadata_options.http_endpoint #=> String, one of "disabled", "enabled"
+    #   resp.instance.metadata_options.http_put_response_hop_limit #=> Integer
+    #   resp.instance.metadata_options.http_protocol_ipv_6 #=> String, one of "disabled", "enabled"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetInstance AWS API Documentation
     #
@@ -6454,12 +7628,12 @@ module Aws::Lightsail
     #
     # The `get instance access details` operation supports tag-based access
     # control via resource tags applied to the resource identified by
-    # `instance name`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `instance name`. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :instance_name
     #   The name of the instance to access.
@@ -6483,6 +7657,8 @@ module Aws::Lightsail
     #   resp.access_details.cert_key #=> String
     #   resp.access_details.expires_at #=> Time
     #   resp.access_details.ip_address #=> String
+    #   resp.access_details.ipv6_addresses #=> Array
+    #   resp.access_details.ipv6_addresses[0] #=> String
     #   resp.access_details.password #=> String
     #   resp.access_details.password_data.ciphertext #=> String
     #   resp.access_details.password_data.key_pair_name #=> String
@@ -6533,10 +7709,10 @@ module Aws::Lightsail
     #     `BurstCapacityPercentage` reaches 100%. For more information, see
     #     [Viewing instance burst capacity in Amazon Lightsail][1].
     #
-    #     `Statistics`\: The most useful statistics are `Maximum` and
+    #     `Statistics`: The most useful statistics are `Maximum` and
     #     `Average`.
     #
-    #     `Unit`\: The published unit is `Percent`.
+    #     `Unit`: The published unit is `Percent`.
     #
     #   * <b> <code>BurstCapacityTime</code> </b> - The available amount of
     #     time for your instance to burst at 100% CPU utilization. Your
@@ -6553,10 +7729,10 @@ module Aws::Lightsail
     #     more information, see [Viewing instance burst capacity in Amazon
     #     Lightsail][1].
     #
-    #     `Statistics`\: The most useful statistics are `Maximum` and
+    #     `Statistics`: The most useful statistics are `Maximum` and
     #     `Average`.
     #
-    #     `Unit`\: The published unit is `Seconds`.
+    #     `Unit`: The published unit is `Seconds`.
     #
     #   * <b> <code>CPUUtilization</code> </b> - The percentage of allocated
     #     compute units that are currently in use on the instance. This metric
@@ -6565,10 +7741,10 @@ module Aws::Lightsail
     #     than Lightsail when the instance is not allocated a full processor
     #     core.
     #
-    #     `Statistics`\: The most useful statistics are `Maximum` and
+    #     `Statistics`: The most useful statistics are `Maximum` and
     #     `Average`.
     #
-    #     `Unit`\: The published unit is `Percent`.
+    #     `Unit`: The published unit is `Percent`.
     #
     #   * <b> <code>NetworkIn</code> </b> - The number of bytes received on
     #     all network interfaces by the instance. This metric identifies the
@@ -6577,9 +7753,9 @@ module Aws::Lightsail
     #     this metric is reported in 5-minute intervals, divide the reported
     #     number by 300 to find Bytes/second.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `Bytes`.
+    #     `Unit`: The published unit is `Bytes`.
     #
     #   * <b> <code>NetworkOut</code> </b> - The number of bytes sent out on
     #     all network interfaces by the instance. This metric identifies the
@@ -6588,9 +7764,9 @@ module Aws::Lightsail
     #     metric is reported in 5-minute intervals, divide the reported number
     #     by 300 to find Bytes/second.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `Bytes`.
+    #     `Unit`: The published unit is `Bytes`.
     #
     #   * <b> <code>StatusCheckFailed</code> </b> - Reports whether the
     #     instance passed or failed both the instance status check and the
@@ -6598,27 +7774,39 @@ module Aws::Lightsail
     #     (failed). This metric data is available in 1-minute (60 seconds)
     #     granularity.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>StatusCheckFailed_Instance</code> </b> - Reports whether
     #     the instance passed or failed the instance status check. This metric
     #     can be either 0 (passed) or 1 (failed). This metric data is
     #     available in 1-minute (60 seconds) granularity.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>StatusCheckFailed_System</code> </b> - Reports whether the
     #     instance passed or failed the system status check. This metric can
     #     be either 0 (passed) or 1 (failed). This metric data is available in
     #     1-minute (60 seconds) granularity.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
+    #
+    #   * <b> <code>MetadataNoToken</code> </b> - Reports the number of times
+    #     that the instance metadata service was successfully accessed without
+    #     a token. This metric determines if there are any processes accessing
+    #     instance metadata by using Instance Metadata Service Version 1,
+    #     which doesn't use a token. If all requests use token-backed
+    #     sessions, such as Instance Metadata Service Version 2, then the
+    #     value is 0.
+    #
+    #     `Statistics`: The most useful statistic is `Sum`.
+    #
+    #     `Unit`: The published unit is `Count`.
     #
     #
     #
@@ -6679,7 +7867,7 @@ module Aws::Lightsail
     #
     #   resp = client.get_instance_metric_data({
     #     instance_name: "ResourceName", # required
-    #     metric_name: "CPUUtilization", # required, accepts CPUUtilization, NetworkIn, NetworkOut, StatusCheckFailed, StatusCheckFailed_Instance, StatusCheckFailed_System, BurstCapacityTime, BurstCapacityPercentage
+    #     metric_name: "CPUUtilization", # required, accepts CPUUtilization, NetworkIn, NetworkOut, StatusCheckFailed, StatusCheckFailed_Instance, StatusCheckFailed_System, BurstCapacityTime, BurstCapacityPercentage, MetadataNoToken
     #     period: 1, # required
     #     start_time: Time.now, # required
     #     end_time: Time.now, # required
@@ -6689,7 +7877,7 @@ module Aws::Lightsail
     #
     # @example Response structure
     #
-    #   resp.metric_name #=> String, one of "CPUUtilization", "NetworkIn", "NetworkOut", "StatusCheckFailed", "StatusCheckFailed_Instance", "StatusCheckFailed_System", "BurstCapacityTime", "BurstCapacityPercentage"
+    #   resp.metric_name #=> String, one of "CPUUtilization", "NetworkIn", "NetworkOut", "StatusCheckFailed", "StatusCheckFailed_Instance", "StatusCheckFailed_System", "BurstCapacityTime", "BurstCapacityPercentage", "MetadataNoToken"
     #   resp.metric_data #=> Array
     #   resp.metric_data[0].average #=> Float
     #   resp.metric_data[0].maximum #=> Float
@@ -6730,7 +7918,7 @@ module Aws::Lightsail
     #   resp.port_states #=> Array
     #   resp.port_states[0].from_port #=> Integer
     #   resp.port_states[0].to_port #=> Integer
-    #   resp.port_states[0].protocol #=> String, one of "tcp", "all", "udp", "icmp"
+    #   resp.port_states[0].protocol #=> String, one of "tcp", "all", "udp", "icmp", "icmpv6"
     #   resp.port_states[0].state #=> String, one of "open", "closed"
     #   resp.port_states[0].cidrs #=> Array
     #   resp.port_states[0].cidrs[0] #=> String
@@ -6770,8 +7958,8 @@ module Aws::Lightsail
     #   resp.instance_snapshot.support_code #=> String
     #   resp.instance_snapshot.created_at #=> Time
     #   resp.instance_snapshot.location.availability_zone #=> String
-    #   resp.instance_snapshot.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.instance_snapshot.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.instance_snapshot.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.instance_snapshot.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.instance_snapshot.tags #=> Array
     #   resp.instance_snapshot.tags[0].key #=> String
     #   resp.instance_snapshot.tags[0].value #=> String
@@ -6783,8 +7971,8 @@ module Aws::Lightsail
     #   resp.instance_snapshot.from_attached_disks[0].support_code #=> String
     #   resp.instance_snapshot.from_attached_disks[0].created_at #=> Time
     #   resp.instance_snapshot.from_attached_disks[0].location.availability_zone #=> String
-    #   resp.instance_snapshot.from_attached_disks[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.instance_snapshot.from_attached_disks[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.instance_snapshot.from_attached_disks[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.instance_snapshot.from_attached_disks[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.instance_snapshot.from_attached_disks[0].tags #=> Array
     #   resp.instance_snapshot.from_attached_disks[0].tags[0].key #=> String
     #   resp.instance_snapshot.from_attached_disks[0].tags[0].value #=> String
@@ -6793,6 +7981,8 @@ module Aws::Lightsail
     #   resp.instance_snapshot.from_attached_disks[0].add_ons[0].status #=> String
     #   resp.instance_snapshot.from_attached_disks[0].add_ons[0].snapshot_time_of_day #=> String
     #   resp.instance_snapshot.from_attached_disks[0].add_ons[0].next_snapshot_time_of_day #=> String
+    #   resp.instance_snapshot.from_attached_disks[0].add_ons[0].threshold #=> String
+    #   resp.instance_snapshot.from_attached_disks[0].add_ons[0].duration #=> String
     #   resp.instance_snapshot.from_attached_disks[0].size_in_gb #=> Integer
     #   resp.instance_snapshot.from_attached_disks[0].is_system_disk #=> Boolean
     #   resp.instance_snapshot.from_attached_disks[0].iops #=> Integer
@@ -6802,6 +7992,7 @@ module Aws::Lightsail
     #   resp.instance_snapshot.from_attached_disks[0].is_attached #=> Boolean
     #   resp.instance_snapshot.from_attached_disks[0].attachment_state #=> String
     #   resp.instance_snapshot.from_attached_disks[0].gb_in_use #=> Integer
+    #   resp.instance_snapshot.from_attached_disks[0].auto_mount_status #=> String, one of "Failed", "Pending", "Mounted", "NotMounted"
     #   resp.instance_snapshot.from_instance_name #=> String
     #   resp.instance_snapshot.from_instance_arn #=> String
     #   resp.instance_snapshot.from_blueprint_id #=> String
@@ -6847,8 +8038,8 @@ module Aws::Lightsail
     #   resp.instance_snapshots[0].support_code #=> String
     #   resp.instance_snapshots[0].created_at #=> Time
     #   resp.instance_snapshots[0].location.availability_zone #=> String
-    #   resp.instance_snapshots[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.instance_snapshots[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.instance_snapshots[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.instance_snapshots[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.instance_snapshots[0].tags #=> Array
     #   resp.instance_snapshots[0].tags[0].key #=> String
     #   resp.instance_snapshots[0].tags[0].value #=> String
@@ -6860,8 +8051,8 @@ module Aws::Lightsail
     #   resp.instance_snapshots[0].from_attached_disks[0].support_code #=> String
     #   resp.instance_snapshots[0].from_attached_disks[0].created_at #=> Time
     #   resp.instance_snapshots[0].from_attached_disks[0].location.availability_zone #=> String
-    #   resp.instance_snapshots[0].from_attached_disks[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.instance_snapshots[0].from_attached_disks[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.instance_snapshots[0].from_attached_disks[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.instance_snapshots[0].from_attached_disks[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.instance_snapshots[0].from_attached_disks[0].tags #=> Array
     #   resp.instance_snapshots[0].from_attached_disks[0].tags[0].key #=> String
     #   resp.instance_snapshots[0].from_attached_disks[0].tags[0].value #=> String
@@ -6870,6 +8061,8 @@ module Aws::Lightsail
     #   resp.instance_snapshots[0].from_attached_disks[0].add_ons[0].status #=> String
     #   resp.instance_snapshots[0].from_attached_disks[0].add_ons[0].snapshot_time_of_day #=> String
     #   resp.instance_snapshots[0].from_attached_disks[0].add_ons[0].next_snapshot_time_of_day #=> String
+    #   resp.instance_snapshots[0].from_attached_disks[0].add_ons[0].threshold #=> String
+    #   resp.instance_snapshots[0].from_attached_disks[0].add_ons[0].duration #=> String
     #   resp.instance_snapshots[0].from_attached_disks[0].size_in_gb #=> Integer
     #   resp.instance_snapshots[0].from_attached_disks[0].is_system_disk #=> Boolean
     #   resp.instance_snapshots[0].from_attached_disks[0].iops #=> Integer
@@ -6879,6 +8072,7 @@ module Aws::Lightsail
     #   resp.instance_snapshots[0].from_attached_disks[0].is_attached #=> Boolean
     #   resp.instance_snapshots[0].from_attached_disks[0].attachment_state #=> String
     #   resp.instance_snapshots[0].from_attached_disks[0].gb_in_use #=> Integer
+    #   resp.instance_snapshots[0].from_attached_disks[0].auto_mount_status #=> String, one of "Failed", "Pending", "Mounted", "NotMounted"
     #   resp.instance_snapshots[0].from_instance_name #=> String
     #   resp.instance_snapshots[0].from_instance_arn #=> String
     #   resp.instance_snapshots[0].from_blueprint_id #=> String
@@ -6955,8 +8149,8 @@ module Aws::Lightsail
     #   resp.instances[0].support_code #=> String
     #   resp.instances[0].created_at #=> Time
     #   resp.instances[0].location.availability_zone #=> String
-    #   resp.instances[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.instances[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.instances[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.instances[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.instances[0].tags #=> Array
     #   resp.instances[0].tags[0].key #=> String
     #   resp.instances[0].tags[0].value #=> String
@@ -6968,12 +8162,14 @@ module Aws::Lightsail
     #   resp.instances[0].add_ons[0].status #=> String
     #   resp.instances[0].add_ons[0].snapshot_time_of_day #=> String
     #   resp.instances[0].add_ons[0].next_snapshot_time_of_day #=> String
+    #   resp.instances[0].add_ons[0].threshold #=> String
+    #   resp.instances[0].add_ons[0].duration #=> String
     #   resp.instances[0].is_static_ip #=> Boolean
     #   resp.instances[0].private_ip_address #=> String
     #   resp.instances[0].public_ip_address #=> String
     #   resp.instances[0].ipv6_addresses #=> Array
     #   resp.instances[0].ipv6_addresses[0] #=> String
-    #   resp.instances[0].ip_address_type #=> String, one of "dualstack", "ipv4"
+    #   resp.instances[0].ip_address_type #=> String, one of "dualstack", "ipv4", "ipv6"
     #   resp.instances[0].hardware.cpu_count #=> Integer
     #   resp.instances[0].hardware.disks #=> Array
     #   resp.instances[0].hardware.disks[0].name #=> String
@@ -6981,8 +8177,8 @@ module Aws::Lightsail
     #   resp.instances[0].hardware.disks[0].support_code #=> String
     #   resp.instances[0].hardware.disks[0].created_at #=> Time
     #   resp.instances[0].hardware.disks[0].location.availability_zone #=> String
-    #   resp.instances[0].hardware.disks[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.instances[0].hardware.disks[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.instances[0].hardware.disks[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.instances[0].hardware.disks[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.instances[0].hardware.disks[0].tags #=> Array
     #   resp.instances[0].hardware.disks[0].tags[0].key #=> String
     #   resp.instances[0].hardware.disks[0].tags[0].value #=> String
@@ -6991,6 +8187,8 @@ module Aws::Lightsail
     #   resp.instances[0].hardware.disks[0].add_ons[0].status #=> String
     #   resp.instances[0].hardware.disks[0].add_ons[0].snapshot_time_of_day #=> String
     #   resp.instances[0].hardware.disks[0].add_ons[0].next_snapshot_time_of_day #=> String
+    #   resp.instances[0].hardware.disks[0].add_ons[0].threshold #=> String
+    #   resp.instances[0].hardware.disks[0].add_ons[0].duration #=> String
     #   resp.instances[0].hardware.disks[0].size_in_gb #=> Integer
     #   resp.instances[0].hardware.disks[0].is_system_disk #=> Boolean
     #   resp.instances[0].hardware.disks[0].iops #=> Integer
@@ -7000,12 +8198,13 @@ module Aws::Lightsail
     #   resp.instances[0].hardware.disks[0].is_attached #=> Boolean
     #   resp.instances[0].hardware.disks[0].attachment_state #=> String
     #   resp.instances[0].hardware.disks[0].gb_in_use #=> Integer
+    #   resp.instances[0].hardware.disks[0].auto_mount_status #=> String, one of "Failed", "Pending", "Mounted", "NotMounted"
     #   resp.instances[0].hardware.ram_size_in_gb #=> Float
     #   resp.instances[0].networking.monthly_transfer.gb_per_month_allocated #=> Integer
     #   resp.instances[0].networking.ports #=> Array
     #   resp.instances[0].networking.ports[0].from_port #=> Integer
     #   resp.instances[0].networking.ports[0].to_port #=> Integer
-    #   resp.instances[0].networking.ports[0].protocol #=> String, one of "tcp", "all", "udp", "icmp"
+    #   resp.instances[0].networking.ports[0].protocol #=> String, one of "tcp", "all", "udp", "icmp", "icmpv6"
     #   resp.instances[0].networking.ports[0].access_from #=> String
     #   resp.instances[0].networking.ports[0].access_type #=> String, one of "Public", "Private"
     #   resp.instances[0].networking.ports[0].common_name #=> String
@@ -7020,6 +8219,11 @@ module Aws::Lightsail
     #   resp.instances[0].state.name #=> String
     #   resp.instances[0].username #=> String
     #   resp.instances[0].ssh_key_name #=> String
+    #   resp.instances[0].metadata_options.state #=> String, one of "pending", "applied"
+    #   resp.instances[0].metadata_options.http_tokens #=> String, one of "optional", "required"
+    #   resp.instances[0].metadata_options.http_endpoint #=> String, one of "disabled", "enabled"
+    #   resp.instances[0].metadata_options.http_put_response_hop_limit #=> Integer
+    #   resp.instances[0].metadata_options.http_protocol_ipv_6 #=> String, one of "disabled", "enabled"
     #   resp.next_page_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetInstances AWS API Documentation
@@ -7053,8 +8257,8 @@ module Aws::Lightsail
     #   resp.key_pair.support_code #=> String
     #   resp.key_pair.created_at #=> Time
     #   resp.key_pair.location.availability_zone #=> String
-    #   resp.key_pair.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.key_pair.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.key_pair.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.key_pair.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.key_pair.tags #=> Array
     #   resp.key_pair.tags[0].key #=> String
     #   resp.key_pair.tags[0].value #=> String
@@ -7078,6 +8282,10 @@ module Aws::Lightsail
     #   results are paginated, the response will return a next page token that
     #   you can specify as the page token in a subsequent request.
     #
+    # @option params [Boolean] :include_default_key_pair
+    #   A Boolean value that indicates whether to include the default key pair
+    #   in the response of your request.
+    #
     # @return [Types::GetKeyPairsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::GetKeyPairsResult#key_pairs #key_pairs} => Array&lt;Types::KeyPair&gt;
@@ -7087,6 +8295,7 @@ module Aws::Lightsail
     #
     #   resp = client.get_key_pairs({
     #     page_token: "string",
+    #     include_default_key_pair: false,
     #   })
     #
     # @example Response structure
@@ -7097,8 +8306,8 @@ module Aws::Lightsail
     #   resp.key_pairs[0].support_code #=> String
     #   resp.key_pairs[0].created_at #=> Time
     #   resp.key_pairs[0].location.availability_zone #=> String
-    #   resp.key_pairs[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.key_pairs[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.key_pairs[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.key_pairs[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.key_pairs[0].tags #=> Array
     #   resp.key_pairs[0].tags[0].key #=> String
     #   resp.key_pairs[0].tags[0].value #=> String
@@ -7136,8 +8345,8 @@ module Aws::Lightsail
     #   resp.load_balancer.support_code #=> String
     #   resp.load_balancer.created_at #=> Time
     #   resp.load_balancer.location.availability_zone #=> String
-    #   resp.load_balancer.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.load_balancer.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.load_balancer.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.load_balancer.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.load_balancer.tags #=> Array
     #   resp.load_balancer.tags[0].key #=> String
     #   resp.load_balancer.tags[0].value #=> String
@@ -7157,7 +8366,9 @@ module Aws::Lightsail
     #   resp.load_balancer.tls_certificate_summaries[0].is_attached #=> Boolean
     #   resp.load_balancer.configuration_options #=> Hash
     #   resp.load_balancer.configuration_options["LoadBalancerAttributeName"] #=> String
-    #   resp.load_balancer.ip_address_type #=> String, one of "dualstack", "ipv4"
+    #   resp.load_balancer.ip_address_type #=> String, one of "dualstack", "ipv4", "ipv6"
+    #   resp.load_balancer.https_redirection_enabled #=> Boolean
+    #   resp.load_balancer.tls_policy_name #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetLoadBalancer AWS API Documentation
     #
@@ -7192,53 +8403,53 @@ module Aws::Lightsail
     #     load balancer. Possible causes include a mismatch of ciphers or
     #     protocols.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>HealthyHostCount</code> </b> - The number of target
     #     instances that are considered healthy.
     #
-    #     `Statistics`\: The most useful statistic are `Average`, `Minimum`,
+    #     `Statistics`: The most useful statistic are `Average`, `Minimum`,
     #     and `Maximum`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>HTTPCode_Instance_2XX_Count</code> </b> - The number of
     #     HTTP 2XX response codes generated by the target instances. This does
     #     not include any response codes generated by the load balancer.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`. Note that
+    #     `Statistics`: The most useful statistic is `Sum`. Note that
     #     `Minimum`, `Maximum`, and `Average` all return `1`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>HTTPCode_Instance_3XX_Count</code> </b> - The number of
     #     HTTP 3XX response codes generated by the target instances. This does
     #     not include any response codes generated by the load balancer.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`. Note that
+    #     `Statistics`: The most useful statistic is `Sum`. Note that
     #     `Minimum`, `Maximum`, and `Average` all return `1`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>HTTPCode_Instance_4XX_Count</code> </b> - The number of
     #     HTTP 4XX response codes generated by the target instances. This does
     #     not include any response codes generated by the load balancer.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`. Note that
+    #     `Statistics`: The most useful statistic is `Sum`. Note that
     #     `Minimum`, `Maximum`, and `Average` all return `1`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>HTTPCode_Instance_5XX_Count</code> </b> - The number of
     #     HTTP 5XX response codes generated by the target instances. This does
     #     not include any response codes generated by the load balancer.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`. Note that
+    #     `Statistics`: The most useful statistic is `Sum`. Note that
     #     `Minimum`, `Maximum`, and `Average` all return `1`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>HTTPCode_LB_4XX_Count</code> </b> - The number of HTTP 4XX
     #     client error codes that originated from the load balancer. Client
@@ -7246,10 +8457,10 @@ module Aws::Lightsail
     #     These requests were not received by the target instance. This count
     #     does not include response codes generated by the target instances.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`. Note that
+    #     `Statistics`: The most useful statistic is `Sum`. Note that
     #     `Minimum`, `Maximum`, and `Average` all return `1`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>HTTPCode_LB_5XX_Count</code> </b> - The number of HTTP 5XX
     #     server error codes that originated from the load balancer. This does
@@ -7258,43 +8469,43 @@ module Aws::Lightsail
     #     to the load balancer, or if the request rate exceeds the capacity of
     #     the instances (spillover) or the load balancer.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`. Note that
+    #     `Statistics`: The most useful statistic is `Sum`. Note that
     #     `Minimum`, `Maximum`, and `Average` all return `1`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>InstanceResponseTime</code> </b> - The time elapsed, in
     #     seconds, after the request leaves the load balancer until a response
     #     from the target instance is received.
     #
-    #     `Statistics`\: The most useful statistic is `Average`.
+    #     `Statistics`: The most useful statistic is `Average`.
     #
-    #     `Unit`\: The published unit is `Seconds`.
+    #     `Unit`: The published unit is `Seconds`.
     #
     #   * <b> <code>RejectedConnectionCount</code> </b> - The number of
     #     connections that were rejected because the load balancer had reached
     #     its maximum number of connections.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>RequestCount</code> </b> - The number of requests
     #     processed over IPv4. This count includes only the requests with a
     #     response generated by a target instance of the load balancer.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`. Note that
+    #     `Statistics`: The most useful statistic is `Sum`. Note that
     #     `Minimum`, `Maximum`, and `Average` all return `1`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>UnhealthyHostCount</code> </b> - The number of target
     #     instances that are considered unhealthy.
     #
-    #     `Statistics`\: The most useful statistic are `Average`, `Minimum`,
+    #     `Statistics`: The most useful statistic are `Average`, `Minimum`,
     #     and `Maximum`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     # @option params [required, Integer] :period
     #   The granularity, in seconds, of the returned data points.
@@ -7406,8 +8617,8 @@ module Aws::Lightsail
     #   resp.tls_certificates[0].support_code #=> String
     #   resp.tls_certificates[0].created_at #=> Time
     #   resp.tls_certificates[0].location.availability_zone #=> String
-    #   resp.tls_certificates[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.tls_certificates[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.tls_certificates[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.tls_certificates[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.tls_certificates[0].tags #=> Array
     #   resp.tls_certificates[0].tags[0].key #=> String
     #   resp.tls_certificates[0].tags[0].value #=> String
@@ -7421,6 +8632,8 @@ module Aws::Lightsail
     #   resp.tls_certificates[0].domain_validation_records[0].value #=> String
     #   resp.tls_certificates[0].domain_validation_records[0].validation_status #=> String, one of "PENDING_VALIDATION", "FAILED", "SUCCESS"
     #   resp.tls_certificates[0].domain_validation_records[0].domain_name #=> String
+    #   resp.tls_certificates[0].domain_validation_records[0].dns_record_creation_state.code #=> String, one of "SUCCEEDED", "STARTED", "FAILED"
+    #   resp.tls_certificates[0].domain_validation_records[0].dns_record_creation_state.message #=> String
     #   resp.tls_certificates[0].failure_reason #=> String, one of "NO_AVAILABLE_CONTACTS", "ADDITIONAL_VERIFICATION_REQUIRED", "DOMAIN_NOT_ALLOWED", "INVALID_PUBLIC_DOMAIN", "OTHER"
     #   resp.tls_certificates[0].issued_at #=> Time
     #   resp.tls_certificates[0].issuer #=> String
@@ -7445,6 +8658,57 @@ module Aws::Lightsail
     # @param [Hash] params ({})
     def get_load_balancer_tls_certificates(params = {}, options = {})
       req = build_request(:get_load_balancer_tls_certificates, params)
+      req.send_request(options)
+    end
+
+    # Returns a list of TLS security policies that you can apply to
+    # Lightsail load balancers.
+    #
+    # For more information about load balancer TLS security policies, see
+    # [Configuring TLS security policies on your Amazon Lightsail load
+    # balancers][1] in the *Amazon Lightsail Developer Guide*.
+    #
+    #
+    #
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configure-load-balancer-tls-security-policy
+    #
+    # @option params [String] :page_token
+    #   The token to advance to the next page of results from your request.
+    #
+    #   To get a page token, perform an initial `GetLoadBalancerTlsPolicies`
+    #   request. If your results are paginated, the response will return a
+    #   next page token that you can specify as the page token in a subsequent
+    #   request.
+    #
+    # @return [Types::GetLoadBalancerTlsPoliciesResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetLoadBalancerTlsPoliciesResult#tls_policies #tls_policies} => Array&lt;Types::LoadBalancerTlsPolicy&gt;
+    #   * {Types::GetLoadBalancerTlsPoliciesResult#next_page_token #next_page_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_load_balancer_tls_policies({
+    #     page_token: "string",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.tls_policies #=> Array
+    #   resp.tls_policies[0].name #=> String
+    #   resp.tls_policies[0].is_default #=> Boolean
+    #   resp.tls_policies[0].description #=> String
+    #   resp.tls_policies[0].protocols #=> Array
+    #   resp.tls_policies[0].protocols[0] #=> String
+    #   resp.tls_policies[0].ciphers #=> Array
+    #   resp.tls_policies[0].ciphers[0] #=> String
+    #   resp.next_page_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetLoadBalancerTlsPolicies AWS API Documentation
+    #
+    # @overload get_load_balancer_tls_policies(params = {})
+    # @param [Hash] params ({})
+    def get_load_balancer_tls_policies(params = {}, options = {})
+      req = build_request(:get_load_balancer_tls_policies, params)
       req.send_request(options)
     end
 
@@ -7476,8 +8740,8 @@ module Aws::Lightsail
     #   resp.load_balancers[0].support_code #=> String
     #   resp.load_balancers[0].created_at #=> Time
     #   resp.load_balancers[0].location.availability_zone #=> String
-    #   resp.load_balancers[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.load_balancers[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.load_balancers[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.load_balancers[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.load_balancers[0].tags #=> Array
     #   resp.load_balancers[0].tags[0].key #=> String
     #   resp.load_balancers[0].tags[0].value #=> String
@@ -7497,7 +8761,9 @@ module Aws::Lightsail
     #   resp.load_balancers[0].tls_certificate_summaries[0].is_attached #=> Boolean
     #   resp.load_balancers[0].configuration_options #=> Hash
     #   resp.load_balancers[0].configuration_options["LoadBalancerAttributeName"] #=> String
-    #   resp.load_balancers[0].ip_address_type #=> String, one of "dualstack", "ipv4"
+    #   resp.load_balancers[0].ip_address_type #=> String, one of "dualstack", "ipv4", "ipv6"
+    #   resp.load_balancers[0].https_redirection_enabled #=> Boolean
+    #   resp.load_balancers[0].tls_policy_name #=> String
     #   resp.next_page_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetLoadBalancers AWS API Documentation
@@ -7530,13 +8796,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -7581,13 +8847,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -7603,8 +8869,7 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Gets operations for a specific resource (e.g., an instance or a static
-    # IP).
+    # Gets operations for a specific resource (an instance or a static IP).
     #
     # @option params [required, String] :resource_name
     #   The name of the resource for which you are requesting information.
@@ -7635,13 +8900,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -7665,12 +8930,12 @@ module Aws::Lightsail
     # @option params [Boolean] :include_availability_zones
     #   A Boolean value indicating whether to also include Availability Zones
     #   in your get regions request. Availability Zones are indicated with a
-    #   letter: e.g., `us-east-2a`.
+    #   letter: `us-east-2a`.
     #
     # @option params [Boolean] :include_relational_database_availability_zones
     #   A Boolean value indicating whether to also include Availability Zones
     #   for databases in your get regions request. Availability Zones are
-    #   indicated with a letter (e.g., `us-east-2a`).
+    #   indicated with a letter (`us-east-2a`).
     #
     # @return [Types::GetRegionsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -7689,7 +8954,7 @@ module Aws::Lightsail
     #   resp.regions[0].continent_code #=> String
     #   resp.regions[0].description #=> String
     #   resp.regions[0].display_name #=> String
-    #   resp.regions[0].name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.regions[0].name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.regions[0].availability_zones #=> Array
     #   resp.regions[0].availability_zones[0].zone_name #=> String
     #   resp.regions[0].availability_zones[0].state #=> String
@@ -7728,8 +8993,8 @@ module Aws::Lightsail
     #   resp.relational_database.support_code #=> String
     #   resp.relational_database.created_at #=> Time
     #   resp.relational_database.location.availability_zone #=> String
-    #   resp.relational_database.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.relational_database.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.relational_database.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.relational_database.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.relational_database.tags #=> Array
     #   resp.relational_database.tags[0].key #=> String
     #   resp.relational_database.tags[0].value #=> String
@@ -7829,6 +9094,10 @@ module Aws::Lightsail
     #   next page token that you can specify as the page token in a subsequent
     #   request.
     #
+    # @option params [Boolean] :include_inactive
+    #   A Boolean value that indicates whether to include inactive
+    #   (unavailable) bundles in the response of your request.
+    #
     # @return [Types::GetRelationalDatabaseBundlesResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::GetRelationalDatabaseBundlesResult#bundles #bundles} => Array&lt;Types::RelationalDatabaseBundle&gt;
@@ -7838,6 +9107,7 @@ module Aws::Lightsail
     #
     #   resp = client.get_relational_database_bundles({
     #     page_token: "string",
+    #     include_inactive: false,
     #   })
     #
     # @example Response structure
@@ -8104,49 +9374,49 @@ module Aws::Lightsail
     #   * <b> <code>CPUUtilization</code> </b> - The percentage of CPU
     #     utilization currently in use on the database.
     #
-    #     `Statistics`\: The most useful statistics are `Maximum` and
+    #     `Statistics`: The most useful statistics are `Maximum` and
     #     `Average`.
     #
-    #     `Unit`\: The published unit is `Percent`.
+    #     `Unit`: The published unit is `Percent`.
     #
     #   * <b> <code>DatabaseConnections</code> </b> - The number of database
     #     connections in use.
     #
-    #     `Statistics`\: The most useful statistics are `Maximum` and `Sum`.
+    #     `Statistics`: The most useful statistics are `Maximum` and `Sum`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>DiskQueueDepth</code> </b> - The number of outstanding IOs
     #     (read/write requests) that are waiting to access the disk.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `Count`.
+    #     `Unit`: The published unit is `Count`.
     #
     #   * <b> <code>FreeStorageSpace</code> </b> - The amount of available
     #     storage space.
     #
-    #     `Statistics`\: The most useful statistic is `Sum`.
+    #     `Statistics`: The most useful statistic is `Sum`.
     #
-    #     `Unit`\: The published unit is `Bytes`.
+    #     `Unit`: The published unit is `Bytes`.
     #
     #   * <b> <code>NetworkReceiveThroughput</code> </b> - The incoming
     #     (Receive) network traffic on the database, including both customer
     #     database traffic and AWS traffic used for monitoring and
     #     replication.
     #
-    #     `Statistics`\: The most useful statistic is `Average`.
+    #     `Statistics`: The most useful statistic is `Average`.
     #
-    #     `Unit`\: The published unit is `Bytes/Second`.
+    #     `Unit`: The published unit is `Bytes/Second`.
     #
     #   * <b> <code>NetworkTransmitThroughput</code> </b> - The outgoing
     #     (Transmit) network traffic on the database, including both customer
     #     database traffic and AWS traffic used for monitoring and
     #     replication.
     #
-    #     `Statistics`\: The most useful statistic is `Average`.
+    #     `Statistics`: The most useful statistic is `Average`.
     #
-    #     `Unit`\: The published unit is `Bytes/Second`.
+    #     `Unit`: The published unit is `Bytes/Second`.
     #
     # @option params [required, Integer] :period
     #   The granularity, in seconds, of the returned data points.
@@ -8325,8 +9595,8 @@ module Aws::Lightsail
     #   resp.relational_database_snapshot.support_code #=> String
     #   resp.relational_database_snapshot.created_at #=> Time
     #   resp.relational_database_snapshot.location.availability_zone #=> String
-    #   resp.relational_database_snapshot.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.relational_database_snapshot.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.relational_database_snapshot.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.relational_database_snapshot.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.relational_database_snapshot.tags #=> Array
     #   resp.relational_database_snapshot.tags[0].key #=> String
     #   resp.relational_database_snapshot.tags[0].value #=> String
@@ -8378,8 +9648,8 @@ module Aws::Lightsail
     #   resp.relational_database_snapshots[0].support_code #=> String
     #   resp.relational_database_snapshots[0].created_at #=> Time
     #   resp.relational_database_snapshots[0].location.availability_zone #=> String
-    #   resp.relational_database_snapshots[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.relational_database_snapshots[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.relational_database_snapshots[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.relational_database_snapshots[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.relational_database_snapshots[0].tags #=> Array
     #   resp.relational_database_snapshots[0].tags[0].key #=> String
     #   resp.relational_database_snapshots[0].tags[0].value #=> String
@@ -8431,8 +9701,8 @@ module Aws::Lightsail
     #   resp.relational_databases[0].support_code #=> String
     #   resp.relational_databases[0].created_at #=> Time
     #   resp.relational_databases[0].location.availability_zone #=> String
-    #   resp.relational_databases[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.relational_databases[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.relational_databases[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.relational_databases[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.relational_databases[0].tags #=> Array
     #   resp.relational_databases[0].tags[0].key #=> String
     #   resp.relational_databases[0].tags[0].value #=> String
@@ -8474,7 +9744,66 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Returns information about a specific static IP.
+    # Returns detailed information for five of the most recent
+    # `SetupInstanceHttps` requests that were ran on the target instance.
+    #
+    # @option params [required, String] :resource_name
+    #   The name of the resource for which you are requesting information.
+    #
+    # @option params [String] :page_token
+    #   The token to advance to the next page of results from your request.
+    #
+    #   To get a page token, perform an initial `GetSetupHistory` request. If
+    #   your results are paginated, the response will return a next page token
+    #   that you can specify as the page token in a subsequent request.
+    #
+    # @return [Types::GetSetupHistoryResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetSetupHistoryResult#setup_history #setup_history} => Array&lt;Types::SetupHistory&gt;
+    #   * {Types::GetSetupHistoryResult#next_page_token #next_page_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_setup_history({
+    #     resource_name: "ResourceName", # required
+    #     page_token: "SetupHistoryPageToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.setup_history #=> Array
+    #   resp.setup_history[0].operation_id #=> String
+    #   resp.setup_history[0].request.instance_name #=> String
+    #   resp.setup_history[0].request.domain_names #=> Array
+    #   resp.setup_history[0].request.domain_names[0] #=> String
+    #   resp.setup_history[0].request.certificate_provider #=> String, one of "LetsEncrypt"
+    #   resp.setup_history[0].resource.name #=> String
+    #   resp.setup_history[0].resource.arn #=> String
+    #   resp.setup_history[0].resource.created_at #=> Time
+    #   resp.setup_history[0].resource.location.availability_zone #=> String
+    #   resp.setup_history[0].resource.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.setup_history[0].resource.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.setup_history[0].execution_details #=> Array
+    #   resp.setup_history[0].execution_details[0].command #=> String
+    #   resp.setup_history[0].execution_details[0].date_time #=> Time
+    #   resp.setup_history[0].execution_details[0].name #=> String
+    #   resp.setup_history[0].execution_details[0].status #=> String, one of "succeeded", "failed", "inProgress"
+    #   resp.setup_history[0].execution_details[0].standard_error #=> String
+    #   resp.setup_history[0].execution_details[0].standard_output #=> String
+    #   resp.setup_history[0].execution_details[0].version #=> String
+    #   resp.setup_history[0].status #=> String, one of "succeeded", "failed", "inProgress"
+    #   resp.next_page_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/GetSetupHistory AWS API Documentation
+    #
+    # @overload get_setup_history(params = {})
+    # @param [Hash] params ({})
+    def get_setup_history(params = {}, options = {})
+      req = build_request(:get_setup_history, params)
+      req.send_request(options)
+    end
+
+    # Returns information about an Amazon Lightsail static IP.
     #
     # @option params [required, String] :static_ip_name
     #   The name of the static IP in Lightsail.
@@ -8496,8 +9825,8 @@ module Aws::Lightsail
     #   resp.static_ip.support_code #=> String
     #   resp.static_ip.created_at #=> Time
     #   resp.static_ip.location.availability_zone #=> String
-    #   resp.static_ip.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.static_ip.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.static_ip.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.static_ip.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.static_ip.ip_address #=> String
     #   resp.static_ip.attached_to #=> String
     #   resp.static_ip.is_attached #=> Boolean
@@ -8539,8 +9868,8 @@ module Aws::Lightsail
     #   resp.static_ips[0].support_code #=> String
     #   resp.static_ips[0].created_at #=> Time
     #   resp.static_ips[0].location.availability_zone #=> String
-    #   resp.static_ips[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.static_ips[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.static_ips[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.static_ips[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.static_ips[0].ip_address #=> String
     #   resp.static_ips[0].attached_to #=> String
     #   resp.static_ips[0].is_attached #=> Boolean
@@ -8578,13 +9907,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -8625,12 +9954,12 @@ module Aws::Lightsail
     #
     # The `OpenInstancePublicPorts` action supports tag-based access control
     # via resource tags applied to the resource identified by
-    # `instanceName`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `instanceName`. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, Types::PortInfo] :port_info
     #   An object to describe the ports to open for the specified instance.
@@ -8648,7 +9977,7 @@ module Aws::Lightsail
     #     port_info: { # required
     #       from_port: 1,
     #       to_port: 1,
-    #       protocol: "tcp", # accepts tcp, all, udp, icmp
+    #       protocol: "tcp", # accepts tcp, all, udp, icmp, icmpv6
     #       cidrs: ["string"],
     #       ipv6_cidrs: ["string"],
     #       cidr_list_aliases: ["string"],
@@ -8660,13 +9989,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -8681,7 +10010,7 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Tries to peer the Lightsail VPC with the user's default VPC.
+    # Peers the Lightsail VPC with the user's default VPC.
     #
     # @return [Types::PeerVpcResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -8691,13 +10020,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -8744,18 +10073,18 @@ module Aws::Lightsail
     #
     #   The following metrics are available for each resource type:
     #
-    #   * **Instances**\: `BurstCapacityPercentage`, `BurstCapacityTime`,
+    #   * **Instances**: `BurstCapacityPercentage`, `BurstCapacityTime`,
     #     `CPUUtilization`, `NetworkIn`, `NetworkOut`, `StatusCheckFailed`,
     #     `StatusCheckFailed_Instance`, and `StatusCheckFailed_System`.
     #
-    #   * **Load balancers**\: `ClientTLSNegotiationErrorCount`,
+    #   * **Load balancers**: `ClientTLSNegotiationErrorCount`,
     #     `HealthyHostCount`, `UnhealthyHostCount`, `HTTPCode_LB_4XX_Count`,
     #     `HTTPCode_LB_5XX_Count`, `HTTPCode_Instance_2XX_Count`,
     #     `HTTPCode_Instance_3XX_Count`, `HTTPCode_Instance_4XX_Count`,
     #     `HTTPCode_Instance_5XX_Count`, `InstanceResponseTime`,
     #     `RejectedConnectionCount`, and `RequestCount`.
     #
-    #   * **Relational databases**\: `CPUUtilization`, `DatabaseConnections`,
+    #   * **Relational databases**: `CPUUtilization`, `DatabaseConnections`,
     #     `DiskQueueDepth`, `FreeStorageSpace`, `NetworkReceiveThroughput`,
     #     and `NetworkTransmitThroughput`.
     #
@@ -8831,12 +10160,12 @@ module Aws::Lightsail
     #   triggered.
     #
     #   A notification is not sent if a contact protocol is not specified, if
-    #   the specified contact protocol is not configured in the AWS Region, or
-    #   if notifications are not enabled for the alarm using the
-    #   `notificationEnabled` paramater.
+    #   the specified contact protocol is not configured in the Amazon Web
+    #   Services Region, or if notifications are not enabled for the alarm
+    #   using the `notificationEnabled` paramater.
     #
     #   Use the `CreateContactMethod` action to configure a contact protocol
-    #   in an AWS Region.
+    #   in an Amazon Web Services Region.
     #
     # @option params [Array<String>] :notification_triggers
     #   The alarm states that trigger a notification.
@@ -8898,13 +10227,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -8929,12 +10258,12 @@ module Aws::Lightsail
     #
     # The `PutInstancePublicPorts` action supports tag-based access control
     # via resource tags applied to the resource identified by
-    # `instanceName`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `instanceName`. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, Array<Types::PortInfo>] :port_infos
     #   An array of objects to describe the ports to open for the specified
@@ -8954,7 +10283,7 @@ module Aws::Lightsail
     #       {
     #         from_port: 1,
     #         to_port: 1,
-    #         protocol: "tcp", # accepts tcp, all, udp, icmp
+    #         protocol: "tcp", # accepts tcp, all, udp, icmp, icmpv6
     #         cidrs: ["string"],
     #         ipv6_cidrs: ["string"],
     #         cidr_list_aliases: ["string"],
@@ -8967,13 +10296,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -8992,11 +10321,11 @@ module Aws::Lightsail
     #
     # The `reboot instance` operation supports tag-based access control via
     # resource tags applied to the resource identified by `instance name`.
-    # For more information, see the [Lightsail Dev Guide][1].
+    # For more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :instance_name
     #   The name of the instance to reboot.
@@ -9016,13 +10345,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9041,12 +10370,12 @@ module Aws::Lightsail
     #
     # The `reboot relational database` operation supports tag-based access
     # control via resource tags applied to the resource identified by
-    # relationalDatabaseName. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # relationalDatabaseName. For more information, see the [Amazon
+    # Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :relational_database_name
     #   The name of your database to reboot.
@@ -9066,13 +10395,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9094,10 +10423,13 @@ module Aws::Lightsail
     # Control (lightsailctl) plugin to push container images to your
     # Lightsail container service. For more information, see [Pushing and
     # managing container images on your Amazon Lightsail container
-    # services](amazon-lightsail-pushing-container-images) in the *Lightsail
-    # Dev Guide*.
+    # services][1] in the *Amazon Lightsail Developer Guide*.
     #
     #  </note>
+    #
+    #
+    #
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-pushing-container-images
     #
     # @option params [required, String] :service_name
     #   The name of the container service for which to register a container
@@ -9180,13 +10512,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9231,13 +10563,13 @@ module Aws::Lightsail
     #   resp.create_time #=> Time
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -9258,10 +10590,11 @@ module Aws::Lightsail
     #
     # A contact method is used to send you notifications about your Amazon
     # Lightsail resources. You can add one email address and one mobile
-    # phone number contact method in each AWS Region. However, SMS text
-    # messaging is not supported in some AWS Regions, and SMS text messages
-    # cannot be sent to some countries/regions. For more information, see
-    # [Notifications in Amazon Lightsail][1].
+    # phone number contact method in each Amazon Web Services Region.
+    # However, SMS text messaging is not supported in some Amazon Web
+    # Services Regions, and SMS text messages cannot be sent to some
+    # countries/regions. For more information, see [Notifications in Amazon
+    # Lightsail][1].
     #
     # A verification request is sent to the contact method when you
     # initially create it. Use this action to send another verification
@@ -9293,13 +10626,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9314,7 +10647,7 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Sets the IP address type for a Amazon Lightsail resource.
+    # Sets the IP address type for an Amazon Lightsail resource.
     #
     # Use this action to enable dual-stack for a resource, which enables
     # IPv4 and IPv6 for the specified resource. Alternately, you can use
@@ -9323,12 +10656,13 @@ module Aws::Lightsail
     # @option params [required, String] :resource_type
     #   The resource type.
     #
-    #   The possible values are `Distribution`, `Instance`, and
+    #   The resource values are `Distribution`, `Instance`, and
     #   `LoadBalancer`.
     #
     #   <note markdown="1"> Distribution-related APIs are available only in the N. Virginia
-    #   (`us-east-1`) AWS Region. Set your AWS Region configuration to
-    #   `us-east-1` to create, view, or edit distributions.
+    #   (`us-east-1`) Amazon Web Services Region. Set your Amazon Web Services
+    #   Region configuration to `us-east-1` to create, view, or edit
+    #   distributions.
     #
     #    </note>
     #
@@ -9338,8 +10672,23 @@ module Aws::Lightsail
     # @option params [required, String] :ip_address_type
     #   The IP address type to set for the specified resource.
     #
-    #   The possible values are `ipv4` for IPv4 only, and `dualstack` for IPv4
-    #   and IPv6.
+    #   The possible values are `ipv4` for IPv4 only, `ipv6` for IPv6 only,
+    #   and `dualstack` for IPv4 and IPv6.
+    #
+    # @option params [Boolean] :accept_bundle_update
+    #   Required parameter to accept the instance bundle update when changing
+    #   to, and from, IPv6-only.
+    #
+    #   <note markdown="1"> An instance bundle will change when switching from `dual-stack` or
+    #   `ipv4`, to `ipv6`. It also changes when switching from `ipv6`, to
+    #   `dual-stack` or `ipv4`.
+    #
+    #    You must include this parameter in the command to update the bundle.
+    #   For example, if you switch from `dual-stack` to `ipv6`, the bundle
+    #   will be updated, and billing for the IPv6-only instance bundle begins
+    #   immediately.
+    #
+    #    </note>
     #
     # @return [Types::SetIpAddressTypeResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -9348,9 +10697,10 @@ module Aws::Lightsail
     # @example Request syntax with placeholder values
     #
     #   resp = client.set_ip_address_type({
-    #     resource_type: "ContainerService", # required, accepts ContainerService, Instance, StaticIp, KeyPair, InstanceSnapshot, Domain, PeeredVpc, LoadBalancer, LoadBalancerTlsCertificate, Disk, DiskSnapshot, RelationalDatabase, RelationalDatabaseSnapshot, ExportSnapshotRecord, CloudFormationStackRecord, Alarm, ContactMethod, Distribution, Certificate
+    #     resource_type: "ContainerService", # required, accepts ContainerService, Instance, StaticIp, KeyPair, InstanceSnapshot, Domain, PeeredVpc, LoadBalancer, LoadBalancerTlsCertificate, Disk, DiskSnapshot, RelationalDatabase, RelationalDatabaseSnapshot, ExportSnapshotRecord, CloudFormationStackRecord, Alarm, ContactMethod, Distribution, Certificate, Bucket
     #     resource_name: "ResourceName", # required
-    #     ip_address_type: "dualstack", # required, accepts dualstack, ipv4
+    #     ip_address_type: "dualstack", # required, accepts dualstack, ipv4, ipv6
+    #     accept_bundle_update: false,
     #   })
     #
     # @example Response structure
@@ -9358,13 +10708,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9379,24 +10729,191 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
+    # Sets the Amazon Lightsail resources that can access the specified
+    # Lightsail bucket.
+    #
+    # Lightsail buckets currently support setting access for Lightsail
+    # instances in the same Amazon Web Services Region.
+    #
+    # @option params [required, String] :resource_name
+    #   The name of the Lightsail instance for which to set bucket access. The
+    #   instance must be in a running or stopped state.
+    #
+    # @option params [required, String] :bucket_name
+    #   The name of the bucket for which to set access to another Lightsail
+    #   resource.
+    #
+    # @option params [required, String] :access
+    #   The access setting.
+    #
+    #   The following access settings are available:
+    #
+    #   * `allow` - Allows access to the bucket and its objects.
+    #
+    #   * `deny` - Denies access to the bucket and its objects. Use this
+    #     setting to remove access for a resource previously set to `allow`.
+    #
+    # @return [Types::SetResourceAccessForBucketResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::SetResourceAccessForBucketResult#operations #operations} => Array&lt;Types::Operation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.set_resource_access_for_bucket({
+    #     resource_name: "ResourceName", # required
+    #     bucket_name: "BucketName", # required
+    #     access: "allow", # required, accepts allow, deny
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operations #=> Array
+    #   resp.operations[0].id #=> String
+    #   resp.operations[0].resource_name #=> String
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operations[0].created_at #=> Time
+    #   resp.operations[0].location.availability_zone #=> String
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operations[0].is_terminal #=> Boolean
+    #   resp.operations[0].operation_details #=> String
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operations[0].status_changed_at #=> Time
+    #   resp.operations[0].error_code #=> String
+    #   resp.operations[0].error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/SetResourceAccessForBucket AWS API Documentation
+    #
+    # @overload set_resource_access_for_bucket(params = {})
+    # @param [Hash] params ({})
+    def set_resource_access_for_bucket(params = {}, options = {})
+      req = build_request(:set_resource_access_for_bucket, params)
+      req.send_request(options)
+    end
+
+    # Creates an SSL/TLS certificate that secures traffic for your website.
+    # After the certificate is created, it is installed on the specified
+    # Lightsail instance.
+    #
+    # If you provide more than one domain name in the request, at least one
+    # name must be less than or equal to 63 characters in length.
+    #
+    # @option params [required, String] :instance_name
+    #   The name of the Lightsail instance.
+    #
+    # @option params [required, String] :email_address
+    #   The contact method for SSL/TLS certificate renewal alerts. You can
+    #   enter one email address.
+    #
+    # @option params [required, Array<String>] :domain_names
+    #   The name of the domain and subdomains that were specified for the
+    #   SSL/TLS certificate.
+    #
+    # @option params [required, String] :certificate_provider
+    #   The certificate authority that issues the SSL/TLS certificate.
+    #
+    # @return [Types::SetupInstanceHttpsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::SetupInstanceHttpsResult#operations #operations} => Array&lt;Types::Operation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.setup_instance_https({
+    #     instance_name: "ResourceName", # required
+    #     email_address: "EmailAddress", # required
+    #     domain_names: ["SetupDomainName"], # required
+    #     certificate_provider: "LetsEncrypt", # required, accepts LetsEncrypt
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operations #=> Array
+    #   resp.operations[0].id #=> String
+    #   resp.operations[0].resource_name #=> String
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operations[0].created_at #=> Time
+    #   resp.operations[0].location.availability_zone #=> String
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operations[0].is_terminal #=> Boolean
+    #   resp.operations[0].operation_details #=> String
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operations[0].status_changed_at #=> Time
+    #   resp.operations[0].error_code #=> String
+    #   resp.operations[0].error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/SetupInstanceHttps AWS API Documentation
+    #
+    # @overload setup_instance_https(params = {})
+    # @param [Hash] params ({})
+    def setup_instance_https(params = {}, options = {})
+      req = build_request(:setup_instance_https, params)
+      req.send_request(options)
+    end
+
+    # Initiates a graphical user interface (GUI) session that’s used to
+    # access a virtual computer’s operating system and application. The
+    # session will be active for 1 hour. Use this action to resume the
+    # session after it expires.
+    #
+    # @option params [required, String] :resource_name
+    #   The resource name.
+    #
+    # @return [Types::StartGUISessionResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StartGUISessionResult#operations #operations} => Array&lt;Types::Operation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_gui_session({
+    #     resource_name: "ResourceName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operations #=> Array
+    #   resp.operations[0].id #=> String
+    #   resp.operations[0].resource_name #=> String
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operations[0].created_at #=> Time
+    #   resp.operations[0].location.availability_zone #=> String
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operations[0].is_terminal #=> Boolean
+    #   resp.operations[0].operation_details #=> String
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operations[0].status_changed_at #=> Time
+    #   resp.operations[0].error_code #=> String
+    #   resp.operations[0].error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/StartGUISession AWS API Documentation
+    #
+    # @overload start_gui_session(params = {})
+    # @param [Hash] params ({})
+    def start_gui_session(params = {}, options = {})
+      req = build_request(:start_gui_session, params)
+      req.send_request(options)
+    end
+
     # Starts a specific Amazon Lightsail instance from a stopped state. To
     # restart an instance, use the `reboot instance` operation.
     #
     # <note markdown="1"> When you start a stopped instance, Lightsail assigns a new public IP
     # address to the instance. To use the same IP address after stopping and
     # starting an instance, create a static IP address and attach it to the
-    # instance. For more information, see the [Lightsail Dev Guide][1].
+    # instance. For more information, see the [Amazon Lightsail Developer
+    # Guide][1].
     #
     #  </note>
     #
     # The `start instance` operation supports tag-based access control via
     # resource tags applied to the resource identified by `instance name`.
-    # For more information, see the [Lightsail Dev Guide][2].
+    # For more information, see the [Amazon Lightsail Developer Guide][2].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/lightsail-create-static-ip
-    # [2]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/lightsail-create-static-ip
+    # [2]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :instance_name
     #   The name of the instance (a virtual private server) to start.
@@ -9416,13 +10933,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9442,12 +10959,12 @@ module Aws::Lightsail
     #
     # The `start relational database` operation supports tag-based access
     # control via resource tags applied to the resource identified by
-    # relationalDatabaseName. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # relationalDatabaseName. For more information, see the [Amazon
+    # Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :relational_database_name
     #   The name of your database to start.
@@ -9467,13 +10984,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9488,23 +11005,67 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
+    # Terminates a web-based NICE DCV session that’s used to access a
+    # virtual computer’s operating system or application. The session will
+    # close and any unsaved data will be lost.
+    #
+    # @option params [required, String] :resource_name
+    #   The resource name.
+    #
+    # @return [Types::StopGUISessionResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StopGUISessionResult#operations #operations} => Array&lt;Types::Operation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.stop_gui_session({
+    #     resource_name: "ResourceName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operations #=> Array
+    #   resp.operations[0].id #=> String
+    #   resp.operations[0].resource_name #=> String
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operations[0].created_at #=> Time
+    #   resp.operations[0].location.availability_zone #=> String
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operations[0].is_terminal #=> Boolean
+    #   resp.operations[0].operation_details #=> String
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operations[0].status_changed_at #=> Time
+    #   resp.operations[0].error_code #=> String
+    #   resp.operations[0].error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/StopGUISession AWS API Documentation
+    #
+    # @overload stop_gui_session(params = {})
+    # @param [Hash] params ({})
+    def stop_gui_session(params = {}, options = {})
+      req = build_request(:stop_gui_session, params)
+      req.send_request(options)
+    end
+
     # Stops a specific Amazon Lightsail instance that is currently running.
     #
     # <note markdown="1"> When you start a stopped instance, Lightsail assigns a new public IP
     # address to the instance. To use the same IP address after stopping and
     # starting an instance, create a static IP address and attach it to the
-    # instance. For more information, see the [Lightsail Dev Guide][1].
+    # instance. For more information, see the [Amazon Lightsail Developer
+    # Guide][1].
     #
     #  </note>
     #
     # The `stop instance` operation supports tag-based access control via
     # resource tags applied to the resource identified by `instance name`.
-    # For more information, see the [Lightsail Dev Guide][2].
+    # For more information, see the [Amazon Lightsail Developer Guide][2].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/lightsail-create-static-ip
-    # [2]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/lightsail-create-static-ip
+    # [2]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :instance_name
     #   The name of the instance (a virtual private server) to stop.
@@ -9533,13 +11094,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9559,12 +11120,12 @@ module Aws::Lightsail
     #
     # The `stop relational database` operation supports tag-based access
     # control via resource tags applied to the resource identified by
-    # relationalDatabaseName. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # relationalDatabaseName. For more information, see the [Amazon
+    # Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :relational_database_name
     #   The name of your database to stop.
@@ -9589,13 +11150,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9613,17 +11174,17 @@ module Aws::Lightsail
     # Adds one or more tags to the specified Amazon Lightsail resource. Each
     # resource can have a maximum of 50 tags. Each tag consists of a key and
     # an optional value. Tag keys must be unique per resource. For more
-    # information about tags, see the [Lightsail Dev Guide][1].
+    # information about tags, see the [Amazon Lightsail Developer Guide][1].
     #
     # The `tag resource` operation supports tag-based access control via
     # request tags and resource tags applied to the resource identified by
-    # `resource name`. For more information, see the [Lightsail Dev
-    # Guide][2].
+    # `resource name`. For more information, see the [Amazon Lightsail
+    # Developer Guide][2].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags
-    # [2]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags
+    # [2]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :resource_name
     #   The name of the resource to which you are adding tags.
@@ -9657,13 +11218,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9724,13 +11285,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9745,7 +11306,7 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
-    # Attempts to unpeer the Lightsail VPC from the user's default VPC.
+    # Unpeers the Lightsail VPC from the user's default VPC.
     #
     # @return [Types::UnpeerVpcResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -9755,13 +11316,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -9781,12 +11342,12 @@ module Aws::Lightsail
     #
     # The `untag resource` operation supports tag-based access control via
     # request tags and resource tags applied to the resource identified by
-    # `resource name`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `resource name`. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :resource_name
     #   The name of the resource from which you are removing a tag.
@@ -9815,13 +11376,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -9833,6 +11394,188 @@ module Aws::Lightsail
     # @param [Hash] params ({})
     def untag_resource(params = {}, options = {})
       req = build_request(:untag_resource, params)
+      req.send_request(options)
+    end
+
+    # Updates an existing Amazon Lightsail bucket.
+    #
+    # Use this action to update the configuration of an existing bucket,
+    # such as versioning, public accessibility, and the Amazon Web Services
+    # accounts that can access the bucket.
+    #
+    # @option params [required, String] :bucket_name
+    #   The name of the bucket to update.
+    #
+    # @option params [Types::AccessRules] :access_rules
+    #   An object that sets the public accessibility of objects in the
+    #   specified bucket.
+    #
+    # @option params [String] :versioning
+    #   Specifies whether to enable or suspend versioning of objects in the
+    #   bucket.
+    #
+    #   The following options can be specified:
+    #
+    #   * `Enabled` - Enables versioning of objects in the specified bucket.
+    #
+    #   * `Suspended` - Suspends versioning of objects in the specified
+    #     bucket. Existing object versions are retained.
+    #
+    # @option params [Array<String>] :readonly_access_accounts
+    #   An array of strings to specify the Amazon Web Services account IDs
+    #   that can access the bucket.
+    #
+    #   You can give a maximum of 10 Amazon Web Services accounts access to a
+    #   bucket.
+    #
+    # @option params [Types::BucketAccessLogConfig] :access_log_config
+    #   An object that describes the access log configuration for the bucket.
+    #
+    # @return [Types::UpdateBucketResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateBucketResult#bucket #bucket} => Types::Bucket
+    #   * {Types::UpdateBucketResult#operations #operations} => Array&lt;Types::Operation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_bucket({
+    #     bucket_name: "BucketName", # required
+    #     access_rules: {
+    #       get_object: "public", # accepts public, private
+    #       allow_public_overrides: false,
+    #     },
+    #     versioning: "NonEmptyString",
+    #     readonly_access_accounts: ["NonEmptyString"],
+    #     access_log_config: {
+    #       enabled: false, # required
+    #       destination: "BucketName",
+    #       prefix: "BucketAccessLogPrefix",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.bucket.resource_type #=> String
+    #   resp.bucket.access_rules.get_object #=> String, one of "public", "private"
+    #   resp.bucket.access_rules.allow_public_overrides #=> Boolean
+    #   resp.bucket.arn #=> String
+    #   resp.bucket.bundle_id #=> String
+    #   resp.bucket.created_at #=> Time
+    #   resp.bucket.url #=> String
+    #   resp.bucket.location.availability_zone #=> String
+    #   resp.bucket.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.bucket.name #=> String
+    #   resp.bucket.support_code #=> String
+    #   resp.bucket.tags #=> Array
+    #   resp.bucket.tags[0].key #=> String
+    #   resp.bucket.tags[0].value #=> String
+    #   resp.bucket.object_versioning #=> String
+    #   resp.bucket.able_to_update_bundle #=> Boolean
+    #   resp.bucket.readonly_access_accounts #=> Array
+    #   resp.bucket.readonly_access_accounts[0] #=> String
+    #   resp.bucket.resources_receiving_access #=> Array
+    #   resp.bucket.resources_receiving_access[0].name #=> String
+    #   resp.bucket.resources_receiving_access[0].resource_type #=> String
+    #   resp.bucket.state.code #=> String
+    #   resp.bucket.state.message #=> String
+    #   resp.bucket.access_log_config.enabled #=> Boolean
+    #   resp.bucket.access_log_config.destination #=> String
+    #   resp.bucket.access_log_config.prefix #=> String
+    #   resp.operations #=> Array
+    #   resp.operations[0].id #=> String
+    #   resp.operations[0].resource_name #=> String
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operations[0].created_at #=> Time
+    #   resp.operations[0].location.availability_zone #=> String
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operations[0].is_terminal #=> Boolean
+    #   resp.operations[0].operation_details #=> String
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operations[0].status_changed_at #=> Time
+    #   resp.operations[0].error_code #=> String
+    #   resp.operations[0].error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/UpdateBucket AWS API Documentation
+    #
+    # @overload update_bucket(params = {})
+    # @param [Hash] params ({})
+    def update_bucket(params = {}, options = {})
+      req = build_request(:update_bucket, params)
+      req.send_request(options)
+    end
+
+    # Updates the bundle, or storage plan, of an existing Amazon Lightsail
+    # bucket.
+    #
+    # A bucket bundle specifies the monthly cost, storage space, and data
+    # transfer quota for a bucket. You can update a bucket's bundle only
+    # one time within a monthly Amazon Web Services billing cycle. To
+    # determine if you can update a bucket's bundle, use the
+    # [GetBuckets][1] action. The `ableToUpdateBundle` parameter in the
+    # response will indicate whether you can currently update a bucket's
+    # bundle.
+    #
+    # Update a bucket's bundle if it's consistently going over its storage
+    # space or data transfer quota, or if a bucket's usage is consistently
+    # in the lower range of its storage space or data transfer quota. Due to
+    # the unpredictable usage fluctuations that a bucket might experience,
+    # we strongly recommend that you update a bucket's bundle only as a
+    # long-term strategy, instead of as a short-term, monthly cost-cutting
+    # measure. Choose a bucket bundle that will provide the bucket with
+    # ample storage space and data transfer for a long time to come.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBuckets.html
+    #
+    # @option params [required, String] :bucket_name
+    #   The name of the bucket for which to update the bundle.
+    #
+    # @option params [required, String] :bundle_id
+    #   The ID of the new bundle to apply to the bucket.
+    #
+    #   Use the [GetBucketBundles][1] action to get a list of bundle IDs that
+    #   you can specify.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBucketBundles.html
+    #
+    # @return [Types::UpdateBucketBundleResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateBucketBundleResult#operations #operations} => Array&lt;Types::Operation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_bucket_bundle({
+    #     bucket_name: "BucketName", # required
+    #     bundle_id: "NonEmptyString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operations #=> Array
+    #   resp.operations[0].id #=> String
+    #   resp.operations[0].resource_name #=> String
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operations[0].created_at #=> Time
+    #   resp.operations[0].location.availability_zone #=> String
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operations[0].is_terminal #=> Boolean
+    #   resp.operations[0].operation_details #=> String
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operations[0].status_changed_at #=> Time
+    #   resp.operations[0].error_code #=> String
+    #   resp.operations[0].error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/UpdateBucketBundle AWS API Documentation
+    #
+    # @overload update_bucket_bundle(params = {})
+    # @param [Hash] params ({})
+    def update_bucket_bundle(params = {}, options = {})
+      req = build_request(:update_bucket_bundle, params)
       req.send_request(options)
     end
 
@@ -9886,6 +11629,19 @@ module Aws::Lightsail
     #   You can specify public domain names using a string to array map as
     #   shown in the example later on this page.
     #
+    # @option params [Types::PrivateRegistryAccessRequest] :private_registry_access
+    #   An object to describe the configuration for the container service to
+    #   access private container image repositories, such as Amazon Elastic
+    #   Container Registry (Amazon ECR) private repositories.
+    #
+    #   For more information, see [Configuring access to an Amazon ECR private
+    #   repository for an Amazon Lightsail container service][1] in the
+    #   *Amazon Lightsail Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-container-service-ecr-private-repo-access
+    #
     # @return [Types::UpdateContainerServiceResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateContainerServiceResult#container_service #container_service} => Types::ContainerService
@@ -9900,6 +11656,11 @@ module Aws::Lightsail
     #     public_domain_names: {
     #       "string" => ["string"],
     #     },
+    #     private_registry_access: {
+    #       ecr_image_puller_role: {
+    #         is_active: false,
+    #       },
+    #     },
     #   })
     #
     # @example Response structure
@@ -9908,14 +11669,16 @@ module Aws::Lightsail
     #   resp.container_service.arn #=> String
     #   resp.container_service.created_at #=> Time
     #   resp.container_service.location.availability_zone #=> String
-    #   resp.container_service.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
-    #   resp.container_service.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.container_service.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.container_service.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.container_service.tags #=> Array
     #   resp.container_service.tags[0].key #=> String
     #   resp.container_service.tags[0].value #=> String
     #   resp.container_service.power #=> String, one of "nano", "micro", "small", "medium", "large", "xlarge"
     #   resp.container_service.power_id #=> String
-    #   resp.container_service.state #=> String, one of "PENDING", "READY", "RUNNING", "UPDATING", "DELETING", "DISABLED"
+    #   resp.container_service.state #=> String, one of "PENDING", "READY", "RUNNING", "UPDATING", "DELETING", "DISABLED", "DEPLOYING"
+    #   resp.container_service.state_detail.code #=> String, one of "CREATING_SYSTEM_RESOURCES", "CREATING_NETWORK_INFRASTRUCTURE", "PROVISIONING_CERTIFICATE", "PROVISIONING_SERVICE", "CREATING_DEPLOYMENT", "EVALUATING_HEALTH_CHECK", "ACTIVATING_DEPLOYMENT", "CERTIFICATE_LIMIT_EXCEEDED", "UNKNOWN_ERROR"
+    #   resp.container_service.state_detail.message #=> String
     #   resp.container_service.scale #=> Integer
     #   resp.container_service.current_deployment.version #=> Integer
     #   resp.container_service.current_deployment.state #=> String, one of "ACTIVATING", "ACTIVE", "INACTIVE", "FAILED"
@@ -9962,6 +11725,8 @@ module Aws::Lightsail
     #   resp.container_service.public_domain_names["string"] #=> Array
     #   resp.container_service.public_domain_names["string"][0] #=> String
     #   resp.container_service.url #=> String
+    #   resp.container_service.private_registry_access.ecr_image_puller_role.is_active #=> Boolean
+    #   resp.container_service.private_registry_access.ecr_image_puller_role.principal_arn #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/UpdateContainerService AWS API Documentation
     #
@@ -9976,7 +11741,7 @@ module Aws::Lightsail
     # distribution.
     #
     # Use this action to update the configuration of your existing
-    # distribution
+    # distribution.
     #
     # @option params [required, String] :distribution_name
     #   The name of the distribution to update.
@@ -9986,7 +11751,7 @@ module Aws::Lightsail
     #
     # @option params [Types::InputOrigin] :origin
     #   An object that describes the origin resource for the distribution,
-    #   such as a Lightsail instance or load balancer.
+    #   such as a Lightsail instance, bucket, or load balancer.
     #
     #   The distribution pulls, caches, and serves content from the origin.
     #
@@ -10011,6 +11776,33 @@ module Aws::Lightsail
     # @option params [Boolean] :is_enabled
     #   Indicates whether to enable the distribution.
     #
+    # @option params [String] :viewer_minimum_tls_protocol_version
+    #   Use this parameter to update the minimum TLS protocol version for the
+    #   SSL/TLS certificate that's attached to the distribution.
+    #
+    # @option params [String] :certificate_name
+    #   The name of the SSL/TLS certificate that you want to attach to the
+    #   distribution.
+    #
+    #   Only certificates with a status of `ISSUED` can be attached to a
+    #   distribution.
+    #
+    #   Use the [GetCertificates][1] action to get a list of certificate names
+    #   that you can specify.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetCertificates.html
+    #
+    # @option params [Boolean] :use_default_certificate
+    #   Indicates whether the default SSL/TLS certificate is attached to the
+    #   distribution. The default value is `true`. When `true`, the
+    #   distribution uses the default domain name such as
+    #   `d111111abcdef8.cloudfront.net`.
+    #
+    #   Set this value to `false` to attach a new certificate to the
+    #   distribution.
+    #
     # @return [Types::UpdateDistributionResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateDistributionResult#operation #operation} => Types::Operation
@@ -10021,8 +11813,9 @@ module Aws::Lightsail
     #     distribution_name: "ResourceName", # required
     #     origin: {
     #       name: "ResourceName",
-    #       region_name: "us-east-1", # accepts us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, ca-central-1, ap-south-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, ap-northeast-2
+    #       region_name: "us-east-1", # accepts us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, ca-central-1, ap-south-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, ap-northeast-2, eu-north-1
     #       protocol_policy: "http-only", # accepts http-only, https-only
+    #       response_timeout: 1,
     #     },
     #     default_cache_behavior: {
     #       behavior: "dont-cache", # accepts dont-cache, cache
@@ -10053,19 +11846,22 @@ module Aws::Lightsail
     #       },
     #     ],
     #     is_enabled: false,
+    #     viewer_minimum_tls_protocol_version: "TLSv1.1_2016", # accepts TLSv1.1_2016, TLSv1.2_2018, TLSv1.2_2019, TLSv1.2_2021
+    #     certificate_name: "ResourceName",
+    #     use_default_certificate: false,
     #   })
     #
     # @example Response structure
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -10084,16 +11880,16 @@ module Aws::Lightsail
     # (CDN) distribution.
     #
     # A distribution bundle specifies the monthly network transfer quota and
-    # monthly cost of your dsitribution.
+    # monthly cost of your distribution.
     #
     # Update your distribution's bundle if your distribution is going over
     # its monthly network transfer quota and is incurring an overage fee.
     #
     # You can update your distribution's bundle only one time within your
-    # monthly AWS billing cycle. To determine if you can update your
-    # distribution's bundle, use the `GetDistributions` action. The
-    # `ableToUpdateBundle` parameter in the result will indicate whether you
-    # can currently update your distribution's bundle.
+    # monthly Amazon Web Services billing cycle. To determine if you can
+    # update your distribution's bundle, use the `GetDistributions` action.
+    # The `ableToUpdateBundle` parameter in the result will indicate whether
+    # you can currently update your distribution's bundle.
     #
     # @option params [String] :distribution_name
     #   The name of the distribution for which to update the bundle.
@@ -10122,13 +11918,13 @@ module Aws::Lightsail
     #
     #   resp.operation.id #=> String
     #   resp.operation.resource_name #=> String
-    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operation.created_at #=> Time
     #   resp.operation.location.availability_zone #=> String
-    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operation.is_terminal #=> Boolean
     #   resp.operation.operation_details #=> String
-    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operation.status_changed_at #=> Time
     #   resp.operation.error_code #=> String
@@ -10147,11 +11943,11 @@ module Aws::Lightsail
     #
     # The `update domain entry` operation supports tag-based access control
     # via resource tags applied to the resource identified by `domain name`.
-    # For more information, see the [Lightsail Dev Guide][1].
+    # For more information, see the [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :domain_name
     #   The name of the domain recordset to update.
@@ -10185,13 +11981,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -10206,27 +12002,155 @@ module Aws::Lightsail
       req.send_request(options)
     end
 
+    # Modifies the Amazon Lightsail instance metadata parameters on a
+    # running or stopped instance. When you modify the parameters on a
+    # running instance, the `GetInstance` or `GetInstances` API operation
+    # initially responds with a state of `pending`. After the parameter
+    # modifications are successfully applied, the state changes to `applied`
+    # in subsequent `GetInstance` or `GetInstances` API calls. For more
+    # information, see [Use IMDSv2 with an Amazon Lightsail instance][1] in
+    # the *Amazon Lightsail Developer Guide*.
+    #
+    #
+    #
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-instance-metadata-service
+    #
+    # @option params [required, String] :instance_name
+    #   The name of the instance for which to update metadata parameters.
+    #
+    # @option params [String] :http_tokens
+    #   The state of token usage for your instance metadata requests. If the
+    #   parameter is not specified in the request, the default state is
+    #   `optional`.
+    #
+    #   If the state is `optional`, you can choose whether to retrieve
+    #   instance metadata with a signed token header on your request. If you
+    #   retrieve the IAM role credentials without a token, the version 1.0
+    #   role credentials are returned. If you retrieve the IAM role
+    #   credentials by using a valid signed token, the version 2.0 role
+    #   credentials are returned.
+    #
+    #   If the state is `required`, you must send a signed token header with
+    #   all instance metadata retrieval requests. In this state, retrieving
+    #   the IAM role credential always returns the version 2.0 credentials.
+    #   The version 1.0 credentials are not available.
+    #
+    # @option params [String] :http_endpoint
+    #   Enables or disables the HTTP metadata endpoint on your instances. If
+    #   this parameter is not specified, the existing state is maintained.
+    #
+    #   If you specify a value of `disabled`, you cannot access your instance
+    #   metadata.
+    #
+    # @option params [Integer] :http_put_response_hop_limit
+    #   The desired HTTP PUT response hop limit for instance metadata
+    #   requests. A larger number means that the instance metadata requests
+    #   can travel farther. If no parameter is specified, the existing state
+    #   is maintained.
+    #
+    # @option params [String] :http_protocol_ipv_6
+    #   Enables or disables the IPv6 endpoint for the instance metadata
+    #   service. This setting applies only when the HTTP metadata endpoint is
+    #   enabled.
+    #
+    #   <note markdown="1"> This parameter is available only for instances in the Europe
+    #   (Stockholm) Amazon Web Services Region (`eu-north-1`).
+    #
+    #    </note>
+    #
+    # @return [Types::UpdateInstanceMetadataOptionsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateInstanceMetadataOptionsResult#operation #operation} => Types::Operation
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_instance_metadata_options({
+    #     instance_name: "ResourceName", # required
+    #     http_tokens: "optional", # accepts optional, required
+    #     http_endpoint: "disabled", # accepts disabled, enabled
+    #     http_put_response_hop_limit: 1,
+    #     http_protocol_ipv_6: "disabled", # accepts disabled, enabled
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.operation.id #=> String
+    #   resp.operation.resource_name #=> String
+    #   resp.operation.resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
+    #   resp.operation.created_at #=> Time
+    #   resp.operation.location.availability_zone #=> String
+    #   resp.operation.location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
+    #   resp.operation.is_terminal #=> Boolean
+    #   resp.operation.operation_details #=> String
+    #   resp.operation.operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
+    #   resp.operation.status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
+    #   resp.operation.status_changed_at #=> Time
+    #   resp.operation.error_code #=> String
+    #   resp.operation.error_details #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/lightsail-2016-11-28/UpdateInstanceMetadataOptions AWS API Documentation
+    #
+    # @overload update_instance_metadata_options(params = {})
+    # @param [Hash] params ({})
+    def update_instance_metadata_options(params = {}, options = {})
+      req = build_request(:update_instance_metadata_options, params)
+      req.send_request(options)
+    end
+
     # Updates the specified attribute for a load balancer. You can only
     # update one attribute at a time.
     #
     # The `update load balancer attribute` operation supports tag-based
     # access control via resource tags applied to the resource identified by
-    # `load balancer name`. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # `load balancer name`. For more information, see the [Amazon Lightsail
+    # Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :load_balancer_name
-    #   The name of the load balancer that you want to modify (e.g.,
-    #   `my-load-balancer`.
+    #   The name of the load balancer that you want to modify
+    #   (`my-load-balancer`.
     #
     # @option params [required, String] :attribute_name
-    #   The name of the attribute you want to update. Valid values are below.
+    #   The name of the attribute you want to update.
     #
     # @option params [required, String] :attribute_value
     #   The value that you want to specify for the attribute name.
+    #
+    #   The following values are supported depending on what you specify for
+    #   the `attributeName` request parameter:
+    #
+    #   * If you specify `HealthCheckPath` for the `attributeName` request
+    #     parameter, then the `attributeValue` request parameter must be the
+    #     path to ping on the target (for example, `/weather/us/wa/seattle`).
+    #
+    #   * If you specify `SessionStickinessEnabled` for the `attributeName`
+    #     request parameter, then the `attributeValue` request parameter must
+    #     be `true` to activate session stickiness or `false` to deactivate
+    #     session stickiness.
+    #
+    #   * If you specify `SessionStickiness_LB_CookieDurationSeconds` for the
+    #     `attributeName` request parameter, then the `attributeValue` request
+    #     parameter must be an interger that represents the cookie duration in
+    #     seconds.
+    #
+    #   * If you specify `HttpsRedirectionEnabled` for the `attributeName`
+    #     request parameter, then the `attributeValue` request parameter must
+    #     be `true` to activate HTTP to HTTPS redirection or `false` to
+    #     deactivate HTTP to HTTPS redirection.
+    #
+    #   * If you specify `TlsPolicyName` for the `attributeName` request
+    #     parameter, then the `attributeValue` request parameter must be the
+    #     name of the TLS policy.
+    #
+    #     Use the [GetLoadBalancerTlsPolicies][1] action to get a list of TLS
+    #     policy names that you can specify.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetLoadBalancerTlsPolicies.html
     #
     # @return [Types::UpdateLoadBalancerAttributeResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -10236,7 +12160,7 @@ module Aws::Lightsail
     #
     #   resp = client.update_load_balancer_attribute({
     #     load_balancer_name: "ResourceName", # required
-    #     attribute_name: "HealthCheckPath", # required, accepts HealthCheckPath, SessionStickinessEnabled, SessionStickiness_LB_CookieDurationSeconds
+    #     attribute_name: "HealthCheckPath", # required, accepts HealthCheckPath, SessionStickinessEnabled, SessionStickiness_LB_CookieDurationSeconds, HttpsRedirectionEnabled, TlsPolicyName
     #     attribute_value: "StringMax256", # required
     #   })
     #
@@ -10245,13 +12169,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -10275,21 +12199,27 @@ module Aws::Lightsail
     #
     # The `update relational database` operation supports tag-based access
     # control via resource tags applied to the resource identified by
-    # relationalDatabaseName. For more information, see the [Lightsail Dev
-    # Guide][1].
+    # relationalDatabaseName. For more information, see the [Amazon
+    # Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :relational_database_name
-    #   The name of your database to update.
+    #   The name of your Lightsail database resource to update.
     #
     # @option params [String] :master_user_password
-    #   The password for the master user of your database. The password can
-    #   include any printable ASCII character except "/", """, or "@".
+    #   The password for the master user. The password can include any
+    #   printable ASCII character except "/", """, or "@".
     #
-    #   Constraints: Must contain 8 to 41 characters.
+    #   My**SQL**
+    #
+    #   Constraints: Must contain from 8 to 41 characters.
+    #
+    #   **PostgreSQL**
+    #
+    #   Constraints: Must contain from 8 to 128 characters.
     #
     # @option params [Boolean] :rotate_master_user_password
     #   When `true`, the master user password is changed to a new strong
@@ -10319,8 +12249,8 @@ module Aws::Lightsail
     #   your database.
     #
     #   The default is a 30-minute window selected at random from an 8-hour
-    #   block of time for each AWS Region, occurring on a random day of the
-    #   week.
+    #   block of time for each Amazon Web Services Region, occurring on a
+    #   random day of the week.
     #
     #   Constraints:
     #
@@ -10368,6 +12298,18 @@ module Aws::Lightsail
     #   Indicates the certificate that needs to be associated with the
     #   database.
     #
+    # @option params [String] :relational_database_blueprint_id
+    #   This parameter is used to update the major version of the database.
+    #   Enter the `blueprintId` for the major version that you want to update
+    #   to.
+    #
+    #   Use the [GetRelationalDatabaseBlueprints][1] action to get a list of
+    #   available blueprint IDs.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetRelationalDatabaseBlueprints.html
+    #
     # @return [Types::UpdateRelationalDatabaseResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateRelationalDatabaseResult#operations #operations} => Array&lt;Types::Operation&gt;
@@ -10385,6 +12327,7 @@ module Aws::Lightsail
     #     publicly_accessible: false,
     #     apply_immediately: false,
     #     ca_certificate_identifier: "string",
+    #     relational_database_blueprint_id: "string",
     #   })
     #
     # @example Response structure
@@ -10392,13 +12335,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -10427,11 +12370,11 @@ module Aws::Lightsail
     # The `update relational database parameters` operation supports
     # tag-based access control via resource tags applied to the resource
     # identified by relationalDatabaseName. For more information, see the
-    # [Lightsail Dev Guide][1].
+    # [Amazon Lightsail Developer Guide][1].
     #
     #
     #
-    # [1]: https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags
+    # [1]: https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags
     #
     # @option params [required, String] :relational_database_name
     #   The name of your database for which to update parameters.
@@ -10466,13 +12409,13 @@ module Aws::Lightsail
     #   resp.operations #=> Array
     #   resp.operations[0].id #=> String
     #   resp.operations[0].resource_name #=> String
-    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate"
+    #   resp.operations[0].resource_type #=> String, one of "ContainerService", "Instance", "StaticIp", "KeyPair", "InstanceSnapshot", "Domain", "PeeredVpc", "LoadBalancer", "LoadBalancerTlsCertificate", "Disk", "DiskSnapshot", "RelationalDatabase", "RelationalDatabaseSnapshot", "ExportSnapshotRecord", "CloudFormationStackRecord", "Alarm", "ContactMethod", "Distribution", "Certificate", "Bucket"
     #   resp.operations[0].created_at #=> Time
     #   resp.operations[0].location.availability_zone #=> String
-    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2"
+    #   resp.operations[0].location.region_name #=> String, one of "us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "eu-north-1"
     #   resp.operations[0].is_terminal #=> Boolean
     #   resp.operations[0].operation_details #=> String
-    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage"
+    #   resp.operations[0].operation_type #=> String, one of "DeleteKnownHostKeys", "DeleteInstance", "CreateInstance", "StopInstance", "StartInstance", "RebootInstance", "OpenInstancePublicPorts", "PutInstancePublicPorts", "CloseInstancePublicPorts", "AllocateStaticIp", "ReleaseStaticIp", "AttachStaticIp", "DetachStaticIp", "UpdateDomainEntry", "DeleteDomainEntry", "CreateDomain", "DeleteDomain", "CreateInstanceSnapshot", "DeleteInstanceSnapshot", "CreateInstancesFromSnapshot", "CreateLoadBalancer", "DeleteLoadBalancer", "AttachInstancesToLoadBalancer", "DetachInstancesFromLoadBalancer", "UpdateLoadBalancerAttribute", "CreateLoadBalancerTlsCertificate", "DeleteLoadBalancerTlsCertificate", "AttachLoadBalancerTlsCertificate", "CreateDisk", "DeleteDisk", "AttachDisk", "DetachDisk", "CreateDiskSnapshot", "DeleteDiskSnapshot", "CreateDiskFromSnapshot", "CreateRelationalDatabase", "UpdateRelationalDatabase", "DeleteRelationalDatabase", "CreateRelationalDatabaseFromSnapshot", "CreateRelationalDatabaseSnapshot", "DeleteRelationalDatabaseSnapshot", "UpdateRelationalDatabaseParameters", "StartRelationalDatabase", "RebootRelationalDatabase", "StopRelationalDatabase", "EnableAddOn", "DisableAddOn", "PutAlarm", "GetAlarms", "DeleteAlarm", "TestAlarm", "CreateContactMethod", "GetContactMethods", "SendContactMethodVerification", "DeleteContactMethod", "CreateDistribution", "UpdateDistribution", "DeleteDistribution", "ResetDistributionCache", "AttachCertificateToDistribution", "DetachCertificateFromDistribution", "UpdateDistributionBundle", "SetIpAddressType", "CreateCertificate", "DeleteCertificate", "CreateContainerService", "UpdateContainerService", "DeleteContainerService", "CreateContainerServiceDeployment", "CreateContainerServiceRegistryLogin", "RegisterContainerImage", "DeleteContainerImage", "CreateBucket", "DeleteBucket", "CreateBucketAccessKey", "DeleteBucketAccessKey", "UpdateBucketBundle", "UpdateBucket", "SetResourceAccessForBucket", "UpdateInstanceMetadataOptions", "StartGUISession", "StopGUISession", "SetupInstanceHttps"
     #   resp.operations[0].status #=> String, one of "NotStarted", "Started", "Failed", "Completed", "Succeeded"
     #   resp.operations[0].status_changed_at #=> Time
     #   resp.operations[0].error_code #=> String
@@ -10493,14 +12436,19 @@ module Aws::Lightsail
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::Lightsail')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-lightsail'
-      context[:gem_version] = '1.41.0'
+      context[:gem_version] = '1.102.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -173,13 +173,13 @@ module Aws::MediaLive
       end
 
       # @return [String]
-      def message
-        @message || @data[:message]
+      def element_path
+        @data[:element_path]
       end
 
       # @return [String]
-      def validation_errors
-        @data[:validation_errors]
+      def error_message
+        @data[:error_message]
       end
     end
 

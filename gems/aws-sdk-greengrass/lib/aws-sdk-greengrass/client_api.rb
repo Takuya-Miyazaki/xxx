@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::Greengrass
   # @api private
@@ -479,7 +480,7 @@ module Aws::Greengrass
 
     CreateGroupRequest.add_member(:amzn_client_token, Shapes::ShapeRef.new(shape: __string, location: "header", location_name: "X-Amzn-Client-Token"))
     CreateGroupRequest.add_member(:initial_version, Shapes::ShapeRef.new(shape: GroupVersion, location_name: "InitialVersion"))
-    CreateGroupRequest.add_member(:name, Shapes::ShapeRef.new(shape: __string, location_name: "Name"))
+    CreateGroupRequest.add_member(:name, Shapes::ShapeRef.new(shape: __string, required: true, location_name: "Name"))
     CreateGroupRequest.add_member(:tags, Shapes::ShapeRef.new(shape: Tags, location_name: "tags"))
     CreateGroupRequest.struct_class = Types::CreateGroupRequest
 
@@ -700,6 +701,7 @@ module Aws::Greengrass
     FunctionConfiguration.add_member(:memory_size, Shapes::ShapeRef.new(shape: __integer, location_name: "MemorySize"))
     FunctionConfiguration.add_member(:pinned, Shapes::ShapeRef.new(shape: __boolean, location_name: "Pinned"))
     FunctionConfiguration.add_member(:timeout, Shapes::ShapeRef.new(shape: __integer, location_name: "Timeout"))
+    FunctionConfiguration.add_member(:function_runtime_override, Shapes::ShapeRef.new(shape: __string, location_name: "FunctionRuntimeOverride"))
     FunctionConfiguration.struct_class = Types::FunctionConfiguration
 
     FunctionConfigurationEnvironment.add_member(:access_sysfs, Shapes::ShapeRef.new(shape: __boolean, location_name: "AccessSysfs"))

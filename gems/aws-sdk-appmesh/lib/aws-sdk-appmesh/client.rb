@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:appmesh)
 
 module Aws::AppMesh
   # An API client for AppMesh.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::AppMesh
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::AppMesh::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::AppMesh
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::AppMesh
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::AppMesh
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::AppMesh
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::AppMesh
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::AppMesh
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::AppMesh
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::AppMesh::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::AppMesh::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -354,11 +474,11 @@ module Aws::AppMesh
     #   The name of the service mesh to create the gateway route in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then the account that you specify must share the mesh
-    #   with your account before you can create the resource in the service
-    #   mesh. For more information about mesh sharing, see [Working with
-    #   shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then the account that you specify must
+    #   share the mesh with your account before you can create the resource in
+    #   the service mesh. For more information about mesh sharing, see
+    #   [Working with shared meshes][1].
     #
     #
     #
@@ -393,40 +513,162 @@ module Aws::AppMesh
     #     spec: { # required
     #       grpc_route: {
     #         action: { # required
+    #           rewrite: {
+    #             hostname: {
+    #               default_target_hostname: "ENABLED", # accepts ENABLED, DISABLED
+    #             },
+    #           },
     #           target: { # required
+    #             port: 1,
     #             virtual_service: { # required
     #               virtual_service_name: "ResourceName", # required
     #             },
     #           },
     #         },
     #         match: { # required
+    #           hostname: {
+    #             exact: "ExactHostName",
+    #             suffix: "SuffixHostname",
+    #           },
+    #           metadata: [
+    #             {
+    #               invert: false,
+    #               match: {
+    #                 exact: "HeaderMatch",
+    #                 prefix: "HeaderMatch",
+    #                 range: {
+    #                   end: 1, # required
+    #                   start: 1, # required
+    #                 },
+    #                 regex: "HeaderMatch",
+    #                 suffix: "HeaderMatch",
+    #               },
+    #               name: "HeaderName", # required
+    #             },
+    #           ],
+    #           port: 1,
     #           service_name: "ServiceName",
     #         },
     #       },
     #       http2_route: {
     #         action: { # required
+    #           rewrite: {
+    #             hostname: {
+    #               default_target_hostname: "ENABLED", # accepts ENABLED, DISABLED
+    #             },
+    #             path: {
+    #               exact: "HttpPathExact",
+    #             },
+    #             prefix: {
+    #               default_prefix: "ENABLED", # accepts ENABLED, DISABLED
+    #               value: "HttpGatewayRoutePrefix",
+    #             },
+    #           },
     #           target: { # required
+    #             port: 1,
     #             virtual_service: { # required
     #               virtual_service_name: "ResourceName", # required
     #             },
     #           },
     #         },
     #         match: { # required
-    #           prefix: "String", # required
+    #           headers: [
+    #             {
+    #               invert: false,
+    #               match: {
+    #                 exact: "HeaderMatch",
+    #                 prefix: "HeaderMatch",
+    #                 range: {
+    #                   end: 1, # required
+    #                   start: 1, # required
+    #                 },
+    #                 regex: "HeaderMatch",
+    #                 suffix: "HeaderMatch",
+    #               },
+    #               name: "HeaderName", # required
+    #             },
+    #           ],
+    #           hostname: {
+    #             exact: "ExactHostName",
+    #             suffix: "SuffixHostname",
+    #           },
+    #           method: "GET", # accepts GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
+    #           path: {
+    #             exact: "HttpPathExact",
+    #             regex: "HttpPathRegex",
+    #           },
+    #           port: 1,
+    #           prefix: "String",
+    #           query_parameters: [
+    #             {
+    #               match: {
+    #                 exact: "String",
+    #               },
+    #               name: "QueryParameterName", # required
+    #             },
+    #           ],
     #         },
     #       },
     #       http_route: {
     #         action: { # required
+    #           rewrite: {
+    #             hostname: {
+    #               default_target_hostname: "ENABLED", # accepts ENABLED, DISABLED
+    #             },
+    #             path: {
+    #               exact: "HttpPathExact",
+    #             },
+    #             prefix: {
+    #               default_prefix: "ENABLED", # accepts ENABLED, DISABLED
+    #               value: "HttpGatewayRoutePrefix",
+    #             },
+    #           },
     #           target: { # required
+    #             port: 1,
     #             virtual_service: { # required
     #               virtual_service_name: "ResourceName", # required
     #             },
     #           },
     #         },
     #         match: { # required
-    #           prefix: "String", # required
+    #           headers: [
+    #             {
+    #               invert: false,
+    #               match: {
+    #                 exact: "HeaderMatch",
+    #                 prefix: "HeaderMatch",
+    #                 range: {
+    #                   end: 1, # required
+    #                   start: 1, # required
+    #                 },
+    #                 regex: "HeaderMatch",
+    #                 suffix: "HeaderMatch",
+    #               },
+    #               name: "HeaderName", # required
+    #             },
+    #           ],
+    #           hostname: {
+    #             exact: "ExactHostName",
+    #             suffix: "SuffixHostname",
+    #           },
+    #           method: "GET", # accepts GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
+    #           path: {
+    #             exact: "HttpPathExact",
+    #             regex: "HttpPathRegex",
+    #           },
+    #           port: 1,
+    #           prefix: "String",
+    #           query_parameters: [
+    #             {
+    #               match: {
+    #                 exact: "String",
+    #               },
+    #               name: "QueryParameterName", # required
+    #             },
+    #           ],
     #         },
     #       },
+    #       priority: 1,
     #     },
     #     tags: [
     #       {
@@ -448,12 +690,73 @@ module Aws::AppMesh
     #   resp.gateway_route.metadata.resource_owner #=> String
     #   resp.gateway_route.metadata.uid #=> String
     #   resp.gateway_route.metadata.version #=> Integer
+    #   resp.gateway_route.spec.grpc_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.grpc_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.grpc_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.grpc_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.grpc_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata #=> Array
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].invert #=> Boolean
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.exact #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.prefix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.regex #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.suffix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].name #=> String
+    #   resp.gateway_route.spec.grpc_route.match.port #=> Integer
     #   resp.gateway_route.spec.grpc_route.match.service_name #=> String
+    #   resp.gateway_route.spec.http2_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http2_route.action.rewrite.path.exact #=> String
+    #   resp.gateway_route.spec.http2_route.action.rewrite.prefix.default_prefix #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http2_route.action.rewrite.prefix.value #=> String
+    #   resp.gateway_route.spec.http2_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.http2_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers #=> Array
+    #   resp.gateway_route.spec.http2_route.match.headers[0].invert #=> Boolean
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.prefix #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.regex #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.suffix #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].name #=> String
+    #   resp.gateway_route.spec.http2_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.http2_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.gateway_route.spec.http2_route.match.path.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.path.regex #=> String
+    #   resp.gateway_route.spec.http2_route.match.port #=> Integer
     #   resp.gateway_route.spec.http2_route.match.prefix #=> String
+    #   resp.gateway_route.spec.http2_route.match.query_parameters #=> Array
+    #   resp.gateway_route.spec.http2_route.match.query_parameters[0].match.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.query_parameters[0].name #=> String
+    #   resp.gateway_route.spec.http_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http_route.action.rewrite.path.exact #=> String
+    #   resp.gateway_route.spec.http_route.action.rewrite.prefix.default_prefix #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http_route.action.rewrite.prefix.value #=> String
+    #   resp.gateway_route.spec.http_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.http_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.http_route.match.headers #=> Array
+    #   resp.gateway_route.spec.http_route.match.headers[0].invert #=> Boolean
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.prefix #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.regex #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.suffix #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].name #=> String
+    #   resp.gateway_route.spec.http_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.http_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.gateway_route.spec.http_route.match.path.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.path.regex #=> String
+    #   resp.gateway_route.spec.http_route.match.port #=> Integer
     #   resp.gateway_route.spec.http_route.match.prefix #=> String
+    #   resp.gateway_route.spec.http_route.match.query_parameters #=> Array
+    #   resp.gateway_route.spec.http_route.match.query_parameters[0].match.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.query_parameters[0].name #=> String
+    #   resp.gateway_route.spec.priority #=> Integer
     #   resp.gateway_route.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.gateway_route.virtual_gateway_name #=> String
     #
@@ -514,6 +817,9 @@ module Aws::AppMesh
     #       egress_filter: {
     #         type: "ALLOW_ALL", # required, accepts ALLOW_ALL, DROP_ALL
     #       },
+    #       service_discovery: {
+    #         ip_preference: "IPv6_PREFERRED", # accepts IPv6_PREFERRED, IPv4_PREFERRED, IPv4_ONLY, IPv6_ONLY
+    #       },
     #     },
     #     tags: [
     #       {
@@ -534,6 +840,7 @@ module Aws::AppMesh
     #   resp.mesh.metadata.uid #=> String
     #   resp.mesh.metadata.version #=> Integer
     #   resp.mesh.spec.egress_filter.type #=> String, one of "ALLOW_ALL", "DROP_ALL"
+    #   resp.mesh.spec.service_discovery.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
     #   resp.mesh.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appmesh-2019-01-25/CreateMesh AWS API Documentation
@@ -568,11 +875,11 @@ module Aws::AppMesh
     #   The name of the service mesh to create the route in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then the account that you specify must share the mesh
-    #   with your account before you can create the resource in the service
-    #   mesh. For more information about mesh sharing, see [Working with
-    #   shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then the account that you specify must
+    #   share the mesh with your account before you can create the resource in
+    #   the service mesh. For more information about mesh sharing, see
+    #   [Working with shared meshes][1].
     #
     #
     #
@@ -612,6 +919,7 @@ module Aws::AppMesh
     #         action: { # required
     #           weighted_targets: [ # required
     #             {
+    #               port: 1,
     #               virtual_node: "ResourceName", # required
     #               weight: 1, # required
     #             },
@@ -635,6 +943,7 @@ module Aws::AppMesh
     #             },
     #           ],
     #           method_name: "MethodName",
+    #           port: 1,
     #           service_name: "ServiceName",
     #         },
     #         retry_policy: {
@@ -662,6 +971,7 @@ module Aws::AppMesh
     #         action: { # required
     #           weighted_targets: [ # required
     #             {
+    #               port: 1,
     #               virtual_node: "ResourceName", # required
     #               weight: 1, # required
     #             },
@@ -685,7 +995,20 @@ module Aws::AppMesh
     #             },
     #           ],
     #           method: "GET", # accepts GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
-    #           prefix: "String", # required
+    #           path: {
+    #             exact: "HttpPathExact",
+    #             regex: "HttpPathRegex",
+    #           },
+    #           port: 1,
+    #           prefix: "String",
+    #           query_parameters: [
+    #             {
+    #               match: {
+    #                 exact: "String",
+    #               },
+    #               name: "QueryParameterName", # required
+    #             },
+    #           ],
     #           scheme: "http", # accepts http, https
     #         },
     #         retry_policy: {
@@ -712,6 +1035,7 @@ module Aws::AppMesh
     #         action: { # required
     #           weighted_targets: [ # required
     #             {
+    #               port: 1,
     #               virtual_node: "ResourceName", # required
     #               weight: 1, # required
     #             },
@@ -735,7 +1059,20 @@ module Aws::AppMesh
     #             },
     #           ],
     #           method: "GET", # accepts GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
-    #           prefix: "String", # required
+    #           path: {
+    #             exact: "HttpPathExact",
+    #             regex: "HttpPathRegex",
+    #           },
+    #           port: 1,
+    #           prefix: "String",
+    #           query_parameters: [
+    #             {
+    #               match: {
+    #                 exact: "String",
+    #               },
+    #               name: "QueryParameterName", # required
+    #             },
+    #           ],
     #           scheme: "http", # accepts http, https
     #         },
     #         retry_policy: {
@@ -763,10 +1100,14 @@ module Aws::AppMesh
     #         action: { # required
     #           weighted_targets: [ # required
     #             {
+    #               port: 1,
     #               virtual_node: "ResourceName", # required
     #               weight: 1, # required
     #             },
     #           ],
+    #         },
+    #         match: {
+    #           port: 1,
     #         },
     #         timeout: {
     #           idle: {
@@ -797,6 +1138,7 @@ module Aws::AppMesh
     #   resp.route.metadata.version #=> Integer
     #   resp.route.route_name #=> String
     #   resp.route.spec.grpc_route.action.weighted_targets #=> Array
+    #   resp.route.spec.grpc_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.grpc_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.grpc_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.grpc_route.match.metadata #=> Array
@@ -809,6 +1151,7 @@ module Aws::AppMesh
     #   resp.route.spec.grpc_route.match.metadata[0].match.suffix #=> String
     #   resp.route.spec.grpc_route.match.metadata[0].name #=> String
     #   resp.route.spec.grpc_route.match.method_name #=> String
+    #   resp.route.spec.grpc_route.match.port #=> Integer
     #   resp.route.spec.grpc_route.match.service_name #=> String
     #   resp.route.spec.grpc_route.retry_policy.grpc_retry_events #=> Array
     #   resp.route.spec.grpc_route.retry_policy.grpc_retry_events[0] #=> String, one of "cancelled", "deadline-exceeded", "internal", "resource-exhausted", "unavailable"
@@ -824,6 +1167,7 @@ module Aws::AppMesh
     #   resp.route.spec.grpc_route.timeout.per_request.unit #=> String, one of "s", "ms"
     #   resp.route.spec.grpc_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.http2_route.action.weighted_targets #=> Array
+    #   resp.route.spec.http2_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.http2_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.http2_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.http2_route.match.headers #=> Array
@@ -836,7 +1180,13 @@ module Aws::AppMesh
     #   resp.route.spec.http2_route.match.headers[0].match.suffix #=> String
     #   resp.route.spec.http2_route.match.headers[0].name #=> String
     #   resp.route.spec.http2_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.route.spec.http2_route.match.path.exact #=> String
+    #   resp.route.spec.http2_route.match.path.regex #=> String
+    #   resp.route.spec.http2_route.match.port #=> Integer
     #   resp.route.spec.http2_route.match.prefix #=> String
+    #   resp.route.spec.http2_route.match.query_parameters #=> Array
+    #   resp.route.spec.http2_route.match.query_parameters[0].match.exact #=> String
+    #   resp.route.spec.http2_route.match.query_parameters[0].name #=> String
     #   resp.route.spec.http2_route.match.scheme #=> String, one of "http", "https"
     #   resp.route.spec.http2_route.retry_policy.http_retry_events #=> Array
     #   resp.route.spec.http2_route.retry_policy.http_retry_events[0] #=> String
@@ -850,6 +1200,7 @@ module Aws::AppMesh
     #   resp.route.spec.http2_route.timeout.per_request.unit #=> String, one of "s", "ms"
     #   resp.route.spec.http2_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.http_route.action.weighted_targets #=> Array
+    #   resp.route.spec.http_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.http_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.http_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.http_route.match.headers #=> Array
@@ -862,7 +1213,13 @@ module Aws::AppMesh
     #   resp.route.spec.http_route.match.headers[0].match.suffix #=> String
     #   resp.route.spec.http_route.match.headers[0].name #=> String
     #   resp.route.spec.http_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.route.spec.http_route.match.path.exact #=> String
+    #   resp.route.spec.http_route.match.path.regex #=> String
+    #   resp.route.spec.http_route.match.port #=> Integer
     #   resp.route.spec.http_route.match.prefix #=> String
+    #   resp.route.spec.http_route.match.query_parameters #=> Array
+    #   resp.route.spec.http_route.match.query_parameters[0].match.exact #=> String
+    #   resp.route.spec.http_route.match.query_parameters[0].name #=> String
     #   resp.route.spec.http_route.match.scheme #=> String, one of "http", "https"
     #   resp.route.spec.http_route.retry_policy.http_retry_events #=> Array
     #   resp.route.spec.http_route.retry_policy.http_retry_events[0] #=> String
@@ -877,8 +1234,10 @@ module Aws::AppMesh
     #   resp.route.spec.http_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.priority #=> Integer
     #   resp.route.spec.tcp_route.action.weighted_targets #=> Array
+    #   resp.route.spec.tcp_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.tcp_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.tcp_route.action.weighted_targets[0].weight #=> Integer
+    #   resp.route.spec.tcp_route.match.port #=> Integer
     #   resp.route.spec.tcp_route.timeout.idle.unit #=> String, one of "s", "ms"
     #   resp.route.spec.tcp_route.timeout.idle.value #=> Integer
     #   resp.route.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
@@ -921,11 +1280,11 @@ module Aws::AppMesh
     #   The name of the service mesh to create the virtual gateway in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then the account that you specify must share the mesh
-    #   with your account before you can create the resource in the service
-    #   mesh. For more information about mesh sharing, see [Working with
-    #   shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then the account that you specify must
+    #   share the mesh with your account before you can create the resource in
+    #   the service mesh. For more information about mesh sharing, see
+    #   [Working with shared meshes][1].
     #
     #
     #
@@ -958,15 +1317,32 @@ module Aws::AppMesh
     #       backend_defaults: {
     #         client_policy: {
     #           tls: {
+    #             certificate: {
+    #               file: {
+    #                 certificate_chain: "FilePath", # required
+    #                 private_key: "FilePath", # required
+    #               },
+    #               sds: {
+    #                 secret_name: "VirtualGatewaySdsSecretName", # required
+    #               },
+    #             },
     #             enforce: false,
     #             ports: [1],
     #             validation: { # required
+    #               subject_alternative_names: {
+    #                 match: { # required
+    #                   exact: ["SubjectAlternativeName"], # required
+    #                 },
+    #               },
     #               trust: { # required
     #                 acm: {
     #                   certificate_authority_arns: ["Arn"], # required
     #                 },
     #                 file: {
     #                   certificate_chain: "FilePath", # required
+    #                 },
+    #                 sds: {
+    #                   secret_name: "VirtualGatewaySdsSecretName", # required
     #                 },
     #               },
     #             },
@@ -1009,14 +1385,41 @@ module Aws::AppMesh
     #                 certificate_chain: "FilePath", # required
     #                 private_key: "FilePath", # required
     #               },
+    #               sds: {
+    #                 secret_name: "VirtualGatewaySdsSecretName", # required
+    #               },
     #             },
     #             mode: "STRICT", # required, accepts STRICT, PERMISSIVE, DISABLED
+    #             validation: {
+    #               subject_alternative_names: {
+    #                 match: { # required
+    #                   exact: ["SubjectAlternativeName"], # required
+    #                 },
+    #               },
+    #               trust: { # required
+    #                 file: {
+    #                   certificate_chain: "FilePath", # required
+    #                 },
+    #                 sds: {
+    #                   secret_name: "VirtualGatewaySdsSecretName", # required
+    #                 },
+    #               },
+    #             },
     #           },
     #         },
     #       ],
     #       logging: {
     #         access_log: {
     #           file: {
+    #             format: {
+    #               json: [
+    #                 {
+    #                   key: "JsonKey", # required
+    #                   value: "JsonValue", # required
+    #                 },
+    #               ],
+    #               text: "TextFormat",
+    #             },
     #             path: "FilePath", # required
     #           },
     #         },
@@ -1041,12 +1444,18 @@ module Aws::AppMesh
     #   resp.virtual_gateway.metadata.resource_owner #=> String
     #   resp.virtual_gateway.metadata.uid #=> String
     #   resp.virtual_gateway.metadata.version #=> Integer
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.ports #=> Array
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.listeners #=> Array
     #   resp.virtual_gateway.spec.listeners[0].connection_pool.grpc.max_requests #=> Integer
     #   resp.virtual_gateway.spec.listeners[0].connection_pool.http.max_connections #=> Integer
@@ -1064,7 +1473,16 @@ module Aws::AppMesh
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.acm.certificate_arn #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.file.certificate_chain #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.file.private_key #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.certificate.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.mode #=> String, one of "STRICT", "PERMISSIVE", "DISABLED"
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.subject_alternative_names.match.exact[0] #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.trust.sds.secret_name #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json #=> Array
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json[0].key #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json[0].value #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.text #=> String
     #   resp.virtual_gateway.spec.logging.access_log.file.path #=> String
     #   resp.virtual_gateway.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.virtual_gateway.virtual_gateway_name #=> String
@@ -1105,14 +1523,12 @@ module Aws::AppMesh
     # and traces. You can override this behavior by setting the
     # `APPMESH_RESOURCE_CLUSTER` environment variable with your own name.
     #
-    #  AWS Cloud Map is not available in the eu-south-1 Region.
-    #
     #  </note>
     #
     # For more information about virtual nodes, see [Virtual nodes][1]. You
     # must be using `1.15.0` or later of the Envoy image when setting these
-    # variables. For more information about App Mesh Envoy variables, see
-    # [Envoy image][2] in the AWS App Mesh User Guide.
+    # variables. For more information aboutApp Mesh Envoy variables, see
+    # [Envoy image][2] in the App Mesh User Guide.
     #
     #
     #
@@ -1131,11 +1547,11 @@ module Aws::AppMesh
     #   The name of the service mesh to create the virtual node in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then the account that you specify must share the mesh
-    #   with your account before you can create the resource in the service
-    #   mesh. For more information about mesh sharing, see [Working with
-    #   shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then the account that you specify must
+    #   share the mesh with your account before you can create the resource in
+    #   the service mesh. For more information about mesh sharing, see
+    #   [Working with shared meshes][1].
     #
     #
     #
@@ -1168,15 +1584,32 @@ module Aws::AppMesh
     #       backend_defaults: {
     #         client_policy: {
     #           tls: {
+    #             certificate: {
+    #               file: {
+    #                 certificate_chain: "FilePath", # required
+    #                 private_key: "FilePath", # required
+    #               },
+    #               sds: {
+    #                 secret_name: "SdsSecretName", # required
+    #               },
+    #             },
     #             enforce: false,
     #             ports: [1],
     #             validation: { # required
+    #               subject_alternative_names: {
+    #                 match: { # required
+    #                   exact: ["SubjectAlternativeName"], # required
+    #                 },
+    #               },
     #               trust: { # required
     #                 acm: {
     #                   certificate_authority_arns: ["Arn"], # required
     #                 },
     #                 file: {
     #                   certificate_chain: "FilePath", # required
+    #                 },
+    #                 sds: {
+    #                   secret_name: "SdsSecretName", # required
     #                 },
     #               },
     #             },
@@ -1188,15 +1621,32 @@ module Aws::AppMesh
     #           virtual_service: {
     #             client_policy: {
     #               tls: {
+    #                 certificate: {
+    #                   file: {
+    #                     certificate_chain: "FilePath", # required
+    #                     private_key: "FilePath", # required
+    #                   },
+    #                   sds: {
+    #                     secret_name: "SdsSecretName", # required
+    #                   },
+    #                 },
     #                 enforce: false,
     #                 ports: [1],
     #                 validation: { # required
+    #                   subject_alternative_names: {
+    #                     match: { # required
+    #                       exact: ["SubjectAlternativeName"], # required
+    #                     },
+    #                   },
     #                   trust: { # required
     #                     acm: {
     #                       certificate_authority_arns: ["Arn"], # required
     #                     },
     #                     file: {
     #                       certificate_chain: "FilePath", # required
+    #                     },
+    #                     sds: {
+    #                       secret_name: "SdsSecretName", # required
     #                     },
     #                   },
     #                 },
@@ -1295,14 +1745,41 @@ module Aws::AppMesh
     #                 certificate_chain: "FilePath", # required
     #                 private_key: "FilePath", # required
     #               },
+    #               sds: {
+    #                 secret_name: "SdsSecretName", # required
+    #               },
     #             },
     #             mode: "STRICT", # required, accepts STRICT, PERMISSIVE, DISABLED
+    #             validation: {
+    #               subject_alternative_names: {
+    #                 match: { # required
+    #                   exact: ["SubjectAlternativeName"], # required
+    #                 },
+    #               },
+    #               trust: { # required
+    #                 file: {
+    #                   certificate_chain: "FilePath", # required
+    #                 },
+    #                 sds: {
+    #                   secret_name: "SdsSecretName", # required
+    #                 },
+    #               },
+    #             },
     #           },
     #         },
     #       ],
     #       logging: {
     #         access_log: {
     #           file: {
+    #             format: {
+    #               json: [
+    #                 {
+    #                   key: "JsonKey", # required
+    #                   value: "JsonValue", # required
+    #                 },
+    #               ],
+    #               text: "TextFormat",
+    #             },
     #             path: "FilePath", # required
     #           },
     #         },
@@ -1315,11 +1792,14 @@ module Aws::AppMesh
     #               value: "AwsCloudMapInstanceAttributeValue", # required
     #             },
     #           ],
+    #           ip_preference: "IPv6_PREFERRED", # accepts IPv6_PREFERRED, IPv4_PREFERRED, IPv4_ONLY, IPv6_ONLY
     #           namespace_name: "AwsCloudMapName", # required
     #           service_name: "AwsCloudMapName", # required
     #         },
     #         dns: {
     #           hostname: "Hostname", # required
+    #           ip_preference: "IPv6_PREFERRED", # accepts IPv6_PREFERRED, IPv4_PREFERRED, IPv4_ONLY, IPv6_ONLY
+    #           response_type: "LOADBALANCER", # accepts LOADBALANCER, ENDPOINTS
     #         },
     #       },
     #     },
@@ -1342,19 +1822,31 @@ module Aws::AppMesh
     #   resp.virtual_node.metadata.resource_owner #=> String
     #   resp.virtual_node.metadata.uid #=> String
     #   resp.virtual_node.metadata.version #=> Integer
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.ports #=> Array
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends #=> Array
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.ports #=> Array
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.virtual_service_name #=> String
     #   resp.virtual_node.spec.listeners #=> Array
     #   resp.virtual_node.spec.listeners[0].connection_pool.grpc.max_requests #=> Integer
@@ -1394,14 +1886,26 @@ module Aws::AppMesh
     #   resp.virtual_node.spec.listeners[0].tls.certificate.acm.certificate_arn #=> String
     #   resp.virtual_node.spec.listeners[0].tls.certificate.file.certificate_chain #=> String
     #   resp.virtual_node.spec.listeners[0].tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.listeners[0].tls.mode #=> String, one of "STRICT", "PERMISSIVE", "DISABLED"
+    #   resp.virtual_node.spec.listeners[0].tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.listeners[0].tls.validation.subject_alternative_names.match.exact[0] #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.validation.trust.sds.secret_name #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.json #=> Array
+    #   resp.virtual_node.spec.logging.access_log.file.format.json[0].key #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.json[0].value #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.text #=> String
     #   resp.virtual_node.spec.logging.access_log.file.path #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes #=> Array
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes[0].key #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes[0].value #=> String
+    #   resp.virtual_node.spec.service_discovery.aws_cloud_map.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.namespace_name #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.service_name #=> String
     #   resp.virtual_node.spec.service_discovery.dns.hostname #=> String
+    #   resp.virtual_node.spec.service_discovery.dns.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
+    #   resp.virtual_node.spec.service_discovery.dns.response_type #=> String, one of "LOADBALANCER", "ENDPOINTS"
     #   resp.virtual_node.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.virtual_node.virtual_node_name #=> String
     #
@@ -1441,11 +1945,11 @@ module Aws::AppMesh
     #   The name of the service mesh to create the virtual router in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then the account that you specify must share the mesh
-    #   with your account before you can create the resource in the service
-    #   mesh. For more information about mesh sharing, see [Working with
-    #   shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then the account that you specify must
+    #   share the mesh with your account before you can create the resource in
+    #   the service mesh. For more information about mesh sharing, see
+    #   [Working with shared meshes][1].
     #
     #
     #
@@ -1546,11 +2050,11 @@ module Aws::AppMesh
     #   The name of the service mesh to create the virtual service in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then the account that you specify must share the mesh
-    #   with your account before you can create the resource in the service
-    #   mesh. For more information about mesh sharing, see [Working with
-    #   shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then the account that you specify must
+    #   share the mesh with your account before you can create the resource in
+    #   the service mesh. For more information about mesh sharing, see
+    #   [Working with shared meshes][1].
     #
     #
     #
@@ -1631,10 +2135,10 @@ module Aws::AppMesh
     #   The name of the service mesh to delete the gateway route from.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -1667,12 +2171,73 @@ module Aws::AppMesh
     #   resp.gateway_route.metadata.resource_owner #=> String
     #   resp.gateway_route.metadata.uid #=> String
     #   resp.gateway_route.metadata.version #=> Integer
+    #   resp.gateway_route.spec.grpc_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.grpc_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.grpc_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.grpc_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.grpc_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata #=> Array
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].invert #=> Boolean
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.exact #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.prefix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.regex #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.suffix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].name #=> String
+    #   resp.gateway_route.spec.grpc_route.match.port #=> Integer
     #   resp.gateway_route.spec.grpc_route.match.service_name #=> String
+    #   resp.gateway_route.spec.http2_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http2_route.action.rewrite.path.exact #=> String
+    #   resp.gateway_route.spec.http2_route.action.rewrite.prefix.default_prefix #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http2_route.action.rewrite.prefix.value #=> String
+    #   resp.gateway_route.spec.http2_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.http2_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers #=> Array
+    #   resp.gateway_route.spec.http2_route.match.headers[0].invert #=> Boolean
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.prefix #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.regex #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.suffix #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].name #=> String
+    #   resp.gateway_route.spec.http2_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.http2_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.gateway_route.spec.http2_route.match.path.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.path.regex #=> String
+    #   resp.gateway_route.spec.http2_route.match.port #=> Integer
     #   resp.gateway_route.spec.http2_route.match.prefix #=> String
+    #   resp.gateway_route.spec.http2_route.match.query_parameters #=> Array
+    #   resp.gateway_route.spec.http2_route.match.query_parameters[0].match.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.query_parameters[0].name #=> String
+    #   resp.gateway_route.spec.http_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http_route.action.rewrite.path.exact #=> String
+    #   resp.gateway_route.spec.http_route.action.rewrite.prefix.default_prefix #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http_route.action.rewrite.prefix.value #=> String
+    #   resp.gateway_route.spec.http_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.http_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.http_route.match.headers #=> Array
+    #   resp.gateway_route.spec.http_route.match.headers[0].invert #=> Boolean
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.prefix #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.regex #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.suffix #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].name #=> String
+    #   resp.gateway_route.spec.http_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.http_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.gateway_route.spec.http_route.match.path.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.path.regex #=> String
+    #   resp.gateway_route.spec.http_route.match.port #=> Integer
     #   resp.gateway_route.spec.http_route.match.prefix #=> String
+    #   resp.gateway_route.spec.http_route.match.query_parameters #=> Array
+    #   resp.gateway_route.spec.http_route.match.query_parameters[0].match.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.query_parameters[0].name #=> String
+    #   resp.gateway_route.spec.priority #=> Integer
     #   resp.gateway_route.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.gateway_route.virtual_gateway_name #=> String
     #
@@ -1715,6 +2280,7 @@ module Aws::AppMesh
     #   resp.mesh.metadata.uid #=> String
     #   resp.mesh.metadata.version #=> Integer
     #   resp.mesh.spec.egress_filter.type #=> String, one of "ALLOW_ALL", "DROP_ALL"
+    #   resp.mesh.spec.service_discovery.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
     #   resp.mesh.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appmesh-2019-01-25/DeleteMesh AWS API Documentation
@@ -1732,10 +2298,10 @@ module Aws::AppMesh
     #   The name of the service mesh to delete the route in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -1772,6 +2338,7 @@ module Aws::AppMesh
     #   resp.route.metadata.version #=> Integer
     #   resp.route.route_name #=> String
     #   resp.route.spec.grpc_route.action.weighted_targets #=> Array
+    #   resp.route.spec.grpc_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.grpc_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.grpc_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.grpc_route.match.metadata #=> Array
@@ -1784,6 +2351,7 @@ module Aws::AppMesh
     #   resp.route.spec.grpc_route.match.metadata[0].match.suffix #=> String
     #   resp.route.spec.grpc_route.match.metadata[0].name #=> String
     #   resp.route.spec.grpc_route.match.method_name #=> String
+    #   resp.route.spec.grpc_route.match.port #=> Integer
     #   resp.route.spec.grpc_route.match.service_name #=> String
     #   resp.route.spec.grpc_route.retry_policy.grpc_retry_events #=> Array
     #   resp.route.spec.grpc_route.retry_policy.grpc_retry_events[0] #=> String, one of "cancelled", "deadline-exceeded", "internal", "resource-exhausted", "unavailable"
@@ -1799,6 +2367,7 @@ module Aws::AppMesh
     #   resp.route.spec.grpc_route.timeout.per_request.unit #=> String, one of "s", "ms"
     #   resp.route.spec.grpc_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.http2_route.action.weighted_targets #=> Array
+    #   resp.route.spec.http2_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.http2_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.http2_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.http2_route.match.headers #=> Array
@@ -1811,7 +2380,13 @@ module Aws::AppMesh
     #   resp.route.spec.http2_route.match.headers[0].match.suffix #=> String
     #   resp.route.spec.http2_route.match.headers[0].name #=> String
     #   resp.route.spec.http2_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.route.spec.http2_route.match.path.exact #=> String
+    #   resp.route.spec.http2_route.match.path.regex #=> String
+    #   resp.route.spec.http2_route.match.port #=> Integer
     #   resp.route.spec.http2_route.match.prefix #=> String
+    #   resp.route.spec.http2_route.match.query_parameters #=> Array
+    #   resp.route.spec.http2_route.match.query_parameters[0].match.exact #=> String
+    #   resp.route.spec.http2_route.match.query_parameters[0].name #=> String
     #   resp.route.spec.http2_route.match.scheme #=> String, one of "http", "https"
     #   resp.route.spec.http2_route.retry_policy.http_retry_events #=> Array
     #   resp.route.spec.http2_route.retry_policy.http_retry_events[0] #=> String
@@ -1825,6 +2400,7 @@ module Aws::AppMesh
     #   resp.route.spec.http2_route.timeout.per_request.unit #=> String, one of "s", "ms"
     #   resp.route.spec.http2_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.http_route.action.weighted_targets #=> Array
+    #   resp.route.spec.http_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.http_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.http_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.http_route.match.headers #=> Array
@@ -1837,7 +2413,13 @@ module Aws::AppMesh
     #   resp.route.spec.http_route.match.headers[0].match.suffix #=> String
     #   resp.route.spec.http_route.match.headers[0].name #=> String
     #   resp.route.spec.http_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.route.spec.http_route.match.path.exact #=> String
+    #   resp.route.spec.http_route.match.path.regex #=> String
+    #   resp.route.spec.http_route.match.port #=> Integer
     #   resp.route.spec.http_route.match.prefix #=> String
+    #   resp.route.spec.http_route.match.query_parameters #=> Array
+    #   resp.route.spec.http_route.match.query_parameters[0].match.exact #=> String
+    #   resp.route.spec.http_route.match.query_parameters[0].name #=> String
     #   resp.route.spec.http_route.match.scheme #=> String, one of "http", "https"
     #   resp.route.spec.http_route.retry_policy.http_retry_events #=> Array
     #   resp.route.spec.http_route.retry_policy.http_retry_events[0] #=> String
@@ -1852,8 +2434,10 @@ module Aws::AppMesh
     #   resp.route.spec.http_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.priority #=> Integer
     #   resp.route.spec.tcp_route.action.weighted_targets #=> Array
+    #   resp.route.spec.tcp_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.tcp_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.tcp_route.action.weighted_targets[0].weight #=> Integer
+    #   resp.route.spec.tcp_route.match.port #=> Integer
     #   resp.route.spec.tcp_route.timeout.idle.unit #=> String, one of "s", "ms"
     #   resp.route.spec.tcp_route.timeout.idle.value #=> Integer
     #   resp.route.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
@@ -1875,10 +2459,10 @@ module Aws::AppMesh
     #   The name of the service mesh to delete the virtual gateway from.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -1909,12 +2493,18 @@ module Aws::AppMesh
     #   resp.virtual_gateway.metadata.resource_owner #=> String
     #   resp.virtual_gateway.metadata.uid #=> String
     #   resp.virtual_gateway.metadata.version #=> Integer
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.ports #=> Array
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.listeners #=> Array
     #   resp.virtual_gateway.spec.listeners[0].connection_pool.grpc.max_requests #=> Integer
     #   resp.virtual_gateway.spec.listeners[0].connection_pool.http.max_connections #=> Integer
@@ -1932,7 +2522,16 @@ module Aws::AppMesh
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.acm.certificate_arn #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.file.certificate_chain #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.file.private_key #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.certificate.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.mode #=> String, one of "STRICT", "PERMISSIVE", "DISABLED"
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.subject_alternative_names.match.exact[0] #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.trust.sds.secret_name #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json #=> Array
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json[0].key #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json[0].value #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.text #=> String
     #   resp.virtual_gateway.spec.logging.access_log.file.path #=> String
     #   resp.virtual_gateway.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.virtual_gateway.virtual_gateway_name #=> String
@@ -1955,10 +2554,10 @@ module Aws::AppMesh
     #   The name of the service mesh to delete the virtual node in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -1989,19 +2588,31 @@ module Aws::AppMesh
     #   resp.virtual_node.metadata.resource_owner #=> String
     #   resp.virtual_node.metadata.uid #=> String
     #   resp.virtual_node.metadata.version #=> Integer
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.ports #=> Array
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends #=> Array
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.ports #=> Array
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.virtual_service_name #=> String
     #   resp.virtual_node.spec.listeners #=> Array
     #   resp.virtual_node.spec.listeners[0].connection_pool.grpc.max_requests #=> Integer
@@ -2041,14 +2652,26 @@ module Aws::AppMesh
     #   resp.virtual_node.spec.listeners[0].tls.certificate.acm.certificate_arn #=> String
     #   resp.virtual_node.spec.listeners[0].tls.certificate.file.certificate_chain #=> String
     #   resp.virtual_node.spec.listeners[0].tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.listeners[0].tls.mode #=> String, one of "STRICT", "PERMISSIVE", "DISABLED"
+    #   resp.virtual_node.spec.listeners[0].tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.listeners[0].tls.validation.subject_alternative_names.match.exact[0] #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.validation.trust.sds.secret_name #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.json #=> Array
+    #   resp.virtual_node.spec.logging.access_log.file.format.json[0].key #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.json[0].value #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.text #=> String
     #   resp.virtual_node.spec.logging.access_log.file.path #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes #=> Array
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes[0].key #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes[0].value #=> String
+    #   resp.virtual_node.spec.service_discovery.aws_cloud_map.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.namespace_name #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.service_name #=> String
     #   resp.virtual_node.spec.service_discovery.dns.hostname #=> String
+    #   resp.virtual_node.spec.service_discovery.dns.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
+    #   resp.virtual_node.spec.service_discovery.dns.response_type #=> String, one of "LOADBALANCER", "ENDPOINTS"
     #   resp.virtual_node.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.virtual_node.virtual_node_name #=> String
     #
@@ -2070,10 +2693,10 @@ module Aws::AppMesh
     #   The name of the service mesh to delete the virtual router in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -2125,10 +2748,10 @@ module Aws::AppMesh
     #   The name of the service mesh to delete the virtual service in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -2182,10 +2805,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the gateway route resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -2219,12 +2842,73 @@ module Aws::AppMesh
     #   resp.gateway_route.metadata.resource_owner #=> String
     #   resp.gateway_route.metadata.uid #=> String
     #   resp.gateway_route.metadata.version #=> Integer
+    #   resp.gateway_route.spec.grpc_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.grpc_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.grpc_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.grpc_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.grpc_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata #=> Array
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].invert #=> Boolean
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.exact #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.prefix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.regex #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.suffix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].name #=> String
+    #   resp.gateway_route.spec.grpc_route.match.port #=> Integer
     #   resp.gateway_route.spec.grpc_route.match.service_name #=> String
+    #   resp.gateway_route.spec.http2_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http2_route.action.rewrite.path.exact #=> String
+    #   resp.gateway_route.spec.http2_route.action.rewrite.prefix.default_prefix #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http2_route.action.rewrite.prefix.value #=> String
+    #   resp.gateway_route.spec.http2_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.http2_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers #=> Array
+    #   resp.gateway_route.spec.http2_route.match.headers[0].invert #=> Boolean
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.prefix #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.regex #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.suffix #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].name #=> String
+    #   resp.gateway_route.spec.http2_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.http2_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.gateway_route.spec.http2_route.match.path.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.path.regex #=> String
+    #   resp.gateway_route.spec.http2_route.match.port #=> Integer
     #   resp.gateway_route.spec.http2_route.match.prefix #=> String
+    #   resp.gateway_route.spec.http2_route.match.query_parameters #=> Array
+    #   resp.gateway_route.spec.http2_route.match.query_parameters[0].match.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.query_parameters[0].name #=> String
+    #   resp.gateway_route.spec.http_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http_route.action.rewrite.path.exact #=> String
+    #   resp.gateway_route.spec.http_route.action.rewrite.prefix.default_prefix #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http_route.action.rewrite.prefix.value #=> String
+    #   resp.gateway_route.spec.http_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.http_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.http_route.match.headers #=> Array
+    #   resp.gateway_route.spec.http_route.match.headers[0].invert #=> Boolean
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.prefix #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.regex #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.suffix #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].name #=> String
+    #   resp.gateway_route.spec.http_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.http_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.gateway_route.spec.http_route.match.path.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.path.regex #=> String
+    #   resp.gateway_route.spec.http_route.match.port #=> Integer
     #   resp.gateway_route.spec.http_route.match.prefix #=> String
+    #   resp.gateway_route.spec.http_route.match.query_parameters #=> Array
+    #   resp.gateway_route.spec.http_route.match.query_parameters[0].match.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.query_parameters[0].name #=> String
+    #   resp.gateway_route.spec.priority #=> Integer
     #   resp.gateway_route.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.gateway_route.virtual_gateway_name #=> String
     #
@@ -2243,10 +2927,10 @@ module Aws::AppMesh
     #   The name of the service mesh to describe.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -2274,6 +2958,7 @@ module Aws::AppMesh
     #   resp.mesh.metadata.uid #=> String
     #   resp.mesh.metadata.version #=> Integer
     #   resp.mesh.spec.egress_filter.type #=> String, one of "ALLOW_ALL", "DROP_ALL"
+    #   resp.mesh.spec.service_discovery.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
     #   resp.mesh.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appmesh-2019-01-25/DescribeMesh AWS API Documentation
@@ -2291,10 +2976,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the route resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -2331,6 +3016,7 @@ module Aws::AppMesh
     #   resp.route.metadata.version #=> Integer
     #   resp.route.route_name #=> String
     #   resp.route.spec.grpc_route.action.weighted_targets #=> Array
+    #   resp.route.spec.grpc_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.grpc_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.grpc_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.grpc_route.match.metadata #=> Array
@@ -2343,6 +3029,7 @@ module Aws::AppMesh
     #   resp.route.spec.grpc_route.match.metadata[0].match.suffix #=> String
     #   resp.route.spec.grpc_route.match.metadata[0].name #=> String
     #   resp.route.spec.grpc_route.match.method_name #=> String
+    #   resp.route.spec.grpc_route.match.port #=> Integer
     #   resp.route.spec.grpc_route.match.service_name #=> String
     #   resp.route.spec.grpc_route.retry_policy.grpc_retry_events #=> Array
     #   resp.route.spec.grpc_route.retry_policy.grpc_retry_events[0] #=> String, one of "cancelled", "deadline-exceeded", "internal", "resource-exhausted", "unavailable"
@@ -2358,6 +3045,7 @@ module Aws::AppMesh
     #   resp.route.spec.grpc_route.timeout.per_request.unit #=> String, one of "s", "ms"
     #   resp.route.spec.grpc_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.http2_route.action.weighted_targets #=> Array
+    #   resp.route.spec.http2_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.http2_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.http2_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.http2_route.match.headers #=> Array
@@ -2370,7 +3058,13 @@ module Aws::AppMesh
     #   resp.route.spec.http2_route.match.headers[0].match.suffix #=> String
     #   resp.route.spec.http2_route.match.headers[0].name #=> String
     #   resp.route.spec.http2_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.route.spec.http2_route.match.path.exact #=> String
+    #   resp.route.spec.http2_route.match.path.regex #=> String
+    #   resp.route.spec.http2_route.match.port #=> Integer
     #   resp.route.spec.http2_route.match.prefix #=> String
+    #   resp.route.spec.http2_route.match.query_parameters #=> Array
+    #   resp.route.spec.http2_route.match.query_parameters[0].match.exact #=> String
+    #   resp.route.spec.http2_route.match.query_parameters[0].name #=> String
     #   resp.route.spec.http2_route.match.scheme #=> String, one of "http", "https"
     #   resp.route.spec.http2_route.retry_policy.http_retry_events #=> Array
     #   resp.route.spec.http2_route.retry_policy.http_retry_events[0] #=> String
@@ -2384,6 +3078,7 @@ module Aws::AppMesh
     #   resp.route.spec.http2_route.timeout.per_request.unit #=> String, one of "s", "ms"
     #   resp.route.spec.http2_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.http_route.action.weighted_targets #=> Array
+    #   resp.route.spec.http_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.http_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.http_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.http_route.match.headers #=> Array
@@ -2396,7 +3091,13 @@ module Aws::AppMesh
     #   resp.route.spec.http_route.match.headers[0].match.suffix #=> String
     #   resp.route.spec.http_route.match.headers[0].name #=> String
     #   resp.route.spec.http_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.route.spec.http_route.match.path.exact #=> String
+    #   resp.route.spec.http_route.match.path.regex #=> String
+    #   resp.route.spec.http_route.match.port #=> Integer
     #   resp.route.spec.http_route.match.prefix #=> String
+    #   resp.route.spec.http_route.match.query_parameters #=> Array
+    #   resp.route.spec.http_route.match.query_parameters[0].match.exact #=> String
+    #   resp.route.spec.http_route.match.query_parameters[0].name #=> String
     #   resp.route.spec.http_route.match.scheme #=> String, one of "http", "https"
     #   resp.route.spec.http_route.retry_policy.http_retry_events #=> Array
     #   resp.route.spec.http_route.retry_policy.http_retry_events[0] #=> String
@@ -2411,8 +3112,10 @@ module Aws::AppMesh
     #   resp.route.spec.http_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.priority #=> Integer
     #   resp.route.spec.tcp_route.action.weighted_targets #=> Array
+    #   resp.route.spec.tcp_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.tcp_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.tcp_route.action.weighted_targets[0].weight #=> Integer
+    #   resp.route.spec.tcp_route.match.port #=> Integer
     #   resp.route.spec.tcp_route.timeout.idle.unit #=> String, one of "s", "ms"
     #   resp.route.spec.tcp_route.timeout.idle.value #=> Integer
     #   resp.route.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
@@ -2433,10 +3136,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the gateway route resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -2467,12 +3170,18 @@ module Aws::AppMesh
     #   resp.virtual_gateway.metadata.resource_owner #=> String
     #   resp.virtual_gateway.metadata.uid #=> String
     #   resp.virtual_gateway.metadata.version #=> Integer
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.ports #=> Array
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.listeners #=> Array
     #   resp.virtual_gateway.spec.listeners[0].connection_pool.grpc.max_requests #=> Integer
     #   resp.virtual_gateway.spec.listeners[0].connection_pool.http.max_connections #=> Integer
@@ -2490,7 +3199,16 @@ module Aws::AppMesh
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.acm.certificate_arn #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.file.certificate_chain #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.file.private_key #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.certificate.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.mode #=> String, one of "STRICT", "PERMISSIVE", "DISABLED"
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.subject_alternative_names.match.exact[0] #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.trust.sds.secret_name #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json #=> Array
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json[0].key #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json[0].value #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.text #=> String
     #   resp.virtual_gateway.spec.logging.access_log.file.path #=> String
     #   resp.virtual_gateway.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.virtual_gateway.virtual_gateway_name #=> String
@@ -2510,10 +3228,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the virtual node resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -2544,19 +3262,31 @@ module Aws::AppMesh
     #   resp.virtual_node.metadata.resource_owner #=> String
     #   resp.virtual_node.metadata.uid #=> String
     #   resp.virtual_node.metadata.version #=> Integer
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.ports #=> Array
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends #=> Array
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.ports #=> Array
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.virtual_service_name #=> String
     #   resp.virtual_node.spec.listeners #=> Array
     #   resp.virtual_node.spec.listeners[0].connection_pool.grpc.max_requests #=> Integer
@@ -2596,14 +3326,26 @@ module Aws::AppMesh
     #   resp.virtual_node.spec.listeners[0].tls.certificate.acm.certificate_arn #=> String
     #   resp.virtual_node.spec.listeners[0].tls.certificate.file.certificate_chain #=> String
     #   resp.virtual_node.spec.listeners[0].tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.listeners[0].tls.mode #=> String, one of "STRICT", "PERMISSIVE", "DISABLED"
+    #   resp.virtual_node.spec.listeners[0].tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.listeners[0].tls.validation.subject_alternative_names.match.exact[0] #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.validation.trust.sds.secret_name #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.json #=> Array
+    #   resp.virtual_node.spec.logging.access_log.file.format.json[0].key #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.json[0].value #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.text #=> String
     #   resp.virtual_node.spec.logging.access_log.file.path #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes #=> Array
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes[0].key #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes[0].value #=> String
+    #   resp.virtual_node.spec.service_discovery.aws_cloud_map.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.namespace_name #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.service_name #=> String
     #   resp.virtual_node.spec.service_discovery.dns.hostname #=> String
+    #   resp.virtual_node.spec.service_discovery.dns.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
+    #   resp.virtual_node.spec.service_discovery.dns.response_type #=> String, one of "LOADBALANCER", "ENDPOINTS"
     #   resp.virtual_node.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.virtual_node.virtual_node_name #=> String
     #
@@ -2622,10 +3364,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the virtual router resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -2677,10 +3419,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the virtual service resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -2742,10 +3484,10 @@ module Aws::AppMesh
     #   The name of the service mesh to list gateway routes in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -2875,10 +3617,10 @@ module Aws::AppMesh
     #   The name of the service mesh to list routes in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -3002,10 +3744,10 @@ module Aws::AppMesh
     #   The name of the service mesh to list virtual gateways in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -3071,10 +3813,10 @@ module Aws::AppMesh
     #   The name of the service mesh to list virtual nodes in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -3140,10 +3882,10 @@ module Aws::AppMesh
     #   The name of the service mesh to list virtual routers in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -3209,10 +3951,10 @@ module Aws::AppMesh
     #   The name of the service mesh to list virtual services in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -3342,10 +4084,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the gateway route resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -3373,40 +4115,162 @@ module Aws::AppMesh
     #     spec: { # required
     #       grpc_route: {
     #         action: { # required
+    #           rewrite: {
+    #             hostname: {
+    #               default_target_hostname: "ENABLED", # accepts ENABLED, DISABLED
+    #             },
+    #           },
     #           target: { # required
+    #             port: 1,
     #             virtual_service: { # required
     #               virtual_service_name: "ResourceName", # required
     #             },
     #           },
     #         },
     #         match: { # required
+    #           hostname: {
+    #             exact: "ExactHostName",
+    #             suffix: "SuffixHostname",
+    #           },
+    #           metadata: [
+    #             {
+    #               invert: false,
+    #               match: {
+    #                 exact: "HeaderMatch",
+    #                 prefix: "HeaderMatch",
+    #                 range: {
+    #                   end: 1, # required
+    #                   start: 1, # required
+    #                 },
+    #                 regex: "HeaderMatch",
+    #                 suffix: "HeaderMatch",
+    #               },
+    #               name: "HeaderName", # required
+    #             },
+    #           ],
+    #           port: 1,
     #           service_name: "ServiceName",
     #         },
     #       },
     #       http2_route: {
     #         action: { # required
+    #           rewrite: {
+    #             hostname: {
+    #               default_target_hostname: "ENABLED", # accepts ENABLED, DISABLED
+    #             },
+    #             path: {
+    #               exact: "HttpPathExact",
+    #             },
+    #             prefix: {
+    #               default_prefix: "ENABLED", # accepts ENABLED, DISABLED
+    #               value: "HttpGatewayRoutePrefix",
+    #             },
+    #           },
     #           target: { # required
+    #             port: 1,
     #             virtual_service: { # required
     #               virtual_service_name: "ResourceName", # required
     #             },
     #           },
     #         },
     #         match: { # required
-    #           prefix: "String", # required
+    #           headers: [
+    #             {
+    #               invert: false,
+    #               match: {
+    #                 exact: "HeaderMatch",
+    #                 prefix: "HeaderMatch",
+    #                 range: {
+    #                   end: 1, # required
+    #                   start: 1, # required
+    #                 },
+    #                 regex: "HeaderMatch",
+    #                 suffix: "HeaderMatch",
+    #               },
+    #               name: "HeaderName", # required
+    #             },
+    #           ],
+    #           hostname: {
+    #             exact: "ExactHostName",
+    #             suffix: "SuffixHostname",
+    #           },
+    #           method: "GET", # accepts GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
+    #           path: {
+    #             exact: "HttpPathExact",
+    #             regex: "HttpPathRegex",
+    #           },
+    #           port: 1,
+    #           prefix: "String",
+    #           query_parameters: [
+    #             {
+    #               match: {
+    #                 exact: "String",
+    #               },
+    #               name: "QueryParameterName", # required
+    #             },
+    #           ],
     #         },
     #       },
     #       http_route: {
     #         action: { # required
+    #           rewrite: {
+    #             hostname: {
+    #               default_target_hostname: "ENABLED", # accepts ENABLED, DISABLED
+    #             },
+    #             path: {
+    #               exact: "HttpPathExact",
+    #             },
+    #             prefix: {
+    #               default_prefix: "ENABLED", # accepts ENABLED, DISABLED
+    #               value: "HttpGatewayRoutePrefix",
+    #             },
+    #           },
     #           target: { # required
+    #             port: 1,
     #             virtual_service: { # required
     #               virtual_service_name: "ResourceName", # required
     #             },
     #           },
     #         },
     #         match: { # required
-    #           prefix: "String", # required
+    #           headers: [
+    #             {
+    #               invert: false,
+    #               match: {
+    #                 exact: "HeaderMatch",
+    #                 prefix: "HeaderMatch",
+    #                 range: {
+    #                   end: 1, # required
+    #                   start: 1, # required
+    #                 },
+    #                 regex: "HeaderMatch",
+    #                 suffix: "HeaderMatch",
+    #               },
+    #               name: "HeaderName", # required
+    #             },
+    #           ],
+    #           hostname: {
+    #             exact: "ExactHostName",
+    #             suffix: "SuffixHostname",
+    #           },
+    #           method: "GET", # accepts GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
+    #           path: {
+    #             exact: "HttpPathExact",
+    #             regex: "HttpPathRegex",
+    #           },
+    #           port: 1,
+    #           prefix: "String",
+    #           query_parameters: [
+    #             {
+    #               match: {
+    #                 exact: "String",
+    #               },
+    #               name: "QueryParameterName", # required
+    #             },
+    #           ],
     #         },
     #       },
+    #       priority: 1,
     #     },
     #     virtual_gateway_name: "ResourceName", # required
     #   })
@@ -3422,12 +4286,73 @@ module Aws::AppMesh
     #   resp.gateway_route.metadata.resource_owner #=> String
     #   resp.gateway_route.metadata.uid #=> String
     #   resp.gateway_route.metadata.version #=> Integer
+    #   resp.gateway_route.spec.grpc_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.grpc_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.grpc_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.grpc_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.grpc_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata #=> Array
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].invert #=> Boolean
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.exact #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.prefix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.regex #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].match.suffix #=> String
+    #   resp.gateway_route.spec.grpc_route.match.metadata[0].name #=> String
+    #   resp.gateway_route.spec.grpc_route.match.port #=> Integer
     #   resp.gateway_route.spec.grpc_route.match.service_name #=> String
+    #   resp.gateway_route.spec.http2_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http2_route.action.rewrite.path.exact #=> String
+    #   resp.gateway_route.spec.http2_route.action.rewrite.prefix.default_prefix #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http2_route.action.rewrite.prefix.value #=> String
+    #   resp.gateway_route.spec.http2_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.http2_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers #=> Array
+    #   resp.gateway_route.spec.http2_route.match.headers[0].invert #=> Boolean
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.prefix #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.regex #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].match.suffix #=> String
+    #   resp.gateway_route.spec.http2_route.match.headers[0].name #=> String
+    #   resp.gateway_route.spec.http2_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.http2_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.gateway_route.spec.http2_route.match.path.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.path.regex #=> String
+    #   resp.gateway_route.spec.http2_route.match.port #=> Integer
     #   resp.gateway_route.spec.http2_route.match.prefix #=> String
+    #   resp.gateway_route.spec.http2_route.match.query_parameters #=> Array
+    #   resp.gateway_route.spec.http2_route.match.query_parameters[0].match.exact #=> String
+    #   resp.gateway_route.spec.http2_route.match.query_parameters[0].name #=> String
+    #   resp.gateway_route.spec.http_route.action.rewrite.hostname.default_target_hostname #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http_route.action.rewrite.path.exact #=> String
+    #   resp.gateway_route.spec.http_route.action.rewrite.prefix.default_prefix #=> String, one of "ENABLED", "DISABLED"
+    #   resp.gateway_route.spec.http_route.action.rewrite.prefix.value #=> String
+    #   resp.gateway_route.spec.http_route.action.target.port #=> Integer
     #   resp.gateway_route.spec.http_route.action.target.virtual_service.virtual_service_name #=> String
+    #   resp.gateway_route.spec.http_route.match.headers #=> Array
+    #   resp.gateway_route.spec.http_route.match.headers[0].invert #=> Boolean
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.prefix #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.range.end #=> Integer
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.range.start #=> Integer
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.regex #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].match.suffix #=> String
+    #   resp.gateway_route.spec.http_route.match.headers[0].name #=> String
+    #   resp.gateway_route.spec.http_route.match.hostname.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.hostname.suffix #=> String
+    #   resp.gateway_route.spec.http_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.gateway_route.spec.http_route.match.path.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.path.regex #=> String
+    #   resp.gateway_route.spec.http_route.match.port #=> Integer
     #   resp.gateway_route.spec.http_route.match.prefix #=> String
+    #   resp.gateway_route.spec.http_route.match.query_parameters #=> Array
+    #   resp.gateway_route.spec.http_route.match.query_parameters[0].match.exact #=> String
+    #   resp.gateway_route.spec.http_route.match.query_parameters[0].name #=> String
+    #   resp.gateway_route.spec.priority #=> Integer
     #   resp.gateway_route.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.gateway_route.virtual_gateway_name #=> String
     #
@@ -3469,6 +4394,9 @@ module Aws::AppMesh
     #       egress_filter: {
     #         type: "ALLOW_ALL", # required, accepts ALLOW_ALL, DROP_ALL
     #       },
+    #       service_discovery: {
+    #         ip_preference: "IPv6_PREFERRED", # accepts IPv6_PREFERRED, IPv4_PREFERRED, IPv4_ONLY, IPv6_ONLY
+    #       },
     #     },
     #   })
     #
@@ -3483,6 +4411,7 @@ module Aws::AppMesh
     #   resp.mesh.metadata.uid #=> String
     #   resp.mesh.metadata.version #=> Integer
     #   resp.mesh.spec.egress_filter.type #=> String, one of "ALLOW_ALL", "DROP_ALL"
+    #   resp.mesh.spec.service_discovery.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
     #   resp.mesh.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appmesh-2019-01-25/UpdateMesh AWS API Documentation
@@ -3509,10 +4438,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the route resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -3544,6 +4473,7 @@ module Aws::AppMesh
     #         action: { # required
     #           weighted_targets: [ # required
     #             {
+    #               port: 1,
     #               virtual_node: "ResourceName", # required
     #               weight: 1, # required
     #             },
@@ -3567,6 +4497,7 @@ module Aws::AppMesh
     #             },
     #           ],
     #           method_name: "MethodName",
+    #           port: 1,
     #           service_name: "ServiceName",
     #         },
     #         retry_policy: {
@@ -3594,6 +4525,7 @@ module Aws::AppMesh
     #         action: { # required
     #           weighted_targets: [ # required
     #             {
+    #               port: 1,
     #               virtual_node: "ResourceName", # required
     #               weight: 1, # required
     #             },
@@ -3617,7 +4549,20 @@ module Aws::AppMesh
     #             },
     #           ],
     #           method: "GET", # accepts GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
-    #           prefix: "String", # required
+    #           path: {
+    #             exact: "HttpPathExact",
+    #             regex: "HttpPathRegex",
+    #           },
+    #           port: 1,
+    #           prefix: "String",
+    #           query_parameters: [
+    #             {
+    #               match: {
+    #                 exact: "String",
+    #               },
+    #               name: "QueryParameterName", # required
+    #             },
+    #           ],
     #           scheme: "http", # accepts http, https
     #         },
     #         retry_policy: {
@@ -3644,6 +4589,7 @@ module Aws::AppMesh
     #         action: { # required
     #           weighted_targets: [ # required
     #             {
+    #               port: 1,
     #               virtual_node: "ResourceName", # required
     #               weight: 1, # required
     #             },
@@ -3667,7 +4613,20 @@ module Aws::AppMesh
     #             },
     #           ],
     #           method: "GET", # accepts GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
-    #           prefix: "String", # required
+    #           path: {
+    #             exact: "HttpPathExact",
+    #             regex: "HttpPathRegex",
+    #           },
+    #           port: 1,
+    #           prefix: "String",
+    #           query_parameters: [
+    #             {
+    #               match: {
+    #                 exact: "String",
+    #               },
+    #               name: "QueryParameterName", # required
+    #             },
+    #           ],
     #           scheme: "http", # accepts http, https
     #         },
     #         retry_policy: {
@@ -3695,10 +4654,14 @@ module Aws::AppMesh
     #         action: { # required
     #           weighted_targets: [ # required
     #             {
+    #               port: 1,
     #               virtual_node: "ResourceName", # required
     #               weight: 1, # required
     #             },
     #           ],
+    #         },
+    #         match: {
+    #           port: 1,
     #         },
     #         timeout: {
     #           idle: {
@@ -3723,6 +4686,7 @@ module Aws::AppMesh
     #   resp.route.metadata.version #=> Integer
     #   resp.route.route_name #=> String
     #   resp.route.spec.grpc_route.action.weighted_targets #=> Array
+    #   resp.route.spec.grpc_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.grpc_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.grpc_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.grpc_route.match.metadata #=> Array
@@ -3735,6 +4699,7 @@ module Aws::AppMesh
     #   resp.route.spec.grpc_route.match.metadata[0].match.suffix #=> String
     #   resp.route.spec.grpc_route.match.metadata[0].name #=> String
     #   resp.route.spec.grpc_route.match.method_name #=> String
+    #   resp.route.spec.grpc_route.match.port #=> Integer
     #   resp.route.spec.grpc_route.match.service_name #=> String
     #   resp.route.spec.grpc_route.retry_policy.grpc_retry_events #=> Array
     #   resp.route.spec.grpc_route.retry_policy.grpc_retry_events[0] #=> String, one of "cancelled", "deadline-exceeded", "internal", "resource-exhausted", "unavailable"
@@ -3750,6 +4715,7 @@ module Aws::AppMesh
     #   resp.route.spec.grpc_route.timeout.per_request.unit #=> String, one of "s", "ms"
     #   resp.route.spec.grpc_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.http2_route.action.weighted_targets #=> Array
+    #   resp.route.spec.http2_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.http2_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.http2_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.http2_route.match.headers #=> Array
@@ -3762,7 +4728,13 @@ module Aws::AppMesh
     #   resp.route.spec.http2_route.match.headers[0].match.suffix #=> String
     #   resp.route.spec.http2_route.match.headers[0].name #=> String
     #   resp.route.spec.http2_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.route.spec.http2_route.match.path.exact #=> String
+    #   resp.route.spec.http2_route.match.path.regex #=> String
+    #   resp.route.spec.http2_route.match.port #=> Integer
     #   resp.route.spec.http2_route.match.prefix #=> String
+    #   resp.route.spec.http2_route.match.query_parameters #=> Array
+    #   resp.route.spec.http2_route.match.query_parameters[0].match.exact #=> String
+    #   resp.route.spec.http2_route.match.query_parameters[0].name #=> String
     #   resp.route.spec.http2_route.match.scheme #=> String, one of "http", "https"
     #   resp.route.spec.http2_route.retry_policy.http_retry_events #=> Array
     #   resp.route.spec.http2_route.retry_policy.http_retry_events[0] #=> String
@@ -3776,6 +4748,7 @@ module Aws::AppMesh
     #   resp.route.spec.http2_route.timeout.per_request.unit #=> String, one of "s", "ms"
     #   resp.route.spec.http2_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.http_route.action.weighted_targets #=> Array
+    #   resp.route.spec.http_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.http_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.http_route.action.weighted_targets[0].weight #=> Integer
     #   resp.route.spec.http_route.match.headers #=> Array
@@ -3788,7 +4761,13 @@ module Aws::AppMesh
     #   resp.route.spec.http_route.match.headers[0].match.suffix #=> String
     #   resp.route.spec.http_route.match.headers[0].name #=> String
     #   resp.route.spec.http_route.match.method #=> String, one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+    #   resp.route.spec.http_route.match.path.exact #=> String
+    #   resp.route.spec.http_route.match.path.regex #=> String
+    #   resp.route.spec.http_route.match.port #=> Integer
     #   resp.route.spec.http_route.match.prefix #=> String
+    #   resp.route.spec.http_route.match.query_parameters #=> Array
+    #   resp.route.spec.http_route.match.query_parameters[0].match.exact #=> String
+    #   resp.route.spec.http_route.match.query_parameters[0].name #=> String
     #   resp.route.spec.http_route.match.scheme #=> String, one of "http", "https"
     #   resp.route.spec.http_route.retry_policy.http_retry_events #=> Array
     #   resp.route.spec.http_route.retry_policy.http_retry_events[0] #=> String
@@ -3803,8 +4782,10 @@ module Aws::AppMesh
     #   resp.route.spec.http_route.timeout.per_request.value #=> Integer
     #   resp.route.spec.priority #=> Integer
     #   resp.route.spec.tcp_route.action.weighted_targets #=> Array
+    #   resp.route.spec.tcp_route.action.weighted_targets[0].port #=> Integer
     #   resp.route.spec.tcp_route.action.weighted_targets[0].virtual_node #=> String
     #   resp.route.spec.tcp_route.action.weighted_targets[0].weight #=> Integer
+    #   resp.route.spec.tcp_route.match.port #=> Integer
     #   resp.route.spec.tcp_route.timeout.idle.unit #=> String, one of "s", "ms"
     #   resp.route.spec.tcp_route.timeout.idle.value #=> Integer
     #   resp.route.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
@@ -3833,10 +4814,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the virtual gateway resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -3863,15 +4844,32 @@ module Aws::AppMesh
     #       backend_defaults: {
     #         client_policy: {
     #           tls: {
+    #             certificate: {
+    #               file: {
+    #                 certificate_chain: "FilePath", # required
+    #                 private_key: "FilePath", # required
+    #               },
+    #               sds: {
+    #                 secret_name: "VirtualGatewaySdsSecretName", # required
+    #               },
+    #             },
     #             enforce: false,
     #             ports: [1],
     #             validation: { # required
+    #               subject_alternative_names: {
+    #                 match: { # required
+    #                   exact: ["SubjectAlternativeName"], # required
+    #                 },
+    #               },
     #               trust: { # required
     #                 acm: {
     #                   certificate_authority_arns: ["Arn"], # required
     #                 },
     #                 file: {
     #                   certificate_chain: "FilePath", # required
+    #                 },
+    #                 sds: {
+    #                   secret_name: "VirtualGatewaySdsSecretName", # required
     #                 },
     #               },
     #             },
@@ -3914,14 +4912,41 @@ module Aws::AppMesh
     #                 certificate_chain: "FilePath", # required
     #                 private_key: "FilePath", # required
     #               },
+    #               sds: {
+    #                 secret_name: "VirtualGatewaySdsSecretName", # required
+    #               },
     #             },
     #             mode: "STRICT", # required, accepts STRICT, PERMISSIVE, DISABLED
+    #             validation: {
+    #               subject_alternative_names: {
+    #                 match: { # required
+    #                   exact: ["SubjectAlternativeName"], # required
+    #                 },
+    #               },
+    #               trust: { # required
+    #                 file: {
+    #                   certificate_chain: "FilePath", # required
+    #                 },
+    #                 sds: {
+    #                   secret_name: "VirtualGatewaySdsSecretName", # required
+    #                 },
+    #               },
+    #             },
     #           },
     #         },
     #       ],
     #       logging: {
     #         access_log: {
     #           file: {
+    #             format: {
+    #               json: [
+    #                 {
+    #                   key: "JsonKey", # required
+    #                   value: "JsonValue", # required
+    #                 },
+    #               ],
+    #               text: "TextFormat",
+    #             },
     #             path: "FilePath", # required
     #           },
     #         },
@@ -3940,12 +4965,18 @@ module Aws::AppMesh
     #   resp.virtual_gateway.metadata.resource_owner #=> String
     #   resp.virtual_gateway.metadata.uid #=> String
     #   resp.virtual_gateway.metadata.version #=> Integer
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.ports #=> Array
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.backend_defaults.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.listeners #=> Array
     #   resp.virtual_gateway.spec.listeners[0].connection_pool.grpc.max_requests #=> Integer
     #   resp.virtual_gateway.spec.listeners[0].connection_pool.http.max_connections #=> Integer
@@ -3963,7 +4994,16 @@ module Aws::AppMesh
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.acm.certificate_arn #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.file.certificate_chain #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.certificate.file.private_key #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.certificate.sds.secret_name #=> String
     #   resp.virtual_gateway.spec.listeners[0].tls.mode #=> String, one of "STRICT", "PERMISSIVE", "DISABLED"
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.subject_alternative_names.match.exact[0] #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_gateway.spec.listeners[0].tls.validation.trust.sds.secret_name #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json #=> Array
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json[0].key #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.json[0].value #=> String
+    #   resp.virtual_gateway.spec.logging.access_log.file.format.text #=> String
     #   resp.virtual_gateway.spec.logging.access_log.file.path #=> String
     #   resp.virtual_gateway.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.virtual_gateway.virtual_gateway_name #=> String
@@ -3991,10 +5031,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the virtual node resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -4021,15 +5061,32 @@ module Aws::AppMesh
     #       backend_defaults: {
     #         client_policy: {
     #           tls: {
+    #             certificate: {
+    #               file: {
+    #                 certificate_chain: "FilePath", # required
+    #                 private_key: "FilePath", # required
+    #               },
+    #               sds: {
+    #                 secret_name: "SdsSecretName", # required
+    #               },
+    #             },
     #             enforce: false,
     #             ports: [1],
     #             validation: { # required
+    #               subject_alternative_names: {
+    #                 match: { # required
+    #                   exact: ["SubjectAlternativeName"], # required
+    #                 },
+    #               },
     #               trust: { # required
     #                 acm: {
     #                   certificate_authority_arns: ["Arn"], # required
     #                 },
     #                 file: {
     #                   certificate_chain: "FilePath", # required
+    #                 },
+    #                 sds: {
+    #                   secret_name: "SdsSecretName", # required
     #                 },
     #               },
     #             },
@@ -4041,15 +5098,32 @@ module Aws::AppMesh
     #           virtual_service: {
     #             client_policy: {
     #               tls: {
+    #                 certificate: {
+    #                   file: {
+    #                     certificate_chain: "FilePath", # required
+    #                     private_key: "FilePath", # required
+    #                   },
+    #                   sds: {
+    #                     secret_name: "SdsSecretName", # required
+    #                   },
+    #                 },
     #                 enforce: false,
     #                 ports: [1],
     #                 validation: { # required
+    #                   subject_alternative_names: {
+    #                     match: { # required
+    #                       exact: ["SubjectAlternativeName"], # required
+    #                     },
+    #                   },
     #                   trust: { # required
     #                     acm: {
     #                       certificate_authority_arns: ["Arn"], # required
     #                     },
     #                     file: {
     #                       certificate_chain: "FilePath", # required
+    #                     },
+    #                     sds: {
+    #                       secret_name: "SdsSecretName", # required
     #                     },
     #                   },
     #                 },
@@ -4148,14 +5222,41 @@ module Aws::AppMesh
     #                 certificate_chain: "FilePath", # required
     #                 private_key: "FilePath", # required
     #               },
+    #               sds: {
+    #                 secret_name: "SdsSecretName", # required
+    #               },
     #             },
     #             mode: "STRICT", # required, accepts STRICT, PERMISSIVE, DISABLED
+    #             validation: {
+    #               subject_alternative_names: {
+    #                 match: { # required
+    #                   exact: ["SubjectAlternativeName"], # required
+    #                 },
+    #               },
+    #               trust: { # required
+    #                 file: {
+    #                   certificate_chain: "FilePath", # required
+    #                 },
+    #                 sds: {
+    #                   secret_name: "SdsSecretName", # required
+    #                 },
+    #               },
+    #             },
     #           },
     #         },
     #       ],
     #       logging: {
     #         access_log: {
     #           file: {
+    #             format: {
+    #               json: [
+    #                 {
+    #                   key: "JsonKey", # required
+    #                   value: "JsonValue", # required
+    #                 },
+    #               ],
+    #               text: "TextFormat",
+    #             },
     #             path: "FilePath", # required
     #           },
     #         },
@@ -4168,11 +5269,14 @@ module Aws::AppMesh
     #               value: "AwsCloudMapInstanceAttributeValue", # required
     #             },
     #           ],
+    #           ip_preference: "IPv6_PREFERRED", # accepts IPv6_PREFERRED, IPv4_PREFERRED, IPv4_ONLY, IPv6_ONLY
     #           namespace_name: "AwsCloudMapName", # required
     #           service_name: "AwsCloudMapName", # required
     #         },
     #         dns: {
     #           hostname: "Hostname", # required
+    #           ip_preference: "IPv6_PREFERRED", # accepts IPv6_PREFERRED, IPv4_PREFERRED, IPv4_ONLY, IPv6_ONLY
+    #           response_type: "LOADBALANCER", # accepts LOADBALANCER, ENDPOINTS
     #         },
     #       },
     #     },
@@ -4189,19 +5293,31 @@ module Aws::AppMesh
     #   resp.virtual_node.metadata.resource_owner #=> String
     #   resp.virtual_node.metadata.uid #=> String
     #   resp.virtual_node.metadata.version #=> Integer
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.ports #=> Array
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backend_defaults.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends #=> Array
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.enforce #=> Boolean
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.ports #=> Array
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.ports[0] #=> Integer
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.subject_alternative_names.match.exact[0] #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.acm.certificate_authority_arns #=> Array
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.acm.certificate_authority_arns[0] #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.backends[0].virtual_service.client_policy.tls.validation.trust.sds.secret_name #=> String
     #   resp.virtual_node.spec.backends[0].virtual_service.virtual_service_name #=> String
     #   resp.virtual_node.spec.listeners #=> Array
     #   resp.virtual_node.spec.listeners[0].connection_pool.grpc.max_requests #=> Integer
@@ -4241,14 +5357,26 @@ module Aws::AppMesh
     #   resp.virtual_node.spec.listeners[0].tls.certificate.acm.certificate_arn #=> String
     #   resp.virtual_node.spec.listeners[0].tls.certificate.file.certificate_chain #=> String
     #   resp.virtual_node.spec.listeners[0].tls.certificate.file.private_key #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.certificate.sds.secret_name #=> String
     #   resp.virtual_node.spec.listeners[0].tls.mode #=> String, one of "STRICT", "PERMISSIVE", "DISABLED"
+    #   resp.virtual_node.spec.listeners[0].tls.validation.subject_alternative_names.match.exact #=> Array
+    #   resp.virtual_node.spec.listeners[0].tls.validation.subject_alternative_names.match.exact[0] #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.validation.trust.file.certificate_chain #=> String
+    #   resp.virtual_node.spec.listeners[0].tls.validation.trust.sds.secret_name #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.json #=> Array
+    #   resp.virtual_node.spec.logging.access_log.file.format.json[0].key #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.json[0].value #=> String
+    #   resp.virtual_node.spec.logging.access_log.file.format.text #=> String
     #   resp.virtual_node.spec.logging.access_log.file.path #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes #=> Array
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes[0].key #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.attributes[0].value #=> String
+    #   resp.virtual_node.spec.service_discovery.aws_cloud_map.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.namespace_name #=> String
     #   resp.virtual_node.spec.service_discovery.aws_cloud_map.service_name #=> String
     #   resp.virtual_node.spec.service_discovery.dns.hostname #=> String
+    #   resp.virtual_node.spec.service_discovery.dns.ip_preference #=> String, one of "IPv6_PREFERRED", "IPv4_PREFERRED", "IPv4_ONLY", "IPv6_ONLY"
+    #   resp.virtual_node.spec.service_discovery.dns.response_type #=> String, one of "LOADBALANCER", "ENDPOINTS"
     #   resp.virtual_node.status.status #=> String, one of "ACTIVE", "INACTIVE", "DELETED"
     #   resp.virtual_node.virtual_node_name #=> String
     #
@@ -4275,10 +5403,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the virtual router resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -4353,10 +5481,10 @@ module Aws::AppMesh
     #   The name of the service mesh that the virtual service resides in.
     #
     # @option params [String] :mesh_owner
-    #   The AWS IAM account ID of the service mesh owner. If the account ID is
-    #   not your own, then it's the ID of the account that shared the mesh
-    #   with your account. For more information about mesh sharing, see
-    #   [Working with shared meshes][1].
+    #   The Amazon Web Services IAM account ID of the service mesh owner. If
+    #   the account ID is not your own, then it's the ID of the account that
+    #   shared the mesh with your account. For more information about mesh
+    #   sharing, see [Working with shared meshes][1].
     #
     #
     #
@@ -4422,14 +5550,19 @@ module Aws::AppMesh
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::AppMesh')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-appmesh'
-      context[:gem_version] = '1.33.0'
+      context[:gem_version] = '1.72.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

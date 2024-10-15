@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,7 +11,12 @@ module Aws::KinesisVideoArchivedMedia
   module Types
 
     # Kinesis Video Streams has throttled the request because you have
-    # exceeded the limit of allowed client calls. Try making the call later.
+    # exceeded a limit. Try making the call later. For information about
+    # limits, see [Kinesis Video Streams Limits][1].
+    #
+    #
+    #
+    # [1]: http://docs.aws.amazon.com/kinesisvideostreams/latest/dg/limits.html
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -35,17 +40,6 @@ module Aws::KinesisVideoArchivedMedia
     # range and very different points in time, only the oldest ingested
     # collection of fragments are returned.
     #
-    # @note When making an API call, you may pass ClipFragmentSelector
-    #   data as a hash:
-    #
-    #       {
-    #         fragment_selector_type: "PRODUCER_TIMESTAMP", # required, accepts PRODUCER_TIMESTAMP, SERVER_TIMESTAMP
-    #         timestamp_range: { # required
-    #           start_timestamp: Time.now, # required
-    #           end_timestamp: Time.now, # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] fragment_selector_type
     #   The origin of the timestamps to use (Server or Producer).
     #   @return [String]
@@ -65,36 +59,24 @@ module Aws::KinesisVideoArchivedMedia
 
     # The range of timestamps for which to return fragments.
     #
-    # The values in the ClipTimestampRange are `inclusive`. Fragments that
-    # begin before the start time but continue past it, or fragments that
-    # begin before the end time but continue past it, are included in the
-    # session.
-    #
-    # @note When making an API call, you may pass ClipTimestampRange
-    #   data as a hash:
-    #
-    #       {
-    #         start_timestamp: Time.now, # required
-    #         end_timestamp: Time.now, # required
-    #       }
-    #
     # @!attribute [rw] start_timestamp
     #   The starting timestamp in the range of timestamps for which to
     #   return fragments.
     #
-    #   This value is inclusive. Fragments that start before the
-    #   `StartTimestamp` and continue past it are included in the session.
-    #   If `FragmentSelectorType` is `SERVER_TIMESTAMP`, the
+    #   Only fragments that start exactly at or after `StartTimestamp` are
+    #   included in the session. Fragments that start before
+    #   `StartTimestamp` and continue past it aren't included in the
+    #   session. If `FragmentSelectorType` is `SERVER_TIMESTAMP`, the
     #   `StartTimestamp` must be later than the stream head.
     #   @return [Time]
     #
     # @!attribute [rw] end_timestamp
     #   The end of the timestamp range for the requested media.
     #
-    #   This value must be within 3 hours of the specified `StartTimestamp`,
-    #   and it must be later than the `StartTimestamp` value. If
-    #   `FragmentSelectorType` for the request is `SERVER_TIMESTAMP`, this
-    #   value must be in the past.
+    #   This value must be within 24 hours of the specified
+    #   `StartTimestamp`, and it must be later than the `StartTimestamp`
+    #   value. If `FragmentSelectorType` for the request is
+    #   `SERVER_TIMESTAMP`, this value must be in the past.
     #
     #   This value is inclusive. The `EndTimestamp` is compared to the
     #   (starting) timestamp of the fragment. Fragments that start before
@@ -113,17 +95,6 @@ module Aws::KinesisVideoArchivedMedia
 
     # Contains the range of timestamps for the requested media, and the
     # source of the timestamps.
-    #
-    # @note When making an API call, you may pass DASHFragmentSelector
-    #   data as a hash:
-    #
-    #       {
-    #         fragment_selector_type: "PRODUCER_TIMESTAMP", # accepts PRODUCER_TIMESTAMP, SERVER_TIMESTAMP
-    #         timestamp_range: {
-    #           start_timestamp: Time.now,
-    #           end_timestamp: Time.now,
-    #         },
-    #       }
     #
     # @!attribute [rw] fragment_selector_type
     #   The source of the timestamps for the requested media.
@@ -176,20 +147,10 @@ module Aws::KinesisVideoArchivedMedia
     #
     # This value should not be present if `PlaybackType` is `LIVE`.
     #
-    # <note markdown="1"> The values in the `DASHimestampRange` are inclusive. Fragments that
-    # begin before the start time but continue past it, or fragments that
-    # begin before the end time but continue past it, are included in the
-    # session.
-    #
-    #  </note>
-    #
-    # @note When making an API call, you may pass DASHTimestampRange
-    #   data as a hash:
-    #
-    #       {
-    #         start_timestamp: Time.now,
-    #         end_timestamp: Time.now,
-    #       }
+    # The values in `DASHimestampRange` are inclusive. Fragments that start
+    # exactly at or after the start time are included in the session.
+    # Fragments that start before the start time and continue past it are
+    # not included in the session.
     #
     # @!attribute [rw] start_timestamp
     #   The start of the timestamp range for the requested media.
@@ -197,17 +158,16 @@ module Aws::KinesisVideoArchivedMedia
     #   If the `DASHTimestampRange` value is specified, the `StartTimestamp`
     #   value is required.
     #
-    #   <note markdown="1"> This value is inclusive. Fragments that start before the
-    #   `StartTimestamp` and continue past it are included in the session.
-    #   If `FragmentSelectorType` is `SERVER_TIMESTAMP`, the
+    #   Only fragments that start exactly at or after `StartTimestamp` are
+    #   included in the session. Fragments that start before
+    #   `StartTimestamp` and continue past it aren't included in the
+    #   session. If `FragmentSelectorType` is `SERVER_TIMESTAMP`, the
     #   `StartTimestamp` must be later than the stream head.
-    #
-    #    </note>
     #   @return [Time]
     #
     # @!attribute [rw] end_timestamp
     #   The end of the timestamp range for the requested media. This value
-    #   must be within 3 hours of the specified `StartTimestamp`, and it
+    #   must be within 24 hours of the specified `StartTimestamp`, and it
     #   must be later than the `StartTimestamp` value.
     #
     #   If `FragmentSelectorType` for the request is `SERVER_TIMESTAMP`,
@@ -252,7 +212,8 @@ module Aws::KinesisVideoArchivedMedia
     #   @return [Time]
     #
     # @!attribute [rw] server_timestamp
-    #   The timestamp from the AWS server corresponding to the fragment.
+    #   The timestamp from the Amazon Web Services server corresponding to
+    #   the fragment.
     #   @return [Time]
     #
     # @!attribute [rw] fragment_length_in_milliseconds
@@ -292,17 +253,6 @@ module Aws::KinesisVideoArchivedMedia
     # of 00:00:04 would return the fragments with start times of 00:00:02
     # and 00:00:04.
     #
-    # @note When making an API call, you may pass FragmentSelector
-    #   data as a hash:
-    #
-    #       {
-    #         fragment_selector_type: "PRODUCER_TIMESTAMP", # required, accepts PRODUCER_TIMESTAMP, SERVER_TIMESTAMP
-    #         timestamp_range: { # required
-    #           start_timestamp: Time.now, # required
-    #           end_timestamp: Time.now, # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] fragment_selector_type
     #   The origin of the timestamps to use (Server or Producer).
     #   @return [String]
@@ -320,21 +270,6 @@ module Aws::KinesisVideoArchivedMedia
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetClipInput
-    #   data as a hash:
-    #
-    #       {
-    #         stream_name: "StreamName",
-    #         stream_arn: "ResourceARN",
-    #         clip_fragment_selector: { # required
-    #           fragment_selector_type: "PRODUCER_TIMESTAMP", # required, accepts PRODUCER_TIMESTAMP, SERVER_TIMESTAMP
-    #           timestamp_range: { # required
-    #             start_timestamp: Time.now, # required
-    #             end_timestamp: Time.now, # required
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] stream_name
     #   The name of the stream for which to retrieve the media clip.
     #
@@ -371,8 +306,11 @@ module Aws::KinesisVideoArchivedMedia
     #   Traditional MP4 file that contains the media clip from the specified
     #   video stream. The output will contain the first 100 MB or the first
     #   200 fragments from the specified start timestamp. For more
-    #   information, see [Kinesis Video Streams Limits](Kinesis Video
-    #   Streams Limits).
+    #   information, see [Kinesis Video Streams Limits][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/limits.html
     #   @return [IO]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesis-video-archived-media-2017-09-30/GetClipOutput AWS API Documentation
@@ -384,26 +322,6 @@ module Aws::KinesisVideoArchivedMedia
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetDASHStreamingSessionURLInput
-    #   data as a hash:
-    #
-    #       {
-    #         stream_name: "StreamName",
-    #         stream_arn: "ResourceARN",
-    #         playback_mode: "LIVE", # accepts LIVE, LIVE_REPLAY, ON_DEMAND
-    #         display_fragment_timestamp: "ALWAYS", # accepts ALWAYS, NEVER
-    #         display_fragment_number: "ALWAYS", # accepts ALWAYS, NEVER
-    #         dash_fragment_selector: {
-    #           fragment_selector_type: "PRODUCER_TIMESTAMP", # accepts PRODUCER_TIMESTAMP, SERVER_TIMESTAMP
-    #           timestamp_range: {
-    #             start_timestamp: Time.now,
-    #             end_timestamp: Time.now,
-    #           },
-    #         },
-    #         expires: 1,
-    #         max_manifest_fragment_results: 1,
-    #       }
-    #
     # @!attribute [rw] stream_name
     #   The name of the stream for which to retrieve the MPEG-DASH manifest
     #   URL.
@@ -423,7 +341,7 @@ module Aws::KinesisVideoArchivedMedia
     #
     #   Features of the three types of sessions include the following:
     #
-    #   * <b> <code>LIVE</code> </b>\: For sessions of this type, the
+    #   * <b> <code>LIVE</code> </b>: For sessions of this type, the
     #     MPEG-DASH manifest is continually updated with the latest
     #     fragments as they become available. We recommend that the media
     #     player retrieve a new manifest on a one-second interval. When this
@@ -444,7 +362,7 @@ module Aws::KinesisVideoArchivedMedia
     #
     #      </note>
     #
-    #   * <b> <code>LIVE_REPLAY</code> </b>\: For sessions of this type, the
+    #   * <b> <code>LIVE_REPLAY</code> </b>: For sessions of this type, the
     #     MPEG-DASH manifest is updated similarly to how it is updated for
     #     `LIVE` mode except that it starts by including fragments from a
     #     given start time. Instead of fragments being added as they are
@@ -458,14 +376,13 @@ module Aws::KinesisVideoArchivedMedia
     #     without being limited by the 1,000 fragment limit in the
     #     `ON_DEMAND` mode.
     #
-    #   * <b> <code>ON_DEMAND</code> </b>\: For sessions of this type, the
+    #   * <b> <code>ON_DEMAND</code> </b>: For sessions of this type, the
     #     MPEG-DASH manifest contains all the fragments for the session, up
-    #     to the number that is specified in
-    #     `MaxMediaPlaylistFragmentResults`. The manifest must be retrieved
-    #     only once for each session. When this type of session is played in
-    #     a media player, the user interface typically displays a scrubber
-    #     control for choosing the position in the playback window to
-    #     display.
+    #     to the number that is specified in `MaxManifestFragmentResults`.
+    #     The manifest must be retrieved only once for each session. When
+    #     this type of session is played in a media player, the user
+    #     interface typically displays a scrubber control for choosing the
+    #     position in the playback window to display.
     #
     #   In all playback modes, if `FragmentSelectorType` is
     #   `PRODUCER_TIMESTAMP`, and if there are multiple fragments with the
@@ -587,27 +504,6 @@ module Aws::KinesisVideoArchivedMedia
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetHLSStreamingSessionURLInput
-    #   data as a hash:
-    #
-    #       {
-    #         stream_name: "StreamName",
-    #         stream_arn: "ResourceARN",
-    #         playback_mode: "LIVE", # accepts LIVE, LIVE_REPLAY, ON_DEMAND
-    #         hls_fragment_selector: {
-    #           fragment_selector_type: "PRODUCER_TIMESTAMP", # accepts PRODUCER_TIMESTAMP, SERVER_TIMESTAMP
-    #           timestamp_range: {
-    #             start_timestamp: Time.now,
-    #             end_timestamp: Time.now,
-    #           },
-    #         },
-    #         container_format: "FRAGMENTED_MP4", # accepts FRAGMENTED_MP4, MPEG_TS
-    #         discontinuity_mode: "ALWAYS", # accepts ALWAYS, NEVER, ON_DISCONTINUITY
-    #         display_fragment_timestamp: "ALWAYS", # accepts ALWAYS, NEVER
-    #         expires: 1,
-    #         max_media_playlist_fragment_results: 1,
-    #       }
-    #
     # @!attribute [rw] stream_name
     #   The name of the stream for which to retrieve the HLS master playlist
     #   URL.
@@ -627,7 +523,7 @@ module Aws::KinesisVideoArchivedMedia
     #
     #   Features of the three types of sessions include the following:
     #
-    #   * <b> <code>LIVE</code> </b>\: For sessions of this type, the HLS
+    #   * <b> <code>LIVE</code> </b>: For sessions of this type, the HLS
     #     media playlist is continually updated with the latest fragments as
     #     they become available. We recommend that the media player retrieve
     #     a new playlist on a one-second interval. When this type of session
@@ -647,7 +543,7 @@ module Aws::KinesisVideoArchivedMedia
     #
     #      </note>
     #
-    #   * <b> <code>LIVE_REPLAY</code> </b>\: For sessions of this type, the
+    #   * <b> <code>LIVE_REPLAY</code> </b>: For sessions of this type, the
     #     HLS media playlist is updated similarly to how it is updated for
     #     `LIVE` mode except that it starts by including fragments from a
     #     given start time. Instead of fragments being added as they are
@@ -661,7 +557,7 @@ module Aws::KinesisVideoArchivedMedia
     #     previously archived media without being limited by the 1,000
     #     fragment limit in the `ON_DEMAND` mode.
     #
-    #   * <b> <code>ON_DEMAND</code> </b>\: For sessions of this type, the
+    #   * <b> <code>ON_DEMAND</code> </b>: For sessions of this type, the
     #     HLS media playlist contains all the fragments for the session, up
     #     to the number that is specified in
     #     `MaxMediaPlaylistFragmentResults`. The playlist must be retrieved
@@ -672,8 +568,8 @@ module Aws::KinesisVideoArchivedMedia
     #
     #   In all playback modes, if `FragmentSelectorType` is
     #   `PRODUCER_TIMESTAMP`, and if there are multiple fragments with the
-    #   same start timestamp, the fragment that has the larger fragment
-    #   number (that is, the newer fragment) is included in the HLS media
+    #   same start timestamp, the fragment that has the largest fragment
+    #   number (that is, the newest fragment) is included in the HLS media
     #   playlist. The other fragments are not included. Fragments that have
     #   different timestamps but have overlapping durations are still
     #   included in the HLS media playlist. This can lead to unexpected
@@ -726,15 +622,15 @@ module Aws::KinesisVideoArchivedMedia
     #
     #   The following modes are supported:
     #
-    #   * `ALWAYS`\: a discontinuity marker is placed between every fragment
+    #   * `ALWAYS`: a discontinuity marker is placed between every fragment
     #     in the HLS media playlist. It is recommended to use a value of
     #     `ALWAYS` if the fragment timestamps are not accurate.
     #
-    #   * `NEVER`\: no discontinuity markers are placed anywhere. It is
+    #   * `NEVER`: no discontinuity markers are placed anywhere. It is
     #     recommended to use a value of `NEVER` to ensure the media player
     #     timeline most accurately maps to the producer timestamps.
     #
-    #   * `ON_DISCONTIUNITY`\: a discontinuity marker is placed between
+    #   * `ON_DISCONTINUITY`: a discontinuity marker is placed between
     #     fragments that have a gap or overlap of more than 50 milliseconds.
     #     For most playback scenarios, it is recommended to use a value of
     #     `ON_DISCONTINUITY` so that the media player timeline is only reset
@@ -792,9 +688,9 @@ module Aws::KinesisVideoArchivedMedia
     #   The default is 5 fragments if `PlaybackMode` is `LIVE` or
     #   `LIVE_REPLAY`, and 1,000 if `PlaybackMode` is `ON_DEMAND`.
     #
-    #   The maximum value of 1,000 fragments corresponds to more than 16
-    #   minutes of video on streams with 1-second fragments, and more than 2
-    #   1/2 hours of video on streams with 10-second fragments.
+    #   The maximum value of 5,000 fragments corresponds to more than 80
+    #   minutes of video on streams with 1-second fragments, and more than
+    #   13 hours of video on streams with 10-second fragments.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesis-video-archived-media-2017-09-30/GetHLSStreamingSessionURLInput AWS API Documentation
@@ -826,16 +722,144 @@ module Aws::KinesisVideoArchivedMedia
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetMediaForFragmentListInput
-    #   data as a hash:
+    # @!attribute [rw] stream_name
+    #   The name of the stream from which to retrieve the images. You must
+    #   specify either the `StreamName` or the `StreamARN`.
+    #   @return [String]
     #
-    #       {
-    #         stream_name: "StreamName", # required
-    #         fragments: ["FragmentNumberString"], # required
-    #       }
+    # @!attribute [rw] stream_arn
+    #   The Amazon Resource Name (ARN) of the stream from which to retrieve
+    #   the images. You must specify either the `StreamName` or the
+    #   `StreamARN`.
+    #   @return [String]
     #
+    # @!attribute [rw] image_selector_type
+    #   The origin of the Server or Producer timestamps to use to generate
+    #   the images.
+    #   @return [String]
+    #
+    # @!attribute [rw] start_timestamp
+    #   The starting point from which the images should be generated. This
+    #   `StartTimestamp` must be within an inclusive range of timestamps for
+    #   an image to be returned.
+    #   @return [Time]
+    #
+    # @!attribute [rw] end_timestamp
+    #   The end timestamp for the range of images to be generated. If the
+    #   time range between `StartTimestamp` and `EndTimestamp` is more than
+    #   300 seconds above `StartTimestamp`, you will receive an
+    #   `IllegalArgumentException`.
+    #   @return [Time]
+    #
+    # @!attribute [rw] sampling_interval
+    #   The time interval in milliseconds (ms) at which the images need to
+    #   be generated from the stream. The minimum value that can be provided
+    #   is 200 ms (5 images per second). If the timestamp range is less than
+    #   the sampling interval, the image from the `startTimestamp` will be
+    #   returned if available.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] format
+    #   The format that will be used to encode the image.
+    #   @return [String]
+    #
+    # @!attribute [rw] format_config
+    #   The list of a key-value pair structure that contains extra
+    #   parameters that can be applied when the image is generated. The
+    #   `FormatConfig` key is the `JPEGQuality`, which indicates the JPEG
+    #   quality key to be used to generate the image. The `FormatConfig`
+    #   value accepts ints from 1 to 100. If the value is 1, the image will
+    #   be generated with less quality and the best compression. If the
+    #   value is 100, the image will be generated with the best quality and
+    #   less compression. If no value is provided, the default value of the
+    #   `JPEGQuality` key will be set to 80.
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] width_pixels
+    #   The width of the output image that is used in conjunction with the
+    #   `HeightPixels` parameter. When both `WidthPixels` and `HeightPixels`
+    #   parameters are provided, the image will be stretched to fit the
+    #   specified aspect ratio. If only the `WidthPixels` parameter is
+    #   provided or if only the `HeightPixels` is provided, a
+    #   `ValidationException` will be thrown. If neither parameter is
+    #   provided, the original image size from the stream will be returned.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] height_pixels
+    #   The height of the output image that is used in conjunction with the
+    #   `WidthPixels` parameter. When both `HeightPixels` and `WidthPixels`
+    #   parameters are provided, the image will be stretched to fit the
+    #   specified aspect ratio. If only the `HeightPixels` parameter is
+    #   provided, its original aspect ratio will be used to calculate the
+    #   `WidthPixels` ratio. If neither parameter is provided, the original
+    #   image size will be returned.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of images to be returned by the API.
+    #
+    #   <note markdown="1"> The default limit is 25 images per API response. Providing a
+    #   `MaxResults` greater than this value will result in a page size of
+    #   25. Any additional results will be paginated.
+    #
+    #    </note>
+    #   @return [Integer]
+    #
+    # @!attribute [rw] next_token
+    #   A token that specifies where to start paginating the next set of
+    #   Images. This is the `GetImages:NextToken` from a previously
+    #   truncated response.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesis-video-archived-media-2017-09-30/GetImagesInput AWS API Documentation
+    #
+    class GetImagesInput < Struct.new(
+      :stream_name,
+      :stream_arn,
+      :image_selector_type,
+      :start_timestamp,
+      :end_timestamp,
+      :sampling_interval,
+      :format,
+      :format_config,
+      :width_pixels,
+      :height_pixels,
+      :max_results,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] images
+    #   The list of images generated from the video stream. If there is no
+    #   media available for the given timestamp, the `NO_MEDIA` error will
+    #   be listed in the output. If an error occurs while the image is being
+    #   generated, the `MEDIA_ERROR` will be listed in the output as the
+    #   cause of the missing image.
+    #   @return [Array<Types::Image>]
+    #
+    # @!attribute [rw] next_token
+    #   The encrypted token that was used in the request to get more images.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesis-video-archived-media-2017-09-30/GetImagesOutput AWS API Documentation
+    #
+    class GetImagesOutput < Struct.new(
+      :images,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] stream_name
     #   The name of the stream from which to retrieve fragment media.
+    #   Specify either this parameter or the `StreamARN` parameter.
+    #   @return [String]
+    #
+    # @!attribute [rw] stream_arn
+    #   The Amazon Resource Name (ARN) of the stream from which to retrieve
+    #   fragment media. Specify either this parameter or the `StreamName`
+    #   parameter.
     #   @return [String]
     #
     # @!attribute [rw] fragments
@@ -847,6 +871,7 @@ module Aws::KinesisVideoArchivedMedia
     #
     class GetMediaForFragmentListInput < Struct.new(
       :stream_name,
+      :stream_arn,
       :fragments)
       SENSITIVE = []
       include Aws::Structure
@@ -878,7 +903,7 @@ module Aws::KinesisVideoArchivedMedia
     #     that threw the exception
     #
     #   * AWS\_KINESISVIDEO\_EXCEPTION\_ERROR\_CODE - The integer code of
-    #     the exception
+    #     the
     #
     #   * AWS\_KINESISVIDEO\_EXCEPTION\_MESSAGE - A text description of the
     #     exception
@@ -899,17 +924,6 @@ module Aws::KinesisVideoArchivedMedia
 
     # Contains the range of timestamps for the requested media, and the
     # source of the timestamps.
-    #
-    # @note When making an API call, you may pass HLSFragmentSelector
-    #   data as a hash:
-    #
-    #       {
-    #         fragment_selector_type: "PRODUCER_TIMESTAMP", # accepts PRODUCER_TIMESTAMP, SERVER_TIMESTAMP
-    #         timestamp_range: {
-    #           start_timestamp: Time.now,
-    #           end_timestamp: Time.now,
-    #         },
-    #       }
     #
     # @!attribute [rw] fragment_selector_type
     #   The source of the timestamps for the requested media.
@@ -962,38 +976,22 @@ module Aws::KinesisVideoArchivedMedia
     #
     # This value should not be present if `PlaybackType` is `LIVE`.
     #
-    # <note markdown="1"> The values in the `HLSTimestampRange` are inclusive. Fragments that
-    # begin before the start time but continue past it, or fragments that
-    # begin before the end time but continue past it, are included in the
-    # session.
-    #
-    #  </note>
-    #
-    # @note When making an API call, you may pass HLSTimestampRange
-    #   data as a hash:
-    #
-    #       {
-    #         start_timestamp: Time.now,
-    #         end_timestamp: Time.now,
-    #       }
-    #
     # @!attribute [rw] start_timestamp
     #   The start of the timestamp range for the requested media.
     #
     #   If the `HLSTimestampRange` value is specified, the `StartTimestamp`
     #   value is required.
     #
-    #   <note markdown="1"> This value is inclusive. Fragments that start before the
-    #   `StartTimestamp` and continue past it are included in the session.
-    #   If `FragmentSelectorType` is `SERVER_TIMESTAMP`, the
+    #   Only fragments that start exactly at or after `StartTimestamp` are
+    #   included in the session. Fragments that start before
+    #   `StartTimestamp` and continue past it aren't included in the
+    #   session. If `FragmentSelectorType` is `SERVER_TIMESTAMP`, the
     #   `StartTimestamp` must be later than the stream head.
-    #
-    #    </note>
     #   @return [Time]
     #
     # @!attribute [rw] end_timestamp
     #   The end of the timestamp range for the requested media. This value
-    #   must be within 3 hours of the specified `StartTimestamp`, and it
+    #   must be within 24 hours of the specified `StartTimestamp`, and it
     #   must be later than the `StartTimestamp` value.
     #
     #   If `FragmentSelectorType` for the request is `SERVER_TIMESTAMP`,
@@ -1017,6 +1015,46 @@ module Aws::KinesisVideoArchivedMedia
     class HLSTimestampRange < Struct.new(
       :start_timestamp,
       :end_timestamp)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # A structure that contains the `Timestamp`, `Error`, and
+    # `ImageContent`.
+    #
+    # @!attribute [rw] time_stamp
+    #   An attribute of the `Image` object that is used to extract an image
+    #   from the video stream. This field is used to manage gaps on images
+    #   or to better understand the pagination window.
+    #   @return [Time]
+    #
+    # @!attribute [rw] error
+    #   The error message shown when the image for the provided timestamp
+    #   was not extracted due to a non-tryable error. An error will be
+    #   returned if:
+    #
+    #   * There is no media that exists for the specified `Timestamp`.
+    #
+    #   ^
+    #   ^
+    #
+    #   * The media for the specified time does not allow an image to be
+    #     extracted. In this case the media is audio only, or the incorrect
+    #     media has been ingested.
+    #
+    #   ^
+    #   @return [String]
+    #
+    # @!attribute [rw] image_content
+    #   An attribute of the `Image` object that is Base64 encoded.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesis-video-archived-media-2017-09-30/Image AWS API Documentation
+    #
+    class Image < Struct.new(
+      :time_stamp,
+      :error,
+      :image_content)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1063,24 +1101,15 @@ module Aws::KinesisVideoArchivedMedia
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListFragmentsInput
-    #   data as a hash:
-    #
-    #       {
-    #         stream_name: "StreamName", # required
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #         fragment_selector: {
-    #           fragment_selector_type: "PRODUCER_TIMESTAMP", # required, accepts PRODUCER_TIMESTAMP, SERVER_TIMESTAMP
-    #           timestamp_range: { # required
-    #             start_timestamp: Time.now, # required
-    #             end_timestamp: Time.now, # required
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] stream_name
     #   The name of the stream from which to retrieve a fragment list.
+    #   Specify either this parameter or the `StreamARN` parameter.
+    #   @return [String]
+    #
+    # @!attribute [rw] stream_arn
+    #   The Amazon Resource Name (ARN) of the stream from which to retrieve
+    #   a fragment list. Specify either this parameter or the `StreamName`
+    #   parameter.
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -1098,12 +1127,17 @@ module Aws::KinesisVideoArchivedMedia
     # @!attribute [rw] fragment_selector
     #   Describes the timestamp range and timestamp origin for the range of
     #   fragments to return.
+    #
+    #   <note markdown="1"> This is only required when the `NextToken` isn't passed in the API.
+    #
+    #    </note>
     #   @return [Types::FragmentSelector]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesis-video-archived-media-2017-09-30/ListFragmentsInput AWS API Documentation
     #
     class ListFragmentsInput < Struct.new(
       :stream_name,
+      :stream_arn,
       :max_results,
       :next_token,
       :fragment_selector)
@@ -1146,8 +1180,8 @@ module Aws::KinesisVideoArchivedMedia
       include Aws::Structure
     end
 
-    # A streaming session was requested for a stream that does not retain
-    # data (that is, has a `DataRetentionInHours` of 0).
+    # `GetImages` was requested for a stream that does not retain data (that
+    # is, has a `DataRetentionInHours` of 0).
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -1174,8 +1208,8 @@ module Aws::KinesisVideoArchivedMedia
       include Aws::Structure
     end
 
-    # `GetMedia` throws this error when Kinesis Video Streams can't find
-    # the stream that you specified.
+    # `GetImages` will throw this error when Kinesis Video Streams can't
+    # find the stream that you specified.
     #
     # `GetHLSStreamingSessionURL` and `GetDASHStreamingSessionURL` throw
     # this error if a session with a `PlaybackMode` of `ON_DEMAND` or
@@ -1196,14 +1230,6 @@ module Aws::KinesisVideoArchivedMedia
     end
 
     # The range of timestamps for which to return fragments.
-    #
-    # @note When making an API call, you may pass TimestampRange
-    #   data as a hash:
-    #
-    #       {
-    #         start_timestamp: Time.now, # required
-    #         end_timestamp: Time.now, # required
-    #       }
     #
     # @!attribute [rw] start_timestamp
     #   The starting timestamp in the range of timestamps for which to
@@ -1243,3 +1269,4 @@ module Aws::KinesisVideoArchivedMedia
 
   end
 end
+

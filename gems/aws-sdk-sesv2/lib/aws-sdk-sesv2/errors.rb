@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -32,6 +32,7 @@ module Aws::SESV2
   # * {BadRequestException}
   # * {ConcurrentModificationException}
   # * {ConflictException}
+  # * {InternalServiceErrorException}
   # * {InvalidNextTokenException}
   # * {LimitExceededException}
   # * {MailFromDomainNotVerifiedException}
@@ -91,6 +92,16 @@ module Aws::SESV2
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::SESV2::Types::ConflictException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class InternalServiceErrorException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SESV2::Types::InternalServiceErrorException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

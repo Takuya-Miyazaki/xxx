@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -54,7 +54,9 @@ module Aws::RDS
     #
     # @return [self]
     def load
-      resp = @client.describe_event_categories(source_type: @name)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.describe_event_categories(source_type: @name)
+      end
       @data = resp.event_categories_map_list[0]
       self
     end
@@ -169,7 +171,9 @@ module Aws::RDS
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @deprecated

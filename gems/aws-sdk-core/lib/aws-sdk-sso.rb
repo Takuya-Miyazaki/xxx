@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -13,12 +13,7 @@ unless Module.const_defined?(:Aws)
   require 'aws-sigv4'
 end
 
-require_relative 'aws-sdk-sso/types'
-require_relative 'aws-sdk-sso/client_api'
-require_relative 'aws-sdk-sso/client'
-require_relative 'aws-sdk-sso/errors'
-require_relative 'aws-sdk-sso/resource'
-require_relative 'aws-sdk-sso/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:sso)
 
 # This module provides support for AWS Single Sign-On. This module is available in the
 # `aws-sdk-core` gem.
@@ -49,7 +44,20 @@ require_relative 'aws-sdk-sso/customizations'
 #
 # @!group service
 module Aws::SSO
+  autoload :Types, 'aws-sdk-sso/types'
+  autoload :ClientApi, 'aws-sdk-sso/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-sso/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-sso/client'
+  autoload :Errors, 'aws-sdk-sso/errors'
+  autoload :Resource, 'aws-sdk-sso/resource'
+  autoload :EndpointParameters, 'aws-sdk-sso/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-sso/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-sso/endpoints'
 
-  GEM_VERSION = '3.111.1'
+  GEM_VERSION = '3.209.1'
 
 end
+
+require_relative 'aws-sdk-sso/customizations'

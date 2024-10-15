@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,16 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-opsworks/types'
-require_relative 'aws-sdk-opsworks/client_api'
-require_relative 'aws-sdk-opsworks/client'
-require_relative 'aws-sdk-opsworks/errors'
-require_relative 'aws-sdk-opsworks/waiters'
-require_relative 'aws-sdk-opsworks/resource'
-require_relative 'aws-sdk-opsworks/layer'
-require_relative 'aws-sdk-opsworks/stack'
-require_relative 'aws-sdk-opsworks/stack_summary'
-require_relative 'aws-sdk-opsworks/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:opsworks)
 
 # This module provides support for AWS OpsWorks. This module is available in the
 # `aws-sdk-opsworks` gem.
@@ -51,7 +42,24 @@ require_relative 'aws-sdk-opsworks/customizations'
 #
 # @!group service
 module Aws::OpsWorks
+  autoload :Types, 'aws-sdk-opsworks/types'
+  autoload :ClientApi, 'aws-sdk-opsworks/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-opsworks/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-opsworks/client'
+  autoload :Errors, 'aws-sdk-opsworks/errors'
+  autoload :Waiters, 'aws-sdk-opsworks/waiters'
+  autoload :Resource, 'aws-sdk-opsworks/resource'
+  autoload :EndpointParameters, 'aws-sdk-opsworks/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-opsworks/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-opsworks/endpoints'
+  autoload :Layer, 'aws-sdk-opsworks/layer'
+  autoload :Stack, 'aws-sdk-opsworks/stack'
+  autoload :StackSummary, 'aws-sdk-opsworks/stack_summary'
 
-  GEM_VERSION = '1.30.0'
+  GEM_VERSION = '1.67.0'
 
 end
+
+require_relative 'aws-sdk-opsworks/customizations'

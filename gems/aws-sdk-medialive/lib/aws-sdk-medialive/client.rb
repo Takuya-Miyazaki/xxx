@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:medialive)
 
 module Aws::MediaLive
   # An API client for MediaLive.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::MediaLive
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::MediaLive::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::MediaLive
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::MediaLive
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::MediaLive
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::MediaLive
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::MediaLive
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::MediaLive
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::MediaLive
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::MediaLive::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::MediaLive::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -497,7 +617,8 @@ module Aws::MediaLive
     #           action_name: "__string", # required
     #           schedule_action_settings: { # required
     #             hls_id_3_segment_tagging_settings: {
-    #               tag: "__string", # required
+    #               tag: "__string",
+    #               id_3: "__string",
     #             },
     #             hls_timed_metadata_settings: {
     #               id_3: "__string", # required
@@ -530,12 +651,24 @@ module Aws::MediaLive
     #               },
     #               url_path: ["__string"],
     #             },
+    #             motion_graphics_image_activate_settings: {
+    #               duration: 1,
+    #               password_param: "__string",
+    #               url: "__string",
+    #               username: "__string",
+    #             },
+    #             motion_graphics_image_deactivate_settings: {
+    #             },
     #             pause_state_settings: {
     #               pipelines: [
     #                 {
     #                   pipeline_id: "PIPELINE_0", # required, accepts PIPELINE_0, PIPELINE_1
     #                 },
     #               ],
+    #             },
+    #             scte_35_input_settings: {
+    #               input_attachment_name_reference: "__string",
+    #               mode: "FIXED", # required, accepts FIXED, FOLLOW_ACTIVE
     #             },
     #             scte_35_return_to_network_settings: {
     #               splice_event_id: 1, # required
@@ -577,7 +710,7 @@ module Aws::MediaLive
     #               height: 1,
     #               image: { # required
     #                 password_param: "__string",
-    #                 uri: "__string", # required
+    #                 uri: "__stringMax2048", # required
     #                 username: "__string",
     #               },
     #               image_x: 1,
@@ -589,6 +722,28 @@ module Aws::MediaLive
     #             static_image_deactivate_settings: {
     #               fade_out: 1,
     #               layer: 1,
+    #             },
+    #             static_image_output_activate_settings: {
+    #               duration: 1,
+    #               fade_in: 1,
+    #               fade_out: 1,
+    #               height: 1,
+    #               image: { # required
+    #                 password_param: "__string",
+    #                 uri: "__stringMax2048", # required
+    #                 username: "__string",
+    #               },
+    #               image_x: 1,
+    #               image_y: 1,
+    #               layer: 1,
+    #               opacity: 1,
+    #               output_names: ["__string"], # required
+    #               width: 1,
+    #             },
+    #             static_image_output_deactivate_settings: {
+    #               fade_out: 1,
+    #               layer: 1,
+    #               output_names: ["__string"], # required
     #             },
     #           },
     #           schedule_action_start_settings: { # required
@@ -615,6 +770,7 @@ module Aws::MediaLive
     #   resp.creates.schedule_actions #=> Array
     #   resp.creates.schedule_actions[0].action_name #=> String
     #   resp.creates.schedule_actions[0].schedule_action_settings.hls_id_3_segment_tagging_settings.tag #=> String
+    #   resp.creates.schedule_actions[0].schedule_action_settings.hls_id_3_segment_tagging_settings.id_3 #=> String
     #   resp.creates.schedule_actions[0].schedule_action_settings.hls_timed_metadata_settings.id_3 #=> String
     #   resp.creates.schedule_actions[0].schedule_action_settings.input_prepare_settings.input_attachment_name_reference #=> String
     #   resp.creates.schedule_actions[0].schedule_action_settings.input_prepare_settings.input_clipping_settings.input_timecode_source #=> String, one of "ZEROBASED", "EMBEDDED"
@@ -630,8 +786,14 @@ module Aws::MediaLive
     #   resp.creates.schedule_actions[0].schedule_action_settings.input_switch_settings.input_clipping_settings.stop_timecode.timecode #=> String
     #   resp.creates.schedule_actions[0].schedule_action_settings.input_switch_settings.url_path #=> Array
     #   resp.creates.schedule_actions[0].schedule_action_settings.input_switch_settings.url_path[0] #=> String
+    #   resp.creates.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.duration #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.password_param #=> String
+    #   resp.creates.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.url #=> String
+    #   resp.creates.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.username #=> String
     #   resp.creates.schedule_actions[0].schedule_action_settings.pause_state_settings.pipelines #=> Array
     #   resp.creates.schedule_actions[0].schedule_action_settings.pause_state_settings.pipelines[0].pipeline_id #=> String, one of "PIPELINE_0", "PIPELINE_1"
+    #   resp.creates.schedule_actions[0].schedule_action_settings.scte_35_input_settings.input_attachment_name_reference #=> String
+    #   resp.creates.schedule_actions[0].schedule_action_settings.scte_35_input_settings.mode #=> String, one of "FIXED", "FOLLOW_ACTIVE"
     #   resp.creates.schedule_actions[0].schedule_action_settings.scte_35_return_to_network_settings.splice_event_id #=> Integer
     #   resp.creates.schedule_actions[0].schedule_action_settings.scte_35_splice_insert_settings.duration #=> Integer
     #   resp.creates.schedule_actions[0].schedule_action_settings.scte_35_splice_insert_settings.splice_event_id #=> Integer
@@ -664,12 +826,31 @@ module Aws::MediaLive
     #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_activate_settings.width #=> Integer
     #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_deactivate_settings.fade_out #=> Integer
     #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_deactivate_settings.layer #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.duration #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.fade_in #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.fade_out #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.height #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image.password_param #=> String
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image.uri #=> String
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image.username #=> String
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image_x #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image_y #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.layer #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.opacity #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.output_names #=> Array
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.output_names[0] #=> String
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.width #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.fade_out #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.layer #=> Integer
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.output_names #=> Array
+    #   resp.creates.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.output_names[0] #=> String
     #   resp.creates.schedule_actions[0].schedule_action_start_settings.fixed_mode_schedule_action_start_settings.time #=> String
     #   resp.creates.schedule_actions[0].schedule_action_start_settings.follow_mode_schedule_action_start_settings.follow_point #=> String, one of "END", "START"
     #   resp.creates.schedule_actions[0].schedule_action_start_settings.follow_mode_schedule_action_start_settings.reference_action_name #=> String
     #   resp.deletes.schedule_actions #=> Array
     #   resp.deletes.schedule_actions[0].action_name #=> String
     #   resp.deletes.schedule_actions[0].schedule_action_settings.hls_id_3_segment_tagging_settings.tag #=> String
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.hls_id_3_segment_tagging_settings.id_3 #=> String
     #   resp.deletes.schedule_actions[0].schedule_action_settings.hls_timed_metadata_settings.id_3 #=> String
     #   resp.deletes.schedule_actions[0].schedule_action_settings.input_prepare_settings.input_attachment_name_reference #=> String
     #   resp.deletes.schedule_actions[0].schedule_action_settings.input_prepare_settings.input_clipping_settings.input_timecode_source #=> String, one of "ZEROBASED", "EMBEDDED"
@@ -685,8 +866,14 @@ module Aws::MediaLive
     #   resp.deletes.schedule_actions[0].schedule_action_settings.input_switch_settings.input_clipping_settings.stop_timecode.timecode #=> String
     #   resp.deletes.schedule_actions[0].schedule_action_settings.input_switch_settings.url_path #=> Array
     #   resp.deletes.schedule_actions[0].schedule_action_settings.input_switch_settings.url_path[0] #=> String
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.duration #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.password_param #=> String
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.url #=> String
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.username #=> String
     #   resp.deletes.schedule_actions[0].schedule_action_settings.pause_state_settings.pipelines #=> Array
     #   resp.deletes.schedule_actions[0].schedule_action_settings.pause_state_settings.pipelines[0].pipeline_id #=> String, one of "PIPELINE_0", "PIPELINE_1"
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.scte_35_input_settings.input_attachment_name_reference #=> String
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.scte_35_input_settings.mode #=> String, one of "FIXED", "FOLLOW_ACTIVE"
     #   resp.deletes.schedule_actions[0].schedule_action_settings.scte_35_return_to_network_settings.splice_event_id #=> Integer
     #   resp.deletes.schedule_actions[0].schedule_action_settings.scte_35_splice_insert_settings.duration #=> Integer
     #   resp.deletes.schedule_actions[0].schedule_action_settings.scte_35_splice_insert_settings.splice_event_id #=> Integer
@@ -719,6 +906,24 @@ module Aws::MediaLive
     #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_activate_settings.width #=> Integer
     #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_deactivate_settings.fade_out #=> Integer
     #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_deactivate_settings.layer #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.duration #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.fade_in #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.fade_out #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.height #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image.password_param #=> String
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image.uri #=> String
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image.username #=> String
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image_x #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image_y #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.layer #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.opacity #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.output_names #=> Array
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.output_names[0] #=> String
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.width #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.fade_out #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.layer #=> Integer
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.output_names #=> Array
+    #   resp.deletes.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.output_names[0] #=> String
     #   resp.deletes.schedule_actions[0].schedule_action_start_settings.fixed_mode_schedule_action_start_settings.time #=> String
     #   resp.deletes.schedule_actions[0].schedule_action_start_settings.follow_mode_schedule_action_start_settings.follow_point #=> String, one of "END", "START"
     #   resp.deletes.schedule_actions[0].schedule_action_start_settings.follow_mode_schedule_action_start_settings.reference_action_name #=> String
@@ -753,6 +958,30 @@ module Aws::MediaLive
       req.send_request(options)
     end
 
+    # Send a request to claim an AWS Elemental device that you have
+    # purchased from a third-party vendor. After the request succeeds, you
+    # will own the device.
+    #
+    # @option params [String] :id
+    #   The id of the device you want to claim.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.claim_device({
+    #     id: "__string",
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ClaimDevice AWS API Documentation
+    #
+    # @overload claim_device(params = {})
+    # @param [Hash] params ({})
+    def claim_device(params = {}, options = {})
+      req = build_request(:claim_device, params)
+      req.send_request(options)
+    end
+
     # Creates a new channel
     #
     # @option params [Types::CdiInputSpecification] :cdi_input_specification
@@ -773,6 +1002,8 @@ module Aws::MediaLive
     # @option params [String] :log_level
     #   The log level the user wants for their channel.
     #
+    # @option params [Types::MaintenanceCreateSettings] :maintenance
+    #
     # @option params [String] :name
     #
     # @option params [String] :request_id
@@ -785,911 +1016,17 @@ module Aws::MediaLive
     #
     # @option params [Hash<String,String>] :tags
     #
+    # @option params [Types::VpcOutputSettings] :vpc
+    #   The properties for a private VPC Output When this property is
+    #   specified, the output egress addresses will be created in a user
+    #   specified VPC
+    #
+    # @option params [Types::AnywhereSettings] :anywhere_settings
+    #   Elemental anywhere settings
+    #
     # @return [Types::CreateChannelResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateChannelResponse#channel #channel} => Types::Channel
-    #
-    # @example Request syntax with placeholder values
-    #
-    #   resp = client.create_channel({
-    #     cdi_input_specification: {
-    #       resolution: "SD", # accepts SD, HD, FHD, UHD
-    #     },
-    #     channel_class: "STANDARD", # accepts STANDARD, SINGLE_PIPELINE
-    #     destinations: [
-    #       {
-    #         id: "__string",
-    #         media_package_settings: [
-    #           {
-    #             channel_id: "__stringMin1",
-    #           },
-    #         ],
-    #         multiplex_settings: {
-    #           multiplex_id: "__stringMin1",
-    #           program_name: "__stringMin1",
-    #         },
-    #         settings: [
-    #           {
-    #             password_param: "__string",
-    #             stream_name: "__string",
-    #             url: "__string",
-    #             username: "__string",
-    #           },
-    #         ],
-    #       },
-    #     ],
-    #     encoder_settings: {
-    #       audio_descriptions: [ # required
-    #         {
-    #           audio_normalization_settings: {
-    #             algorithm: "ITU_1770_1", # accepts ITU_1770_1, ITU_1770_2
-    #             algorithm_control: "CORRECT_AUDIO", # accepts CORRECT_AUDIO
-    #             target_lkfs: 1.0,
-    #           },
-    #           audio_selector_name: "__string", # required
-    #           audio_type: "CLEAN_EFFECTS", # accepts CLEAN_EFFECTS, HEARING_IMPAIRED, UNDEFINED, VISUAL_IMPAIRED_COMMENTARY
-    #           audio_type_control: "FOLLOW_INPUT", # accepts FOLLOW_INPUT, USE_CONFIGURED
-    #           codec_settings: {
-    #             aac_settings: {
-    #               bitrate: 1.0,
-    #               coding_mode: "AD_RECEIVER_MIX", # accepts AD_RECEIVER_MIX, CODING_MODE_1_0, CODING_MODE_1_1, CODING_MODE_2_0, CODING_MODE_5_1
-    #               input_type: "BROADCASTER_MIXED_AD", # accepts BROADCASTER_MIXED_AD, NORMAL
-    #               profile: "HEV1", # accepts HEV1, HEV2, LC
-    #               rate_control_mode: "CBR", # accepts CBR, VBR
-    #               raw_format: "LATM_LOAS", # accepts LATM_LOAS, NONE
-    #               sample_rate: 1.0,
-    #               spec: "MPEG2", # accepts MPEG2, MPEG4
-    #               vbr_quality: "HIGH", # accepts HIGH, LOW, MEDIUM_HIGH, MEDIUM_LOW
-    #             },
-    #             ac_3_settings: {
-    #               bitrate: 1.0,
-    #               bitstream_mode: "COMMENTARY", # accepts COMMENTARY, COMPLETE_MAIN, DIALOGUE, EMERGENCY, HEARING_IMPAIRED, MUSIC_AND_EFFECTS, VISUALLY_IMPAIRED, VOICE_OVER
-    #               coding_mode: "CODING_MODE_1_0", # accepts CODING_MODE_1_0, CODING_MODE_1_1, CODING_MODE_2_0, CODING_MODE_3_2_LFE
-    #               dialnorm: 1,
-    #               drc_profile: "FILM_STANDARD", # accepts FILM_STANDARD, NONE
-    #               lfe_filter: "DISABLED", # accepts DISABLED, ENABLED
-    #               metadata_control: "FOLLOW_INPUT", # accepts FOLLOW_INPUT, USE_CONFIGURED
-    #             },
-    #             eac_3_settings: {
-    #               attenuation_control: "ATTENUATE_3_DB", # accepts ATTENUATE_3_DB, NONE
-    #               bitrate: 1.0,
-    #               bitstream_mode: "COMMENTARY", # accepts COMMENTARY, COMPLETE_MAIN, EMERGENCY, HEARING_IMPAIRED, VISUALLY_IMPAIRED
-    #               coding_mode: "CODING_MODE_1_0", # accepts CODING_MODE_1_0, CODING_MODE_2_0, CODING_MODE_3_2
-    #               dc_filter: "DISABLED", # accepts DISABLED, ENABLED
-    #               dialnorm: 1,
-    #               drc_line: "FILM_LIGHT", # accepts FILM_LIGHT, FILM_STANDARD, MUSIC_LIGHT, MUSIC_STANDARD, NONE, SPEECH
-    #               drc_rf: "FILM_LIGHT", # accepts FILM_LIGHT, FILM_STANDARD, MUSIC_LIGHT, MUSIC_STANDARD, NONE, SPEECH
-    #               lfe_control: "LFE", # accepts LFE, NO_LFE
-    #               lfe_filter: "DISABLED", # accepts DISABLED, ENABLED
-    #               lo_ro_center_mix_level: 1.0,
-    #               lo_ro_surround_mix_level: 1.0,
-    #               lt_rt_center_mix_level: 1.0,
-    #               lt_rt_surround_mix_level: 1.0,
-    #               metadata_control: "FOLLOW_INPUT", # accepts FOLLOW_INPUT, USE_CONFIGURED
-    #               passthrough_control: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, WHEN_POSSIBLE
-    #               phase_control: "NO_SHIFT", # accepts NO_SHIFT, SHIFT_90_DEGREES
-    #               stereo_downmix: "DPL2", # accepts DPL2, LO_RO, LT_RT, NOT_INDICATED
-    #               surround_ex_mode: "DISABLED", # accepts DISABLED, ENABLED, NOT_INDICATED
-    #               surround_mode: "DISABLED", # accepts DISABLED, ENABLED, NOT_INDICATED
-    #             },
-    #             mp_2_settings: {
-    #               bitrate: 1.0,
-    #               coding_mode: "CODING_MODE_1_0", # accepts CODING_MODE_1_0, CODING_MODE_2_0
-    #               sample_rate: 1.0,
-    #             },
-    #             pass_through_settings: {
-    #             },
-    #             wav_settings: {
-    #               bit_depth: 1.0,
-    #               coding_mode: "CODING_MODE_1_0", # accepts CODING_MODE_1_0, CODING_MODE_2_0, CODING_MODE_4_0, CODING_MODE_8_0
-    #               sample_rate: 1.0,
-    #             },
-    #           },
-    #           language_code: "__stringMin1Max35",
-    #           language_code_control: "FOLLOW_INPUT", # accepts FOLLOW_INPUT, USE_CONFIGURED
-    #           name: "__string", # required
-    #           remix_settings: {
-    #             channel_mappings: [ # required
-    #               {
-    #                 input_channel_levels: [ # required
-    #                   {
-    #                     gain: 1, # required
-    #                     input_channel: 1, # required
-    #                   },
-    #                 ],
-    #                 output_channel: 1, # required
-    #               },
-    #             ],
-    #             channels_in: 1,
-    #             channels_out: 1,
-    #           },
-    #           stream_name: "__string",
-    #         },
-    #       ],
-    #       avail_blanking: {
-    #         avail_blanking_image: {
-    #           password_param: "__string",
-    #           uri: "__string", # required
-    #           username: "__string",
-    #         },
-    #         state: "DISABLED", # accepts DISABLED, ENABLED
-    #       },
-    #       avail_configuration: {
-    #         avail_settings: {
-    #           scte_35_splice_insert: {
-    #             ad_avail_offset: 1,
-    #             no_regional_blackout_flag: "FOLLOW", # accepts FOLLOW, IGNORE
-    #             web_delivery_allowed_flag: "FOLLOW", # accepts FOLLOW, IGNORE
-    #           },
-    #           scte_35_time_signal_apos: {
-    #             ad_avail_offset: 1,
-    #             no_regional_blackout_flag: "FOLLOW", # accepts FOLLOW, IGNORE
-    #             web_delivery_allowed_flag: "FOLLOW", # accepts FOLLOW, IGNORE
-    #           },
-    #         },
-    #       },
-    #       blackout_slate: {
-    #         blackout_slate_image: {
-    #           password_param: "__string",
-    #           uri: "__string", # required
-    #           username: "__string",
-    #         },
-    #         network_end_blackout: "DISABLED", # accepts DISABLED, ENABLED
-    #         network_end_blackout_image: {
-    #           password_param: "__string",
-    #           uri: "__string", # required
-    #           username: "__string",
-    #         },
-    #         network_id: "__stringMin34Max34",
-    #         state: "DISABLED", # accepts DISABLED, ENABLED
-    #       },
-    #       caption_descriptions: [
-    #         {
-    #           caption_selector_name: "__string", # required
-    #           destination_settings: {
-    #             arib_destination_settings: {
-    #             },
-    #             burn_in_destination_settings: {
-    #               alignment: "CENTERED", # accepts CENTERED, LEFT, SMART
-    #               background_color: "BLACK", # accepts BLACK, NONE, WHITE
-    #               background_opacity: 1,
-    #               font: {
-    #                 password_param: "__string",
-    #                 uri: "__string", # required
-    #                 username: "__string",
-    #               },
-    #               font_color: "BLACK", # accepts BLACK, BLUE, GREEN, RED, WHITE, YELLOW
-    #               font_opacity: 1,
-    #               font_resolution: 1,
-    #               font_size: "__string",
-    #               outline_color: "BLACK", # accepts BLACK, BLUE, GREEN, RED, WHITE, YELLOW
-    #               outline_size: 1,
-    #               shadow_color: "BLACK", # accepts BLACK, NONE, WHITE
-    #               shadow_opacity: 1,
-    #               shadow_x_offset: 1,
-    #               shadow_y_offset: 1,
-    #               teletext_grid_control: "FIXED", # accepts FIXED, SCALED
-    #               x_position: 1,
-    #               y_position: 1,
-    #             },
-    #             dvb_sub_destination_settings: {
-    #               alignment: "CENTERED", # accepts CENTERED, LEFT, SMART
-    #               background_color: "BLACK", # accepts BLACK, NONE, WHITE
-    #               background_opacity: 1,
-    #               font: {
-    #                 password_param: "__string",
-    #                 uri: "__string", # required
-    #                 username: "__string",
-    #               },
-    #               font_color: "BLACK", # accepts BLACK, BLUE, GREEN, RED, WHITE, YELLOW
-    #               font_opacity: 1,
-    #               font_resolution: 1,
-    #               font_size: "__string",
-    #               outline_color: "BLACK", # accepts BLACK, BLUE, GREEN, RED, WHITE, YELLOW
-    #               outline_size: 1,
-    #               shadow_color: "BLACK", # accepts BLACK, NONE, WHITE
-    #               shadow_opacity: 1,
-    #               shadow_x_offset: 1,
-    #               shadow_y_offset: 1,
-    #               teletext_grid_control: "FIXED", # accepts FIXED, SCALED
-    #               x_position: 1,
-    #               y_position: 1,
-    #             },
-    #             ebu_tt_d_destination_settings: {
-    #               fill_line_gap: "DISABLED", # accepts DISABLED, ENABLED
-    #               font_family: "__string",
-    #               style_control: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #             },
-    #             embedded_destination_settings: {
-    #             },
-    #             embedded_plus_scte_20_destination_settings: {
-    #             },
-    #             rtmp_caption_info_destination_settings: {
-    #             },
-    #             scte_20_plus_embedded_destination_settings: {
-    #             },
-    #             scte_27_destination_settings: {
-    #             },
-    #             smpte_tt_destination_settings: {
-    #             },
-    #             teletext_destination_settings: {
-    #             },
-    #             ttml_destination_settings: {
-    #               style_control: "PASSTHROUGH", # accepts PASSTHROUGH, USE_CONFIGURED
-    #             },
-    #             webvtt_destination_settings: {
-    #             },
-    #           },
-    #           language_code: "__string",
-    #           language_description: "__string",
-    #           name: "__string", # required
-    #         },
-    #       ],
-    #       feature_activations: {
-    #         input_prepare_schedule_actions: "DISABLED", # accepts DISABLED, ENABLED
-    #       },
-    #       global_configuration: {
-    #         initial_audio_gain: 1,
-    #         input_end_action: "NONE", # accepts NONE, SWITCH_AND_LOOP_INPUTS
-    #         input_loss_behavior: {
-    #           black_frame_msec: 1,
-    #           input_loss_image_color: "__stringMin6Max6",
-    #           input_loss_image_slate: {
-    #             password_param: "__string",
-    #             uri: "__string", # required
-    #             username: "__string",
-    #           },
-    #           input_loss_image_type: "COLOR", # accepts COLOR, SLATE
-    #           repeat_frame_msec: 1,
-    #         },
-    #         output_locking_mode: "EPOCH_LOCKING", # accepts EPOCH_LOCKING, PIPELINE_LOCKING
-    #         output_timing_source: "INPUT_CLOCK", # accepts INPUT_CLOCK, SYSTEM_CLOCK
-    #         support_low_framerate_inputs: "DISABLED", # accepts DISABLED, ENABLED
-    #       },
-    #       nielsen_configuration: {
-    #         distributor_id: "__string",
-    #         nielsen_pcm_to_id_3_tagging: "DISABLED", # accepts DISABLED, ENABLED
-    #       },
-    #       output_groups: [ # required
-    #         {
-    #           name: "__stringMax32",
-    #           output_group_settings: { # required
-    #             archive_group_settings: {
-    #               destination: { # required
-    #                 destination_ref_id: "__string",
-    #               },
-    #               rollover_interval: 1,
-    #             },
-    #             frame_capture_group_settings: {
-    #               destination: { # required
-    #                 destination_ref_id: "__string",
-    #               },
-    #             },
-    #             hls_group_settings: {
-    #               ad_markers: ["ADOBE"], # accepts ADOBE, ELEMENTAL, ELEMENTAL_SCTE35
-    #               base_url_content: "__string",
-    #               base_url_content_1: "__string",
-    #               base_url_manifest: "__string",
-    #               base_url_manifest_1: "__string",
-    #               caption_language_mappings: [
-    #                 {
-    #                   caption_channel: 1, # required
-    #                   language_code: "__stringMin3Max3", # required
-    #                   language_description: "__stringMin1", # required
-    #                 },
-    #               ],
-    #               caption_language_setting: "INSERT", # accepts INSERT, NONE, OMIT
-    #               client_cache: "DISABLED", # accepts DISABLED, ENABLED
-    #               codec_specification: "RFC_4281", # accepts RFC_4281, RFC_6381
-    #               constant_iv: "__stringMin32Max32",
-    #               destination: { # required
-    #                 destination_ref_id: "__string",
-    #               },
-    #               directory_structure: "SINGLE_DIRECTORY", # accepts SINGLE_DIRECTORY, SUBDIRECTORY_PER_STREAM
-    #               discontinuity_tags: "INSERT", # accepts INSERT, NEVER_INSERT
-    #               encryption_type: "AES128", # accepts AES128, SAMPLE_AES
-    #               hls_cdn_settings: {
-    #                 hls_akamai_settings: {
-    #                   connection_retry_interval: 1,
-    #                   filecache_duration: 1,
-    #                   http_transfer_mode: "CHUNKED", # accepts CHUNKED, NON_CHUNKED
-    #                   num_retries: 1,
-    #                   restart_delay: 1,
-    #                   salt: "__string",
-    #                   token: "__string",
-    #                 },
-    #                 hls_basic_put_settings: {
-    #                   connection_retry_interval: 1,
-    #                   filecache_duration: 1,
-    #                   num_retries: 1,
-    #                   restart_delay: 1,
-    #                 },
-    #                 hls_media_store_settings: {
-    #                   connection_retry_interval: 1,
-    #                   filecache_duration: 1,
-    #                   media_store_storage_class: "TEMPORAL", # accepts TEMPORAL
-    #                   num_retries: 1,
-    #                   restart_delay: 1,
-    #                 },
-    #                 hls_webdav_settings: {
-    #                   connection_retry_interval: 1,
-    #                   filecache_duration: 1,
-    #                   http_transfer_mode: "CHUNKED", # accepts CHUNKED, NON_CHUNKED
-    #                   num_retries: 1,
-    #                   restart_delay: 1,
-    #                 },
-    #               },
-    #               hls_id_3_segment_tagging: "DISABLED", # accepts DISABLED, ENABLED
-    #               i_frame_only_playlists: "DISABLED", # accepts DISABLED, STANDARD
-    #               incomplete_segment_behavior: "AUTO", # accepts AUTO, SUPPRESS
-    #               index_n_segments: 1,
-    #               input_loss_action: "EMIT_OUTPUT", # accepts EMIT_OUTPUT, PAUSE_OUTPUT
-    #               iv_in_manifest: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #               iv_source: "EXPLICIT", # accepts EXPLICIT, FOLLOWS_SEGMENT_NUMBER
-    #               keep_segments: 1,
-    #               key_format: "__string",
-    #               key_format_versions: "__string",
-    #               key_provider_settings: {
-    #                 static_key_settings: {
-    #                   key_provider_server: {
-    #                     password_param: "__string",
-    #                     uri: "__string", # required
-    #                     username: "__string",
-    #                   },
-    #                   static_key_value: "__stringMin32Max32", # required
-    #                 },
-    #               },
-    #               manifest_compression: "GZIP", # accepts GZIP, NONE
-    #               manifest_duration_format: "FLOATING_POINT", # accepts FLOATING_POINT, INTEGER
-    #               min_segment_length: 1,
-    #               mode: "LIVE", # accepts LIVE, VOD
-    #               output_selection: "MANIFESTS_AND_SEGMENTS", # accepts MANIFESTS_AND_SEGMENTS, SEGMENTS_ONLY, VARIANT_MANIFESTS_AND_SEGMENTS
-    #               program_date_time: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #               program_date_time_period: 1,
-    #               redundant_manifest: "DISABLED", # accepts DISABLED, ENABLED
-    #               segment_length: 1,
-    #               segmentation_mode: "USE_INPUT_SEGMENTATION", # accepts USE_INPUT_SEGMENTATION, USE_SEGMENT_DURATION
-    #               segments_per_subdirectory: 1,
-    #               stream_inf_resolution: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #               timed_metadata_id_3_frame: "NONE", # accepts NONE, PRIV, TDRL
-    #               timed_metadata_id_3_period: 1,
-    #               timestamp_delta_milliseconds: 1,
-    #               ts_file_mode: "SEGMENTED_FILES", # accepts SEGMENTED_FILES, SINGLE_FILE
-    #             },
-    #             media_package_group_settings: {
-    #               destination: { # required
-    #                 destination_ref_id: "__string",
-    #               },
-    #             },
-    #             ms_smooth_group_settings: {
-    #               acquisition_point_id: "__string",
-    #               audio_only_timecode_control: "PASSTHROUGH", # accepts PASSTHROUGH, USE_CONFIGURED_CLOCK
-    #               certificate_mode: "SELF_SIGNED", # accepts SELF_SIGNED, VERIFY_AUTHENTICITY
-    #               connection_retry_interval: 1,
-    #               destination: { # required
-    #                 destination_ref_id: "__string",
-    #               },
-    #               event_id: "__string",
-    #               event_id_mode: "NO_EVENT_ID", # accepts NO_EVENT_ID, USE_CONFIGURED, USE_TIMESTAMP
-    #               event_stop_behavior: "NONE", # accepts NONE, SEND_EOS
-    #               filecache_duration: 1,
-    #               fragment_length: 1,
-    #               input_loss_action: "EMIT_OUTPUT", # accepts EMIT_OUTPUT, PAUSE_OUTPUT
-    #               num_retries: 1,
-    #               restart_delay: 1,
-    #               segmentation_mode: "USE_INPUT_SEGMENTATION", # accepts USE_INPUT_SEGMENTATION, USE_SEGMENT_DURATION
-    #               send_delay_ms: 1,
-    #               sparse_track_type: "NONE", # accepts NONE, SCTE_35, SCTE_35_WITHOUT_SEGMENTATION
-    #               stream_manifest_behavior: "DO_NOT_SEND", # accepts DO_NOT_SEND, SEND
-    #               timestamp_offset: "__string",
-    #               timestamp_offset_mode: "USE_CONFIGURED_OFFSET", # accepts USE_CONFIGURED_OFFSET, USE_EVENT_START_DATE
-    #             },
-    #             multiplex_group_settings: {
-    #             },
-    #             rtmp_group_settings: {
-    #               ad_markers: ["ON_CUE_POINT_SCTE35"], # accepts ON_CUE_POINT_SCTE35
-    #               authentication_scheme: "AKAMAI", # accepts AKAMAI, COMMON
-    #               cache_full_behavior: "DISCONNECT_IMMEDIATELY", # accepts DISCONNECT_IMMEDIATELY, WAIT_FOR_SERVER
-    #               cache_length: 1,
-    #               caption_data: "ALL", # accepts ALL, FIELD1_608, FIELD1_AND_FIELD2_608
-    #               input_loss_action: "EMIT_OUTPUT", # accepts EMIT_OUTPUT, PAUSE_OUTPUT
-    #               restart_delay: 1,
-    #             },
-    #             udp_group_settings: {
-    #               input_loss_action: "DROP_PROGRAM", # accepts DROP_PROGRAM, DROP_TS, EMIT_PROGRAM
-    #               timed_metadata_id_3_frame: "NONE", # accepts NONE, PRIV, TDRL
-    #               timed_metadata_id_3_period: 1,
-    #             },
-    #           },
-    #           outputs: [ # required
-    #             {
-    #               audio_description_names: ["__string"],
-    #               caption_description_names: ["__string"],
-    #               output_name: "__stringMin1Max255",
-    #               output_settings: { # required
-    #                 archive_output_settings: {
-    #                   container_settings: { # required
-    #                     m2ts_settings: {
-    #                       absent_input_audio_behavior: "DROP", # accepts DROP, ENCODE_SILENCE
-    #                       arib: "DISABLED", # accepts DISABLED, ENABLED
-    #                       arib_captions_pid: "__string",
-    #                       arib_captions_pid_control: "AUTO", # accepts AUTO, USE_CONFIGURED
-    #                       audio_buffer_model: "ATSC", # accepts ATSC, DVB
-    #                       audio_frames_per_pes: 1,
-    #                       audio_pids: "__string",
-    #                       audio_stream_type: "ATSC", # accepts ATSC, DVB
-    #                       bitrate: 1,
-    #                       buffer_model: "MULTIPLEX", # accepts MULTIPLEX, NONE
-    #                       cc_descriptor: "DISABLED", # accepts DISABLED, ENABLED
-    #                       dvb_nit_settings: {
-    #                         network_id: 1, # required
-    #                         network_name: "__stringMin1Max256", # required
-    #                         rep_interval: 1,
-    #                       },
-    #                       dvb_sdt_settings: {
-    #                         output_sdt: "SDT_FOLLOW", # accepts SDT_FOLLOW, SDT_FOLLOW_IF_PRESENT, SDT_MANUAL, SDT_NONE
-    #                         rep_interval: 1,
-    #                         service_name: "__stringMin1Max256",
-    #                         service_provider_name: "__stringMin1Max256",
-    #                       },
-    #                       dvb_sub_pids: "__string",
-    #                       dvb_tdt_settings: {
-    #                         rep_interval: 1,
-    #                       },
-    #                       dvb_teletext_pid: "__string",
-    #                       ebif: "NONE", # accepts NONE, PASSTHROUGH
-    #                       ebp_audio_interval: "VIDEO_AND_FIXED_INTERVALS", # accepts VIDEO_AND_FIXED_INTERVALS, VIDEO_INTERVAL
-    #                       ebp_lookahead_ms: 1,
-    #                       ebp_placement: "VIDEO_AND_AUDIO_PIDS", # accepts VIDEO_AND_AUDIO_PIDS, VIDEO_PID
-    #                       ecm_pid: "__string",
-    #                       es_rate_in_pes: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #                       etv_platform_pid: "__string",
-    #                       etv_signal_pid: "__string",
-    #                       fragment_time: 1.0,
-    #                       klv: "NONE", # accepts NONE, PASSTHROUGH
-    #                       klv_data_pids: "__string",
-    #                       nielsen_id_3_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                       null_packet_bitrate: 1.0,
-    #                       pat_interval: 1,
-    #                       pcr_control: "CONFIGURED_PCR_PERIOD", # accepts CONFIGURED_PCR_PERIOD, PCR_EVERY_PES_PACKET
-    #                       pcr_period: 1,
-    #                       pcr_pid: "__string",
-    #                       pmt_interval: 1,
-    #                       pmt_pid: "__string",
-    #                       program_num: 1,
-    #                       rate_mode: "CBR", # accepts CBR, VBR
-    #                       scte_27_pids: "__string",
-    #                       scte_35_control: "NONE", # accepts NONE, PASSTHROUGH
-    #                       scte_35_pid: "__string",
-    #                       segmentation_markers: "EBP", # accepts EBP, EBP_LEGACY, NONE, PSI_SEGSTART, RAI_ADAPT, RAI_SEGSTART
-    #                       segmentation_style: "MAINTAIN_CADENCE", # accepts MAINTAIN_CADENCE, RESET_CADENCE
-    #                       segmentation_time: 1.0,
-    #                       timed_metadata_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                       timed_metadata_pid: "__string",
-    #                       transport_stream_id: 1,
-    #                       video_pid: "__string",
-    #                     },
-    #                     raw_settings: {
-    #                     },
-    #                   },
-    #                   extension: "__string",
-    #                   name_modifier: "__string",
-    #                 },
-    #                 frame_capture_output_settings: {
-    #                   name_modifier: "__string",
-    #                 },
-    #                 hls_output_settings: {
-    #                   h265_packaging_type: "HEV1", # accepts HEV1, HVC1
-    #                   hls_settings: { # required
-    #                     audio_only_hls_settings: {
-    #                       audio_group_id: "__string",
-    #                       audio_only_image: {
-    #                         password_param: "__string",
-    #                         uri: "__string", # required
-    #                         username: "__string",
-    #                       },
-    #                       audio_track_type: "ALTERNATE_AUDIO_AUTO_SELECT", # accepts ALTERNATE_AUDIO_AUTO_SELECT, ALTERNATE_AUDIO_AUTO_SELECT_DEFAULT, ALTERNATE_AUDIO_NOT_AUTO_SELECT, AUDIO_ONLY_VARIANT_STREAM
-    #                       segment_type: "AAC", # accepts AAC, FMP4
-    #                     },
-    #                     fmp_4_hls_settings: {
-    #                       audio_rendition_sets: "__string",
-    #                       nielsen_id_3_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                       timed_metadata_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                     },
-    #                     standard_hls_settings: {
-    #                       audio_rendition_sets: "__string",
-    #                       m3u_8_settings: { # required
-    #                         audio_frames_per_pes: 1,
-    #                         audio_pids: "__string",
-    #                         ecm_pid: "__string",
-    #                         nielsen_id_3_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                         pat_interval: 1,
-    #                         pcr_control: "CONFIGURED_PCR_PERIOD", # accepts CONFIGURED_PCR_PERIOD, PCR_EVERY_PES_PACKET
-    #                         pcr_period: 1,
-    #                         pcr_pid: "__string",
-    #                         pmt_interval: 1,
-    #                         pmt_pid: "__string",
-    #                         program_num: 1,
-    #                         scte_35_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                         scte_35_pid: "__string",
-    #                         timed_metadata_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                         timed_metadata_pid: "__string",
-    #                         transport_stream_id: 1,
-    #                         video_pid: "__string",
-    #                       },
-    #                     },
-    #                   },
-    #                   name_modifier: "__stringMin1",
-    #                   segment_modifier: "__string",
-    #                 },
-    #                 media_package_output_settings: {
-    #                 },
-    #                 ms_smooth_output_settings: {
-    #                   h265_packaging_type: "HEV1", # accepts HEV1, HVC1
-    #                   name_modifier: "__string",
-    #                 },
-    #                 multiplex_output_settings: {
-    #                   destination: { # required
-    #                     destination_ref_id: "__string",
-    #                   },
-    #                 },
-    #                 rtmp_output_settings: {
-    #                   certificate_mode: "SELF_SIGNED", # accepts SELF_SIGNED, VERIFY_AUTHENTICITY
-    #                   connection_retry_interval: 1,
-    #                   destination: { # required
-    #                     destination_ref_id: "__string",
-    #                   },
-    #                   num_retries: 1,
-    #                 },
-    #                 udp_output_settings: {
-    #                   buffer_msec: 1,
-    #                   container_settings: { # required
-    #                     m2ts_settings: {
-    #                       absent_input_audio_behavior: "DROP", # accepts DROP, ENCODE_SILENCE
-    #                       arib: "DISABLED", # accepts DISABLED, ENABLED
-    #                       arib_captions_pid: "__string",
-    #                       arib_captions_pid_control: "AUTO", # accepts AUTO, USE_CONFIGURED
-    #                       audio_buffer_model: "ATSC", # accepts ATSC, DVB
-    #                       audio_frames_per_pes: 1,
-    #                       audio_pids: "__string",
-    #                       audio_stream_type: "ATSC", # accepts ATSC, DVB
-    #                       bitrate: 1,
-    #                       buffer_model: "MULTIPLEX", # accepts MULTIPLEX, NONE
-    #                       cc_descriptor: "DISABLED", # accepts DISABLED, ENABLED
-    #                       dvb_nit_settings: {
-    #                         network_id: 1, # required
-    #                         network_name: "__stringMin1Max256", # required
-    #                         rep_interval: 1,
-    #                       },
-    #                       dvb_sdt_settings: {
-    #                         output_sdt: "SDT_FOLLOW", # accepts SDT_FOLLOW, SDT_FOLLOW_IF_PRESENT, SDT_MANUAL, SDT_NONE
-    #                         rep_interval: 1,
-    #                         service_name: "__stringMin1Max256",
-    #                         service_provider_name: "__stringMin1Max256",
-    #                       },
-    #                       dvb_sub_pids: "__string",
-    #                       dvb_tdt_settings: {
-    #                         rep_interval: 1,
-    #                       },
-    #                       dvb_teletext_pid: "__string",
-    #                       ebif: "NONE", # accepts NONE, PASSTHROUGH
-    #                       ebp_audio_interval: "VIDEO_AND_FIXED_INTERVALS", # accepts VIDEO_AND_FIXED_INTERVALS, VIDEO_INTERVAL
-    #                       ebp_lookahead_ms: 1,
-    #                       ebp_placement: "VIDEO_AND_AUDIO_PIDS", # accepts VIDEO_AND_AUDIO_PIDS, VIDEO_PID
-    #                       ecm_pid: "__string",
-    #                       es_rate_in_pes: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #                       etv_platform_pid: "__string",
-    #                       etv_signal_pid: "__string",
-    #                       fragment_time: 1.0,
-    #                       klv: "NONE", # accepts NONE, PASSTHROUGH
-    #                       klv_data_pids: "__string",
-    #                       nielsen_id_3_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                       null_packet_bitrate: 1.0,
-    #                       pat_interval: 1,
-    #                       pcr_control: "CONFIGURED_PCR_PERIOD", # accepts CONFIGURED_PCR_PERIOD, PCR_EVERY_PES_PACKET
-    #                       pcr_period: 1,
-    #                       pcr_pid: "__string",
-    #                       pmt_interval: 1,
-    #                       pmt_pid: "__string",
-    #                       program_num: 1,
-    #                       rate_mode: "CBR", # accepts CBR, VBR
-    #                       scte_27_pids: "__string",
-    #                       scte_35_control: "NONE", # accepts NONE, PASSTHROUGH
-    #                       scte_35_pid: "__string",
-    #                       segmentation_markers: "EBP", # accepts EBP, EBP_LEGACY, NONE, PSI_SEGSTART, RAI_ADAPT, RAI_SEGSTART
-    #                       segmentation_style: "MAINTAIN_CADENCE", # accepts MAINTAIN_CADENCE, RESET_CADENCE
-    #                       segmentation_time: 1.0,
-    #                       timed_metadata_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                       timed_metadata_pid: "__string",
-    #                       transport_stream_id: 1,
-    #                       video_pid: "__string",
-    #                     },
-    #                   },
-    #                   destination: { # required
-    #                     destination_ref_id: "__string",
-    #                   },
-    #                   fec_output_settings: {
-    #                     column_depth: 1,
-    #                     include_fec: "COLUMN", # accepts COLUMN, COLUMN_AND_ROW
-    #                     row_length: 1,
-    #                   },
-    #                 },
-    #               },
-    #               video_description_name: "__string",
-    #             },
-    #           ],
-    #         },
-    #       ],
-    #       timecode_config: { # required
-    #         source: "EMBEDDED", # required, accepts EMBEDDED, SYSTEMCLOCK, ZEROBASED
-    #         sync_threshold: 1,
-    #       },
-    #       video_descriptions: [ # required
-    #         {
-    #           codec_settings: {
-    #             frame_capture_settings: {
-    #               capture_interval: 1, # required
-    #               capture_interval_units: "MILLISECONDS", # accepts MILLISECONDS, SECONDS
-    #             },
-    #             h264_settings: {
-    #               adaptive_quantization: "HIGH", # accepts HIGH, HIGHER, LOW, MAX, MEDIUM, OFF
-    #               afd_signaling: "AUTO", # accepts AUTO, FIXED, NONE
-    #               bitrate: 1,
-    #               buf_fill_pct: 1,
-    #               buf_size: 1,
-    #               color_metadata: "IGNORE", # accepts IGNORE, INSERT
-    #               color_space_settings: {
-    #                 color_space_passthrough_settings: {
-    #                 },
-    #                 rec_601_settings: {
-    #                 },
-    #                 rec_709_settings: {
-    #                 },
-    #               },
-    #               entropy_encoding: "CABAC", # accepts CABAC, CAVLC
-    #               filter_settings: {
-    #                 temporal_filter_settings: {
-    #                   post_filter_sharpening: "AUTO", # accepts AUTO, DISABLED, ENABLED
-    #                   strength: "AUTO", # accepts AUTO, STRENGTH_1, STRENGTH_2, STRENGTH_3, STRENGTH_4, STRENGTH_5, STRENGTH_6, STRENGTH_7, STRENGTH_8, STRENGTH_9, STRENGTH_10, STRENGTH_11, STRENGTH_12, STRENGTH_13, STRENGTH_14, STRENGTH_15, STRENGTH_16
-    #                 },
-    #               },
-    #               fixed_afd: "AFD_0000", # accepts AFD_0000, AFD_0010, AFD_0011, AFD_0100, AFD_1000, AFD_1001, AFD_1010, AFD_1011, AFD_1101, AFD_1110, AFD_1111
-    #               flicker_aq: "DISABLED", # accepts DISABLED, ENABLED
-    #               force_field_pictures: "DISABLED", # accepts DISABLED, ENABLED
-    #               framerate_control: "INITIALIZE_FROM_SOURCE", # accepts INITIALIZE_FROM_SOURCE, SPECIFIED
-    #               framerate_denominator: 1,
-    #               framerate_numerator: 1,
-    #               gop_b_reference: "DISABLED", # accepts DISABLED, ENABLED
-    #               gop_closed_cadence: 1,
-    #               gop_num_b_frames: 1,
-    #               gop_size: 1.0,
-    #               gop_size_units: "FRAMES", # accepts FRAMES, SECONDS
-    #               level: "H264_LEVEL_1", # accepts H264_LEVEL_1, H264_LEVEL_1_1, H264_LEVEL_1_2, H264_LEVEL_1_3, H264_LEVEL_2, H264_LEVEL_2_1, H264_LEVEL_2_2, H264_LEVEL_3, H264_LEVEL_3_1, H264_LEVEL_3_2, H264_LEVEL_4, H264_LEVEL_4_1, H264_LEVEL_4_2, H264_LEVEL_5, H264_LEVEL_5_1, H264_LEVEL_5_2, H264_LEVEL_AUTO
-    #               look_ahead_rate_control: "HIGH", # accepts HIGH, LOW, MEDIUM
-    #               max_bitrate: 1,
-    #               min_i_interval: 1,
-    #               num_ref_frames: 1,
-    #               par_control: "INITIALIZE_FROM_SOURCE", # accepts INITIALIZE_FROM_SOURCE, SPECIFIED
-    #               par_denominator: 1,
-    #               par_numerator: 1,
-    #               profile: "BASELINE", # accepts BASELINE, HIGH, HIGH_10BIT, HIGH_422, HIGH_422_10BIT, MAIN
-    #               quality_level: "ENHANCED_QUALITY", # accepts ENHANCED_QUALITY, STANDARD_QUALITY
-    #               qvbr_quality_level: 1,
-    #               rate_control_mode: "CBR", # accepts CBR, MULTIPLEX, QVBR, VBR
-    #               scan_type: "INTERLACED", # accepts INTERLACED, PROGRESSIVE
-    #               scene_change_detect: "DISABLED", # accepts DISABLED, ENABLED
-    #               slices: 1,
-    #               softness: 1,
-    #               spatial_aq: "DISABLED", # accepts DISABLED, ENABLED
-    #               subgop_length: "DYNAMIC", # accepts DYNAMIC, FIXED
-    #               syntax: "DEFAULT", # accepts DEFAULT, RP2027
-    #               temporal_aq: "DISABLED", # accepts DISABLED, ENABLED
-    #               timecode_insertion: "DISABLED", # accepts DISABLED, PIC_TIMING_SEI
-    #             },
-    #             h265_settings: {
-    #               adaptive_quantization: "HIGH", # accepts HIGH, HIGHER, LOW, MAX, MEDIUM, OFF
-    #               afd_signaling: "AUTO", # accepts AUTO, FIXED, NONE
-    #               alternative_transfer_function: "INSERT", # accepts INSERT, OMIT
-    #               bitrate: 1,
-    #               buf_size: 1,
-    #               color_metadata: "IGNORE", # accepts IGNORE, INSERT
-    #               color_space_settings: {
-    #                 color_space_passthrough_settings: {
-    #                 },
-    #                 hdr_10_settings: {
-    #                   max_cll: 1,
-    #                   max_fall: 1,
-    #                 },
-    #                 rec_601_settings: {
-    #                 },
-    #                 rec_709_settings: {
-    #                 },
-    #               },
-    #               filter_settings: {
-    #                 temporal_filter_settings: {
-    #                   post_filter_sharpening: "AUTO", # accepts AUTO, DISABLED, ENABLED
-    #                   strength: "AUTO", # accepts AUTO, STRENGTH_1, STRENGTH_2, STRENGTH_3, STRENGTH_4, STRENGTH_5, STRENGTH_6, STRENGTH_7, STRENGTH_8, STRENGTH_9, STRENGTH_10, STRENGTH_11, STRENGTH_12, STRENGTH_13, STRENGTH_14, STRENGTH_15, STRENGTH_16
-    #                 },
-    #               },
-    #               fixed_afd: "AFD_0000", # accepts AFD_0000, AFD_0010, AFD_0011, AFD_0100, AFD_1000, AFD_1001, AFD_1010, AFD_1011, AFD_1101, AFD_1110, AFD_1111
-    #               flicker_aq: "DISABLED", # accepts DISABLED, ENABLED
-    #               framerate_denominator: 1, # required
-    #               framerate_numerator: 1, # required
-    #               gop_closed_cadence: 1,
-    #               gop_size: 1.0,
-    #               gop_size_units: "FRAMES", # accepts FRAMES, SECONDS
-    #               level: "H265_LEVEL_1", # accepts H265_LEVEL_1, H265_LEVEL_2, H265_LEVEL_2_1, H265_LEVEL_3, H265_LEVEL_3_1, H265_LEVEL_4, H265_LEVEL_4_1, H265_LEVEL_5, H265_LEVEL_5_1, H265_LEVEL_5_2, H265_LEVEL_6, H265_LEVEL_6_1, H265_LEVEL_6_2, H265_LEVEL_AUTO
-    #               look_ahead_rate_control: "HIGH", # accepts HIGH, LOW, MEDIUM
-    #               max_bitrate: 1,
-    #               min_i_interval: 1,
-    #               par_denominator: 1,
-    #               par_numerator: 1,
-    #               profile: "MAIN", # accepts MAIN, MAIN_10BIT
-    #               qvbr_quality_level: 1,
-    #               rate_control_mode: "CBR", # accepts CBR, MULTIPLEX, QVBR
-    #               scan_type: "INTERLACED", # accepts INTERLACED, PROGRESSIVE
-    #               scene_change_detect: "DISABLED", # accepts DISABLED, ENABLED
-    #               slices: 1,
-    #               tier: "HIGH", # accepts HIGH, MAIN
-    #               timecode_insertion: "DISABLED", # accepts DISABLED, PIC_TIMING_SEI
-    #             },
-    #             mpeg_2_settings: {
-    #               adaptive_quantization: "AUTO", # accepts AUTO, HIGH, LOW, MEDIUM, OFF
-    #               afd_signaling: "AUTO", # accepts AUTO, FIXED, NONE
-    #               color_metadata: "IGNORE", # accepts IGNORE, INSERT
-    #               color_space: "AUTO", # accepts AUTO, PASSTHROUGH
-    #               display_aspect_ratio: "DISPLAYRATIO16X9", # accepts DISPLAYRATIO16X9, DISPLAYRATIO4X3
-    #               filter_settings: {
-    #                 temporal_filter_settings: {
-    #                   post_filter_sharpening: "AUTO", # accepts AUTO, DISABLED, ENABLED
-    #                   strength: "AUTO", # accepts AUTO, STRENGTH_1, STRENGTH_2, STRENGTH_3, STRENGTH_4, STRENGTH_5, STRENGTH_6, STRENGTH_7, STRENGTH_8, STRENGTH_9, STRENGTH_10, STRENGTH_11, STRENGTH_12, STRENGTH_13, STRENGTH_14, STRENGTH_15, STRENGTH_16
-    #                 },
-    #               },
-    #               fixed_afd: "AFD_0000", # accepts AFD_0000, AFD_0010, AFD_0011, AFD_0100, AFD_1000, AFD_1001, AFD_1010, AFD_1011, AFD_1101, AFD_1110, AFD_1111
-    #               framerate_denominator: 1, # required
-    #               framerate_numerator: 1, # required
-    #               gop_closed_cadence: 1,
-    #               gop_num_b_frames: 1,
-    #               gop_size: 1.0,
-    #               gop_size_units: "FRAMES", # accepts FRAMES, SECONDS
-    #               scan_type: "INTERLACED", # accepts INTERLACED, PROGRESSIVE
-    #               subgop_length: "DYNAMIC", # accepts DYNAMIC, FIXED
-    #               timecode_insertion: "DISABLED", # accepts DISABLED, GOP_TIMECODE
-    #             },
-    #           },
-    #           height: 1,
-    #           name: "__string", # required
-    #           respond_to_afd: "NONE", # accepts NONE, PASSTHROUGH, RESPOND
-    #           scaling_behavior: "DEFAULT", # accepts DEFAULT, STRETCH_TO_OUTPUT
-    #           sharpness: 1,
-    #           width: 1,
-    #         },
-    #       ],
-    #     },
-    #     input_attachments: [
-    #       {
-    #         automatic_input_failover_settings: {
-    #           error_clear_time_msec: 1,
-    #           failover_conditions: [
-    #             {
-    #               failover_condition_settings: {
-    #                 audio_silence_settings: {
-    #                   audio_selector_name: "__string", # required
-    #                   audio_silence_threshold_msec: 1,
-    #                 },
-    #                 input_loss_settings: {
-    #                   input_loss_threshold_msec: 1,
-    #                 },
-    #                 video_black_settings: {
-    #                   black_detect_threshold: 1.0,
-    #                   video_black_threshold_msec: 1,
-    #                 },
-    #               },
-    #             },
-    #           ],
-    #           input_preference: "EQUAL_INPUT_PREFERENCE", # accepts EQUAL_INPUT_PREFERENCE, PRIMARY_INPUT_PREFERRED
-    #           secondary_input_id: "__string", # required
-    #         },
-    #         input_attachment_name: "__string",
-    #         input_id: "__string",
-    #         input_settings: {
-    #           audio_selectors: [
-    #             {
-    #               name: "__stringMin1", # required
-    #               selector_settings: {
-    #                 audio_language_selection: {
-    #                   language_code: "__string", # required
-    #                   language_selection_policy: "LOOSE", # accepts LOOSE, STRICT
-    #                 },
-    #                 audio_pid_selection: {
-    #                   pid: 1, # required
-    #                 },
-    #                 audio_track_selection: {
-    #                   tracks: [ # required
-    #                     {
-    #                       track: 1, # required
-    #                     },
-    #                   ],
-    #                 },
-    #               },
-    #             },
-    #           ],
-    #           caption_selectors: [
-    #             {
-    #               language_code: "__string",
-    #               name: "__stringMin1", # required
-    #               selector_settings: {
-    #                 ancillary_source_settings: {
-    #                   source_ancillary_channel_number: 1,
-    #                 },
-    #                 arib_source_settings: {
-    #                 },
-    #                 dvb_sub_source_settings: {
-    #                   pid: 1,
-    #                 },
-    #                 embedded_source_settings: {
-    #                   convert_608_to_708: "DISABLED", # accepts DISABLED, UPCONVERT
-    #                   scte_20_detection: "AUTO", # accepts AUTO, OFF
-    #                   source_608_channel_number: 1,
-    #                   source_608_track_number: 1,
-    #                 },
-    #                 scte_20_source_settings: {
-    #                   convert_608_to_708: "DISABLED", # accepts DISABLED, UPCONVERT
-    #                   source_608_channel_number: 1,
-    #                 },
-    #                 scte_27_source_settings: {
-    #                   pid: 1,
-    #                 },
-    #                 teletext_source_settings: {
-    #                   page_number: "__string",
-    #                 },
-    #               },
-    #             },
-    #           ],
-    #           deblock_filter: "DISABLED", # accepts DISABLED, ENABLED
-    #           denoise_filter: "DISABLED", # accepts DISABLED, ENABLED
-    #           filter_strength: 1,
-    #           input_filter: "AUTO", # accepts AUTO, DISABLED, FORCED
-    #           network_input_settings: {
-    #             hls_input_settings: {
-    #               bandwidth: 1,
-    #               buffer_segments: 1,
-    #               retries: 1,
-    #               retry_interval: 1,
-    #             },
-    #             server_validation: "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", # accepts CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME, CHECK_CRYPTOGRAPHY_ONLY
-    #           },
-    #           smpte_2038_data_preference: "IGNORE", # accepts IGNORE, PREFER
-    #           source_end_behavior: "CONTINUE", # accepts CONTINUE, LOOP
-    #           video_selector: {
-    #             color_space: "FOLLOW", # accepts FOLLOW, REC_601, REC_709
-    #             color_space_usage: "FALLBACK", # accepts FALLBACK, FORCE
-    #             selector_settings: {
-    #               video_selector_pid: {
-    #                 pid: 1,
-    #               },
-    #               video_selector_program_id: {
-    #                 program_id: 1,
-    #               },
-    #             },
-    #           },
-    #         },
-    #       },
-    #     ],
-    #     input_specification: {
-    #       codec: "MPEG2", # accepts MPEG2, AVC, HEVC
-    #       maximum_bitrate: "MAX_10_MBPS", # accepts MAX_10_MBPS, MAX_20_MBPS, MAX_50_MBPS
-    #       resolution: "SD", # accepts SD, HD, UHD
-    #     },
-    #     log_level: "ERROR", # accepts ERROR, WARNING, INFO, DEBUG, DISABLED
-    #     name: "__string",
-    #     request_id: "__string",
-    #     reserved: "__string",
-    #     role_arn: "__string",
-    #     tags: {
-    #       "__string" => "__string",
-    #     },
-    #   })
     #
     # @example Response structure
     #
@@ -1707,6 +1044,10 @@ module Aws::MediaLive
     #   resp.channel.destinations[0].settings[0].stream_name #=> String
     #   resp.channel.destinations[0].settings[0].url #=> String
     #   resp.channel.destinations[0].settings[0].username #=> String
+    #   resp.channel.destinations[0].srt_settings #=> Array
+    #   resp.channel.destinations[0].srt_settings[0].encryption_passphrase_secret_arn #=> String
+    #   resp.channel.destinations[0].srt_settings[0].stream_id #=> String
+    #   resp.channel.destinations[0].srt_settings[0].url #=> String
     #   resp.channel.egress_endpoints #=> Array
     #   resp.channel.egress_endpoints[0].source_ip #=> String
     #   resp.channel.encoder_settings.audio_descriptions #=> Array
@@ -1716,6 +1057,13 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.audio_descriptions[0].audio_selector_name #=> String
     #   resp.channel.encoder_settings.audio_descriptions[0].audio_type #=> String, one of "CLEAN_EFFECTS", "HEARING_IMPAIRED", "UNDEFINED", "VISUAL_IMPAIRED_COMMENTARY"
     #   resp.channel.encoder_settings.audio_descriptions[0].audio_type_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_check_digit_string #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_stepaside #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.csid #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_distribution_type #=> String, one of "FINAL_DISTRIBUTOR", "PROGRAM_CONTENT"
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.check_digit_string #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.sid #=> Float
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.timezone #=> String, one of "AMERICA_PUERTO_RICO", "US_ALASKA", "US_ARIZONA", "US_CENTRAL", "US_EASTERN", "US_HAWAII", "US_MOUNTAIN", "US_PACIFIC", "US_SAMOA", "UTC"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.bitrate #=> Float
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.coding_mode #=> String, one of "AD_RECEIVER_MIX", "CODING_MODE_1_0", "CODING_MODE_1_1", "CODING_MODE_2_0", "CODING_MODE_5_1"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.input_type #=> String, one of "BROADCASTER_MIXED_AD", "NORMAL"
@@ -1732,6 +1080,14 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.drc_profile #=> String, one of "FILM_STANDARD", "NONE"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.lfe_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.metadata_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.bitrate #=> Float
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.coding_mode #=> String, one of "CODING_MODE_5_1_4", "CODING_MODE_7_1_4", "CODING_MODE_9_1_6"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.dialnorm #=> Integer
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_line #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_rf #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.height_trim #=> Float
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.surround_trim #=> Float
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitrate #=> Float
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitstream_mode #=> String, one of "COMMENTARY", "COMPLETE_MAIN", "EMERGENCY", "HEARING_IMPAIRED", "VISUALLY_IMPAIRED"
@@ -1769,16 +1125,26 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.audio_descriptions[0].remix_settings.channels_in #=> Integer
     #   resp.channel.encoder_settings.audio_descriptions[0].remix_settings.channels_out #=> Integer
     #   resp.channel.encoder_settings.audio_descriptions[0].stream_name #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_dash_roles #=> Array
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_dash_roles[0] #=> String, one of "ALTERNATE", "COMMENTARY", "DESCRIPTION", "DUB", "EMERGENCY", "ENHANCED-AUDIO-INTELLIGIBILITY", "KARAOKE", "MAIN", "SUPPLEMENTARY"
+    #   resp.channel.encoder_settings.audio_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.channel.encoder_settings.avail_blanking.avail_blanking_image.password_param #=> String
     #   resp.channel.encoder_settings.avail_blanking.avail_blanking_image.uri #=> String
     #   resp.channel.encoder_settings.avail_blanking.avail_blanking_image.username #=> String
     #   resp.channel.encoder_settings.avail_blanking.state #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.acquisition_point_id #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.ad_avail_offset #=> Integer
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.password_param #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.pois_endpoint #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.username #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.zone_identity #=> String
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.ad_avail_offset #=> Integer
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.ad_avail_offset #=> Integer
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.channel.encoder_settings.avail_configuration.scte_35_segmentation_scope #=> String, one of "ALL_OUTPUT_GROUPS", "SCTE35_ENABLED_OUTPUT_GROUPS"
     #   resp.channel.encoder_settings.blackout_slate.blackout_slate_image.password_param #=> String
     #   resp.channel.encoder_settings.blackout_slate.blackout_slate_image.uri #=> String
     #   resp.channel.encoder_settings.blackout_slate.blackout_slate_image.username #=> String
@@ -1789,6 +1155,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.blackout_slate.network_id #=> String
     #   resp.channel.encoder_settings.blackout_slate.state #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.caption_descriptions #=> Array
+    #   resp.channel.encoder_settings.caption_descriptions[0].accessibility #=> String, one of "DOES_NOT_IMPLEMENT_ACCESSIBILITY_FEATURES", "IMPLEMENTS_ACCESSIBILITY_FEATURES"
     #   resp.channel.encoder_settings.caption_descriptions[0].caption_selector_name #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.alignment #=> String, one of "CENTERED", "LEFT", "SMART"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.background_color #=> String, one of "BLACK", "NONE", "WHITE"
@@ -1828,14 +1195,20 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.teletext_grid_control #=> String, one of "FIXED", "SCALED"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.x_position #=> Integer
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.y_position #=> Integer
+    #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.copyright_holder #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.fill_line_gap #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.font_family #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.style_control #=> String, one of "EXCLUDE", "INCLUDE"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ttml_destination_settings.style_control #=> String, one of "PASSTHROUGH", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.webvtt_destination_settings.style_control #=> String, one of "NO_STYLE_DATA", "PASSTHROUGH"
     #   resp.channel.encoder_settings.caption_descriptions[0].language_code #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].language_description #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].name #=> String
+    #   resp.channel.encoder_settings.caption_descriptions[0].caption_dash_roles #=> Array
+    #   resp.channel.encoder_settings.caption_descriptions[0].caption_dash_roles[0] #=> String, one of "ALTERNATE", "CAPTION", "COMMENTARY", "DESCRIPTION", "DUB", "EASYREADER", "EMERGENCY", "FORCED-SUBTITLE", "KARAOKE", "MAIN", "METADATA", "SUBTITLE", "SUPPLEMENTARY"
+    #   resp.channel.encoder_settings.caption_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.channel.encoder_settings.feature_activations.input_prepare_schedule_actions #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.feature_activations.output_static_image_overlay_schedule_actions #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.global_configuration.initial_audio_gain #=> Integer
     #   resp.channel.encoder_settings.global_configuration.input_end_action #=> String, one of "NONE", "SWITCH_AND_LOOP_INPUTS"
     #   resp.channel.encoder_settings.global_configuration.input_loss_behavior.black_frame_msec #=> Integer
@@ -1848,13 +1221,18 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.global_configuration.output_locking_mode #=> String, one of "EPOCH_LOCKING", "PIPELINE_LOCKING"
     #   resp.channel.encoder_settings.global_configuration.output_timing_source #=> String, one of "INPUT_CLOCK", "SYSTEM_CLOCK"
     #   resp.channel.encoder_settings.global_configuration.support_low_framerate_inputs #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.custom_epoch #=> String
+    #   resp.channel.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.jam_sync_time #=> String
+    #   resp.channel.encoder_settings.motion_graphics_configuration.motion_graphics_insertion #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.nielsen_configuration.distributor_id #=> String
     #   resp.channel.encoder_settings.nielsen_configuration.nielsen_pcm_to_id_3_tagging #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.output_groups #=> Array
     #   resp.channel.encoder_settings.output_groups[0].name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.archive_cdn_settings.archive_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.destination.destination_ref_id #=> String
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.rollover_interval #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.frame_capture_cdn_settings.frame_capture_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers #=> Array
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers[0] #=> String, one of "ADOBE", "ELEMENTAL", "ELEMENTAL_SCTE35"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_content #=> String
@@ -1889,6 +1267,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.media_store_storage_class #=> String, one of "TEMPORAL"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.num_retries #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.restart_delay #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.connection_retry_interval #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.filecache_duration #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.http_transfer_mode #=> String, one of "CHUNKED", "NON_CHUNKED"
@@ -1914,6 +1293,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.mode #=> String, one of "LIVE", "VOD"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.output_selection #=> String, one of "MANIFESTS_AND_SEGMENTS", "SEGMENTS_ONLY", "VARIANT_MANIFESTS_AND_SEGMENTS"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_clock #=> String, one of "INITIALIZE_FROM_OUTPUT_TIMECODE", "SYSTEM_CLOCK"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_period #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.redundant_manifest #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.segment_length #=> Integer
@@ -1952,9 +1332,17 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.caption_data #=> String, one of "ALL", "FIELD1_608", "FIELD1_AND_FIELD2_608"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.input_loss_action #=> String, one of "EMIT_OUTPUT", "PAUSE_OUTPUT"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.restart_delay #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.include_filler_nal_units #=> String, one of "AUTO", "DROP", "INCLUDE"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_frame #=> String, one of "NONE", "PRIV", "TDRL"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_period #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.scte_35_type #=> String, one of "NONE", "SCTE_35_WITHOUT_SEGMENTATION"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length_units #=> String, one of "MILLISECONDS", "SECONDS"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.send_delay_ms #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.srt_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.channel.encoder_settings.output_groups[0].outputs #=> Array
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].audio_description_names #=> Array
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].audio_description_names[0] #=> String
@@ -2006,6 +1394,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -2044,11 +1433,27 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.timed_metadata_pid #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.transport_stream_id #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.video_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_data_pids #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.name_modifier #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.segment_modifier #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.h265_packaging_type #=> String, one of "HEV1", "HVC1"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.name_modifier #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_period #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.certificate_mode #=> String, one of "SELF_SIGNED", "VERIFY_AUTHENTICITY"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.connection_retry_interval #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.destination.destination_ref_id #=> String
@@ -2099,6 +1504,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -2110,13 +1516,74 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.column_depth #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.include_fec #=> String, one of "COLUMN", "COLUMN_AND_ROW"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.row_length #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.cmaf_ingest_output_settings.name_modifier #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.buffer_msec #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid_control #=> String, one of "AUTO", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.bitrate #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.buffer_model #=> String, one of "MULTIPLEX", "NONE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_id #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.rep_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.output_sdt #=> String, one of "SDT_FOLLOW", "SDT_FOLLOW_IF_PRESENT", "SDT_MANUAL", "SDT_NONE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.rep_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_provider_name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sub_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_tdt_settings.rep_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_teletext_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_audio_interval #=> String, one of "VIDEO_AND_FIXED_INTERVALS", "VIDEO_INTERVAL"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_lookahead_ms #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_placement #=> String, one of "VIDEO_AND_AUDIO_PIDS", "VIDEO_PID"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ecm_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_platform_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_signal_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.fragment_time #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv_data_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.null_packet_bitrate #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pat_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_period #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.program_num #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.rate_mode #=> String, one of "CBR", "VBR"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.transport_stream_id #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.video_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.encryption_type #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.latency #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].video_description_name #=> String
     #   resp.channel.encoder_settings.timecode_config.source #=> String, one of "EMBEDDED", "SYSTEMCLOCK", "ZEROBASED"
     #   resp.channel.encoder_settings.timecode_config.sync_threshold #=> Integer
     #   resp.channel.encoder_settings.video_descriptions #=> Array
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval_units #=> String, one of "MILLISECONDS", "SECONDS"
-    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.bitrate #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.buf_fill_pct #=> Integer
@@ -2125,6 +1592,8 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.entropy_encoding #=> String, one of "CABAC", "CAVLC"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.force_field_pictures #=> String, one of "DISABLED", "ENABLED"
@@ -2157,7 +1626,11 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.syntax #=> String, one of "DEFAULT", "RP2027"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.temporal_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
-    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.min_qp #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.alternative_transfer_function #=> String, one of "INSERT", "OMIT"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.bitrate #=> Integer
@@ -2167,6 +1640,8 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.framerate_denominator #=> Integer
@@ -2188,6 +1663,16 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.slices #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tier #=> String, one of "HIGH", "MAIN"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_over_picture_boundaries #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_temporal_predictor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_height #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_padding #=> String, one of "NONE", "PADDED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_width #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.treeblock_size #=> String, one of "AUTO", "TREE_SIZE_32X32"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.min_qp #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "LOW", "MEDIUM", "OFF"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.color_metadata #=> String, one of "IGNORE", "INSERT"
@@ -2205,12 +1690,40 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.subgop_length #=> String, one of "DYNAMIC", "FIXED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_insertion #=> String, one of "DISABLED", "GOP_TIMECODE"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.buf_size #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_denominator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_numerator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size #=> Float
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.level #=> String, one of "AV1_LEVEL_2", "AV1_LEVEL_2_1", "AV1_LEVEL_3", "AV1_LEVEL_3_1", "AV1_LEVEL_4", "AV1_LEVEL_4_1", "AV1_LEVEL_5", "AV1_LEVEL_5_1", "AV1_LEVEL_5_2", "AV1_LEVEL_5_3", "AV1_LEVEL_6", "AV1_LEVEL_6_1", "AV1_LEVEL_6_2", "AV1_LEVEL_6_3", "AV1_LEVEL_AUTO"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.look_ahead_rate_control #=> String, one of "HIGH", "LOW", "MEDIUM"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.max_bitrate #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.min_i_interval #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_denominator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_numerator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.qvbr_quality_level #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.scene_change_detect #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.prefix #=> String
     #   resp.channel.encoder_settings.video_descriptions[0].height #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].name #=> String
     #   resp.channel.encoder_settings.video_descriptions[0].respond_to_afd #=> String, one of "NONE", "PASSTHROUGH", "RESPOND"
     #   resp.channel.encoder_settings.video_descriptions[0].scaling_behavior #=> String, one of "DEFAULT", "STRETCH_TO_OUTPUT"
     #   resp.channel.encoder_settings.video_descriptions[0].sharpness #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].width #=> Integer
+    #   resp.channel.encoder_settings.thumbnail_configuration.state #=> String, one of "AUTO", "DISABLED"
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections #=> Array
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections[0].input_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections[0].output_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections[0].uri #=> String
     #   resp.channel.id #=> String
     #   resp.channel.input_attachments #=> Array
     #   resp.channel.input_attachments[0].automatic_input_failover_settings.error_clear_time_msec #=> Integer
@@ -2226,15 +1739,19 @@ module Aws::MediaLive
     #   resp.channel.input_attachments[0].input_id #=> String
     #   resp.channel.input_attachments[0].input_settings.audio_selectors #=> Array
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].name #=> String
+    #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.group_id #=> String
+    #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.name #=> String
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_code #=> String
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_selection_policy #=> String, one of "LOOSE", "STRICT"
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_pid_selection.pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks #=> Array
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks[0].track #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.dolby_e_decode.program_selection #=> String, one of "ALL_CHANNELS", "PROGRAM_1", "PROGRAM_2", "PROGRAM_3", "PROGRAM_4", "PROGRAM_5", "PROGRAM_6", "PROGRAM_7", "PROGRAM_8"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors #=> Array
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].language_code #=> String
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].name #=> String
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.ancillary_source_settings.source_ancillary_channel_number #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.scte_20_detection #=> String, one of "AUTO", "OFF"
@@ -2242,7 +1759,12 @@ module Aws::MediaLive
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.source_608_track_number #=> Integer
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.source_608_channel_number #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.pid #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.height #=> Float
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.left_offset #=> Float
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.top_offset #=> Float
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.width #=> Float
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.page_number #=> String
     #   resp.channel.input_attachments[0].input_settings.deblock_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.input_attachments[0].input_settings.denoise_filter #=> String, one of "DISABLED", "ENABLED"
@@ -2252,27 +1774,50 @@ module Aws::MediaLive
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.buffer_segments #=> Integer
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retries #=> Integer
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retry_interval #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.scte_35_source #=> String, one of "MANIFEST", "SEGMENTS"
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.server_validation #=> String, one of "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", "CHECK_CRYPTOGRAPHY_ONLY"
+    #   resp.channel.input_attachments[0].input_settings.network_input_settings.multicast_input_settings.source_ip_address #=> String
+    #   resp.channel.input_attachments[0].input_settings.scte_35_pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.smpte_2038_data_preference #=> String, one of "IGNORE", "PREFER"
     #   resp.channel.input_attachments[0].input_settings.source_end_behavior #=> String, one of "CONTINUE", "LOOP"
-    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "REC_601", "REC_709"
+    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.channel.input_attachments[0].input_settings.video_selector.color_space_usage #=> String, one of "FALLBACK", "FORCE"
     #   resp.channel.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_pid.pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_program_id.program_id #=> Integer
+    #   resp.channel.input_attachments[0].logical_interface_names #=> Array
+    #   resp.channel.input_attachments[0].logical_interface_names[0] #=> String
     #   resp.channel.input_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC"
     #   resp.channel.input_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.channel.input_specification.resolution #=> String, one of "SD", "HD", "UHD"
     #   resp.channel.log_level #=> String, one of "ERROR", "WARNING", "INFO", "DEBUG", "DISABLED"
+    #   resp.channel.maintenance.maintenance_day #=> String, one of "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+    #   resp.channel.maintenance.maintenance_deadline #=> String
+    #   resp.channel.maintenance.maintenance_scheduled_date #=> String
+    #   resp.channel.maintenance.maintenance_start_time #=> String
     #   resp.channel.name #=> String
     #   resp.channel.pipeline_details #=> Array
     #   resp.channel.pipeline_details[0].active_input_attachment_name #=> String
     #   resp.channel.pipeline_details[0].active_input_switch_action_name #=> String
+    #   resp.channel.pipeline_details[0].active_motion_graphics_action_name #=> String
+    #   resp.channel.pipeline_details[0].active_motion_graphics_uri #=> String
     #   resp.channel.pipeline_details[0].pipeline_id #=> String
     #   resp.channel.pipelines_running_count #=> Integer
     #   resp.channel.role_arn #=> String
     #   resp.channel.state #=> String, one of "CREATING", "CREATE_FAILED", "IDLE", "STARTING", "RUNNING", "RECOVERING", "STOPPING", "DELETING", "DELETED", "UPDATING", "UPDATE_FAILED"
     #   resp.channel.tags #=> Hash
     #   resp.channel.tags["__string"] #=> String
+    #   resp.channel.vpc.availability_zones #=> Array
+    #   resp.channel.vpc.availability_zones[0] #=> String
+    #   resp.channel.vpc.network_interface_ids #=> Array
+    #   resp.channel.vpc.network_interface_ids[0] #=> String
+    #   resp.channel.vpc.security_group_ids #=> Array
+    #   resp.channel.vpc.security_group_ids[0] #=> String
+    #   resp.channel.vpc.subnet_ids #=> Array
+    #   resp.channel.vpc.subnet_ids[0] #=> String
+    #   resp.channel.anywhere_settings.channel_placement_group_id #=> String
+    #   resp.channel.anywhere_settings.cluster_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateChannel AWS API Documentation
     #
@@ -2306,6 +1851,7 @@ module Aws::MediaLive
     # @option params [Hash<String,String>] :tags
     #
     # @option params [String] :type
+    #   The different types of inputs that AWS Elemental MediaLive supports.
     #
     # @option params [Types::InputVpcRequest] :vpc
     #   Settings for a private VPC Input. When this property is specified, the
@@ -2313,6 +1859,20 @@ module Aws::MediaLive
     #   public Internet addresses. This property requires setting the roleArn
     #   property on Input creation. Not compatible with the
     #   inputSecurityGroups property.
+    #
+    # @option params [Types::SrtSettingsRequest] :srt_settings
+    #   Configures the sources for this SRT input. For a single-pipeline
+    #   input, include one srtCallerSource in the array. For a
+    #   standard-pipeline input, include two srtCallerSource.
+    #
+    # @option params [String] :input_network_location
+    #   With the introduction of MediaLive Anywhere, a MediaLive input can now
+    #   exist in two different places: AWS or inside an on-premises
+    #   datacenter. By default all inputs will continue to be AWS inputs.
+    #
+    # @option params [Types::MulticastSettingsCreateRequest] :multicast_settings
+    #   Settings for a Multicast input. Contains a list of multicast Urls and
+    #   optional source ip addresses.
     #
     # @return [Types::CreateInputResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2324,6 +1884,14 @@ module Aws::MediaLive
     #     destinations: [
     #       {
     #         stream_name: "__string",
+    #         network: "__string",
+    #         network_routes: [
+    #           {
+    #             cidr: "__string",
+    #             gateway: "__string",
+    #           },
+    #         ],
+    #         static_ip_address: "__string",
     #       },
     #     ],
     #     input_devices: [
@@ -2350,10 +1918,33 @@ module Aws::MediaLive
     #     tags: {
     #       "__string" => "__string",
     #     },
-    #     type: "UDP_PUSH", # accepts UDP_PUSH, RTP_PUSH, RTMP_PUSH, RTMP_PULL, URL_PULL, MP4_FILE, MEDIACONNECT, INPUT_DEVICE, AWS_CDI
+    #     type: "UDP_PUSH", # accepts UDP_PUSH, RTP_PUSH, RTMP_PUSH, RTMP_PULL, URL_PULL, MP4_FILE, MEDIACONNECT, INPUT_DEVICE, AWS_CDI, TS_FILE, SRT_CALLER, MULTICAST
     #     vpc: {
     #       security_group_ids: ["__string"],
     #       subnet_ids: ["__string"], # required
+    #     },
+    #     srt_settings: {
+    #       srt_caller_sources: [
+    #         {
+    #           decryption: {
+    #             algorithm: "AES128", # accepts AES128, AES192, AES256
+    #             passphrase_secret_arn: "__string",
+    #           },
+    #           minimum_latency: 1,
+    #           srt_listener_address: "__string",
+    #           srt_listener_port: "__string",
+    #           stream_id: "__string",
+    #         },
+    #       ],
+    #     },
+    #     input_network_location: "AWS", # accepts AWS, ON_PREMISES
+    #     multicast_settings: {
+    #       sources: [
+    #         {
+    #           source_ip: "__string",
+    #           url: "__string", # required
+    #         },
+    #       ],
     #     },
     #   })
     #
@@ -2368,10 +1959,16 @@ module Aws::MediaLive
     #   resp.input.destinations[0].url #=> String
     #   resp.input.destinations[0].vpc.availability_zone #=> String
     #   resp.input.destinations[0].vpc.network_interface_id #=> String
+    #   resp.input.destinations[0].network #=> String
+    #   resp.input.destinations[0].network_routes #=> Array
+    #   resp.input.destinations[0].network_routes[0].cidr #=> String
+    #   resp.input.destinations[0].network_routes[0].gateway #=> String
     #   resp.input.id #=> String
     #   resp.input.input_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
     #   resp.input.input_devices #=> Array
     #   resp.input.input_devices[0].id #=> String
+    #   resp.input.input_partner_ids #=> Array
+    #   resp.input.input_partner_ids[0] #=> String
     #   resp.input.input_source_type #=> String, one of "STATIC", "DYNAMIC"
     #   resp.input.media_connect_flows #=> Array
     #   resp.input.media_connect_flows[0].flow_arn #=> String
@@ -2386,7 +1983,18 @@ module Aws::MediaLive
     #   resp.input.state #=> String, one of "CREATING", "DETACHED", "ATTACHED", "DELETING", "DELETED"
     #   resp.input.tags #=> Hash
     #   resp.input.tags["__string"] #=> String
-    #   resp.input.type #=> String, one of "UDP_PUSH", "RTP_PUSH", "RTMP_PUSH", "RTMP_PULL", "URL_PULL", "MP4_FILE", "MEDIACONNECT", "INPUT_DEVICE", "AWS_CDI"
+    #   resp.input.type #=> String, one of "UDP_PUSH", "RTP_PUSH", "RTMP_PUSH", "RTMP_PULL", "URL_PULL", "MP4_FILE", "MEDIACONNECT", "INPUT_DEVICE", "AWS_CDI", "TS_FILE", "SRT_CALLER", "MULTICAST"
+    #   resp.input.srt_settings.srt_caller_sources #=> Array
+    #   resp.input.srt_settings.srt_caller_sources[0].decryption.algorithm #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.input.srt_settings.srt_caller_sources[0].decryption.passphrase_secret_arn #=> String
+    #   resp.input.srt_settings.srt_caller_sources[0].minimum_latency #=> Integer
+    #   resp.input.srt_settings.srt_caller_sources[0].srt_listener_address #=> String
+    #   resp.input.srt_settings.srt_caller_sources[0].srt_listener_port #=> String
+    #   resp.input.srt_settings.srt_caller_sources[0].stream_id #=> String
+    #   resp.input.input_network_location #=> String, one of "AWS", "ON_PREMISES"
+    #   resp.input.multicast_settings.sources #=> Array
+    #   resp.input.multicast_settings.sources[0].source_ip #=> String
+    #   resp.input.multicast_settings.sources[0].url #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateInput AWS API Documentation
     #
@@ -2574,6 +2182,11 @@ module Aws::MediaLive
     #   resp.multiplex_program.packet_identifiers_map.scte_35_pid #=> Integer
     #   resp.multiplex_program.packet_identifiers_map.timed_metadata_pid #=> Integer
     #   resp.multiplex_program.packet_identifiers_map.video_pid #=> Integer
+    #   resp.multiplex_program.packet_identifiers_map.arib_captions_pid #=> Integer
+    #   resp.multiplex_program.packet_identifiers_map.dvb_teletext_pids #=> Array
+    #   resp.multiplex_program.packet_identifiers_map.dvb_teletext_pids[0] #=> Integer
+    #   resp.multiplex_program.packet_identifiers_map.ecm_pid #=> Integer
+    #   resp.multiplex_program.packet_identifiers_map.smpte_2038_pid #=> Integer
     #   resp.multiplex_program.pipeline_details #=> Array
     #   resp.multiplex_program.pipeline_details[0].active_channel_pipeline #=> String
     #   resp.multiplex_program.pipeline_details[0].pipeline_id #=> String
@@ -2585,6 +2198,87 @@ module Aws::MediaLive
     # @param [Hash] params ({})
     def create_multiplex_program(params = {}, options = {})
       req = build_request(:create_multiplex_program, params)
+      req.send_request(options)
+    end
+
+    # Create a partner input
+    #
+    # @option params [required, String] :input_id
+    #
+    # @option params [String] :request_id
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [Hash<String,String>] :tags
+    #
+    # @return [Types::CreatePartnerInputResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreatePartnerInputResponse#input #input} => Types::Input
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_partner_input({
+    #     input_id: "__string", # required
+    #     request_id: "__string",
+    #     tags: {
+    #       "__string" => "__string",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.input.arn #=> String
+    #   resp.input.attached_channels #=> Array
+    #   resp.input.attached_channels[0] #=> String
+    #   resp.input.destinations #=> Array
+    #   resp.input.destinations[0].ip #=> String
+    #   resp.input.destinations[0].port #=> String
+    #   resp.input.destinations[0].url #=> String
+    #   resp.input.destinations[0].vpc.availability_zone #=> String
+    #   resp.input.destinations[0].vpc.network_interface_id #=> String
+    #   resp.input.destinations[0].network #=> String
+    #   resp.input.destinations[0].network_routes #=> Array
+    #   resp.input.destinations[0].network_routes[0].cidr #=> String
+    #   resp.input.destinations[0].network_routes[0].gateway #=> String
+    #   resp.input.id #=> String
+    #   resp.input.input_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
+    #   resp.input.input_devices #=> Array
+    #   resp.input.input_devices[0].id #=> String
+    #   resp.input.input_partner_ids #=> Array
+    #   resp.input.input_partner_ids[0] #=> String
+    #   resp.input.input_source_type #=> String, one of "STATIC", "DYNAMIC"
+    #   resp.input.media_connect_flows #=> Array
+    #   resp.input.media_connect_flows[0].flow_arn #=> String
+    #   resp.input.name #=> String
+    #   resp.input.role_arn #=> String
+    #   resp.input.security_groups #=> Array
+    #   resp.input.security_groups[0] #=> String
+    #   resp.input.sources #=> Array
+    #   resp.input.sources[0].password_param #=> String
+    #   resp.input.sources[0].url #=> String
+    #   resp.input.sources[0].username #=> String
+    #   resp.input.state #=> String, one of "CREATING", "DETACHED", "ATTACHED", "DELETING", "DELETED"
+    #   resp.input.tags #=> Hash
+    #   resp.input.tags["__string"] #=> String
+    #   resp.input.type #=> String, one of "UDP_PUSH", "RTP_PUSH", "RTMP_PUSH", "RTMP_PULL", "URL_PULL", "MP4_FILE", "MEDIACONNECT", "INPUT_DEVICE", "AWS_CDI", "TS_FILE", "SRT_CALLER", "MULTICAST"
+    #   resp.input.srt_settings.srt_caller_sources #=> Array
+    #   resp.input.srt_settings.srt_caller_sources[0].decryption.algorithm #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.input.srt_settings.srt_caller_sources[0].decryption.passphrase_secret_arn #=> String
+    #   resp.input.srt_settings.srt_caller_sources[0].minimum_latency #=> Integer
+    #   resp.input.srt_settings.srt_caller_sources[0].srt_listener_address #=> String
+    #   resp.input.srt_settings.srt_caller_sources[0].srt_listener_port #=> String
+    #   resp.input.srt_settings.srt_caller_sources[0].stream_id #=> String
+    #   resp.input.input_network_location #=> String, one of "AWS", "ON_PREMISES"
+    #   resp.input.multicast_settings.sources #=> Array
+    #   resp.input.multicast_settings.sources[0].source_ip #=> String
+    #   resp.input.multicast_settings.sources[0].url #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreatePartnerInput AWS API Documentation
+    #
+    # @overload create_partner_input(params = {})
+    # @param [Hash] params ({})
+    def create_partner_input(params = {}, options = {})
+      req = build_request(:create_partner_input, params)
       req.send_request(options)
     end
 
@@ -2630,12 +2324,15 @@ module Aws::MediaLive
     #   * {Types::DeleteChannelResponse#input_attachments #input_attachments} => Array&lt;Types::InputAttachment&gt;
     #   * {Types::DeleteChannelResponse#input_specification #input_specification} => Types::InputSpecification
     #   * {Types::DeleteChannelResponse#log_level #log_level} => String
+    #   * {Types::DeleteChannelResponse#maintenance #maintenance} => Types::MaintenanceStatus
     #   * {Types::DeleteChannelResponse#name #name} => String
     #   * {Types::DeleteChannelResponse#pipeline_details #pipeline_details} => Array&lt;Types::PipelineDetail&gt;
     #   * {Types::DeleteChannelResponse#pipelines_running_count #pipelines_running_count} => Integer
     #   * {Types::DeleteChannelResponse#role_arn #role_arn} => String
     #   * {Types::DeleteChannelResponse#state #state} => String
     #   * {Types::DeleteChannelResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::DeleteChannelResponse#vpc #vpc} => Types::VpcOutputSettingsDescription
+    #   * {Types::DeleteChannelResponse#anywhere_settings #anywhere_settings} => Types::DescribeAnywhereSettings
     #
     # @example Request syntax with placeholder values
     #
@@ -2659,6 +2356,10 @@ module Aws::MediaLive
     #   resp.destinations[0].settings[0].stream_name #=> String
     #   resp.destinations[0].settings[0].url #=> String
     #   resp.destinations[0].settings[0].username #=> String
+    #   resp.destinations[0].srt_settings #=> Array
+    #   resp.destinations[0].srt_settings[0].encryption_passphrase_secret_arn #=> String
+    #   resp.destinations[0].srt_settings[0].stream_id #=> String
+    #   resp.destinations[0].srt_settings[0].url #=> String
     #   resp.egress_endpoints #=> Array
     #   resp.egress_endpoints[0].source_ip #=> String
     #   resp.encoder_settings.audio_descriptions #=> Array
@@ -2668,6 +2369,13 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].audio_selector_name #=> String
     #   resp.encoder_settings.audio_descriptions[0].audio_type #=> String, one of "CLEAN_EFFECTS", "HEARING_IMPAIRED", "UNDEFINED", "VISUAL_IMPAIRED_COMMENTARY"
     #   resp.encoder_settings.audio_descriptions[0].audio_type_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_check_digit_string #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_stepaside #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.csid #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_distribution_type #=> String, one of "FINAL_DISTRIBUTOR", "PROGRAM_CONTENT"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.check_digit_string #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.sid #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.timezone #=> String, one of "AMERICA_PUERTO_RICO", "US_ALASKA", "US_ARIZONA", "US_CENTRAL", "US_EASTERN", "US_HAWAII", "US_MOUNTAIN", "US_PACIFIC", "US_SAMOA", "UTC"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.bitrate #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.coding_mode #=> String, one of "AD_RECEIVER_MIX", "CODING_MODE_1_0", "CODING_MODE_1_1", "CODING_MODE_2_0", "CODING_MODE_5_1"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.input_type #=> String, one of "BROADCASTER_MIXED_AD", "NORMAL"
@@ -2684,6 +2392,14 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.drc_profile #=> String, one of "FILM_STANDARD", "NONE"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.lfe_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.metadata_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.bitrate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.coding_mode #=> String, one of "CODING_MODE_5_1_4", "CODING_MODE_7_1_4", "CODING_MODE_9_1_6"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.dialnorm #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_line #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_rf #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.height_trim #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.surround_trim #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitrate #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitstream_mode #=> String, one of "COMMENTARY", "COMPLETE_MAIN", "EMERGENCY", "HEARING_IMPAIRED", "VISUALLY_IMPAIRED"
@@ -2721,16 +2437,26 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].remix_settings.channels_in #=> Integer
     #   resp.encoder_settings.audio_descriptions[0].remix_settings.channels_out #=> Integer
     #   resp.encoder_settings.audio_descriptions[0].stream_name #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_dash_roles #=> Array
+    #   resp.encoder_settings.audio_descriptions[0].audio_dash_roles[0] #=> String, one of "ALTERNATE", "COMMENTARY", "DESCRIPTION", "DUB", "EMERGENCY", "ENHANCED-AUDIO-INTELLIGIBILITY", "KARAOKE", "MAIN", "SUPPLEMENTARY"
+    #   resp.encoder_settings.audio_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.password_param #=> String
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.uri #=> String
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.username #=> String
     #   resp.encoder_settings.avail_blanking.state #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.acquisition_point_id #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.ad_avail_offset #=> Integer
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.password_param #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.pois_endpoint #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.username #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.zone_identity #=> String
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.ad_avail_offset #=> Integer
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.ad_avail_offset #=> Integer
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.encoder_settings.avail_configuration.scte_35_segmentation_scope #=> String, one of "ALL_OUTPUT_GROUPS", "SCTE35_ENABLED_OUTPUT_GROUPS"
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.password_param #=> String
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.uri #=> String
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.username #=> String
@@ -2741,6 +2467,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.blackout_slate.network_id #=> String
     #   resp.encoder_settings.blackout_slate.state #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.caption_descriptions #=> Array
+    #   resp.encoder_settings.caption_descriptions[0].accessibility #=> String, one of "DOES_NOT_IMPLEMENT_ACCESSIBILITY_FEATURES", "IMPLEMENTS_ACCESSIBILITY_FEATURES"
     #   resp.encoder_settings.caption_descriptions[0].caption_selector_name #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.alignment #=> String, one of "CENTERED", "LEFT", "SMART"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.background_color #=> String, one of "BLACK", "NONE", "WHITE"
@@ -2780,14 +2507,20 @@ module Aws::MediaLive
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.teletext_grid_control #=> String, one of "FIXED", "SCALED"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.x_position #=> Integer
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.y_position #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.copyright_holder #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.fill_line_gap #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.font_family #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.style_control #=> String, one of "EXCLUDE", "INCLUDE"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ttml_destination_settings.style_control #=> String, one of "PASSTHROUGH", "USE_CONFIGURED"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.webvtt_destination_settings.style_control #=> String, one of "NO_STYLE_DATA", "PASSTHROUGH"
     #   resp.encoder_settings.caption_descriptions[0].language_code #=> String
     #   resp.encoder_settings.caption_descriptions[0].language_description #=> String
     #   resp.encoder_settings.caption_descriptions[0].name #=> String
+    #   resp.encoder_settings.caption_descriptions[0].caption_dash_roles #=> Array
+    #   resp.encoder_settings.caption_descriptions[0].caption_dash_roles[0] #=> String, one of "ALTERNATE", "CAPTION", "COMMENTARY", "DESCRIPTION", "DUB", "EASYREADER", "EMERGENCY", "FORCED-SUBTITLE", "KARAOKE", "MAIN", "METADATA", "SUBTITLE", "SUPPLEMENTARY"
+    #   resp.encoder_settings.caption_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.encoder_settings.feature_activations.input_prepare_schedule_actions #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.feature_activations.output_static_image_overlay_schedule_actions #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.global_configuration.initial_audio_gain #=> Integer
     #   resp.encoder_settings.global_configuration.input_end_action #=> String, one of "NONE", "SWITCH_AND_LOOP_INPUTS"
     #   resp.encoder_settings.global_configuration.input_loss_behavior.black_frame_msec #=> Integer
@@ -2800,13 +2533,18 @@ module Aws::MediaLive
     #   resp.encoder_settings.global_configuration.output_locking_mode #=> String, one of "EPOCH_LOCKING", "PIPELINE_LOCKING"
     #   resp.encoder_settings.global_configuration.output_timing_source #=> String, one of "INPUT_CLOCK", "SYSTEM_CLOCK"
     #   resp.encoder_settings.global_configuration.support_low_framerate_inputs #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.custom_epoch #=> String
+    #   resp.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.jam_sync_time #=> String
+    #   resp.encoder_settings.motion_graphics_configuration.motion_graphics_insertion #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.nielsen_configuration.distributor_id #=> String
     #   resp.encoder_settings.nielsen_configuration.nielsen_pcm_to_id_3_tagging #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.output_groups #=> Array
     #   resp.encoder_settings.output_groups[0].name #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.archive_cdn_settings.archive_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.destination.destination_ref_id #=> String
     #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.rollover_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.frame_capture_cdn_settings.frame_capture_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers #=> Array
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers[0] #=> String, one of "ADOBE", "ELEMENTAL", "ELEMENTAL_SCTE35"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_content #=> String
@@ -2841,6 +2579,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.media_store_storage_class #=> String, one of "TEMPORAL"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.num_retries #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.connection_retry_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.filecache_duration #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.http_transfer_mode #=> String, one of "CHUNKED", "NON_CHUNKED"
@@ -2866,6 +2605,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.mode #=> String, one of "LIVE", "VOD"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.output_selection #=> String, one of "MANIFESTS_AND_SEGMENTS", "SEGMENTS_ONLY", "VARIANT_MANIFESTS_AND_SEGMENTS"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_clock #=> String, one of "INITIALIZE_FROM_OUTPUT_TIMECODE", "SYSTEM_CLOCK"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_period #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.redundant_manifest #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.segment_length #=> Integer
@@ -2904,9 +2644,17 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.caption_data #=> String, one of "ALL", "FIELD1_608", "FIELD1_AND_FIELD2_608"
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.input_loss_action #=> String, one of "EMIT_OUTPUT", "PAUSE_OUTPUT"
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.include_filler_nal_units #=> String, one of "AUTO", "DROP", "INCLUDE"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_frame #=> String, one of "NONE", "PRIV", "TDRL"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.scte_35_type #=> String, one of "NONE", "SCTE_35_WITHOUT_SEGMENTATION"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length_units #=> String, one of "MILLISECONDS", "SECONDS"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.send_delay_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.srt_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.encoder_settings.output_groups[0].outputs #=> Array
     #   resp.encoder_settings.output_groups[0].outputs[0].audio_description_names #=> Array
     #   resp.encoder_settings.output_groups[0].outputs[0].audio_description_names[0] #=> String
@@ -2958,6 +2706,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -2996,11 +2745,27 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.timed_metadata_pid #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.transport_stream_id #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_data_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.name_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.segment_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.h265_packaging_type #=> String, one of "HEV1", "HVC1"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.name_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.certificate_mode #=> String, one of "SELF_SIGNED", "VERIFY_AUTHENTICITY"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.connection_retry_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.destination.destination_ref_id #=> String
@@ -3051,6 +2816,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -3062,13 +2828,74 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.column_depth #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.include_fec #=> String, one of "COLUMN", "COLUMN_AND_ROW"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.row_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.cmaf_ingest_output_settings.name_modifier #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.buffer_msec #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid_control #=> String, one of "AUTO", "USE_CONFIGURED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.bitrate #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.buffer_model #=> String, one of "MULTIPLEX", "NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.output_sdt #=> String, one of "SDT_FOLLOW", "SDT_FOLLOW_IF_PRESENT", "SDT_MANUAL", "SDT_NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_provider_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sub_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_tdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_teletext_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_audio_interval #=> String, one of "VIDEO_AND_FIXED_INTERVALS", "VIDEO_INTERVAL"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_lookahead_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_placement #=> String, one of "VIDEO_AND_AUDIO_PIDS", "VIDEO_PID"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ecm_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_platform_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_signal_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.fragment_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv_data_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.null_packet_bitrate #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pat_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.program_num #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.rate_mode #=> String, one of "CBR", "VBR"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.transport_stream_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.encryption_type #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.latency #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].video_description_name #=> String
     #   resp.encoder_settings.timecode_config.source #=> String, one of "EMBEDDED", "SYSTEMCLOCK", "ZEROBASED"
     #   resp.encoder_settings.timecode_config.sync_threshold #=> Integer
     #   resp.encoder_settings.video_descriptions #=> Array
     #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval_units #=> String, one of "MILLISECONDS", "SECONDS"
-    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.bitrate #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.buf_fill_pct #=> Integer
@@ -3077,6 +2904,8 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.entropy_encoding #=> String, one of "CABAC", "CAVLC"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.force_field_pictures #=> String, one of "DISABLED", "ENABLED"
@@ -3109,7 +2938,11 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.syntax #=> String, one of "DEFAULT", "RP2027"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.temporal_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
-    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.min_qp #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.alternative_transfer_function #=> String, one of "INSERT", "OMIT"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.bitrate #=> Integer
@@ -3119,6 +2952,8 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.framerate_denominator #=> Integer
@@ -3140,6 +2975,16 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.slices #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tier #=> String, one of "HIGH", "MAIN"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_over_picture_boundaries #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_temporal_predictor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_height #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_padding #=> String, one of "NONE", "PADDED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_width #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.treeblock_size #=> String, one of "AUTO", "TREE_SIZE_32X32"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.min_qp #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "LOW", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.color_metadata #=> String, one of "IGNORE", "INSERT"
@@ -3157,12 +3002,40 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.subgop_length #=> String, one of "DYNAMIC", "FIXED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_insertion #=> String, one of "DISABLED", "GOP_TIMECODE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.buf_size #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size #=> Float
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.level #=> String, one of "AV1_LEVEL_2", "AV1_LEVEL_2_1", "AV1_LEVEL_3", "AV1_LEVEL_3_1", "AV1_LEVEL_4", "AV1_LEVEL_4_1", "AV1_LEVEL_5", "AV1_LEVEL_5_1", "AV1_LEVEL_5_2", "AV1_LEVEL_5_3", "AV1_LEVEL_6", "AV1_LEVEL_6_1", "AV1_LEVEL_6_2", "AV1_LEVEL_6_3", "AV1_LEVEL_AUTO"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.look_ahead_rate_control #=> String, one of "HIGH", "LOW", "MEDIUM"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.max_bitrate #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.min_i_interval #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.qvbr_quality_level #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.scene_change_detect #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.prefix #=> String
     #   resp.encoder_settings.video_descriptions[0].height #=> Integer
     #   resp.encoder_settings.video_descriptions[0].name #=> String
     #   resp.encoder_settings.video_descriptions[0].respond_to_afd #=> String, one of "NONE", "PASSTHROUGH", "RESPOND"
     #   resp.encoder_settings.video_descriptions[0].scaling_behavior #=> String, one of "DEFAULT", "STRETCH_TO_OUTPUT"
     #   resp.encoder_settings.video_descriptions[0].sharpness #=> Integer
     #   resp.encoder_settings.video_descriptions[0].width #=> Integer
+    #   resp.encoder_settings.thumbnail_configuration.state #=> String, one of "AUTO", "DISABLED"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections #=> Array
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].input_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].output_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].uri #=> String
     #   resp.id #=> String
     #   resp.input_attachments #=> Array
     #   resp.input_attachments[0].automatic_input_failover_settings.error_clear_time_msec #=> Integer
@@ -3178,15 +3051,19 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_id #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors #=> Array
     #   resp.input_attachments[0].input_settings.audio_selectors[0].name #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.group_id #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.name #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_code #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_selection_policy #=> String, one of "LOOSE", "STRICT"
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_pid_selection.pid #=> Integer
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks #=> Array
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks[0].track #=> Integer
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.dolby_e_decode.program_selection #=> String, one of "ALL_CHANNELS", "PROGRAM_1", "PROGRAM_2", "PROGRAM_3", "PROGRAM_4", "PROGRAM_5", "PROGRAM_6", "PROGRAM_7", "PROGRAM_8"
     #   resp.input_attachments[0].input_settings.caption_selectors #=> Array
     #   resp.input_attachments[0].input_settings.caption_selectors[0].language_code #=> String
     #   resp.input_attachments[0].input_settings.caption_selectors[0].name #=> String
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.ancillary_source_settings.source_ancillary_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.pid #=> Integer
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.scte_20_detection #=> String, one of "AUTO", "OFF"
@@ -3194,7 +3071,12 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.source_608_track_number #=> Integer
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.source_608_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.pid #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.height #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.left_offset #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.top_offset #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.width #=> Float
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.page_number #=> String
     #   resp.input_attachments[0].input_settings.deblock_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.input_attachments[0].input_settings.denoise_filter #=> String, one of "DISABLED", "ENABLED"
@@ -3204,27 +3086,50 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.buffer_segments #=> Integer
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retries #=> Integer
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retry_interval #=> Integer
+    #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.scte_35_source #=> String, one of "MANIFEST", "SEGMENTS"
     #   resp.input_attachments[0].input_settings.network_input_settings.server_validation #=> String, one of "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", "CHECK_CRYPTOGRAPHY_ONLY"
+    #   resp.input_attachments[0].input_settings.network_input_settings.multicast_input_settings.source_ip_address #=> String
+    #   resp.input_attachments[0].input_settings.scte_35_pid #=> Integer
     #   resp.input_attachments[0].input_settings.smpte_2038_data_preference #=> String, one of "IGNORE", "PREFER"
     #   resp.input_attachments[0].input_settings.source_end_behavior #=> String, one of "CONTINUE", "LOOP"
-    #   resp.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "REC_601", "REC_709"
+    #   resp.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.input_attachments[0].input_settings.video_selector.color_space_usage #=> String, one of "FALLBACK", "FORCE"
     #   resp.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_pid.pid #=> Integer
     #   resp.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_program_id.program_id #=> Integer
+    #   resp.input_attachments[0].logical_interface_names #=> Array
+    #   resp.input_attachments[0].logical_interface_names[0] #=> String
     #   resp.input_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC"
     #   resp.input_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.input_specification.resolution #=> String, one of "SD", "HD", "UHD"
     #   resp.log_level #=> String, one of "ERROR", "WARNING", "INFO", "DEBUG", "DISABLED"
+    #   resp.maintenance.maintenance_day #=> String, one of "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+    #   resp.maintenance.maintenance_deadline #=> String
+    #   resp.maintenance.maintenance_scheduled_date #=> String
+    #   resp.maintenance.maintenance_start_time #=> String
     #   resp.name #=> String
     #   resp.pipeline_details #=> Array
     #   resp.pipeline_details[0].active_input_attachment_name #=> String
     #   resp.pipeline_details[0].active_input_switch_action_name #=> String
+    #   resp.pipeline_details[0].active_motion_graphics_action_name #=> String
+    #   resp.pipeline_details[0].active_motion_graphics_uri #=> String
     #   resp.pipeline_details[0].pipeline_id #=> String
     #   resp.pipelines_running_count #=> Integer
     #   resp.role_arn #=> String
     #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "IDLE", "STARTING", "RUNNING", "RECOVERING", "STOPPING", "DELETING", "DELETED", "UPDATING", "UPDATE_FAILED"
     #   resp.tags #=> Hash
     #   resp.tags["__string"] #=> String
+    #   resp.vpc.availability_zones #=> Array
+    #   resp.vpc.availability_zones[0] #=> String
+    #   resp.vpc.network_interface_ids #=> Array
+    #   resp.vpc.network_interface_ids[0] #=> String
+    #   resp.vpc.security_group_ids #=> Array
+    #   resp.vpc.security_group_ids[0] #=> String
+    #   resp.vpc.subnet_ids #=> Array
+    #   resp.vpc.subnet_ids[0] #=> String
+    #   resp.anywhere_settings.channel_placement_group_id #=> String
+    #   resp.anywhere_settings.cluster_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DeleteChannel AWS API Documentation
     #
@@ -3377,6 +3282,11 @@ module Aws::MediaLive
     #   resp.packet_identifiers_map.scte_35_pid #=> Integer
     #   resp.packet_identifiers_map.timed_metadata_pid #=> Integer
     #   resp.packet_identifiers_map.video_pid #=> Integer
+    #   resp.packet_identifiers_map.arib_captions_pid #=> Integer
+    #   resp.packet_identifiers_map.dvb_teletext_pids #=> Array
+    #   resp.packet_identifiers_map.dvb_teletext_pids[0] #=> Integer
+    #   resp.packet_identifiers_map.ecm_pid #=> Integer
+    #   resp.packet_identifiers_map.smpte_2038_pid #=> Integer
     #   resp.pipeline_details #=> Array
     #   resp.pipeline_details[0].active_channel_pipeline #=> String
     #   resp.pipeline_details[0].pipeline_id #=> String
@@ -3409,6 +3319,7 @@ module Aws::MediaLive
     #   * {Types::DeleteReservationResponse#offering_id #offering_id} => String
     #   * {Types::DeleteReservationResponse#offering_type #offering_type} => String
     #   * {Types::DeleteReservationResponse#region #region} => String
+    #   * {Types::DeleteReservationResponse#renewal_settings #renewal_settings} => Types::RenewalSettings
     #   * {Types::DeleteReservationResponse#reservation_id #reservation_id} => String
     #   * {Types::DeleteReservationResponse#resource_specification #resource_specification} => Types::ReservationResourceSpecification
     #   * {Types::DeleteReservationResponse#start #start} => String
@@ -3436,14 +3347,16 @@ module Aws::MediaLive
     #   resp.offering_id #=> String
     #   resp.offering_type #=> String, one of "NO_UPFRONT"
     #   resp.region #=> String
+    #   resp.renewal_settings.automatic_renewal #=> String, one of "DISABLED", "ENABLED", "UNAVAILABLE"
+    #   resp.renewal_settings.renewal_count #=> Integer
     #   resp.reservation_id #=> String
     #   resp.resource_specification.channel_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
-    #   resp.resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK"
+    #   resp.resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK", "AV1"
     #   resp.resource_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.resource_specification.maximum_framerate #=> String, one of "MAX_30_FPS", "MAX_60_FPS"
     #   resp.resource_specification.resolution #=> String, one of "SD", "HD", "FHD", "UHD"
     #   resp.resource_specification.resource_type #=> String, one of "INPUT", "OUTPUT", "MULTIPLEX", "CHANNEL"
-    #   resp.resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION"
+    #   resp.resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION", "MGHD", "MGUHD"
     #   resp.resource_specification.video_quality #=> String, one of "STANDARD", "ENHANCED", "PREMIUM"
     #   resp.start #=> String
     #   resp.state #=> String, one of "ACTIVE", "EXPIRED", "CANCELED", "DELETED"
@@ -3505,6 +3418,25 @@ module Aws::MediaLive
       req.send_request(options)
     end
 
+    # Describe account configuration
+    #
+    # @return [Types::DescribeAccountConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeAccountConfigurationResponse#account_configuration #account_configuration} => Types::AccountConfiguration
+    #
+    # @example Response structure
+    #
+    #   resp.account_configuration.kms_key_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DescribeAccountConfiguration AWS API Documentation
+    #
+    # @overload describe_account_configuration(params = {})
+    # @param [Hash] params ({})
+    def describe_account_configuration(params = {}, options = {})
+      req = build_request(:describe_account_configuration, params)
+      req.send_request(options)
+    end
+
     # Gets details about a channel
     #
     # @option params [required, String] :channel_id
@@ -3521,12 +3453,15 @@ module Aws::MediaLive
     #   * {Types::DescribeChannelResponse#input_attachments #input_attachments} => Array&lt;Types::InputAttachment&gt;
     #   * {Types::DescribeChannelResponse#input_specification #input_specification} => Types::InputSpecification
     #   * {Types::DescribeChannelResponse#log_level #log_level} => String
+    #   * {Types::DescribeChannelResponse#maintenance #maintenance} => Types::MaintenanceStatus
     #   * {Types::DescribeChannelResponse#name #name} => String
     #   * {Types::DescribeChannelResponse#pipeline_details #pipeline_details} => Array&lt;Types::PipelineDetail&gt;
     #   * {Types::DescribeChannelResponse#pipelines_running_count #pipelines_running_count} => Integer
     #   * {Types::DescribeChannelResponse#role_arn #role_arn} => String
     #   * {Types::DescribeChannelResponse#state #state} => String
     #   * {Types::DescribeChannelResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::DescribeChannelResponse#vpc #vpc} => Types::VpcOutputSettingsDescription
+    #   * {Types::DescribeChannelResponse#anywhere_settings #anywhere_settings} => Types::DescribeAnywhereSettings
     #
     # @example Request syntax with placeholder values
     #
@@ -3550,6 +3485,10 @@ module Aws::MediaLive
     #   resp.destinations[0].settings[0].stream_name #=> String
     #   resp.destinations[0].settings[0].url #=> String
     #   resp.destinations[0].settings[0].username #=> String
+    #   resp.destinations[0].srt_settings #=> Array
+    #   resp.destinations[0].srt_settings[0].encryption_passphrase_secret_arn #=> String
+    #   resp.destinations[0].srt_settings[0].stream_id #=> String
+    #   resp.destinations[0].srt_settings[0].url #=> String
     #   resp.egress_endpoints #=> Array
     #   resp.egress_endpoints[0].source_ip #=> String
     #   resp.encoder_settings.audio_descriptions #=> Array
@@ -3559,6 +3498,13 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].audio_selector_name #=> String
     #   resp.encoder_settings.audio_descriptions[0].audio_type #=> String, one of "CLEAN_EFFECTS", "HEARING_IMPAIRED", "UNDEFINED", "VISUAL_IMPAIRED_COMMENTARY"
     #   resp.encoder_settings.audio_descriptions[0].audio_type_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_check_digit_string #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_stepaside #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.csid #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_distribution_type #=> String, one of "FINAL_DISTRIBUTOR", "PROGRAM_CONTENT"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.check_digit_string #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.sid #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.timezone #=> String, one of "AMERICA_PUERTO_RICO", "US_ALASKA", "US_ARIZONA", "US_CENTRAL", "US_EASTERN", "US_HAWAII", "US_MOUNTAIN", "US_PACIFIC", "US_SAMOA", "UTC"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.bitrate #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.coding_mode #=> String, one of "AD_RECEIVER_MIX", "CODING_MODE_1_0", "CODING_MODE_1_1", "CODING_MODE_2_0", "CODING_MODE_5_1"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.input_type #=> String, one of "BROADCASTER_MIXED_AD", "NORMAL"
@@ -3575,6 +3521,14 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.drc_profile #=> String, one of "FILM_STANDARD", "NONE"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.lfe_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.metadata_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.bitrate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.coding_mode #=> String, one of "CODING_MODE_5_1_4", "CODING_MODE_7_1_4", "CODING_MODE_9_1_6"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.dialnorm #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_line #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_rf #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.height_trim #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.surround_trim #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitrate #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitstream_mode #=> String, one of "COMMENTARY", "COMPLETE_MAIN", "EMERGENCY", "HEARING_IMPAIRED", "VISUALLY_IMPAIRED"
@@ -3612,16 +3566,26 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].remix_settings.channels_in #=> Integer
     #   resp.encoder_settings.audio_descriptions[0].remix_settings.channels_out #=> Integer
     #   resp.encoder_settings.audio_descriptions[0].stream_name #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_dash_roles #=> Array
+    #   resp.encoder_settings.audio_descriptions[0].audio_dash_roles[0] #=> String, one of "ALTERNATE", "COMMENTARY", "DESCRIPTION", "DUB", "EMERGENCY", "ENHANCED-AUDIO-INTELLIGIBILITY", "KARAOKE", "MAIN", "SUPPLEMENTARY"
+    #   resp.encoder_settings.audio_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.password_param #=> String
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.uri #=> String
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.username #=> String
     #   resp.encoder_settings.avail_blanking.state #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.acquisition_point_id #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.ad_avail_offset #=> Integer
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.password_param #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.pois_endpoint #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.username #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.zone_identity #=> String
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.ad_avail_offset #=> Integer
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.ad_avail_offset #=> Integer
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.encoder_settings.avail_configuration.scte_35_segmentation_scope #=> String, one of "ALL_OUTPUT_GROUPS", "SCTE35_ENABLED_OUTPUT_GROUPS"
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.password_param #=> String
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.uri #=> String
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.username #=> String
@@ -3632,6 +3596,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.blackout_slate.network_id #=> String
     #   resp.encoder_settings.blackout_slate.state #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.caption_descriptions #=> Array
+    #   resp.encoder_settings.caption_descriptions[0].accessibility #=> String, one of "DOES_NOT_IMPLEMENT_ACCESSIBILITY_FEATURES", "IMPLEMENTS_ACCESSIBILITY_FEATURES"
     #   resp.encoder_settings.caption_descriptions[0].caption_selector_name #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.alignment #=> String, one of "CENTERED", "LEFT", "SMART"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.background_color #=> String, one of "BLACK", "NONE", "WHITE"
@@ -3671,14 +3636,20 @@ module Aws::MediaLive
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.teletext_grid_control #=> String, one of "FIXED", "SCALED"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.x_position #=> Integer
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.y_position #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.copyright_holder #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.fill_line_gap #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.font_family #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.style_control #=> String, one of "EXCLUDE", "INCLUDE"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ttml_destination_settings.style_control #=> String, one of "PASSTHROUGH", "USE_CONFIGURED"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.webvtt_destination_settings.style_control #=> String, one of "NO_STYLE_DATA", "PASSTHROUGH"
     #   resp.encoder_settings.caption_descriptions[0].language_code #=> String
     #   resp.encoder_settings.caption_descriptions[0].language_description #=> String
     #   resp.encoder_settings.caption_descriptions[0].name #=> String
+    #   resp.encoder_settings.caption_descriptions[0].caption_dash_roles #=> Array
+    #   resp.encoder_settings.caption_descriptions[0].caption_dash_roles[0] #=> String, one of "ALTERNATE", "CAPTION", "COMMENTARY", "DESCRIPTION", "DUB", "EASYREADER", "EMERGENCY", "FORCED-SUBTITLE", "KARAOKE", "MAIN", "METADATA", "SUBTITLE", "SUPPLEMENTARY"
+    #   resp.encoder_settings.caption_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.encoder_settings.feature_activations.input_prepare_schedule_actions #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.feature_activations.output_static_image_overlay_schedule_actions #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.global_configuration.initial_audio_gain #=> Integer
     #   resp.encoder_settings.global_configuration.input_end_action #=> String, one of "NONE", "SWITCH_AND_LOOP_INPUTS"
     #   resp.encoder_settings.global_configuration.input_loss_behavior.black_frame_msec #=> Integer
@@ -3691,13 +3662,18 @@ module Aws::MediaLive
     #   resp.encoder_settings.global_configuration.output_locking_mode #=> String, one of "EPOCH_LOCKING", "PIPELINE_LOCKING"
     #   resp.encoder_settings.global_configuration.output_timing_source #=> String, one of "INPUT_CLOCK", "SYSTEM_CLOCK"
     #   resp.encoder_settings.global_configuration.support_low_framerate_inputs #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.custom_epoch #=> String
+    #   resp.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.jam_sync_time #=> String
+    #   resp.encoder_settings.motion_graphics_configuration.motion_graphics_insertion #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.nielsen_configuration.distributor_id #=> String
     #   resp.encoder_settings.nielsen_configuration.nielsen_pcm_to_id_3_tagging #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.output_groups #=> Array
     #   resp.encoder_settings.output_groups[0].name #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.archive_cdn_settings.archive_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.destination.destination_ref_id #=> String
     #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.rollover_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.frame_capture_cdn_settings.frame_capture_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers #=> Array
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers[0] #=> String, one of "ADOBE", "ELEMENTAL", "ELEMENTAL_SCTE35"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_content #=> String
@@ -3732,6 +3708,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.media_store_storage_class #=> String, one of "TEMPORAL"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.num_retries #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.connection_retry_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.filecache_duration #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.http_transfer_mode #=> String, one of "CHUNKED", "NON_CHUNKED"
@@ -3757,6 +3734,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.mode #=> String, one of "LIVE", "VOD"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.output_selection #=> String, one of "MANIFESTS_AND_SEGMENTS", "SEGMENTS_ONLY", "VARIANT_MANIFESTS_AND_SEGMENTS"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_clock #=> String, one of "INITIALIZE_FROM_OUTPUT_TIMECODE", "SYSTEM_CLOCK"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_period #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.redundant_manifest #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.segment_length #=> Integer
@@ -3795,9 +3773,17 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.caption_data #=> String, one of "ALL", "FIELD1_608", "FIELD1_AND_FIELD2_608"
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.input_loss_action #=> String, one of "EMIT_OUTPUT", "PAUSE_OUTPUT"
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.include_filler_nal_units #=> String, one of "AUTO", "DROP", "INCLUDE"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_frame #=> String, one of "NONE", "PRIV", "TDRL"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.scte_35_type #=> String, one of "NONE", "SCTE_35_WITHOUT_SEGMENTATION"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length_units #=> String, one of "MILLISECONDS", "SECONDS"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.send_delay_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.srt_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.encoder_settings.output_groups[0].outputs #=> Array
     #   resp.encoder_settings.output_groups[0].outputs[0].audio_description_names #=> Array
     #   resp.encoder_settings.output_groups[0].outputs[0].audio_description_names[0] #=> String
@@ -3849,6 +3835,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -3887,11 +3874,27 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.timed_metadata_pid #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.transport_stream_id #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_data_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.name_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.segment_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.h265_packaging_type #=> String, one of "HEV1", "HVC1"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.name_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.certificate_mode #=> String, one of "SELF_SIGNED", "VERIFY_AUTHENTICITY"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.connection_retry_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.destination.destination_ref_id #=> String
@@ -3942,6 +3945,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -3953,13 +3957,74 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.column_depth #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.include_fec #=> String, one of "COLUMN", "COLUMN_AND_ROW"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.row_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.cmaf_ingest_output_settings.name_modifier #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.buffer_msec #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid_control #=> String, one of "AUTO", "USE_CONFIGURED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.bitrate #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.buffer_model #=> String, one of "MULTIPLEX", "NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.output_sdt #=> String, one of "SDT_FOLLOW", "SDT_FOLLOW_IF_PRESENT", "SDT_MANUAL", "SDT_NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_provider_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sub_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_tdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_teletext_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_audio_interval #=> String, one of "VIDEO_AND_FIXED_INTERVALS", "VIDEO_INTERVAL"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_lookahead_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_placement #=> String, one of "VIDEO_AND_AUDIO_PIDS", "VIDEO_PID"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ecm_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_platform_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_signal_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.fragment_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv_data_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.null_packet_bitrate #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pat_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.program_num #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.rate_mode #=> String, one of "CBR", "VBR"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.transport_stream_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.encryption_type #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.latency #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].video_description_name #=> String
     #   resp.encoder_settings.timecode_config.source #=> String, one of "EMBEDDED", "SYSTEMCLOCK", "ZEROBASED"
     #   resp.encoder_settings.timecode_config.sync_threshold #=> Integer
     #   resp.encoder_settings.video_descriptions #=> Array
     #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval_units #=> String, one of "MILLISECONDS", "SECONDS"
-    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.bitrate #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.buf_fill_pct #=> Integer
@@ -3968,6 +4033,8 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.entropy_encoding #=> String, one of "CABAC", "CAVLC"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.force_field_pictures #=> String, one of "DISABLED", "ENABLED"
@@ -4000,7 +4067,11 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.syntax #=> String, one of "DEFAULT", "RP2027"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.temporal_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
-    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.min_qp #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.alternative_transfer_function #=> String, one of "INSERT", "OMIT"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.bitrate #=> Integer
@@ -4010,6 +4081,8 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.framerate_denominator #=> Integer
@@ -4031,6 +4104,16 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.slices #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tier #=> String, one of "HIGH", "MAIN"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_over_picture_boundaries #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_temporal_predictor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_height #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_padding #=> String, one of "NONE", "PADDED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_width #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.treeblock_size #=> String, one of "AUTO", "TREE_SIZE_32X32"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.min_qp #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "LOW", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.color_metadata #=> String, one of "IGNORE", "INSERT"
@@ -4048,12 +4131,40 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.subgop_length #=> String, one of "DYNAMIC", "FIXED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_insertion #=> String, one of "DISABLED", "GOP_TIMECODE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.buf_size #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size #=> Float
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.level #=> String, one of "AV1_LEVEL_2", "AV1_LEVEL_2_1", "AV1_LEVEL_3", "AV1_LEVEL_3_1", "AV1_LEVEL_4", "AV1_LEVEL_4_1", "AV1_LEVEL_5", "AV1_LEVEL_5_1", "AV1_LEVEL_5_2", "AV1_LEVEL_5_3", "AV1_LEVEL_6", "AV1_LEVEL_6_1", "AV1_LEVEL_6_2", "AV1_LEVEL_6_3", "AV1_LEVEL_AUTO"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.look_ahead_rate_control #=> String, one of "HIGH", "LOW", "MEDIUM"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.max_bitrate #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.min_i_interval #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.qvbr_quality_level #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.scene_change_detect #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.prefix #=> String
     #   resp.encoder_settings.video_descriptions[0].height #=> Integer
     #   resp.encoder_settings.video_descriptions[0].name #=> String
     #   resp.encoder_settings.video_descriptions[0].respond_to_afd #=> String, one of "NONE", "PASSTHROUGH", "RESPOND"
     #   resp.encoder_settings.video_descriptions[0].scaling_behavior #=> String, one of "DEFAULT", "STRETCH_TO_OUTPUT"
     #   resp.encoder_settings.video_descriptions[0].sharpness #=> Integer
     #   resp.encoder_settings.video_descriptions[0].width #=> Integer
+    #   resp.encoder_settings.thumbnail_configuration.state #=> String, one of "AUTO", "DISABLED"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections #=> Array
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].input_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].output_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].uri #=> String
     #   resp.id #=> String
     #   resp.input_attachments #=> Array
     #   resp.input_attachments[0].automatic_input_failover_settings.error_clear_time_msec #=> Integer
@@ -4069,15 +4180,19 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_id #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors #=> Array
     #   resp.input_attachments[0].input_settings.audio_selectors[0].name #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.group_id #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.name #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_code #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_selection_policy #=> String, one of "LOOSE", "STRICT"
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_pid_selection.pid #=> Integer
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks #=> Array
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks[0].track #=> Integer
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.dolby_e_decode.program_selection #=> String, one of "ALL_CHANNELS", "PROGRAM_1", "PROGRAM_2", "PROGRAM_3", "PROGRAM_4", "PROGRAM_5", "PROGRAM_6", "PROGRAM_7", "PROGRAM_8"
     #   resp.input_attachments[0].input_settings.caption_selectors #=> Array
     #   resp.input_attachments[0].input_settings.caption_selectors[0].language_code #=> String
     #   resp.input_attachments[0].input_settings.caption_selectors[0].name #=> String
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.ancillary_source_settings.source_ancillary_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.pid #=> Integer
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.scte_20_detection #=> String, one of "AUTO", "OFF"
@@ -4085,7 +4200,12 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.source_608_track_number #=> Integer
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.source_608_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.pid #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.height #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.left_offset #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.top_offset #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.width #=> Float
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.page_number #=> String
     #   resp.input_attachments[0].input_settings.deblock_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.input_attachments[0].input_settings.denoise_filter #=> String, one of "DISABLED", "ENABLED"
@@ -4095,27 +4215,50 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.buffer_segments #=> Integer
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retries #=> Integer
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retry_interval #=> Integer
+    #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.scte_35_source #=> String, one of "MANIFEST", "SEGMENTS"
     #   resp.input_attachments[0].input_settings.network_input_settings.server_validation #=> String, one of "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", "CHECK_CRYPTOGRAPHY_ONLY"
+    #   resp.input_attachments[0].input_settings.network_input_settings.multicast_input_settings.source_ip_address #=> String
+    #   resp.input_attachments[0].input_settings.scte_35_pid #=> Integer
     #   resp.input_attachments[0].input_settings.smpte_2038_data_preference #=> String, one of "IGNORE", "PREFER"
     #   resp.input_attachments[0].input_settings.source_end_behavior #=> String, one of "CONTINUE", "LOOP"
-    #   resp.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "REC_601", "REC_709"
+    #   resp.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.input_attachments[0].input_settings.video_selector.color_space_usage #=> String, one of "FALLBACK", "FORCE"
     #   resp.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_pid.pid #=> Integer
     #   resp.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_program_id.program_id #=> Integer
+    #   resp.input_attachments[0].logical_interface_names #=> Array
+    #   resp.input_attachments[0].logical_interface_names[0] #=> String
     #   resp.input_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC"
     #   resp.input_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.input_specification.resolution #=> String, one of "SD", "HD", "UHD"
     #   resp.log_level #=> String, one of "ERROR", "WARNING", "INFO", "DEBUG", "DISABLED"
+    #   resp.maintenance.maintenance_day #=> String, one of "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+    #   resp.maintenance.maintenance_deadline #=> String
+    #   resp.maintenance.maintenance_scheduled_date #=> String
+    #   resp.maintenance.maintenance_start_time #=> String
     #   resp.name #=> String
     #   resp.pipeline_details #=> Array
     #   resp.pipeline_details[0].active_input_attachment_name #=> String
     #   resp.pipeline_details[0].active_input_switch_action_name #=> String
+    #   resp.pipeline_details[0].active_motion_graphics_action_name #=> String
+    #   resp.pipeline_details[0].active_motion_graphics_uri #=> String
     #   resp.pipeline_details[0].pipeline_id #=> String
     #   resp.pipelines_running_count #=> Integer
     #   resp.role_arn #=> String
     #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "IDLE", "STARTING", "RUNNING", "RECOVERING", "STOPPING", "DELETING", "DELETED", "UPDATING", "UPDATE_FAILED"
     #   resp.tags #=> Hash
     #   resp.tags["__string"] #=> String
+    #   resp.vpc.availability_zones #=> Array
+    #   resp.vpc.availability_zones[0] #=> String
+    #   resp.vpc.network_interface_ids #=> Array
+    #   resp.vpc.network_interface_ids[0] #=> String
+    #   resp.vpc.security_group_ids #=> Array
+    #   resp.vpc.security_group_ids[0] #=> String
+    #   resp.vpc.subnet_ids #=> Array
+    #   resp.vpc.subnet_ids[0] #=> String
+    #   resp.anywhere_settings.channel_placement_group_id #=> String
+    #   resp.anywhere_settings.cluster_id #=> String
     #
     #
     # The following waiters are defined for this operation (see {Client#wait_until} for detailed usage):
@@ -4146,6 +4289,7 @@ module Aws::MediaLive
     #   * {Types::DescribeInputResponse#id #id} => String
     #   * {Types::DescribeInputResponse#input_class #input_class} => String
     #   * {Types::DescribeInputResponse#input_devices #input_devices} => Array&lt;Types::InputDeviceSettings&gt;
+    #   * {Types::DescribeInputResponse#input_partner_ids #input_partner_ids} => Array&lt;String&gt;
     #   * {Types::DescribeInputResponse#input_source_type #input_source_type} => String
     #   * {Types::DescribeInputResponse#media_connect_flows #media_connect_flows} => Array&lt;Types::MediaConnectFlow&gt;
     #   * {Types::DescribeInputResponse#name #name} => String
@@ -4155,6 +4299,9 @@ module Aws::MediaLive
     #   * {Types::DescribeInputResponse#state #state} => String
     #   * {Types::DescribeInputResponse#tags #tags} => Hash&lt;String,String&gt;
     #   * {Types::DescribeInputResponse#type #type} => String
+    #   * {Types::DescribeInputResponse#srt_settings #srt_settings} => Types::SrtSettings
+    #   * {Types::DescribeInputResponse#input_network_location #input_network_location} => String
+    #   * {Types::DescribeInputResponse#multicast_settings #multicast_settings} => Types::MulticastSettings
     #
     # @example Request syntax with placeholder values
     #
@@ -4173,10 +4320,16 @@ module Aws::MediaLive
     #   resp.destinations[0].url #=> String
     #   resp.destinations[0].vpc.availability_zone #=> String
     #   resp.destinations[0].vpc.network_interface_id #=> String
+    #   resp.destinations[0].network #=> String
+    #   resp.destinations[0].network_routes #=> Array
+    #   resp.destinations[0].network_routes[0].cidr #=> String
+    #   resp.destinations[0].network_routes[0].gateway #=> String
     #   resp.id #=> String
     #   resp.input_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
     #   resp.input_devices #=> Array
     #   resp.input_devices[0].id #=> String
+    #   resp.input_partner_ids #=> Array
+    #   resp.input_partner_ids[0] #=> String
     #   resp.input_source_type #=> String, one of "STATIC", "DYNAMIC"
     #   resp.media_connect_flows #=> Array
     #   resp.media_connect_flows[0].flow_arn #=> String
@@ -4191,7 +4344,18 @@ module Aws::MediaLive
     #   resp.state #=> String, one of "CREATING", "DETACHED", "ATTACHED", "DELETING", "DELETED"
     #   resp.tags #=> Hash
     #   resp.tags["__string"] #=> String
-    #   resp.type #=> String, one of "UDP_PUSH", "RTP_PUSH", "RTMP_PUSH", "RTMP_PULL", "URL_PULL", "MP4_FILE", "MEDIACONNECT", "INPUT_DEVICE", "AWS_CDI"
+    #   resp.type #=> String, one of "UDP_PUSH", "RTP_PUSH", "RTMP_PUSH", "RTMP_PULL", "URL_PULL", "MP4_FILE", "MEDIACONNECT", "INPUT_DEVICE", "AWS_CDI", "TS_FILE", "SRT_CALLER", "MULTICAST"
+    #   resp.srt_settings.srt_caller_sources #=> Array
+    #   resp.srt_settings.srt_caller_sources[0].decryption.algorithm #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.srt_settings.srt_caller_sources[0].decryption.passphrase_secret_arn #=> String
+    #   resp.srt_settings.srt_caller_sources[0].minimum_latency #=> Integer
+    #   resp.srt_settings.srt_caller_sources[0].srt_listener_address #=> String
+    #   resp.srt_settings.srt_caller_sources[0].srt_listener_port #=> String
+    #   resp.srt_settings.srt_caller_sources[0].stream_id #=> String
+    #   resp.input_network_location #=> String, one of "AWS", "ON_PREMISES"
+    #   resp.multicast_settings.sources #=> Array
+    #   resp.multicast_settings.sources[0].source_ip #=> String
+    #   resp.multicast_settings.sources[0].url #=> String
     #
     #
     # The following waiters are defined for this operation (see {Client#wait_until} for detailed usage):
@@ -4227,6 +4391,10 @@ module Aws::MediaLive
     #   * {Types::DescribeInputDeviceResponse#serial_number #serial_number} => String
     #   * {Types::DescribeInputDeviceResponse#type #type} => String
     #   * {Types::DescribeInputDeviceResponse#uhd_device_settings #uhd_device_settings} => Types::InputDeviceUhdSettings
+    #   * {Types::DescribeInputDeviceResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::DescribeInputDeviceResponse#availability_zone #availability_zone} => String
+    #   * {Types::DescribeInputDeviceResponse#medialive_input_arns #medialive_input_arns} => Array&lt;String&gt;
+    #   * {Types::DescribeInputDeviceResponse#output_type #output_type} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -4239,7 +4407,7 @@ module Aws::MediaLive
     #   resp.arn #=> String
     #   resp.connection_state #=> String, one of "DISCONNECTED", "CONNECTED"
     #   resp.device_settings_sync_state #=> String, one of "SYNCED", "SYNCING"
-    #   resp.device_update_status #=> String, one of "UP_TO_DATE", "NOT_UP_TO_DATE"
+    #   resp.device_update_status #=> String, one of "UP_TO_DATE", "NOT_UP_TO_DATE", "UPDATING"
     #   resp.hd_device_settings.active_input #=> String, one of "HDMI", "SDI"
     #   resp.hd_device_settings.configured_input #=> String, one of "AUTO", "HDMI", "SDI"
     #   resp.hd_device_settings.device_state #=> String, one of "IDLE", "STREAMING"
@@ -4248,6 +4416,7 @@ module Aws::MediaLive
     #   resp.hd_device_settings.max_bitrate #=> Integer
     #   resp.hd_device_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.hd_device_settings.width #=> Integer
+    #   resp.hd_device_settings.latency_ms #=> Integer
     #   resp.id #=> String
     #   resp.mac_address #=> String
     #   resp.name #=> String
@@ -4258,7 +4427,7 @@ module Aws::MediaLive
     #   resp.network_settings.ip_scheme #=> String, one of "STATIC", "DHCP"
     #   resp.network_settings.subnet_mask #=> String
     #   resp.serial_number #=> String
-    #   resp.type #=> String, one of "HD"
+    #   resp.type #=> String, one of "HD", "UHD"
     #   resp.uhd_device_settings.active_input #=> String, one of "HDMI", "SDI"
     #   resp.uhd_device_settings.configured_input #=> String, one of "AUTO", "HDMI", "SDI"
     #   resp.uhd_device_settings.device_state #=> String, one of "IDLE", "STREAMING"
@@ -4267,6 +4436,21 @@ module Aws::MediaLive
     #   resp.uhd_device_settings.max_bitrate #=> Integer
     #   resp.uhd_device_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.uhd_device_settings.width #=> Integer
+    #   resp.uhd_device_settings.latency_ms #=> Integer
+    #   resp.uhd_device_settings.codec #=> String, one of "HEVC", "AVC"
+    #   resp.uhd_device_settings.mediaconnect_settings.flow_arn #=> String
+    #   resp.uhd_device_settings.mediaconnect_settings.role_arn #=> String
+    #   resp.uhd_device_settings.mediaconnect_settings.secret_arn #=> String
+    #   resp.uhd_device_settings.mediaconnect_settings.source_name #=> String
+    #   resp.uhd_device_settings.audio_channel_pairs #=> Array
+    #   resp.uhd_device_settings.audio_channel_pairs[0].id #=> Integer
+    #   resp.uhd_device_settings.audio_channel_pairs[0].profile #=> String, one of "DISABLED", "VBR-AAC_HHE-16000", "VBR-AAC_HE-64000", "VBR-AAC_LC-128000", "CBR-AAC_HQ-192000", "CBR-AAC_HQ-256000", "CBR-AAC_HQ-384000", "CBR-AAC_HQ-512000"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #   resp.availability_zone #=> String
+    #   resp.medialive_input_arns #=> Array
+    #   resp.medialive_input_arns[0] #=> String
+    #   resp.output_type #=> String, one of "NONE", "MEDIALIVE_INPUT", "MEDIACONNECT_FLOW"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DescribeInputDevice AWS API Documentation
     #
@@ -4282,6 +4466,7 @@ module Aws::MediaLive
     # @option params [required, String] :input_device_id
     #
     # @option params [required, String] :accept
+    #   The HTTP Accept header. Indicates the requested type fothe thumbnail.
     #
     # @return [Types::DescribeInputDeviceThumbnailResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4463,6 +4648,11 @@ module Aws::MediaLive
     #   resp.packet_identifiers_map.scte_35_pid #=> Integer
     #   resp.packet_identifiers_map.timed_metadata_pid #=> Integer
     #   resp.packet_identifiers_map.video_pid #=> Integer
+    #   resp.packet_identifiers_map.arib_captions_pid #=> Integer
+    #   resp.packet_identifiers_map.dvb_teletext_pids #=> Array
+    #   resp.packet_identifiers_map.dvb_teletext_pids[0] #=> Integer
+    #   resp.packet_identifiers_map.ecm_pid #=> Integer
+    #   resp.packet_identifiers_map.smpte_2038_pid #=> Integer
     #   resp.pipeline_details #=> Array
     #   resp.pipeline_details[0].active_channel_pipeline #=> String
     #   resp.pipeline_details[0].pipeline_id #=> String
@@ -4513,12 +4703,12 @@ module Aws::MediaLive
     #   resp.offering_type #=> String, one of "NO_UPFRONT"
     #   resp.region #=> String
     #   resp.resource_specification.channel_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
-    #   resp.resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK"
+    #   resp.resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK", "AV1"
     #   resp.resource_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.resource_specification.maximum_framerate #=> String, one of "MAX_30_FPS", "MAX_60_FPS"
     #   resp.resource_specification.resolution #=> String, one of "SD", "HD", "FHD", "UHD"
     #   resp.resource_specification.resource_type #=> String, one of "INPUT", "OUTPUT", "MULTIPLEX", "CHANNEL"
-    #   resp.resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION"
+    #   resp.resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION", "MGHD", "MGUHD"
     #   resp.resource_specification.video_quality #=> String, one of "STANDARD", "ENHANCED", "PREMIUM"
     #   resp.usage_price #=> Float
     #
@@ -4549,6 +4739,7 @@ module Aws::MediaLive
     #   * {Types::DescribeReservationResponse#offering_id #offering_id} => String
     #   * {Types::DescribeReservationResponse#offering_type #offering_type} => String
     #   * {Types::DescribeReservationResponse#region #region} => String
+    #   * {Types::DescribeReservationResponse#renewal_settings #renewal_settings} => Types::RenewalSettings
     #   * {Types::DescribeReservationResponse#reservation_id #reservation_id} => String
     #   * {Types::DescribeReservationResponse#resource_specification #resource_specification} => Types::ReservationResourceSpecification
     #   * {Types::DescribeReservationResponse#start #start} => String
@@ -4576,14 +4767,16 @@ module Aws::MediaLive
     #   resp.offering_id #=> String
     #   resp.offering_type #=> String, one of "NO_UPFRONT"
     #   resp.region #=> String
+    #   resp.renewal_settings.automatic_renewal #=> String, one of "DISABLED", "ENABLED", "UNAVAILABLE"
+    #   resp.renewal_settings.renewal_count #=> Integer
     #   resp.reservation_id #=> String
     #   resp.resource_specification.channel_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
-    #   resp.resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK"
+    #   resp.resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK", "AV1"
     #   resp.resource_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.resource_specification.maximum_framerate #=> String, one of "MAX_30_FPS", "MAX_60_FPS"
     #   resp.resource_specification.resolution #=> String, one of "SD", "HD", "FHD", "UHD"
     #   resp.resource_specification.resource_type #=> String, one of "INPUT", "OUTPUT", "MULTIPLEX", "CHANNEL"
-    #   resp.resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION"
+    #   resp.resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION", "MGHD", "MGUHD"
     #   resp.resource_specification.video_quality #=> String, one of "STANDARD", "ENHANCED", "PREMIUM"
     #   resp.start #=> String
     #   resp.state #=> String, one of "ACTIVE", "EXPIRED", "CANCELED", "DELETED"
@@ -4629,6 +4822,7 @@ module Aws::MediaLive
     #   resp.schedule_actions #=> Array
     #   resp.schedule_actions[0].action_name #=> String
     #   resp.schedule_actions[0].schedule_action_settings.hls_id_3_segment_tagging_settings.tag #=> String
+    #   resp.schedule_actions[0].schedule_action_settings.hls_id_3_segment_tagging_settings.id_3 #=> String
     #   resp.schedule_actions[0].schedule_action_settings.hls_timed_metadata_settings.id_3 #=> String
     #   resp.schedule_actions[0].schedule_action_settings.input_prepare_settings.input_attachment_name_reference #=> String
     #   resp.schedule_actions[0].schedule_action_settings.input_prepare_settings.input_clipping_settings.input_timecode_source #=> String, one of "ZEROBASED", "EMBEDDED"
@@ -4644,8 +4838,14 @@ module Aws::MediaLive
     #   resp.schedule_actions[0].schedule_action_settings.input_switch_settings.input_clipping_settings.stop_timecode.timecode #=> String
     #   resp.schedule_actions[0].schedule_action_settings.input_switch_settings.url_path #=> Array
     #   resp.schedule_actions[0].schedule_action_settings.input_switch_settings.url_path[0] #=> String
+    #   resp.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.duration #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.password_param #=> String
+    #   resp.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.url #=> String
+    #   resp.schedule_actions[0].schedule_action_settings.motion_graphics_image_activate_settings.username #=> String
     #   resp.schedule_actions[0].schedule_action_settings.pause_state_settings.pipelines #=> Array
     #   resp.schedule_actions[0].schedule_action_settings.pause_state_settings.pipelines[0].pipeline_id #=> String, one of "PIPELINE_0", "PIPELINE_1"
+    #   resp.schedule_actions[0].schedule_action_settings.scte_35_input_settings.input_attachment_name_reference #=> String
+    #   resp.schedule_actions[0].schedule_action_settings.scte_35_input_settings.mode #=> String, one of "FIXED", "FOLLOW_ACTIVE"
     #   resp.schedule_actions[0].schedule_action_settings.scte_35_return_to_network_settings.splice_event_id #=> Integer
     #   resp.schedule_actions[0].schedule_action_settings.scte_35_splice_insert_settings.duration #=> Integer
     #   resp.schedule_actions[0].schedule_action_settings.scte_35_splice_insert_settings.splice_event_id #=> Integer
@@ -4678,6 +4878,24 @@ module Aws::MediaLive
     #   resp.schedule_actions[0].schedule_action_settings.static_image_activate_settings.width #=> Integer
     #   resp.schedule_actions[0].schedule_action_settings.static_image_deactivate_settings.fade_out #=> Integer
     #   resp.schedule_actions[0].schedule_action_settings.static_image_deactivate_settings.layer #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.duration #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.fade_in #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.fade_out #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.height #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image.password_param #=> String
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image.uri #=> String
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image.username #=> String
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image_x #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.image_y #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.layer #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.opacity #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.output_names #=> Array
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.output_names[0] #=> String
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_activate_settings.width #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.fade_out #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.layer #=> Integer
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.output_names #=> Array
+    #   resp.schedule_actions[0].schedule_action_settings.static_image_output_deactivate_settings.output_names[0] #=> String
     #   resp.schedule_actions[0].schedule_action_start_settings.fixed_mode_schedule_action_start_settings.time #=> String
     #   resp.schedule_actions[0].schedule_action_start_settings.follow_mode_schedule_action_start_settings.follow_point #=> String, one of "END", "START"
     #   resp.schedule_actions[0].schedule_action_start_settings.follow_mode_schedule_action_start_settings.reference_action_name #=> String
@@ -4688,6 +4906,45 @@ module Aws::MediaLive
     # @param [Hash] params ({})
     def describe_schedule(params = {}, options = {})
       req = build_request(:describe_schedule, params)
+      req.send_request(options)
+    end
+
+    # Describe the latest thumbnails data.
+    #
+    # @option params [required, String] :channel_id
+    #
+    # @option params [required, String] :pipeline_id
+    #
+    # @option params [required, String] :thumbnail_type
+    #
+    # @return [Types::DescribeThumbnailsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeThumbnailsResponse#thumbnail_details #thumbnail_details} => Array&lt;Types::ThumbnailDetail&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_thumbnails({
+    #     channel_id: "__string", # required
+    #     pipeline_id: "__string", # required
+    #     thumbnail_type: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.thumbnail_details #=> Array
+    #   resp.thumbnail_details[0].pipeline_id #=> String
+    #   resp.thumbnail_details[0].thumbnails #=> Array
+    #   resp.thumbnail_details[0].thumbnails[0].body #=> String
+    #   resp.thumbnail_details[0].thumbnails[0].content_type #=> String
+    #   resp.thumbnail_details[0].thumbnails[0].thumbnail_type #=> String, one of "UNSPECIFIED", "CURRENT_ACTIVE"
+    #   resp.thumbnail_details[0].thumbnails[0].time_stamp #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DescribeThumbnails AWS API Documentation
+    #
+    # @overload describe_thumbnails(params = {})
+    # @param [Hash] params ({})
+    def describe_thumbnails(params = {}, options = {})
+      req = build_request(:describe_thumbnails, params)
       req.send_request(options)
     end
 
@@ -4728,6 +4985,10 @@ module Aws::MediaLive
     #   resp.channels[0].destinations[0].settings[0].stream_name #=> String
     #   resp.channels[0].destinations[0].settings[0].url #=> String
     #   resp.channels[0].destinations[0].settings[0].username #=> String
+    #   resp.channels[0].destinations[0].srt_settings #=> Array
+    #   resp.channels[0].destinations[0].srt_settings[0].encryption_passphrase_secret_arn #=> String
+    #   resp.channels[0].destinations[0].srt_settings[0].stream_id #=> String
+    #   resp.channels[0].destinations[0].srt_settings[0].url #=> String
     #   resp.channels[0].egress_endpoints #=> Array
     #   resp.channels[0].egress_endpoints[0].source_ip #=> String
     #   resp.channels[0].id #=> String
@@ -4745,15 +5006,19 @@ module Aws::MediaLive
     #   resp.channels[0].input_attachments[0].input_id #=> String
     #   resp.channels[0].input_attachments[0].input_settings.audio_selectors #=> Array
     #   resp.channels[0].input_attachments[0].input_settings.audio_selectors[0].name #=> String
+    #   resp.channels[0].input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.group_id #=> String
+    #   resp.channels[0].input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.name #=> String
     #   resp.channels[0].input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_code #=> String
     #   resp.channels[0].input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_selection_policy #=> String, one of "LOOSE", "STRICT"
     #   resp.channels[0].input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_pid_selection.pid #=> Integer
     #   resp.channels[0].input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks #=> Array
     #   resp.channels[0].input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks[0].track #=> Integer
+    #   resp.channels[0].input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.dolby_e_decode.program_selection #=> String, one of "ALL_CHANNELS", "PROGRAM_1", "PROGRAM_2", "PROGRAM_3", "PROGRAM_4", "PROGRAM_5", "PROGRAM_6", "PROGRAM_7", "PROGRAM_8"
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors #=> Array
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].language_code #=> String
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].name #=> String
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.ancillary_source_settings.source_ancillary_channel_number #=> Integer
+    #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.pid #=> Integer
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.scte_20_detection #=> String, one of "AUTO", "OFF"
@@ -4761,7 +5026,12 @@ module Aws::MediaLive
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.source_608_track_number #=> Integer
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.source_608_channel_number #=> Integer
+    #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.pid #=> Integer
+    #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.height #=> Float
+    #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.left_offset #=> Float
+    #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.top_offset #=> Float
+    #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.width #=> Float
     #   resp.channels[0].input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.page_number #=> String
     #   resp.channels[0].input_attachments[0].input_settings.deblock_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.channels[0].input_attachments[0].input_settings.denoise_filter #=> String, one of "DISABLED", "ENABLED"
@@ -4771,23 +5041,44 @@ module Aws::MediaLive
     #   resp.channels[0].input_attachments[0].input_settings.network_input_settings.hls_input_settings.buffer_segments #=> Integer
     #   resp.channels[0].input_attachments[0].input_settings.network_input_settings.hls_input_settings.retries #=> Integer
     #   resp.channels[0].input_attachments[0].input_settings.network_input_settings.hls_input_settings.retry_interval #=> Integer
+    #   resp.channels[0].input_attachments[0].input_settings.network_input_settings.hls_input_settings.scte_35_source #=> String, one of "MANIFEST", "SEGMENTS"
     #   resp.channels[0].input_attachments[0].input_settings.network_input_settings.server_validation #=> String, one of "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", "CHECK_CRYPTOGRAPHY_ONLY"
+    #   resp.channels[0].input_attachments[0].input_settings.network_input_settings.multicast_input_settings.source_ip_address #=> String
+    #   resp.channels[0].input_attachments[0].input_settings.scte_35_pid #=> Integer
     #   resp.channels[0].input_attachments[0].input_settings.smpte_2038_data_preference #=> String, one of "IGNORE", "PREFER"
     #   resp.channels[0].input_attachments[0].input_settings.source_end_behavior #=> String, one of "CONTINUE", "LOOP"
-    #   resp.channels[0].input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "REC_601", "REC_709"
+    #   resp.channels[0].input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.channels[0].input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.channels[0].input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.channels[0].input_attachments[0].input_settings.video_selector.color_space_usage #=> String, one of "FALLBACK", "FORCE"
     #   resp.channels[0].input_attachments[0].input_settings.video_selector.selector_settings.video_selector_pid.pid #=> Integer
     #   resp.channels[0].input_attachments[0].input_settings.video_selector.selector_settings.video_selector_program_id.program_id #=> Integer
+    #   resp.channels[0].input_attachments[0].logical_interface_names #=> Array
+    #   resp.channels[0].input_attachments[0].logical_interface_names[0] #=> String
     #   resp.channels[0].input_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC"
     #   resp.channels[0].input_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.channels[0].input_specification.resolution #=> String, one of "SD", "HD", "UHD"
     #   resp.channels[0].log_level #=> String, one of "ERROR", "WARNING", "INFO", "DEBUG", "DISABLED"
+    #   resp.channels[0].maintenance.maintenance_day #=> String, one of "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+    #   resp.channels[0].maintenance.maintenance_deadline #=> String
+    #   resp.channels[0].maintenance.maintenance_scheduled_date #=> String
+    #   resp.channels[0].maintenance.maintenance_start_time #=> String
     #   resp.channels[0].name #=> String
     #   resp.channels[0].pipelines_running_count #=> Integer
     #   resp.channels[0].role_arn #=> String
     #   resp.channels[0].state #=> String, one of "CREATING", "CREATE_FAILED", "IDLE", "STARTING", "RUNNING", "RECOVERING", "STOPPING", "DELETING", "DELETED", "UPDATING", "UPDATE_FAILED"
     #   resp.channels[0].tags #=> Hash
     #   resp.channels[0].tags["__string"] #=> String
+    #   resp.channels[0].vpc.availability_zones #=> Array
+    #   resp.channels[0].vpc.availability_zones[0] #=> String
+    #   resp.channels[0].vpc.network_interface_ids #=> Array
+    #   resp.channels[0].vpc.network_interface_ids[0] #=> String
+    #   resp.channels[0].vpc.security_group_ids #=> Array
+    #   resp.channels[0].vpc.security_group_ids[0] #=> String
+    #   resp.channels[0].vpc.subnet_ids #=> Array
+    #   resp.channels[0].vpc.subnet_ids[0] #=> String
+    #   resp.channels[0].anywhere_settings.channel_placement_group_id #=> String
+    #   resp.channels[0].anywhere_settings.cluster_id #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListChannels AWS API Documentation
@@ -4868,7 +5159,7 @@ module Aws::MediaLive
     #   resp.input_devices[0].arn #=> String
     #   resp.input_devices[0].connection_state #=> String, one of "DISCONNECTED", "CONNECTED"
     #   resp.input_devices[0].device_settings_sync_state #=> String, one of "SYNCED", "SYNCING"
-    #   resp.input_devices[0].device_update_status #=> String, one of "UP_TO_DATE", "NOT_UP_TO_DATE"
+    #   resp.input_devices[0].device_update_status #=> String, one of "UP_TO_DATE", "NOT_UP_TO_DATE", "UPDATING"
     #   resp.input_devices[0].hd_device_settings.active_input #=> String, one of "HDMI", "SDI"
     #   resp.input_devices[0].hd_device_settings.configured_input #=> String, one of "AUTO", "HDMI", "SDI"
     #   resp.input_devices[0].hd_device_settings.device_state #=> String, one of "IDLE", "STREAMING"
@@ -4877,6 +5168,7 @@ module Aws::MediaLive
     #   resp.input_devices[0].hd_device_settings.max_bitrate #=> Integer
     #   resp.input_devices[0].hd_device_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.input_devices[0].hd_device_settings.width #=> Integer
+    #   resp.input_devices[0].hd_device_settings.latency_ms #=> Integer
     #   resp.input_devices[0].id #=> String
     #   resp.input_devices[0].mac_address #=> String
     #   resp.input_devices[0].name #=> String
@@ -4887,7 +5179,7 @@ module Aws::MediaLive
     #   resp.input_devices[0].network_settings.ip_scheme #=> String, one of "STATIC", "DHCP"
     #   resp.input_devices[0].network_settings.subnet_mask #=> String
     #   resp.input_devices[0].serial_number #=> String
-    #   resp.input_devices[0].type #=> String, one of "HD"
+    #   resp.input_devices[0].type #=> String, one of "HD", "UHD"
     #   resp.input_devices[0].uhd_device_settings.active_input #=> String, one of "HDMI", "SDI"
     #   resp.input_devices[0].uhd_device_settings.configured_input #=> String, one of "AUTO", "HDMI", "SDI"
     #   resp.input_devices[0].uhd_device_settings.device_state #=> String, one of "IDLE", "STREAMING"
@@ -4896,6 +5188,21 @@ module Aws::MediaLive
     #   resp.input_devices[0].uhd_device_settings.max_bitrate #=> Integer
     #   resp.input_devices[0].uhd_device_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.input_devices[0].uhd_device_settings.width #=> Integer
+    #   resp.input_devices[0].uhd_device_settings.latency_ms #=> Integer
+    #   resp.input_devices[0].uhd_device_settings.codec #=> String, one of "HEVC", "AVC"
+    #   resp.input_devices[0].uhd_device_settings.mediaconnect_settings.flow_arn #=> String
+    #   resp.input_devices[0].uhd_device_settings.mediaconnect_settings.role_arn #=> String
+    #   resp.input_devices[0].uhd_device_settings.mediaconnect_settings.secret_arn #=> String
+    #   resp.input_devices[0].uhd_device_settings.mediaconnect_settings.source_name #=> String
+    #   resp.input_devices[0].uhd_device_settings.audio_channel_pairs #=> Array
+    #   resp.input_devices[0].uhd_device_settings.audio_channel_pairs[0].id #=> Integer
+    #   resp.input_devices[0].uhd_device_settings.audio_channel_pairs[0].profile #=> String, one of "DISABLED", "VBR-AAC_HHE-16000", "VBR-AAC_HE-64000", "VBR-AAC_LC-128000", "CBR-AAC_HQ-192000", "CBR-AAC_HQ-256000", "CBR-AAC_HQ-384000", "CBR-AAC_HQ-512000"
+    #   resp.input_devices[0].tags #=> Hash
+    #   resp.input_devices[0].tags["__string"] #=> String
+    #   resp.input_devices[0].availability_zone #=> String
+    #   resp.input_devices[0].medialive_input_arns #=> Array
+    #   resp.input_devices[0].medialive_input_arns[0] #=> String
+    #   resp.input_devices[0].output_type #=> String, one of "NONE", "MEDIALIVE_INPUT", "MEDIACONNECT_FLOW"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListInputDevices AWS API Documentation
@@ -4982,10 +5289,16 @@ module Aws::MediaLive
     #   resp.inputs[0].destinations[0].url #=> String
     #   resp.inputs[0].destinations[0].vpc.availability_zone #=> String
     #   resp.inputs[0].destinations[0].vpc.network_interface_id #=> String
+    #   resp.inputs[0].destinations[0].network #=> String
+    #   resp.inputs[0].destinations[0].network_routes #=> Array
+    #   resp.inputs[0].destinations[0].network_routes[0].cidr #=> String
+    #   resp.inputs[0].destinations[0].network_routes[0].gateway #=> String
     #   resp.inputs[0].id #=> String
     #   resp.inputs[0].input_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
     #   resp.inputs[0].input_devices #=> Array
     #   resp.inputs[0].input_devices[0].id #=> String
+    #   resp.inputs[0].input_partner_ids #=> Array
+    #   resp.inputs[0].input_partner_ids[0] #=> String
     #   resp.inputs[0].input_source_type #=> String, one of "STATIC", "DYNAMIC"
     #   resp.inputs[0].media_connect_flows #=> Array
     #   resp.inputs[0].media_connect_flows[0].flow_arn #=> String
@@ -5000,7 +5313,18 @@ module Aws::MediaLive
     #   resp.inputs[0].state #=> String, one of "CREATING", "DETACHED", "ATTACHED", "DELETING", "DELETED"
     #   resp.inputs[0].tags #=> Hash
     #   resp.inputs[0].tags["__string"] #=> String
-    #   resp.inputs[0].type #=> String, one of "UDP_PUSH", "RTP_PUSH", "RTMP_PUSH", "RTMP_PULL", "URL_PULL", "MP4_FILE", "MEDIACONNECT", "INPUT_DEVICE", "AWS_CDI"
+    #   resp.inputs[0].type #=> String, one of "UDP_PUSH", "RTP_PUSH", "RTMP_PUSH", "RTMP_PULL", "URL_PULL", "MP4_FILE", "MEDIACONNECT", "INPUT_DEVICE", "AWS_CDI", "TS_FILE", "SRT_CALLER", "MULTICAST"
+    #   resp.inputs[0].srt_settings.srt_caller_sources #=> Array
+    #   resp.inputs[0].srt_settings.srt_caller_sources[0].decryption.algorithm #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.inputs[0].srt_settings.srt_caller_sources[0].decryption.passphrase_secret_arn #=> String
+    #   resp.inputs[0].srt_settings.srt_caller_sources[0].minimum_latency #=> Integer
+    #   resp.inputs[0].srt_settings.srt_caller_sources[0].srt_listener_address #=> String
+    #   resp.inputs[0].srt_settings.srt_caller_sources[0].srt_listener_port #=> String
+    #   resp.inputs[0].srt_settings.srt_caller_sources[0].stream_id #=> String
+    #   resp.inputs[0].input_network_location #=> String, one of "AWS", "ON_PREMISES"
+    #   resp.inputs[0].multicast_settings.sources #=> Array
+    #   resp.inputs[0].multicast_settings.sources[0].source_ip #=> String
+    #   resp.inputs[0].multicast_settings.sources[0].url #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListInputs AWS API Documentation
@@ -5160,12 +5484,12 @@ module Aws::MediaLive
     #   resp.offerings[0].offering_type #=> String, one of "NO_UPFRONT"
     #   resp.offerings[0].region #=> String
     #   resp.offerings[0].resource_specification.channel_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
-    #   resp.offerings[0].resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK"
+    #   resp.offerings[0].resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK", "AV1"
     #   resp.offerings[0].resource_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.offerings[0].resource_specification.maximum_framerate #=> String, one of "MAX_30_FPS", "MAX_60_FPS"
     #   resp.offerings[0].resource_specification.resolution #=> String, one of "SD", "HD", "FHD", "UHD"
     #   resp.offerings[0].resource_specification.resource_type #=> String, one of "INPUT", "OUTPUT", "MULTIPLEX", "CHANNEL"
-    #   resp.offerings[0].resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION"
+    #   resp.offerings[0].resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION", "MGHD", "MGUHD"
     #   resp.offerings[0].resource_specification.video_quality #=> String, one of "STANDARD", "ENHANCED", "PREMIUM"
     #   resp.offerings[0].usage_price #=> Float
     #
@@ -5238,14 +5562,16 @@ module Aws::MediaLive
     #   resp.reservations[0].offering_id #=> String
     #   resp.reservations[0].offering_type #=> String, one of "NO_UPFRONT"
     #   resp.reservations[0].region #=> String
+    #   resp.reservations[0].renewal_settings.automatic_renewal #=> String, one of "DISABLED", "ENABLED", "UNAVAILABLE"
+    #   resp.reservations[0].renewal_settings.renewal_count #=> Integer
     #   resp.reservations[0].reservation_id #=> String
     #   resp.reservations[0].resource_specification.channel_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
-    #   resp.reservations[0].resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK"
+    #   resp.reservations[0].resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK", "AV1"
     #   resp.reservations[0].resource_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.reservations[0].resource_specification.maximum_framerate #=> String, one of "MAX_30_FPS", "MAX_60_FPS"
     #   resp.reservations[0].resource_specification.resolution #=> String, one of "SD", "HD", "FHD", "UHD"
     #   resp.reservations[0].resource_specification.resource_type #=> String, one of "INPUT", "OUTPUT", "MULTIPLEX", "CHANNEL"
-    #   resp.reservations[0].resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION"
+    #   resp.reservations[0].resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION", "MGHD", "MGUHD"
     #   resp.reservations[0].resource_specification.video_quality #=> String, one of "STANDARD", "ENHANCED", "PREMIUM"
     #   resp.reservations[0].start #=> String
     #   resp.reservations[0].state #=> String, one of "ACTIVE", "EXPIRED", "CANCELED", "DELETED"
@@ -5298,6 +5624,9 @@ module Aws::MediaLive
     #
     # @option params [required, String] :offering_id
     #
+    # @option params [Types::RenewalSettings] :renewal_settings
+    #   The Renewal settings for Reservations
+    #
     # @option params [String] :request_id
     #   **A suitable default value is auto-generated.** You should normally
     #   not need to pass this option.**
@@ -5316,6 +5645,10 @@ module Aws::MediaLive
     #     count: 1, # required
     #     name: "__string",
     #     offering_id: "__string", # required
+    #     renewal_settings: {
+    #       automatic_renewal: "DISABLED", # accepts DISABLED, ENABLED, UNAVAILABLE
+    #       renewal_count: 1,
+    #     },
     #     request_id: "__string",
     #     start: "__string",
     #     tags: {
@@ -5337,14 +5670,16 @@ module Aws::MediaLive
     #   resp.reservation.offering_id #=> String
     #   resp.reservation.offering_type #=> String, one of "NO_UPFRONT"
     #   resp.reservation.region #=> String
+    #   resp.reservation.renewal_settings.automatic_renewal #=> String, one of "DISABLED", "ENABLED", "UNAVAILABLE"
+    #   resp.reservation.renewal_settings.renewal_count #=> Integer
     #   resp.reservation.reservation_id #=> String
     #   resp.reservation.resource_specification.channel_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
-    #   resp.reservation.resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK"
+    #   resp.reservation.resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK", "AV1"
     #   resp.reservation.resource_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.reservation.resource_specification.maximum_framerate #=> String, one of "MAX_30_FPS", "MAX_60_FPS"
     #   resp.reservation.resource_specification.resolution #=> String, one of "SD", "HD", "FHD", "UHD"
     #   resp.reservation.resource_specification.resource_type #=> String, one of "INPUT", "OUTPUT", "MULTIPLEX", "CHANNEL"
-    #   resp.reservation.resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION"
+    #   resp.reservation.resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION", "MGHD", "MGUHD"
     #   resp.reservation.resource_specification.video_quality #=> String, one of "STANDARD", "ENHANCED", "PREMIUM"
     #   resp.reservation.start #=> String
     #   resp.reservation.state #=> String, one of "ACTIVE", "EXPIRED", "CANCELED", "DELETED"
@@ -5358,6 +5693,34 @@ module Aws::MediaLive
     # @param [Hash] params ({})
     def purchase_offering(params = {}, options = {})
       req = build_request(:purchase_offering, params)
+      req.send_request(options)
+    end
+
+    # Send a reboot command to the specified input device. The device will
+    # begin rebooting within a few seconds of sending the command. When the
+    # reboot is complete, the device’s connection status will change to
+    # connected.
+    #
+    # @option params [String] :force
+    #   Whether or not to force reboot the input device.
+    #
+    # @option params [required, String] :input_device_id
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.reboot_input_device({
+    #     force: "NO", # accepts NO, YES
+    #     input_device_id: "__string", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/RebootInputDevice AWS API Documentation
+    #
+    # @overload reboot_input_device(params = {})
+    # @param [Hash] params ({})
+    def reboot_input_device(params = {}, options = {})
+      req = build_request(:reboot_input_device, params)
       req.send_request(options)
     end
 
@@ -5398,12 +5761,15 @@ module Aws::MediaLive
     #   * {Types::StartChannelResponse#input_attachments #input_attachments} => Array&lt;Types::InputAttachment&gt;
     #   * {Types::StartChannelResponse#input_specification #input_specification} => Types::InputSpecification
     #   * {Types::StartChannelResponse#log_level #log_level} => String
+    #   * {Types::StartChannelResponse#maintenance #maintenance} => Types::MaintenanceStatus
     #   * {Types::StartChannelResponse#name #name} => String
     #   * {Types::StartChannelResponse#pipeline_details #pipeline_details} => Array&lt;Types::PipelineDetail&gt;
     #   * {Types::StartChannelResponse#pipelines_running_count #pipelines_running_count} => Integer
     #   * {Types::StartChannelResponse#role_arn #role_arn} => String
     #   * {Types::StartChannelResponse#state #state} => String
     #   * {Types::StartChannelResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::StartChannelResponse#vpc #vpc} => Types::VpcOutputSettingsDescription
+    #   * {Types::StartChannelResponse#anywhere_settings #anywhere_settings} => Types::DescribeAnywhereSettings
     #
     # @example Request syntax with placeholder values
     #
@@ -5427,6 +5793,10 @@ module Aws::MediaLive
     #   resp.destinations[0].settings[0].stream_name #=> String
     #   resp.destinations[0].settings[0].url #=> String
     #   resp.destinations[0].settings[0].username #=> String
+    #   resp.destinations[0].srt_settings #=> Array
+    #   resp.destinations[0].srt_settings[0].encryption_passphrase_secret_arn #=> String
+    #   resp.destinations[0].srt_settings[0].stream_id #=> String
+    #   resp.destinations[0].srt_settings[0].url #=> String
     #   resp.egress_endpoints #=> Array
     #   resp.egress_endpoints[0].source_ip #=> String
     #   resp.encoder_settings.audio_descriptions #=> Array
@@ -5436,6 +5806,13 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].audio_selector_name #=> String
     #   resp.encoder_settings.audio_descriptions[0].audio_type #=> String, one of "CLEAN_EFFECTS", "HEARING_IMPAIRED", "UNDEFINED", "VISUAL_IMPAIRED_COMMENTARY"
     #   resp.encoder_settings.audio_descriptions[0].audio_type_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_check_digit_string #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_stepaside #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.csid #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_distribution_type #=> String, one of "FINAL_DISTRIBUTOR", "PROGRAM_CONTENT"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.check_digit_string #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.sid #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.timezone #=> String, one of "AMERICA_PUERTO_RICO", "US_ALASKA", "US_ARIZONA", "US_CENTRAL", "US_EASTERN", "US_HAWAII", "US_MOUNTAIN", "US_PACIFIC", "US_SAMOA", "UTC"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.bitrate #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.coding_mode #=> String, one of "AD_RECEIVER_MIX", "CODING_MODE_1_0", "CODING_MODE_1_1", "CODING_MODE_2_0", "CODING_MODE_5_1"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.input_type #=> String, one of "BROADCASTER_MIXED_AD", "NORMAL"
@@ -5452,6 +5829,14 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.drc_profile #=> String, one of "FILM_STANDARD", "NONE"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.lfe_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.metadata_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.bitrate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.coding_mode #=> String, one of "CODING_MODE_5_1_4", "CODING_MODE_7_1_4", "CODING_MODE_9_1_6"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.dialnorm #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_line #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_rf #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.height_trim #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.surround_trim #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitrate #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitstream_mode #=> String, one of "COMMENTARY", "COMPLETE_MAIN", "EMERGENCY", "HEARING_IMPAIRED", "VISUALLY_IMPAIRED"
@@ -5489,16 +5874,26 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].remix_settings.channels_in #=> Integer
     #   resp.encoder_settings.audio_descriptions[0].remix_settings.channels_out #=> Integer
     #   resp.encoder_settings.audio_descriptions[0].stream_name #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_dash_roles #=> Array
+    #   resp.encoder_settings.audio_descriptions[0].audio_dash_roles[0] #=> String, one of "ALTERNATE", "COMMENTARY", "DESCRIPTION", "DUB", "EMERGENCY", "ENHANCED-AUDIO-INTELLIGIBILITY", "KARAOKE", "MAIN", "SUPPLEMENTARY"
+    #   resp.encoder_settings.audio_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.password_param #=> String
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.uri #=> String
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.username #=> String
     #   resp.encoder_settings.avail_blanking.state #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.acquisition_point_id #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.ad_avail_offset #=> Integer
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.password_param #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.pois_endpoint #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.username #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.zone_identity #=> String
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.ad_avail_offset #=> Integer
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.ad_avail_offset #=> Integer
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.encoder_settings.avail_configuration.scte_35_segmentation_scope #=> String, one of "ALL_OUTPUT_GROUPS", "SCTE35_ENABLED_OUTPUT_GROUPS"
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.password_param #=> String
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.uri #=> String
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.username #=> String
@@ -5509,6 +5904,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.blackout_slate.network_id #=> String
     #   resp.encoder_settings.blackout_slate.state #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.caption_descriptions #=> Array
+    #   resp.encoder_settings.caption_descriptions[0].accessibility #=> String, one of "DOES_NOT_IMPLEMENT_ACCESSIBILITY_FEATURES", "IMPLEMENTS_ACCESSIBILITY_FEATURES"
     #   resp.encoder_settings.caption_descriptions[0].caption_selector_name #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.alignment #=> String, one of "CENTERED", "LEFT", "SMART"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.background_color #=> String, one of "BLACK", "NONE", "WHITE"
@@ -5548,14 +5944,20 @@ module Aws::MediaLive
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.teletext_grid_control #=> String, one of "FIXED", "SCALED"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.x_position #=> Integer
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.y_position #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.copyright_holder #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.fill_line_gap #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.font_family #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.style_control #=> String, one of "EXCLUDE", "INCLUDE"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ttml_destination_settings.style_control #=> String, one of "PASSTHROUGH", "USE_CONFIGURED"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.webvtt_destination_settings.style_control #=> String, one of "NO_STYLE_DATA", "PASSTHROUGH"
     #   resp.encoder_settings.caption_descriptions[0].language_code #=> String
     #   resp.encoder_settings.caption_descriptions[0].language_description #=> String
     #   resp.encoder_settings.caption_descriptions[0].name #=> String
+    #   resp.encoder_settings.caption_descriptions[0].caption_dash_roles #=> Array
+    #   resp.encoder_settings.caption_descriptions[0].caption_dash_roles[0] #=> String, one of "ALTERNATE", "CAPTION", "COMMENTARY", "DESCRIPTION", "DUB", "EASYREADER", "EMERGENCY", "FORCED-SUBTITLE", "KARAOKE", "MAIN", "METADATA", "SUBTITLE", "SUPPLEMENTARY"
+    #   resp.encoder_settings.caption_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.encoder_settings.feature_activations.input_prepare_schedule_actions #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.feature_activations.output_static_image_overlay_schedule_actions #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.global_configuration.initial_audio_gain #=> Integer
     #   resp.encoder_settings.global_configuration.input_end_action #=> String, one of "NONE", "SWITCH_AND_LOOP_INPUTS"
     #   resp.encoder_settings.global_configuration.input_loss_behavior.black_frame_msec #=> Integer
@@ -5568,13 +5970,18 @@ module Aws::MediaLive
     #   resp.encoder_settings.global_configuration.output_locking_mode #=> String, one of "EPOCH_LOCKING", "PIPELINE_LOCKING"
     #   resp.encoder_settings.global_configuration.output_timing_source #=> String, one of "INPUT_CLOCK", "SYSTEM_CLOCK"
     #   resp.encoder_settings.global_configuration.support_low_framerate_inputs #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.custom_epoch #=> String
+    #   resp.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.jam_sync_time #=> String
+    #   resp.encoder_settings.motion_graphics_configuration.motion_graphics_insertion #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.nielsen_configuration.distributor_id #=> String
     #   resp.encoder_settings.nielsen_configuration.nielsen_pcm_to_id_3_tagging #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.output_groups #=> Array
     #   resp.encoder_settings.output_groups[0].name #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.archive_cdn_settings.archive_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.destination.destination_ref_id #=> String
     #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.rollover_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.frame_capture_cdn_settings.frame_capture_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers #=> Array
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers[0] #=> String, one of "ADOBE", "ELEMENTAL", "ELEMENTAL_SCTE35"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_content #=> String
@@ -5609,6 +6016,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.media_store_storage_class #=> String, one of "TEMPORAL"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.num_retries #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.connection_retry_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.filecache_duration #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.http_transfer_mode #=> String, one of "CHUNKED", "NON_CHUNKED"
@@ -5634,6 +6042,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.mode #=> String, one of "LIVE", "VOD"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.output_selection #=> String, one of "MANIFESTS_AND_SEGMENTS", "SEGMENTS_ONLY", "VARIANT_MANIFESTS_AND_SEGMENTS"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_clock #=> String, one of "INITIALIZE_FROM_OUTPUT_TIMECODE", "SYSTEM_CLOCK"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_period #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.redundant_manifest #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.segment_length #=> Integer
@@ -5672,9 +6081,17 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.caption_data #=> String, one of "ALL", "FIELD1_608", "FIELD1_AND_FIELD2_608"
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.input_loss_action #=> String, one of "EMIT_OUTPUT", "PAUSE_OUTPUT"
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.include_filler_nal_units #=> String, one of "AUTO", "DROP", "INCLUDE"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_frame #=> String, one of "NONE", "PRIV", "TDRL"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.scte_35_type #=> String, one of "NONE", "SCTE_35_WITHOUT_SEGMENTATION"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length_units #=> String, one of "MILLISECONDS", "SECONDS"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.send_delay_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.srt_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.encoder_settings.output_groups[0].outputs #=> Array
     #   resp.encoder_settings.output_groups[0].outputs[0].audio_description_names #=> Array
     #   resp.encoder_settings.output_groups[0].outputs[0].audio_description_names[0] #=> String
@@ -5726,6 +6143,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -5764,11 +6182,27 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.timed_metadata_pid #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.transport_stream_id #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_data_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.name_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.segment_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.h265_packaging_type #=> String, one of "HEV1", "HVC1"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.name_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.certificate_mode #=> String, one of "SELF_SIGNED", "VERIFY_AUTHENTICITY"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.connection_retry_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.destination.destination_ref_id #=> String
@@ -5819,6 +6253,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -5830,13 +6265,74 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.column_depth #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.include_fec #=> String, one of "COLUMN", "COLUMN_AND_ROW"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.row_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.cmaf_ingest_output_settings.name_modifier #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.buffer_msec #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid_control #=> String, one of "AUTO", "USE_CONFIGURED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.bitrate #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.buffer_model #=> String, one of "MULTIPLEX", "NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.output_sdt #=> String, one of "SDT_FOLLOW", "SDT_FOLLOW_IF_PRESENT", "SDT_MANUAL", "SDT_NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_provider_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sub_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_tdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_teletext_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_audio_interval #=> String, one of "VIDEO_AND_FIXED_INTERVALS", "VIDEO_INTERVAL"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_lookahead_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_placement #=> String, one of "VIDEO_AND_AUDIO_PIDS", "VIDEO_PID"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ecm_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_platform_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_signal_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.fragment_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv_data_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.null_packet_bitrate #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pat_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.program_num #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.rate_mode #=> String, one of "CBR", "VBR"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.transport_stream_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.encryption_type #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.latency #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].video_description_name #=> String
     #   resp.encoder_settings.timecode_config.source #=> String, one of "EMBEDDED", "SYSTEMCLOCK", "ZEROBASED"
     #   resp.encoder_settings.timecode_config.sync_threshold #=> Integer
     #   resp.encoder_settings.video_descriptions #=> Array
     #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval_units #=> String, one of "MILLISECONDS", "SECONDS"
-    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.bitrate #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.buf_fill_pct #=> Integer
@@ -5845,6 +6341,8 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.entropy_encoding #=> String, one of "CABAC", "CAVLC"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.force_field_pictures #=> String, one of "DISABLED", "ENABLED"
@@ -5877,7 +6375,11 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.syntax #=> String, one of "DEFAULT", "RP2027"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.temporal_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
-    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.min_qp #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.alternative_transfer_function #=> String, one of "INSERT", "OMIT"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.bitrate #=> Integer
@@ -5887,6 +6389,8 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.framerate_denominator #=> Integer
@@ -5908,6 +6412,16 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.slices #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tier #=> String, one of "HIGH", "MAIN"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_over_picture_boundaries #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_temporal_predictor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_height #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_padding #=> String, one of "NONE", "PADDED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_width #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.treeblock_size #=> String, one of "AUTO", "TREE_SIZE_32X32"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.min_qp #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "LOW", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.color_metadata #=> String, one of "IGNORE", "INSERT"
@@ -5925,12 +6439,40 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.subgop_length #=> String, one of "DYNAMIC", "FIXED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_insertion #=> String, one of "DISABLED", "GOP_TIMECODE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.buf_size #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size #=> Float
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.level #=> String, one of "AV1_LEVEL_2", "AV1_LEVEL_2_1", "AV1_LEVEL_3", "AV1_LEVEL_3_1", "AV1_LEVEL_4", "AV1_LEVEL_4_1", "AV1_LEVEL_5", "AV1_LEVEL_5_1", "AV1_LEVEL_5_2", "AV1_LEVEL_5_3", "AV1_LEVEL_6", "AV1_LEVEL_6_1", "AV1_LEVEL_6_2", "AV1_LEVEL_6_3", "AV1_LEVEL_AUTO"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.look_ahead_rate_control #=> String, one of "HIGH", "LOW", "MEDIUM"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.max_bitrate #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.min_i_interval #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.qvbr_quality_level #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.scene_change_detect #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.prefix #=> String
     #   resp.encoder_settings.video_descriptions[0].height #=> Integer
     #   resp.encoder_settings.video_descriptions[0].name #=> String
     #   resp.encoder_settings.video_descriptions[0].respond_to_afd #=> String, one of "NONE", "PASSTHROUGH", "RESPOND"
     #   resp.encoder_settings.video_descriptions[0].scaling_behavior #=> String, one of "DEFAULT", "STRETCH_TO_OUTPUT"
     #   resp.encoder_settings.video_descriptions[0].sharpness #=> Integer
     #   resp.encoder_settings.video_descriptions[0].width #=> Integer
+    #   resp.encoder_settings.thumbnail_configuration.state #=> String, one of "AUTO", "DISABLED"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections #=> Array
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].input_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].output_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].uri #=> String
     #   resp.id #=> String
     #   resp.input_attachments #=> Array
     #   resp.input_attachments[0].automatic_input_failover_settings.error_clear_time_msec #=> Integer
@@ -5946,15 +6488,19 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_id #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors #=> Array
     #   resp.input_attachments[0].input_settings.audio_selectors[0].name #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.group_id #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.name #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_code #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_selection_policy #=> String, one of "LOOSE", "STRICT"
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_pid_selection.pid #=> Integer
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks #=> Array
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks[0].track #=> Integer
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.dolby_e_decode.program_selection #=> String, one of "ALL_CHANNELS", "PROGRAM_1", "PROGRAM_2", "PROGRAM_3", "PROGRAM_4", "PROGRAM_5", "PROGRAM_6", "PROGRAM_7", "PROGRAM_8"
     #   resp.input_attachments[0].input_settings.caption_selectors #=> Array
     #   resp.input_attachments[0].input_settings.caption_selectors[0].language_code #=> String
     #   resp.input_attachments[0].input_settings.caption_selectors[0].name #=> String
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.ancillary_source_settings.source_ancillary_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.pid #=> Integer
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.scte_20_detection #=> String, one of "AUTO", "OFF"
@@ -5962,7 +6508,12 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.source_608_track_number #=> Integer
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.source_608_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.pid #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.height #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.left_offset #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.top_offset #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.width #=> Float
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.page_number #=> String
     #   resp.input_attachments[0].input_settings.deblock_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.input_attachments[0].input_settings.denoise_filter #=> String, one of "DISABLED", "ENABLED"
@@ -5972,27 +6523,50 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.buffer_segments #=> Integer
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retries #=> Integer
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retry_interval #=> Integer
+    #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.scte_35_source #=> String, one of "MANIFEST", "SEGMENTS"
     #   resp.input_attachments[0].input_settings.network_input_settings.server_validation #=> String, one of "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", "CHECK_CRYPTOGRAPHY_ONLY"
+    #   resp.input_attachments[0].input_settings.network_input_settings.multicast_input_settings.source_ip_address #=> String
+    #   resp.input_attachments[0].input_settings.scte_35_pid #=> Integer
     #   resp.input_attachments[0].input_settings.smpte_2038_data_preference #=> String, one of "IGNORE", "PREFER"
     #   resp.input_attachments[0].input_settings.source_end_behavior #=> String, one of "CONTINUE", "LOOP"
-    #   resp.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "REC_601", "REC_709"
+    #   resp.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.input_attachments[0].input_settings.video_selector.color_space_usage #=> String, one of "FALLBACK", "FORCE"
     #   resp.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_pid.pid #=> Integer
     #   resp.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_program_id.program_id #=> Integer
+    #   resp.input_attachments[0].logical_interface_names #=> Array
+    #   resp.input_attachments[0].logical_interface_names[0] #=> String
     #   resp.input_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC"
     #   resp.input_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.input_specification.resolution #=> String, one of "SD", "HD", "UHD"
     #   resp.log_level #=> String, one of "ERROR", "WARNING", "INFO", "DEBUG", "DISABLED"
+    #   resp.maintenance.maintenance_day #=> String, one of "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+    #   resp.maintenance.maintenance_deadline #=> String
+    #   resp.maintenance.maintenance_scheduled_date #=> String
+    #   resp.maintenance.maintenance_start_time #=> String
     #   resp.name #=> String
     #   resp.pipeline_details #=> Array
     #   resp.pipeline_details[0].active_input_attachment_name #=> String
     #   resp.pipeline_details[0].active_input_switch_action_name #=> String
+    #   resp.pipeline_details[0].active_motion_graphics_action_name #=> String
+    #   resp.pipeline_details[0].active_motion_graphics_uri #=> String
     #   resp.pipeline_details[0].pipeline_id #=> String
     #   resp.pipelines_running_count #=> Integer
     #   resp.role_arn #=> String
     #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "IDLE", "STARTING", "RUNNING", "RECOVERING", "STOPPING", "DELETING", "DELETED", "UPDATING", "UPDATE_FAILED"
     #   resp.tags #=> Hash
     #   resp.tags["__string"] #=> String
+    #   resp.vpc.availability_zones #=> Array
+    #   resp.vpc.availability_zones[0] #=> String
+    #   resp.vpc.network_interface_ids #=> Array
+    #   resp.vpc.network_interface_ids[0] #=> String
+    #   resp.vpc.security_group_ids #=> Array
+    #   resp.vpc.security_group_ids[0] #=> String
+    #   resp.vpc.subnet_ids #=> Array
+    #   resp.vpc.subnet_ids[0] #=> String
+    #   resp.anywhere_settings.channel_placement_group_id #=> String
+    #   resp.anywhere_settings.cluster_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/StartChannel AWS API Documentation
     #
@@ -6000,6 +6574,58 @@ module Aws::MediaLive
     # @param [Hash] params ({})
     def start_channel(params = {}, options = {})
       req = build_request(:start_channel, params)
+      req.send_request(options)
+    end
+
+    # Start an input device that is attached to a MediaConnect flow. (There
+    # is no need to start a device that is attached to a MediaLive input;
+    # MediaLive starts the device when the channel starts.)
+    #
+    # @option params [required, String] :input_device_id
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_input_device({
+    #     input_device_id: "__string", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/StartInputDevice AWS API Documentation
+    #
+    # @overload start_input_device(params = {})
+    # @param [Hash] params ({})
+    def start_input_device(params = {}, options = {})
+      req = build_request(:start_input_device, params)
+      req.send_request(options)
+    end
+
+    # Start a maintenance window for the specified input device. Starting a
+    # maintenance window will give the device up to two hours to install
+    # software. If the device was streaming prior to the maintenance, it
+    # will resume streaming when the software is fully installed. Devices
+    # automatically install updates while they are powered on and their
+    # MediaLive channels are stopped. A maintenance window allows you to
+    # update a device without having to stop MediaLive channels that use the
+    # device. The device must remain powered on and connected to the
+    # internet for the duration of the maintenance.
+    #
+    # @option params [required, String] :input_device_id
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_input_device_maintenance_window({
+    #     input_device_id: "__string", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/StartInputDeviceMaintenanceWindow AWS API Documentation
+    #
+    # @overload start_input_device_maintenance_window(params = {})
+    # @param [Hash] params ({})
+    def start_input_device_maintenance_window(params = {}, options = {})
+      req = build_request(:start_input_device_maintenance_window, params)
       req.send_request(options)
     end
 
@@ -6071,12 +6697,15 @@ module Aws::MediaLive
     #   * {Types::StopChannelResponse#input_attachments #input_attachments} => Array&lt;Types::InputAttachment&gt;
     #   * {Types::StopChannelResponse#input_specification #input_specification} => Types::InputSpecification
     #   * {Types::StopChannelResponse#log_level #log_level} => String
+    #   * {Types::StopChannelResponse#maintenance #maintenance} => Types::MaintenanceStatus
     #   * {Types::StopChannelResponse#name #name} => String
     #   * {Types::StopChannelResponse#pipeline_details #pipeline_details} => Array&lt;Types::PipelineDetail&gt;
     #   * {Types::StopChannelResponse#pipelines_running_count #pipelines_running_count} => Integer
     #   * {Types::StopChannelResponse#role_arn #role_arn} => String
     #   * {Types::StopChannelResponse#state #state} => String
     #   * {Types::StopChannelResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::StopChannelResponse#vpc #vpc} => Types::VpcOutputSettingsDescription
+    #   * {Types::StopChannelResponse#anywhere_settings #anywhere_settings} => Types::DescribeAnywhereSettings
     #
     # @example Request syntax with placeholder values
     #
@@ -6100,6 +6729,10 @@ module Aws::MediaLive
     #   resp.destinations[0].settings[0].stream_name #=> String
     #   resp.destinations[0].settings[0].url #=> String
     #   resp.destinations[0].settings[0].username #=> String
+    #   resp.destinations[0].srt_settings #=> Array
+    #   resp.destinations[0].srt_settings[0].encryption_passphrase_secret_arn #=> String
+    #   resp.destinations[0].srt_settings[0].stream_id #=> String
+    #   resp.destinations[0].srt_settings[0].url #=> String
     #   resp.egress_endpoints #=> Array
     #   resp.egress_endpoints[0].source_ip #=> String
     #   resp.encoder_settings.audio_descriptions #=> Array
@@ -6109,6 +6742,13 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].audio_selector_name #=> String
     #   resp.encoder_settings.audio_descriptions[0].audio_type #=> String, one of "CLEAN_EFFECTS", "HEARING_IMPAIRED", "UNDEFINED", "VISUAL_IMPAIRED_COMMENTARY"
     #   resp.encoder_settings.audio_descriptions[0].audio_type_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_check_digit_string #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_stepaside #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.csid #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_distribution_type #=> String, one of "FINAL_DISTRIBUTOR", "PROGRAM_CONTENT"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.check_digit_string #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.sid #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.timezone #=> String, one of "AMERICA_PUERTO_RICO", "US_ALASKA", "US_ARIZONA", "US_CENTRAL", "US_EASTERN", "US_HAWAII", "US_MOUNTAIN", "US_PACIFIC", "US_SAMOA", "UTC"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.bitrate #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.coding_mode #=> String, one of "AD_RECEIVER_MIX", "CODING_MODE_1_0", "CODING_MODE_1_1", "CODING_MODE_2_0", "CODING_MODE_5_1"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.input_type #=> String, one of "BROADCASTER_MIXED_AD", "NORMAL"
@@ -6125,6 +6765,14 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.drc_profile #=> String, one of "FILM_STANDARD", "NONE"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.lfe_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.metadata_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.bitrate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.coding_mode #=> String, one of "CODING_MODE_5_1_4", "CODING_MODE_7_1_4", "CODING_MODE_9_1_6"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.dialnorm #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_line #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_rf #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.height_trim #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.surround_trim #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitrate #=> Float
     #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitstream_mode #=> String, one of "COMMENTARY", "COMPLETE_MAIN", "EMERGENCY", "HEARING_IMPAIRED", "VISUALLY_IMPAIRED"
@@ -6162,16 +6810,26 @@ module Aws::MediaLive
     #   resp.encoder_settings.audio_descriptions[0].remix_settings.channels_in #=> Integer
     #   resp.encoder_settings.audio_descriptions[0].remix_settings.channels_out #=> Integer
     #   resp.encoder_settings.audio_descriptions[0].stream_name #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_dash_roles #=> Array
+    #   resp.encoder_settings.audio_descriptions[0].audio_dash_roles[0] #=> String, one of "ALTERNATE", "COMMENTARY", "DESCRIPTION", "DUB", "EMERGENCY", "ENHANCED-AUDIO-INTELLIGIBILITY", "KARAOKE", "MAIN", "SUPPLEMENTARY"
+    #   resp.encoder_settings.audio_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.password_param #=> String
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.uri #=> String
     #   resp.encoder_settings.avail_blanking.avail_blanking_image.username #=> String
     #   resp.encoder_settings.avail_blanking.state #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.acquisition_point_id #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.ad_avail_offset #=> Integer
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.password_param #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.pois_endpoint #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.username #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.zone_identity #=> String
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.ad_avail_offset #=> Integer
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.ad_avail_offset #=> Integer
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.encoder_settings.avail_configuration.scte_35_segmentation_scope #=> String, one of "ALL_OUTPUT_GROUPS", "SCTE35_ENABLED_OUTPUT_GROUPS"
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.password_param #=> String
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.uri #=> String
     #   resp.encoder_settings.blackout_slate.blackout_slate_image.username #=> String
@@ -6182,6 +6840,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.blackout_slate.network_id #=> String
     #   resp.encoder_settings.blackout_slate.state #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.caption_descriptions #=> Array
+    #   resp.encoder_settings.caption_descriptions[0].accessibility #=> String, one of "DOES_NOT_IMPLEMENT_ACCESSIBILITY_FEATURES", "IMPLEMENTS_ACCESSIBILITY_FEATURES"
     #   resp.encoder_settings.caption_descriptions[0].caption_selector_name #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.alignment #=> String, one of "CENTERED", "LEFT", "SMART"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.background_color #=> String, one of "BLACK", "NONE", "WHITE"
@@ -6221,14 +6880,20 @@ module Aws::MediaLive
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.teletext_grid_control #=> String, one of "FIXED", "SCALED"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.x_position #=> Integer
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.y_position #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.copyright_holder #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.fill_line_gap #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.font_family #=> String
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.style_control #=> String, one of "EXCLUDE", "INCLUDE"
     #   resp.encoder_settings.caption_descriptions[0].destination_settings.ttml_destination_settings.style_control #=> String, one of "PASSTHROUGH", "USE_CONFIGURED"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.webvtt_destination_settings.style_control #=> String, one of "NO_STYLE_DATA", "PASSTHROUGH"
     #   resp.encoder_settings.caption_descriptions[0].language_code #=> String
     #   resp.encoder_settings.caption_descriptions[0].language_description #=> String
     #   resp.encoder_settings.caption_descriptions[0].name #=> String
+    #   resp.encoder_settings.caption_descriptions[0].caption_dash_roles #=> Array
+    #   resp.encoder_settings.caption_descriptions[0].caption_dash_roles[0] #=> String, one of "ALTERNATE", "CAPTION", "COMMENTARY", "DESCRIPTION", "DUB", "EASYREADER", "EMERGENCY", "FORCED-SUBTITLE", "KARAOKE", "MAIN", "METADATA", "SUBTITLE", "SUPPLEMENTARY"
+    #   resp.encoder_settings.caption_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.encoder_settings.feature_activations.input_prepare_schedule_actions #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.feature_activations.output_static_image_overlay_schedule_actions #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.global_configuration.initial_audio_gain #=> Integer
     #   resp.encoder_settings.global_configuration.input_end_action #=> String, one of "NONE", "SWITCH_AND_LOOP_INPUTS"
     #   resp.encoder_settings.global_configuration.input_loss_behavior.black_frame_msec #=> Integer
@@ -6241,13 +6906,18 @@ module Aws::MediaLive
     #   resp.encoder_settings.global_configuration.output_locking_mode #=> String, one of "EPOCH_LOCKING", "PIPELINE_LOCKING"
     #   resp.encoder_settings.global_configuration.output_timing_source #=> String, one of "INPUT_CLOCK", "SYSTEM_CLOCK"
     #   resp.encoder_settings.global_configuration.support_low_framerate_inputs #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.custom_epoch #=> String
+    #   resp.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.jam_sync_time #=> String
+    #   resp.encoder_settings.motion_graphics_configuration.motion_graphics_insertion #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.nielsen_configuration.distributor_id #=> String
     #   resp.encoder_settings.nielsen_configuration.nielsen_pcm_to_id_3_tagging #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.output_groups #=> Array
     #   resp.encoder_settings.output_groups[0].name #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.archive_cdn_settings.archive_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.destination.destination_ref_id #=> String
     #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.rollover_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.frame_capture_cdn_settings.frame_capture_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers #=> Array
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers[0] #=> String, one of "ADOBE", "ELEMENTAL", "ELEMENTAL_SCTE35"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_content #=> String
@@ -6282,6 +6952,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.media_store_storage_class #=> String, one of "TEMPORAL"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.num_retries #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.connection_retry_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.filecache_duration #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.http_transfer_mode #=> String, one of "CHUNKED", "NON_CHUNKED"
@@ -6307,6 +6978,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.mode #=> String, one of "LIVE", "VOD"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.output_selection #=> String, one of "MANIFESTS_AND_SEGMENTS", "SEGMENTS_ONLY", "VARIANT_MANIFESTS_AND_SEGMENTS"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_clock #=> String, one of "INITIALIZE_FROM_OUTPUT_TIMECODE", "SYSTEM_CLOCK"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_period #=> Integer
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.redundant_manifest #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.segment_length #=> Integer
@@ -6345,9 +7017,17 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.caption_data #=> String, one of "ALL", "FIELD1_608", "FIELD1_AND_FIELD2_608"
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.input_loss_action #=> String, one of "EMIT_OUTPUT", "PAUSE_OUTPUT"
     #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.include_filler_nal_units #=> String, one of "AUTO", "DROP", "INCLUDE"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_frame #=> String, one of "NONE", "PRIV", "TDRL"
     #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.scte_35_type #=> String, one of "NONE", "SCTE_35_WITHOUT_SEGMENTATION"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length_units #=> String, one of "MILLISECONDS", "SECONDS"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.send_delay_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.srt_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.encoder_settings.output_groups[0].outputs #=> Array
     #   resp.encoder_settings.output_groups[0].outputs[0].audio_description_names #=> Array
     #   resp.encoder_settings.output_groups[0].outputs[0].audio_description_names[0] #=> String
@@ -6399,6 +7079,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -6437,11 +7118,27 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.timed_metadata_pid #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.transport_stream_id #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_data_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.name_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.segment_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.h265_packaging_type #=> String, one of "HEV1", "HVC1"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.name_modifier #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.certificate_mode #=> String, one of "SELF_SIGNED", "VERIFY_AUTHENTICITY"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.connection_retry_interval #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.destination.destination_ref_id #=> String
@@ -6492,6 +7189,7 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -6503,13 +7201,74 @@ module Aws::MediaLive
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.column_depth #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.include_fec #=> String, one of "COLUMN", "COLUMN_AND_ROW"
     #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.row_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.cmaf_ingest_output_settings.name_modifier #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.buffer_msec #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid_control #=> String, one of "AUTO", "USE_CONFIGURED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.bitrate #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.buffer_model #=> String, one of "MULTIPLEX", "NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.output_sdt #=> String, one of "SDT_FOLLOW", "SDT_FOLLOW_IF_PRESENT", "SDT_MANUAL", "SDT_NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_provider_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sub_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_tdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_teletext_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_audio_interval #=> String, one of "VIDEO_AND_FIXED_INTERVALS", "VIDEO_INTERVAL"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_lookahead_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_placement #=> String, one of "VIDEO_AND_AUDIO_PIDS", "VIDEO_PID"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ecm_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_platform_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_signal_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.fragment_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv_data_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.null_packet_bitrate #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pat_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.program_num #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.rate_mode #=> String, one of "CBR", "VBR"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.transport_stream_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.encryption_type #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.latency #=> Integer
     #   resp.encoder_settings.output_groups[0].outputs[0].video_description_name #=> String
     #   resp.encoder_settings.timecode_config.source #=> String, one of "EMBEDDED", "SYSTEMCLOCK", "ZEROBASED"
     #   resp.encoder_settings.timecode_config.sync_threshold #=> Integer
     #   resp.encoder_settings.video_descriptions #=> Array
     #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval_units #=> String, one of "MILLISECONDS", "SECONDS"
-    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.bitrate #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.buf_fill_pct #=> Integer
@@ -6518,6 +7277,8 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.entropy_encoding #=> String, one of "CABAC", "CAVLC"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.force_field_pictures #=> String, one of "DISABLED", "ENABLED"
@@ -6550,7 +7311,11 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.syntax #=> String, one of "DEFAULT", "RP2027"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.temporal_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
-    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.min_qp #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.alternative_transfer_function #=> String, one of "INSERT", "OMIT"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.bitrate #=> Integer
@@ -6560,6 +7325,8 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.framerate_denominator #=> Integer
@@ -6581,6 +7348,16 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.slices #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tier #=> String, one of "HIGH", "MAIN"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_over_picture_boundaries #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_temporal_predictor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_height #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_padding #=> String, one of "NONE", "PADDED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_width #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.treeblock_size #=> String, one of "AUTO", "TREE_SIZE_32X32"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.min_qp #=> Integer
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "LOW", "MEDIUM", "OFF"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.color_metadata #=> String, one of "IGNORE", "INSERT"
@@ -6598,12 +7375,40 @@ module Aws::MediaLive
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.subgop_length #=> String, one of "DYNAMIC", "FIXED"
     #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_insertion #=> String, one of "DISABLED", "GOP_TIMECODE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.buf_size #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size #=> Float
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.level #=> String, one of "AV1_LEVEL_2", "AV1_LEVEL_2_1", "AV1_LEVEL_3", "AV1_LEVEL_3_1", "AV1_LEVEL_4", "AV1_LEVEL_4_1", "AV1_LEVEL_5", "AV1_LEVEL_5_1", "AV1_LEVEL_5_2", "AV1_LEVEL_5_3", "AV1_LEVEL_6", "AV1_LEVEL_6_1", "AV1_LEVEL_6_2", "AV1_LEVEL_6_3", "AV1_LEVEL_AUTO"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.look_ahead_rate_control #=> String, one of "HIGH", "LOW", "MEDIUM"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.max_bitrate #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.min_i_interval #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.qvbr_quality_level #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.scene_change_detect #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.prefix #=> String
     #   resp.encoder_settings.video_descriptions[0].height #=> Integer
     #   resp.encoder_settings.video_descriptions[0].name #=> String
     #   resp.encoder_settings.video_descriptions[0].respond_to_afd #=> String, one of "NONE", "PASSTHROUGH", "RESPOND"
     #   resp.encoder_settings.video_descriptions[0].scaling_behavior #=> String, one of "DEFAULT", "STRETCH_TO_OUTPUT"
     #   resp.encoder_settings.video_descriptions[0].sharpness #=> Integer
     #   resp.encoder_settings.video_descriptions[0].width #=> Integer
+    #   resp.encoder_settings.thumbnail_configuration.state #=> String, one of "AUTO", "DISABLED"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections #=> Array
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].input_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].output_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].uri #=> String
     #   resp.id #=> String
     #   resp.input_attachments #=> Array
     #   resp.input_attachments[0].automatic_input_failover_settings.error_clear_time_msec #=> Integer
@@ -6619,15 +7424,19 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_id #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors #=> Array
     #   resp.input_attachments[0].input_settings.audio_selectors[0].name #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.group_id #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.name #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_code #=> String
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_selection_policy #=> String, one of "LOOSE", "STRICT"
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_pid_selection.pid #=> Integer
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks #=> Array
     #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks[0].track #=> Integer
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.dolby_e_decode.program_selection #=> String, one of "ALL_CHANNELS", "PROGRAM_1", "PROGRAM_2", "PROGRAM_3", "PROGRAM_4", "PROGRAM_5", "PROGRAM_6", "PROGRAM_7", "PROGRAM_8"
     #   resp.input_attachments[0].input_settings.caption_selectors #=> Array
     #   resp.input_attachments[0].input_settings.caption_selectors[0].language_code #=> String
     #   resp.input_attachments[0].input_settings.caption_selectors[0].name #=> String
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.ancillary_source_settings.source_ancillary_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.pid #=> Integer
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.scte_20_detection #=> String, one of "AUTO", "OFF"
@@ -6635,7 +7444,12 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.source_608_track_number #=> Integer
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.source_608_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.pid #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.height #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.left_offset #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.top_offset #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.width #=> Float
     #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.page_number #=> String
     #   resp.input_attachments[0].input_settings.deblock_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.input_attachments[0].input_settings.denoise_filter #=> String, one of "DISABLED", "ENABLED"
@@ -6645,27 +7459,50 @@ module Aws::MediaLive
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.buffer_segments #=> Integer
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retries #=> Integer
     #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retry_interval #=> Integer
+    #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.scte_35_source #=> String, one of "MANIFEST", "SEGMENTS"
     #   resp.input_attachments[0].input_settings.network_input_settings.server_validation #=> String, one of "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", "CHECK_CRYPTOGRAPHY_ONLY"
+    #   resp.input_attachments[0].input_settings.network_input_settings.multicast_input_settings.source_ip_address #=> String
+    #   resp.input_attachments[0].input_settings.scte_35_pid #=> Integer
     #   resp.input_attachments[0].input_settings.smpte_2038_data_preference #=> String, one of "IGNORE", "PREFER"
     #   resp.input_attachments[0].input_settings.source_end_behavior #=> String, one of "CONTINUE", "LOOP"
-    #   resp.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "REC_601", "REC_709"
+    #   resp.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.input_attachments[0].input_settings.video_selector.color_space_usage #=> String, one of "FALLBACK", "FORCE"
     #   resp.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_pid.pid #=> Integer
     #   resp.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_program_id.program_id #=> Integer
+    #   resp.input_attachments[0].logical_interface_names #=> Array
+    #   resp.input_attachments[0].logical_interface_names[0] #=> String
     #   resp.input_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC"
     #   resp.input_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.input_specification.resolution #=> String, one of "SD", "HD", "UHD"
     #   resp.log_level #=> String, one of "ERROR", "WARNING", "INFO", "DEBUG", "DISABLED"
+    #   resp.maintenance.maintenance_day #=> String, one of "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+    #   resp.maintenance.maintenance_deadline #=> String
+    #   resp.maintenance.maintenance_scheduled_date #=> String
+    #   resp.maintenance.maintenance_start_time #=> String
     #   resp.name #=> String
     #   resp.pipeline_details #=> Array
     #   resp.pipeline_details[0].active_input_attachment_name #=> String
     #   resp.pipeline_details[0].active_input_switch_action_name #=> String
+    #   resp.pipeline_details[0].active_motion_graphics_action_name #=> String
+    #   resp.pipeline_details[0].active_motion_graphics_uri #=> String
     #   resp.pipeline_details[0].pipeline_id #=> String
     #   resp.pipelines_running_count #=> Integer
     #   resp.role_arn #=> String
     #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "IDLE", "STARTING", "RUNNING", "RECOVERING", "STOPPING", "DELETING", "DELETED", "UPDATING", "UPDATE_FAILED"
     #   resp.tags #=> Hash
     #   resp.tags["__string"] #=> String
+    #   resp.vpc.availability_zones #=> Array
+    #   resp.vpc.availability_zones[0] #=> String
+    #   resp.vpc.network_interface_ids #=> Array
+    #   resp.vpc.network_interface_ids[0] #=> String
+    #   resp.vpc.security_group_ids #=> Array
+    #   resp.vpc.security_group_ids[0] #=> String
+    #   resp.vpc.subnet_ids #=> Array
+    #   resp.vpc.subnet_ids[0] #=> String
+    #   resp.anywhere_settings.channel_placement_group_id #=> String
+    #   resp.anywhere_settings.cluster_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/StopChannel AWS API Documentation
     #
@@ -6673,6 +7510,29 @@ module Aws::MediaLive
     # @param [Hash] params ({})
     def stop_channel(params = {}, options = {})
       req = build_request(:stop_channel, params)
+      req.send_request(options)
+    end
+
+    # Stop an input device that is attached to a MediaConnect flow. (There
+    # is no need to stop a device that is attached to a MediaLive input;
+    # MediaLive automatically stops the device when the channel stops.)
+    #
+    # @option params [required, String] :input_device_id
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.stop_input_device({
+    #     input_device_id: "__string", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/StopInputDevice AWS API Documentation
+    #
+    # @overload stop_input_device(params = {})
+    # @param [Hash] params ({})
+    def stop_input_device(params = {}, options = {})
+      req = build_request(:stop_input_device, params)
       req.send_request(options)
     end
 
@@ -6735,6 +7595,8 @@ module Aws::MediaLive
     #
     # @option params [String] :target_customer_id
     #
+    # @option params [String] :target_region
+    #
     # @option params [String] :transfer_message
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
@@ -6744,6 +7606,7 @@ module Aws::MediaLive
     #   resp = client.transfer_input_device({
     #     input_device_id: "__string", # required
     #     target_customer_id: "__string",
+    #     target_region: "__string",
     #     transfer_message: "__string",
     #   })
     #
@@ -6753,6 +7616,35 @@ module Aws::MediaLive
     # @param [Hash] params ({})
     def transfer_input_device(params = {}, options = {})
       req = build_request(:transfer_input_device, params)
+      req.send_request(options)
+    end
+
+    # Update account configuration
+    #
+    # @option params [Types::AccountConfiguration] :account_configuration
+    #
+    # @return [Types::UpdateAccountConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateAccountConfigurationResponse#account_configuration #account_configuration} => Types::AccountConfiguration
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_account_configuration({
+    #     account_configuration: {
+    #       kms_key_id: "__string",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.account_configuration.kms_key_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateAccountConfiguration AWS API Documentation
+    #
+    # @overload update_account_configuration(params = {})
+    # @param [Hash] params ({})
+    def update_account_configuration(params = {}, options = {})
+      req = build_request(:update_account_configuration, params)
       req.send_request(options)
     end
 
@@ -6774,6 +7666,8 @@ module Aws::MediaLive
     # @option params [String] :log_level
     #   The log level the user wants for their channel.
     #
+    # @option params [Types::MaintenanceUpdateSettings] :maintenance
+    #
     # @option params [String] :name
     #
     # @option params [String] :role_arn
@@ -6781,903 +7675,6 @@ module Aws::MediaLive
     # @return [Types::UpdateChannelResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateChannelResponse#channel #channel} => Types::Channel
-    #
-    # @example Request syntax with placeholder values
-    #
-    #   resp = client.update_channel({
-    #     cdi_input_specification: {
-    #       resolution: "SD", # accepts SD, HD, FHD, UHD
-    #     },
-    #     channel_id: "__string", # required
-    #     destinations: [
-    #       {
-    #         id: "__string",
-    #         media_package_settings: [
-    #           {
-    #             channel_id: "__stringMin1",
-    #           },
-    #         ],
-    #         multiplex_settings: {
-    #           multiplex_id: "__stringMin1",
-    #           program_name: "__stringMin1",
-    #         },
-    #         settings: [
-    #           {
-    #             password_param: "__string",
-    #             stream_name: "__string",
-    #             url: "__string",
-    #             username: "__string",
-    #           },
-    #         ],
-    #       },
-    #     ],
-    #     encoder_settings: {
-    #       audio_descriptions: [ # required
-    #         {
-    #           audio_normalization_settings: {
-    #             algorithm: "ITU_1770_1", # accepts ITU_1770_1, ITU_1770_2
-    #             algorithm_control: "CORRECT_AUDIO", # accepts CORRECT_AUDIO
-    #             target_lkfs: 1.0,
-    #           },
-    #           audio_selector_name: "__string", # required
-    #           audio_type: "CLEAN_EFFECTS", # accepts CLEAN_EFFECTS, HEARING_IMPAIRED, UNDEFINED, VISUAL_IMPAIRED_COMMENTARY
-    #           audio_type_control: "FOLLOW_INPUT", # accepts FOLLOW_INPUT, USE_CONFIGURED
-    #           codec_settings: {
-    #             aac_settings: {
-    #               bitrate: 1.0,
-    #               coding_mode: "AD_RECEIVER_MIX", # accepts AD_RECEIVER_MIX, CODING_MODE_1_0, CODING_MODE_1_1, CODING_MODE_2_0, CODING_MODE_5_1
-    #               input_type: "BROADCASTER_MIXED_AD", # accepts BROADCASTER_MIXED_AD, NORMAL
-    #               profile: "HEV1", # accepts HEV1, HEV2, LC
-    #               rate_control_mode: "CBR", # accepts CBR, VBR
-    #               raw_format: "LATM_LOAS", # accepts LATM_LOAS, NONE
-    #               sample_rate: 1.0,
-    #               spec: "MPEG2", # accepts MPEG2, MPEG4
-    #               vbr_quality: "HIGH", # accepts HIGH, LOW, MEDIUM_HIGH, MEDIUM_LOW
-    #             },
-    #             ac_3_settings: {
-    #               bitrate: 1.0,
-    #               bitstream_mode: "COMMENTARY", # accepts COMMENTARY, COMPLETE_MAIN, DIALOGUE, EMERGENCY, HEARING_IMPAIRED, MUSIC_AND_EFFECTS, VISUALLY_IMPAIRED, VOICE_OVER
-    #               coding_mode: "CODING_MODE_1_0", # accepts CODING_MODE_1_0, CODING_MODE_1_1, CODING_MODE_2_0, CODING_MODE_3_2_LFE
-    #               dialnorm: 1,
-    #               drc_profile: "FILM_STANDARD", # accepts FILM_STANDARD, NONE
-    #               lfe_filter: "DISABLED", # accepts DISABLED, ENABLED
-    #               metadata_control: "FOLLOW_INPUT", # accepts FOLLOW_INPUT, USE_CONFIGURED
-    #             },
-    #             eac_3_settings: {
-    #               attenuation_control: "ATTENUATE_3_DB", # accepts ATTENUATE_3_DB, NONE
-    #               bitrate: 1.0,
-    #               bitstream_mode: "COMMENTARY", # accepts COMMENTARY, COMPLETE_MAIN, EMERGENCY, HEARING_IMPAIRED, VISUALLY_IMPAIRED
-    #               coding_mode: "CODING_MODE_1_0", # accepts CODING_MODE_1_0, CODING_MODE_2_0, CODING_MODE_3_2
-    #               dc_filter: "DISABLED", # accepts DISABLED, ENABLED
-    #               dialnorm: 1,
-    #               drc_line: "FILM_LIGHT", # accepts FILM_LIGHT, FILM_STANDARD, MUSIC_LIGHT, MUSIC_STANDARD, NONE, SPEECH
-    #               drc_rf: "FILM_LIGHT", # accepts FILM_LIGHT, FILM_STANDARD, MUSIC_LIGHT, MUSIC_STANDARD, NONE, SPEECH
-    #               lfe_control: "LFE", # accepts LFE, NO_LFE
-    #               lfe_filter: "DISABLED", # accepts DISABLED, ENABLED
-    #               lo_ro_center_mix_level: 1.0,
-    #               lo_ro_surround_mix_level: 1.0,
-    #               lt_rt_center_mix_level: 1.0,
-    #               lt_rt_surround_mix_level: 1.0,
-    #               metadata_control: "FOLLOW_INPUT", # accepts FOLLOW_INPUT, USE_CONFIGURED
-    #               passthrough_control: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, WHEN_POSSIBLE
-    #               phase_control: "NO_SHIFT", # accepts NO_SHIFT, SHIFT_90_DEGREES
-    #               stereo_downmix: "DPL2", # accepts DPL2, LO_RO, LT_RT, NOT_INDICATED
-    #               surround_ex_mode: "DISABLED", # accepts DISABLED, ENABLED, NOT_INDICATED
-    #               surround_mode: "DISABLED", # accepts DISABLED, ENABLED, NOT_INDICATED
-    #             },
-    #             mp_2_settings: {
-    #               bitrate: 1.0,
-    #               coding_mode: "CODING_MODE_1_0", # accepts CODING_MODE_1_0, CODING_MODE_2_0
-    #               sample_rate: 1.0,
-    #             },
-    #             pass_through_settings: {
-    #             },
-    #             wav_settings: {
-    #               bit_depth: 1.0,
-    #               coding_mode: "CODING_MODE_1_0", # accepts CODING_MODE_1_0, CODING_MODE_2_0, CODING_MODE_4_0, CODING_MODE_8_0
-    #               sample_rate: 1.0,
-    #             },
-    #           },
-    #           language_code: "__stringMin1Max35",
-    #           language_code_control: "FOLLOW_INPUT", # accepts FOLLOW_INPUT, USE_CONFIGURED
-    #           name: "__string", # required
-    #           remix_settings: {
-    #             channel_mappings: [ # required
-    #               {
-    #                 input_channel_levels: [ # required
-    #                   {
-    #                     gain: 1, # required
-    #                     input_channel: 1, # required
-    #                   },
-    #                 ],
-    #                 output_channel: 1, # required
-    #               },
-    #             ],
-    #             channels_in: 1,
-    #             channels_out: 1,
-    #           },
-    #           stream_name: "__string",
-    #         },
-    #       ],
-    #       avail_blanking: {
-    #         avail_blanking_image: {
-    #           password_param: "__string",
-    #           uri: "__string", # required
-    #           username: "__string",
-    #         },
-    #         state: "DISABLED", # accepts DISABLED, ENABLED
-    #       },
-    #       avail_configuration: {
-    #         avail_settings: {
-    #           scte_35_splice_insert: {
-    #             ad_avail_offset: 1,
-    #             no_regional_blackout_flag: "FOLLOW", # accepts FOLLOW, IGNORE
-    #             web_delivery_allowed_flag: "FOLLOW", # accepts FOLLOW, IGNORE
-    #           },
-    #           scte_35_time_signal_apos: {
-    #             ad_avail_offset: 1,
-    #             no_regional_blackout_flag: "FOLLOW", # accepts FOLLOW, IGNORE
-    #             web_delivery_allowed_flag: "FOLLOW", # accepts FOLLOW, IGNORE
-    #           },
-    #         },
-    #       },
-    #       blackout_slate: {
-    #         blackout_slate_image: {
-    #           password_param: "__string",
-    #           uri: "__string", # required
-    #           username: "__string",
-    #         },
-    #         network_end_blackout: "DISABLED", # accepts DISABLED, ENABLED
-    #         network_end_blackout_image: {
-    #           password_param: "__string",
-    #           uri: "__string", # required
-    #           username: "__string",
-    #         },
-    #         network_id: "__stringMin34Max34",
-    #         state: "DISABLED", # accepts DISABLED, ENABLED
-    #       },
-    #       caption_descriptions: [
-    #         {
-    #           caption_selector_name: "__string", # required
-    #           destination_settings: {
-    #             arib_destination_settings: {
-    #             },
-    #             burn_in_destination_settings: {
-    #               alignment: "CENTERED", # accepts CENTERED, LEFT, SMART
-    #               background_color: "BLACK", # accepts BLACK, NONE, WHITE
-    #               background_opacity: 1,
-    #               font: {
-    #                 password_param: "__string",
-    #                 uri: "__string", # required
-    #                 username: "__string",
-    #               },
-    #               font_color: "BLACK", # accepts BLACK, BLUE, GREEN, RED, WHITE, YELLOW
-    #               font_opacity: 1,
-    #               font_resolution: 1,
-    #               font_size: "__string",
-    #               outline_color: "BLACK", # accepts BLACK, BLUE, GREEN, RED, WHITE, YELLOW
-    #               outline_size: 1,
-    #               shadow_color: "BLACK", # accepts BLACK, NONE, WHITE
-    #               shadow_opacity: 1,
-    #               shadow_x_offset: 1,
-    #               shadow_y_offset: 1,
-    #               teletext_grid_control: "FIXED", # accepts FIXED, SCALED
-    #               x_position: 1,
-    #               y_position: 1,
-    #             },
-    #             dvb_sub_destination_settings: {
-    #               alignment: "CENTERED", # accepts CENTERED, LEFT, SMART
-    #               background_color: "BLACK", # accepts BLACK, NONE, WHITE
-    #               background_opacity: 1,
-    #               font: {
-    #                 password_param: "__string",
-    #                 uri: "__string", # required
-    #                 username: "__string",
-    #               },
-    #               font_color: "BLACK", # accepts BLACK, BLUE, GREEN, RED, WHITE, YELLOW
-    #               font_opacity: 1,
-    #               font_resolution: 1,
-    #               font_size: "__string",
-    #               outline_color: "BLACK", # accepts BLACK, BLUE, GREEN, RED, WHITE, YELLOW
-    #               outline_size: 1,
-    #               shadow_color: "BLACK", # accepts BLACK, NONE, WHITE
-    #               shadow_opacity: 1,
-    #               shadow_x_offset: 1,
-    #               shadow_y_offset: 1,
-    #               teletext_grid_control: "FIXED", # accepts FIXED, SCALED
-    #               x_position: 1,
-    #               y_position: 1,
-    #             },
-    #             ebu_tt_d_destination_settings: {
-    #               fill_line_gap: "DISABLED", # accepts DISABLED, ENABLED
-    #               font_family: "__string",
-    #               style_control: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #             },
-    #             embedded_destination_settings: {
-    #             },
-    #             embedded_plus_scte_20_destination_settings: {
-    #             },
-    #             rtmp_caption_info_destination_settings: {
-    #             },
-    #             scte_20_plus_embedded_destination_settings: {
-    #             },
-    #             scte_27_destination_settings: {
-    #             },
-    #             smpte_tt_destination_settings: {
-    #             },
-    #             teletext_destination_settings: {
-    #             },
-    #             ttml_destination_settings: {
-    #               style_control: "PASSTHROUGH", # accepts PASSTHROUGH, USE_CONFIGURED
-    #             },
-    #             webvtt_destination_settings: {
-    #             },
-    #           },
-    #           language_code: "__string",
-    #           language_description: "__string",
-    #           name: "__string", # required
-    #         },
-    #       ],
-    #       feature_activations: {
-    #         input_prepare_schedule_actions: "DISABLED", # accepts DISABLED, ENABLED
-    #       },
-    #       global_configuration: {
-    #         initial_audio_gain: 1,
-    #         input_end_action: "NONE", # accepts NONE, SWITCH_AND_LOOP_INPUTS
-    #         input_loss_behavior: {
-    #           black_frame_msec: 1,
-    #           input_loss_image_color: "__stringMin6Max6",
-    #           input_loss_image_slate: {
-    #             password_param: "__string",
-    #             uri: "__string", # required
-    #             username: "__string",
-    #           },
-    #           input_loss_image_type: "COLOR", # accepts COLOR, SLATE
-    #           repeat_frame_msec: 1,
-    #         },
-    #         output_locking_mode: "EPOCH_LOCKING", # accepts EPOCH_LOCKING, PIPELINE_LOCKING
-    #         output_timing_source: "INPUT_CLOCK", # accepts INPUT_CLOCK, SYSTEM_CLOCK
-    #         support_low_framerate_inputs: "DISABLED", # accepts DISABLED, ENABLED
-    #       },
-    #       nielsen_configuration: {
-    #         distributor_id: "__string",
-    #         nielsen_pcm_to_id_3_tagging: "DISABLED", # accepts DISABLED, ENABLED
-    #       },
-    #       output_groups: [ # required
-    #         {
-    #           name: "__stringMax32",
-    #           output_group_settings: { # required
-    #             archive_group_settings: {
-    #               destination: { # required
-    #                 destination_ref_id: "__string",
-    #               },
-    #               rollover_interval: 1,
-    #             },
-    #             frame_capture_group_settings: {
-    #               destination: { # required
-    #                 destination_ref_id: "__string",
-    #               },
-    #             },
-    #             hls_group_settings: {
-    #               ad_markers: ["ADOBE"], # accepts ADOBE, ELEMENTAL, ELEMENTAL_SCTE35
-    #               base_url_content: "__string",
-    #               base_url_content_1: "__string",
-    #               base_url_manifest: "__string",
-    #               base_url_manifest_1: "__string",
-    #               caption_language_mappings: [
-    #                 {
-    #                   caption_channel: 1, # required
-    #                   language_code: "__stringMin3Max3", # required
-    #                   language_description: "__stringMin1", # required
-    #                 },
-    #               ],
-    #               caption_language_setting: "INSERT", # accepts INSERT, NONE, OMIT
-    #               client_cache: "DISABLED", # accepts DISABLED, ENABLED
-    #               codec_specification: "RFC_4281", # accepts RFC_4281, RFC_6381
-    #               constant_iv: "__stringMin32Max32",
-    #               destination: { # required
-    #                 destination_ref_id: "__string",
-    #               },
-    #               directory_structure: "SINGLE_DIRECTORY", # accepts SINGLE_DIRECTORY, SUBDIRECTORY_PER_STREAM
-    #               discontinuity_tags: "INSERT", # accepts INSERT, NEVER_INSERT
-    #               encryption_type: "AES128", # accepts AES128, SAMPLE_AES
-    #               hls_cdn_settings: {
-    #                 hls_akamai_settings: {
-    #                   connection_retry_interval: 1,
-    #                   filecache_duration: 1,
-    #                   http_transfer_mode: "CHUNKED", # accepts CHUNKED, NON_CHUNKED
-    #                   num_retries: 1,
-    #                   restart_delay: 1,
-    #                   salt: "__string",
-    #                   token: "__string",
-    #                 },
-    #                 hls_basic_put_settings: {
-    #                   connection_retry_interval: 1,
-    #                   filecache_duration: 1,
-    #                   num_retries: 1,
-    #                   restart_delay: 1,
-    #                 },
-    #                 hls_media_store_settings: {
-    #                   connection_retry_interval: 1,
-    #                   filecache_duration: 1,
-    #                   media_store_storage_class: "TEMPORAL", # accepts TEMPORAL
-    #                   num_retries: 1,
-    #                   restart_delay: 1,
-    #                 },
-    #                 hls_webdav_settings: {
-    #                   connection_retry_interval: 1,
-    #                   filecache_duration: 1,
-    #                   http_transfer_mode: "CHUNKED", # accepts CHUNKED, NON_CHUNKED
-    #                   num_retries: 1,
-    #                   restart_delay: 1,
-    #                 },
-    #               },
-    #               hls_id_3_segment_tagging: "DISABLED", # accepts DISABLED, ENABLED
-    #               i_frame_only_playlists: "DISABLED", # accepts DISABLED, STANDARD
-    #               incomplete_segment_behavior: "AUTO", # accepts AUTO, SUPPRESS
-    #               index_n_segments: 1,
-    #               input_loss_action: "EMIT_OUTPUT", # accepts EMIT_OUTPUT, PAUSE_OUTPUT
-    #               iv_in_manifest: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #               iv_source: "EXPLICIT", # accepts EXPLICIT, FOLLOWS_SEGMENT_NUMBER
-    #               keep_segments: 1,
-    #               key_format: "__string",
-    #               key_format_versions: "__string",
-    #               key_provider_settings: {
-    #                 static_key_settings: {
-    #                   key_provider_server: {
-    #                     password_param: "__string",
-    #                     uri: "__string", # required
-    #                     username: "__string",
-    #                   },
-    #                   static_key_value: "__stringMin32Max32", # required
-    #                 },
-    #               },
-    #               manifest_compression: "GZIP", # accepts GZIP, NONE
-    #               manifest_duration_format: "FLOATING_POINT", # accepts FLOATING_POINT, INTEGER
-    #               min_segment_length: 1,
-    #               mode: "LIVE", # accepts LIVE, VOD
-    #               output_selection: "MANIFESTS_AND_SEGMENTS", # accepts MANIFESTS_AND_SEGMENTS, SEGMENTS_ONLY, VARIANT_MANIFESTS_AND_SEGMENTS
-    #               program_date_time: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #               program_date_time_period: 1,
-    #               redundant_manifest: "DISABLED", # accepts DISABLED, ENABLED
-    #               segment_length: 1,
-    #               segmentation_mode: "USE_INPUT_SEGMENTATION", # accepts USE_INPUT_SEGMENTATION, USE_SEGMENT_DURATION
-    #               segments_per_subdirectory: 1,
-    #               stream_inf_resolution: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #               timed_metadata_id_3_frame: "NONE", # accepts NONE, PRIV, TDRL
-    #               timed_metadata_id_3_period: 1,
-    #               timestamp_delta_milliseconds: 1,
-    #               ts_file_mode: "SEGMENTED_FILES", # accepts SEGMENTED_FILES, SINGLE_FILE
-    #             },
-    #             media_package_group_settings: {
-    #               destination: { # required
-    #                 destination_ref_id: "__string",
-    #               },
-    #             },
-    #             ms_smooth_group_settings: {
-    #               acquisition_point_id: "__string",
-    #               audio_only_timecode_control: "PASSTHROUGH", # accepts PASSTHROUGH, USE_CONFIGURED_CLOCK
-    #               certificate_mode: "SELF_SIGNED", # accepts SELF_SIGNED, VERIFY_AUTHENTICITY
-    #               connection_retry_interval: 1,
-    #               destination: { # required
-    #                 destination_ref_id: "__string",
-    #               },
-    #               event_id: "__string",
-    #               event_id_mode: "NO_EVENT_ID", # accepts NO_EVENT_ID, USE_CONFIGURED, USE_TIMESTAMP
-    #               event_stop_behavior: "NONE", # accepts NONE, SEND_EOS
-    #               filecache_duration: 1,
-    #               fragment_length: 1,
-    #               input_loss_action: "EMIT_OUTPUT", # accepts EMIT_OUTPUT, PAUSE_OUTPUT
-    #               num_retries: 1,
-    #               restart_delay: 1,
-    #               segmentation_mode: "USE_INPUT_SEGMENTATION", # accepts USE_INPUT_SEGMENTATION, USE_SEGMENT_DURATION
-    #               send_delay_ms: 1,
-    #               sparse_track_type: "NONE", # accepts NONE, SCTE_35, SCTE_35_WITHOUT_SEGMENTATION
-    #               stream_manifest_behavior: "DO_NOT_SEND", # accepts DO_NOT_SEND, SEND
-    #               timestamp_offset: "__string",
-    #               timestamp_offset_mode: "USE_CONFIGURED_OFFSET", # accepts USE_CONFIGURED_OFFSET, USE_EVENT_START_DATE
-    #             },
-    #             multiplex_group_settings: {
-    #             },
-    #             rtmp_group_settings: {
-    #               ad_markers: ["ON_CUE_POINT_SCTE35"], # accepts ON_CUE_POINT_SCTE35
-    #               authentication_scheme: "AKAMAI", # accepts AKAMAI, COMMON
-    #               cache_full_behavior: "DISCONNECT_IMMEDIATELY", # accepts DISCONNECT_IMMEDIATELY, WAIT_FOR_SERVER
-    #               cache_length: 1,
-    #               caption_data: "ALL", # accepts ALL, FIELD1_608, FIELD1_AND_FIELD2_608
-    #               input_loss_action: "EMIT_OUTPUT", # accepts EMIT_OUTPUT, PAUSE_OUTPUT
-    #               restart_delay: 1,
-    #             },
-    #             udp_group_settings: {
-    #               input_loss_action: "DROP_PROGRAM", # accepts DROP_PROGRAM, DROP_TS, EMIT_PROGRAM
-    #               timed_metadata_id_3_frame: "NONE", # accepts NONE, PRIV, TDRL
-    #               timed_metadata_id_3_period: 1,
-    #             },
-    #           },
-    #           outputs: [ # required
-    #             {
-    #               audio_description_names: ["__string"],
-    #               caption_description_names: ["__string"],
-    #               output_name: "__stringMin1Max255",
-    #               output_settings: { # required
-    #                 archive_output_settings: {
-    #                   container_settings: { # required
-    #                     m2ts_settings: {
-    #                       absent_input_audio_behavior: "DROP", # accepts DROP, ENCODE_SILENCE
-    #                       arib: "DISABLED", # accepts DISABLED, ENABLED
-    #                       arib_captions_pid: "__string",
-    #                       arib_captions_pid_control: "AUTO", # accepts AUTO, USE_CONFIGURED
-    #                       audio_buffer_model: "ATSC", # accepts ATSC, DVB
-    #                       audio_frames_per_pes: 1,
-    #                       audio_pids: "__string",
-    #                       audio_stream_type: "ATSC", # accepts ATSC, DVB
-    #                       bitrate: 1,
-    #                       buffer_model: "MULTIPLEX", # accepts MULTIPLEX, NONE
-    #                       cc_descriptor: "DISABLED", # accepts DISABLED, ENABLED
-    #                       dvb_nit_settings: {
-    #                         network_id: 1, # required
-    #                         network_name: "__stringMin1Max256", # required
-    #                         rep_interval: 1,
-    #                       },
-    #                       dvb_sdt_settings: {
-    #                         output_sdt: "SDT_FOLLOW", # accepts SDT_FOLLOW, SDT_FOLLOW_IF_PRESENT, SDT_MANUAL, SDT_NONE
-    #                         rep_interval: 1,
-    #                         service_name: "__stringMin1Max256",
-    #                         service_provider_name: "__stringMin1Max256",
-    #                       },
-    #                       dvb_sub_pids: "__string",
-    #                       dvb_tdt_settings: {
-    #                         rep_interval: 1,
-    #                       },
-    #                       dvb_teletext_pid: "__string",
-    #                       ebif: "NONE", # accepts NONE, PASSTHROUGH
-    #                       ebp_audio_interval: "VIDEO_AND_FIXED_INTERVALS", # accepts VIDEO_AND_FIXED_INTERVALS, VIDEO_INTERVAL
-    #                       ebp_lookahead_ms: 1,
-    #                       ebp_placement: "VIDEO_AND_AUDIO_PIDS", # accepts VIDEO_AND_AUDIO_PIDS, VIDEO_PID
-    #                       ecm_pid: "__string",
-    #                       es_rate_in_pes: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #                       etv_platform_pid: "__string",
-    #                       etv_signal_pid: "__string",
-    #                       fragment_time: 1.0,
-    #                       klv: "NONE", # accepts NONE, PASSTHROUGH
-    #                       klv_data_pids: "__string",
-    #                       nielsen_id_3_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                       null_packet_bitrate: 1.0,
-    #                       pat_interval: 1,
-    #                       pcr_control: "CONFIGURED_PCR_PERIOD", # accepts CONFIGURED_PCR_PERIOD, PCR_EVERY_PES_PACKET
-    #                       pcr_period: 1,
-    #                       pcr_pid: "__string",
-    #                       pmt_interval: 1,
-    #                       pmt_pid: "__string",
-    #                       program_num: 1,
-    #                       rate_mode: "CBR", # accepts CBR, VBR
-    #                       scte_27_pids: "__string",
-    #                       scte_35_control: "NONE", # accepts NONE, PASSTHROUGH
-    #                       scte_35_pid: "__string",
-    #                       segmentation_markers: "EBP", # accepts EBP, EBP_LEGACY, NONE, PSI_SEGSTART, RAI_ADAPT, RAI_SEGSTART
-    #                       segmentation_style: "MAINTAIN_CADENCE", # accepts MAINTAIN_CADENCE, RESET_CADENCE
-    #                       segmentation_time: 1.0,
-    #                       timed_metadata_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                       timed_metadata_pid: "__string",
-    #                       transport_stream_id: 1,
-    #                       video_pid: "__string",
-    #                     },
-    #                     raw_settings: {
-    #                     },
-    #                   },
-    #                   extension: "__string",
-    #                   name_modifier: "__string",
-    #                 },
-    #                 frame_capture_output_settings: {
-    #                   name_modifier: "__string",
-    #                 },
-    #                 hls_output_settings: {
-    #                   h265_packaging_type: "HEV1", # accepts HEV1, HVC1
-    #                   hls_settings: { # required
-    #                     audio_only_hls_settings: {
-    #                       audio_group_id: "__string",
-    #                       audio_only_image: {
-    #                         password_param: "__string",
-    #                         uri: "__string", # required
-    #                         username: "__string",
-    #                       },
-    #                       audio_track_type: "ALTERNATE_AUDIO_AUTO_SELECT", # accepts ALTERNATE_AUDIO_AUTO_SELECT, ALTERNATE_AUDIO_AUTO_SELECT_DEFAULT, ALTERNATE_AUDIO_NOT_AUTO_SELECT, AUDIO_ONLY_VARIANT_STREAM
-    #                       segment_type: "AAC", # accepts AAC, FMP4
-    #                     },
-    #                     fmp_4_hls_settings: {
-    #                       audio_rendition_sets: "__string",
-    #                       nielsen_id_3_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                       timed_metadata_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                     },
-    #                     standard_hls_settings: {
-    #                       audio_rendition_sets: "__string",
-    #                       m3u_8_settings: { # required
-    #                         audio_frames_per_pes: 1,
-    #                         audio_pids: "__string",
-    #                         ecm_pid: "__string",
-    #                         nielsen_id_3_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                         pat_interval: 1,
-    #                         pcr_control: "CONFIGURED_PCR_PERIOD", # accepts CONFIGURED_PCR_PERIOD, PCR_EVERY_PES_PACKET
-    #                         pcr_period: 1,
-    #                         pcr_pid: "__string",
-    #                         pmt_interval: 1,
-    #                         pmt_pid: "__string",
-    #                         program_num: 1,
-    #                         scte_35_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                         scte_35_pid: "__string",
-    #                         timed_metadata_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                         timed_metadata_pid: "__string",
-    #                         transport_stream_id: 1,
-    #                         video_pid: "__string",
-    #                       },
-    #                     },
-    #                   },
-    #                   name_modifier: "__stringMin1",
-    #                   segment_modifier: "__string",
-    #                 },
-    #                 media_package_output_settings: {
-    #                 },
-    #                 ms_smooth_output_settings: {
-    #                   h265_packaging_type: "HEV1", # accepts HEV1, HVC1
-    #                   name_modifier: "__string",
-    #                 },
-    #                 multiplex_output_settings: {
-    #                   destination: { # required
-    #                     destination_ref_id: "__string",
-    #                   },
-    #                 },
-    #                 rtmp_output_settings: {
-    #                   certificate_mode: "SELF_SIGNED", # accepts SELF_SIGNED, VERIFY_AUTHENTICITY
-    #                   connection_retry_interval: 1,
-    #                   destination: { # required
-    #                     destination_ref_id: "__string",
-    #                   },
-    #                   num_retries: 1,
-    #                 },
-    #                 udp_output_settings: {
-    #                   buffer_msec: 1,
-    #                   container_settings: { # required
-    #                     m2ts_settings: {
-    #                       absent_input_audio_behavior: "DROP", # accepts DROP, ENCODE_SILENCE
-    #                       arib: "DISABLED", # accepts DISABLED, ENABLED
-    #                       arib_captions_pid: "__string",
-    #                       arib_captions_pid_control: "AUTO", # accepts AUTO, USE_CONFIGURED
-    #                       audio_buffer_model: "ATSC", # accepts ATSC, DVB
-    #                       audio_frames_per_pes: 1,
-    #                       audio_pids: "__string",
-    #                       audio_stream_type: "ATSC", # accepts ATSC, DVB
-    #                       bitrate: 1,
-    #                       buffer_model: "MULTIPLEX", # accepts MULTIPLEX, NONE
-    #                       cc_descriptor: "DISABLED", # accepts DISABLED, ENABLED
-    #                       dvb_nit_settings: {
-    #                         network_id: 1, # required
-    #                         network_name: "__stringMin1Max256", # required
-    #                         rep_interval: 1,
-    #                       },
-    #                       dvb_sdt_settings: {
-    #                         output_sdt: "SDT_FOLLOW", # accepts SDT_FOLLOW, SDT_FOLLOW_IF_PRESENT, SDT_MANUAL, SDT_NONE
-    #                         rep_interval: 1,
-    #                         service_name: "__stringMin1Max256",
-    #                         service_provider_name: "__stringMin1Max256",
-    #                       },
-    #                       dvb_sub_pids: "__string",
-    #                       dvb_tdt_settings: {
-    #                         rep_interval: 1,
-    #                       },
-    #                       dvb_teletext_pid: "__string",
-    #                       ebif: "NONE", # accepts NONE, PASSTHROUGH
-    #                       ebp_audio_interval: "VIDEO_AND_FIXED_INTERVALS", # accepts VIDEO_AND_FIXED_INTERVALS, VIDEO_INTERVAL
-    #                       ebp_lookahead_ms: 1,
-    #                       ebp_placement: "VIDEO_AND_AUDIO_PIDS", # accepts VIDEO_AND_AUDIO_PIDS, VIDEO_PID
-    #                       ecm_pid: "__string",
-    #                       es_rate_in_pes: "EXCLUDE", # accepts EXCLUDE, INCLUDE
-    #                       etv_platform_pid: "__string",
-    #                       etv_signal_pid: "__string",
-    #                       fragment_time: 1.0,
-    #                       klv: "NONE", # accepts NONE, PASSTHROUGH
-    #                       klv_data_pids: "__string",
-    #                       nielsen_id_3_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                       null_packet_bitrate: 1.0,
-    #                       pat_interval: 1,
-    #                       pcr_control: "CONFIGURED_PCR_PERIOD", # accepts CONFIGURED_PCR_PERIOD, PCR_EVERY_PES_PACKET
-    #                       pcr_period: 1,
-    #                       pcr_pid: "__string",
-    #                       pmt_interval: 1,
-    #                       pmt_pid: "__string",
-    #                       program_num: 1,
-    #                       rate_mode: "CBR", # accepts CBR, VBR
-    #                       scte_27_pids: "__string",
-    #                       scte_35_control: "NONE", # accepts NONE, PASSTHROUGH
-    #                       scte_35_pid: "__string",
-    #                       segmentation_markers: "EBP", # accepts EBP, EBP_LEGACY, NONE, PSI_SEGSTART, RAI_ADAPT, RAI_SEGSTART
-    #                       segmentation_style: "MAINTAIN_CADENCE", # accepts MAINTAIN_CADENCE, RESET_CADENCE
-    #                       segmentation_time: 1.0,
-    #                       timed_metadata_behavior: "NO_PASSTHROUGH", # accepts NO_PASSTHROUGH, PASSTHROUGH
-    #                       timed_metadata_pid: "__string",
-    #                       transport_stream_id: 1,
-    #                       video_pid: "__string",
-    #                     },
-    #                   },
-    #                   destination: { # required
-    #                     destination_ref_id: "__string",
-    #                   },
-    #                   fec_output_settings: {
-    #                     column_depth: 1,
-    #                     include_fec: "COLUMN", # accepts COLUMN, COLUMN_AND_ROW
-    #                     row_length: 1,
-    #                   },
-    #                 },
-    #               },
-    #               video_description_name: "__string",
-    #             },
-    #           ],
-    #         },
-    #       ],
-    #       timecode_config: { # required
-    #         source: "EMBEDDED", # required, accepts EMBEDDED, SYSTEMCLOCK, ZEROBASED
-    #         sync_threshold: 1,
-    #       },
-    #       video_descriptions: [ # required
-    #         {
-    #           codec_settings: {
-    #             frame_capture_settings: {
-    #               capture_interval: 1, # required
-    #               capture_interval_units: "MILLISECONDS", # accepts MILLISECONDS, SECONDS
-    #             },
-    #             h264_settings: {
-    #               adaptive_quantization: "HIGH", # accepts HIGH, HIGHER, LOW, MAX, MEDIUM, OFF
-    #               afd_signaling: "AUTO", # accepts AUTO, FIXED, NONE
-    #               bitrate: 1,
-    #               buf_fill_pct: 1,
-    #               buf_size: 1,
-    #               color_metadata: "IGNORE", # accepts IGNORE, INSERT
-    #               color_space_settings: {
-    #                 color_space_passthrough_settings: {
-    #                 },
-    #                 rec_601_settings: {
-    #                 },
-    #                 rec_709_settings: {
-    #                 },
-    #               },
-    #               entropy_encoding: "CABAC", # accepts CABAC, CAVLC
-    #               filter_settings: {
-    #                 temporal_filter_settings: {
-    #                   post_filter_sharpening: "AUTO", # accepts AUTO, DISABLED, ENABLED
-    #                   strength: "AUTO", # accepts AUTO, STRENGTH_1, STRENGTH_2, STRENGTH_3, STRENGTH_4, STRENGTH_5, STRENGTH_6, STRENGTH_7, STRENGTH_8, STRENGTH_9, STRENGTH_10, STRENGTH_11, STRENGTH_12, STRENGTH_13, STRENGTH_14, STRENGTH_15, STRENGTH_16
-    #                 },
-    #               },
-    #               fixed_afd: "AFD_0000", # accepts AFD_0000, AFD_0010, AFD_0011, AFD_0100, AFD_1000, AFD_1001, AFD_1010, AFD_1011, AFD_1101, AFD_1110, AFD_1111
-    #               flicker_aq: "DISABLED", # accepts DISABLED, ENABLED
-    #               force_field_pictures: "DISABLED", # accepts DISABLED, ENABLED
-    #               framerate_control: "INITIALIZE_FROM_SOURCE", # accepts INITIALIZE_FROM_SOURCE, SPECIFIED
-    #               framerate_denominator: 1,
-    #               framerate_numerator: 1,
-    #               gop_b_reference: "DISABLED", # accepts DISABLED, ENABLED
-    #               gop_closed_cadence: 1,
-    #               gop_num_b_frames: 1,
-    #               gop_size: 1.0,
-    #               gop_size_units: "FRAMES", # accepts FRAMES, SECONDS
-    #               level: "H264_LEVEL_1", # accepts H264_LEVEL_1, H264_LEVEL_1_1, H264_LEVEL_1_2, H264_LEVEL_1_3, H264_LEVEL_2, H264_LEVEL_2_1, H264_LEVEL_2_2, H264_LEVEL_3, H264_LEVEL_3_1, H264_LEVEL_3_2, H264_LEVEL_4, H264_LEVEL_4_1, H264_LEVEL_4_2, H264_LEVEL_5, H264_LEVEL_5_1, H264_LEVEL_5_2, H264_LEVEL_AUTO
-    #               look_ahead_rate_control: "HIGH", # accepts HIGH, LOW, MEDIUM
-    #               max_bitrate: 1,
-    #               min_i_interval: 1,
-    #               num_ref_frames: 1,
-    #               par_control: "INITIALIZE_FROM_SOURCE", # accepts INITIALIZE_FROM_SOURCE, SPECIFIED
-    #               par_denominator: 1,
-    #               par_numerator: 1,
-    #               profile: "BASELINE", # accepts BASELINE, HIGH, HIGH_10BIT, HIGH_422, HIGH_422_10BIT, MAIN
-    #               quality_level: "ENHANCED_QUALITY", # accepts ENHANCED_QUALITY, STANDARD_QUALITY
-    #               qvbr_quality_level: 1,
-    #               rate_control_mode: "CBR", # accepts CBR, MULTIPLEX, QVBR, VBR
-    #               scan_type: "INTERLACED", # accepts INTERLACED, PROGRESSIVE
-    #               scene_change_detect: "DISABLED", # accepts DISABLED, ENABLED
-    #               slices: 1,
-    #               softness: 1,
-    #               spatial_aq: "DISABLED", # accepts DISABLED, ENABLED
-    #               subgop_length: "DYNAMIC", # accepts DYNAMIC, FIXED
-    #               syntax: "DEFAULT", # accepts DEFAULT, RP2027
-    #               temporal_aq: "DISABLED", # accepts DISABLED, ENABLED
-    #               timecode_insertion: "DISABLED", # accepts DISABLED, PIC_TIMING_SEI
-    #             },
-    #             h265_settings: {
-    #               adaptive_quantization: "HIGH", # accepts HIGH, HIGHER, LOW, MAX, MEDIUM, OFF
-    #               afd_signaling: "AUTO", # accepts AUTO, FIXED, NONE
-    #               alternative_transfer_function: "INSERT", # accepts INSERT, OMIT
-    #               bitrate: 1,
-    #               buf_size: 1,
-    #               color_metadata: "IGNORE", # accepts IGNORE, INSERT
-    #               color_space_settings: {
-    #                 color_space_passthrough_settings: {
-    #                 },
-    #                 hdr_10_settings: {
-    #                   max_cll: 1,
-    #                   max_fall: 1,
-    #                 },
-    #                 rec_601_settings: {
-    #                 },
-    #                 rec_709_settings: {
-    #                 },
-    #               },
-    #               filter_settings: {
-    #                 temporal_filter_settings: {
-    #                   post_filter_sharpening: "AUTO", # accepts AUTO, DISABLED, ENABLED
-    #                   strength: "AUTO", # accepts AUTO, STRENGTH_1, STRENGTH_2, STRENGTH_3, STRENGTH_4, STRENGTH_5, STRENGTH_6, STRENGTH_7, STRENGTH_8, STRENGTH_9, STRENGTH_10, STRENGTH_11, STRENGTH_12, STRENGTH_13, STRENGTH_14, STRENGTH_15, STRENGTH_16
-    #                 },
-    #               },
-    #               fixed_afd: "AFD_0000", # accepts AFD_0000, AFD_0010, AFD_0011, AFD_0100, AFD_1000, AFD_1001, AFD_1010, AFD_1011, AFD_1101, AFD_1110, AFD_1111
-    #               flicker_aq: "DISABLED", # accepts DISABLED, ENABLED
-    #               framerate_denominator: 1, # required
-    #               framerate_numerator: 1, # required
-    #               gop_closed_cadence: 1,
-    #               gop_size: 1.0,
-    #               gop_size_units: "FRAMES", # accepts FRAMES, SECONDS
-    #               level: "H265_LEVEL_1", # accepts H265_LEVEL_1, H265_LEVEL_2, H265_LEVEL_2_1, H265_LEVEL_3, H265_LEVEL_3_1, H265_LEVEL_4, H265_LEVEL_4_1, H265_LEVEL_5, H265_LEVEL_5_1, H265_LEVEL_5_2, H265_LEVEL_6, H265_LEVEL_6_1, H265_LEVEL_6_2, H265_LEVEL_AUTO
-    #               look_ahead_rate_control: "HIGH", # accepts HIGH, LOW, MEDIUM
-    #               max_bitrate: 1,
-    #               min_i_interval: 1,
-    #               par_denominator: 1,
-    #               par_numerator: 1,
-    #               profile: "MAIN", # accepts MAIN, MAIN_10BIT
-    #               qvbr_quality_level: 1,
-    #               rate_control_mode: "CBR", # accepts CBR, MULTIPLEX, QVBR
-    #               scan_type: "INTERLACED", # accepts INTERLACED, PROGRESSIVE
-    #               scene_change_detect: "DISABLED", # accepts DISABLED, ENABLED
-    #               slices: 1,
-    #               tier: "HIGH", # accepts HIGH, MAIN
-    #               timecode_insertion: "DISABLED", # accepts DISABLED, PIC_TIMING_SEI
-    #             },
-    #             mpeg_2_settings: {
-    #               adaptive_quantization: "AUTO", # accepts AUTO, HIGH, LOW, MEDIUM, OFF
-    #               afd_signaling: "AUTO", # accepts AUTO, FIXED, NONE
-    #               color_metadata: "IGNORE", # accepts IGNORE, INSERT
-    #               color_space: "AUTO", # accepts AUTO, PASSTHROUGH
-    #               display_aspect_ratio: "DISPLAYRATIO16X9", # accepts DISPLAYRATIO16X9, DISPLAYRATIO4X3
-    #               filter_settings: {
-    #                 temporal_filter_settings: {
-    #                   post_filter_sharpening: "AUTO", # accepts AUTO, DISABLED, ENABLED
-    #                   strength: "AUTO", # accepts AUTO, STRENGTH_1, STRENGTH_2, STRENGTH_3, STRENGTH_4, STRENGTH_5, STRENGTH_6, STRENGTH_7, STRENGTH_8, STRENGTH_9, STRENGTH_10, STRENGTH_11, STRENGTH_12, STRENGTH_13, STRENGTH_14, STRENGTH_15, STRENGTH_16
-    #                 },
-    #               },
-    #               fixed_afd: "AFD_0000", # accepts AFD_0000, AFD_0010, AFD_0011, AFD_0100, AFD_1000, AFD_1001, AFD_1010, AFD_1011, AFD_1101, AFD_1110, AFD_1111
-    #               framerate_denominator: 1, # required
-    #               framerate_numerator: 1, # required
-    #               gop_closed_cadence: 1,
-    #               gop_num_b_frames: 1,
-    #               gop_size: 1.0,
-    #               gop_size_units: "FRAMES", # accepts FRAMES, SECONDS
-    #               scan_type: "INTERLACED", # accepts INTERLACED, PROGRESSIVE
-    #               subgop_length: "DYNAMIC", # accepts DYNAMIC, FIXED
-    #               timecode_insertion: "DISABLED", # accepts DISABLED, GOP_TIMECODE
-    #             },
-    #           },
-    #           height: 1,
-    #           name: "__string", # required
-    #           respond_to_afd: "NONE", # accepts NONE, PASSTHROUGH, RESPOND
-    #           scaling_behavior: "DEFAULT", # accepts DEFAULT, STRETCH_TO_OUTPUT
-    #           sharpness: 1,
-    #           width: 1,
-    #         },
-    #       ],
-    #     },
-    #     input_attachments: [
-    #       {
-    #         automatic_input_failover_settings: {
-    #           error_clear_time_msec: 1,
-    #           failover_conditions: [
-    #             {
-    #               failover_condition_settings: {
-    #                 audio_silence_settings: {
-    #                   audio_selector_name: "__string", # required
-    #                   audio_silence_threshold_msec: 1,
-    #                 },
-    #                 input_loss_settings: {
-    #                   input_loss_threshold_msec: 1,
-    #                 },
-    #                 video_black_settings: {
-    #                   black_detect_threshold: 1.0,
-    #                   video_black_threshold_msec: 1,
-    #                 },
-    #               },
-    #             },
-    #           ],
-    #           input_preference: "EQUAL_INPUT_PREFERENCE", # accepts EQUAL_INPUT_PREFERENCE, PRIMARY_INPUT_PREFERRED
-    #           secondary_input_id: "__string", # required
-    #         },
-    #         input_attachment_name: "__string",
-    #         input_id: "__string",
-    #         input_settings: {
-    #           audio_selectors: [
-    #             {
-    #               name: "__stringMin1", # required
-    #               selector_settings: {
-    #                 audio_language_selection: {
-    #                   language_code: "__string", # required
-    #                   language_selection_policy: "LOOSE", # accepts LOOSE, STRICT
-    #                 },
-    #                 audio_pid_selection: {
-    #                   pid: 1, # required
-    #                 },
-    #                 audio_track_selection: {
-    #                   tracks: [ # required
-    #                     {
-    #                       track: 1, # required
-    #                     },
-    #                   ],
-    #                 },
-    #               },
-    #             },
-    #           ],
-    #           caption_selectors: [
-    #             {
-    #               language_code: "__string",
-    #               name: "__stringMin1", # required
-    #               selector_settings: {
-    #                 ancillary_source_settings: {
-    #                   source_ancillary_channel_number: 1,
-    #                 },
-    #                 arib_source_settings: {
-    #                 },
-    #                 dvb_sub_source_settings: {
-    #                   pid: 1,
-    #                 },
-    #                 embedded_source_settings: {
-    #                   convert_608_to_708: "DISABLED", # accepts DISABLED, UPCONVERT
-    #                   scte_20_detection: "AUTO", # accepts AUTO, OFF
-    #                   source_608_channel_number: 1,
-    #                   source_608_track_number: 1,
-    #                 },
-    #                 scte_20_source_settings: {
-    #                   convert_608_to_708: "DISABLED", # accepts DISABLED, UPCONVERT
-    #                   source_608_channel_number: 1,
-    #                 },
-    #                 scte_27_source_settings: {
-    #                   pid: 1,
-    #                 },
-    #                 teletext_source_settings: {
-    #                   page_number: "__string",
-    #                 },
-    #               },
-    #             },
-    #           ],
-    #           deblock_filter: "DISABLED", # accepts DISABLED, ENABLED
-    #           denoise_filter: "DISABLED", # accepts DISABLED, ENABLED
-    #           filter_strength: 1,
-    #           input_filter: "AUTO", # accepts AUTO, DISABLED, FORCED
-    #           network_input_settings: {
-    #             hls_input_settings: {
-    #               bandwidth: 1,
-    #               buffer_segments: 1,
-    #               retries: 1,
-    #               retry_interval: 1,
-    #             },
-    #             server_validation: "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", # accepts CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME, CHECK_CRYPTOGRAPHY_ONLY
-    #           },
-    #           smpte_2038_data_preference: "IGNORE", # accepts IGNORE, PREFER
-    #           source_end_behavior: "CONTINUE", # accepts CONTINUE, LOOP
-    #           video_selector: {
-    #             color_space: "FOLLOW", # accepts FOLLOW, REC_601, REC_709
-    #             color_space_usage: "FALLBACK", # accepts FALLBACK, FORCE
-    #             selector_settings: {
-    #               video_selector_pid: {
-    #                 pid: 1,
-    #               },
-    #               video_selector_program_id: {
-    #                 program_id: 1,
-    #               },
-    #             },
-    #           },
-    #         },
-    #       },
-    #     ],
-    #     input_specification: {
-    #       codec: "MPEG2", # accepts MPEG2, AVC, HEVC
-    #       maximum_bitrate: "MAX_10_MBPS", # accepts MAX_10_MBPS, MAX_20_MBPS, MAX_50_MBPS
-    #       resolution: "SD", # accepts SD, HD, UHD
-    #     },
-    #     log_level: "ERROR", # accepts ERROR, WARNING, INFO, DEBUG, DISABLED
-    #     name: "__string",
-    #     role_arn: "__string",
-    #   })
     #
     # @example Response structure
     #
@@ -7695,6 +7692,10 @@ module Aws::MediaLive
     #   resp.channel.destinations[0].settings[0].stream_name #=> String
     #   resp.channel.destinations[0].settings[0].url #=> String
     #   resp.channel.destinations[0].settings[0].username #=> String
+    #   resp.channel.destinations[0].srt_settings #=> Array
+    #   resp.channel.destinations[0].srt_settings[0].encryption_passphrase_secret_arn #=> String
+    #   resp.channel.destinations[0].srt_settings[0].stream_id #=> String
+    #   resp.channel.destinations[0].srt_settings[0].url #=> String
     #   resp.channel.egress_endpoints #=> Array
     #   resp.channel.egress_endpoints[0].source_ip #=> String
     #   resp.channel.encoder_settings.audio_descriptions #=> Array
@@ -7704,6 +7705,13 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.audio_descriptions[0].audio_selector_name #=> String
     #   resp.channel.encoder_settings.audio_descriptions[0].audio_type #=> String, one of "CLEAN_EFFECTS", "HEARING_IMPAIRED", "UNDEFINED", "VISUAL_IMPAIRED_COMMENTARY"
     #   resp.channel.encoder_settings.audio_descriptions[0].audio_type_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_check_digit_string #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_stepaside #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.csid #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_distribution_type #=> String, one of "FINAL_DISTRIBUTOR", "PROGRAM_CONTENT"
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.check_digit_string #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.sid #=> Float
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.timezone #=> String, one of "AMERICA_PUERTO_RICO", "US_ALASKA", "US_ARIZONA", "US_CENTRAL", "US_EASTERN", "US_HAWAII", "US_MOUNTAIN", "US_PACIFIC", "US_SAMOA", "UTC"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.bitrate #=> Float
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.coding_mode #=> String, one of "AD_RECEIVER_MIX", "CODING_MODE_1_0", "CODING_MODE_1_1", "CODING_MODE_2_0", "CODING_MODE_5_1"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.input_type #=> String, one of "BROADCASTER_MIXED_AD", "NORMAL"
@@ -7720,6 +7728,14 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.drc_profile #=> String, one of "FILM_STANDARD", "NONE"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.lfe_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.metadata_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.bitrate #=> Float
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.coding_mode #=> String, one of "CODING_MODE_5_1_4", "CODING_MODE_7_1_4", "CODING_MODE_9_1_6"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.dialnorm #=> Integer
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_line #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_rf #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.height_trim #=> Float
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.surround_trim #=> Float
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitrate #=> Float
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitstream_mode #=> String, one of "COMMENTARY", "COMPLETE_MAIN", "EMERGENCY", "HEARING_IMPAIRED", "VISUALLY_IMPAIRED"
@@ -7757,16 +7773,26 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.audio_descriptions[0].remix_settings.channels_in #=> Integer
     #   resp.channel.encoder_settings.audio_descriptions[0].remix_settings.channels_out #=> Integer
     #   resp.channel.encoder_settings.audio_descriptions[0].stream_name #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_dash_roles #=> Array
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_dash_roles[0] #=> String, one of "ALTERNATE", "COMMENTARY", "DESCRIPTION", "DUB", "EMERGENCY", "ENHANCED-AUDIO-INTELLIGIBILITY", "KARAOKE", "MAIN", "SUPPLEMENTARY"
+    #   resp.channel.encoder_settings.audio_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.channel.encoder_settings.avail_blanking.avail_blanking_image.password_param #=> String
     #   resp.channel.encoder_settings.avail_blanking.avail_blanking_image.uri #=> String
     #   resp.channel.encoder_settings.avail_blanking.avail_blanking_image.username #=> String
     #   resp.channel.encoder_settings.avail_blanking.state #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.acquisition_point_id #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.ad_avail_offset #=> Integer
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.password_param #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.pois_endpoint #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.username #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.zone_identity #=> String
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.ad_avail_offset #=> Integer
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.ad_avail_offset #=> Integer
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.channel.encoder_settings.avail_configuration.scte_35_segmentation_scope #=> String, one of "ALL_OUTPUT_GROUPS", "SCTE35_ENABLED_OUTPUT_GROUPS"
     #   resp.channel.encoder_settings.blackout_slate.blackout_slate_image.password_param #=> String
     #   resp.channel.encoder_settings.blackout_slate.blackout_slate_image.uri #=> String
     #   resp.channel.encoder_settings.blackout_slate.blackout_slate_image.username #=> String
@@ -7777,6 +7803,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.blackout_slate.network_id #=> String
     #   resp.channel.encoder_settings.blackout_slate.state #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.caption_descriptions #=> Array
+    #   resp.channel.encoder_settings.caption_descriptions[0].accessibility #=> String, one of "DOES_NOT_IMPLEMENT_ACCESSIBILITY_FEATURES", "IMPLEMENTS_ACCESSIBILITY_FEATURES"
     #   resp.channel.encoder_settings.caption_descriptions[0].caption_selector_name #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.alignment #=> String, one of "CENTERED", "LEFT", "SMART"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.background_color #=> String, one of "BLACK", "NONE", "WHITE"
@@ -7816,14 +7843,20 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.teletext_grid_control #=> String, one of "FIXED", "SCALED"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.x_position #=> Integer
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.y_position #=> Integer
+    #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.copyright_holder #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.fill_line_gap #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.font_family #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.style_control #=> String, one of "EXCLUDE", "INCLUDE"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ttml_destination_settings.style_control #=> String, one of "PASSTHROUGH", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.webvtt_destination_settings.style_control #=> String, one of "NO_STYLE_DATA", "PASSTHROUGH"
     #   resp.channel.encoder_settings.caption_descriptions[0].language_code #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].language_description #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].name #=> String
+    #   resp.channel.encoder_settings.caption_descriptions[0].caption_dash_roles #=> Array
+    #   resp.channel.encoder_settings.caption_descriptions[0].caption_dash_roles[0] #=> String, one of "ALTERNATE", "CAPTION", "COMMENTARY", "DESCRIPTION", "DUB", "EASYREADER", "EMERGENCY", "FORCED-SUBTITLE", "KARAOKE", "MAIN", "METADATA", "SUBTITLE", "SUPPLEMENTARY"
+    #   resp.channel.encoder_settings.caption_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.channel.encoder_settings.feature_activations.input_prepare_schedule_actions #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.feature_activations.output_static_image_overlay_schedule_actions #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.global_configuration.initial_audio_gain #=> Integer
     #   resp.channel.encoder_settings.global_configuration.input_end_action #=> String, one of "NONE", "SWITCH_AND_LOOP_INPUTS"
     #   resp.channel.encoder_settings.global_configuration.input_loss_behavior.black_frame_msec #=> Integer
@@ -7836,13 +7869,18 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.global_configuration.output_locking_mode #=> String, one of "EPOCH_LOCKING", "PIPELINE_LOCKING"
     #   resp.channel.encoder_settings.global_configuration.output_timing_source #=> String, one of "INPUT_CLOCK", "SYSTEM_CLOCK"
     #   resp.channel.encoder_settings.global_configuration.support_low_framerate_inputs #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.custom_epoch #=> String
+    #   resp.channel.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.jam_sync_time #=> String
+    #   resp.channel.encoder_settings.motion_graphics_configuration.motion_graphics_insertion #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.nielsen_configuration.distributor_id #=> String
     #   resp.channel.encoder_settings.nielsen_configuration.nielsen_pcm_to_id_3_tagging #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.output_groups #=> Array
     #   resp.channel.encoder_settings.output_groups[0].name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.archive_cdn_settings.archive_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.destination.destination_ref_id #=> String
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.rollover_interval #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.frame_capture_cdn_settings.frame_capture_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers #=> Array
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers[0] #=> String, one of "ADOBE", "ELEMENTAL", "ELEMENTAL_SCTE35"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_content #=> String
@@ -7877,6 +7915,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.media_store_storage_class #=> String, one of "TEMPORAL"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.num_retries #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.restart_delay #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.connection_retry_interval #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.filecache_duration #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.http_transfer_mode #=> String, one of "CHUNKED", "NON_CHUNKED"
@@ -7902,6 +7941,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.mode #=> String, one of "LIVE", "VOD"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.output_selection #=> String, one of "MANIFESTS_AND_SEGMENTS", "SEGMENTS_ONLY", "VARIANT_MANIFESTS_AND_SEGMENTS"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_clock #=> String, one of "INITIALIZE_FROM_OUTPUT_TIMECODE", "SYSTEM_CLOCK"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_period #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.redundant_manifest #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.segment_length #=> Integer
@@ -7940,9 +7980,17 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.caption_data #=> String, one of "ALL", "FIELD1_608", "FIELD1_AND_FIELD2_608"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.input_loss_action #=> String, one of "EMIT_OUTPUT", "PAUSE_OUTPUT"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.restart_delay #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.include_filler_nal_units #=> String, one of "AUTO", "DROP", "INCLUDE"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_frame #=> String, one of "NONE", "PRIV", "TDRL"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_period #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.scte_35_type #=> String, one of "NONE", "SCTE_35_WITHOUT_SEGMENTATION"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length_units #=> String, one of "MILLISECONDS", "SECONDS"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.send_delay_ms #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.srt_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.channel.encoder_settings.output_groups[0].outputs #=> Array
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].audio_description_names #=> Array
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].audio_description_names[0] #=> String
@@ -7994,6 +8042,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -8032,11 +8081,27 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.timed_metadata_pid #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.transport_stream_id #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.video_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_data_pids #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.name_modifier #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.segment_modifier #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.h265_packaging_type #=> String, one of "HEV1", "HVC1"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.name_modifier #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_period #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.certificate_mode #=> String, one of "SELF_SIGNED", "VERIFY_AUTHENTICITY"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.connection_retry_interval #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.destination.destination_ref_id #=> String
@@ -8087,6 +8152,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -8098,13 +8164,74 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.column_depth #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.include_fec #=> String, one of "COLUMN", "COLUMN_AND_ROW"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.row_length #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.cmaf_ingest_output_settings.name_modifier #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.buffer_msec #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid_control #=> String, one of "AUTO", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.bitrate #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.buffer_model #=> String, one of "MULTIPLEX", "NONE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_id #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.rep_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.output_sdt #=> String, one of "SDT_FOLLOW", "SDT_FOLLOW_IF_PRESENT", "SDT_MANUAL", "SDT_NONE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.rep_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_provider_name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sub_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_tdt_settings.rep_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_teletext_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_audio_interval #=> String, one of "VIDEO_AND_FIXED_INTERVALS", "VIDEO_INTERVAL"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_lookahead_ms #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_placement #=> String, one of "VIDEO_AND_AUDIO_PIDS", "VIDEO_PID"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ecm_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_platform_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_signal_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.fragment_time #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv_data_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.null_packet_bitrate #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pat_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_period #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.program_num #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.rate_mode #=> String, one of "CBR", "VBR"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.transport_stream_id #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.video_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.encryption_type #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.latency #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].video_description_name #=> String
     #   resp.channel.encoder_settings.timecode_config.source #=> String, one of "EMBEDDED", "SYSTEMCLOCK", "ZEROBASED"
     #   resp.channel.encoder_settings.timecode_config.sync_threshold #=> Integer
     #   resp.channel.encoder_settings.video_descriptions #=> Array
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval_units #=> String, one of "MILLISECONDS", "SECONDS"
-    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.bitrate #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.buf_fill_pct #=> Integer
@@ -8113,6 +8240,8 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.entropy_encoding #=> String, one of "CABAC", "CAVLC"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.force_field_pictures #=> String, one of "DISABLED", "ENABLED"
@@ -8145,7 +8274,11 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.syntax #=> String, one of "DEFAULT", "RP2027"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.temporal_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
-    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.min_qp #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.alternative_transfer_function #=> String, one of "INSERT", "OMIT"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.bitrate #=> Integer
@@ -8155,6 +8288,8 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.framerate_denominator #=> Integer
@@ -8176,6 +8311,16 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.slices #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tier #=> String, one of "HIGH", "MAIN"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_over_picture_boundaries #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_temporal_predictor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_height #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_padding #=> String, one of "NONE", "PADDED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_width #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.treeblock_size #=> String, one of "AUTO", "TREE_SIZE_32X32"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.min_qp #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "LOW", "MEDIUM", "OFF"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.color_metadata #=> String, one of "IGNORE", "INSERT"
@@ -8193,12 +8338,40 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.subgop_length #=> String, one of "DYNAMIC", "FIXED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_insertion #=> String, one of "DISABLED", "GOP_TIMECODE"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.buf_size #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_denominator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_numerator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size #=> Float
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.level #=> String, one of "AV1_LEVEL_2", "AV1_LEVEL_2_1", "AV1_LEVEL_3", "AV1_LEVEL_3_1", "AV1_LEVEL_4", "AV1_LEVEL_4_1", "AV1_LEVEL_5", "AV1_LEVEL_5_1", "AV1_LEVEL_5_2", "AV1_LEVEL_5_3", "AV1_LEVEL_6", "AV1_LEVEL_6_1", "AV1_LEVEL_6_2", "AV1_LEVEL_6_3", "AV1_LEVEL_AUTO"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.look_ahead_rate_control #=> String, one of "HIGH", "LOW", "MEDIUM"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.max_bitrate #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.min_i_interval #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_denominator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_numerator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.qvbr_quality_level #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.scene_change_detect #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.prefix #=> String
     #   resp.channel.encoder_settings.video_descriptions[0].height #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].name #=> String
     #   resp.channel.encoder_settings.video_descriptions[0].respond_to_afd #=> String, one of "NONE", "PASSTHROUGH", "RESPOND"
     #   resp.channel.encoder_settings.video_descriptions[0].scaling_behavior #=> String, one of "DEFAULT", "STRETCH_TO_OUTPUT"
     #   resp.channel.encoder_settings.video_descriptions[0].sharpness #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].width #=> Integer
+    #   resp.channel.encoder_settings.thumbnail_configuration.state #=> String, one of "AUTO", "DISABLED"
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections #=> Array
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections[0].input_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections[0].output_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections[0].uri #=> String
     #   resp.channel.id #=> String
     #   resp.channel.input_attachments #=> Array
     #   resp.channel.input_attachments[0].automatic_input_failover_settings.error_clear_time_msec #=> Integer
@@ -8214,15 +8387,19 @@ module Aws::MediaLive
     #   resp.channel.input_attachments[0].input_id #=> String
     #   resp.channel.input_attachments[0].input_settings.audio_selectors #=> Array
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].name #=> String
+    #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.group_id #=> String
+    #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.name #=> String
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_code #=> String
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_selection_policy #=> String, one of "LOOSE", "STRICT"
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_pid_selection.pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks #=> Array
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks[0].track #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.dolby_e_decode.program_selection #=> String, one of "ALL_CHANNELS", "PROGRAM_1", "PROGRAM_2", "PROGRAM_3", "PROGRAM_4", "PROGRAM_5", "PROGRAM_6", "PROGRAM_7", "PROGRAM_8"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors #=> Array
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].language_code #=> String
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].name #=> String
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.ancillary_source_settings.source_ancillary_channel_number #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.scte_20_detection #=> String, one of "AUTO", "OFF"
@@ -8230,7 +8407,12 @@ module Aws::MediaLive
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.source_608_track_number #=> Integer
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.source_608_channel_number #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.pid #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.height #=> Float
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.left_offset #=> Float
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.top_offset #=> Float
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.width #=> Float
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.page_number #=> String
     #   resp.channel.input_attachments[0].input_settings.deblock_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.input_attachments[0].input_settings.denoise_filter #=> String, one of "DISABLED", "ENABLED"
@@ -8240,27 +8422,50 @@ module Aws::MediaLive
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.buffer_segments #=> Integer
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retries #=> Integer
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retry_interval #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.scte_35_source #=> String, one of "MANIFEST", "SEGMENTS"
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.server_validation #=> String, one of "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", "CHECK_CRYPTOGRAPHY_ONLY"
+    #   resp.channel.input_attachments[0].input_settings.network_input_settings.multicast_input_settings.source_ip_address #=> String
+    #   resp.channel.input_attachments[0].input_settings.scte_35_pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.smpte_2038_data_preference #=> String, one of "IGNORE", "PREFER"
     #   resp.channel.input_attachments[0].input_settings.source_end_behavior #=> String, one of "CONTINUE", "LOOP"
-    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "REC_601", "REC_709"
+    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.channel.input_attachments[0].input_settings.video_selector.color_space_usage #=> String, one of "FALLBACK", "FORCE"
     #   resp.channel.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_pid.pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_program_id.program_id #=> Integer
+    #   resp.channel.input_attachments[0].logical_interface_names #=> Array
+    #   resp.channel.input_attachments[0].logical_interface_names[0] #=> String
     #   resp.channel.input_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC"
     #   resp.channel.input_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.channel.input_specification.resolution #=> String, one of "SD", "HD", "UHD"
     #   resp.channel.log_level #=> String, one of "ERROR", "WARNING", "INFO", "DEBUG", "DISABLED"
+    #   resp.channel.maintenance.maintenance_day #=> String, one of "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+    #   resp.channel.maintenance.maintenance_deadline #=> String
+    #   resp.channel.maintenance.maintenance_scheduled_date #=> String
+    #   resp.channel.maintenance.maintenance_start_time #=> String
     #   resp.channel.name #=> String
     #   resp.channel.pipeline_details #=> Array
     #   resp.channel.pipeline_details[0].active_input_attachment_name #=> String
     #   resp.channel.pipeline_details[0].active_input_switch_action_name #=> String
+    #   resp.channel.pipeline_details[0].active_motion_graphics_action_name #=> String
+    #   resp.channel.pipeline_details[0].active_motion_graphics_uri #=> String
     #   resp.channel.pipeline_details[0].pipeline_id #=> String
     #   resp.channel.pipelines_running_count #=> Integer
     #   resp.channel.role_arn #=> String
     #   resp.channel.state #=> String, one of "CREATING", "CREATE_FAILED", "IDLE", "STARTING", "RUNNING", "RECOVERING", "STOPPING", "DELETING", "DELETED", "UPDATING", "UPDATE_FAILED"
     #   resp.channel.tags #=> Hash
     #   resp.channel.tags["__string"] #=> String
+    #   resp.channel.vpc.availability_zones #=> Array
+    #   resp.channel.vpc.availability_zones[0] #=> String
+    #   resp.channel.vpc.network_interface_ids #=> Array
+    #   resp.channel.vpc.network_interface_ids[0] #=> String
+    #   resp.channel.vpc.security_group_ids #=> Array
+    #   resp.channel.vpc.security_group_ids[0] #=> String
+    #   resp.channel.vpc.subnet_ids #=> Array
+    #   resp.channel.vpc.subnet_ids[0] #=> String
+    #   resp.channel.anywhere_settings.channel_placement_group_id #=> String
+    #   resp.channel.anywhere_settings.cluster_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateChannel AWS API Documentation
     #
@@ -8310,6 +8515,13 @@ module Aws::MediaLive
     #             username: "__string",
     #           },
     #         ],
+    #         srt_settings: [
+    #           {
+    #             encryption_passphrase_secret_arn: "__string",
+    #             stream_id: "__string",
+    #             url: "__string",
+    #           },
+    #         ],
     #       },
     #     ],
     #   })
@@ -8330,6 +8542,10 @@ module Aws::MediaLive
     #   resp.channel.destinations[0].settings[0].stream_name #=> String
     #   resp.channel.destinations[0].settings[0].url #=> String
     #   resp.channel.destinations[0].settings[0].username #=> String
+    #   resp.channel.destinations[0].srt_settings #=> Array
+    #   resp.channel.destinations[0].srt_settings[0].encryption_passphrase_secret_arn #=> String
+    #   resp.channel.destinations[0].srt_settings[0].stream_id #=> String
+    #   resp.channel.destinations[0].srt_settings[0].url #=> String
     #   resp.channel.egress_endpoints #=> Array
     #   resp.channel.egress_endpoints[0].source_ip #=> String
     #   resp.channel.encoder_settings.audio_descriptions #=> Array
@@ -8339,6 +8555,13 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.audio_descriptions[0].audio_selector_name #=> String
     #   resp.channel.encoder_settings.audio_descriptions[0].audio_type #=> String, one of "CLEAN_EFFECTS", "HEARING_IMPAIRED", "UNDEFINED", "VISUAL_IMPAIRED_COMMENTARY"
     #   resp.channel.encoder_settings.audio_descriptions[0].audio_type_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_check_digit_string #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_stepaside #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.csid #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_distribution_type #=> String, one of "FINAL_DISTRIBUTOR", "PROGRAM_CONTENT"
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.check_digit_string #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.sid #=> Float
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.timezone #=> String, one of "AMERICA_PUERTO_RICO", "US_ALASKA", "US_ARIZONA", "US_CENTRAL", "US_EASTERN", "US_HAWAII", "US_MOUNTAIN", "US_PACIFIC", "US_SAMOA", "UTC"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.bitrate #=> Float
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.coding_mode #=> String, one of "AD_RECEIVER_MIX", "CODING_MODE_1_0", "CODING_MODE_1_1", "CODING_MODE_2_0", "CODING_MODE_5_1"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.input_type #=> String, one of "BROADCASTER_MIXED_AD", "NORMAL"
@@ -8355,6 +8578,14 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.drc_profile #=> String, one of "FILM_STANDARD", "NONE"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.lfe_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.metadata_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.bitrate #=> Float
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.coding_mode #=> String, one of "CODING_MODE_5_1_4", "CODING_MODE_7_1_4", "CODING_MODE_9_1_6"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.dialnorm #=> Integer
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_line #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_rf #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.height_trim #=> Float
+    #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.surround_trim #=> Float
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitrate #=> Float
     #   resp.channel.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitstream_mode #=> String, one of "COMMENTARY", "COMPLETE_MAIN", "EMERGENCY", "HEARING_IMPAIRED", "VISUALLY_IMPAIRED"
@@ -8392,16 +8623,26 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.audio_descriptions[0].remix_settings.channels_in #=> Integer
     #   resp.channel.encoder_settings.audio_descriptions[0].remix_settings.channels_out #=> Integer
     #   resp.channel.encoder_settings.audio_descriptions[0].stream_name #=> String
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_dash_roles #=> Array
+    #   resp.channel.encoder_settings.audio_descriptions[0].audio_dash_roles[0] #=> String, one of "ALTERNATE", "COMMENTARY", "DESCRIPTION", "DUB", "EMERGENCY", "ENHANCED-AUDIO-INTELLIGIBILITY", "KARAOKE", "MAIN", "SUPPLEMENTARY"
+    #   resp.channel.encoder_settings.audio_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.channel.encoder_settings.avail_blanking.avail_blanking_image.password_param #=> String
     #   resp.channel.encoder_settings.avail_blanking.avail_blanking_image.uri #=> String
     #   resp.channel.encoder_settings.avail_blanking.avail_blanking_image.username #=> String
     #   resp.channel.encoder_settings.avail_blanking.state #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.acquisition_point_id #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.ad_avail_offset #=> Integer
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.password_param #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.pois_endpoint #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.username #=> String
+    #   resp.channel.encoder_settings.avail_configuration.avail_settings.esam.zone_identity #=> String
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.ad_avail_offset #=> Integer
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.ad_avail_offset #=> Integer
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
     #   resp.channel.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.channel.encoder_settings.avail_configuration.scte_35_segmentation_scope #=> String, one of "ALL_OUTPUT_GROUPS", "SCTE35_ENABLED_OUTPUT_GROUPS"
     #   resp.channel.encoder_settings.blackout_slate.blackout_slate_image.password_param #=> String
     #   resp.channel.encoder_settings.blackout_slate.blackout_slate_image.uri #=> String
     #   resp.channel.encoder_settings.blackout_slate.blackout_slate_image.username #=> String
@@ -8412,6 +8653,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.blackout_slate.network_id #=> String
     #   resp.channel.encoder_settings.blackout_slate.state #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.caption_descriptions #=> Array
+    #   resp.channel.encoder_settings.caption_descriptions[0].accessibility #=> String, one of "DOES_NOT_IMPLEMENT_ACCESSIBILITY_FEATURES", "IMPLEMENTS_ACCESSIBILITY_FEATURES"
     #   resp.channel.encoder_settings.caption_descriptions[0].caption_selector_name #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.alignment #=> String, one of "CENTERED", "LEFT", "SMART"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.background_color #=> String, one of "BLACK", "NONE", "WHITE"
@@ -8451,14 +8693,20 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.teletext_grid_control #=> String, one of "FIXED", "SCALED"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.x_position #=> Integer
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.y_position #=> Integer
+    #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.copyright_holder #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.fill_line_gap #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.font_family #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.style_control #=> String, one of "EXCLUDE", "INCLUDE"
     #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.ttml_destination_settings.style_control #=> String, one of "PASSTHROUGH", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.caption_descriptions[0].destination_settings.webvtt_destination_settings.style_control #=> String, one of "NO_STYLE_DATA", "PASSTHROUGH"
     #   resp.channel.encoder_settings.caption_descriptions[0].language_code #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].language_description #=> String
     #   resp.channel.encoder_settings.caption_descriptions[0].name #=> String
+    #   resp.channel.encoder_settings.caption_descriptions[0].caption_dash_roles #=> Array
+    #   resp.channel.encoder_settings.caption_descriptions[0].caption_dash_roles[0] #=> String, one of "ALTERNATE", "CAPTION", "COMMENTARY", "DESCRIPTION", "DUB", "EASYREADER", "EMERGENCY", "FORCED-SUBTITLE", "KARAOKE", "MAIN", "METADATA", "SUBTITLE", "SUPPLEMENTARY"
+    #   resp.channel.encoder_settings.caption_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
     #   resp.channel.encoder_settings.feature_activations.input_prepare_schedule_actions #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.feature_activations.output_static_image_overlay_schedule_actions #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.global_configuration.initial_audio_gain #=> Integer
     #   resp.channel.encoder_settings.global_configuration.input_end_action #=> String, one of "NONE", "SWITCH_AND_LOOP_INPUTS"
     #   resp.channel.encoder_settings.global_configuration.input_loss_behavior.black_frame_msec #=> Integer
@@ -8471,13 +8719,18 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.global_configuration.output_locking_mode #=> String, one of "EPOCH_LOCKING", "PIPELINE_LOCKING"
     #   resp.channel.encoder_settings.global_configuration.output_timing_source #=> String, one of "INPUT_CLOCK", "SYSTEM_CLOCK"
     #   resp.channel.encoder_settings.global_configuration.support_low_framerate_inputs #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.custom_epoch #=> String
+    #   resp.channel.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.jam_sync_time #=> String
+    #   resp.channel.encoder_settings.motion_graphics_configuration.motion_graphics_insertion #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.nielsen_configuration.distributor_id #=> String
     #   resp.channel.encoder_settings.nielsen_configuration.nielsen_pcm_to_id_3_tagging #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.output_groups #=> Array
     #   resp.channel.encoder_settings.output_groups[0].name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.archive_cdn_settings.archive_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.destination.destination_ref_id #=> String
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.rollover_interval #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.frame_capture_cdn_settings.frame_capture_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers #=> Array
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers[0] #=> String, one of "ADOBE", "ELEMENTAL", "ELEMENTAL_SCTE35"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_content #=> String
@@ -8512,6 +8765,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.media_store_storage_class #=> String, one of "TEMPORAL"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.num_retries #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.restart_delay #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.connection_retry_interval #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.filecache_duration #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.http_transfer_mode #=> String, one of "CHUNKED", "NON_CHUNKED"
@@ -8537,6 +8791,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.mode #=> String, one of "LIVE", "VOD"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.output_selection #=> String, one of "MANIFESTS_AND_SEGMENTS", "SEGMENTS_ONLY", "VARIANT_MANIFESTS_AND_SEGMENTS"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_clock #=> String, one of "INITIALIZE_FROM_OUTPUT_TIMECODE", "SYSTEM_CLOCK"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_period #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.redundant_manifest #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.segment_length #=> Integer
@@ -8575,9 +8830,17 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.caption_data #=> String, one of "ALL", "FIELD1_608", "FIELD1_AND_FIELD2_608"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.input_loss_action #=> String, one of "EMIT_OUTPUT", "PAUSE_OUTPUT"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.restart_delay #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.include_filler_nal_units #=> String, one of "AUTO", "DROP", "INCLUDE"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_frame #=> String, one of "NONE", "PRIV", "TDRL"
     #   resp.channel.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_period #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.scte_35_type #=> String, one of "NONE", "SCTE_35_WITHOUT_SEGMENTATION"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length_units #=> String, one of "MILLISECONDS", "SECONDS"
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.send_delay_ms #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].output_group_settings.srt_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
     #   resp.channel.encoder_settings.output_groups[0].outputs #=> Array
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].audio_description_names #=> Array
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].audio_description_names[0] #=> String
@@ -8629,6 +8892,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -8667,11 +8931,27 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.timed_metadata_pid #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.transport_stream_id #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.video_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_data_pids #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.name_modifier #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.segment_modifier #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.h265_packaging_type #=> String, one of "HEV1", "HVC1"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.name_modifier #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_period #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.certificate_mode #=> String, one of "SELF_SIGNED", "VERIFY_AUTHENTICITY"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.connection_retry_interval #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.destination.destination_ref_id #=> String
@@ -8722,6 +9002,7 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
@@ -8733,13 +9014,74 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.column_depth #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.include_fec #=> String, one of "COLUMN", "COLUMN_AND_ROW"
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.row_length #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.cmaf_ingest_output_settings.name_modifier #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.buffer_msec #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid_control #=> String, one of "AUTO", "USE_CONFIGURED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.bitrate #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.buffer_model #=> String, one of "MULTIPLEX", "NONE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_id #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.rep_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.output_sdt #=> String, one of "SDT_FOLLOW", "SDT_FOLLOW_IF_PRESENT", "SDT_MANUAL", "SDT_NONE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.rep_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_provider_name #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sub_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_tdt_settings.rep_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_teletext_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_audio_interval #=> String, one of "VIDEO_AND_FIXED_INTERVALS", "VIDEO_INTERVAL"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_lookahead_ms #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_placement #=> String, one of "VIDEO_AND_AUDIO_PIDS", "VIDEO_PID"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ecm_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_platform_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_signal_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.fragment_time #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv_data_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.null_packet_bitrate #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pat_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_period #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_interval #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.program_num #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.rate_mode #=> String, one of "CBR", "VBR"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.transport_stream_id #=> Integer
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.video_pid #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.destination.destination_ref_id #=> String
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.encryption_type #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.channel.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.latency #=> Integer
     #   resp.channel.encoder_settings.output_groups[0].outputs[0].video_description_name #=> String
     #   resp.channel.encoder_settings.timecode_config.source #=> String, one of "EMBEDDED", "SYSTEMCLOCK", "ZEROBASED"
     #   resp.channel.encoder_settings.timecode_config.sync_threshold #=> Integer
     #   resp.channel.encoder_settings.video_descriptions #=> Array
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval_units #=> String, one of "MILLISECONDS", "SECONDS"
-    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.bitrate #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.buf_fill_pct #=> Integer
@@ -8748,6 +9090,8 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.entropy_encoding #=> String, one of "CABAC", "CAVLC"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.force_field_pictures #=> String, one of "DISABLED", "ENABLED"
@@ -8780,7 +9124,11 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.syntax #=> String, one of "DEFAULT", "RP2027"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.temporal_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
-    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h264_settings.min_qp #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.alternative_transfer_function #=> String, one of "INSERT", "OMIT"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.bitrate #=> Integer
@@ -8790,6 +9138,8 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.framerate_denominator #=> Integer
@@ -8811,6 +9161,16 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.slices #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tier #=> String, one of "HIGH", "MAIN"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_over_picture_boundaries #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_temporal_predictor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_height #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_padding #=> String, one of "NONE", "PADDED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_width #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.treeblock_size #=> String, one of "AUTO", "TREE_SIZE_32X32"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.h265_settings.min_qp #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "LOW", "MEDIUM", "OFF"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.color_metadata #=> String, one of "IGNORE", "INSERT"
@@ -8828,12 +9188,40 @@ module Aws::MediaLive
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.subgop_length #=> String, one of "DYNAMIC", "FIXED"
     #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_insertion #=> String, one of "DISABLED", "GOP_TIMECODE"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.buf_size #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_denominator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_numerator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size #=> Float
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.level #=> String, one of "AV1_LEVEL_2", "AV1_LEVEL_2_1", "AV1_LEVEL_3", "AV1_LEVEL_3_1", "AV1_LEVEL_4", "AV1_LEVEL_4_1", "AV1_LEVEL_5", "AV1_LEVEL_5_1", "AV1_LEVEL_5_2", "AV1_LEVEL_5_3", "AV1_LEVEL_6", "AV1_LEVEL_6_1", "AV1_LEVEL_6_2", "AV1_LEVEL_6_3", "AV1_LEVEL_AUTO"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.look_ahead_rate_control #=> String, one of "HIGH", "LOW", "MEDIUM"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.max_bitrate #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.min_i_interval #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_denominator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_numerator #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.qvbr_quality_level #=> Integer
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.scene_change_detect #=> String, one of "DISABLED", "ENABLED"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.channel.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.prefix #=> String
     #   resp.channel.encoder_settings.video_descriptions[0].height #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].name #=> String
     #   resp.channel.encoder_settings.video_descriptions[0].respond_to_afd #=> String, one of "NONE", "PASSTHROUGH", "RESPOND"
     #   resp.channel.encoder_settings.video_descriptions[0].scaling_behavior #=> String, one of "DEFAULT", "STRETCH_TO_OUTPUT"
     #   resp.channel.encoder_settings.video_descriptions[0].sharpness #=> Integer
     #   resp.channel.encoder_settings.video_descriptions[0].width #=> Integer
+    #   resp.channel.encoder_settings.thumbnail_configuration.state #=> String, one of "AUTO", "DISABLED"
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections #=> Array
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections[0].input_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections[0].output_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.channel.encoder_settings.color_correction_settings.global_color_corrections[0].uri #=> String
     #   resp.channel.id #=> String
     #   resp.channel.input_attachments #=> Array
     #   resp.channel.input_attachments[0].automatic_input_failover_settings.error_clear_time_msec #=> Integer
@@ -8849,15 +9237,19 @@ module Aws::MediaLive
     #   resp.channel.input_attachments[0].input_id #=> String
     #   resp.channel.input_attachments[0].input_settings.audio_selectors #=> Array
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].name #=> String
+    #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.group_id #=> String
+    #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.name #=> String
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_code #=> String
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_selection_policy #=> String, one of "LOOSE", "STRICT"
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_pid_selection.pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks #=> Array
     #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks[0].track #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.dolby_e_decode.program_selection #=> String, one of "ALL_CHANNELS", "PROGRAM_1", "PROGRAM_2", "PROGRAM_3", "PROGRAM_4", "PROGRAM_5", "PROGRAM_6", "PROGRAM_7", "PROGRAM_8"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors #=> Array
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].language_code #=> String
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].name #=> String
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.ancillary_source_settings.source_ancillary_channel_number #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.scte_20_detection #=> String, one of "AUTO", "OFF"
@@ -8865,7 +9257,12 @@ module Aws::MediaLive
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.source_608_track_number #=> Integer
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.source_608_channel_number #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.pid #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.height #=> Float
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.left_offset #=> Float
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.top_offset #=> Float
+    #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.width #=> Float
     #   resp.channel.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.page_number #=> String
     #   resp.channel.input_attachments[0].input_settings.deblock_filter #=> String, one of "DISABLED", "ENABLED"
     #   resp.channel.input_attachments[0].input_settings.denoise_filter #=> String, one of "DISABLED", "ENABLED"
@@ -8875,27 +9272,50 @@ module Aws::MediaLive
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.buffer_segments #=> Integer
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retries #=> Integer
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retry_interval #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.network_input_settings.hls_input_settings.scte_35_source #=> String, one of "MANIFEST", "SEGMENTS"
     #   resp.channel.input_attachments[0].input_settings.network_input_settings.server_validation #=> String, one of "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", "CHECK_CRYPTOGRAPHY_ONLY"
+    #   resp.channel.input_attachments[0].input_settings.network_input_settings.multicast_input_settings.source_ip_address #=> String
+    #   resp.channel.input_attachments[0].input_settings.scte_35_pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.smpte_2038_data_preference #=> String, one of "IGNORE", "PREFER"
     #   resp.channel.input_attachments[0].input_settings.source_end_behavior #=> String, one of "CONTINUE", "LOOP"
-    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "REC_601", "REC_709"
+    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.channel.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_fall #=> Integer
     #   resp.channel.input_attachments[0].input_settings.video_selector.color_space_usage #=> String, one of "FALLBACK", "FORCE"
     #   resp.channel.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_pid.pid #=> Integer
     #   resp.channel.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_program_id.program_id #=> Integer
+    #   resp.channel.input_attachments[0].logical_interface_names #=> Array
+    #   resp.channel.input_attachments[0].logical_interface_names[0] #=> String
     #   resp.channel.input_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC"
     #   resp.channel.input_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.channel.input_specification.resolution #=> String, one of "SD", "HD", "UHD"
     #   resp.channel.log_level #=> String, one of "ERROR", "WARNING", "INFO", "DEBUG", "DISABLED"
+    #   resp.channel.maintenance.maintenance_day #=> String, one of "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+    #   resp.channel.maintenance.maintenance_deadline #=> String
+    #   resp.channel.maintenance.maintenance_scheduled_date #=> String
+    #   resp.channel.maintenance.maintenance_start_time #=> String
     #   resp.channel.name #=> String
     #   resp.channel.pipeline_details #=> Array
     #   resp.channel.pipeline_details[0].active_input_attachment_name #=> String
     #   resp.channel.pipeline_details[0].active_input_switch_action_name #=> String
+    #   resp.channel.pipeline_details[0].active_motion_graphics_action_name #=> String
+    #   resp.channel.pipeline_details[0].active_motion_graphics_uri #=> String
     #   resp.channel.pipeline_details[0].pipeline_id #=> String
     #   resp.channel.pipelines_running_count #=> Integer
     #   resp.channel.role_arn #=> String
     #   resp.channel.state #=> String, one of "CREATING", "CREATE_FAILED", "IDLE", "STARTING", "RUNNING", "RECOVERING", "STOPPING", "DELETING", "DELETED", "UPDATING", "UPDATE_FAILED"
     #   resp.channel.tags #=> Hash
     #   resp.channel.tags["__string"] #=> String
+    #   resp.channel.vpc.availability_zones #=> Array
+    #   resp.channel.vpc.availability_zones[0] #=> String
+    #   resp.channel.vpc.network_interface_ids #=> Array
+    #   resp.channel.vpc.network_interface_ids[0] #=> String
+    #   resp.channel.vpc.security_group_ids #=> Array
+    #   resp.channel.vpc.security_group_ids[0] #=> String
+    #   resp.channel.vpc.subnet_ids #=> Array
+    #   resp.channel.vpc.subnet_ids[0] #=> String
+    #   resp.channel.anywhere_settings.channel_placement_group_id #=> String
+    #   resp.channel.anywhere_settings.cluster_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateChannelClass AWS API Documentation
     #
@@ -8924,6 +9344,15 @@ module Aws::MediaLive
     #
     # @option params [Array<Types::InputSourceRequest>] :sources
     #
+    # @option params [Types::SrtSettingsRequest] :srt_settings
+    #   Configures the sources for this SRT input. For a single-pipeline
+    #   input, include one srtCallerSource in the array. For a
+    #   standard-pipeline input, include two srtCallerSource.
+    #
+    # @option params [Types::MulticastSettingsUpdateRequest] :multicast_settings
+    #   Settings for a Multicast input. Contains a list of multicast Urls and
+    #   optional source ip addresses.
+    #
     # @return [Types::UpdateInputResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateInputResponse#input #input} => Types::Input
@@ -8934,6 +9363,14 @@ module Aws::MediaLive
     #     destinations: [
     #       {
     #         stream_name: "__string",
+    #         network: "__string",
+    #         network_routes: [
+    #           {
+    #             cidr: "__string",
+    #             gateway: "__string",
+    #           },
+    #         ],
+    #         static_ip_address: "__string",
     #       },
     #     ],
     #     input_devices: [
@@ -8957,6 +9394,28 @@ module Aws::MediaLive
     #         username: "__string",
     #       },
     #     ],
+    #     srt_settings: {
+    #       srt_caller_sources: [
+    #         {
+    #           decryption: {
+    #             algorithm: "AES128", # accepts AES128, AES192, AES256
+    #             passphrase_secret_arn: "__string",
+    #           },
+    #           minimum_latency: 1,
+    #           srt_listener_address: "__string",
+    #           srt_listener_port: "__string",
+    #           stream_id: "__string",
+    #         },
+    #       ],
+    #     },
+    #     multicast_settings: {
+    #       sources: [
+    #         {
+    #           source_ip: "__string",
+    #           url: "__string", # required
+    #         },
+    #       ],
+    #     },
     #   })
     #
     # @example Response structure
@@ -8970,10 +9429,16 @@ module Aws::MediaLive
     #   resp.input.destinations[0].url #=> String
     #   resp.input.destinations[0].vpc.availability_zone #=> String
     #   resp.input.destinations[0].vpc.network_interface_id #=> String
+    #   resp.input.destinations[0].network #=> String
+    #   resp.input.destinations[0].network_routes #=> Array
+    #   resp.input.destinations[0].network_routes[0].cidr #=> String
+    #   resp.input.destinations[0].network_routes[0].gateway #=> String
     #   resp.input.id #=> String
     #   resp.input.input_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
     #   resp.input.input_devices #=> Array
     #   resp.input.input_devices[0].id #=> String
+    #   resp.input.input_partner_ids #=> Array
+    #   resp.input.input_partner_ids[0] #=> String
     #   resp.input.input_source_type #=> String, one of "STATIC", "DYNAMIC"
     #   resp.input.media_connect_flows #=> Array
     #   resp.input.media_connect_flows[0].flow_arn #=> String
@@ -8988,7 +9453,18 @@ module Aws::MediaLive
     #   resp.input.state #=> String, one of "CREATING", "DETACHED", "ATTACHED", "DELETING", "DELETED"
     #   resp.input.tags #=> Hash
     #   resp.input.tags["__string"] #=> String
-    #   resp.input.type #=> String, one of "UDP_PUSH", "RTP_PUSH", "RTMP_PUSH", "RTMP_PULL", "URL_PULL", "MP4_FILE", "MEDIACONNECT", "INPUT_DEVICE", "AWS_CDI"
+    #   resp.input.type #=> String, one of "UDP_PUSH", "RTP_PUSH", "RTMP_PUSH", "RTMP_PULL", "URL_PULL", "MP4_FILE", "MEDIACONNECT", "INPUT_DEVICE", "AWS_CDI", "TS_FILE", "SRT_CALLER", "MULTICAST"
+    #   resp.input.srt_settings.srt_caller_sources #=> Array
+    #   resp.input.srt_settings.srt_caller_sources[0].decryption.algorithm #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.input.srt_settings.srt_caller_sources[0].decryption.passphrase_secret_arn #=> String
+    #   resp.input.srt_settings.srt_caller_sources[0].minimum_latency #=> Integer
+    #   resp.input.srt_settings.srt_caller_sources[0].srt_listener_address #=> String
+    #   resp.input.srt_settings.srt_caller_sources[0].srt_listener_port #=> String
+    #   resp.input.srt_settings.srt_caller_sources[0].stream_id #=> String
+    #   resp.input.input_network_location #=> String, one of "AWS", "ON_PREMISES"
+    #   resp.input.multicast_settings.sources #=> Array
+    #   resp.input.multicast_settings.sources[0].source_ip #=> String
+    #   resp.input.multicast_settings.sources[0].url #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateInput AWS API Documentation
     #
@@ -9011,6 +9487,8 @@ module Aws::MediaLive
     # @option params [Types::InputDeviceConfigurableSettings] :uhd_device_settings
     #   Configurable settings for the input device.
     #
+    # @option params [String] :availability_zone
+    #
     # @return [Types::UpdateInputDeviceResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateInputDeviceResponse#arn #arn} => String
@@ -9025,6 +9503,10 @@ module Aws::MediaLive
     #   * {Types::UpdateInputDeviceResponse#serial_number #serial_number} => String
     #   * {Types::UpdateInputDeviceResponse#type #type} => String
     #   * {Types::UpdateInputDeviceResponse#uhd_device_settings #uhd_device_settings} => Types::InputDeviceUhdSettings
+    #   * {Types::UpdateInputDeviceResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::UpdateInputDeviceResponse#availability_zone #availability_zone} => String
+    #   * {Types::UpdateInputDeviceResponse#medialive_input_arns #medialive_input_arns} => Array&lt;String&gt;
+    #   * {Types::UpdateInputDeviceResponse#output_type #output_type} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -9032,13 +9514,42 @@ module Aws::MediaLive
     #     hd_device_settings: {
     #       configured_input: "AUTO", # accepts AUTO, HDMI, SDI
     #       max_bitrate: 1,
+    #       latency_ms: 1,
+    #       codec: "HEVC", # accepts HEVC, AVC
+    #       mediaconnect_settings: {
+    #         flow_arn: "__string",
+    #         role_arn: "__string",
+    #         secret_arn: "__string",
+    #         source_name: "__string",
+    #       },
+    #       audio_channel_pairs: [
+    #         {
+    #           id: 1,
+    #           profile: "DISABLED", # accepts DISABLED, VBR-AAC_HHE-16000, VBR-AAC_HE-64000, VBR-AAC_LC-128000, CBR-AAC_HQ-192000, CBR-AAC_HQ-256000, CBR-AAC_HQ-384000, CBR-AAC_HQ-512000
+    #         },
+    #       ],
     #     },
     #     input_device_id: "__string", # required
     #     name: "__string",
     #     uhd_device_settings: {
     #       configured_input: "AUTO", # accepts AUTO, HDMI, SDI
     #       max_bitrate: 1,
+    #       latency_ms: 1,
+    #       codec: "HEVC", # accepts HEVC, AVC
+    #       mediaconnect_settings: {
+    #         flow_arn: "__string",
+    #         role_arn: "__string",
+    #         secret_arn: "__string",
+    #         source_name: "__string",
+    #       },
+    #       audio_channel_pairs: [
+    #         {
+    #           id: 1,
+    #           profile: "DISABLED", # accepts DISABLED, VBR-AAC_HHE-16000, VBR-AAC_HE-64000, VBR-AAC_LC-128000, CBR-AAC_HQ-192000, CBR-AAC_HQ-256000, CBR-AAC_HQ-384000, CBR-AAC_HQ-512000
+    #         },
+    #       ],
     #     },
+    #     availability_zone: "__string",
     #   })
     #
     # @example Response structure
@@ -9046,7 +9557,7 @@ module Aws::MediaLive
     #   resp.arn #=> String
     #   resp.connection_state #=> String, one of "DISCONNECTED", "CONNECTED"
     #   resp.device_settings_sync_state #=> String, one of "SYNCED", "SYNCING"
-    #   resp.device_update_status #=> String, one of "UP_TO_DATE", "NOT_UP_TO_DATE"
+    #   resp.device_update_status #=> String, one of "UP_TO_DATE", "NOT_UP_TO_DATE", "UPDATING"
     #   resp.hd_device_settings.active_input #=> String, one of "HDMI", "SDI"
     #   resp.hd_device_settings.configured_input #=> String, one of "AUTO", "HDMI", "SDI"
     #   resp.hd_device_settings.device_state #=> String, one of "IDLE", "STREAMING"
@@ -9055,6 +9566,7 @@ module Aws::MediaLive
     #   resp.hd_device_settings.max_bitrate #=> Integer
     #   resp.hd_device_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.hd_device_settings.width #=> Integer
+    #   resp.hd_device_settings.latency_ms #=> Integer
     #   resp.id #=> String
     #   resp.mac_address #=> String
     #   resp.name #=> String
@@ -9065,7 +9577,7 @@ module Aws::MediaLive
     #   resp.network_settings.ip_scheme #=> String, one of "STATIC", "DHCP"
     #   resp.network_settings.subnet_mask #=> String
     #   resp.serial_number #=> String
-    #   resp.type #=> String, one of "HD"
+    #   resp.type #=> String, one of "HD", "UHD"
     #   resp.uhd_device_settings.active_input #=> String, one of "HDMI", "SDI"
     #   resp.uhd_device_settings.configured_input #=> String, one of "AUTO", "HDMI", "SDI"
     #   resp.uhd_device_settings.device_state #=> String, one of "IDLE", "STREAMING"
@@ -9074,6 +9586,21 @@ module Aws::MediaLive
     #   resp.uhd_device_settings.max_bitrate #=> Integer
     #   resp.uhd_device_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
     #   resp.uhd_device_settings.width #=> Integer
+    #   resp.uhd_device_settings.latency_ms #=> Integer
+    #   resp.uhd_device_settings.codec #=> String, one of "HEVC", "AVC"
+    #   resp.uhd_device_settings.mediaconnect_settings.flow_arn #=> String
+    #   resp.uhd_device_settings.mediaconnect_settings.role_arn #=> String
+    #   resp.uhd_device_settings.mediaconnect_settings.secret_arn #=> String
+    #   resp.uhd_device_settings.mediaconnect_settings.source_name #=> String
+    #   resp.uhd_device_settings.audio_channel_pairs #=> Array
+    #   resp.uhd_device_settings.audio_channel_pairs[0].id #=> Integer
+    #   resp.uhd_device_settings.audio_channel_pairs[0].profile #=> String, one of "DISABLED", "VBR-AAC_HHE-16000", "VBR-AAC_HE-64000", "VBR-AAC_LC-128000", "CBR-AAC_HQ-192000", "CBR-AAC_HQ-256000", "CBR-AAC_HQ-384000", "CBR-AAC_HQ-512000"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #   resp.availability_zone #=> String
+    #   resp.medialive_input_arns #=> Array
+    #   resp.medialive_input_arns[0] #=> String
+    #   resp.output_type #=> String, one of "NONE", "MEDIALIVE_INPUT", "MEDIACONNECT_FLOW"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateInputDevice AWS API Documentation
     #
@@ -9140,6 +9667,8 @@ module Aws::MediaLive
     #
     # @option params [String] :name
     #
+    # @option params [Hash<String,Types::MultiplexProgramPacketIdentifiersMap>] :packet_identifiers_mapping
+    #
     # @return [Types::UpdateMultiplexResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateMultiplexResponse#multiplex #multiplex} => Types::Multiplex
@@ -9155,6 +9684,27 @@ module Aws::MediaLive
     #       transport_stream_reserved_bitrate: 1,
     #     },
     #     name: "__string",
+    #     packet_identifiers_mapping: {
+    #       "__string" => {
+    #         audio_pids: [1],
+    #         dvb_sub_pids: [1],
+    #         dvb_teletext_pid: 1,
+    #         etv_platform_pid: 1,
+    #         etv_signal_pid: 1,
+    #         klv_data_pids: [1],
+    #         pcr_pid: 1,
+    #         pmt_pid: 1,
+    #         private_metadata_pid: 1,
+    #         scte_27_pids: [1],
+    #         scte_35_pid: 1,
+    #         timed_metadata_pid: 1,
+    #         video_pid: 1,
+    #         arib_captions_pid: 1,
+    #         dvb_teletext_pids: [1],
+    #         ecm_pid: 1,
+    #         smpte_2038_pid: 1,
+    #       },
+    #     },
     #   })
     #
     # @example Response structure
@@ -9249,6 +9799,11 @@ module Aws::MediaLive
     #   resp.multiplex_program.packet_identifiers_map.scte_35_pid #=> Integer
     #   resp.multiplex_program.packet_identifiers_map.timed_metadata_pid #=> Integer
     #   resp.multiplex_program.packet_identifiers_map.video_pid #=> Integer
+    #   resp.multiplex_program.packet_identifiers_map.arib_captions_pid #=> Integer
+    #   resp.multiplex_program.packet_identifiers_map.dvb_teletext_pids #=> Array
+    #   resp.multiplex_program.packet_identifiers_map.dvb_teletext_pids[0] #=> Integer
+    #   resp.multiplex_program.packet_identifiers_map.ecm_pid #=> Integer
+    #   resp.multiplex_program.packet_identifiers_map.smpte_2038_pid #=> Integer
     #   resp.multiplex_program.pipeline_details #=> Array
     #   resp.multiplex_program.pipeline_details[0].active_channel_pipeline #=> String
     #   resp.multiplex_program.pipeline_details[0].pipeline_id #=> String
@@ -9267,6 +9822,9 @@ module Aws::MediaLive
     #
     # @option params [String] :name
     #
+    # @option params [Types::RenewalSettings] :renewal_settings
+    #   The Renewal settings for Reservations
+    #
     # @option params [required, String] :reservation_id
     #
     # @return [Types::UpdateReservationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -9277,6 +9835,10 @@ module Aws::MediaLive
     #
     #   resp = client.update_reservation({
     #     name: "__string",
+    #     renewal_settings: {
+    #       automatic_renewal: "DISABLED", # accepts DISABLED, ENABLED, UNAVAILABLE
+    #       renewal_count: 1,
+    #     },
     #     reservation_id: "__string", # required
     #   })
     #
@@ -9294,14 +9856,16 @@ module Aws::MediaLive
     #   resp.reservation.offering_id #=> String
     #   resp.reservation.offering_type #=> String, one of "NO_UPFRONT"
     #   resp.reservation.region #=> String
+    #   resp.reservation.renewal_settings.automatic_renewal #=> String, one of "DISABLED", "ENABLED", "UNAVAILABLE"
+    #   resp.reservation.renewal_settings.renewal_count #=> Integer
     #   resp.reservation.reservation_id #=> String
     #   resp.reservation.resource_specification.channel_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
-    #   resp.reservation.resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK"
+    #   resp.reservation.resource_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC", "AUDIO", "LINK", "AV1"
     #   resp.reservation.resource_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
     #   resp.reservation.resource_specification.maximum_framerate #=> String, one of "MAX_30_FPS", "MAX_60_FPS"
     #   resp.reservation.resource_specification.resolution #=> String, one of "SD", "HD", "FHD", "UHD"
     #   resp.reservation.resource_specification.resource_type #=> String, one of "INPUT", "OUTPUT", "MULTIPLEX", "CHANNEL"
-    #   resp.reservation.resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION"
+    #   resp.reservation.resource_specification.special_feature #=> String, one of "ADVANCED_AUDIO", "AUDIO_NORMALIZATION", "MGHD", "MGUHD"
     #   resp.reservation.resource_specification.video_quality #=> String, one of "STANDARD", "ENHANCED", "PREMIUM"
     #   resp.reservation.start #=> String
     #   resp.reservation.state #=> String, one of "ACTIVE", "EXPIRED", "CANCELED", "DELETED"
@@ -9318,20 +9882,3704 @@ module Aws::MediaLive
       req.send_request(options)
     end
 
+    # Restart pipelines in one channel that is currently running.
+    #
+    # @option params [required, String] :channel_id
+    #
+    # @option params [Array<String>] :pipeline_ids
+    #   An array of pipelines to restart in this channel. Format PIPELINE\_0
+    #   or PIPELINE\_1.
+    #
+    # @return [Types::RestartChannelPipelinesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::RestartChannelPipelinesResponse#arn #arn} => String
+    #   * {Types::RestartChannelPipelinesResponse#cdi_input_specification #cdi_input_specification} => Types::CdiInputSpecification
+    #   * {Types::RestartChannelPipelinesResponse#channel_class #channel_class} => String
+    #   * {Types::RestartChannelPipelinesResponse#destinations #destinations} => Array&lt;Types::OutputDestination&gt;
+    #   * {Types::RestartChannelPipelinesResponse#egress_endpoints #egress_endpoints} => Array&lt;Types::ChannelEgressEndpoint&gt;
+    #   * {Types::RestartChannelPipelinesResponse#encoder_settings #encoder_settings} => Types::EncoderSettings
+    #   * {Types::RestartChannelPipelinesResponse#id #id} => String
+    #   * {Types::RestartChannelPipelinesResponse#input_attachments #input_attachments} => Array&lt;Types::InputAttachment&gt;
+    #   * {Types::RestartChannelPipelinesResponse#input_specification #input_specification} => Types::InputSpecification
+    #   * {Types::RestartChannelPipelinesResponse#log_level #log_level} => String
+    #   * {Types::RestartChannelPipelinesResponse#maintenance #maintenance} => Types::MaintenanceStatus
+    #   * {Types::RestartChannelPipelinesResponse#maintenance_status #maintenance_status} => String
+    #   * {Types::RestartChannelPipelinesResponse#name #name} => String
+    #   * {Types::RestartChannelPipelinesResponse#pipeline_details #pipeline_details} => Array&lt;Types::PipelineDetail&gt;
+    #   * {Types::RestartChannelPipelinesResponse#pipelines_running_count #pipelines_running_count} => Integer
+    #   * {Types::RestartChannelPipelinesResponse#role_arn #role_arn} => String
+    #   * {Types::RestartChannelPipelinesResponse#state #state} => String
+    #   * {Types::RestartChannelPipelinesResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::RestartChannelPipelinesResponse#vpc #vpc} => Types::VpcOutputSettingsDescription
+    #   * {Types::RestartChannelPipelinesResponse#anywhere_settings #anywhere_settings} => Types::DescribeAnywhereSettings
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.restart_channel_pipelines({
+    #     channel_id: "__string", # required
+    #     pipeline_ids: ["PIPELINE_0"], # accepts PIPELINE_0, PIPELINE_1
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.cdi_input_specification.resolution #=> String, one of "SD", "HD", "FHD", "UHD"
+    #   resp.channel_class #=> String, one of "STANDARD", "SINGLE_PIPELINE"
+    #   resp.destinations #=> Array
+    #   resp.destinations[0].id #=> String
+    #   resp.destinations[0].media_package_settings #=> Array
+    #   resp.destinations[0].media_package_settings[0].channel_id #=> String
+    #   resp.destinations[0].multiplex_settings.multiplex_id #=> String
+    #   resp.destinations[0].multiplex_settings.program_name #=> String
+    #   resp.destinations[0].settings #=> Array
+    #   resp.destinations[0].settings[0].password_param #=> String
+    #   resp.destinations[0].settings[0].stream_name #=> String
+    #   resp.destinations[0].settings[0].url #=> String
+    #   resp.destinations[0].settings[0].username #=> String
+    #   resp.destinations[0].srt_settings #=> Array
+    #   resp.destinations[0].srt_settings[0].encryption_passphrase_secret_arn #=> String
+    #   resp.destinations[0].srt_settings[0].stream_id #=> String
+    #   resp.destinations[0].srt_settings[0].url #=> String
+    #   resp.egress_endpoints #=> Array
+    #   resp.egress_endpoints[0].source_ip #=> String
+    #   resp.encoder_settings.audio_descriptions #=> Array
+    #   resp.encoder_settings.audio_descriptions[0].audio_normalization_settings.algorithm #=> String, one of "ITU_1770_1", "ITU_1770_2"
+    #   resp.encoder_settings.audio_descriptions[0].audio_normalization_settings.algorithm_control #=> String, one of "CORRECT_AUDIO"
+    #   resp.encoder_settings.audio_descriptions[0].audio_normalization_settings.target_lkfs #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].audio_selector_name #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_type #=> String, one of "CLEAN_EFFECTS", "HEARING_IMPAIRED", "UNDEFINED", "VISUAL_IMPAIRED_COMMENTARY"
+    #   resp.encoder_settings.audio_descriptions[0].audio_type_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_check_digit_string #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.cbet_stepaside #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_cbet_settings.csid #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_distribution_type #=> String, one of "FINAL_DISTRIBUTOR", "PROGRAM_CONTENT"
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.check_digit_string #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.sid #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].audio_watermarking_settings.nielsen_watermarks_settings.nielsen_naes_ii_nw_settings.timezone #=> String, one of "AMERICA_PUERTO_RICO", "US_ALASKA", "US_ARIZONA", "US_CENTRAL", "US_EASTERN", "US_HAWAII", "US_MOUNTAIN", "US_PACIFIC", "US_SAMOA", "UTC"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.bitrate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.coding_mode #=> String, one of "AD_RECEIVER_MIX", "CODING_MODE_1_0", "CODING_MODE_1_1", "CODING_MODE_2_0", "CODING_MODE_5_1"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.input_type #=> String, one of "BROADCASTER_MIXED_AD", "NORMAL"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.profile #=> String, one of "HEV1", "HEV2", "LC"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.rate_control_mode #=> String, one of "CBR", "VBR"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.raw_format #=> String, one of "LATM_LOAS", "NONE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.sample_rate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.spec #=> String, one of "MPEG2", "MPEG4"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.aac_settings.vbr_quality #=> String, one of "HIGH", "LOW", "MEDIUM_HIGH", "MEDIUM_LOW"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.bitrate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.bitstream_mode #=> String, one of "COMMENTARY", "COMPLETE_MAIN", "DIALOGUE", "EMERGENCY", "HEARING_IMPAIRED", "MUSIC_AND_EFFECTS", "VISUALLY_IMPAIRED", "VOICE_OVER"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.coding_mode #=> String, one of "CODING_MODE_1_0", "CODING_MODE_1_1", "CODING_MODE_2_0", "CODING_MODE_3_2_LFE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.dialnorm #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.drc_profile #=> String, one of "FILM_STANDARD", "NONE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.lfe_filter #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.metadata_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.ac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.bitrate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.coding_mode #=> String, one of "CODING_MODE_5_1_4", "CODING_MODE_7_1_4", "CODING_MODE_9_1_6"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.dialnorm #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_line #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.drc_rf #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.height_trim #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_atmos_settings.surround_trim #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.attenuation_control #=> String, one of "ATTENUATE_3_DB", "NONE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitrate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.bitstream_mode #=> String, one of "COMMENTARY", "COMPLETE_MAIN", "EMERGENCY", "HEARING_IMPAIRED", "VISUALLY_IMPAIRED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.coding_mode #=> String, one of "CODING_MODE_1_0", "CODING_MODE_2_0", "CODING_MODE_3_2"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.dc_filter #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.dialnorm #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.drc_line #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.drc_rf #=> String, one of "FILM_LIGHT", "FILM_STANDARD", "MUSIC_LIGHT", "MUSIC_STANDARD", "NONE", "SPEECH"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.lfe_control #=> String, one of "LFE", "NO_LFE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.lfe_filter #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.lo_ro_center_mix_level #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.lo_ro_surround_mix_level #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.lt_rt_center_mix_level #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.lt_rt_surround_mix_level #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.metadata_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.passthrough_control #=> String, one of "NO_PASSTHROUGH", "WHEN_POSSIBLE"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.phase_control #=> String, one of "NO_SHIFT", "SHIFT_90_DEGREES"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.stereo_downmix #=> String, one of "DPL2", "LO_RO", "LT_RT", "NOT_INDICATED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.surround_ex_mode #=> String, one of "DISABLED", "ENABLED", "NOT_INDICATED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.eac_3_settings.surround_mode #=> String, one of "DISABLED", "ENABLED", "NOT_INDICATED"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.mp_2_settings.bitrate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.mp_2_settings.coding_mode #=> String, one of "CODING_MODE_1_0", "CODING_MODE_2_0"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.mp_2_settings.sample_rate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.wav_settings.bit_depth #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.wav_settings.coding_mode #=> String, one of "CODING_MODE_1_0", "CODING_MODE_2_0", "CODING_MODE_4_0", "CODING_MODE_8_0"
+    #   resp.encoder_settings.audio_descriptions[0].codec_settings.wav_settings.sample_rate #=> Float
+    #   resp.encoder_settings.audio_descriptions[0].language_code #=> String
+    #   resp.encoder_settings.audio_descriptions[0].language_code_control #=> String, one of "FOLLOW_INPUT", "USE_CONFIGURED"
+    #   resp.encoder_settings.audio_descriptions[0].name #=> String
+    #   resp.encoder_settings.audio_descriptions[0].remix_settings.channel_mappings #=> Array
+    #   resp.encoder_settings.audio_descriptions[0].remix_settings.channel_mappings[0].input_channel_levels #=> Array
+    #   resp.encoder_settings.audio_descriptions[0].remix_settings.channel_mappings[0].input_channel_levels[0].gain #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].remix_settings.channel_mappings[0].input_channel_levels[0].input_channel #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].remix_settings.channel_mappings[0].output_channel #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].remix_settings.channels_in #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].remix_settings.channels_out #=> Integer
+    #   resp.encoder_settings.audio_descriptions[0].stream_name #=> String
+    #   resp.encoder_settings.audio_descriptions[0].audio_dash_roles #=> Array
+    #   resp.encoder_settings.audio_descriptions[0].audio_dash_roles[0] #=> String, one of "ALTERNATE", "COMMENTARY", "DESCRIPTION", "DUB", "EMERGENCY", "ENHANCED-AUDIO-INTELLIGIBILITY", "KARAOKE", "MAIN", "SUPPLEMENTARY"
+    #   resp.encoder_settings.audio_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
+    #   resp.encoder_settings.avail_blanking.avail_blanking_image.password_param #=> String
+    #   resp.encoder_settings.avail_blanking.avail_blanking_image.uri #=> String
+    #   resp.encoder_settings.avail_blanking.avail_blanking_image.username #=> String
+    #   resp.encoder_settings.avail_blanking.state #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.acquisition_point_id #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.ad_avail_offset #=> Integer
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.password_param #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.pois_endpoint #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.username #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.esam.zone_identity #=> String
+    #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.ad_avail_offset #=> Integer
+    #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_splice_insert.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.ad_avail_offset #=> Integer
+    #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.no_regional_blackout_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.encoder_settings.avail_configuration.avail_settings.scte_35_time_signal_apos.web_delivery_allowed_flag #=> String, one of "FOLLOW", "IGNORE"
+    #   resp.encoder_settings.avail_configuration.scte_35_segmentation_scope #=> String, one of "ALL_OUTPUT_GROUPS", "SCTE35_ENABLED_OUTPUT_GROUPS"
+    #   resp.encoder_settings.blackout_slate.blackout_slate_image.password_param #=> String
+    #   resp.encoder_settings.blackout_slate.blackout_slate_image.uri #=> String
+    #   resp.encoder_settings.blackout_slate.blackout_slate_image.username #=> String
+    #   resp.encoder_settings.blackout_slate.network_end_blackout #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.blackout_slate.network_end_blackout_image.password_param #=> String
+    #   resp.encoder_settings.blackout_slate.network_end_blackout_image.uri #=> String
+    #   resp.encoder_settings.blackout_slate.network_end_blackout_image.username #=> String
+    #   resp.encoder_settings.blackout_slate.network_id #=> String
+    #   resp.encoder_settings.blackout_slate.state #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.caption_descriptions #=> Array
+    #   resp.encoder_settings.caption_descriptions[0].accessibility #=> String, one of "DOES_NOT_IMPLEMENT_ACCESSIBILITY_FEATURES", "IMPLEMENTS_ACCESSIBILITY_FEATURES"
+    #   resp.encoder_settings.caption_descriptions[0].caption_selector_name #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.alignment #=> String, one of "CENTERED", "LEFT", "SMART"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.background_color #=> String, one of "BLACK", "NONE", "WHITE"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.background_opacity #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.font.password_param #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.font.uri #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.font.username #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.font_color #=> String, one of "BLACK", "BLUE", "GREEN", "RED", "WHITE", "YELLOW"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.font_opacity #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.font_resolution #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.font_size #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.outline_color #=> String, one of "BLACK", "BLUE", "GREEN", "RED", "WHITE", "YELLOW"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.outline_size #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.shadow_color #=> String, one of "BLACK", "NONE", "WHITE"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.shadow_opacity #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.shadow_x_offset #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.shadow_y_offset #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.teletext_grid_control #=> String, one of "FIXED", "SCALED"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.x_position #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.burn_in_destination_settings.y_position #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.alignment #=> String, one of "CENTERED", "LEFT", "SMART"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.background_color #=> String, one of "BLACK", "NONE", "WHITE"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.background_opacity #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.font.password_param #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.font.uri #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.font.username #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.font_color #=> String, one of "BLACK", "BLUE", "GREEN", "RED", "WHITE", "YELLOW"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.font_opacity #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.font_resolution #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.font_size #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.outline_color #=> String, one of "BLACK", "BLUE", "GREEN", "RED", "WHITE", "YELLOW"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.outline_size #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.shadow_color #=> String, one of "BLACK", "NONE", "WHITE"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.shadow_opacity #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.shadow_x_offset #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.shadow_y_offset #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.teletext_grid_control #=> String, one of "FIXED", "SCALED"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.x_position #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.dvb_sub_destination_settings.y_position #=> Integer
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.copyright_holder #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.fill_line_gap #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.font_family #=> String
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.ebu_tt_d_destination_settings.style_control #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.ttml_destination_settings.style_control #=> String, one of "PASSTHROUGH", "USE_CONFIGURED"
+    #   resp.encoder_settings.caption_descriptions[0].destination_settings.webvtt_destination_settings.style_control #=> String, one of "NO_STYLE_DATA", "PASSTHROUGH"
+    #   resp.encoder_settings.caption_descriptions[0].language_code #=> String
+    #   resp.encoder_settings.caption_descriptions[0].language_description #=> String
+    #   resp.encoder_settings.caption_descriptions[0].name #=> String
+    #   resp.encoder_settings.caption_descriptions[0].caption_dash_roles #=> Array
+    #   resp.encoder_settings.caption_descriptions[0].caption_dash_roles[0] #=> String, one of "ALTERNATE", "CAPTION", "COMMENTARY", "DESCRIPTION", "DUB", "EASYREADER", "EMERGENCY", "FORCED-SUBTITLE", "KARAOKE", "MAIN", "METADATA", "SUBTITLE", "SUPPLEMENTARY"
+    #   resp.encoder_settings.caption_descriptions[0].dvb_dash_accessibility #=> String, one of "DVBDASH_1_VISUALLY_IMPAIRED", "DVBDASH_2_HARD_OF_HEARING", "DVBDASH_3_SUPPLEMENTAL_COMMENTARY", "DVBDASH_4_DIRECTORS_COMMENTARY", "DVBDASH_5_EDUCATIONAL_NOTES", "DVBDASH_6_MAIN_PROGRAM", "DVBDASH_7_CLEAN_FEED"
+    #   resp.encoder_settings.feature_activations.input_prepare_schedule_actions #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.feature_activations.output_static_image_overlay_schedule_actions #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.global_configuration.initial_audio_gain #=> Integer
+    #   resp.encoder_settings.global_configuration.input_end_action #=> String, one of "NONE", "SWITCH_AND_LOOP_INPUTS"
+    #   resp.encoder_settings.global_configuration.input_loss_behavior.black_frame_msec #=> Integer
+    #   resp.encoder_settings.global_configuration.input_loss_behavior.input_loss_image_color #=> String
+    #   resp.encoder_settings.global_configuration.input_loss_behavior.input_loss_image_slate.password_param #=> String
+    #   resp.encoder_settings.global_configuration.input_loss_behavior.input_loss_image_slate.uri #=> String
+    #   resp.encoder_settings.global_configuration.input_loss_behavior.input_loss_image_slate.username #=> String
+    #   resp.encoder_settings.global_configuration.input_loss_behavior.input_loss_image_type #=> String, one of "COLOR", "SLATE"
+    #   resp.encoder_settings.global_configuration.input_loss_behavior.repeat_frame_msec #=> Integer
+    #   resp.encoder_settings.global_configuration.output_locking_mode #=> String, one of "EPOCH_LOCKING", "PIPELINE_LOCKING"
+    #   resp.encoder_settings.global_configuration.output_timing_source #=> String, one of "INPUT_CLOCK", "SYSTEM_CLOCK"
+    #   resp.encoder_settings.global_configuration.support_low_framerate_inputs #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.custom_epoch #=> String
+    #   resp.encoder_settings.global_configuration.output_locking_settings.epoch_locking_settings.jam_sync_time #=> String
+    #   resp.encoder_settings.motion_graphics_configuration.motion_graphics_insertion #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.nielsen_configuration.distributor_id #=> String
+    #   resp.encoder_settings.nielsen_configuration.nielsen_pcm_to_id_3_tagging #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups #=> Array
+    #   resp.encoder_settings.output_groups[0].name #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.archive_cdn_settings.archive_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.archive_group_settings.rollover_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.frame_capture_group_settings.frame_capture_cdn_settings.frame_capture_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers #=> Array
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ad_markers[0] #=> String, one of "ADOBE", "ELEMENTAL", "ELEMENTAL_SCTE35"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_content #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_content_1 #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_manifest #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.base_url_manifest_1 #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.caption_language_mappings #=> Array
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.caption_language_mappings[0].caption_channel #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.caption_language_mappings[0].language_code #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.caption_language_mappings[0].language_description #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.caption_language_setting #=> String, one of "INSERT", "NONE", "OMIT"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.client_cache #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.codec_specification #=> String, one of "RFC_4281", "RFC_6381"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.constant_iv #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.directory_structure #=> String, one of "SINGLE_DIRECTORY", "SUBDIRECTORY_PER_STREAM"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.discontinuity_tags #=> String, one of "INSERT", "NEVER_INSERT"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.encryption_type #=> String, one of "AES128", "SAMPLE_AES"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_akamai_settings.connection_retry_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_akamai_settings.filecache_duration #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_akamai_settings.http_transfer_mode #=> String, one of "CHUNKED", "NON_CHUNKED"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_akamai_settings.num_retries #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_akamai_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_akamai_settings.salt #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_akamai_settings.token #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_basic_put_settings.connection_retry_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_basic_put_settings.filecache_duration #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_basic_put_settings.num_retries #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_basic_put_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.connection_retry_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.filecache_duration #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.media_store_storage_class #=> String, one of "TEMPORAL"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.num_retries #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_media_store_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_s3_settings.canned_acl #=> String, one of "AUTHENTICATED_READ", "BUCKET_OWNER_FULL_CONTROL", "BUCKET_OWNER_READ", "PUBLIC_READ"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.connection_retry_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.filecache_duration #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.http_transfer_mode #=> String, one of "CHUNKED", "NON_CHUNKED"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.num_retries #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_cdn_settings.hls_webdav_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.hls_id_3_segment_tagging #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.i_frame_only_playlists #=> String, one of "DISABLED", "STANDARD"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.incomplete_segment_behavior #=> String, one of "AUTO", "SUPPRESS"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.index_n_segments #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.input_loss_action #=> String, one of "EMIT_OUTPUT", "PAUSE_OUTPUT"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.iv_in_manifest #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.iv_source #=> String, one of "EXPLICIT", "FOLLOWS_SEGMENT_NUMBER"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.keep_segments #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.key_format #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.key_format_versions #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.key_provider_settings.static_key_settings.key_provider_server.password_param #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.key_provider_settings.static_key_settings.key_provider_server.uri #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.key_provider_settings.static_key_settings.key_provider_server.username #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.key_provider_settings.static_key_settings.static_key_value #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.manifest_compression #=> String, one of "GZIP", "NONE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.manifest_duration_format #=> String, one of "FLOATING_POINT", "INTEGER"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.min_segment_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.mode #=> String, one of "LIVE", "VOD"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.output_selection #=> String, one of "MANIFESTS_AND_SEGMENTS", "SEGMENTS_ONLY", "VARIANT_MANIFESTS_AND_SEGMENTS"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_clock #=> String, one of "INITIALIZE_FROM_OUTPUT_TIMECODE", "SYSTEM_CLOCK"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.program_date_time_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.redundant_manifest #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.segment_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.segmentation_mode #=> String, one of "USE_INPUT_SEGMENTATION", "USE_SEGMENT_DURATION"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.segments_per_subdirectory #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.stream_inf_resolution #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.timed_metadata_id_3_frame #=> String, one of "NONE", "PRIV", "TDRL"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.timed_metadata_id_3_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.timestamp_delta_milliseconds #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.hls_group_settings.ts_file_mode #=> String, one of "SEGMENTED_FILES", "SINGLE_FILE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.media_package_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.acquisition_point_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.audio_only_timecode_control #=> String, one of "PASSTHROUGH", "USE_CONFIGURED_CLOCK"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.certificate_mode #=> String, one of "SELF_SIGNED", "VERIFY_AUTHENTICITY"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.connection_retry_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.event_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.event_id_mode #=> String, one of "NO_EVENT_ID", "USE_CONFIGURED", "USE_TIMESTAMP"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.event_stop_behavior #=> String, one of "NONE", "SEND_EOS"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.filecache_duration #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.fragment_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.input_loss_action #=> String, one of "EMIT_OUTPUT", "PAUSE_OUTPUT"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.num_retries #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.segmentation_mode #=> String, one of "USE_INPUT_SEGMENTATION", "USE_SEGMENT_DURATION"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.send_delay_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.sparse_track_type #=> String, one of "NONE", "SCTE_35", "SCTE_35_WITHOUT_SEGMENTATION"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.stream_manifest_behavior #=> String, one of "DO_NOT_SEND", "SEND"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.timestamp_offset #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.ms_smooth_group_settings.timestamp_offset_mode #=> String, one of "USE_CONFIGURED_OFFSET", "USE_EVENT_START_DATE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.ad_markers #=> Array
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.ad_markers[0] #=> String, one of "ON_CUE_POINT_SCTE35"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.authentication_scheme #=> String, one of "AKAMAI", "COMMON"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.cache_full_behavior #=> String, one of "DISCONNECT_IMMEDIATELY", "WAIT_FOR_SERVER"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.cache_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.caption_data #=> String, one of "ALL", "FIELD1_608", "FIELD1_AND_FIELD2_608"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.input_loss_action #=> String, one of "EMIT_OUTPUT", "PAUSE_OUTPUT"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.restart_delay #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.rtmp_group_settings.include_filler_nal_units #=> String, one of "AUTO", "DROP", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_frame #=> String, one of "NONE", "PRIV", "TDRL"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.udp_group_settings.timed_metadata_id_3_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.scte_35_type #=> String, one of "NONE", "SCTE_35_WITHOUT_SEGMENTATION"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.segment_length_units #=> String, one of "MILLISECONDS", "SECONDS"
+    #   resp.encoder_settings.output_groups[0].output_group_settings.cmaf_ingest_group_settings.send_delay_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].output_group_settings.srt_group_settings.input_loss_action #=> String, one of "DROP_PROGRAM", "DROP_TS", "EMIT_PROGRAM"
+    #   resp.encoder_settings.output_groups[0].outputs #=> Array
+    #   resp.encoder_settings.output_groups[0].outputs[0].audio_description_names #=> Array
+    #   resp.encoder_settings.output_groups[0].outputs[0].audio_description_names[0] #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].caption_description_names #=> Array
+    #   resp.encoder_settings.output_groups[0].outputs[0].caption_description_names[0] #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.arib_captions_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.arib_captions_pid_control #=> String, one of "AUTO", "USE_CONFIGURED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.audio_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.bitrate #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.buffer_model #=> String, one of "MULTIPLEX", "NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.dvb_nit_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.output_sdt #=> String, one of "SDT_FOLLOW", "SDT_FOLLOW_IF_PRESENT", "SDT_MANUAL", "SDT_NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_provider_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.dvb_sub_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.dvb_tdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.dvb_teletext_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.ebp_audio_interval #=> String, one of "VIDEO_AND_FIXED_INTERVALS", "VIDEO_INTERVAL"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.ebp_lookahead_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.ebp_placement #=> String, one of "VIDEO_AND_AUDIO_PIDS", "VIDEO_PID"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.ecm_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.etv_platform_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.etv_signal_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.fragment_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.klv_data_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.null_packet_bitrate #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.pat_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.pcr_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.pmt_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.pmt_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.program_num #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.rate_mode #=> String, one of "CBR", "VBR"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.timed_metadata_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.transport_stream_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.container_settings.m2ts_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.extension #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.archive_output_settings.name_modifier #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.frame_capture_output_settings.name_modifier #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.h265_packaging_type #=> String, one of "HEV1", "HVC1"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.audio_only_hls_settings.audio_group_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.audio_only_hls_settings.audio_only_image.password_param #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.audio_only_hls_settings.audio_only_image.uri #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.audio_only_hls_settings.audio_only_image.username #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.audio_only_hls_settings.audio_track_type #=> String, one of "ALTERNATE_AUDIO_AUTO_SELECT", "ALTERNATE_AUDIO_AUTO_SELECT_DEFAULT", "ALTERNATE_AUDIO_NOT_AUTO_SELECT", "AUDIO_ONLY_VARIANT_STREAM"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.audio_only_hls_settings.segment_type #=> String, one of "AAC", "FMP4"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.fmp_4_hls_settings.audio_rendition_sets #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.fmp_4_hls_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.fmp_4_hls_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.audio_rendition_sets #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.audio_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.ecm_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.pat_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.pcr_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.pmt_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.pmt_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.program_num #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.scte_35_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.timed_metadata_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.transport_stream_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.hls_settings.standard_hls_settings.m3u_8_settings.klv_data_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.name_modifier #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.hls_output_settings.segment_modifier #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.h265_packaging_type #=> String, one of "HEV1", "HVC1"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.ms_smooth_output_settings.name_modifier #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.multiplex_output_settings.container_settings.multiplex_m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.certificate_mode #=> String, one of "SELF_SIGNED", "VERIFY_AUTHENTICITY"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.connection_retry_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.rtmp_output_settings.num_retries #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.buffer_msec #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.arib_captions_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.arib_captions_pid_control #=> String, one of "AUTO", "USE_CONFIGURED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.audio_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.bitrate #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.buffer_model #=> String, one of "MULTIPLEX", "NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.dvb_nit_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.output_sdt #=> String, one of "SDT_FOLLOW", "SDT_FOLLOW_IF_PRESENT", "SDT_MANUAL", "SDT_NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_provider_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.dvb_sub_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.dvb_tdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.dvb_teletext_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.ebp_audio_interval #=> String, one of "VIDEO_AND_FIXED_INTERVALS", "VIDEO_INTERVAL"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.ebp_lookahead_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.ebp_placement #=> String, one of "VIDEO_AND_AUDIO_PIDS", "VIDEO_PID"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.ecm_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.etv_platform_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.etv_signal_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.fragment_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.klv_data_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.null_packet_bitrate #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.pat_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.pcr_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.pmt_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.pmt_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.program_num #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.rate_mode #=> String, one of "CBR", "VBR"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.timed_metadata_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.transport_stream_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.container_settings.m2ts_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.column_depth #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.include_fec #=> String, one of "COLUMN", "COLUMN_AND_ROW"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.udp_output_settings.fec_output_settings.row_length #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.cmaf_ingest_output_settings.name_modifier #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.buffer_msec #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.absent_input_audio_behavior #=> String, one of "DROP", "ENCODE_SILENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.arib_captions_pid_control #=> String, one of "AUTO", "USE_CONFIGURED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_buffer_model #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_frames_per_pes #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.audio_stream_type #=> String, one of "ATSC", "DVB"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.bitrate #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.buffer_model #=> String, one of "MULTIPLEX", "NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.cc_descriptor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.network_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_nit_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.output_sdt #=> String, one of "SDT_FOLLOW", "SDT_FOLLOW_IF_PRESENT", "SDT_MANUAL", "SDT_NONE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sdt_settings.service_provider_name #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_sub_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_tdt_settings.rep_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.dvb_teletext_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebif #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_audio_interval #=> String, one of "VIDEO_AND_FIXED_INTERVALS", "VIDEO_INTERVAL"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_lookahead_ms #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ebp_placement #=> String, one of "VIDEO_AND_AUDIO_PIDS", "VIDEO_PID"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.ecm_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.es_rate_in_pes #=> String, one of "EXCLUDE", "INCLUDE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_platform_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.etv_signal_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.fragment_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.klv_data_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.nielsen_id_3_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.null_packet_bitrate #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pat_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_control #=> String, one of "CONFIGURED_PCR_PERIOD", "PCR_EVERY_PES_PACKET"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_period #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pcr_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_interval #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.pmt_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.program_num #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.rate_mode #=> String, one of "CBR", "VBR"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_27_pids #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_control #=> String, one of "NONE", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.scte_35_preroll_pullup_milliseconds #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_markers #=> String, one of "EBP", "EBP_LEGACY", "NONE", "PSI_SEGSTART", "RAI_ADAPT", "RAI_SEGSTART"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_style #=> String, one of "MAINTAIN_CADENCE", "RESET_CADENCE"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.segmentation_time #=> Float
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_behavior #=> String, one of "NO_PASSTHROUGH", "PASSTHROUGH"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.timed_metadata_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.transport_stream_id #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.container_settings.m2ts_settings.video_pid #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.destination.destination_ref_id #=> String
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.encryption_type #=> String, one of "AES128", "AES192", "AES256"
+    #   resp.encoder_settings.output_groups[0].outputs[0].output_settings.srt_output_settings.latency #=> Integer
+    #   resp.encoder_settings.output_groups[0].outputs[0].video_description_name #=> String
+    #   resp.encoder_settings.timecode_config.source #=> String, one of "EMBEDDED", "SYSTEMCLOCK", "ZEROBASED"
+    #   resp.encoder_settings.timecode_config.sync_threshold #=> Integer
+    #   resp.encoder_settings.video_descriptions #=> Array
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.capture_interval_units #=> String, one of "MILLISECONDS", "SECONDS"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.frame_capture_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.bitrate #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.buf_fill_pct #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.buf_size #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.color_metadata #=> String, one of "IGNORE", "INSERT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.entropy_encoding #=> String, one of "CABAC", "CAVLC"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.force_field_pictures #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.framerate_control #=> String, one of "INITIALIZE_FROM_SOURCE", "SPECIFIED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.framerate_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.framerate_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.gop_b_reference #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.gop_closed_cadence #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.gop_num_b_frames #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.gop_size #=> Float
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.level #=> String, one of "H264_LEVEL_1", "H264_LEVEL_1_1", "H264_LEVEL_1_2", "H264_LEVEL_1_3", "H264_LEVEL_2", "H264_LEVEL_2_1", "H264_LEVEL_2_2", "H264_LEVEL_3", "H264_LEVEL_3_1", "H264_LEVEL_3_2", "H264_LEVEL_4", "H264_LEVEL_4_1", "H264_LEVEL_4_2", "H264_LEVEL_5", "H264_LEVEL_5_1", "H264_LEVEL_5_2", "H264_LEVEL_AUTO"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.look_ahead_rate_control #=> String, one of "HIGH", "LOW", "MEDIUM"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.max_bitrate #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.min_i_interval #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.num_ref_frames #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.par_control #=> String, one of "INITIALIZE_FROM_SOURCE", "SPECIFIED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.par_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.par_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.profile #=> String, one of "BASELINE", "HIGH", "HIGH_10BIT", "HIGH_422", "HIGH_422_10BIT", "MAIN"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.quality_level #=> String, one of "ENHANCED_QUALITY", "STANDARD_QUALITY"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.qvbr_quality_level #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.rate_control_mode #=> String, one of "CBR", "MULTIPLEX", "QVBR", "VBR"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.scene_change_detect #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.slices #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.softness #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.spatial_aq #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.subgop_length #=> String, one of "DYNAMIC", "FIXED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.syntax #=> String, one of "DEFAULT", "RP2027"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.temporal_aq #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h264_settings.min_qp #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "HIGHER", "LOW", "MAX", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.alternative_transfer_function #=> String, one of "INSERT", "OMIT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.bitrate #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.buf_size #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.color_metadata #=> String, one of "IGNORE", "INSERT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.post_filter_sharpening #=> String, one of "DISABLED", "SHARPENING_1", "SHARPENING_2", "SHARPENING_3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.filter_settings.bandwidth_reduction_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.flicker_aq #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.framerate_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.framerate_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.gop_closed_cadence #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.gop_size #=> Float
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.level #=> String, one of "H265_LEVEL_1", "H265_LEVEL_2", "H265_LEVEL_2_1", "H265_LEVEL_3", "H265_LEVEL_3_1", "H265_LEVEL_4", "H265_LEVEL_4_1", "H265_LEVEL_5", "H265_LEVEL_5_1", "H265_LEVEL_5_2", "H265_LEVEL_6", "H265_LEVEL_6_1", "H265_LEVEL_6_2", "H265_LEVEL_AUTO"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.look_ahead_rate_control #=> String, one of "HIGH", "LOW", "MEDIUM"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.max_bitrate #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.min_i_interval #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.par_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.par_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.profile #=> String, one of "MAIN", "MAIN_10BIT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.qvbr_quality_level #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.rate_control_mode #=> String, one of "CBR", "MULTIPLEX", "QVBR"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.scene_change_detect #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.slices #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tier #=> String, one of "HIGH", "MAIN"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_insertion #=> String, one of "DISABLED", "PIC_TIMING_SEI"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_over_picture_boundaries #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.mv_temporal_predictor #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_height #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_padding #=> String, one of "NONE", "PADDED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.tile_width #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.treeblock_size #=> String, one of "AUTO", "TREE_SIZE_32X32"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.h265_settings.min_qp #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.adaptive_quantization #=> String, one of "AUTO", "HIGH", "LOW", "MEDIUM", "OFF"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.color_metadata #=> String, one of "IGNORE", "INSERT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.color_space #=> String, one of "AUTO", "PASSTHROUGH"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.display_aspect_ratio #=> String, one of "DISPLAYRATIO16X9", "DISPLAYRATIO4X3"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.filter_settings.temporal_filter_settings.post_filter_sharpening #=> String, one of "AUTO", "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.filter_settings.temporal_filter_settings.strength #=> String, one of "AUTO", "STRENGTH_1", "STRENGTH_2", "STRENGTH_3", "STRENGTH_4", "STRENGTH_5", "STRENGTH_6", "STRENGTH_7", "STRENGTH_8", "STRENGTH_9", "STRENGTH_10", "STRENGTH_11", "STRENGTH_12", "STRENGTH_13", "STRENGTH_14", "STRENGTH_15", "STRENGTH_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.framerate_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.framerate_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.gop_closed_cadence #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.gop_num_b_frames #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.gop_size #=> Float
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.scan_type #=> String, one of "INTERLACED", "PROGRESSIVE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.subgop_length #=> String, one of "DYNAMIC", "FIXED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_insertion #=> String, one of "DISABLED", "GOP_TIMECODE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.mpeg_2_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.afd_signaling #=> String, one of "AUTO", "FIXED", "NONE"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.buf_size #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.color_space_settings.hdr_10_settings.max_fall #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.fixed_afd #=> String, one of "AFD_0000", "AFD_0010", "AFD_0011", "AFD_0100", "AFD_1000", "AFD_1001", "AFD_1010", "AFD_1011", "AFD_1101", "AFD_1110", "AFD_1111"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.framerate_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size #=> Float
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.gop_size_units #=> String, one of "FRAMES", "SECONDS"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.level #=> String, one of "AV1_LEVEL_2", "AV1_LEVEL_2_1", "AV1_LEVEL_3", "AV1_LEVEL_3_1", "AV1_LEVEL_4", "AV1_LEVEL_4_1", "AV1_LEVEL_5", "AV1_LEVEL_5_1", "AV1_LEVEL_5_2", "AV1_LEVEL_5_3", "AV1_LEVEL_6", "AV1_LEVEL_6_1", "AV1_LEVEL_6_2", "AV1_LEVEL_6_3", "AV1_LEVEL_AUTO"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.look_ahead_rate_control #=> String, one of "HIGH", "LOW", "MEDIUM"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.max_bitrate #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.min_i_interval #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_denominator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.par_numerator #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.qvbr_quality_level #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.scene_change_detect #=> String, one of "DISABLED", "ENABLED"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.font_size #=> String, one of "EXTRA_SMALL_10", "LARGE_48", "MEDIUM_32", "SMALL_16"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.position #=> String, one of "BOTTOM_CENTER", "BOTTOM_LEFT", "BOTTOM_RIGHT", "MIDDLE_CENTER", "MIDDLE_LEFT", "MIDDLE_RIGHT", "TOP_CENTER", "TOP_LEFT", "TOP_RIGHT"
+    #   resp.encoder_settings.video_descriptions[0].codec_settings.av_1_settings.timecode_burnin_settings.prefix #=> String
+    #   resp.encoder_settings.video_descriptions[0].height #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].name #=> String
+    #   resp.encoder_settings.video_descriptions[0].respond_to_afd #=> String, one of "NONE", "PASSTHROUGH", "RESPOND"
+    #   resp.encoder_settings.video_descriptions[0].scaling_behavior #=> String, one of "DEFAULT", "STRETCH_TO_OUTPUT"
+    #   resp.encoder_settings.video_descriptions[0].sharpness #=> Integer
+    #   resp.encoder_settings.video_descriptions[0].width #=> Integer
+    #   resp.encoder_settings.thumbnail_configuration.state #=> String, one of "AUTO", "DISABLED"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections #=> Array
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].input_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].output_color_space #=> String, one of "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.encoder_settings.color_correction_settings.global_color_corrections[0].uri #=> String
+    #   resp.id #=> String
+    #   resp.input_attachments #=> Array
+    #   resp.input_attachments[0].automatic_input_failover_settings.error_clear_time_msec #=> Integer
+    #   resp.input_attachments[0].automatic_input_failover_settings.failover_conditions #=> Array
+    #   resp.input_attachments[0].automatic_input_failover_settings.failover_conditions[0].failover_condition_settings.audio_silence_settings.audio_selector_name #=> String
+    #   resp.input_attachments[0].automatic_input_failover_settings.failover_conditions[0].failover_condition_settings.audio_silence_settings.audio_silence_threshold_msec #=> Integer
+    #   resp.input_attachments[0].automatic_input_failover_settings.failover_conditions[0].failover_condition_settings.input_loss_settings.input_loss_threshold_msec #=> Integer
+    #   resp.input_attachments[0].automatic_input_failover_settings.failover_conditions[0].failover_condition_settings.video_black_settings.black_detect_threshold #=> Float
+    #   resp.input_attachments[0].automatic_input_failover_settings.failover_conditions[0].failover_condition_settings.video_black_settings.video_black_threshold_msec #=> Integer
+    #   resp.input_attachments[0].automatic_input_failover_settings.input_preference #=> String, one of "EQUAL_INPUT_PREFERENCE", "PRIMARY_INPUT_PREFERRED"
+    #   resp.input_attachments[0].automatic_input_failover_settings.secondary_input_id #=> String
+    #   resp.input_attachments[0].input_attachment_name #=> String
+    #   resp.input_attachments[0].input_id #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors #=> Array
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].name #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.group_id #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_hls_rendition_selection.name #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_code #=> String
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_language_selection.language_selection_policy #=> String, one of "LOOSE", "STRICT"
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_pid_selection.pid #=> Integer
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks #=> Array
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.tracks[0].track #=> Integer
+    #   resp.input_attachments[0].input_settings.audio_selectors[0].selector_settings.audio_track_selection.dolby_e_decode.program_selection #=> String, one of "ALL_CHANNELS", "PROGRAM_1", "PROGRAM_2", "PROGRAM_3", "PROGRAM_4", "PROGRAM_5", "PROGRAM_6", "PROGRAM_7", "PROGRAM_8"
+    #   resp.input_attachments[0].input_settings.caption_selectors #=> Array
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].language_code #=> String
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].name #=> String
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.ancillary_source_settings.source_ancillary_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.dvb_sub_source_settings.pid #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.scte_20_detection #=> String, one of "AUTO", "OFF"
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.source_608_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.embedded_source_settings.source_608_track_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.convert_608_to_708 #=> String, one of "DISABLED", "UPCONVERT"
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_20_source_settings.source_608_channel_number #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.ocr_language #=> String, one of "DEU", "ENG", "FRA", "NLD", "POR", "SPA"
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.scte_27_source_settings.pid #=> Integer
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.height #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.left_offset #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.top_offset #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.output_rectangle.width #=> Float
+    #   resp.input_attachments[0].input_settings.caption_selectors[0].selector_settings.teletext_source_settings.page_number #=> String
+    #   resp.input_attachments[0].input_settings.deblock_filter #=> String, one of "DISABLED", "ENABLED"
+    #   resp.input_attachments[0].input_settings.denoise_filter #=> String, one of "DISABLED", "ENABLED"
+    #   resp.input_attachments[0].input_settings.filter_strength #=> Integer
+    #   resp.input_attachments[0].input_settings.input_filter #=> String, one of "AUTO", "DISABLED", "FORCED"
+    #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.bandwidth #=> Integer
+    #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.buffer_segments #=> Integer
+    #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retries #=> Integer
+    #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.retry_interval #=> Integer
+    #   resp.input_attachments[0].input_settings.network_input_settings.hls_input_settings.scte_35_source #=> String, one of "MANIFEST", "SEGMENTS"
+    #   resp.input_attachments[0].input_settings.network_input_settings.server_validation #=> String, one of "CHECK_CRYPTOGRAPHY_AND_VALIDATE_NAME", "CHECK_CRYPTOGRAPHY_ONLY"
+    #   resp.input_attachments[0].input_settings.network_input_settings.multicast_input_settings.source_ip_address #=> String
+    #   resp.input_attachments[0].input_settings.scte_35_pid #=> Integer
+    #   resp.input_attachments[0].input_settings.smpte_2038_data_preference #=> String, one of "IGNORE", "PREFER"
+    #   resp.input_attachments[0].input_settings.source_end_behavior #=> String, one of "CONTINUE", "LOOP"
+    #   resp.input_attachments[0].input_settings.video_selector.color_space #=> String, one of "FOLLOW", "HDR10", "HLG_2020", "REC_601", "REC_709"
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_cll #=> Integer
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_settings.hdr_10_settings.max_fall #=> Integer
+    #   resp.input_attachments[0].input_settings.video_selector.color_space_usage #=> String, one of "FALLBACK", "FORCE"
+    #   resp.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_pid.pid #=> Integer
+    #   resp.input_attachments[0].input_settings.video_selector.selector_settings.video_selector_program_id.program_id #=> Integer
+    #   resp.input_attachments[0].logical_interface_names #=> Array
+    #   resp.input_attachments[0].logical_interface_names[0] #=> String
+    #   resp.input_specification.codec #=> String, one of "MPEG2", "AVC", "HEVC"
+    #   resp.input_specification.maximum_bitrate #=> String, one of "MAX_10_MBPS", "MAX_20_MBPS", "MAX_50_MBPS"
+    #   resp.input_specification.resolution #=> String, one of "SD", "HD", "UHD"
+    #   resp.log_level #=> String, one of "ERROR", "WARNING", "INFO", "DEBUG", "DISABLED"
+    #   resp.maintenance.maintenance_day #=> String, one of "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+    #   resp.maintenance.maintenance_deadline #=> String
+    #   resp.maintenance.maintenance_scheduled_date #=> String
+    #   resp.maintenance.maintenance_start_time #=> String
+    #   resp.maintenance_status #=> String
+    #   resp.name #=> String
+    #   resp.pipeline_details #=> Array
+    #   resp.pipeline_details[0].active_input_attachment_name #=> String
+    #   resp.pipeline_details[0].active_input_switch_action_name #=> String
+    #   resp.pipeline_details[0].active_motion_graphics_action_name #=> String
+    #   resp.pipeline_details[0].active_motion_graphics_uri #=> String
+    #   resp.pipeline_details[0].pipeline_id #=> String
+    #   resp.pipelines_running_count #=> Integer
+    #   resp.role_arn #=> String
+    #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "IDLE", "STARTING", "RUNNING", "RECOVERING", "STOPPING", "DELETING", "DELETED", "UPDATING", "UPDATE_FAILED"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #   resp.vpc.availability_zones #=> Array
+    #   resp.vpc.availability_zones[0] #=> String
+    #   resp.vpc.network_interface_ids #=> Array
+    #   resp.vpc.network_interface_ids[0] #=> String
+    #   resp.vpc.security_group_ids #=> Array
+    #   resp.vpc.security_group_ids[0] #=> String
+    #   resp.vpc.subnet_ids #=> Array
+    #   resp.vpc.subnet_ids[0] #=> String
+    #   resp.anywhere_settings.channel_placement_group_id #=> String
+    #   resp.anywhere_settings.cluster_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/RestartChannelPipelines AWS API Documentation
+    #
+    # @overload restart_channel_pipelines(params = {})
+    # @param [Hash] params ({})
+    def restart_channel_pipelines(params = {}, options = {})
+      req = build_request(:restart_channel_pipelines, params)
+      req.send_request(options)
+    end
+
+    # Creates a cloudwatch alarm template to dynamically generate cloudwatch
+    # metric alarms on targeted resource types.
+    #
+    # @option params [required, String] :comparison_operator
+    #   The comparison operator used to compare the specified statistic and
+    #   the threshold.
+    #
+    # @option params [Integer] :datapoints_to_alarm
+    #
+    # @option params [String] :description
+    #
+    # @option params [required, Integer] :evaluation_periods
+    #
+    # @option params [required, String] :group_identifier
+    #
+    # @option params [required, String] :metric_name
+    #
+    # @option params [required, String] :name
+    #
+    # @option params [required, Integer] :period
+    #
+    # @option params [required, String] :statistic
+    #   The statistic to apply to the alarm's metric data.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Represents the tags associated with a resource.
+    #
+    # @option params [required, String] :target_resource_type
+    #   The resource type this template should dynamically generate cloudwatch
+    #   metric alarms for.
+    #
+    # @option params [required, Float] :threshold
+    #
+    # @option params [required, String] :treat_missing_data
+    #   Specifies how missing data points are treated when evaluating the
+    #   alarm's condition.
+    #
+    # @return [Types::CreateCloudWatchAlarmTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#arn #arn} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#comparison_operator #comparison_operator} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#created_at #created_at} => Time
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#datapoints_to_alarm #datapoints_to_alarm} => Integer
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#description #description} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#evaluation_periods #evaluation_periods} => Integer
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#group_id #group_id} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#id #id} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#metric_name #metric_name} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#modified_at #modified_at} => Time
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#name #name} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#period #period} => Integer
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#statistic #statistic} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#target_resource_type #target_resource_type} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#threshold #threshold} => Float
+    #   * {Types::CreateCloudWatchAlarmTemplateResponse#treat_missing_data #treat_missing_data} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_cloud_watch_alarm_template({
+    #     comparison_operator: "GreaterThanOrEqualToThreshold", # required, accepts GreaterThanOrEqualToThreshold, GreaterThanThreshold, LessThanThreshold, LessThanOrEqualToThreshold
+    #     datapoints_to_alarm: 1,
+    #     description: "__stringMin0Max1024",
+    #     evaluation_periods: 1, # required
+    #     group_identifier: "__stringPatternS", # required
+    #     metric_name: "__stringMax64", # required
+    #     name: "__stringMin1Max255PatternS", # required
+    #     period: 1, # required
+    #     statistic: "SampleCount", # required, accepts SampleCount, Average, Sum, Minimum, Maximum
+    #     tags: {
+    #       "__string" => "__string",
+    #     },
+    #     target_resource_type: "CLOUDFRONT_DISTRIBUTION", # required, accepts CLOUDFRONT_DISTRIBUTION, MEDIALIVE_MULTIPLEX, MEDIALIVE_CHANNEL, MEDIALIVE_INPUT_DEVICE, MEDIAPACKAGE_CHANNEL, MEDIAPACKAGE_ORIGIN_ENDPOINT, MEDIACONNECT_FLOW, S3_BUCKET
+    #     threshold: 1.0, # required
+    #     treat_missing_data: "notBreaching", # required, accepts notBreaching, breaching, ignore, missing
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.comparison_operator #=> String, one of "GreaterThanOrEqualToThreshold", "GreaterThanThreshold", "LessThanThreshold", "LessThanOrEqualToThreshold"
+    #   resp.created_at #=> Time
+    #   resp.datapoints_to_alarm #=> Integer
+    #   resp.description #=> String
+    #   resp.evaluation_periods #=> Integer
+    #   resp.group_id #=> String
+    #   resp.id #=> String
+    #   resp.metric_name #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.period #=> Integer
+    #   resp.statistic #=> String, one of "SampleCount", "Average", "Sum", "Minimum", "Maximum"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #   resp.target_resource_type #=> String, one of "CLOUDFRONT_DISTRIBUTION", "MEDIALIVE_MULTIPLEX", "MEDIALIVE_CHANNEL", "MEDIALIVE_INPUT_DEVICE", "MEDIAPACKAGE_CHANNEL", "MEDIAPACKAGE_ORIGIN_ENDPOINT", "MEDIACONNECT_FLOW", "S3_BUCKET"
+    #   resp.threshold #=> Float
+    #   resp.treat_missing_data #=> String, one of "notBreaching", "breaching", "ignore", "missing"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateCloudWatchAlarmTemplate AWS API Documentation
+    #
+    # @overload create_cloud_watch_alarm_template(params = {})
+    # @param [Hash] params ({})
+    def create_cloud_watch_alarm_template(params = {}, options = {})
+      req = build_request(:create_cloud_watch_alarm_template, params)
+      req.send_request(options)
+    end
+
+    # Creates a cloudwatch alarm template group to group your cloudwatch
+    # alarm templates and to attach to signal maps for dynamically creating
+    # alarms.
+    #
+    # @option params [String] :description
+    #
+    # @option params [required, String] :name
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Represents the tags associated with a resource.
+    #
+    # @return [Types::CreateCloudWatchAlarmTemplateGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateCloudWatchAlarmTemplateGroupResponse#arn #arn} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateGroupResponse#created_at #created_at} => Time
+    #   * {Types::CreateCloudWatchAlarmTemplateGroupResponse#description #description} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateGroupResponse#id #id} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateGroupResponse#modified_at #modified_at} => Time
+    #   * {Types::CreateCloudWatchAlarmTemplateGroupResponse#name #name} => String
+    #   * {Types::CreateCloudWatchAlarmTemplateGroupResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_cloud_watch_alarm_template_group({
+    #     description: "__stringMin0Max1024",
+    #     name: "__stringMin1Max255PatternS", # required
+    #     tags: {
+    #       "__string" => "__string",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.id #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateCloudWatchAlarmTemplateGroup AWS API Documentation
+    #
+    # @overload create_cloud_watch_alarm_template_group(params = {})
+    # @param [Hash] params ({})
+    def create_cloud_watch_alarm_template_group(params = {}, options = {})
+      req = build_request(:create_cloud_watch_alarm_template_group, params)
+      req.send_request(options)
+    end
+
+    # Creates an eventbridge rule template to monitor events and send
+    # notifications to your targeted resources.
+    #
+    # @option params [String] :description
+    #
+    # @option params [Array<Types::EventBridgeRuleTemplateTarget>] :event_targets
+    #
+    # @option params [required, String] :event_type
+    #   The type of event to match with the rule.
+    #
+    # @option params [required, String] :group_identifier
+    #
+    # @option params [required, String] :name
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Represents the tags associated with a resource.
+    #
+    # @return [Types::CreateEventBridgeRuleTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateEventBridgeRuleTemplateResponse#arn #arn} => String
+    #   * {Types::CreateEventBridgeRuleTemplateResponse#created_at #created_at} => Time
+    #   * {Types::CreateEventBridgeRuleTemplateResponse#description #description} => String
+    #   * {Types::CreateEventBridgeRuleTemplateResponse#event_targets #event_targets} => Array&lt;Types::EventBridgeRuleTemplateTarget&gt;
+    #   * {Types::CreateEventBridgeRuleTemplateResponse#event_type #event_type} => String
+    #   * {Types::CreateEventBridgeRuleTemplateResponse#group_id #group_id} => String
+    #   * {Types::CreateEventBridgeRuleTemplateResponse#id #id} => String
+    #   * {Types::CreateEventBridgeRuleTemplateResponse#modified_at #modified_at} => Time
+    #   * {Types::CreateEventBridgeRuleTemplateResponse#name #name} => String
+    #   * {Types::CreateEventBridgeRuleTemplateResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_event_bridge_rule_template({
+    #     description: "__stringMin0Max1024",
+    #     event_targets: [
+    #       {
+    #         arn: "__stringMin1Max2048PatternArn", # required
+    #       },
+    #     ],
+    #     event_type: "MEDIALIVE_MULTIPLEX_ALERT", # required, accepts MEDIALIVE_MULTIPLEX_ALERT, MEDIALIVE_MULTIPLEX_STATE_CHANGE, MEDIALIVE_CHANNEL_ALERT, MEDIALIVE_CHANNEL_INPUT_CHANGE, MEDIALIVE_CHANNEL_STATE_CHANGE, MEDIAPACKAGE_INPUT_NOTIFICATION, MEDIAPACKAGE_KEY_PROVIDER_NOTIFICATION, MEDIAPACKAGE_HARVEST_JOB_NOTIFICATION, SIGNAL_MAP_ACTIVE_ALARM, MEDIACONNECT_ALERT, MEDIACONNECT_SOURCE_HEALTH, MEDIACONNECT_OUTPUT_HEALTH, MEDIACONNECT_FLOW_STATUS_CHANGE
+    #     group_identifier: "__stringPatternS", # required
+    #     name: "__stringMin1Max255PatternS", # required
+    #     tags: {
+    #       "__string" => "__string",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.event_targets #=> Array
+    #   resp.event_targets[0].arn #=> String
+    #   resp.event_type #=> String, one of "MEDIALIVE_MULTIPLEX_ALERT", "MEDIALIVE_MULTIPLEX_STATE_CHANGE", "MEDIALIVE_CHANNEL_ALERT", "MEDIALIVE_CHANNEL_INPUT_CHANGE", "MEDIALIVE_CHANNEL_STATE_CHANGE", "MEDIAPACKAGE_INPUT_NOTIFICATION", "MEDIAPACKAGE_KEY_PROVIDER_NOTIFICATION", "MEDIAPACKAGE_HARVEST_JOB_NOTIFICATION", "SIGNAL_MAP_ACTIVE_ALARM", "MEDIACONNECT_ALERT", "MEDIACONNECT_SOURCE_HEALTH", "MEDIACONNECT_OUTPUT_HEALTH", "MEDIACONNECT_FLOW_STATUS_CHANGE"
+    #   resp.group_id #=> String
+    #   resp.id #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateEventBridgeRuleTemplate AWS API Documentation
+    #
+    # @overload create_event_bridge_rule_template(params = {})
+    # @param [Hash] params ({})
+    def create_event_bridge_rule_template(params = {}, options = {})
+      req = build_request(:create_event_bridge_rule_template, params)
+      req.send_request(options)
+    end
+
+    # Creates an eventbridge rule template group to group your eventbridge
+    # rule templates and to attach to signal maps for dynamically creating
+    # notification rules.
+    #
+    # @option params [String] :description
+    #
+    # @option params [required, String] :name
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Represents the tags associated with a resource.
+    #
+    # @return [Types::CreateEventBridgeRuleTemplateGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateEventBridgeRuleTemplateGroupResponse#arn #arn} => String
+    #   * {Types::CreateEventBridgeRuleTemplateGroupResponse#created_at #created_at} => Time
+    #   * {Types::CreateEventBridgeRuleTemplateGroupResponse#description #description} => String
+    #   * {Types::CreateEventBridgeRuleTemplateGroupResponse#id #id} => String
+    #   * {Types::CreateEventBridgeRuleTemplateGroupResponse#modified_at #modified_at} => Time
+    #   * {Types::CreateEventBridgeRuleTemplateGroupResponse#name #name} => String
+    #   * {Types::CreateEventBridgeRuleTemplateGroupResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_event_bridge_rule_template_group({
+    #     description: "__stringMin0Max1024",
+    #     name: "__stringMin1Max255PatternS", # required
+    #     tags: {
+    #       "__string" => "__string",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.id #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateEventBridgeRuleTemplateGroup AWS API Documentation
+    #
+    # @overload create_event_bridge_rule_template_group(params = {})
+    # @param [Hash] params ({})
+    def create_event_bridge_rule_template_group(params = {}, options = {})
+      req = build_request(:create_event_bridge_rule_template_group, params)
+      req.send_request(options)
+    end
+
+    # Initiates the creation of a new signal map. Will discover a new
+    # mediaResourceMap based on the provided discoveryEntryPointArn.
+    #
+    # @option params [Array<String>] :cloud_watch_alarm_template_group_identifiers
+    #
+    # @option params [String] :description
+    #
+    # @option params [required, String] :discovery_entry_point_arn
+    #
+    # @option params [Array<String>] :event_bridge_rule_template_group_identifiers
+    #
+    # @option params [required, String] :name
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Represents the tags associated with a resource.
+    #
+    # @return [Types::CreateSignalMapResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateSignalMapResponse#arn #arn} => String
+    #   * {Types::CreateSignalMapResponse#cloud_watch_alarm_template_group_ids #cloud_watch_alarm_template_group_ids} => Array&lt;String&gt;
+    #   * {Types::CreateSignalMapResponse#created_at #created_at} => Time
+    #   * {Types::CreateSignalMapResponse#description #description} => String
+    #   * {Types::CreateSignalMapResponse#discovery_entry_point_arn #discovery_entry_point_arn} => String
+    #   * {Types::CreateSignalMapResponse#error_message #error_message} => String
+    #   * {Types::CreateSignalMapResponse#event_bridge_rule_template_group_ids #event_bridge_rule_template_group_ids} => Array&lt;String&gt;
+    #   * {Types::CreateSignalMapResponse#failed_media_resource_map #failed_media_resource_map} => Hash&lt;String,Types::MediaResource&gt;
+    #   * {Types::CreateSignalMapResponse#id #id} => String
+    #   * {Types::CreateSignalMapResponse#last_discovered_at #last_discovered_at} => Time
+    #   * {Types::CreateSignalMapResponse#last_successful_monitor_deployment #last_successful_monitor_deployment} => Types::SuccessfulMonitorDeployment
+    #   * {Types::CreateSignalMapResponse#media_resource_map #media_resource_map} => Hash&lt;String,Types::MediaResource&gt;
+    #   * {Types::CreateSignalMapResponse#modified_at #modified_at} => Time
+    #   * {Types::CreateSignalMapResponse#monitor_changes_pending_deployment #monitor_changes_pending_deployment} => Boolean
+    #   * {Types::CreateSignalMapResponse#monitor_deployment #monitor_deployment} => Types::MonitorDeployment
+    #   * {Types::CreateSignalMapResponse#name #name} => String
+    #   * {Types::CreateSignalMapResponse#status #status} => String
+    #   * {Types::CreateSignalMapResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_signal_map({
+    #     cloud_watch_alarm_template_group_identifiers: ["__stringPatternS"],
+    #     description: "__stringMin0Max1024",
+    #     discovery_entry_point_arn: "__stringMin1Max2048", # required
+    #     event_bridge_rule_template_group_identifiers: ["__stringPatternS"],
+    #     name: "__stringMin1Max255PatternS", # required
+    #     tags: {
+    #       "__string" => "__string",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.cloud_watch_alarm_template_group_ids #=> Array
+    #   resp.cloud_watch_alarm_template_group_ids[0] #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.discovery_entry_point_arn #=> String
+    #   resp.error_message #=> String
+    #   resp.event_bridge_rule_template_group_ids #=> Array
+    #   resp.event_bridge_rule_template_group_ids[0] #=> String
+    #   resp.failed_media_resource_map #=> Hash
+    #   resp.failed_media_resource_map["__string"].destinations #=> Array
+    #   resp.failed_media_resource_map["__string"].destinations[0].arn #=> String
+    #   resp.failed_media_resource_map["__string"].destinations[0].name #=> String
+    #   resp.failed_media_resource_map["__string"].name #=> String
+    #   resp.failed_media_resource_map["__string"].sources #=> Array
+    #   resp.failed_media_resource_map["__string"].sources[0].arn #=> String
+    #   resp.failed_media_resource_map["__string"].sources[0].name #=> String
+    #   resp.id #=> String
+    #   resp.last_discovered_at #=> Time
+    #   resp.last_successful_monitor_deployment.details_uri #=> String
+    #   resp.last_successful_monitor_deployment.status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.media_resource_map #=> Hash
+    #   resp.media_resource_map["__string"].destinations #=> Array
+    #   resp.media_resource_map["__string"].destinations[0].arn #=> String
+    #   resp.media_resource_map["__string"].destinations[0].name #=> String
+    #   resp.media_resource_map["__string"].name #=> String
+    #   resp.media_resource_map["__string"].sources #=> Array
+    #   resp.media_resource_map["__string"].sources[0].arn #=> String
+    #   resp.media_resource_map["__string"].sources[0].name #=> String
+    #   resp.modified_at #=> Time
+    #   resp.monitor_changes_pending_deployment #=> Boolean
+    #   resp.monitor_deployment.details_uri #=> String
+    #   resp.monitor_deployment.error_message #=> String
+    #   resp.monitor_deployment.status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.name #=> String
+    #   resp.status #=> String, one of "CREATE_IN_PROGRESS", "CREATE_COMPLETE", "CREATE_FAILED", "UPDATE_IN_PROGRESS", "UPDATE_COMPLETE", "UPDATE_REVERTED", "UPDATE_FAILED", "READY", "NOT_READY"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateSignalMap AWS API Documentation
+    #
+    # @overload create_signal_map(params = {})
+    # @param [Hash] params ({})
+    def create_signal_map(params = {}, options = {})
+      req = build_request(:create_signal_map, params)
+      req.send_request(options)
+    end
+
+    # Deletes a cloudwatch alarm template.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_cloud_watch_alarm_template({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DeleteCloudWatchAlarmTemplate AWS API Documentation
+    #
+    # @overload delete_cloud_watch_alarm_template(params = {})
+    # @param [Hash] params ({})
+    def delete_cloud_watch_alarm_template(params = {}, options = {})
+      req = build_request(:delete_cloud_watch_alarm_template, params)
+      req.send_request(options)
+    end
+
+    # Deletes a cloudwatch alarm template group. You must detach this group
+    # from all signal maps and ensure its existing templates are moved to
+    # another group or deleted.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_cloud_watch_alarm_template_group({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DeleteCloudWatchAlarmTemplateGroup AWS API Documentation
+    #
+    # @overload delete_cloud_watch_alarm_template_group(params = {})
+    # @param [Hash] params ({})
+    def delete_cloud_watch_alarm_template_group(params = {}, options = {})
+      req = build_request(:delete_cloud_watch_alarm_template_group, params)
+      req.send_request(options)
+    end
+
+    # Deletes an eventbridge rule template.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_event_bridge_rule_template({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DeleteEventBridgeRuleTemplate AWS API Documentation
+    #
+    # @overload delete_event_bridge_rule_template(params = {})
+    # @param [Hash] params ({})
+    def delete_event_bridge_rule_template(params = {}, options = {})
+      req = build_request(:delete_event_bridge_rule_template, params)
+      req.send_request(options)
+    end
+
+    # Deletes an eventbridge rule template group. You must detach this group
+    # from all signal maps and ensure its existing templates are moved to
+    # another group or deleted.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_event_bridge_rule_template_group({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DeleteEventBridgeRuleTemplateGroup AWS API Documentation
+    #
+    # @overload delete_event_bridge_rule_template_group(params = {})
+    # @param [Hash] params ({})
+    def delete_event_bridge_rule_template_group(params = {}, options = {})
+      req = build_request(:delete_event_bridge_rule_template_group, params)
+      req.send_request(options)
+    end
+
+    # Deletes the specified signal map.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_signal_map({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DeleteSignalMap AWS API Documentation
+    #
+    # @overload delete_signal_map(params = {})
+    # @param [Hash] params ({})
+    def delete_signal_map(params = {}, options = {})
+      req = build_request(:delete_signal_map, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the specified cloudwatch alarm template.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Types::GetCloudWatchAlarmTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#arn #arn} => String
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#comparison_operator #comparison_operator} => String
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#created_at #created_at} => Time
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#datapoints_to_alarm #datapoints_to_alarm} => Integer
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#description #description} => String
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#evaluation_periods #evaluation_periods} => Integer
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#group_id #group_id} => String
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#id #id} => String
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#metric_name #metric_name} => String
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#modified_at #modified_at} => Time
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#name #name} => String
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#period #period} => Integer
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#statistic #statistic} => String
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#target_resource_type #target_resource_type} => String
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#threshold #threshold} => Float
+    #   * {Types::GetCloudWatchAlarmTemplateResponse#treat_missing_data #treat_missing_data} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_cloud_watch_alarm_template({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.comparison_operator #=> String, one of "GreaterThanOrEqualToThreshold", "GreaterThanThreshold", "LessThanThreshold", "LessThanOrEqualToThreshold"
+    #   resp.created_at #=> Time
+    #   resp.datapoints_to_alarm #=> Integer
+    #   resp.description #=> String
+    #   resp.evaluation_periods #=> Integer
+    #   resp.group_id #=> String
+    #   resp.id #=> String
+    #   resp.metric_name #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.period #=> Integer
+    #   resp.statistic #=> String, one of "SampleCount", "Average", "Sum", "Minimum", "Maximum"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #   resp.target_resource_type #=> String, one of "CLOUDFRONT_DISTRIBUTION", "MEDIALIVE_MULTIPLEX", "MEDIALIVE_CHANNEL", "MEDIALIVE_INPUT_DEVICE", "MEDIAPACKAGE_CHANNEL", "MEDIAPACKAGE_ORIGIN_ENDPOINT", "MEDIACONNECT_FLOW", "S3_BUCKET"
+    #   resp.threshold #=> Float
+    #   resp.treat_missing_data #=> String, one of "notBreaching", "breaching", "ignore", "missing"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/GetCloudWatchAlarmTemplate AWS API Documentation
+    #
+    # @overload get_cloud_watch_alarm_template(params = {})
+    # @param [Hash] params ({})
+    def get_cloud_watch_alarm_template(params = {}, options = {})
+      req = build_request(:get_cloud_watch_alarm_template, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the specified cloudwatch alarm template group.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Types::GetCloudWatchAlarmTemplateGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetCloudWatchAlarmTemplateGroupResponse#arn #arn} => String
+    #   * {Types::GetCloudWatchAlarmTemplateGroupResponse#created_at #created_at} => Time
+    #   * {Types::GetCloudWatchAlarmTemplateGroupResponse#description #description} => String
+    #   * {Types::GetCloudWatchAlarmTemplateGroupResponse#id #id} => String
+    #   * {Types::GetCloudWatchAlarmTemplateGroupResponse#modified_at #modified_at} => Time
+    #   * {Types::GetCloudWatchAlarmTemplateGroupResponse#name #name} => String
+    #   * {Types::GetCloudWatchAlarmTemplateGroupResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_cloud_watch_alarm_template_group({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.id #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/GetCloudWatchAlarmTemplateGroup AWS API Documentation
+    #
+    # @overload get_cloud_watch_alarm_template_group(params = {})
+    # @param [Hash] params ({})
+    def get_cloud_watch_alarm_template_group(params = {}, options = {})
+      req = build_request(:get_cloud_watch_alarm_template_group, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the specified eventbridge rule template.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Types::GetEventBridgeRuleTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetEventBridgeRuleTemplateResponse#arn #arn} => String
+    #   * {Types::GetEventBridgeRuleTemplateResponse#created_at #created_at} => Time
+    #   * {Types::GetEventBridgeRuleTemplateResponse#description #description} => String
+    #   * {Types::GetEventBridgeRuleTemplateResponse#event_targets #event_targets} => Array&lt;Types::EventBridgeRuleTemplateTarget&gt;
+    #   * {Types::GetEventBridgeRuleTemplateResponse#event_type #event_type} => String
+    #   * {Types::GetEventBridgeRuleTemplateResponse#group_id #group_id} => String
+    #   * {Types::GetEventBridgeRuleTemplateResponse#id #id} => String
+    #   * {Types::GetEventBridgeRuleTemplateResponse#modified_at #modified_at} => Time
+    #   * {Types::GetEventBridgeRuleTemplateResponse#name #name} => String
+    #   * {Types::GetEventBridgeRuleTemplateResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_event_bridge_rule_template({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.event_targets #=> Array
+    #   resp.event_targets[0].arn #=> String
+    #   resp.event_type #=> String, one of "MEDIALIVE_MULTIPLEX_ALERT", "MEDIALIVE_MULTIPLEX_STATE_CHANGE", "MEDIALIVE_CHANNEL_ALERT", "MEDIALIVE_CHANNEL_INPUT_CHANGE", "MEDIALIVE_CHANNEL_STATE_CHANGE", "MEDIAPACKAGE_INPUT_NOTIFICATION", "MEDIAPACKAGE_KEY_PROVIDER_NOTIFICATION", "MEDIAPACKAGE_HARVEST_JOB_NOTIFICATION", "SIGNAL_MAP_ACTIVE_ALARM", "MEDIACONNECT_ALERT", "MEDIACONNECT_SOURCE_HEALTH", "MEDIACONNECT_OUTPUT_HEALTH", "MEDIACONNECT_FLOW_STATUS_CHANGE"
+    #   resp.group_id #=> String
+    #   resp.id #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/GetEventBridgeRuleTemplate AWS API Documentation
+    #
+    # @overload get_event_bridge_rule_template(params = {})
+    # @param [Hash] params ({})
+    def get_event_bridge_rule_template(params = {}, options = {})
+      req = build_request(:get_event_bridge_rule_template, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the specified eventbridge rule template group.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Types::GetEventBridgeRuleTemplateGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetEventBridgeRuleTemplateGroupResponse#arn #arn} => String
+    #   * {Types::GetEventBridgeRuleTemplateGroupResponse#created_at #created_at} => Time
+    #   * {Types::GetEventBridgeRuleTemplateGroupResponse#description #description} => String
+    #   * {Types::GetEventBridgeRuleTemplateGroupResponse#id #id} => String
+    #   * {Types::GetEventBridgeRuleTemplateGroupResponse#modified_at #modified_at} => Time
+    #   * {Types::GetEventBridgeRuleTemplateGroupResponse#name #name} => String
+    #   * {Types::GetEventBridgeRuleTemplateGroupResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_event_bridge_rule_template_group({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.id #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/GetEventBridgeRuleTemplateGroup AWS API Documentation
+    #
+    # @overload get_event_bridge_rule_template_group(params = {})
+    # @param [Hash] params ({})
+    def get_event_bridge_rule_template_group(params = {}, options = {})
+      req = build_request(:get_event_bridge_rule_template_group, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the specified signal map.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Types::GetSignalMapResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetSignalMapResponse#arn #arn} => String
+    #   * {Types::GetSignalMapResponse#cloud_watch_alarm_template_group_ids #cloud_watch_alarm_template_group_ids} => Array&lt;String&gt;
+    #   * {Types::GetSignalMapResponse#created_at #created_at} => Time
+    #   * {Types::GetSignalMapResponse#description #description} => String
+    #   * {Types::GetSignalMapResponse#discovery_entry_point_arn #discovery_entry_point_arn} => String
+    #   * {Types::GetSignalMapResponse#error_message #error_message} => String
+    #   * {Types::GetSignalMapResponse#event_bridge_rule_template_group_ids #event_bridge_rule_template_group_ids} => Array&lt;String&gt;
+    #   * {Types::GetSignalMapResponse#failed_media_resource_map #failed_media_resource_map} => Hash&lt;String,Types::MediaResource&gt;
+    #   * {Types::GetSignalMapResponse#id #id} => String
+    #   * {Types::GetSignalMapResponse#last_discovered_at #last_discovered_at} => Time
+    #   * {Types::GetSignalMapResponse#last_successful_monitor_deployment #last_successful_monitor_deployment} => Types::SuccessfulMonitorDeployment
+    #   * {Types::GetSignalMapResponse#media_resource_map #media_resource_map} => Hash&lt;String,Types::MediaResource&gt;
+    #   * {Types::GetSignalMapResponse#modified_at #modified_at} => Time
+    #   * {Types::GetSignalMapResponse#monitor_changes_pending_deployment #monitor_changes_pending_deployment} => Boolean
+    #   * {Types::GetSignalMapResponse#monitor_deployment #monitor_deployment} => Types::MonitorDeployment
+    #   * {Types::GetSignalMapResponse#name #name} => String
+    #   * {Types::GetSignalMapResponse#status #status} => String
+    #   * {Types::GetSignalMapResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_signal_map({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.cloud_watch_alarm_template_group_ids #=> Array
+    #   resp.cloud_watch_alarm_template_group_ids[0] #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.discovery_entry_point_arn #=> String
+    #   resp.error_message #=> String
+    #   resp.event_bridge_rule_template_group_ids #=> Array
+    #   resp.event_bridge_rule_template_group_ids[0] #=> String
+    #   resp.failed_media_resource_map #=> Hash
+    #   resp.failed_media_resource_map["__string"].destinations #=> Array
+    #   resp.failed_media_resource_map["__string"].destinations[0].arn #=> String
+    #   resp.failed_media_resource_map["__string"].destinations[0].name #=> String
+    #   resp.failed_media_resource_map["__string"].name #=> String
+    #   resp.failed_media_resource_map["__string"].sources #=> Array
+    #   resp.failed_media_resource_map["__string"].sources[0].arn #=> String
+    #   resp.failed_media_resource_map["__string"].sources[0].name #=> String
+    #   resp.id #=> String
+    #   resp.last_discovered_at #=> Time
+    #   resp.last_successful_monitor_deployment.details_uri #=> String
+    #   resp.last_successful_monitor_deployment.status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.media_resource_map #=> Hash
+    #   resp.media_resource_map["__string"].destinations #=> Array
+    #   resp.media_resource_map["__string"].destinations[0].arn #=> String
+    #   resp.media_resource_map["__string"].destinations[0].name #=> String
+    #   resp.media_resource_map["__string"].name #=> String
+    #   resp.media_resource_map["__string"].sources #=> Array
+    #   resp.media_resource_map["__string"].sources[0].arn #=> String
+    #   resp.media_resource_map["__string"].sources[0].name #=> String
+    #   resp.modified_at #=> Time
+    #   resp.monitor_changes_pending_deployment #=> Boolean
+    #   resp.monitor_deployment.details_uri #=> String
+    #   resp.monitor_deployment.error_message #=> String
+    #   resp.monitor_deployment.status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.name #=> String
+    #   resp.status #=> String, one of "CREATE_IN_PROGRESS", "CREATE_COMPLETE", "CREATE_FAILED", "UPDATE_IN_PROGRESS", "UPDATE_COMPLETE", "UPDATE_REVERTED", "UPDATE_FAILED", "READY", "NOT_READY"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    #
+    # The following waiters are defined for this operation (see {Client#wait_until} for detailed usage):
+    #
+    #   * signal_map_created
+    #   * signal_map_monitor_deleted
+    #   * signal_map_monitor_deployed
+    #   * signal_map_updated
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/GetSignalMap AWS API Documentation
+    #
+    # @overload get_signal_map(params = {})
+    # @param [Hash] params ({})
+    def get_signal_map(params = {}, options = {})
+      req = build_request(:get_signal_map, params)
+      req.send_request(options)
+    end
+
+    # Lists cloudwatch alarm template groups.
+    #
+    # @option params [Integer] :max_results
+    #
+    # @option params [String] :next_token
+    #
+    # @option params [String] :scope
+    #
+    # @option params [String] :signal_map_identifier
+    #
+    # @return [Types::ListCloudWatchAlarmTemplateGroupsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListCloudWatchAlarmTemplateGroupsResponse#cloud_watch_alarm_template_groups #cloud_watch_alarm_template_groups} => Array&lt;Types::CloudWatchAlarmTemplateGroupSummary&gt;
+    #   * {Types::ListCloudWatchAlarmTemplateGroupsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_cloud_watch_alarm_template_groups({
+    #     max_results: 1,
+    #     next_token: "__string",
+    #     scope: "__string",
+    #     signal_map_identifier: "__string",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.cloud_watch_alarm_template_groups #=> Array
+    #   resp.cloud_watch_alarm_template_groups[0].arn #=> String
+    #   resp.cloud_watch_alarm_template_groups[0].created_at #=> Time
+    #   resp.cloud_watch_alarm_template_groups[0].description #=> String
+    #   resp.cloud_watch_alarm_template_groups[0].id #=> String
+    #   resp.cloud_watch_alarm_template_groups[0].modified_at #=> Time
+    #   resp.cloud_watch_alarm_template_groups[0].name #=> String
+    #   resp.cloud_watch_alarm_template_groups[0].tags #=> Hash
+    #   resp.cloud_watch_alarm_template_groups[0].tags["__string"] #=> String
+    #   resp.cloud_watch_alarm_template_groups[0].template_count #=> Integer
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListCloudWatchAlarmTemplateGroups AWS API Documentation
+    #
+    # @overload list_cloud_watch_alarm_template_groups(params = {})
+    # @param [Hash] params ({})
+    def list_cloud_watch_alarm_template_groups(params = {}, options = {})
+      req = build_request(:list_cloud_watch_alarm_template_groups, params)
+      req.send_request(options)
+    end
+
+    # Lists cloudwatch alarm templates.
+    #
+    # @option params [String] :group_identifier
+    #
+    # @option params [Integer] :max_results
+    #
+    # @option params [String] :next_token
+    #
+    # @option params [String] :scope
+    #
+    # @option params [String] :signal_map_identifier
+    #
+    # @return [Types::ListCloudWatchAlarmTemplatesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListCloudWatchAlarmTemplatesResponse#cloud_watch_alarm_templates #cloud_watch_alarm_templates} => Array&lt;Types::CloudWatchAlarmTemplateSummary&gt;
+    #   * {Types::ListCloudWatchAlarmTemplatesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_cloud_watch_alarm_templates({
+    #     group_identifier: "__string",
+    #     max_results: 1,
+    #     next_token: "__string",
+    #     scope: "__string",
+    #     signal_map_identifier: "__string",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.cloud_watch_alarm_templates #=> Array
+    #   resp.cloud_watch_alarm_templates[0].arn #=> String
+    #   resp.cloud_watch_alarm_templates[0].comparison_operator #=> String, one of "GreaterThanOrEqualToThreshold", "GreaterThanThreshold", "LessThanThreshold", "LessThanOrEqualToThreshold"
+    #   resp.cloud_watch_alarm_templates[0].created_at #=> Time
+    #   resp.cloud_watch_alarm_templates[0].datapoints_to_alarm #=> Integer
+    #   resp.cloud_watch_alarm_templates[0].description #=> String
+    #   resp.cloud_watch_alarm_templates[0].evaluation_periods #=> Integer
+    #   resp.cloud_watch_alarm_templates[0].group_id #=> String
+    #   resp.cloud_watch_alarm_templates[0].id #=> String
+    #   resp.cloud_watch_alarm_templates[0].metric_name #=> String
+    #   resp.cloud_watch_alarm_templates[0].modified_at #=> Time
+    #   resp.cloud_watch_alarm_templates[0].name #=> String
+    #   resp.cloud_watch_alarm_templates[0].period #=> Integer
+    #   resp.cloud_watch_alarm_templates[0].statistic #=> String, one of "SampleCount", "Average", "Sum", "Minimum", "Maximum"
+    #   resp.cloud_watch_alarm_templates[0].tags #=> Hash
+    #   resp.cloud_watch_alarm_templates[0].tags["__string"] #=> String
+    #   resp.cloud_watch_alarm_templates[0].target_resource_type #=> String, one of "CLOUDFRONT_DISTRIBUTION", "MEDIALIVE_MULTIPLEX", "MEDIALIVE_CHANNEL", "MEDIALIVE_INPUT_DEVICE", "MEDIAPACKAGE_CHANNEL", "MEDIAPACKAGE_ORIGIN_ENDPOINT", "MEDIACONNECT_FLOW", "S3_BUCKET"
+    #   resp.cloud_watch_alarm_templates[0].threshold #=> Float
+    #   resp.cloud_watch_alarm_templates[0].treat_missing_data #=> String, one of "notBreaching", "breaching", "ignore", "missing"
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListCloudWatchAlarmTemplates AWS API Documentation
+    #
+    # @overload list_cloud_watch_alarm_templates(params = {})
+    # @param [Hash] params ({})
+    def list_cloud_watch_alarm_templates(params = {}, options = {})
+      req = build_request(:list_cloud_watch_alarm_templates, params)
+      req.send_request(options)
+    end
+
+    # Lists eventbridge rule template groups.
+    #
+    # @option params [Integer] :max_results
+    #
+    # @option params [String] :next_token
+    #
+    # @option params [String] :signal_map_identifier
+    #
+    # @return [Types::ListEventBridgeRuleTemplateGroupsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListEventBridgeRuleTemplateGroupsResponse#event_bridge_rule_template_groups #event_bridge_rule_template_groups} => Array&lt;Types::EventBridgeRuleTemplateGroupSummary&gt;
+    #   * {Types::ListEventBridgeRuleTemplateGroupsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_event_bridge_rule_template_groups({
+    #     max_results: 1,
+    #     next_token: "__string",
+    #     signal_map_identifier: "__string",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.event_bridge_rule_template_groups #=> Array
+    #   resp.event_bridge_rule_template_groups[0].arn #=> String
+    #   resp.event_bridge_rule_template_groups[0].created_at #=> Time
+    #   resp.event_bridge_rule_template_groups[0].description #=> String
+    #   resp.event_bridge_rule_template_groups[0].id #=> String
+    #   resp.event_bridge_rule_template_groups[0].modified_at #=> Time
+    #   resp.event_bridge_rule_template_groups[0].name #=> String
+    #   resp.event_bridge_rule_template_groups[0].tags #=> Hash
+    #   resp.event_bridge_rule_template_groups[0].tags["__string"] #=> String
+    #   resp.event_bridge_rule_template_groups[0].template_count #=> Integer
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListEventBridgeRuleTemplateGroups AWS API Documentation
+    #
+    # @overload list_event_bridge_rule_template_groups(params = {})
+    # @param [Hash] params ({})
+    def list_event_bridge_rule_template_groups(params = {}, options = {})
+      req = build_request(:list_event_bridge_rule_template_groups, params)
+      req.send_request(options)
+    end
+
+    # Lists eventbridge rule templates.
+    #
+    # @option params [String] :group_identifier
+    #
+    # @option params [Integer] :max_results
+    #
+    # @option params [String] :next_token
+    #
+    # @option params [String] :signal_map_identifier
+    #
+    # @return [Types::ListEventBridgeRuleTemplatesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListEventBridgeRuleTemplatesResponse#event_bridge_rule_templates #event_bridge_rule_templates} => Array&lt;Types::EventBridgeRuleTemplateSummary&gt;
+    #   * {Types::ListEventBridgeRuleTemplatesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_event_bridge_rule_templates({
+    #     group_identifier: "__string",
+    #     max_results: 1,
+    #     next_token: "__string",
+    #     signal_map_identifier: "__string",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.event_bridge_rule_templates #=> Array
+    #   resp.event_bridge_rule_templates[0].arn #=> String
+    #   resp.event_bridge_rule_templates[0].created_at #=> Time
+    #   resp.event_bridge_rule_templates[0].description #=> String
+    #   resp.event_bridge_rule_templates[0].event_target_count #=> Integer
+    #   resp.event_bridge_rule_templates[0].event_type #=> String, one of "MEDIALIVE_MULTIPLEX_ALERT", "MEDIALIVE_MULTIPLEX_STATE_CHANGE", "MEDIALIVE_CHANNEL_ALERT", "MEDIALIVE_CHANNEL_INPUT_CHANGE", "MEDIALIVE_CHANNEL_STATE_CHANGE", "MEDIAPACKAGE_INPUT_NOTIFICATION", "MEDIAPACKAGE_KEY_PROVIDER_NOTIFICATION", "MEDIAPACKAGE_HARVEST_JOB_NOTIFICATION", "SIGNAL_MAP_ACTIVE_ALARM", "MEDIACONNECT_ALERT", "MEDIACONNECT_SOURCE_HEALTH", "MEDIACONNECT_OUTPUT_HEALTH", "MEDIACONNECT_FLOW_STATUS_CHANGE"
+    #   resp.event_bridge_rule_templates[0].group_id #=> String
+    #   resp.event_bridge_rule_templates[0].id #=> String
+    #   resp.event_bridge_rule_templates[0].modified_at #=> Time
+    #   resp.event_bridge_rule_templates[0].name #=> String
+    #   resp.event_bridge_rule_templates[0].tags #=> Hash
+    #   resp.event_bridge_rule_templates[0].tags["__string"] #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListEventBridgeRuleTemplates AWS API Documentation
+    #
+    # @overload list_event_bridge_rule_templates(params = {})
+    # @param [Hash] params ({})
+    def list_event_bridge_rule_templates(params = {}, options = {})
+      req = build_request(:list_event_bridge_rule_templates, params)
+      req.send_request(options)
+    end
+
+    # Lists signal maps.
+    #
+    # @option params [String] :cloud_watch_alarm_template_group_identifier
+    #
+    # @option params [String] :event_bridge_rule_template_group_identifier
+    #
+    # @option params [Integer] :max_results
+    #
+    # @option params [String] :next_token
+    #
+    # @return [Types::ListSignalMapsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListSignalMapsResponse#next_token #next_token} => String
+    #   * {Types::ListSignalMapsResponse#signal_maps #signal_maps} => Array&lt;Types::SignalMapSummary&gt;
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_signal_maps({
+    #     cloud_watch_alarm_template_group_identifier: "__string",
+    #     event_bridge_rule_template_group_identifier: "__string",
+    #     max_results: 1,
+    #     next_token: "__string",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.next_token #=> String
+    #   resp.signal_maps #=> Array
+    #   resp.signal_maps[0].arn #=> String
+    #   resp.signal_maps[0].created_at #=> Time
+    #   resp.signal_maps[0].description #=> String
+    #   resp.signal_maps[0].id #=> String
+    #   resp.signal_maps[0].modified_at #=> Time
+    #   resp.signal_maps[0].monitor_deployment_status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.signal_maps[0].name #=> String
+    #   resp.signal_maps[0].status #=> String, one of "CREATE_IN_PROGRESS", "CREATE_COMPLETE", "CREATE_FAILED", "UPDATE_IN_PROGRESS", "UPDATE_COMPLETE", "UPDATE_REVERTED", "UPDATE_FAILED", "READY", "NOT_READY"
+    #   resp.signal_maps[0].tags #=> Hash
+    #   resp.signal_maps[0].tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListSignalMaps AWS API Documentation
+    #
+    # @overload list_signal_maps(params = {})
+    # @param [Hash] params ({})
+    def list_signal_maps(params = {}, options = {})
+      req = build_request(:list_signal_maps, params)
+      req.send_request(options)
+    end
+
+    # Initiates a deployment to delete the monitor of the specified signal
+    # map.
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Types::StartDeleteMonitorDeploymentResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StartDeleteMonitorDeploymentResponse#arn #arn} => String
+    #   * {Types::StartDeleteMonitorDeploymentResponse#cloud_watch_alarm_template_group_ids #cloud_watch_alarm_template_group_ids} => Array&lt;String&gt;
+    #   * {Types::StartDeleteMonitorDeploymentResponse#created_at #created_at} => Time
+    #   * {Types::StartDeleteMonitorDeploymentResponse#description #description} => String
+    #   * {Types::StartDeleteMonitorDeploymentResponse#discovery_entry_point_arn #discovery_entry_point_arn} => String
+    #   * {Types::StartDeleteMonitorDeploymentResponse#error_message #error_message} => String
+    #   * {Types::StartDeleteMonitorDeploymentResponse#event_bridge_rule_template_group_ids #event_bridge_rule_template_group_ids} => Array&lt;String&gt;
+    #   * {Types::StartDeleteMonitorDeploymentResponse#failed_media_resource_map #failed_media_resource_map} => Hash&lt;String,Types::MediaResource&gt;
+    #   * {Types::StartDeleteMonitorDeploymentResponse#id #id} => String
+    #   * {Types::StartDeleteMonitorDeploymentResponse#last_discovered_at #last_discovered_at} => Time
+    #   * {Types::StartDeleteMonitorDeploymentResponse#last_successful_monitor_deployment #last_successful_monitor_deployment} => Types::SuccessfulMonitorDeployment
+    #   * {Types::StartDeleteMonitorDeploymentResponse#media_resource_map #media_resource_map} => Hash&lt;String,Types::MediaResource&gt;
+    #   * {Types::StartDeleteMonitorDeploymentResponse#modified_at #modified_at} => Time
+    #   * {Types::StartDeleteMonitorDeploymentResponse#monitor_changes_pending_deployment #monitor_changes_pending_deployment} => Boolean
+    #   * {Types::StartDeleteMonitorDeploymentResponse#monitor_deployment #monitor_deployment} => Types::MonitorDeployment
+    #   * {Types::StartDeleteMonitorDeploymentResponse#name #name} => String
+    #   * {Types::StartDeleteMonitorDeploymentResponse#status #status} => String
+    #   * {Types::StartDeleteMonitorDeploymentResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_delete_monitor_deployment({
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.cloud_watch_alarm_template_group_ids #=> Array
+    #   resp.cloud_watch_alarm_template_group_ids[0] #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.discovery_entry_point_arn #=> String
+    #   resp.error_message #=> String
+    #   resp.event_bridge_rule_template_group_ids #=> Array
+    #   resp.event_bridge_rule_template_group_ids[0] #=> String
+    #   resp.failed_media_resource_map #=> Hash
+    #   resp.failed_media_resource_map["__string"].destinations #=> Array
+    #   resp.failed_media_resource_map["__string"].destinations[0].arn #=> String
+    #   resp.failed_media_resource_map["__string"].destinations[0].name #=> String
+    #   resp.failed_media_resource_map["__string"].name #=> String
+    #   resp.failed_media_resource_map["__string"].sources #=> Array
+    #   resp.failed_media_resource_map["__string"].sources[0].arn #=> String
+    #   resp.failed_media_resource_map["__string"].sources[0].name #=> String
+    #   resp.id #=> String
+    #   resp.last_discovered_at #=> Time
+    #   resp.last_successful_monitor_deployment.details_uri #=> String
+    #   resp.last_successful_monitor_deployment.status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.media_resource_map #=> Hash
+    #   resp.media_resource_map["__string"].destinations #=> Array
+    #   resp.media_resource_map["__string"].destinations[0].arn #=> String
+    #   resp.media_resource_map["__string"].destinations[0].name #=> String
+    #   resp.media_resource_map["__string"].name #=> String
+    #   resp.media_resource_map["__string"].sources #=> Array
+    #   resp.media_resource_map["__string"].sources[0].arn #=> String
+    #   resp.media_resource_map["__string"].sources[0].name #=> String
+    #   resp.modified_at #=> Time
+    #   resp.monitor_changes_pending_deployment #=> Boolean
+    #   resp.monitor_deployment.details_uri #=> String
+    #   resp.monitor_deployment.error_message #=> String
+    #   resp.monitor_deployment.status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.name #=> String
+    #   resp.status #=> String, one of "CREATE_IN_PROGRESS", "CREATE_COMPLETE", "CREATE_FAILED", "UPDATE_IN_PROGRESS", "UPDATE_COMPLETE", "UPDATE_REVERTED", "UPDATE_FAILED", "READY", "NOT_READY"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/StartDeleteMonitorDeployment AWS API Documentation
+    #
+    # @overload start_delete_monitor_deployment(params = {})
+    # @param [Hash] params ({})
+    def start_delete_monitor_deployment(params = {}, options = {})
+      req = build_request(:start_delete_monitor_deployment, params)
+      req.send_request(options)
+    end
+
+    # Initiates a deployment to deploy the latest monitor of the specified
+    # signal map.
+    #
+    # @option params [Boolean] :dry_run
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Types::StartMonitorDeploymentResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StartMonitorDeploymentResponse#arn #arn} => String
+    #   * {Types::StartMonitorDeploymentResponse#cloud_watch_alarm_template_group_ids #cloud_watch_alarm_template_group_ids} => Array&lt;String&gt;
+    #   * {Types::StartMonitorDeploymentResponse#created_at #created_at} => Time
+    #   * {Types::StartMonitorDeploymentResponse#description #description} => String
+    #   * {Types::StartMonitorDeploymentResponse#discovery_entry_point_arn #discovery_entry_point_arn} => String
+    #   * {Types::StartMonitorDeploymentResponse#error_message #error_message} => String
+    #   * {Types::StartMonitorDeploymentResponse#event_bridge_rule_template_group_ids #event_bridge_rule_template_group_ids} => Array&lt;String&gt;
+    #   * {Types::StartMonitorDeploymentResponse#failed_media_resource_map #failed_media_resource_map} => Hash&lt;String,Types::MediaResource&gt;
+    #   * {Types::StartMonitorDeploymentResponse#id #id} => String
+    #   * {Types::StartMonitorDeploymentResponse#last_discovered_at #last_discovered_at} => Time
+    #   * {Types::StartMonitorDeploymentResponse#last_successful_monitor_deployment #last_successful_monitor_deployment} => Types::SuccessfulMonitorDeployment
+    #   * {Types::StartMonitorDeploymentResponse#media_resource_map #media_resource_map} => Hash&lt;String,Types::MediaResource&gt;
+    #   * {Types::StartMonitorDeploymentResponse#modified_at #modified_at} => Time
+    #   * {Types::StartMonitorDeploymentResponse#monitor_changes_pending_deployment #monitor_changes_pending_deployment} => Boolean
+    #   * {Types::StartMonitorDeploymentResponse#monitor_deployment #monitor_deployment} => Types::MonitorDeployment
+    #   * {Types::StartMonitorDeploymentResponse#name #name} => String
+    #   * {Types::StartMonitorDeploymentResponse#status #status} => String
+    #   * {Types::StartMonitorDeploymentResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_monitor_deployment({
+    #     dry_run: false,
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.cloud_watch_alarm_template_group_ids #=> Array
+    #   resp.cloud_watch_alarm_template_group_ids[0] #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.discovery_entry_point_arn #=> String
+    #   resp.error_message #=> String
+    #   resp.event_bridge_rule_template_group_ids #=> Array
+    #   resp.event_bridge_rule_template_group_ids[0] #=> String
+    #   resp.failed_media_resource_map #=> Hash
+    #   resp.failed_media_resource_map["__string"].destinations #=> Array
+    #   resp.failed_media_resource_map["__string"].destinations[0].arn #=> String
+    #   resp.failed_media_resource_map["__string"].destinations[0].name #=> String
+    #   resp.failed_media_resource_map["__string"].name #=> String
+    #   resp.failed_media_resource_map["__string"].sources #=> Array
+    #   resp.failed_media_resource_map["__string"].sources[0].arn #=> String
+    #   resp.failed_media_resource_map["__string"].sources[0].name #=> String
+    #   resp.id #=> String
+    #   resp.last_discovered_at #=> Time
+    #   resp.last_successful_monitor_deployment.details_uri #=> String
+    #   resp.last_successful_monitor_deployment.status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.media_resource_map #=> Hash
+    #   resp.media_resource_map["__string"].destinations #=> Array
+    #   resp.media_resource_map["__string"].destinations[0].arn #=> String
+    #   resp.media_resource_map["__string"].destinations[0].name #=> String
+    #   resp.media_resource_map["__string"].name #=> String
+    #   resp.media_resource_map["__string"].sources #=> Array
+    #   resp.media_resource_map["__string"].sources[0].arn #=> String
+    #   resp.media_resource_map["__string"].sources[0].name #=> String
+    #   resp.modified_at #=> Time
+    #   resp.monitor_changes_pending_deployment #=> Boolean
+    #   resp.monitor_deployment.details_uri #=> String
+    #   resp.monitor_deployment.error_message #=> String
+    #   resp.monitor_deployment.status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.name #=> String
+    #   resp.status #=> String, one of "CREATE_IN_PROGRESS", "CREATE_COMPLETE", "CREATE_FAILED", "UPDATE_IN_PROGRESS", "UPDATE_COMPLETE", "UPDATE_REVERTED", "UPDATE_FAILED", "READY", "NOT_READY"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/StartMonitorDeployment AWS API Documentation
+    #
+    # @overload start_monitor_deployment(params = {})
+    # @param [Hash] params ({})
+    def start_monitor_deployment(params = {}, options = {})
+      req = build_request(:start_monitor_deployment, params)
+      req.send_request(options)
+    end
+
+    # Initiates an update for the specified signal map. Will discover a new
+    # signal map if a changed discoveryEntryPointArn is provided.
+    #
+    # @option params [Array<String>] :cloud_watch_alarm_template_group_identifiers
+    #
+    # @option params [String] :description
+    #
+    # @option params [String] :discovery_entry_point_arn
+    #
+    # @option params [Array<String>] :event_bridge_rule_template_group_identifiers
+    #
+    # @option params [Boolean] :force_rediscovery
+    #
+    # @option params [required, String] :identifier
+    #
+    # @option params [String] :name
+    #
+    # @return [Types::StartUpdateSignalMapResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StartUpdateSignalMapResponse#arn #arn} => String
+    #   * {Types::StartUpdateSignalMapResponse#cloud_watch_alarm_template_group_ids #cloud_watch_alarm_template_group_ids} => Array&lt;String&gt;
+    #   * {Types::StartUpdateSignalMapResponse#created_at #created_at} => Time
+    #   * {Types::StartUpdateSignalMapResponse#description #description} => String
+    #   * {Types::StartUpdateSignalMapResponse#discovery_entry_point_arn #discovery_entry_point_arn} => String
+    #   * {Types::StartUpdateSignalMapResponse#error_message #error_message} => String
+    #   * {Types::StartUpdateSignalMapResponse#event_bridge_rule_template_group_ids #event_bridge_rule_template_group_ids} => Array&lt;String&gt;
+    #   * {Types::StartUpdateSignalMapResponse#failed_media_resource_map #failed_media_resource_map} => Hash&lt;String,Types::MediaResource&gt;
+    #   * {Types::StartUpdateSignalMapResponse#id #id} => String
+    #   * {Types::StartUpdateSignalMapResponse#last_discovered_at #last_discovered_at} => Time
+    #   * {Types::StartUpdateSignalMapResponse#last_successful_monitor_deployment #last_successful_monitor_deployment} => Types::SuccessfulMonitorDeployment
+    #   * {Types::StartUpdateSignalMapResponse#media_resource_map #media_resource_map} => Hash&lt;String,Types::MediaResource&gt;
+    #   * {Types::StartUpdateSignalMapResponse#modified_at #modified_at} => Time
+    #   * {Types::StartUpdateSignalMapResponse#monitor_changes_pending_deployment #monitor_changes_pending_deployment} => Boolean
+    #   * {Types::StartUpdateSignalMapResponse#monitor_deployment #monitor_deployment} => Types::MonitorDeployment
+    #   * {Types::StartUpdateSignalMapResponse#name #name} => String
+    #   * {Types::StartUpdateSignalMapResponse#status #status} => String
+    #   * {Types::StartUpdateSignalMapResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_update_signal_map({
+    #     cloud_watch_alarm_template_group_identifiers: ["__stringPatternS"],
+    #     description: "__stringMin0Max1024",
+    #     discovery_entry_point_arn: "__stringMin1Max2048",
+    #     event_bridge_rule_template_group_identifiers: ["__stringPatternS"],
+    #     force_rediscovery: false,
+    #     identifier: "__string", # required
+    #     name: "__stringMin1Max255PatternS",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.cloud_watch_alarm_template_group_ids #=> Array
+    #   resp.cloud_watch_alarm_template_group_ids[0] #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.discovery_entry_point_arn #=> String
+    #   resp.error_message #=> String
+    #   resp.event_bridge_rule_template_group_ids #=> Array
+    #   resp.event_bridge_rule_template_group_ids[0] #=> String
+    #   resp.failed_media_resource_map #=> Hash
+    #   resp.failed_media_resource_map["__string"].destinations #=> Array
+    #   resp.failed_media_resource_map["__string"].destinations[0].arn #=> String
+    #   resp.failed_media_resource_map["__string"].destinations[0].name #=> String
+    #   resp.failed_media_resource_map["__string"].name #=> String
+    #   resp.failed_media_resource_map["__string"].sources #=> Array
+    #   resp.failed_media_resource_map["__string"].sources[0].arn #=> String
+    #   resp.failed_media_resource_map["__string"].sources[0].name #=> String
+    #   resp.id #=> String
+    #   resp.last_discovered_at #=> Time
+    #   resp.last_successful_monitor_deployment.details_uri #=> String
+    #   resp.last_successful_monitor_deployment.status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.media_resource_map #=> Hash
+    #   resp.media_resource_map["__string"].destinations #=> Array
+    #   resp.media_resource_map["__string"].destinations[0].arn #=> String
+    #   resp.media_resource_map["__string"].destinations[0].name #=> String
+    #   resp.media_resource_map["__string"].name #=> String
+    #   resp.media_resource_map["__string"].sources #=> Array
+    #   resp.media_resource_map["__string"].sources[0].arn #=> String
+    #   resp.media_resource_map["__string"].sources[0].name #=> String
+    #   resp.modified_at #=> Time
+    #   resp.monitor_changes_pending_deployment #=> Boolean
+    #   resp.monitor_deployment.details_uri #=> String
+    #   resp.monitor_deployment.error_message #=> String
+    #   resp.monitor_deployment.status #=> String, one of "NOT_DEPLOYED", "DRY_RUN_DEPLOYMENT_COMPLETE", "DRY_RUN_DEPLOYMENT_FAILED", "DRY_RUN_DEPLOYMENT_IN_PROGRESS", "DEPLOYMENT_COMPLETE", "DEPLOYMENT_FAILED", "DEPLOYMENT_IN_PROGRESS", "DELETE_COMPLETE", "DELETE_FAILED", "DELETE_IN_PROGRESS"
+    #   resp.name #=> String
+    #   resp.status #=> String, one of "CREATE_IN_PROGRESS", "CREATE_COMPLETE", "CREATE_FAILED", "UPDATE_IN_PROGRESS", "UPDATE_COMPLETE", "UPDATE_REVERTED", "UPDATE_FAILED", "READY", "NOT_READY"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/StartUpdateSignalMap AWS API Documentation
+    #
+    # @overload start_update_signal_map(params = {})
+    # @param [Hash] params ({})
+    def start_update_signal_map(params = {}, options = {})
+      req = build_request(:start_update_signal_map, params)
+      req.send_request(options)
+    end
+
+    # Updates the specified cloudwatch alarm template.
+    #
+    # @option params [String] :comparison_operator
+    #   The comparison operator used to compare the specified statistic and
+    #   the threshold.
+    #
+    # @option params [Integer] :datapoints_to_alarm
+    #
+    # @option params [String] :description
+    #
+    # @option params [Integer] :evaluation_periods
+    #
+    # @option params [String] :group_identifier
+    #
+    # @option params [required, String] :identifier
+    #
+    # @option params [String] :metric_name
+    #
+    # @option params [String] :name
+    #
+    # @option params [Integer] :period
+    #
+    # @option params [String] :statistic
+    #   The statistic to apply to the alarm's metric data.
+    #
+    # @option params [String] :target_resource_type
+    #   The resource type this template should dynamically generate cloudwatch
+    #   metric alarms for.
+    #
+    # @option params [Float] :threshold
+    #
+    # @option params [String] :treat_missing_data
+    #   Specifies how missing data points are treated when evaluating the
+    #   alarm's condition.
+    #
+    # @return [Types::UpdateCloudWatchAlarmTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#arn #arn} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#comparison_operator #comparison_operator} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#created_at #created_at} => Time
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#datapoints_to_alarm #datapoints_to_alarm} => Integer
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#description #description} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#evaluation_periods #evaluation_periods} => Integer
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#group_id #group_id} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#id #id} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#metric_name #metric_name} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#modified_at #modified_at} => Time
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#name #name} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#period #period} => Integer
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#statistic #statistic} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#tags #tags} => Hash&lt;String,String&gt;
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#target_resource_type #target_resource_type} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#threshold #threshold} => Float
+    #   * {Types::UpdateCloudWatchAlarmTemplateResponse#treat_missing_data #treat_missing_data} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_cloud_watch_alarm_template({
+    #     comparison_operator: "GreaterThanOrEqualToThreshold", # accepts GreaterThanOrEqualToThreshold, GreaterThanThreshold, LessThanThreshold, LessThanOrEqualToThreshold
+    #     datapoints_to_alarm: 1,
+    #     description: "__stringMin0Max1024",
+    #     evaluation_periods: 1,
+    #     group_identifier: "__stringPatternS",
+    #     identifier: "__string", # required
+    #     metric_name: "__stringMax64",
+    #     name: "__stringMin1Max255PatternS",
+    #     period: 1,
+    #     statistic: "SampleCount", # accepts SampleCount, Average, Sum, Minimum, Maximum
+    #     target_resource_type: "CLOUDFRONT_DISTRIBUTION", # accepts CLOUDFRONT_DISTRIBUTION, MEDIALIVE_MULTIPLEX, MEDIALIVE_CHANNEL, MEDIALIVE_INPUT_DEVICE, MEDIAPACKAGE_CHANNEL, MEDIAPACKAGE_ORIGIN_ENDPOINT, MEDIACONNECT_FLOW, S3_BUCKET
+    #     threshold: 1.0,
+    #     treat_missing_data: "notBreaching", # accepts notBreaching, breaching, ignore, missing
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.comparison_operator #=> String, one of "GreaterThanOrEqualToThreshold", "GreaterThanThreshold", "LessThanThreshold", "LessThanOrEqualToThreshold"
+    #   resp.created_at #=> Time
+    #   resp.datapoints_to_alarm #=> Integer
+    #   resp.description #=> String
+    #   resp.evaluation_periods #=> Integer
+    #   resp.group_id #=> String
+    #   resp.id #=> String
+    #   resp.metric_name #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.period #=> Integer
+    #   resp.statistic #=> String, one of "SampleCount", "Average", "Sum", "Minimum", "Maximum"
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #   resp.target_resource_type #=> String, one of "CLOUDFRONT_DISTRIBUTION", "MEDIALIVE_MULTIPLEX", "MEDIALIVE_CHANNEL", "MEDIALIVE_INPUT_DEVICE", "MEDIAPACKAGE_CHANNEL", "MEDIAPACKAGE_ORIGIN_ENDPOINT", "MEDIACONNECT_FLOW", "S3_BUCKET"
+    #   resp.threshold #=> Float
+    #   resp.treat_missing_data #=> String, one of "notBreaching", "breaching", "ignore", "missing"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateCloudWatchAlarmTemplate AWS API Documentation
+    #
+    # @overload update_cloud_watch_alarm_template(params = {})
+    # @param [Hash] params ({})
+    def update_cloud_watch_alarm_template(params = {}, options = {})
+      req = build_request(:update_cloud_watch_alarm_template, params)
+      req.send_request(options)
+    end
+
+    # Updates the specified cloudwatch alarm template group.
+    #
+    # @option params [String] :description
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Types::UpdateCloudWatchAlarmTemplateGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateCloudWatchAlarmTemplateGroupResponse#arn #arn} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateGroupResponse#created_at #created_at} => Time
+    #   * {Types::UpdateCloudWatchAlarmTemplateGroupResponse#description #description} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateGroupResponse#id #id} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateGroupResponse#modified_at #modified_at} => Time
+    #   * {Types::UpdateCloudWatchAlarmTemplateGroupResponse#name #name} => String
+    #   * {Types::UpdateCloudWatchAlarmTemplateGroupResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_cloud_watch_alarm_template_group({
+    #     description: "__stringMin0Max1024",
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.id #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateCloudWatchAlarmTemplateGroup AWS API Documentation
+    #
+    # @overload update_cloud_watch_alarm_template_group(params = {})
+    # @param [Hash] params ({})
+    def update_cloud_watch_alarm_template_group(params = {}, options = {})
+      req = build_request(:update_cloud_watch_alarm_template_group, params)
+      req.send_request(options)
+    end
+
+    # Updates the specified eventbridge rule template.
+    #
+    # @option params [String] :description
+    #
+    # @option params [Array<Types::EventBridgeRuleTemplateTarget>] :event_targets
+    #
+    # @option params [String] :event_type
+    #   The type of event to match with the rule.
+    #
+    # @option params [String] :group_identifier
+    #
+    # @option params [required, String] :identifier
+    #
+    # @option params [String] :name
+    #
+    # @return [Types::UpdateEventBridgeRuleTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateEventBridgeRuleTemplateResponse#arn #arn} => String
+    #   * {Types::UpdateEventBridgeRuleTemplateResponse#created_at #created_at} => Time
+    #   * {Types::UpdateEventBridgeRuleTemplateResponse#description #description} => String
+    #   * {Types::UpdateEventBridgeRuleTemplateResponse#event_targets #event_targets} => Array&lt;Types::EventBridgeRuleTemplateTarget&gt;
+    #   * {Types::UpdateEventBridgeRuleTemplateResponse#event_type #event_type} => String
+    #   * {Types::UpdateEventBridgeRuleTemplateResponse#group_id #group_id} => String
+    #   * {Types::UpdateEventBridgeRuleTemplateResponse#id #id} => String
+    #   * {Types::UpdateEventBridgeRuleTemplateResponse#modified_at #modified_at} => Time
+    #   * {Types::UpdateEventBridgeRuleTemplateResponse#name #name} => String
+    #   * {Types::UpdateEventBridgeRuleTemplateResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_event_bridge_rule_template({
+    #     description: "__stringMin0Max1024",
+    #     event_targets: [
+    #       {
+    #         arn: "__stringMin1Max2048PatternArn", # required
+    #       },
+    #     ],
+    #     event_type: "MEDIALIVE_MULTIPLEX_ALERT", # accepts MEDIALIVE_MULTIPLEX_ALERT, MEDIALIVE_MULTIPLEX_STATE_CHANGE, MEDIALIVE_CHANNEL_ALERT, MEDIALIVE_CHANNEL_INPUT_CHANGE, MEDIALIVE_CHANNEL_STATE_CHANGE, MEDIAPACKAGE_INPUT_NOTIFICATION, MEDIAPACKAGE_KEY_PROVIDER_NOTIFICATION, MEDIAPACKAGE_HARVEST_JOB_NOTIFICATION, SIGNAL_MAP_ACTIVE_ALARM, MEDIACONNECT_ALERT, MEDIACONNECT_SOURCE_HEALTH, MEDIACONNECT_OUTPUT_HEALTH, MEDIACONNECT_FLOW_STATUS_CHANGE
+    #     group_identifier: "__stringPatternS",
+    #     identifier: "__string", # required
+    #     name: "__stringMin1Max255PatternS",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.event_targets #=> Array
+    #   resp.event_targets[0].arn #=> String
+    #   resp.event_type #=> String, one of "MEDIALIVE_MULTIPLEX_ALERT", "MEDIALIVE_MULTIPLEX_STATE_CHANGE", "MEDIALIVE_CHANNEL_ALERT", "MEDIALIVE_CHANNEL_INPUT_CHANGE", "MEDIALIVE_CHANNEL_STATE_CHANGE", "MEDIAPACKAGE_INPUT_NOTIFICATION", "MEDIAPACKAGE_KEY_PROVIDER_NOTIFICATION", "MEDIAPACKAGE_HARVEST_JOB_NOTIFICATION", "SIGNAL_MAP_ACTIVE_ALARM", "MEDIACONNECT_ALERT", "MEDIACONNECT_SOURCE_HEALTH", "MEDIACONNECT_OUTPUT_HEALTH", "MEDIACONNECT_FLOW_STATUS_CHANGE"
+    #   resp.group_id #=> String
+    #   resp.id #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateEventBridgeRuleTemplate AWS API Documentation
+    #
+    # @overload update_event_bridge_rule_template(params = {})
+    # @param [Hash] params ({})
+    def update_event_bridge_rule_template(params = {}, options = {})
+      req = build_request(:update_event_bridge_rule_template, params)
+      req.send_request(options)
+    end
+
+    # Updates the specified eventbridge rule template group.
+    #
+    # @option params [String] :description
+    #
+    # @option params [required, String] :identifier
+    #
+    # @return [Types::UpdateEventBridgeRuleTemplateGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateEventBridgeRuleTemplateGroupResponse#arn #arn} => String
+    #   * {Types::UpdateEventBridgeRuleTemplateGroupResponse#created_at #created_at} => Time
+    #   * {Types::UpdateEventBridgeRuleTemplateGroupResponse#description #description} => String
+    #   * {Types::UpdateEventBridgeRuleTemplateGroupResponse#id #id} => String
+    #   * {Types::UpdateEventBridgeRuleTemplateGroupResponse#modified_at #modified_at} => Time
+    #   * {Types::UpdateEventBridgeRuleTemplateGroupResponse#name #name} => String
+    #   * {Types::UpdateEventBridgeRuleTemplateGroupResponse#tags #tags} => Hash&lt;String,String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_event_bridge_rule_template_group({
+    #     description: "__stringMin0Max1024",
+    #     identifier: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.created_at #=> Time
+    #   resp.description #=> String
+    #   resp.id #=> String
+    #   resp.modified_at #=> Time
+    #   resp.name #=> String
+    #   resp.tags #=> Hash
+    #   resp.tags["__string"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateEventBridgeRuleTemplateGroup AWS API Documentation
+    #
+    # @overload update_event_bridge_rule_template_group(params = {})
+    # @param [Hash] params ({})
+    def update_event_bridge_rule_template_group(params = {}, options = {})
+      req = build_request(:update_event_bridge_rule_template_group, params)
+      req.send_request(options)
+    end
+
+    # Create a ChannelPlacementGroup in the specified Cluster. As part of
+    # the create operation, you specify the Nodes to attach the group
+    # to.After you create a ChannelPlacementGroup, you add Channels to the
+    # group (you do this by modifying the Channels to add them to a specific
+    # group). You now have an association of Channels to
+    # ChannelPlacementGroup, and ChannelPlacementGroup to Nodes. This
+    # association means that all the Channels in the group are able to run
+    # on any of the Nodes associated with the group.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [String] :name
+    #   Specify a name that is unique in the Cluster. You can't change the
+    #   name. Names are case-sensitive.
+    #
+    # @option params [Array<String>] :nodes
+    #   An array of one ID for the Node that you want to associate with the
+    #   ChannelPlacementGroup. (You can't associate more than one Node with
+    #   the ChannelPlacementGroup.) The Node and the ChannelPlacementGroup
+    #   must be in the same Cluster.
+    #
+    # @option params [String] :request_id
+    #   An ID that you assign to a create request. This ID ensures idempotency when creating resources. the request.**A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [Hash<String,String>] :tags
+    #   A collection of key-value pairs.
+    #
+    # @return [Types::CreateChannelPlacementGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateChannelPlacementGroupResponse#arn #arn} => String
+    #   * {Types::CreateChannelPlacementGroupResponse#channels #channels} => Array&lt;String&gt;
+    #   * {Types::CreateChannelPlacementGroupResponse#cluster_id #cluster_id} => String
+    #   * {Types::CreateChannelPlacementGroupResponse#id #id} => String
+    #   * {Types::CreateChannelPlacementGroupResponse#name #name} => String
+    #   * {Types::CreateChannelPlacementGroupResponse#nodes #nodes} => Array&lt;String&gt;
+    #   * {Types::CreateChannelPlacementGroupResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_channel_placement_group({
+    #     cluster_id: "__string", # required
+    #     name: "__string",
+    #     nodes: ["__string"],
+    #     request_id: "__string",
+    #     tags: {
+    #       "__string" => "__string",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channels #=> Array
+    #   resp.channels[0] #=> String
+    #   resp.cluster_id #=> String
+    #   resp.id #=> String
+    #   resp.name #=> String
+    #   resp.nodes #=> Array
+    #   resp.nodes[0] #=> String
+    #   resp.state #=> String, one of "UNASSIGNED", "ASSIGNING", "ASSIGNED", "DELETING", "DELETE_FAILED", "DELETED", "UNASSIGNING"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateChannelPlacementGroup AWS API Documentation
+    #
+    # @overload create_channel_placement_group(params = {})
+    # @param [Hash] params ({})
+    def create_channel_placement_group(params = {}, options = {})
+      req = build_request(:create_channel_placement_group, params)
+      req.send_request(options)
+    end
+
+    # Create a new Cluster.
+    #
+    # @option params [String] :cluster_type
+    #   Specify a type. All the Nodes that you later add to this Cluster must
+    #   be this type of hardware. One Cluster instance can't contain
+    #   different hardware types. You won't be able to change this parameter
+    #   after you create the Cluster.
+    #
+    # @option params [String] :instance_role_arn
+    #   The ARN of the IAM role for the Node in this Cluster. The role must
+    #   include all the operations that you expect these Node to perform. If
+    #   necessary, create a role in IAM, then attach it here.
+    #
+    # @option params [String] :name
+    #   Specify a name that is unique in the AWS account. We recommend that
+    #   you assign a name that hints at the types of Nodes in the Cluster.
+    #   Names are case-sensitive.
+    #
+    # @option params [Types::ClusterNetworkSettingsCreateRequest] :network_settings
+    #   Network settings that connect the Nodes in the Cluster to one or more
+    #   of the Networks that the Cluster is associated with.
+    #
+    # @option params [String] :request_id
+    #   The unique ID of the request.**A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [Hash<String,String>] :tags
+    #   A collection of key-value pairs.
+    #
+    # @return [Types::CreateClusterResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateClusterResponse#arn #arn} => String
+    #   * {Types::CreateClusterResponse#channel_ids #channel_ids} => Array&lt;String&gt;
+    #   * {Types::CreateClusterResponse#cluster_type #cluster_type} => String
+    #   * {Types::CreateClusterResponse#id #id} => String
+    #   * {Types::CreateClusterResponse#instance_role_arn #instance_role_arn} => String
+    #   * {Types::CreateClusterResponse#name #name} => String
+    #   * {Types::CreateClusterResponse#network_settings #network_settings} => Types::ClusterNetworkSettings
+    #   * {Types::CreateClusterResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_cluster({
+    #     cluster_type: "ON_PREMISES", # accepts ON_PREMISES
+    #     instance_role_arn: "__string",
+    #     name: "__string",
+    #     network_settings: {
+    #       default_route: "__string",
+    #       interface_mappings: [
+    #         {
+    #           logical_interface_name: "__string",
+    #           network_id: "__string",
+    #         },
+    #       ],
+    #     },
+    #     request_id: "__string",
+    #     tags: {
+    #       "__string" => "__string",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channel_ids #=> Array
+    #   resp.channel_ids[0] #=> String
+    #   resp.cluster_type #=> String, one of "ON_PREMISES"
+    #   resp.id #=> String
+    #   resp.instance_role_arn #=> String
+    #   resp.name #=> String
+    #   resp.network_settings.default_route #=> String
+    #   resp.network_settings.interface_mappings #=> Array
+    #   resp.network_settings.interface_mappings[0].logical_interface_name #=> String
+    #   resp.network_settings.interface_mappings[0].network_id #=> String
+    #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "DELETING", "DELETE_FAILED", "DELETED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateCluster AWS API Documentation
+    #
+    # @overload create_cluster(params = {})
+    # @param [Hash] params ({})
+    def create_cluster(params = {}, options = {})
+      req = build_request(:create_cluster, params)
+      req.send_request(options)
+    end
+
+    # Create as many Networks as you need. You will associate one or more
+    # Clusters with each Network.Each Network provides MediaLive Anywhere
+    # with required information about the network in your organization that
+    # you are using for video encoding using MediaLive.
+    #
+    # @option params [Array<Types::IpPoolCreateRequest>] :ip_pools
+    #   An array of IpPoolCreateRequests that identify a collection of IP
+    #   addresses in your network that you want to reserve for use in
+    #   MediaLive Anywhere. MediaLiveAnywhere uses these IP addresses for Push
+    #   inputs (in both Bridge and NATnetworks) and for output destinations
+    #   (only in Bridge networks). EachIpPoolUpdateRequest specifies one CIDR
+    #   block.
+    #
+    # @option params [String] :name
+    #   Specify a name that is unique in the AWS account. We recommend that
+    #   you assign a name that hints at the type of traffic on the network.
+    #   Names are case-sensitive.
+    #
+    # @option params [String] :request_id
+    #   An ID that you assign to a create request. This ID ensures idempotency when creating resources.**A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [Array<Types::RouteCreateRequest>] :routes
+    #   An array of routes that MediaLive Anywhere needs to know about in
+    #   order to route encoding traffic.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   A collection of key-value pairs.
+    #
+    # @return [Types::CreateNetworkResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateNetworkResponse#arn #arn} => String
+    #   * {Types::CreateNetworkResponse#associated_cluster_ids #associated_cluster_ids} => Array&lt;String&gt;
+    #   * {Types::CreateNetworkResponse#id #id} => String
+    #   * {Types::CreateNetworkResponse#ip_pools #ip_pools} => Array&lt;Types::IpPool&gt;
+    #   * {Types::CreateNetworkResponse#name #name} => String
+    #   * {Types::CreateNetworkResponse#routes #routes} => Array&lt;Types::Route&gt;
+    #   * {Types::CreateNetworkResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_network({
+    #     ip_pools: [
+    #       {
+    #         cidr: "__string",
+    #       },
+    #     ],
+    #     name: "__string",
+    #     request_id: "__string",
+    #     routes: [
+    #       {
+    #         cidr: "__string",
+    #         gateway: "__string",
+    #       },
+    #     ],
+    #     tags: {
+    #       "__string" => "__string",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.associated_cluster_ids #=> Array
+    #   resp.associated_cluster_ids[0] #=> String
+    #   resp.id #=> String
+    #   resp.ip_pools #=> Array
+    #   resp.ip_pools[0].cidr #=> String
+    #   resp.name #=> String
+    #   resp.routes #=> Array
+    #   resp.routes[0].cidr #=> String
+    #   resp.routes[0].gateway #=> String
+    #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "DELETING", "IDLE", "IN_USE", "UPDATING", "DELETE_FAILED", "DELETED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateNetwork AWS API Documentation
+    #
+    # @overload create_network(params = {})
+    # @param [Hash] params ({})
+    def create_network(params = {}, options = {})
+      req = build_request(:create_network, params)
+      req.send_request(options)
+    end
+
+    # Create a Node in the specified Cluster. You can also create Nodes
+    # using the CreateNodeRegistrationScript. Note that you can't move a
+    # Node to another Cluster.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [String] :name
+    #   The user-specified name of the Node to be created.
+    #
+    # @option params [Array<Types::NodeInterfaceMappingCreateRequest>] :node_interface_mappings
+    #   An array of interface mappings for the Node. Each mapping logically
+    #   connects one physical interface on the node hardware with one logical
+    #   interface name. You created the logical names in the
+    #   logicalInterfaceName parameter when you created the Cluster. Create
+    #   one mapping for each physical interface on the node, but only for node
+    #   interfaces that you plan to use for encoding content traffic (and not
+    #   for any management-only interface). In each mapping pair, we recommend
+    #   that you specify the logical name first, then assign the physical name
+    #   that applies.The physicalInterfaceName is the final piece of data that
+    #   associates a node interface with a network. The association works as
+    #   follows: Node physicalInterfaceName > Node logicalInterfaceName =
+    #   Cluster logicalInterfaceName > networkId.
+    #
+    # @option params [String] :request_id
+    #   An ID that you assign to a create request. This ID ensures idempotency when creating resources.**A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [String] :role
+    #   The initial role of the Node in the Cluster. ACTIVE means the Node is
+    #   available for encoding. BACKUP means the Node is a redundant Node and
+    #   might get used if an ACTIVE Node fails.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   A collection of key-value pairs.
+    #
+    # @return [Types::CreateNodeResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateNodeResponse#arn #arn} => String
+    #   * {Types::CreateNodeResponse#channel_placement_groups #channel_placement_groups} => Array&lt;String&gt;
+    #   * {Types::CreateNodeResponse#cluster_id #cluster_id} => String
+    #   * {Types::CreateNodeResponse#connection_state #connection_state} => String
+    #   * {Types::CreateNodeResponse#id #id} => String
+    #   * {Types::CreateNodeResponse#instance_arn #instance_arn} => String
+    #   * {Types::CreateNodeResponse#name #name} => String
+    #   * {Types::CreateNodeResponse#node_interface_mappings #node_interface_mappings} => Array&lt;Types::NodeInterfaceMapping&gt;
+    #   * {Types::CreateNodeResponse#role #role} => String
+    #   * {Types::CreateNodeResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_node({
+    #     cluster_id: "__string", # required
+    #     name: "__string",
+    #     node_interface_mappings: [
+    #       {
+    #         logical_interface_name: "__string",
+    #         network_interface_mode: "NAT", # accepts NAT, BRIDGE
+    #         physical_interface_name: "__string",
+    #       },
+    #     ],
+    #     request_id: "__string",
+    #     role: "BACKUP", # accepts BACKUP, ACTIVE
+    #     tags: {
+    #       "__string" => "__string",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channel_placement_groups #=> Array
+    #   resp.channel_placement_groups[0] #=> String
+    #   resp.cluster_id #=> String
+    #   resp.connection_state #=> String, one of "CONNECTED", "DISCONNECTED"
+    #   resp.id #=> String
+    #   resp.instance_arn #=> String
+    #   resp.name #=> String
+    #   resp.node_interface_mappings #=> Array
+    #   resp.node_interface_mappings[0].logical_interface_name #=> String
+    #   resp.node_interface_mappings[0].network_interface_mode #=> String, one of "NAT", "BRIDGE"
+    #   resp.node_interface_mappings[0].physical_interface_name #=> String
+    #   resp.role #=> String, one of "BACKUP", "ACTIVE"
+    #   resp.state #=> String, one of "CREATED", "REGISTERING", "READY_TO_ACTIVATE", "REGISTRATION_FAILED", "ACTIVATION_FAILED", "ACTIVE", "READY", "IN_USE", "DEREGISTERING", "DRAINING", "DEREGISTRATION_FAILED", "DEREGISTERED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateNode AWS API Documentation
+    #
+    # @overload create_node(params = {})
+    # @param [Hash] params ({})
+    def create_node(params = {}, options = {})
+      req = build_request(:create_node, params)
+      req.send_request(options)
+    end
+
+    # Create the Register Node script for all the nodes intended for a
+    # specific Cluster. You will then run the script on each hardware unit
+    # that is intended for that Cluster. The script creates a Node in the
+    # specified Cluster. It then binds the Node to this hardware unit, and
+    # activates the node hardware for use with MediaLive Anywhere.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [String] :id
+    #   If you're generating a re-registration script for an already existing
+    #   node, this is where you provide the id.
+    #
+    # @option params [String] :name
+    #   Specify a pattern for MediaLive Anywhere to use to assign a name to
+    #   each Node in the Cluster. The pattern can include the variables $hn
+    #   (hostname of the node hardware) and $ts for the date and time that the
+    #   Node is created, in UTC (for example, 2024-08-20T23:35:12Z).
+    #
+    # @option params [Array<Types::NodeInterfaceMapping>] :node_interface_mappings
+    #   An array of interface mappings for the Node. Each mapping logically
+    #   connects one physical interface on the node hardware with one logical
+    #   interface name. This mapping associates a node interface with a
+    #   network. The association works as follows: Node physicalInterfaceName
+    #   > Node logicalInterfaceName = Cluster logicalInterfaceName >
+    #   networkId.
+    #
+    # @option params [String] :request_id
+    #   An ID that you assign to a create request. This ID ensures idempotency when creating resources.**A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [String] :role
+    #   The initial role of the Node in the Cluster. ACTIVE means the Node is
+    #   available for encoding. BACKUP means the Node is a redundant Node and
+    #   might get used if an ACTIVE Node fails.
+    #
+    # @return [Types::CreateNodeRegistrationScriptResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateNodeRegistrationScriptResponse#node_registration_script #node_registration_script} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_node_registration_script({
+    #     cluster_id: "__string", # required
+    #     id: "__string",
+    #     name: "__string",
+    #     node_interface_mappings: [
+    #       {
+    #         logical_interface_name: "__string",
+    #         network_interface_mode: "NAT", # accepts NAT, BRIDGE
+    #         physical_interface_name: "__string",
+    #       },
+    #     ],
+    #     request_id: "__string",
+    #     role: "BACKUP", # accepts BACKUP, ACTIVE
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.node_registration_script #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/CreateNodeRegistrationScript AWS API Documentation
+    #
+    # @overload create_node_registration_script(params = {})
+    # @param [Hash] params ({})
+    def create_node_registration_script(params = {}, options = {})
+      req = build_request(:create_node_registration_script, params)
+      req.send_request(options)
+    end
+
+    # Delete the specified ChannelPlacementGroup that exists in the
+    # specified Cluster.
+    #
+    # @option params [required, String] :channel_placement_group_id
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @return [Types::DeleteChannelPlacementGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteChannelPlacementGroupResponse#arn #arn} => String
+    #   * {Types::DeleteChannelPlacementGroupResponse#channels #channels} => Array&lt;String&gt;
+    #   * {Types::DeleteChannelPlacementGroupResponse#cluster_id #cluster_id} => String
+    #   * {Types::DeleteChannelPlacementGroupResponse#id #id} => String
+    #   * {Types::DeleteChannelPlacementGroupResponse#name #name} => String
+    #   * {Types::DeleteChannelPlacementGroupResponse#nodes #nodes} => Array&lt;String&gt;
+    #   * {Types::DeleteChannelPlacementGroupResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_channel_placement_group({
+    #     channel_placement_group_id: "__string", # required
+    #     cluster_id: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channels #=> Array
+    #   resp.channels[0] #=> String
+    #   resp.cluster_id #=> String
+    #   resp.id #=> String
+    #   resp.name #=> String
+    #   resp.nodes #=> Array
+    #   resp.nodes[0] #=> String
+    #   resp.state #=> String, one of "UNASSIGNED", "ASSIGNING", "ASSIGNED", "DELETING", "DELETE_FAILED", "DELETED", "UNASSIGNING"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DeleteChannelPlacementGroup AWS API Documentation
+    #
+    # @overload delete_channel_placement_group(params = {})
+    # @param [Hash] params ({})
+    def delete_channel_placement_group(params = {}, options = {})
+      req = build_request(:delete_channel_placement_group, params)
+      req.send_request(options)
+    end
+
+    # Delete a Cluster. The Cluster must be idle.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @return [Types::DeleteClusterResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteClusterResponse#arn #arn} => String
+    #   * {Types::DeleteClusterResponse#channel_ids #channel_ids} => Array&lt;String&gt;
+    #   * {Types::DeleteClusterResponse#cluster_type #cluster_type} => String
+    #   * {Types::DeleteClusterResponse#id #id} => String
+    #   * {Types::DeleteClusterResponse#instance_role_arn #instance_role_arn} => String
+    #   * {Types::DeleteClusterResponse#name #name} => String
+    #   * {Types::DeleteClusterResponse#network_settings #network_settings} => Types::ClusterNetworkSettings
+    #   * {Types::DeleteClusterResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_cluster({
+    #     cluster_id: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channel_ids #=> Array
+    #   resp.channel_ids[0] #=> String
+    #   resp.cluster_type #=> String, one of "ON_PREMISES"
+    #   resp.id #=> String
+    #   resp.instance_role_arn #=> String
+    #   resp.name #=> String
+    #   resp.network_settings.default_route #=> String
+    #   resp.network_settings.interface_mappings #=> Array
+    #   resp.network_settings.interface_mappings[0].logical_interface_name #=> String
+    #   resp.network_settings.interface_mappings[0].network_id #=> String
+    #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "DELETING", "DELETE_FAILED", "DELETED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DeleteCluster AWS API Documentation
+    #
+    # @overload delete_cluster(params = {})
+    # @param [Hash] params ({})
+    def delete_cluster(params = {}, options = {})
+      req = build_request(:delete_cluster, params)
+      req.send_request(options)
+    end
+
+    # Delete a Network. The Network must have no resources associated with
+    # it.
+    #
+    # @option params [required, String] :network_id
+    #
+    # @return [Types::DeleteNetworkResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteNetworkResponse#arn #arn} => String
+    #   * {Types::DeleteNetworkResponse#associated_cluster_ids #associated_cluster_ids} => Array&lt;String&gt;
+    #   * {Types::DeleteNetworkResponse#id #id} => String
+    #   * {Types::DeleteNetworkResponse#ip_pools #ip_pools} => Array&lt;Types::IpPool&gt;
+    #   * {Types::DeleteNetworkResponse#name #name} => String
+    #   * {Types::DeleteNetworkResponse#routes #routes} => Array&lt;Types::Route&gt;
+    #   * {Types::DeleteNetworkResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_network({
+    #     network_id: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.associated_cluster_ids #=> Array
+    #   resp.associated_cluster_ids[0] #=> String
+    #   resp.id #=> String
+    #   resp.ip_pools #=> Array
+    #   resp.ip_pools[0].cidr #=> String
+    #   resp.name #=> String
+    #   resp.routes #=> Array
+    #   resp.routes[0].cidr #=> String
+    #   resp.routes[0].gateway #=> String
+    #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "DELETING", "IDLE", "IN_USE", "UPDATING", "DELETE_FAILED", "DELETED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DeleteNetwork AWS API Documentation
+    #
+    # @overload delete_network(params = {})
+    # @param [Hash] params ({})
+    def delete_network(params = {}, options = {})
+      req = build_request(:delete_network, params)
+      req.send_request(options)
+    end
+
+    # Delete a Node. The Node must be IDLE.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [required, String] :node_id
+    #
+    # @return [Types::DeleteNodeResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteNodeResponse#arn #arn} => String
+    #   * {Types::DeleteNodeResponse#channel_placement_groups #channel_placement_groups} => Array&lt;String&gt;
+    #   * {Types::DeleteNodeResponse#cluster_id #cluster_id} => String
+    #   * {Types::DeleteNodeResponse#connection_state #connection_state} => String
+    #   * {Types::DeleteNodeResponse#id #id} => String
+    #   * {Types::DeleteNodeResponse#instance_arn #instance_arn} => String
+    #   * {Types::DeleteNodeResponse#name #name} => String
+    #   * {Types::DeleteNodeResponse#node_interface_mappings #node_interface_mappings} => Array&lt;Types::NodeInterfaceMapping&gt;
+    #   * {Types::DeleteNodeResponse#role #role} => String
+    #   * {Types::DeleteNodeResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_node({
+    #     cluster_id: "__string", # required
+    #     node_id: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channel_placement_groups #=> Array
+    #   resp.channel_placement_groups[0] #=> String
+    #   resp.cluster_id #=> String
+    #   resp.connection_state #=> String, one of "CONNECTED", "DISCONNECTED"
+    #   resp.id #=> String
+    #   resp.instance_arn #=> String
+    #   resp.name #=> String
+    #   resp.node_interface_mappings #=> Array
+    #   resp.node_interface_mappings[0].logical_interface_name #=> String
+    #   resp.node_interface_mappings[0].network_interface_mode #=> String, one of "NAT", "BRIDGE"
+    #   resp.node_interface_mappings[0].physical_interface_name #=> String
+    #   resp.role #=> String, one of "BACKUP", "ACTIVE"
+    #   resp.state #=> String, one of "CREATED", "REGISTERING", "READY_TO_ACTIVATE", "REGISTRATION_FAILED", "ACTIVATION_FAILED", "ACTIVE", "READY", "IN_USE", "DEREGISTERING", "DRAINING", "DEREGISTRATION_FAILED", "DEREGISTERED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DeleteNode AWS API Documentation
+    #
+    # @overload delete_node(params = {})
+    # @param [Hash] params ({})
+    def delete_node(params = {}, options = {})
+      req = build_request(:delete_node, params)
+      req.send_request(options)
+    end
+
+    # Get details about a ChannelPlacementGroup.
+    #
+    # @option params [required, String] :channel_placement_group_id
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @return [Types::DescribeChannelPlacementGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeChannelPlacementGroupResponse#arn #arn} => String
+    #   * {Types::DescribeChannelPlacementGroupResponse#channels #channels} => Array&lt;String&gt;
+    #   * {Types::DescribeChannelPlacementGroupResponse#cluster_id #cluster_id} => String
+    #   * {Types::DescribeChannelPlacementGroupResponse#id #id} => String
+    #   * {Types::DescribeChannelPlacementGroupResponse#name #name} => String
+    #   * {Types::DescribeChannelPlacementGroupResponse#nodes #nodes} => Array&lt;String&gt;
+    #   * {Types::DescribeChannelPlacementGroupResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_channel_placement_group({
+    #     channel_placement_group_id: "__string", # required
+    #     cluster_id: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channels #=> Array
+    #   resp.channels[0] #=> String
+    #   resp.cluster_id #=> String
+    #   resp.id #=> String
+    #   resp.name #=> String
+    #   resp.nodes #=> Array
+    #   resp.nodes[0] #=> String
+    #   resp.state #=> String, one of "UNASSIGNED", "ASSIGNING", "ASSIGNED", "DELETING", "DELETE_FAILED", "DELETED", "UNASSIGNING"
+    #
+    #
+    # The following waiters are defined for this operation (see {Client#wait_until} for detailed usage):
+    #
+    #   * channel_placement_group_assigned
+    #   * channel_placement_group_deleted
+    #   * channel_placement_group_unassigned
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DescribeChannelPlacementGroup AWS API Documentation
+    #
+    # @overload describe_channel_placement_group(params = {})
+    # @param [Hash] params ({})
+    def describe_channel_placement_group(params = {}, options = {})
+      req = build_request(:describe_channel_placement_group, params)
+      req.send_request(options)
+    end
+
+    # Get details about a Cluster.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @return [Types::DescribeClusterResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeClusterResponse#arn #arn} => String
+    #   * {Types::DescribeClusterResponse#channel_ids #channel_ids} => Array&lt;String&gt;
+    #   * {Types::DescribeClusterResponse#cluster_type #cluster_type} => String
+    #   * {Types::DescribeClusterResponse#id #id} => String
+    #   * {Types::DescribeClusterResponse#instance_role_arn #instance_role_arn} => String
+    #   * {Types::DescribeClusterResponse#name #name} => String
+    #   * {Types::DescribeClusterResponse#network_settings #network_settings} => Types::ClusterNetworkSettings
+    #   * {Types::DescribeClusterResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_cluster({
+    #     cluster_id: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channel_ids #=> Array
+    #   resp.channel_ids[0] #=> String
+    #   resp.cluster_type #=> String, one of "ON_PREMISES"
+    #   resp.id #=> String
+    #   resp.instance_role_arn #=> String
+    #   resp.name #=> String
+    #   resp.network_settings.default_route #=> String
+    #   resp.network_settings.interface_mappings #=> Array
+    #   resp.network_settings.interface_mappings[0].logical_interface_name #=> String
+    #   resp.network_settings.interface_mappings[0].network_id #=> String
+    #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "DELETING", "DELETE_FAILED", "DELETED"
+    #
+    #
+    # The following waiters are defined for this operation (see {Client#wait_until} for detailed usage):
+    #
+    #   * cluster_created
+    #   * cluster_deleted
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DescribeCluster AWS API Documentation
+    #
+    # @overload describe_cluster(params = {})
+    # @param [Hash] params ({})
+    def describe_cluster(params = {}, options = {})
+      req = build_request(:describe_cluster, params)
+      req.send_request(options)
+    end
+
+    # Get details about a Network.
+    #
+    # @option params [required, String] :network_id
+    #
+    # @return [Types::DescribeNetworkResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeNetworkResponse#arn #arn} => String
+    #   * {Types::DescribeNetworkResponse#associated_cluster_ids #associated_cluster_ids} => Array&lt;String&gt;
+    #   * {Types::DescribeNetworkResponse#id #id} => String
+    #   * {Types::DescribeNetworkResponse#ip_pools #ip_pools} => Array&lt;Types::IpPool&gt;
+    #   * {Types::DescribeNetworkResponse#name #name} => String
+    #   * {Types::DescribeNetworkResponse#routes #routes} => Array&lt;Types::Route&gt;
+    #   * {Types::DescribeNetworkResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_network({
+    #     network_id: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.associated_cluster_ids #=> Array
+    #   resp.associated_cluster_ids[0] #=> String
+    #   resp.id #=> String
+    #   resp.ip_pools #=> Array
+    #   resp.ip_pools[0].cidr #=> String
+    #   resp.name #=> String
+    #   resp.routes #=> Array
+    #   resp.routes[0].cidr #=> String
+    #   resp.routes[0].gateway #=> String
+    #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "DELETING", "IDLE", "IN_USE", "UPDATING", "DELETE_FAILED", "DELETED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DescribeNetwork AWS API Documentation
+    #
+    # @overload describe_network(params = {})
+    # @param [Hash] params ({})
+    def describe_network(params = {}, options = {})
+      req = build_request(:describe_network, params)
+      req.send_request(options)
+    end
+
+    # Get details about a Node in the specified Cluster.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [required, String] :node_id
+    #
+    # @return [Types::DescribeNodeResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeNodeResponse#arn #arn} => String
+    #   * {Types::DescribeNodeResponse#channel_placement_groups #channel_placement_groups} => Array&lt;String&gt;
+    #   * {Types::DescribeNodeResponse#cluster_id #cluster_id} => String
+    #   * {Types::DescribeNodeResponse#connection_state #connection_state} => String
+    #   * {Types::DescribeNodeResponse#id #id} => String
+    #   * {Types::DescribeNodeResponse#instance_arn #instance_arn} => String
+    #   * {Types::DescribeNodeResponse#name #name} => String
+    #   * {Types::DescribeNodeResponse#node_interface_mappings #node_interface_mappings} => Array&lt;Types::NodeInterfaceMapping&gt;
+    #   * {Types::DescribeNodeResponse#role #role} => String
+    #   * {Types::DescribeNodeResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_node({
+    #     cluster_id: "__string", # required
+    #     node_id: "__string", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channel_placement_groups #=> Array
+    #   resp.channel_placement_groups[0] #=> String
+    #   resp.cluster_id #=> String
+    #   resp.connection_state #=> String, one of "CONNECTED", "DISCONNECTED"
+    #   resp.id #=> String
+    #   resp.instance_arn #=> String
+    #   resp.name #=> String
+    #   resp.node_interface_mappings #=> Array
+    #   resp.node_interface_mappings[0].logical_interface_name #=> String
+    #   resp.node_interface_mappings[0].network_interface_mode #=> String, one of "NAT", "BRIDGE"
+    #   resp.node_interface_mappings[0].physical_interface_name #=> String
+    #   resp.role #=> String, one of "BACKUP", "ACTIVE"
+    #   resp.state #=> String, one of "CREATED", "REGISTERING", "READY_TO_ACTIVATE", "REGISTRATION_FAILED", "ACTIVATION_FAILED", "ACTIVE", "READY", "IN_USE", "DEREGISTERING", "DRAINING", "DEREGISTRATION_FAILED", "DEREGISTERED"
+    #
+    #
+    # The following waiters are defined for this operation (see {Client#wait_until} for detailed usage):
+    #
+    #   * node_deregistered
+    #   * node_registered
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/DescribeNode AWS API Documentation
+    #
+    # @overload describe_node(params = {})
+    # @param [Hash] params ({})
+    def describe_node(params = {}, options = {})
+      req = build_request(:describe_node, params)
+      req.send_request(options)
+    end
+
+    # Retrieve the list of ChannelPlacementGroups in the specified Cluster.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [Integer] :max_results
+    #
+    # @option params [String] :next_token
+    #
+    # @return [Types::ListChannelPlacementGroupsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListChannelPlacementGroupsResponse#channel_placement_groups #channel_placement_groups} => Array&lt;Types::DescribeChannelPlacementGroupSummary&gt;
+    #   * {Types::ListChannelPlacementGroupsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_channel_placement_groups({
+    #     cluster_id: "__string", # required
+    #     max_results: 1,
+    #     next_token: "__string",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.channel_placement_groups #=> Array
+    #   resp.channel_placement_groups[0].arn #=> String
+    #   resp.channel_placement_groups[0].channels #=> Array
+    #   resp.channel_placement_groups[0].channels[0] #=> String
+    #   resp.channel_placement_groups[0].cluster_id #=> String
+    #   resp.channel_placement_groups[0].id #=> String
+    #   resp.channel_placement_groups[0].name #=> String
+    #   resp.channel_placement_groups[0].nodes #=> Array
+    #   resp.channel_placement_groups[0].nodes[0] #=> String
+    #   resp.channel_placement_groups[0].state #=> String, one of "UNASSIGNED", "ASSIGNING", "ASSIGNED", "DELETING", "DELETE_FAILED", "DELETED", "UNASSIGNING"
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListChannelPlacementGroups AWS API Documentation
+    #
+    # @overload list_channel_placement_groups(params = {})
+    # @param [Hash] params ({})
+    def list_channel_placement_groups(params = {}, options = {})
+      req = build_request(:list_channel_placement_groups, params)
+      req.send_request(options)
+    end
+
+    # Retrieve the list of Clusters.
+    #
+    # @option params [Integer] :max_results
+    #
+    # @option params [String] :next_token
+    #
+    # @return [Types::ListClustersResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListClustersResponse#clusters #clusters} => Array&lt;Types::DescribeClusterSummary&gt;
+    #   * {Types::ListClustersResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_clusters({
+    #     max_results: 1,
+    #     next_token: "__string",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.clusters #=> Array
+    #   resp.clusters[0].arn #=> String
+    #   resp.clusters[0].channel_ids #=> Array
+    #   resp.clusters[0].channel_ids[0] #=> String
+    #   resp.clusters[0].cluster_type #=> String, one of "ON_PREMISES"
+    #   resp.clusters[0].id #=> String
+    #   resp.clusters[0].instance_role_arn #=> String
+    #   resp.clusters[0].name #=> String
+    #   resp.clusters[0].network_settings.default_route #=> String
+    #   resp.clusters[0].network_settings.interface_mappings #=> Array
+    #   resp.clusters[0].network_settings.interface_mappings[0].logical_interface_name #=> String
+    #   resp.clusters[0].network_settings.interface_mappings[0].network_id #=> String
+    #   resp.clusters[0].state #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "DELETING", "DELETE_FAILED", "DELETED"
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListClusters AWS API Documentation
+    #
+    # @overload list_clusters(params = {})
+    # @param [Hash] params ({})
+    def list_clusters(params = {}, options = {})
+      req = build_request(:list_clusters, params)
+      req.send_request(options)
+    end
+
+    # Retrieve the list of Networks.
+    #
+    # @option params [Integer] :max_results
+    #
+    # @option params [String] :next_token
+    #
+    # @return [Types::ListNetworksResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListNetworksResponse#networks #networks} => Array&lt;Types::DescribeNetworkSummary&gt;
+    #   * {Types::ListNetworksResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_networks({
+    #     max_results: 1,
+    #     next_token: "__string",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.networks #=> Array
+    #   resp.networks[0].arn #=> String
+    #   resp.networks[0].associated_cluster_ids #=> Array
+    #   resp.networks[0].associated_cluster_ids[0] #=> String
+    #   resp.networks[0].id #=> String
+    #   resp.networks[0].ip_pools #=> Array
+    #   resp.networks[0].ip_pools[0].cidr #=> String
+    #   resp.networks[0].name #=> String
+    #   resp.networks[0].routes #=> Array
+    #   resp.networks[0].routes[0].cidr #=> String
+    #   resp.networks[0].routes[0].gateway #=> String
+    #   resp.networks[0].state #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "DELETING", "IDLE", "IN_USE", "UPDATING", "DELETE_FAILED", "DELETED"
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListNetworks AWS API Documentation
+    #
+    # @overload list_networks(params = {})
+    # @param [Hash] params ({})
+    def list_networks(params = {}, options = {})
+      req = build_request(:list_networks, params)
+      req.send_request(options)
+    end
+
+    # Retrieve the list of Nodes.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [Integer] :max_results
+    #
+    # @option params [String] :next_token
+    #
+    # @return [Types::ListNodesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListNodesResponse#next_token #next_token} => String
+    #   * {Types::ListNodesResponse#nodes #nodes} => Array&lt;Types::DescribeNodeSummary&gt;
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_nodes({
+    #     cluster_id: "__string", # required
+    #     max_results: 1,
+    #     next_token: "__string",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.next_token #=> String
+    #   resp.nodes #=> Array
+    #   resp.nodes[0].arn #=> String
+    #   resp.nodes[0].channel_placement_groups #=> Array
+    #   resp.nodes[0].channel_placement_groups[0] #=> String
+    #   resp.nodes[0].cluster_id #=> String
+    #   resp.nodes[0].connection_state #=> String, one of "CONNECTED", "DISCONNECTED"
+    #   resp.nodes[0].id #=> String
+    #   resp.nodes[0].instance_arn #=> String
+    #   resp.nodes[0].managed_instance_id #=> String
+    #   resp.nodes[0].name #=> String
+    #   resp.nodes[0].node_interface_mappings #=> Array
+    #   resp.nodes[0].node_interface_mappings[0].logical_interface_name #=> String
+    #   resp.nodes[0].node_interface_mappings[0].network_interface_mode #=> String, one of "NAT", "BRIDGE"
+    #   resp.nodes[0].node_interface_mappings[0].physical_interface_name #=> String
+    #   resp.nodes[0].role #=> String, one of "BACKUP", "ACTIVE"
+    #   resp.nodes[0].state #=> String, one of "CREATED", "REGISTERING", "READY_TO_ACTIVATE", "REGISTRATION_FAILED", "ACTIVATION_FAILED", "ACTIVE", "READY", "IN_USE", "DEREGISTERING", "DRAINING", "DEREGISTRATION_FAILED", "DEREGISTERED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/ListNodes AWS API Documentation
+    #
+    # @overload list_nodes(params = {})
+    # @param [Hash] params ({})
+    def list_nodes(params = {}, options = {})
+      req = build_request(:list_nodes, params)
+      req.send_request(options)
+    end
+
+    # Change the settings for a ChannelPlacementGroup.
+    #
+    # @option params [required, String] :channel_placement_group_id
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [String] :name
+    #   Include this parameter only if you want to change the current name of
+    #   the ChannelPlacementGroup. Specify a name that is unique in the
+    #   Cluster. You can't change the name. Names are case-sensitive.
+    #
+    # @option params [Array<String>] :nodes
+    #   Include this parameter only if you want to change the list of Nodes
+    #   that are associated with the ChannelPlacementGroup.
+    #
+    # @return [Types::UpdateChannelPlacementGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateChannelPlacementGroupResponse#arn #arn} => String
+    #   * {Types::UpdateChannelPlacementGroupResponse#channels #channels} => Array&lt;String&gt;
+    #   * {Types::UpdateChannelPlacementGroupResponse#cluster_id #cluster_id} => String
+    #   * {Types::UpdateChannelPlacementGroupResponse#id #id} => String
+    #   * {Types::UpdateChannelPlacementGroupResponse#name #name} => String
+    #   * {Types::UpdateChannelPlacementGroupResponse#nodes #nodes} => Array&lt;String&gt;
+    #   * {Types::UpdateChannelPlacementGroupResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_channel_placement_group({
+    #     channel_placement_group_id: "__string", # required
+    #     cluster_id: "__string", # required
+    #     name: "__string",
+    #     nodes: ["__string"],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channels #=> Array
+    #   resp.channels[0] #=> String
+    #   resp.cluster_id #=> String
+    #   resp.id #=> String
+    #   resp.name #=> String
+    #   resp.nodes #=> Array
+    #   resp.nodes[0] #=> String
+    #   resp.state #=> String, one of "UNASSIGNED", "ASSIGNING", "ASSIGNED", "DELETING", "DELETE_FAILED", "DELETED", "UNASSIGNING"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateChannelPlacementGroup AWS API Documentation
+    #
+    # @overload update_channel_placement_group(params = {})
+    # @param [Hash] params ({})
+    def update_channel_placement_group(params = {}, options = {})
+      req = build_request(:update_channel_placement_group, params)
+      req.send_request(options)
+    end
+
+    # Change the settings for a Cluster.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [String] :name
+    #   Include this parameter only if you want to change the current name of
+    #   the Cluster. Specify a name that is unique in the AWS account. You
+    #   can't change the name. Names are case-sensitive.
+    #
+    # @option params [Types::ClusterNetworkSettingsUpdateRequest] :network_settings
+    #   Include this property only if you want to change the current
+    #   connections between the Nodes in the Cluster and the Networks the
+    #   Cluster is associated with.
+    #
+    # @return [Types::UpdateClusterResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateClusterResponse#arn #arn} => String
+    #   * {Types::UpdateClusterResponse#channel_ids #channel_ids} => Array&lt;String&gt;
+    #   * {Types::UpdateClusterResponse#cluster_type #cluster_type} => String
+    #   * {Types::UpdateClusterResponse#id #id} => String
+    #   * {Types::UpdateClusterResponse#name #name} => String
+    #   * {Types::UpdateClusterResponse#network_settings #network_settings} => Types::ClusterNetworkSettings
+    #   * {Types::UpdateClusterResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_cluster({
+    #     cluster_id: "__string", # required
+    #     name: "__string",
+    #     network_settings: {
+    #       default_route: "__string",
+    #       interface_mappings: [
+    #         {
+    #           logical_interface_name: "__string",
+    #           network_id: "__string",
+    #         },
+    #       ],
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channel_ids #=> Array
+    #   resp.channel_ids[0] #=> String
+    #   resp.cluster_type #=> String, one of "ON_PREMISES"
+    #   resp.id #=> String
+    #   resp.name #=> String
+    #   resp.network_settings.default_route #=> String
+    #   resp.network_settings.interface_mappings #=> Array
+    #   resp.network_settings.interface_mappings[0].logical_interface_name #=> String
+    #   resp.network_settings.interface_mappings[0].network_id #=> String
+    #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "DELETING", "DELETE_FAILED", "DELETED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateCluster AWS API Documentation
+    #
+    # @overload update_cluster(params = {})
+    # @param [Hash] params ({})
+    def update_cluster(params = {}, options = {})
+      req = build_request(:update_cluster, params)
+      req.send_request(options)
+    end
+
+    # Change the settings for a Network.
+    #
+    # @option params [Array<Types::IpPoolUpdateRequest>] :ip_pools
+    #   Include this parameter only if you want to change the pool of IP
+    #   addresses in the network. An array of IpPoolCreateRequests that
+    #   identify a collection of IP addresses in this network that you want to
+    #   reserve for use in MediaLive Anywhere. MediaLive Anywhere uses these
+    #   IP addresses for Push inputs (in both Bridge and NAT networks) and for
+    #   output destinations (only in Bridge networks). Each
+    #   IpPoolUpdateRequest specifies one CIDR block.
+    #
+    # @option params [String] :name
+    #   Include this parameter only if you want to change the name of the
+    #   Network. Specify a name that is unique in the AWS account. Names are
+    #   case-sensitive.
+    #
+    # @option params [required, String] :network_id
+    #
+    # @option params [Array<Types::RouteUpdateRequest>] :routes
+    #   Include this parameter only if you want to change or add routes in the
+    #   Network. An array of Routes that MediaLive Anywhere needs to know
+    #   about in order to route encoding traffic.
+    #
+    # @return [Types::UpdateNetworkResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateNetworkResponse#arn #arn} => String
+    #   * {Types::UpdateNetworkResponse#associated_cluster_ids #associated_cluster_ids} => Array&lt;String&gt;
+    #   * {Types::UpdateNetworkResponse#id #id} => String
+    #   * {Types::UpdateNetworkResponse#ip_pools #ip_pools} => Array&lt;Types::IpPool&gt;
+    #   * {Types::UpdateNetworkResponse#name #name} => String
+    #   * {Types::UpdateNetworkResponse#routes #routes} => Array&lt;Types::Route&gt;
+    #   * {Types::UpdateNetworkResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_network({
+    #     ip_pools: [
+    #       {
+    #         cidr: "__string",
+    #       },
+    #     ],
+    #     name: "__string",
+    #     network_id: "__string", # required
+    #     routes: [
+    #       {
+    #         cidr: "__string",
+    #         gateway: "__string",
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.associated_cluster_ids #=> Array
+    #   resp.associated_cluster_ids[0] #=> String
+    #   resp.id #=> String
+    #   resp.ip_pools #=> Array
+    #   resp.ip_pools[0].cidr #=> String
+    #   resp.name #=> String
+    #   resp.routes #=> Array
+    #   resp.routes[0].cidr #=> String
+    #   resp.routes[0].gateway #=> String
+    #   resp.state #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "DELETING", "IDLE", "IN_USE", "UPDATING", "DELETE_FAILED", "DELETED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateNetwork AWS API Documentation
+    #
+    # @overload update_network(params = {})
+    # @param [Hash] params ({})
+    def update_network(params = {}, options = {})
+      req = build_request(:update_network, params)
+      req.send_request(options)
+    end
+
+    # Change the settings for a Node.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [String] :name
+    #   Include this parameter only if you want to change the current name of
+    #   the Node. Specify a name that is unique in the Cluster. You can't
+    #   change the name. Names are case-sensitive.
+    #
+    # @option params [required, String] :node_id
+    #
+    # @option params [String] :role
+    #   The initial role of the Node in the Cluster. ACTIVE means the Node is
+    #   available for encoding. BACKUP means the Node is a redundant Node and
+    #   might get used if an ACTIVE Node fails.
+    #
+    # @return [Types::UpdateNodeResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateNodeResponse#arn #arn} => String
+    #   * {Types::UpdateNodeResponse#channel_placement_groups #channel_placement_groups} => Array&lt;String&gt;
+    #   * {Types::UpdateNodeResponse#cluster_id #cluster_id} => String
+    #   * {Types::UpdateNodeResponse#connection_state #connection_state} => String
+    #   * {Types::UpdateNodeResponse#id #id} => String
+    #   * {Types::UpdateNodeResponse#instance_arn #instance_arn} => String
+    #   * {Types::UpdateNodeResponse#name #name} => String
+    #   * {Types::UpdateNodeResponse#node_interface_mappings #node_interface_mappings} => Array&lt;Types::NodeInterfaceMapping&gt;
+    #   * {Types::UpdateNodeResponse#role #role} => String
+    #   * {Types::UpdateNodeResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_node({
+    #     cluster_id: "__string", # required
+    #     name: "__string",
+    #     node_id: "__string", # required
+    #     role: "BACKUP", # accepts BACKUP, ACTIVE
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channel_placement_groups #=> Array
+    #   resp.channel_placement_groups[0] #=> String
+    #   resp.cluster_id #=> String
+    #   resp.connection_state #=> String, one of "CONNECTED", "DISCONNECTED"
+    #   resp.id #=> String
+    #   resp.instance_arn #=> String
+    #   resp.name #=> String
+    #   resp.node_interface_mappings #=> Array
+    #   resp.node_interface_mappings[0].logical_interface_name #=> String
+    #   resp.node_interface_mappings[0].network_interface_mode #=> String, one of "NAT", "BRIDGE"
+    #   resp.node_interface_mappings[0].physical_interface_name #=> String
+    #   resp.role #=> String, one of "BACKUP", "ACTIVE"
+    #   resp.state #=> String, one of "CREATED", "REGISTERING", "READY_TO_ACTIVATE", "REGISTRATION_FAILED", "ACTIVATION_FAILED", "ACTIVE", "READY", "IN_USE", "DEREGISTERING", "DRAINING", "DEREGISTRATION_FAILED", "DEREGISTERED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateNode AWS API Documentation
+    #
+    # @overload update_node(params = {})
+    # @param [Hash] params ({})
+    def update_node(params = {}, options = {})
+      req = build_request(:update_node, params)
+      req.send_request(options)
+    end
+
+    # Update the state of a node.
+    #
+    # @option params [required, String] :cluster_id
+    #
+    # @option params [required, String] :node_id
+    #
+    # @option params [String] :state
+    #   The state to apply to the Node. Set to ACTIVE (COMMISSIONED) to
+    #   indicate that the Node is deployable. MediaLive Anywhere will consider
+    #   this node it needs a Node to run a Channel on, or when it needs a Node
+    #   to promote from a backup node to an active node. Set to DRAINING to
+    #   isolate the Node so that MediaLive Anywhere won't use it.
+    #
+    # @return [Types::UpdateNodeStateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateNodeStateResponse#arn #arn} => String
+    #   * {Types::UpdateNodeStateResponse#channel_placement_groups #channel_placement_groups} => Array&lt;String&gt;
+    #   * {Types::UpdateNodeStateResponse#cluster_id #cluster_id} => String
+    #   * {Types::UpdateNodeStateResponse#connection_state #connection_state} => String
+    #   * {Types::UpdateNodeStateResponse#id #id} => String
+    #   * {Types::UpdateNodeStateResponse#instance_arn #instance_arn} => String
+    #   * {Types::UpdateNodeStateResponse#name #name} => String
+    #   * {Types::UpdateNodeStateResponse#node_interface_mappings #node_interface_mappings} => Array&lt;Types::NodeInterfaceMapping&gt;
+    #   * {Types::UpdateNodeStateResponse#role #role} => String
+    #   * {Types::UpdateNodeStateResponse#state #state} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_node_state({
+    #     cluster_id: "__string", # required
+    #     node_id: "__string", # required
+    #     state: "ACTIVE", # accepts ACTIVE, DRAINING
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.arn #=> String
+    #   resp.channel_placement_groups #=> Array
+    #   resp.channel_placement_groups[0] #=> String
+    #   resp.cluster_id #=> String
+    #   resp.connection_state #=> String, one of "CONNECTED", "DISCONNECTED"
+    #   resp.id #=> String
+    #   resp.instance_arn #=> String
+    #   resp.name #=> String
+    #   resp.node_interface_mappings #=> Array
+    #   resp.node_interface_mappings[0].logical_interface_name #=> String
+    #   resp.node_interface_mappings[0].network_interface_mode #=> String, one of "NAT", "BRIDGE"
+    #   resp.node_interface_mappings[0].physical_interface_name #=> String
+    #   resp.role #=> String, one of "BACKUP", "ACTIVE"
+    #   resp.state #=> String, one of "CREATED", "REGISTERING", "READY_TO_ACTIVATE", "REGISTRATION_FAILED", "ACTIVATION_FAILED", "ACTIVE", "READY", "IN_USE", "DEREGISTERING", "DRAINING", "DEREGISTRATION_FAILED", "DEREGISTERED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/medialive-2017-10-14/UpdateNodeState AWS API Documentation
+    #
+    # @overload update_node_state(params = {})
+    # @param [Hash] params ({})
+    def update_node_state(params = {}, options = {})
+      req = build_request(:update_node_state, params)
+      req.send_request(options)
+    end
+
     # @!endgroup
 
     # @param params ({})
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::MediaLive')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-medialive'
-      context[:gem_version] = '1.61.0'
+      context[:gem_version] = '1.136.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 
@@ -9397,19 +13645,30 @@ module Aws::MediaLive
     # The following table lists the valid waiter names, the operations they call,
     # and the default `:delay` and `:max_attempts` values.
     #
-    # | waiter_name       | params                      | :delay   | :max_attempts |
-    # | ----------------- | --------------------------- | -------- | ------------- |
-    # | channel_created   | {Client#describe_channel}   | 3        | 5             |
-    # | channel_deleted   | {Client#describe_channel}   | 5        | 84            |
-    # | channel_running   | {Client#describe_channel}   | 5        | 120           |
-    # | channel_stopped   | {Client#describe_channel}   | 5        | 60            |
-    # | input_attached    | {Client#describe_input}     | 5        | 20            |
-    # | input_deleted     | {Client#describe_input}     | 5        | 20            |
-    # | input_detached    | {Client#describe_input}     | 5        | 84            |
-    # | multiplex_created | {Client#describe_multiplex} | 3        | 5             |
-    # | multiplex_deleted | {Client#describe_multiplex} | 5        | 20            |
-    # | multiplex_running | {Client#describe_multiplex} | 5        | 120           |
-    # | multiplex_stopped | {Client#describe_multiplex} | 5        | 28            |
+    # | waiter_name                        | params                                    | :delay   | :max_attempts |
+    # | ---------------------------------- | ----------------------------------------- | -------- | ------------- |
+    # | channel_created                    | {Client#describe_channel}                 | 3        | 5             |
+    # | channel_deleted                    | {Client#describe_channel}                 | 5        | 84            |
+    # | channel_placement_group_assigned   | {Client#describe_channel_placement_group} | 3        | 5             |
+    # | channel_placement_group_deleted    | {Client#describe_channel_placement_group} | 5        | 20            |
+    # | channel_placement_group_unassigned | {Client#describe_channel_placement_group} | 5        | 20            |
+    # | channel_running                    | {Client#describe_channel}                 | 5        | 120           |
+    # | channel_stopped                    | {Client#describe_channel}                 | 5        | 60            |
+    # | cluster_created                    | {Client#describe_cluster}                 | 3        | 5             |
+    # | cluster_deleted                    | {Client#describe_cluster}                 | 5        | 20            |
+    # | input_attached                     | {Client#describe_input}                   | 5        | 20            |
+    # | input_deleted                      | {Client#describe_input}                   | 5        | 20            |
+    # | input_detached                     | {Client#describe_input}                   | 5        | 84            |
+    # | multiplex_created                  | {Client#describe_multiplex}               | 3        | 5             |
+    # | multiplex_deleted                  | {Client#describe_multiplex}               | 5        | 20            |
+    # | multiplex_running                  | {Client#describe_multiplex}               | 5        | 120           |
+    # | multiplex_stopped                  | {Client#describe_multiplex}               | 5        | 28            |
+    # | node_deregistered                  | {Client#describe_node}                    | 5        | 20            |
+    # | node_registered                    | {Client#describe_node}                    | 3        | 5             |
+    # | signal_map_created                 | {Client#get_signal_map}                   | 5        | 60            |
+    # | signal_map_monitor_deleted         | {Client#get_signal_map}                   | 5        | 120           |
+    # | signal_map_monitor_deployed        | {Client#get_signal_map}                   | 5        | 120           |
+    # | signal_map_updated                 | {Client#get_signal_map}                   | 5        | 60            |
     #
     # @raise [Errors::FailureStateError] Raised when the waiter terminates
     #   because the waiter has entered a state that it will not transition
@@ -9462,15 +13721,26 @@ module Aws::MediaLive
       {
         channel_created: Waiters::ChannelCreated,
         channel_deleted: Waiters::ChannelDeleted,
+        channel_placement_group_assigned: Waiters::ChannelPlacementGroupAssigned,
+        channel_placement_group_deleted: Waiters::ChannelPlacementGroupDeleted,
+        channel_placement_group_unassigned: Waiters::ChannelPlacementGroupUnassigned,
         channel_running: Waiters::ChannelRunning,
         channel_stopped: Waiters::ChannelStopped,
+        cluster_created: Waiters::ClusterCreated,
+        cluster_deleted: Waiters::ClusterDeleted,
         input_attached: Waiters::InputAttached,
         input_deleted: Waiters::InputDeleted,
         input_detached: Waiters::InputDetached,
         multiplex_created: Waiters::MultiplexCreated,
         multiplex_deleted: Waiters::MultiplexDeleted,
         multiplex_running: Waiters::MultiplexRunning,
-        multiplex_stopped: Waiters::MultiplexStopped
+        multiplex_stopped: Waiters::MultiplexStopped,
+        node_deregistered: Waiters::NodeDeregistered,
+        node_registered: Waiters::NodeRegistered,
+        signal_map_created: Waiters::SignalMapCreated,
+        signal_map_monitor_deleted: Waiters::SignalMapMonitorDeleted,
+        signal_map_monitor_deployed: Waiters::SignalMapMonitorDeployed,
+        signal_map_updated: Waiters::SignalMapUpdated
       }
     end
 

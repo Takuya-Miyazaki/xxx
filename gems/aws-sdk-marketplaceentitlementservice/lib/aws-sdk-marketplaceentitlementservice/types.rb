@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -97,18 +97,6 @@ module Aws::MarketplaceEntitlementService
 
     # The GetEntitlementsRequest contains parameters for the GetEntitlements
     # operation.
-    #
-    # @note When making an API call, you may pass GetEntitlementsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         product_code: "ProductCode", # required
-    #         filter: {
-    #           "CUSTOMER_IDENTIFIER" => ["FilterValue"],
-    #         },
-    #         next_token: "NonEmptyString",
-    #         max_results: 1,
-    #       }
     #
     # @!attribute [rw] product_code
     #   Product code is used to uniquely identify a product in AWS
@@ -211,3 +199,4 @@ module Aws::MarketplaceEntitlementService
 
   end
 end
+

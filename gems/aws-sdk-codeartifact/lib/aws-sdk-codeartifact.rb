@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-codeartifact/types'
-require_relative 'aws-sdk-codeartifact/client_api'
-require_relative 'aws-sdk-codeartifact/client'
-require_relative 'aws-sdk-codeartifact/errors'
-require_relative 'aws-sdk-codeartifact/resource'
-require_relative 'aws-sdk-codeartifact/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:codeartifact)
 
 # This module provides support for CodeArtifact. This module is available in the
 # `aws-sdk-codeartifact` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-codeartifact/customizations'
 #
 # @!group service
 module Aws::CodeArtifact
+  autoload :Types, 'aws-sdk-codeartifact/types'
+  autoload :ClientApi, 'aws-sdk-codeartifact/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-codeartifact/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-codeartifact/client'
+  autoload :Errors, 'aws-sdk-codeartifact/errors'
+  autoload :Resource, 'aws-sdk-codeartifact/resource'
+  autoload :EndpointParameters, 'aws-sdk-codeartifact/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-codeartifact/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-codeartifact/endpoints'
 
-  GEM_VERSION = '1.6.0'
+  GEM_VERSION = '1.54.0'
 
 end
+
+require_relative 'aws-sdk-codeartifact/customizations'

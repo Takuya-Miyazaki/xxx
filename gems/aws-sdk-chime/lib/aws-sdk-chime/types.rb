@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -64,6 +64,10 @@ module Aws::Chime
     #   Supported licenses for the Amazon Chime account.
     #   @return [Array<String>]
     #
+    # @!attribute [rw] account_status
+    #   The status of the account.
+    #   @return [String]
+    #
     # @!attribute [rw] signin_delegate_groups
     #   The sign-in delegate groups associated with the account.
     #   @return [Array<Types::SigninDelegateGroup>]
@@ -78,6 +82,7 @@ module Aws::Chime
       :created_timestamp,
       :default_license,
       :supported_licenses,
+      :account_status,
       :signin_delegate_groups)
       SENSITIVE = []
       include Aws::Structure
@@ -92,14 +97,6 @@ module Aws::Chime
     #
     #
     # [1]: https://docs.aws.amazon.com/chime/latest/ag/policies.html
-    #
-    # @note When making an API call, you may pass AccountSettings
-    #   data as a hash:
-    #
-    #       {
-    #         disable_remote_control: false,
-    #         enable_dial_out: false,
-    #       }
     #
     # @!attribute [rw] disable_remote_control
     #   Setting that stops or starts remote control of shared screens during
@@ -125,16 +122,68 @@ module Aws::Chime
       include Aws::Structure
     end
 
+    # A validated address.
+    #
+    # @!attribute [rw] street_name
+    #   The address street, such as `8th Avenue`.
+    #   @return [String]
+    #
+    # @!attribute [rw] street_suffix
+    #   The address suffix, such as the `N` in `8th Avenue N`.
+    #   @return [String]
+    #
+    # @!attribute [rw] post_directional
+    #   An address suffix location, such as the `S. Unit A` in `Central Park
+    #   S. Unit A`.
+    #   @return [String]
+    #
+    # @!attribute [rw] pre_directional
+    #   An address prefix location, such as the `N` in `N. Third St.`.
+    #   @return [String]
+    #
+    # @!attribute [rw] street_number
+    #   The numeric portion of an address.
+    #   @return [String]
+    #
+    # @!attribute [rw] city
+    #   The city of an address.
+    #   @return [String]
+    #
+    # @!attribute [rw] state
+    #   The state of an address.
+    #   @return [String]
+    #
+    # @!attribute [rw] postal_code
+    #   The postal code of an address.
+    #   @return [String]
+    #
+    # @!attribute [rw] postal_code_plus_4
+    #   The Zip + 4 or postal code + 4 of an address.
+    #   @return [String]
+    #
+    # @!attribute [rw] country
+    #   The country of an address.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/Address AWS API Documentation
+    #
+    class Address < Struct.new(
+      :street_name,
+      :street_suffix,
+      :post_directional,
+      :pre_directional,
+      :street_number,
+      :city,
+      :state,
+      :postal_code,
+      :postal_code_plus_4,
+      :country)
+      SENSITIVE = [:street_name, :street_suffix, :post_directional, :pre_directional, :street_number, :city, :state, :postal_code, :postal_code_plus_4, :country]
+      include Aws::Structure
+    end
+
     # The Alexa for Business metadata associated with an Amazon Chime user,
     # used to integrate Alexa for Business with a device.
-    #
-    # @note When making an API call, you may pass AlexaForBusinessMetadata
-    #   data as a hash:
-    #
-    #       {
-    #         is_alexa_for_business_enabled: false,
-    #         alexa_for_business_room_arn: "SensitiveString",
-    #       }
     #
     # @!attribute [rw] is_alexa_for_business_enabled
     #   Starts or stops Alexa for Business.
@@ -153,27 +202,28 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # An instance of a Chime messaging application.
+    # The details of an `AppInstance`, an instance of an Amazon Chime SDK
+    # messaging application.
     #
     # @!attribute [rw] app_instance_arn
     #   The ARN of the messaging instance.
     #   @return [String]
     #
     # @!attribute [rw] name
-    #   The name of an app instance.
+    #   The name of an `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] metadata
-    #   The metadata of an app instance.
+    #   The metadata of an `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] created_timestamp
-    #   The time at which an app instance was created. In epoch
+    #   The time at which an `AppInstance` was created. In epoch
     #   milliseconds.
     #   @return [Time]
     #
     # @!attribute [rw] last_updated_timestamp
-    #   The time an app instance was last updated. In epoch milliseconds.
+    #   The time an `AppInstance` was last updated. In epoch milliseconds.
     #   @return [Time]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/AppInstance AWS API Documentation
@@ -188,15 +238,14 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Promotes a user to the administrator role for the duration of an app
-    # instance.
+    # The details of an `AppInstanceAdmin`.
     #
     # @!attribute [rw] admin
-    #   The name and metadata of the app instance administrator.
+    #   The `AppInstanceAdmin` data.
     #   @return [Types::Identity]
     #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance administrator.
+    #   The ARN of the `AppInstance` for which the user is an administrator.
     #   @return [String]
     #
     # @!attribute [rw] created_timestamp
@@ -213,10 +262,10 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The identity and metadata of an administrator.
+    # Summary of the details of an `AppInstanceAdmin`.
     #
     # @!attribute [rw] admin
-    #   The name and metadata of the app instance administrator.
+    #   The details of the `AppInstanceAdmin`.
     #   @return [Types::Identity]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/AppInstanceAdminSummary AWS API Documentation
@@ -227,19 +276,10 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The length of time in days to retain messages.
-    #
-    # @note When making an API call, you may pass AppInstanceRetentionSettings
-    #   data as a hash:
-    #
-    #       {
-    #         channel_retention_settings: {
-    #           retention_days: 1,
-    #         },
-    #       }
+    # The details of the data-retention settings for an `AppInstance`.
     #
     # @!attribute [rw] channel_retention_settings
-    #   The length of time in days to retain a channel.
+    #   The length of time in days to retain the messages in a channel.
     #   @return [Types::ChannelRetentionSettings]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/AppInstanceRetentionSettings AWS API Documentation
@@ -250,18 +290,10 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The streaming configuration of an app instance.
-    #
-    # @note When making an API call, you may pass AppInstanceStreamingConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_data_type: "Channel", # required, accepts Channel, ChannelMessage
-    #         resource_arn: "Arn", # required
-    #       }
+    # The details of the streaming configuration of an `AppInstance`.
     #
     # @!attribute [rw] app_instance_data_type
-    #   The data type of the app instance.
+    #   The type of data to be streamed.
     #   @return [String]
     #
     # @!attribute [rw] resource_arn
@@ -277,18 +309,18 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The summary data for an app instance.
+    # Summary of the data for an `AppInstance`.
     #
     # @!attribute [rw] app_instance_arn
-    #   The app instance ARN.
+    #   The `AppInstance` ARN.
     #   @return [String]
     #
     # @!attribute [rw] name
-    #   The name of the app instance summary.
+    #   The name of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] metadata
-    #   The metadata of the app instance summary.
+    #   The metadata of the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/AppInstanceSummary AWS API Documentation
@@ -301,26 +333,26 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The app instance user.
+    # The details of an `AppInstanceUser`.
     #
     # @!attribute [rw] app_instance_user_arn
-    #   The ARN of the app instance user.
+    #   The ARN of the `AppInstanceUser`.
     #   @return [String]
     #
     # @!attribute [rw] name
-    #   The name of the app instance user.
+    #   The name of the `AppInstanceUser`.
     #   @return [String]
     #
     # @!attribute [rw] created_timestamp
-    #   The time at which the app instance user was created.
+    #   The time at which the `AppInstanceUser` was created.
     #   @return [Time]
     #
     # @!attribute [rw] metadata
-    #   The metadata of the app instance user.
+    #   The metadata of the `AppInstanceUser`.
     #   @return [String]
     #
     # @!attribute [rw] last_updated_timestamp
-    #   The time at which the app instance user was last updated.
+    #   The time at which the `AppInstanceUser` was last updated.
     #   @return [Time]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/AppInstanceUser AWS API Documentation
@@ -335,14 +367,14 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Lists the channels to which app instance users belong.
+    # Summary of the membership details of an `AppInstanceUser`.
     #
     # @!attribute [rw] type
-    #   The type of channel summary,
+    #   The type of `ChannelMembership`.
     #   @return [String]
     #
     # @!attribute [rw] read_marker_timestamp
-    #   The time at which a summary was last read.
+    #   The time at which a message was last read.
     #   @return [Time]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/AppInstanceUserMembershipSummary AWS API Documentation
@@ -354,18 +386,18 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The app instance user summary data .
+    # Summary of the details of an `AppInstanceUser`.
     #
     # @!attribute [rw] app_instance_user_arn
-    #   The ARN of the app instance user.
+    #   The ARN of the `AppInstanceUser`.
     #   @return [String]
     #
     # @!attribute [rw] name
-    #   The name in an app instance user summary.
+    #   The name of an `AppInstanceUser`.
     #   @return [String]
     #
     # @!attribute [rw] metadata
-    #   The metadata in an app instance user summary.
+    #   The metadata of the `AppInstanceUser`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/AppInstanceUserSummary AWS API Documentation
@@ -378,15 +410,30 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AssociatePhoneNumberWithUserRequest
-    #   data as a hash:
+    # The configuration for the artifacts.
     #
-    #       {
-    #         account_id: "String", # required
-    #         user_id: "String", # required
-    #         e164_phone_number: "E164PhoneNumber", # required
-    #       }
+    # @!attribute [rw] audio
+    #   The configuration for the audio artifacts.
+    #   @return [Types::AudioArtifactsConfiguration]
     #
+    # @!attribute [rw] video
+    #   The configuration for the video artifacts.
+    #   @return [Types::VideoArtifactsConfiguration]
+    #
+    # @!attribute [rw] content
+    #   The configuration for the content artifacts.
+    #   @return [Types::ContentArtifactsConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ArtifactsConfiguration AWS API Documentation
+    #
+    class ArtifactsConfiguration < Struct.new(
+      :audio,
+      :video,
+      :content)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -413,15 +460,6 @@ module Aws::Chime
     #
     class AssociatePhoneNumberWithUserResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass AssociatePhoneNumbersWithVoiceConnectorGroupRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_group_id: "NonEmptyString", # required
-    #         e164_phone_numbers: ["E164PhoneNumber"], # required
-    #         force_associate: false,
-    #       }
-    #
     # @!attribute [rw] voice_connector_group_id
     #   The Amazon Chime Voice Connector group ID.
     #   @return [String]
@@ -443,7 +481,7 @@ module Aws::Chime
       :voice_connector_group_id,
       :e164_phone_numbers,
       :force_associate)
-      SENSITIVE = []
+      SENSITIVE = [:e164_phone_numbers]
       include Aws::Structure
     end
 
@@ -461,15 +499,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AssociatePhoneNumbersWithVoiceConnectorRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         e164_phone_numbers: ["E164PhoneNumber"], # required
-    #         force_associate: false,
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -491,7 +520,7 @@ module Aws::Chime
       :voice_connector_id,
       :e164_phone_numbers,
       :force_associate)
-      SENSITIVE = []
+      SENSITIVE = [:e164_phone_numbers]
       include Aws::Structure
     end
 
@@ -509,18 +538,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AssociateSigninDelegateGroupsWithAccountRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         signin_delegate_groups: [ # required
-    #           {
-    #             group_name: "NonEmptyString",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -543,7 +560,7 @@ module Aws::Chime
     class AssociateSigninDelegateGroupsWithAccountResponse < Aws::EmptyStructure; end
 
     # An Amazon Chime SDK meeting attendee. Includes a unique `AttendeeId`
-    # and `JoinToken`. The `JoinToken` allows a client to authenticate and
+    # and `JoinToken` . The `JoinToken` allows a client to authenticate and
     # join as the specified attendee. The `JoinToken` expires when the
     # meeting ends or when DeleteAttendee is called. After that, the
     # attendee is unable to join the meeting.
@@ -554,9 +571,7 @@ module Aws::Chime
     #
     # @!attribute [rw] external_user_id
     #   The Amazon Chime SDK external user ID. An idempotency token. Links
-    #   the attendee to an identity managed by a builder application. If you
-    #   create an attendee with the same external user id, the service
-    #   returns the existing record.
+    #   the attendee to an identity managed by a builder application.
     #   @return [String]
     #
     # @!attribute [rw] attendee_id
@@ -577,6 +592,20 @@ module Aws::Chime
       include Aws::Structure
     end
 
+    # The audio artifact configuration object.
+    #
+    # @!attribute [rw] mux_type
+    #   The MUX type of the audio artifact configuration object.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/AudioArtifactsConfiguration AWS API Documentation
+    #
+    class AudioArtifactsConfiguration < Struct.new(
+      :mux_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The input parameters don't match the service's restrictions.
     #
     # @!attribute [rw] code
@@ -594,24 +623,36 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchCreateAttendeeRequest
-    #   data as a hash:
+    # The membership information, including member ARNs, the channel ARN,
+    # and membership types.
     #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         attendees: [ # required
-    #           {
-    #             external_user_id: "ExternalUserIdType", # required
-    #             tags: [
-    #               {
-    #                 key: "TagKey", # required
-    #                 value: "TagValue", # required
-    #               },
-    #             ],
-    #           },
-    #         ],
-    #       }
+    # @!attribute [rw] invited_by
+    #   The identifier of the member who invited another member.
+    #   @return [Types::Identity]
     #
+    # @!attribute [rw] type
+    #   The membership types set for the channel users.
+    #   @return [String]
+    #
+    # @!attribute [rw] members
+    #   The users successfully added to the request.
+    #   @return [Array<Types::Identity>]
+    #
+    # @!attribute [rw] channel_arn
+    #   The ARN of the channel to which you're adding users.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/BatchChannelMemberships AWS API Documentation
+    #
+    class BatchChannelMemberships < Struct.new(
+      :invited_by,
+      :type,
+      :members,
+      :channel_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -648,20 +689,80 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchCreateRoomMembershipRequest
-    #   data as a hash:
+    # A list of failed member ARNs, error codes, and error messages.
     #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         room_id: "NonEmptyString", # required
-    #         membership_item_list: [ # required
-    #           {
-    #             member_id: "NonEmptyString",
-    #             role: "Administrator", # accepts Administrator, Member
-    #           },
-    #         ],
-    #       }
+    # @!attribute [rw] member_arn
+    #   The ARN of the member that the service couldn't add.
+    #   @return [String]
     #
+    # @!attribute [rw] error_code
+    #   The error code.
+    #   @return [String]
+    #
+    # @!attribute [rw] error_message
+    #   The error message.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/BatchCreateChannelMembershipError AWS API Documentation
+    #
+    class BatchCreateChannelMembershipError < Struct.new(
+      :member_arn,
+      :error_code,
+      :error_message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] channel_arn
+    #   The ARN of the channel to which you're adding users.
+    #   @return [String]
+    #
+    # @!attribute [rw] type
+    #   The membership type of a user, `DEFAULT` or `HIDDEN`. Default
+    #   members are always returned as part of `ListChannelMemberships`.
+    #   Hidden members are only returned if the type filter in
+    #   `ListChannelMemberships` equals `HIDDEN`. Otherwise hidden members
+    #   are not returned. This is only supported by moderators.
+    #   @return [String]
+    #
+    # @!attribute [rw] member_arns
+    #   The ARNs of the members you want to add to the channel.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/BatchCreateChannelMembershipRequest AWS API Documentation
+    #
+    class BatchCreateChannelMembershipRequest < Struct.new(
+      :channel_arn,
+      :type,
+      :member_arns,
+      :chime_bearer)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] batch_channel_memberships
+    #   The list of channel memberships in the response.
+    #   @return [Types::BatchChannelMemberships]
+    #
+    # @!attribute [rw] errors
+    #   If the action fails for one or more of the memberships in the
+    #   request, a list of the memberships is returned, along with error
+    #   codes and error messages.
+    #   @return [Array<Types::BatchCreateChannelMembershipError>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/BatchCreateChannelMembershipResponse AWS API Documentation
+    #
+    class BatchCreateChannelMembershipResponse < Struct.new(
+      :batch_channel_memberships,
+      :errors)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -698,13 +799,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchDeletePhoneNumberRequest
-    #   data as a hash:
-    #
-    #       {
-    #         phone_number_ids: ["String"], # required
-    #       }
-    #
     # @!attribute [rw] phone_number_ids
     #   List of phone number IDs.
     #   @return [Array<String>]
@@ -731,14 +825,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchSuspendUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         user_id_list: ["NonEmptyString"], # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -770,14 +856,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchUnsuspendUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         user_id_list: ["NonEmptyString"], # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -809,19 +887,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchUpdatePhoneNumberRequest
-    #   data as a hash:
-    #
-    #       {
-    #         update_phone_number_request_items: [ # required
-    #           {
-    #             phone_number_id: "NonEmptyString", # required
-    #             product_type: "BusinessCalling", # accepts BusinessCalling, VoiceConnector
-    #             calling_name: "CallingName",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] update_phone_number_request_items
     #   The request containing the phone number IDs and product types or
     #   calling names to update.
@@ -849,24 +914,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchUpdateUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         update_user_request_items: [ # required
-    #           {
-    #             user_id: "NonEmptyString", # required
-    #             license_type: "Basic", # accepts Basic, Plus, Pro, ProTrial
-    #             user_type: "PrivateUser", # accepts PrivateUser, SharedDevice
-    #             alexa_for_business_metadata: {
-    #               is_alexa_for_business_enabled: false,
-    #               alexa_for_business_room_arn: "SensitiveString",
-    #             },
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -958,13 +1005,6 @@ module Aws::Chime
     # AWS account. Includes any Amazon S3 buckets designated for storing
     # call detail records.
     #
-    # @note When making an API call, you may pass BusinessCallingSettings
-    #   data as a hash:
-    #
-    #       {
-    #         cdr_bucket: "String",
-    #       }
-    #
     # @!attribute [rw] cdr_bucket
     #   The Amazon S3 bucket designated for call detail record storage.
     #   @return [String]
@@ -977,7 +1017,51 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Creates a channel.
+    # A suggested address.
+    #
+    # @!attribute [rw] street_info
+    #   The street information of a candidate address
+    #   @return [String]
+    #
+    # @!attribute [rw] street_number
+    #   The numeric portion of a candidate address.
+    #   @return [String]
+    #
+    # @!attribute [rw] city
+    #   The city of a candidate address.
+    #   @return [String]
+    #
+    # @!attribute [rw] state
+    #   The state of a candidate address.
+    #   @return [String]
+    #
+    # @!attribute [rw] postal_code
+    #   The postal code of a candidate address.
+    #   @return [String]
+    #
+    # @!attribute [rw] postal_code_plus_4
+    #   The Zip + 4 or postal code + 4 of a candidate address.
+    #   @return [String]
+    #
+    # @!attribute [rw] country
+    #   The country of a candidate address.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CandidateAddress AWS API Documentation
+    #
+    class CandidateAddress < Struct.new(
+      :street_info,
+      :street_number,
+      :city,
+      :state,
+      :postal_code,
+      :postal_code_plus_4,
+      :country)
+      SENSITIVE = [:street_info, :street_number, :city, :state, :postal_code, :postal_code_plus_4, :country]
+      include Aws::Structure
+    end
+
+    # The details of a channel.
     #
     # @!attribute [rw] name
     #   The name of the channel.
@@ -992,23 +1076,23 @@ module Aws::Chime
     #   @return [String]
     #
     # @!attribute [rw] privacy
-    #   The channel's privacy setting, `PUBLIC` or `HIDDEN`.
+    #   The channel's privacy setting.
     #   @return [String]
     #
     # @!attribute [rw] metadata
-    #   The metadata of the channel.
+    #   The channel's metadata.
     #   @return [String]
     #
     # @!attribute [rw] created_by
-    #   The administrator who created the channel.
+    #   The `AppInstanceUser` who created the channel.
     #   @return [Types::Identity]
     #
     # @!attribute [rw] created_timestamp
-    #   The time at which the administrator created the channel.
+    #   The time at which the `AppInstanceUser` created the channel.
     #   @return [Time]
     #
     # @!attribute [rw] last_message_timestamp
-    #   The time at which a member sent the last message in a session.
+    #   The time at which a member sent the last message in the channel.
     #   @return [Time]
     #
     # @!attribute [rw] last_updated_timestamp
@@ -1031,7 +1115,7 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Bans a user from a channel.
+    # The details of a channel ban.
     #
     # @!attribute [rw] member
     #   The member being banned from the channel.
@@ -1046,7 +1130,7 @@ module Aws::Chime
     #   @return [Time]
     #
     # @!attribute [rw] created_by
-    #   The parameter of the action.
+    #   The `AppInstanceUser` who created the ban.
     #   @return [Types::Identity]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ChannelBan AWS API Documentation
@@ -1060,7 +1144,7 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The summary data for the channel ban.
+    # Summary of the details of a `ChannelBan`.
     #
     # @!attribute [rw] member
     #   The member being banned from a channel.
@@ -1074,11 +1158,10 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Creates a channel member.
+    # The details of a channel member.
     #
     # @!attribute [rw] invited_by
-    #   The identifier of the member who invited another member. Taken from
-    #   the message header.
+    #   The identifier of the member who invited another member.
     #   @return [Types::Identity]
     #
     # @!attribute [rw] type
@@ -1114,14 +1197,14 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Returns the channel membership summary data for an app instance.
+    # Summary of the channel membership details of an `AppInstanceUser`.
     #
     # @!attribute [rw] channel_summary
-    #   The summary data for a channel.
+    #   Summary of the details of a `Channel`.
     #   @return [Types::ChannelSummary]
     #
     # @!attribute [rw] app_instance_user_membership_summary
-    #   Returns the channel membership data for an app instance.
+    #   Summary of the membership details of an `AppInstanceUser`.
     #   @return [Types::AppInstanceUserMembershipSummary]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ChannelMembershipForAppInstanceUserSummary AWS API Documentation
@@ -1133,7 +1216,7 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The summary data of a channel membership.
+    # Summary of the details of a `ChannelMembership`.
     #
     # @!attribute [rw] member
     #   A member's summary data.
@@ -1147,7 +1230,7 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Creates a message in a channel.
+    # The details of a message in a channel.
     #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
@@ -1186,11 +1269,11 @@ module Aws::Chime
     #   @return [Types::Identity]
     #
     # @!attribute [rw] redacted
-    #   Hides the content of a message. The message still exists on the back
-    #   end, but this action only returns metadata.
+    #   Hides the content of a message.
     #   @return [Boolean]
     #
     # @!attribute [rw] persistence
+    #   The persistence setting for a channel message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ChannelMessage AWS API Documentation
@@ -1211,22 +1294,22 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # A summary of the messages in a channel.
+    # Summary of the messages in a `Channel`.
     #
     # @!attribute [rw] message_id
-    #   The ID of the message summary.
+    #   The ID of the message.
     #   @return [String]
     #
     # @!attribute [rw] content
-    #   The content of the message summary.
+    #   The content of the message.
     #   @return [String]
     #
     # @!attribute [rw] metadata
-    #   The metadata of the message summary.
+    #   The metadata of the message.
     #   @return [String]
     #
     # @!attribute [rw] type
-    #   The type of message summary.
+    #   The type of message.
     #   @return [String]
     #
     # @!attribute [rw] created_timestamp
@@ -1234,17 +1317,19 @@ module Aws::Chime
     #   @return [Time]
     #
     # @!attribute [rw] last_updated_timestamp
+    #   The time at which a message was last updated.
     #   @return [Time]
     #
     # @!attribute [rw] last_edited_timestamp
+    #   The time at which a message was last edited.
     #   @return [Time]
     #
     # @!attribute [rw] sender
-    #   The sender of the message summary.
+    #   The message sender.
     #   @return [Types::Identity]
     #
     # @!attribute [rw] redacted
-    #   Redacts the content of a message summary.
+    #   Indicates whether a message was redacted.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ChannelMessageSummary AWS API Documentation
@@ -1263,10 +1348,10 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Returns the summary data for a moderated channel.
+    # Summary of the details of a moderated channel.
     #
     # @!attribute [rw] channel_summary
-    #   The summary data for a channel.
+    #   Summary of the details of a `Channel`.
     #   @return [Types::ChannelSummary]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ChannelModeratedByAppInstanceUserSummary AWS API Documentation
@@ -1277,7 +1362,7 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Creates a moderator on a channel.
+    # The details of a channel moderator.
     #
     # @!attribute [rw] moderator
     #   The moderator's data.
@@ -1292,7 +1377,7 @@ module Aws::Chime
     #   @return [Time]
     #
     # @!attribute [rw] created_by
-    #   The member who created the moderator.
+    #   The `AppInstanceUser` who created the moderator.
     #   @return [Types::Identity]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ChannelModerator AWS API Documentation
@@ -1306,7 +1391,7 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Summary data of the moderators in a channel.
+    # Summary of the details of a `ChannelModerator`.
     #
     # @!attribute [rw] moderator
     #   The data for a moderator.
@@ -1320,17 +1405,10 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The retention settings for a channel.
-    #
-    # @note When making an API call, you may pass ChannelRetentionSettings
-    #   data as a hash:
-    #
-    #       {
-    #         retention_days: 1,
-    #       }
+    # The details of the retention settings for a channel.
     #
     # @!attribute [rw] retention_days
-    #   The time in days to retain a channel.
+    #   The time in days to retain the messages in a channel.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ChannelRetentionSettings AWS API Documentation
@@ -1341,27 +1419,26 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The summary data for a channel.
+    # Summary of the details of a `Channel`.
     #
     # @!attribute [rw] name
-    #   The parameter of the action.
+    #   The name of the channel.
     #   @return [String]
     #
     # @!attribute [rw] channel_arn
-    #   The ARN of the channel summary.
+    #   The ARN of the channel.
     #   @return [String]
     #
     # @!attribute [rw] mode
-    #   The summary mode of the channel.
+    #   The mode of the channel.
     #   @return [String]
     #
     # @!attribute [rw] privacy
-    #   The privacy setting of the channel being summarized, `PUBLIC` or
-    #   `HIDDEN`.
+    #   The privacy setting of the channel.
     #   @return [String]
     #
     # @!attribute [rw] metadata
-    #   The metadata of the channel summary.
+    #   The metadata of the channel.
     #   @return [String]
     #
     # @!attribute [rw] last_message_timestamp
@@ -1378,6 +1455,27 @@ module Aws::Chime
       :metadata,
       :last_message_timestamp)
       SENSITIVE = [:name, :metadata]
+      include Aws::Structure
+    end
+
+    # The configuration object of the Amazon Chime SDK meeting for a
+    # specified media capture pipeline. `SourceType` must be
+    # `ChimeSdkMeeting`.
+    #
+    # @!attribute [rw] source_configuration
+    #   The source configuration for a specified media capture pipeline.
+    #   @return [Types::SourceConfiguration]
+    #
+    # @!attribute [rw] artifacts_configuration
+    #   The configuration for the artifacts in an Amazon Chime SDK meeting.
+    #   @return [Types::ArtifactsConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ChimeSdkMeetingConfiguration AWS API Documentation
+    #
+    class ChimeSdkMeetingConfiguration < Struct.new(
+      :source_configuration,
+      :artifacts_configuration)
+      SENSITIVE = []
       include Aws::Structure
     end
 
@@ -1399,18 +1497,30 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The retention settings that determine how long to retain chat
-    # conversation messages for an Amazon Chime Enterprise account.
+    # The content artifact object.
     #
-    # @note When making an API call, you may pass ConversationRetentionSettings
-    #   data as a hash:
+    # @!attribute [rw] state
+    #   Indicates whether the content artifact is enabled or disabled.
+    #   @return [String]
     #
-    #       {
-    #         retention_days: 1,
-    #       }
+    # @!attribute [rw] mux_type
+    #   The MUX type of the artifact configuration.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ContentArtifactsConfiguration AWS API Documentation
+    #
+    class ContentArtifactsConfiguration < Struct.new(
+      :state,
+      :mux_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The retention settings that determine how long to retain conversation
+    # messages for an Amazon Chime Enterprise account.
     #
     # @!attribute [rw] retention_days
-    #   The number of days for which to retain chat conversation messages.
+    #   The number of days for which to retain conversation messages.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ConversationRetentionSettings AWS API Documentation
@@ -1421,13 +1531,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateAccountRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "AccountName", # required
-    #       }
-    #
     # @!attribute [rw] name
     #   The name of the Amazon Chime account.
     #   @return [String]
@@ -1441,8 +1544,7 @@ module Aws::Chime
     end
 
     # @!attribute [rw] account
-    #   The Amazon Chime account details. An AWS account can have multiple
-    #   Amazon Chime accounts.
+    #   The Amazon Chime account details.
     #   @return [Types::Account]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateAccountResponse AWS API Documentation
@@ -1453,20 +1555,12 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateAppInstanceAdminRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_admin_arn: "ChimeArn", # required
-    #         app_instance_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_admin_arn
-    #   The ARN of the administrator of the current app instance.
+    #   The ARN of the administrator of the current `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateAppInstanceAdminRequest AWS API Documentation
@@ -1479,11 +1573,11 @@ module Aws::Chime
     end
 
     # @!attribute [rw] app_instance_admin
-    #   The name and ARN of the admin for the app instance.
+    #   The name and ARN of the admin for the `AppInstance`.
     #   @return [Types::Identity]
     #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the of the admin for the app instance.
+    #   The ARN of the of the admin for the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateAppInstanceAdminResponse AWS API Documentation
@@ -1495,42 +1589,38 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateAppInstanceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "NonEmptyResourceName", # required
-    #         metadata: "Metadata",
-    #         client_request_token: "ClientRequestToken", # required
-    #       }
-    #
     # @!attribute [rw] name
-    #   The name of the app instance.
+    #   The name of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] metadata
-    #   The metadata of the app instance. Limited to a 1KB string in UTF-8.
+    #   The metadata of the `AppInstance`. Limited to a 1KB string in UTF-8.
     #   @return [String]
     #
     # @!attribute [rw] client_request_token
-    #   The `ClientRequestToken` of the app instance.
+    #   The `ClientRequestToken` of the `AppInstance`.
     #
     #   **A suitable default value is auto-generated.** You should normally
     #   not need to pass this option.
     #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   Tags assigned to the `AppInstance`.
+    #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateAppInstanceRequest AWS API Documentation
     #
     class CreateAppInstanceRequest < Struct.new(
       :name,
       :metadata,
-      :client_request_token)
+      :client_request_token,
+      :tags)
       SENSITIVE = [:name, :metadata, :client_request_token]
       include Aws::Structure
     end
 
     # @!attribute [rw] app_instance_arn
-    #   The Amazon Resource Number (ARN) of the app instance.
+    #   The Amazon Resource Number (ARN) of the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateAppInstanceResponse AWS API Documentation
@@ -1541,23 +1631,12 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateAppInstanceUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #         app_instance_user_id: "UserId", # required
-    #         name: "UserName", # required
-    #         metadata: "Metadata",
-    #         client_request_token: "ClientRequestToken", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance request.
+    #   The ARN of the `AppInstance` request.
     #   @return [String]
     #
     # @!attribute [rw] app_instance_user_id
-    #   The user ID of the app instance.
+    #   The user ID of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] name
@@ -1569,11 +1648,15 @@ module Aws::Chime
     #   @return [String]
     #
     # @!attribute [rw] client_request_token
-    #   The token assigned to the user requesting an app instance.
+    #   The token assigned to the user requesting an `AppInstance`.
     #
     #   **A suitable default value is auto-generated.** You should normally
     #   not need to pass this option.
     #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   Tags assigned to the `AppInstanceUser`.
+    #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateAppInstanceUserRequest AWS API Documentation
     #
@@ -1582,7 +1665,8 @@ module Aws::Chime
       :app_instance_user_id,
       :name,
       :metadata,
-      :client_request_token)
+      :client_request_token,
+      :tags)
       SENSITIVE = [:app_instance_user_id, :name, :metadata, :client_request_token]
       include Aws::Structure
     end
@@ -1605,9 +1689,7 @@ module Aws::Chime
     #
     # @!attribute [rw] external_user_id
     #   The Amazon Chime SDK external user ID. An idempotency token. Links
-    #   the attendee to an identity managed by a builder application. If you
-    #   create an attendee with the same external user id, the service
-    #   returns the existing record.
+    #   the attendee to an identity managed by a builder application.
     #   @return [String]
     #
     # @!attribute [rw] error_code
@@ -1628,29 +1710,13 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateAttendeeRequest
-    #   data as a hash:
-    #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         external_user_id: "ExternalUserIdType", # required
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
     #
     # @!attribute [rw] external_user_id
     #   The Amazon Chime SDK external user ID. An idempotency token. Links
-    #   the attendee to an identity managed by a builder application. If you
-    #   create an attendee with the same external user id, the service
-    #   returns the existing record.
+    #   the attendee to an identity managed by a builder application.
     #   @return [String]
     #
     # @!attribute [rw] tags
@@ -1670,27 +1736,9 @@ module Aws::Chime
     # The Amazon Chime SDK attendee fields to create, used with the
     # BatchCreateAttendee action.
     #
-    # @note When making an API call, you may pass CreateAttendeeRequestItem
-    #   data as a hash:
-    #
-    #       {
-    #         external_user_id: "ExternalUserIdType", # required
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] external_user_id
     #   The Amazon Chime SDK external user ID. An idempotency token. Links
-    #   the attendee to an identity managed by a builder application. If you
-    #   create an attendee with the same external user id, the service
-    #   returns the existing record.
-    #
-    #   The Amazon Chime SDK external user ID. Links the attendee to an
-    #   identity managed by a builder application.
+    #   the attendee to an identity managed by a builder application.
     #   @return [String]
     #
     # @!attribute [rw] tags
@@ -1718,15 +1766,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateBotRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         display_name: "SensitiveString", # required
-    #         domain: "NonEmptyString",
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -1761,14 +1800,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateChannelBanRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         member_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the ban request.
     #   @return [String]
@@ -1777,11 +1808,16 @@ module Aws::Chime
     #   The ARN of the member being banned.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateChannelBanRequest AWS API Documentation
     #
     class CreateChannelBanRequest < Struct.new(
       :channel_arn,
-      :member_arn)
+      :member_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1804,15 +1840,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateChannelMembershipRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         member_arn: "ChimeArn", # required
-    #         type: "DEFAULT", # required, accepts DEFAULT, HIDDEN
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel to which you're adding users.
     #   @return [String]
@@ -1829,12 +1856,17 @@ module Aws::Chime
     #   are not returned. This is only supported by moderators.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateChannelMembershipRequest AWS API Documentation
     #
     class CreateChannelMembershipRequest < Struct.new(
       :channel_arn,
       :member_arn,
-      :type)
+      :type,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1856,14 +1888,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateChannelModeratorRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         channel_moderator_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -1872,11 +1896,16 @@ module Aws::Chime
     #   The ARN of the moderator.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateChannelModeratorRequest AWS API Documentation
     #
     class CreateChannelModeratorRequest < Struct.new(
       :channel_arn,
-      :channel_moderator_arn)
+      :channel_moderator_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1898,24 +1927,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #         name: "NonEmptyResourceName", # required
-    #         mode: "UNRESTRICTED", # accepts UNRESTRICTED, RESTRICTED
-    #         privacy: "PUBLIC", # accepts PUBLIC, PRIVATE
-    #         metadata: "Metadata",
-    #         client_request_token: "ClientRequestToken", # required
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
     #   The ARN of the channel request.
     #   @return [String]
@@ -1934,7 +1945,7 @@ module Aws::Chime
     # @!attribute [rw] privacy
     #   The channel's privacy level: `PUBLIC` or `PRIVATE`. Private
     #   channels aren't discoverable by users outside the channel. Public
-    #   channels are discoverable by anyone in the app instance.
+    #   channels are discoverable by anyone in the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] metadata
@@ -1949,7 +1960,12 @@ module Aws::Chime
     #   @return [String]
     #
     # @!attribute [rw] tags
+    #   The tags for the creation request.
     #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateChannelRequest AWS API Documentation
     #
@@ -1960,7 +1976,8 @@ module Aws::Chime
       :privacy,
       :metadata,
       :client_request_token,
-      :tags)
+      :tags,
+      :chime_bearer)
       SENSITIVE = [:name, :metadata, :client_request_token]
       include Aws::Structure
     end
@@ -1977,25 +1994,66 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateMeetingDialOutRequest
-    #   data as a hash:
+    # @!attribute [rw] source_type
+    #   Source type from which the media artifacts will be captured. A Chime
+    #   SDK Meeting is the only supported source.
+    #   @return [String]
     #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         from_phone_number: "E164PhoneNumber", # required
-    #         to_phone_number: "E164PhoneNumber", # required
-    #         join_token: "JoinTokenString", # required
-    #       }
+    # @!attribute [rw] source_arn
+    #   ARN of the source from which the media artifacts are captured.
+    #   @return [String]
     #
+    # @!attribute [rw] sink_type
+    #   Destination type to which the media artifacts are saved. You must
+    #   use an S3 bucket.
+    #   @return [String]
+    #
+    # @!attribute [rw] sink_arn
+    #   The ARN of the sink type.
+    #   @return [String]
+    #
+    # @!attribute [rw] client_request_token
+    #   The unique identifier for the client request. The token makes the
+    #   API request idempotent. Use a different token for different media
+    #   pipeline requests.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.
+    #   @return [String]
+    #
+    # @!attribute [rw] chime_sdk_meeting_configuration
+    #   The configuration for a specified media capture pipeline.
+    #   `SourceType` must be `ChimeSdkMeeting`.
+    #   @return [Types::ChimeSdkMeetingConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateMediaCapturePipelineRequest AWS API Documentation
+    #
+    class CreateMediaCapturePipelineRequest < Struct.new(
+      :source_type,
+      :source_arn,
+      :sink_type,
+      :sink_arn,
+      :client_request_token,
+      :chime_sdk_meeting_configuration)
+      SENSITIVE = [:source_arn, :sink_arn, :client_request_token]
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] media_capture_pipeline
+    #   A media capture pipeline object, the ID, source type, source ARN,
+    #   sink type, and sink ARN of a media capture pipeline object.
+    #   @return [Types::MediaCapturePipeline]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateMediaCapturePipelineResponse AWS API Documentation
+    #
+    class CreateMediaCapturePipelineResponse < Struct.new(
+      :media_capture_pipeline)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
-    #
-    #   Type: String
-    #
-    #   Pattern:
-    #   \[a-fA-F0-9\]\\\{8\\}(?:-\[a-fA-F0-9\]\\\{4\\})\\\{3\\}-\[a-fA-F0-9\]\\\{12\\}
-    #
-    #   Required: No
     #   @return [String]
     #
     # @!attribute [rw] from_phone_number
@@ -2008,12 +2066,12 @@ module Aws::Chime
     #   @return [String]
     #
     # @!attribute [rw] join_token
-    #   Token used by the Amazon Chime SDK attendee. Call the [
-    #   CreateAttendee API][1] to get a join token.
+    #   Token used by the Amazon Chime SDK attendee. Call the
+    #   [CreateAttendee][1] action to get a join token.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/https:/docs.aws.amazon.com/chime/latest/APIReference/API_Attendee.html
+    #   [1]: https://docs.aws.amazon.com/chime/latest/APIReference/API_CreateAttendee.html
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateMeetingDialOutRequest AWS API Documentation
@@ -2039,26 +2097,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateMeetingRequest
-    #   data as a hash:
-    #
-    #       {
-    #         client_request_token: "ClientRequestToken", # required
-    #         external_meeting_id: "ExternalMeetingIdType",
-    #         meeting_host_id: "ExternalUserIdType",
-    #         media_region: "String",
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #         notifications_configuration: {
-    #           sns_topic_arn: "Arn",
-    #           sqs_queue_arn: "Arn",
-    #         },
-    #       }
-    #
     # @!attribute [rw] client_request_token
     #   The unique identifier for the client request. Use a different token
     #   for different meetings.
@@ -2078,11 +2116,11 @@ module Aws::Chime
     # @!attribute [rw] media_region
     #   The Region in which to create the meeting. Default: `us-east-1`.
     #
-    #   Available values: `af-south-1`, `ap-northeast-1`, `ap-northeast-2`,
-    #   `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ca-central-1`,
-    #   `eu-central-1`, `eu-north-1`, `eu-south-1`, `eu-west-1`,
-    #   `eu-west-2`, `eu-west-3`, `sa-east-1`, `us-east-1`, `us-east-2`,
-    #   `us-west-1`, `us-west-2`.
+    #   Available values: `af-south-1` , `ap-northeast-1` , `ap-northeast-2`
+    #   , `ap-south-1` , `ap-southeast-1` , `ap-southeast-2` ,
+    #   `ca-central-1` , `eu-central-1` , `eu-north-1` , `eu-south-1` ,
+    #   `eu-west-1` , `eu-west-2` , `eu-west-3` , `sa-east-1` , `us-east-1`
+    #   , `us-east-2` , `us-west-1` , `us-west-2` .
     #   @return [String]
     #
     # @!attribute [rw] tags
@@ -2109,7 +2147,7 @@ module Aws::Chime
 
     # @!attribute [rw] meeting
     #   The meeting information, including the meeting ID and
-    #   `MediaPlacement`.
+    #   `MediaPlacement` .
     #   @return [Types::Meeting]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateMeetingResponse AWS API Documentation
@@ -2120,37 +2158,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateMeetingWithAttendeesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         client_request_token: "ClientRequestToken", # required
-    #         external_meeting_id: "ExternalMeetingIdType",
-    #         meeting_host_id: "ExternalUserIdType",
-    #         media_region: "String",
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #         notifications_configuration: {
-    #           sns_topic_arn: "Arn",
-    #           sqs_queue_arn: "Arn",
-    #         },
-    #         attendees: [
-    #           {
-    #             external_user_id: "ExternalUserIdType", # required
-    #             tags: [
-    #               {
-    #                 key: "TagKey", # required
-    #                 value: "TagValue", # required
-    #               },
-    #             ],
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] client_request_token
     #   The unique identifier for the client request. Use a different token
     #   for different meetings.
@@ -2168,13 +2175,13 @@ module Aws::Chime
     #   @return [String]
     #
     # @!attribute [rw] media_region
-    #   The Region in which to create the meeting. Default: `us-east-1`.
+    #   The Region in which to create the meeting. Default: `us-east-1` .
     #
-    #   Available values: `af-south-1`, `ap-northeast-1`, `ap-northeast-2`,
-    #   `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ca-central-1`,
-    #   `eu-central-1`, `eu-north-1`, `eu-south-1`, `eu-west-1`,
-    #   `eu-west-2`, `eu-west-3`, `sa-east-1`, `us-east-1`, `us-east-2`,
-    #   `us-west-1`, `us-west-2`.
+    #   Available values: `af-south-1` , `ap-northeast-1` , `ap-northeast-2`
+    #   , `ap-south-1` , `ap-southeast-1` , `ap-southeast-2` ,
+    #   `ca-central-1` , `eu-central-1` , `eu-north-1` , `eu-south-1` ,
+    #   `eu-west-1` , `eu-west-2` , `eu-west-3` , `sa-east-1` , `us-east-1`
+    #   , `us-east-2` , `us-west-1` , `us-west-2` .
     #   @return [String]
     #
     # @!attribute [rw] tags
@@ -2182,10 +2189,10 @@ module Aws::Chime
     #   @return [Array<Types::Tag>]
     #
     # @!attribute [rw] notifications_configuration
-    #   The configuration for resource targets to receive notifications when
-    #   Amazon Chime SDK meeting and attendee events occur. The Amazon Chime
-    #   SDK supports resource targets located in the US East (N. Virginia)
-    #   AWS Region (`us-east-1`).
+    #   The resource target configurations for receiving Amazon Chime SDK
+    #   meeting and attendee event notifications. The Amazon Chime SDK
+    #   supports resource targets located in the US East (N. Virginia) AWS
+    #   Region (us-east-1).
     #   @return [Types::MeetingNotificationConfiguration]
     #
     # @!attribute [rw] attendees
@@ -2230,14 +2237,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreatePhoneNumberOrderRequest
-    #   data as a hash:
-    #
-    #       {
-    #         product_type: "BusinessCalling", # required, accepts BusinessCalling, VoiceConnector
-    #         e164_phone_numbers: ["E164PhoneNumber"], # required
-    #       }
-    #
     # @!attribute [rw] product_type
     #   The phone number product type.
     #   @return [String]
@@ -2251,7 +2250,7 @@ module Aws::Chime
     class CreatePhoneNumberOrderRequest < Struct.new(
       :product_type,
       :e164_phone_numbers)
-      SENSITIVE = []
+      SENSITIVE = [:e164_phone_numbers]
       include Aws::Structure
     end
 
@@ -2267,23 +2266,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateProxySessionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString128", # required
-    #         participant_phone_numbers: ["E164PhoneNumber"], # required
-    #         name: "ProxySessionNameString",
-    #         expiry_minutes: 1,
-    #         capabilities: ["Voice"], # required, accepts Voice, SMS
-    #         number_selection_behavior: "PreferSticky", # accepts PreferSticky, AvoidSticky
-    #         geo_match_level: "Country", # accepts Country, AreaCode
-    #         geo_match_params: {
-    #           country: "Country", # required
-    #           area_code: "AreaCode", # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime voice connector ID.
     #   @return [String]
@@ -2329,7 +2311,7 @@ module Aws::Chime
       :number_selection_behavior,
       :geo_match_level,
       :geo_match_params)
-      SENSITIVE = [:name]
+      SENSITIVE = [:participant_phone_numbers, :name]
       include Aws::Structure
     end
 
@@ -2345,16 +2327,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateRoomMembershipRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         room_id: "NonEmptyString", # required
-    #         member_id: "NonEmptyString", # required
-    #         role: "Administrator", # accepts Administrator, Member
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -2394,15 +2366,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateRoomRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         name: "SensitiveString", # required
-    #         client_request_token: "ClientRequestToken",
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -2440,35 +2403,31 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateSipMediaApplicationCallRequest
-    #   data as a hash:
-    #
-    #       {
-    #         from_phone_number: "E164PhoneNumber",
-    #         to_phone_number: "E164PhoneNumber",
-    #         sip_media_application_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] from_phone_number
-    #   The phone number that a user calls from.
+    #   The phone number that a user calls from. This is a phone number in
+    #   your Amazon Chime phone number inventory.
     #   @return [String]
     #
     # @!attribute [rw] to_phone_number
-    #   The phone number that the user dials in order to connect to a
-    #   meeting
+    #   The phone number that the service should call.
     #   @return [String]
     #
     # @!attribute [rw] sip_media_application_id
     #   The ID of the SIP media application.
     #   @return [String]
     #
+    # @!attribute [rw] sip_headers
+    #   The SIP headers added to an outbound call leg.
+    #   @return [Hash<String,String>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateSipMediaApplicationCallRequest AWS API Documentation
     #
     class CreateSipMediaApplicationCallRequest < Struct.new(
       :from_phone_number,
       :to_phone_number,
-      :sip_media_application_id)
-      SENSITIVE = [:from_phone_number, :to_phone_number]
+      :sip_media_application_id,
+      :sip_headers)
+      SENSITIVE = [:from_phone_number, :to_phone_number, :sip_headers]
       include Aws::Structure
     end
 
@@ -2484,21 +2443,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateSipMediaApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         aws_region: "String", # required
-    #         name: "SipMediaApplicationName",
-    #         endpoints: [ # required
-    #           {
-    #             lambda_arn: "FunctionArn",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] aws_region
-    #   AWS Region assigned to the SIP media application.
+    #   The AWS Region assigned to the SIP media application.
     #   @return [String]
     #
     # @!attribute [rw] name
@@ -2521,7 +2467,7 @@ module Aws::Chime
     end
 
     # @!attribute [rw] sip_media_application
-    #   The Sip media application details.
+    #   The SIP media application details.
     #   @return [Types::SipMediaApplication]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/CreateSipMediaApplicationResponse AWS API Documentation
@@ -2532,45 +2478,23 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateSipRuleRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "SipRuleName", # required
-    #         trigger_type: "ToPhoneNumber", # required, accepts ToPhoneNumber, RequestUriHostname
-    #         trigger_value: "NonEmptyString", # required
-    #         disabled: false,
-    #         target_applications: [ # required
-    #           {
-    #             sip_media_application_id: "NonEmptyString",
-    #             priority: 1,
-    #             aws_region: "String",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] name
     #   The name of the SIP rule.
     #   @return [String]
     #
     # @!attribute [rw] trigger_type
-    #   The type of trigger whose value is assigned to the SIP rule in
-    #   `TriggerValue`. Allowed trigger values are `RequestUriHostname` and
-    #   `ToPhoneNumber`.
+    #   The type of trigger assigned to the SIP rule in `TriggerValue`,
+    #   currently `RequestUriHostname` or `ToPhoneNumber`.
     #   @return [String]
     #
     # @!attribute [rw] trigger_value
-    #   If `TriggerType` is `RequestUriHostname` then the value can be the
+    #   If `TriggerType` is `RequestUriHostname`, the value can be the
     #   outbound host name of an Amazon Chime Voice Connector. If
-    #   `TriggerType` is `ToPhoneNumber` then the value can be a
-    #   customer-owned phone number in E164 format. `SipRule` is triggered
-    #   if the SIP application requests a host name, or a If `TriggerType`
-    #   is `RequestUriHostname`, then the value can be the outbound hostname
-    #   of an Amazon Chime Voice Connector. If `TriggerType` is
-    #   `ToPhoneNumber`, then the value can be a customer-owned phone number
-    #   in E164 format. `SipRule` is triggered if the SIP application
-    #   requests a host name, or a `ToPhoneNumber` value matches the
-    #   incoming SIP request.
+    #   `TriggerType` is `ToPhoneNumber`, the value can be a customer-owned
+    #   phone number in the E164 format. The `SipMediaApplication` specified
+    #   in the `SipRule` is triggered if the request URI in an incoming SIP
+    #   request matches the `RequestUriHostname`, or if the `To` header in
+    #   the incoming SIP request matches the `ToPhoneNumber` value.
     #   @return [String]
     #
     # @!attribute [rw] disabled
@@ -2608,16 +2532,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         username: "String",
-    #         email: "EmailAddress",
-    #         user_type: "PrivateUser", # accepts PrivateUser, SharedDevice
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -2657,19 +2571,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateVoiceConnectorGroupRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "VoiceConnectorGroupName", # required
-    #         voice_connector_items: [
-    #           {
-    #             voice_connector_id: "NonEmptyString", # required
-    #             priority: 1, # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] name
     #   The name of the Amazon Chime Voice Connector group.
     #   @return [String]
@@ -2699,22 +2600,13 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateVoiceConnectorRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "VoiceConnectorName", # required
-    #         aws_region: "us-east-1", # accepts us-east-1, us-west-2
-    #         require_encryption: false, # required
-    #       }
-    #
     # @!attribute [rw] name
     #   The name of the Amazon Chime Voice Connector.
     #   @return [String]
     #
     # @!attribute [rw] aws_region
     #   The AWS Region in which the Amazon Chime Voice Connector is created.
-    #   Default value: `us-east-1`.
+    #   Default value: `us-east-1` .
     #   @return [String]
     #
     # @!attribute [rw] require_encryption
@@ -2747,14 +2639,6 @@ module Aws::Chime
     # The SIP credentials used to authenticate requests to your Amazon Chime
     # Voice Connector.
     #
-    # @note When making an API call, you may pass Credential
-    #   data as a hash:
-    #
-    #       {
-    #         username: "SensitiveString",
-    #         password: "SensitiveString",
-    #       }
-    #
     # @!attribute [rw] username
     #   The RFC2617 compliant user name associated with the SIP credentials,
     #   in US-ASCII format.
@@ -2777,15 +2661,6 @@ module Aws::Chime
     # The Dialed Number Identification Service (DNIS) emergency calling
     # configuration details associated with an Amazon Chime Voice
     # Connector's emergency calling configuration.
-    #
-    # @note When making an API call, you may pass DNISEmergencyCallingConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         emergency_phone_number: "E164PhoneNumber", # required
-    #         test_phone_number: "E164PhoneNumber",
-    #         calling_country: "Alpha2CountryCode", # required
-    #       }
     #
     # @!attribute [rw] emergency_phone_number
     #   The DNIS phone number to route emergency calls to, in E.164 format.
@@ -2811,13 +2686,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteAccountRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -2834,20 +2702,12 @@ module Aws::Chime
     #
     class DeleteAccountResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteAppInstanceAdminRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_admin_arn: "ChimeArn", # required
-    #         app_instance_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_admin_arn
-    #   The ARN of the app instance's administrator.
+    #   The ARN of the `AppInstance`'s administrator.
     #   @return [String]
     #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DeleteAppInstanceAdminRequest AWS API Documentation
@@ -2859,15 +2719,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteAppInstanceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DeleteAppInstanceRequest AWS API Documentation
@@ -2878,13 +2731,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteAppInstanceStreamingConfigurationsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
     #   The ARN of the streaming configurations being deleted.
     #   @return [String]
@@ -2897,13 +2743,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteAppInstanceUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_user_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_user_arn
     #   The ARN of the user request being deleted.
     #   @return [String]
@@ -2916,14 +2755,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteAttendeeRequest
-    #   data as a hash:
-    #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         attendee_id: "GuidString", # required
-    #       }
-    #
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -2941,39 +2772,28 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteChannelBanRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         member_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
-    #   The ARN of the channel from which the app instance user was banned.
+    #   The ARN of the channel from which the `AppInstanceUser` was banned.
     #   @return [String]
     #
     # @!attribute [rw] member_arn
-    #   The ARN of the app instance user that you want to reinstate.
+    #   The ARN of the `AppInstanceUser` that you want to reinstate.
+    #   @return [String]
+    #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DeleteChannelBanRequest AWS API Documentation
     #
     class DeleteChannelBanRequest < Struct.new(
       :channel_arn,
-      :member_arn)
+      :member_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteChannelMembershipRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         member_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel from which you want to remove the user.
     #   @return [String]
@@ -2982,23 +2802,20 @@ module Aws::Chime
     #   The ARN of the member that you're removing from the channel.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DeleteChannelMembershipRequest AWS API Documentation
     #
     class DeleteChannelMembershipRequest < Struct.new(
       :channel_arn,
-      :member_arn)
+      :member_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteChannelMessageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         message_id: "MessageId", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -3007,23 +2824,20 @@ module Aws::Chime
     #   The ID of the message being deleted.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DeleteChannelMessageRequest AWS API Documentation
     #
     class DeleteChannelMessageRequest < Struct.new(
       :channel_arn,
-      :message_id)
+      :message_id,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteChannelModeratorRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         channel_moderator_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -3032,42 +2846,37 @@ module Aws::Chime
     #   The ARN of the moderator being deleted.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DeleteChannelModeratorRequest AWS API Documentation
     #
     class DeleteChannelModeratorRequest < Struct.new(
       :channel_arn,
-      :channel_moderator_arn)
+      :channel_moderator_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel being deleted.
+    #   @return [String]
+    #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DeleteChannelRequest AWS API Documentation
     #
     class DeleteChannelRequest < Struct.new(
-      :channel_arn)
+      :channel_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteEventsConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         bot_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -3085,13 +2894,18 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteMeetingRequest
-    #   data as a hash:
+    # @!attribute [rw] media_pipeline_id
+    #   The ID of the media capture pipeline being deleted.
+    #   @return [String]
     #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DeleteMediaCapturePipelineRequest AWS API Documentation
     #
+    class DeleteMediaCapturePipelineRequest < Struct.new(
+      :media_pipeline_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -3104,13 +2918,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeletePhoneNumberRequest
-    #   data as a hash:
-    #
-    #       {
-    #         phone_number_id: "String", # required
-    #       }
-    #
     # @!attribute [rw] phone_number_id
     #   The phone number ID.
     #   @return [String]
@@ -3123,14 +2930,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteProxySessionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString128", # required
-    #         proxy_session_id: "NonEmptyString128", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime voice connector ID.
     #   @return [String]
@@ -3148,15 +2947,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteRoomMembershipRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         room_id: "NonEmptyString", # required
-    #         member_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -3179,14 +2969,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteRoomRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         room_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -3204,13 +2986,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteSipMediaApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         sip_media_application_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] sip_media_application_id
     #   The SIP media application ID.
     #   @return [String]
@@ -3223,13 +2998,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteSipRuleRequest
-    #   data as a hash:
-    #
-    #       {
-    #         sip_rule_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] sip_rule_id
     #   The SIP rule ID.
     #   @return [String]
@@ -3242,13 +3010,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteVoiceConnectorEmergencyCallingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -3261,13 +3022,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteVoiceConnectorGroupRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_group_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_group_id
     #   The Amazon Chime Voice Connector group ID.
     #   @return [String]
@@ -3280,13 +3034,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteVoiceConnectorOriginationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -3299,13 +3046,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteVoiceConnectorProxyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString128", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -3318,13 +3058,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteVoiceConnectorRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -3337,13 +3070,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteVoiceConnectorStreamingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -3356,14 +3082,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteVoiceConnectorTerminationCredentialsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         usernames: ["SensitiveString"], # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -3378,17 +3096,10 @@ module Aws::Chime
     class DeleteVoiceConnectorTerminationCredentialsRequest < Struct.new(
       :voice_connector_id,
       :usernames)
-      SENSITIVE = []
+      SENSITIVE = [:usernames]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteVoiceConnectorTerminationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -3401,20 +3112,12 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeAppInstanceAdminRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_admin_arn: "ChimeArn", # required
-    #         app_instance_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_admin_arn
-    #   The ARN of the app instance administrator.
+    #   The ARN of the `AppInstanceAdmin`.
     #   @return [String]
     #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeAppInstanceAdminRequest AWS API Documentation
@@ -3427,8 +3130,8 @@ module Aws::Chime
     end
 
     # @!attribute [rw] app_instance_admin
-    #   The ARN and name of the app instance user, the ARN of the app
-    #   instance, and the created and last-updated timestamps. All
+    #   The ARN and name of the `AppInstanceUser`, the ARN of the
+    #   `AppInstance`, and the created and last-updated timestamps. All
     #   timestamps use epoch milliseconds.
     #   @return [Types::AppInstanceAdmin]
     #
@@ -3440,15 +3143,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeAppInstanceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeAppInstanceRequest AWS API Documentation
@@ -3461,7 +3157,7 @@ module Aws::Chime
 
     # @!attribute [rw] app_instance
     #   The ARN, metadata, created and last-updated timestamps, and the name
-    #   of the app instance. All timestamps use epoch milliseconds.
+    #   of the `AppInstance`. All timestamps use epoch milliseconds.
     #   @return [Types::AppInstance]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeAppInstanceResponse AWS API Documentation
@@ -3472,15 +3168,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeAppInstanceUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_user_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_user_arn
-    #   The ARN of the app instance user.
+    #   The ARN of the `AppInstanceUser`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeAppInstanceUserRequest AWS API Documentation
@@ -3492,7 +3181,7 @@ module Aws::Chime
     end
 
     # @!attribute [rw] app_instance_user
-    #   The name of the app instance user.
+    #   The name of the `AppInstanceUser`.
     #   @return [Types::AppInstanceUser]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeAppInstanceUserResponse AWS API Documentation
@@ -3503,14 +3192,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeChannelBanRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         member_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel from which the user is banned.
     #   @return [String]
@@ -3519,17 +3200,22 @@ module Aws::Chime
     #   The ARN of the member being banned.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeChannelBanRequest AWS API Documentation
     #
     class DescribeChannelBanRequest < Struct.new(
       :channel_arn,
-      :member_arn)
+      :member_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # @!attribute [rw] channel_ban
-    #   The the details of the ban.
+    #   The details of the ban.
     #   @return [Types::ChannelBan]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeChannelBanResponse AWS API Documentation
@@ -3540,14 +3226,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeChannelMembershipForAppInstanceUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         app_instance_user_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel to which the user belongs.
     #   @return [String]
@@ -3556,11 +3234,16 @@ module Aws::Chime
     #   The ARN of the user in a channel.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeChannelMembershipForAppInstanceUserRequest AWS API Documentation
     #
     class DescribeChannelMembershipForAppInstanceUserRequest < Struct.new(
       :channel_arn,
-      :app_instance_user_arn)
+      :app_instance_user_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3577,14 +3260,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeChannelMembershipRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         member_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -3593,11 +3268,16 @@ module Aws::Chime
     #   The ARN of the member.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeChannelMembershipRequest AWS API Documentation
     #
     class DescribeChannelMembershipRequest < Struct.new(
       :channel_arn,
-      :member_arn)
+      :member_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3614,27 +3294,24 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeChannelModeratedByAppInstanceUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         app_instance_user_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the moderated channel.
     #   @return [String]
     #
     # @!attribute [rw] app_instance_user_arn
-    #   The ARN of the app instance user in the moderated channel.
+    #   The ARN of the `AppInstanceUser` in the moderated channel.
+    #   @return [String]
+    #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeChannelModeratedByAppInstanceUserRequest AWS API Documentation
     #
     class DescribeChannelModeratedByAppInstanceUserRequest < Struct.new(
       :channel_arn,
-      :app_instance_user_arn)
+      :app_instance_user_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3651,14 +3328,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeChannelModeratorRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         channel_moderator_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -3667,11 +3336,16 @@ module Aws::Chime
     #   The ARN of the channel moderator.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeChannelModeratorRequest AWS API Documentation
     #
     class DescribeChannelModeratorRequest < Struct.new(
       :channel_arn,
-      :channel_moderator_arn)
+      :channel_moderator_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3688,21 +3362,19 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
+    #   @return [String]
+    #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/DescribeChannelRequest AWS API Documentation
     #
     class DescribeChannelRequest < Struct.new(
-      :channel_arn)
+      :channel_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3719,14 +3391,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DisassociatePhoneNumberFromUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "String", # required
-    #         user_id: "String", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -3748,14 +3412,6 @@ module Aws::Chime
     #
     class DisassociatePhoneNumberFromUserResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DisassociatePhoneNumbersFromVoiceConnectorGroupRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_group_id: "NonEmptyString", # required
-    #         e164_phone_numbers: ["E164PhoneNumber"], # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_group_id
     #   The Amazon Chime Voice Connector group ID.
     #   @return [String]
@@ -3769,7 +3425,7 @@ module Aws::Chime
     class DisassociatePhoneNumbersFromVoiceConnectorGroupRequest < Struct.new(
       :voice_connector_group_id,
       :e164_phone_numbers)
-      SENSITIVE = []
+      SENSITIVE = [:e164_phone_numbers]
       include Aws::Structure
     end
 
@@ -3787,14 +3443,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DisassociatePhoneNumbersFromVoiceConnectorRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         e164_phone_numbers: ["E164PhoneNumber"], # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -3808,7 +3456,7 @@ module Aws::Chime
     class DisassociatePhoneNumbersFromVoiceConnectorRequest < Struct.new(
       :voice_connector_id,
       :e164_phone_numbers)
-      SENSITIVE = []
+      SENSITIVE = [:e164_phone_numbers]
       include Aws::Structure
     end
 
@@ -3826,14 +3474,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DisassociateSigninDelegateGroupsFromAccountRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         group_names: ["String"], # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -3858,19 +3498,6 @@ module Aws::Chime
     # The emergency calling configuration details associated with an Amazon
     # Chime Voice Connector.
     #
-    # @note When making an API call, you may pass EmergencyCallingConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         dnis: [
-    #           {
-    #             emergency_phone_number: "E164PhoneNumber", # required
-    #             test_phone_number: "E164PhoneNumber",
-    #             calling_country: "Alpha2CountryCode", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] dnis
     #   The Dialed Number Identification Service (DNIS) emergency calling
     #   configuration details.
@@ -3880,6 +3507,284 @@ module Aws::Chime
     #
     class EmergencyCallingConfiguration < Struct.new(
       :dnis)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Settings specific to the Amazon Transcribe Medical engine.
+    #
+    # @!attribute [rw] language_code
+    #   The language code specified for the Amazon Transcribe Medical
+    #   engine.
+    #   @return [String]
+    #
+    # @!attribute [rw] specialty
+    #   The specialty specified for the Amazon Transcribe Medical engine.
+    #   @return [String]
+    #
+    # @!attribute [rw] type
+    #   The type of transcription.
+    #   @return [String]
+    #
+    # @!attribute [rw] vocabulary_name
+    #   The name of the vocabulary passed to Amazon Transcribe Medical.
+    #   @return [String]
+    #
+    # @!attribute [rw] region
+    #   The AWS Region passed to Amazon Transcribe Medical. If you don't
+    #   specify a Region, Amazon Chime uses the meeting's Region.
+    #   @return [String]
+    #
+    # @!attribute [rw] content_identification_type
+    #   Labels all personally identifiable information (PII) identified in
+    #   your transcript. If you don't include `PiiEntityTypes`, all PII is
+    #   identified.
+    #
+    #   You can’t set `ContentIdentificationType` and
+    #   `ContentRedactionType`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/EngineTranscribeMedicalSettings AWS API Documentation
+    #
+    class EngineTranscribeMedicalSettings < Struct.new(
+      :language_code,
+      :specialty,
+      :type,
+      :vocabulary_name,
+      :region,
+      :content_identification_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Settings specific for Amazon Transcribe as the live transcription
+    # engine.
+    #
+    # If you specify an invalid combination of parameters, a
+    # `TranscriptFailed` event will be sent with the contents of the
+    # `BadRequestException` generated by Amazon Transcribe. For more
+    # information on each parameter and which combinations are valid, refer
+    # to the [StartStreamTranscription][1] API in the *Amazon Transcribe
+    # Developer Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/transcribe/latest/APIReference/API_streaming_StartStreamTranscription.html
+    #
+    # @!attribute [rw] language_code
+    #   Specify the language code that represents the language spoken.
+    #
+    #   If you're unsure of the language spoken in your audio, consider
+    #   using `IdentifyLanguage` to enable automatic language
+    #   identification.
+    #   @return [String]
+    #
+    # @!attribute [rw] vocabulary_filter_method
+    #   Specify how you want your vocabulary filter applied to your
+    #   transcript.
+    #
+    #   To replace words with `***`, choose `mask`.
+    #
+    #   To delete words, choose `remove`.
+    #
+    #   To flag words without changing them, choose `tag`.
+    #   @return [String]
+    #
+    # @!attribute [rw] vocabulary_filter_name
+    #   Specify the name of the custom vocabulary filter that you want to
+    #   use when processing your transcription. Note that vocabulary filter
+    #   names are case sensitive.
+    #
+    #   If you use Amazon Transcribe in multiple Regions, the vocabulary
+    #   filter must be available in Amazon Transcribe in each Region.
+    #
+    #   If you include `IdentifyLanguage` and want to use one or more
+    #   vocabulary filters with your transcription, use the
+    #   `VocabularyFilterNames` parameter instead.
+    #   @return [String]
+    #
+    # @!attribute [rw] vocabulary_name
+    #   Specify the name of the custom vocabulary that you want to use when
+    #   processing your transcription. Note that vocabulary names are case
+    #   sensitive.
+    #
+    #   If you use Amazon Transcribe multiple Regions, the vocabulary must
+    #   be available in Amazon Transcribe in each Region.
+    #
+    #   If you include `IdentifyLanguage` and want to use one or more custom
+    #   vocabularies with your transcription, use the `VocabularyNames`
+    #   parameter instead.
+    #   @return [String]
+    #
+    # @!attribute [rw] region
+    #   The AWS Region in which to use Amazon Transcribe.
+    #
+    #   If you don't specify a Region, then the `MediaRegion` parameter of
+    #   the [CreateMeeting.html][1] API will be used. However, if Amazon
+    #   Transcribe is not available in the `MediaRegion`, then a
+    #   TranscriptFailed event is sent.
+    #
+    #   Use `auto` to use Amazon Transcribe in a Region near the meeting’s
+    #   `MediaRegion`. For more information, refer to [Choosing a
+    #   transcription Region][2] in the *Amazon Chime SDK Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/chime-sdk/latest/APIReference/API_meeting-chime_CreateMeeting.html
+    #   [2]: https://docs.aws.amazon.com/chime-sdk/latest/dg/transcription-options.html#choose-region
+    #   @return [String]
+    #
+    # @!attribute [rw] enable_partial_results_stabilization
+    #   Enables partial result stabilization for your transcription. Partial
+    #   result stabilization can reduce latency in your output, but may
+    #   impact accuracy.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] partial_results_stability
+    #   Specify the level of stability to use when you enable partial
+    #   results stabilization (`EnablePartialResultsStabilization`).
+    #
+    #   Low stability provides the highest accuracy. High stability
+    #   transcribes faster, but with slightly lower accuracy.
+    #   @return [String]
+    #
+    # @!attribute [rw] content_identification_type
+    #   Labels all personally identifiable information (PII) identified in
+    #   your transcript. If you don't include `PiiEntityTypes`, all PII is
+    #   identified.
+    #
+    #   You can’t set `ContentIdentificationType` and
+    #   `ContentRedactionType`.
+    #   @return [String]
+    #
+    # @!attribute [rw] content_redaction_type
+    #   Content redaction is performed at the segment level. If you don't
+    #   include `PiiEntityTypes`, all PII is redacted.
+    #
+    #   You can’t set `ContentIdentificationType` and
+    #   `ContentRedactionType`.
+    #   @return [String]
+    #
+    # @!attribute [rw] pii_entity_types
+    #   Specify which types of personally identifiable information (PII) you
+    #   want to redact in your transcript. You can include as many types as
+    #   you'd like, or you can select `ALL`.
+    #
+    #   Values must be comma-separated and can include: `ADDRESS`,
+    #   `BANK_ACCOUNT_NUMBER`, `BANK_ROUTING`, `CREDIT_DEBIT_CVV`,
+    #   `CREDIT_DEBIT_EXPIRY` `CREDIT_DEBIT_NUMBER`, `EMAIL`,`NAME`,
+    #   `PHONE`, `PIN`, `SSN`, or `ALL`.
+    #
+    #   Note that if you include `PiiEntityTypes`, you must also include
+    #   `ContentIdentificationType` or `ContentRedactionType`.
+    #
+    #   If you include `ContentRedactionType` or
+    #   `ContentIdentificationType`, but do not include `PiiEntityTypes`,
+    #   all PII is redacted or identified.
+    #   @return [String]
+    #
+    # @!attribute [rw] language_model_name
+    #   Specify the name of the custom language model that you want to use
+    #   when processing your transcription. Note that language model names
+    #   are case sensitive.
+    #
+    #   The language of the specified language model must match the language
+    #   code. If the languages don't match, the custom language model
+    #   isn't applied. There are no errors or warnings associated with a
+    #   language mismatch.
+    #
+    #   If you use Amazon Transcribe in multiple Regions, the custom
+    #   language model must be available in Amazon Transcribe in each
+    #   Region.
+    #   @return [String]
+    #
+    # @!attribute [rw] identify_language
+    #   Enables automatic language identification for your transcription.
+    #
+    #   If you include `IdentifyLanguage`, you can optionally use
+    #   `LanguageOptions` to include a list of language codes that you think
+    #   may be present in your audio stream. Including language options can
+    #   improve transcription accuracy.
+    #
+    #   You can also use `PreferredLanguage` to include a preferred
+    #   language. Doing so can help Amazon Transcribe identify the language
+    #   faster.
+    #
+    #   You must include either `LanguageCode` or `IdentifyLanguage`.
+    #
+    #   Language identification can't be combined with custom language
+    #   models or redaction.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] language_options
+    #   Specify two or more language codes that represent the languages you
+    #   think may be present in your media; including more than five is not
+    #   recommended. If you're unsure what languages are present, do not
+    #   include this parameter.
+    #
+    #   Including language options can improve the accuracy of language
+    #   identification.
+    #
+    #   If you include `LanguageOptions`, you must also include
+    #   `IdentifyLanguage`.
+    #
+    #   You can only include one language dialect per language. For example,
+    #   you cannot include `en-US` and `en-AU`.
+    #   @return [String]
+    #
+    # @!attribute [rw] preferred_language
+    #   Specify a preferred language from the subset of languages codes you
+    #   specified in `LanguageOptions`.
+    #
+    #   You can only use this parameter if you include `IdentifyLanguage`
+    #   and `LanguageOptions`.
+    #   @return [String]
+    #
+    # @!attribute [rw] vocabulary_names
+    #   Specify the names of the custom vocabularies that you want to use
+    #   when processing your transcription. Note that vocabulary names are
+    #   case sensitive.
+    #
+    #   If you use Amazon Transcribe in multiple Regions, the vocabulary
+    #   must be available in Amazon Transcribe in each Region.
+    #
+    #   If you don't include `IdentifyLanguage` and want to use a custom
+    #   vocabulary with your transcription, use the `VocabularyName`
+    #   parameter instead.
+    #   @return [String]
+    #
+    # @!attribute [rw] vocabulary_filter_names
+    #   Specify the names of the custom vocabulary filters that you want to
+    #   use when processing your transcription. Note that vocabulary filter
+    #   names are case sensitive.
+    #
+    #   If you use Amazon Transcribe in multiple Regions, the vocabulary
+    #   filter must be available in Amazon Transcribe in each Region.
+    #
+    #   If you're *not* including `IdentifyLanguage` and want to use a
+    #   custom vocabulary filter with your transcription, use the
+    #   `VocabularyFilterName` parameter instead.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/EngineTranscribeSettings AWS API Documentation
+    #
+    class EngineTranscribeSettings < Struct.new(
+      :language_code,
+      :vocabulary_filter_method,
+      :vocabulary_filter_name,
+      :vocabulary_name,
+      :region,
+      :enable_partial_results_stabilization,
+      :partial_results_stability,
+      :content_identification_type,
+      :content_redaction_type,
+      :pii_entity_types,
+      :language_model_name,
+      :identify_language,
+      :language_options,
+      :preferred_language,
+      :vocabulary_names,
+      :vocabulary_filter_names)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3929,14 +3834,6 @@ module Aws::Chime
     # The country and area code for a proxy phone number in a proxy phone
     # session.
     #
-    # @note When making an API call, you may pass GeoMatchParams
-    #   data as a hash:
-    #
-    #       {
-    #         country: "Country", # required
-    #         area_code: "AreaCode", # required
-    #       }
-    #
     # @!attribute [rw] country
     #   The country.
     #   @return [String]
@@ -3954,13 +3851,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetAccountRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -3974,8 +3864,7 @@ module Aws::Chime
     end
 
     # @!attribute [rw] account
-    #   The Amazon Chime account details. An AWS account can have multiple
-    #   Amazon Chime accounts.
+    #   The Amazon Chime account details.
     #   @return [Types::Account]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/GetAccountResponse AWS API Documentation
@@ -3986,13 +3875,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetAccountSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -4017,15 +3899,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetAppInstanceRetentionSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/GetAppInstanceRetentionSettingsRequest AWS API Documentation
@@ -4037,7 +3912,7 @@ module Aws::Chime
     end
 
     # @!attribute [rw] app_instance_retention_settings
-    #   The retention settings for the app instance.
+    #   The retention settings for the `AppInstance`.
     #   @return [Types::AppInstanceRetentionSettings]
     #
     # @!attribute [rw] initiate_deletion_timestamp
@@ -4054,15 +3929,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetAppInstanceStreamingConfigurationsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/GetAppInstanceStreamingConfigurationsRequest AWS API Documentation
@@ -4085,14 +3953,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetAttendeeRequest
-    #   data as a hash:
-    #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         attendee_id: "GuidString", # required
-    #       }
-    #
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -4122,14 +3982,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetBotRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         bot_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -4159,14 +4011,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetChannelMessageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         message_id: "MessageId", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -4175,11 +4019,16 @@ module Aws::Chime
     #   The ID of the message.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/GetChannelMessageRequest AWS API Documentation
     #
     class GetChannelMessageRequest < Struct.new(
       :channel_arn,
-      :message_id)
+      :message_id,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -4196,14 +4045,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetEventsConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         bot_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -4250,13 +4091,30 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetMeetingRequest
-    #   data as a hash:
+    # @!attribute [rw] media_pipeline_id
+    #   The ID of the pipeline that you want to get.
+    #   @return [String]
     #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/GetMediaCapturePipelineRequest AWS API Documentation
     #
+    class GetMediaCapturePipelineRequest < Struct.new(
+      :media_pipeline_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] media_capture_pipeline
+    #   The media capture pipeline object.
+    #   @return [Types::MediaCapturePipeline]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/GetMediaCapturePipelineResponse AWS API Documentation
+    #
+    class GetMediaCapturePipelineResponse < Struct.new(
+      :media_capture_pipeline)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -4299,13 +4157,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetPhoneNumberOrderRequest
-    #   data as a hash:
-    #
-    #       {
-    #         phone_number_order_id: "GuidString", # required
-    #       }
-    #
     # @!attribute [rw] phone_number_order_id
     #   The ID for the phone number order.
     #   @return [String]
@@ -4330,13 +4181,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetPhoneNumberRequest
-    #   data as a hash:
-    #
-    #       {
-    #         phone_number_id: "String", # required
-    #       }
-    #
     # @!attribute [rw] phone_number_id
     #   The phone number ID.
     #   @return [String]
@@ -4378,14 +4222,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetProxySessionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString128", # required
-    #         proxy_session_id: "NonEmptyString128", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime voice connector ID.
     #   @return [String]
@@ -4415,13 +4251,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetRetentionSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -4452,14 +4281,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetRoomRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         room_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -4489,15 +4310,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSipMediaApplicationLoggingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         sip_media_application_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] sip_media_application_id
-    #   The ID of the SIP media application.
+    #   The SIP media application ID.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/GetSipMediaApplicationLoggingConfigurationRequest AWS API Documentation
@@ -4520,13 +4334,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSipMediaApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         sip_media_application_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] sip_media_application_id
     #   The SIP media application ID.
     #   @return [String]
@@ -4551,13 +4358,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSipRuleRequest
-    #   data as a hash:
-    #
-    #       {
-    #         sip_rule_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] sip_rule_id
     #   The SIP rule ID.
     #   @return [String]
@@ -4582,14 +4382,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         user_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -4619,14 +4411,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetUserSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "String", # required
-    #         user_id: "String", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -4656,13 +4440,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceConnectorEmergencyCallingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -4687,13 +4464,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceConnectorGroupRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_group_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_group_id
     #   The Amazon Chime Voice Connector group ID.
     #   @return [String]
@@ -4718,13 +4488,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceConnectorLoggingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -4749,13 +4512,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceConnectorOriginationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -4780,13 +4536,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceConnectorProxyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString128", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime voice connector ID.
     #   @return [String]
@@ -4811,13 +4560,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceConnectorRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -4842,13 +4584,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceConnectorStreamingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -4873,13 +4608,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceConnectorTerminationHealthRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -4904,13 +4632,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetVoiceConnectorTerminationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -4935,7 +4656,7 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The ARN and name of a user.
+    # The details of a user.
     #
     # @!attribute [rw] arn
     #   The ARN in an Identity.
@@ -4984,15 +4705,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass InviteUsersRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         user_email_list: ["EmailAddress"], # required
-    #         user_type: "PrivateUser", # accepts PrivateUser, SharedDevice
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -5011,7 +4723,7 @@ module Aws::Chime
       :account_id,
       :user_email_list,
       :user_type)
-      SENSITIVE = []
+      SENSITIVE = [:user_email_list]
       include Aws::Structure
     end
 
@@ -5027,16 +4739,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListAccountsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "AccountName",
-    #         user_email: "EmailAddress",
-    #         next_token: "String",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] name
     #   Amazon Chime account name prefix with which to filter results.
     #   @return [String]
@@ -5066,11 +4768,11 @@ module Aws::Chime
     end
 
     # @!attribute [rw] accounts
-    #   The list of accounts.
+    #   List of Amazon Chime accounts and account details.
     #   @return [Array<Types::Account>]
     #
     # @!attribute [rw] next_token
-    #   The account's user token.
+    #   The token to use to retrieve the next page of results.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListAccountsResponse AWS API Documentation
@@ -5082,17 +4784,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListAppInstanceAdminsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -5115,7 +4808,7 @@ module Aws::Chime
     end
 
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] app_instance_admins
@@ -5137,17 +4830,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListAppInstanceUsersRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -5170,11 +4854,11 @@ module Aws::Chime
     end
 
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] app_instance_users
-    #   The information for each of the requested app instance users.
+    #   The information for each requested `AppInstanceUser`.
     #   @return [Array<Types::AppInstanceUserSummary>]
     #
     # @!attribute [rw] next_token
@@ -5192,21 +4876,13 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListAppInstancesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] max_results
-    #   The maximum number of app instances that you want to return.
+    #   The maximum number of `AppInstance`s that you want to return.
     #   @return [Integer]
     #
     # @!attribute [rw] next_token
     #   The token passed by previous API requests until you reach the
-    #   maximum number of app instances.
+    #   maximum number of `AppInstance`s.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListAppInstancesRequest AWS API Documentation
@@ -5219,12 +4895,12 @@ module Aws::Chime
     end
 
     # @!attribute [rw] app_instances
-    #   The information for each app instance.
+    #   The information for each `AppInstance`.
     #   @return [Array<Types::AppInstanceSummary>]
     #
     # @!attribute [rw] next_token
     #   The token passed by previous API requests until the maximum number
-    #   of app instances is reached.
+    #   of `AppInstance`s is reached.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListAppInstancesResponse AWS API Documentation
@@ -5236,14 +4912,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListAttendeeTagsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         attendee_id: "GuidString", # required
-    #       }
-    #
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -5273,15 +4941,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListAttendeesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         next_token: "String",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -5321,15 +4980,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListBotsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         max_results: 1,
-    #         next_token: "String",
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -5370,15 +5020,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListChannelBansRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -5392,12 +5033,17 @@ module Aws::Chime
     #   returned.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListChannelBansRequest AWS API Documentation
     #
     class ListChannelBansRequest < Struct.new(
       :channel_arn,
       :max_results,
-      :next_token)
+      :next_token,
+      :chime_bearer)
       SENSITIVE = [:next_token]
       include Aws::Structure
     end
@@ -5425,17 +5071,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListChannelMembershipsForAppInstanceUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_user_arn: "ChimeArn",
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] app_instance_user_arn
-    #   The ARN of the app instance users
+    #   The ARN of the `AppInstanceUser`s
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -5447,19 +5084,23 @@ module Aws::Chime
     #   channel memberships is reached.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListChannelMembershipsForAppInstanceUserRequest AWS API Documentation
     #
     class ListChannelMembershipsForAppInstanceUserRequest < Struct.new(
       :app_instance_user_arn,
       :max_results,
-      :next_token)
+      :next_token,
+      :chime_bearer)
       SENSITIVE = [:next_token]
       include Aws::Structure
     end
 
     # @!attribute [rw] channel_memberships
-    #   The token passed by previous API calls until all requested users are
-    #   returned.
+    #   The information for the requested channel memberships.
     #   @return [Array<Types::ChannelMembershipForAppInstanceUserSummary>]
     #
     # @!attribute [rw] next_token
@@ -5476,16 +5117,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListChannelMembershipsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         type: "DEFAULT", # accepts DEFAULT, HIDDEN
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The maximum number of channel memberships that you want returned.
     #   @return [String]
@@ -5504,7 +5135,11 @@ module Aws::Chime
     #
     # @!attribute [rw] next_token
     #   The token passed by previous API calls until all requested channel
-    #   memberships are returned..
+    #   memberships are returned.
+    #   @return [String]
+    #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListChannelMembershipsRequest AWS API Documentation
@@ -5513,7 +5148,8 @@ module Aws::Chime
       :channel_arn,
       :type,
       :max_results,
-      :next_token)
+      :next_token,
+      :chime_bearer)
       SENSITIVE = [:next_token]
       include Aws::Structure
     end
@@ -5541,18 +5177,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListChannelMessagesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         sort_order: "ASCENDING", # accepts ASCENDING, DESCENDING
-    #         not_before: Time.now,
-    #         not_after: Time.now,
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -5579,6 +5203,10 @@ module Aws::Chime
     #   are returned.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListChannelMessagesRequest AWS API Documentation
     #
     class ListChannelMessagesRequest < Struct.new(
@@ -5587,7 +5215,8 @@ module Aws::Chime
       :not_before,
       :not_after,
       :max_results,
-      :next_token)
+      :next_token,
+      :chime_bearer)
       SENSITIVE = [:next_token]
       include Aws::Structure
     end
@@ -5602,7 +5231,7 @@ module Aws::Chime
     #   @return [String]
     #
     # @!attribute [rw] channel_messages
-    #   The information about and content of each requested message.
+    #   The information about, and content of, each requested message.
     #   @return [Array<Types::ChannelMessageSummary>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListChannelMessagesResponse AWS API Documentation
@@ -5615,15 +5244,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListChannelModeratorsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -5637,12 +5257,17 @@ module Aws::Chime
     #   moderators are returned.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListChannelModeratorsRequest AWS API Documentation
     #
     class ListChannelModeratorsRequest < Struct.new(
       :channel_arn,
       :max_results,
-      :next_token)
+      :next_token,
+      :chime_bearer)
       SENSITIVE = [:next_token]
       include Aws::Structure
     end
@@ -5670,15 +5295,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListChannelsModeratedByAppInstanceUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_user_arn: "ChimeArn",
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] app_instance_user_arn
     #   The ARN of the user in the moderated channel.
     #   @return [String]
@@ -5692,12 +5308,17 @@ module Aws::Chime
     #   channels moderated by the user is reached.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListChannelsModeratedByAppInstanceUserRequest AWS API Documentation
     #
     class ListChannelsModeratedByAppInstanceUserRequest < Struct.new(
       :app_instance_user_arn,
       :max_results,
-      :next_token)
+      :next_token,
+      :chime_bearer)
       SENSITIVE = [:next_token]
       include Aws::Structure
     end
@@ -5720,24 +5341,14 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListChannelsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #         privacy: "PUBLIC", # accepts PUBLIC, PRIVATE
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] privacy
     #   The privacy setting. `PUBLIC` retrieves all the public channels.
-    #   `PRIVATE` retrieves private channels. Only an app instance
-    #   administrator can retrieve private channels.
+    #   `PRIVATE` retrieves private channels. Only an `AppInstanceAdmin` can
+    #   retrieve private channels.
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -5749,13 +5360,18 @@ module Aws::Chime
     #   are returned.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListChannelsRequest AWS API Documentation
     #
     class ListChannelsRequest < Struct.new(
       :app_instance_arn,
       :privacy,
       :max_results,
-      :next_token)
+      :next_token,
+      :chime_bearer)
       SENSITIVE = [:next_token]
       include Aws::Structure
     end
@@ -5778,13 +5394,41 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListMeetingTagsRequest
-    #   data as a hash:
+    # @!attribute [rw] next_token
+    #   The token used to retrieve the next page of results.
+    #   @return [String]
     #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #       }
+    # @!attribute [rw] max_results
+    #   The maximum number of results to return in a single call. Valid
+    #   Range: 1 - 99.
+    #   @return [Integer]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListMediaCapturePipelinesRequest AWS API Documentation
+    #
+    class ListMediaCapturePipelinesRequest < Struct.new(
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] media_capture_pipelines
+    #   The media capture pipeline objects in the list.
+    #   @return [Array<Types::MediaCapturePipeline>]
+    #
+    # @!attribute [rw] next_token
+    #   The token used to retrieve the next page of results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListMediaCapturePipelinesResponse AWS API Documentation
+    #
+    class ListMediaCapturePipelinesResponse < Struct.new(
+      :media_capture_pipelines,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -5809,14 +5453,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListMeetingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "String",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   The token to use to retrieve the next page of results.
     #   @return [String]
@@ -5851,14 +5487,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListPhoneNumberOrdersRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "String",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   The token to use to retrieve the next page of results.
     #   @return [String]
@@ -5893,18 +5521,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListPhoneNumbersRequest
-    #   data as a hash:
-    #
-    #       {
-    #         status: "AcquireInProgress", # accepts AcquireInProgress, AcquireFailed, Unassigned, Assigned, ReleaseInProgress, DeleteInProgress, ReleaseFailed, DeleteFailed
-    #         product_type: "BusinessCalling", # accepts BusinessCalling, VoiceConnector
-    #         filter_name: "AccountId", # accepts AccountId, UserId, VoiceConnectorId, VoiceConnectorGroupId, SipRuleId
-    #         filter_value: "String",
-    #         max_results: 1,
-    #         next_token: "String",
-    #       }
-    #
     # @!attribute [rw] status
     #   The phone number status.
     #   @return [String]
@@ -5959,16 +5575,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListProxySessionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString128", # required
-    #         status: "Open", # accepts Open, InProgress, Closed
-    #         next_token: "NextTokenString",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime voice connector ID.
     #   @return [String]
@@ -6013,16 +5619,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListRoomMembershipsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         room_id: "NonEmptyString", # required
-    #         max_results: 1,
-    #         next_token: "String",
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -6067,16 +5663,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListRoomsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         member_id: "String",
-    #         max_results: 1,
-    #         next_token: "String",
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -6121,14 +5707,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListSipMediaApplicationsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         max_results: 1,
-    #         next_token: "NextTokenString",
-    #       }
-    #
     # @!attribute [rw] max_results
     #   The maximum number of results to return in a single call. Defaults
     #   to 100.
@@ -6164,15 +5742,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListSipRulesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         sip_media_application_id: "NonEmptyString",
-    #         max_results: 1,
-    #         next_token: "NextTokenString",
-    #       }
-    #
     # @!attribute [rw] sip_media_application_id
     #   The SIP media application ID.
     #   @return [String]
@@ -6213,13 +5782,30 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
+    # @!attribute [rw] product_type
+    #   The phone number product type.
+    #   @return [String]
     #
-    #       {
-    #         resource_arn: "Arn", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListSupportedPhoneNumberCountriesRequest AWS API Documentation
     #
+    class ListSupportedPhoneNumberCountriesRequest < Struct.new(
+      :product_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] phone_number_countries
+    #   The supported phone number countries.
+    #   @return [Array<Types::PhoneNumberCountry>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ListSupportedPhoneNumberCountriesResponse AWS API Documentation
+    #
+    class ListSupportedPhoneNumberCountriesResponse < Struct.new(
+      :phone_number_countries)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] resource_arn
     #   The resource ARN.
     #   @return [String]
@@ -6244,17 +5830,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListUsersRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         user_email: "EmailAddress",
-    #         user_type: "PrivateUser", # accepts PrivateUser, SharedDevice
-    #         max_results: 1,
-    #         next_token: "String",
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -6305,14 +5880,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListVoiceConnectorGroupsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "String",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   The token to use to retrieve the next page of results.
     #   @return [String]
@@ -6347,13 +5914,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListVoiceConnectorTerminationCredentialsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -6374,18 +5934,10 @@ module Aws::Chime
     #
     class ListVoiceConnectorTerminationCredentialsResponse < Struct.new(
       :usernames)
-      SENSITIVE = []
+      SENSITIVE = [:usernames]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListVoiceConnectorsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "String",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   The token to use to retrieve the next page of results.
     #   @return [String]
@@ -6424,34 +5976,24 @@ module Aws::Chime
     # Connector. Specifies whether SIP message logs are enabled for sending
     # to Amazon CloudWatch Logs.
     #
-    # @note When making an API call, you may pass LoggingConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         enable_sip_logs: false,
-    #       }
-    #
     # @!attribute [rw] enable_sip_logs
-    #   When true, enables SIP message logs for sending to Amazon CloudWatch
-    #   Logs.
+    #   Boolean that enables SIP message logs to Amazon CloudWatch logs.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] enable_media_metric_logs
+    #   Boolean that enables logging of detailed media metrics for Voice
+    #   Connectors to Amazon CloudWatch logs.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/LoggingConfiguration AWS API Documentation
     #
     class LoggingConfiguration < Struct.new(
-      :enable_sip_logs)
+      :enable_sip_logs,
+      :enable_media_metric_logs)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass LogoutUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         user_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -6473,8 +6015,68 @@ module Aws::Chime
     #
     class LogoutUserResponse < Aws::EmptyStructure; end
 
+    # A media capture pipeline object consisting of an ID, source type,
+    # source ARN, a sink type, a sink ARN, and a configuration object.
+    #
+    # @!attribute [rw] media_pipeline_id
+    #   The ID of a media capture pipeline.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_type
+    #   Source type from which media artifacts are saved. You must use
+    #   `ChimeMeeting`.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_arn
+    #   ARN of the source from which the media artifacts will be saved.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The status of the media capture pipeline.
+    #   @return [String]
+    #
+    # @!attribute [rw] sink_type
+    #   Destination type to which the media artifacts are saved. You must
+    #   use an S3 Bucket.
+    #   @return [String]
+    #
+    # @!attribute [rw] sink_arn
+    #   ARN of the destination to which the media artifacts are saved.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_timestamp
+    #   The time at which the capture pipeline was created, in ISO 8601
+    #   format.
+    #   @return [Time]
+    #
+    # @!attribute [rw] updated_timestamp
+    #   The time at which the capture pipeline was updated, in ISO 8601
+    #   format.
+    #   @return [Time]
+    #
+    # @!attribute [rw] chime_sdk_meeting_configuration
+    #   The configuration for a specified media capture pipeline.
+    #   `SourceType` must be `ChimeSdkMeeting`.
+    #   @return [Types::ChimeSdkMeetingConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/MediaCapturePipeline AWS API Documentation
+    #
+    class MediaCapturePipeline < Struct.new(
+      :media_pipeline_id,
+      :source_type,
+      :source_arn,
+      :status,
+      :sink_type,
+      :sink_arn,
+      :created_timestamp,
+      :updated_timestamp,
+      :chime_sdk_meeting_configuration)
+      SENSITIVE = [:source_arn, :sink_arn]
+      include Aws::Structure
+    end
+
     # A set of endpoints used by clients to connect to the media service
-    # group for a Amazon Chime SDK meeting.
+    # group for an Amazon Chime SDK meeting.
     #
     # @!attribute [rw] audio_host_url
     #   The audio host URL.
@@ -6486,14 +6088,23 @@ module Aws::Chime
     #
     # @!attribute [rw] screen_data_url
     #   The screen data URL.
+    #
+    #   **This parameter is is no longer supported and no longer used by the
+    #   Amazon Chime SDK.**
     #   @return [String]
     #
     # @!attribute [rw] screen_sharing_url
     #   The screen sharing URL.
+    #
+    #   **This parameter is is no longer supported and no longer used by the
+    #   Amazon Chime SDK.**.
     #   @return [String]
     #
     # @!attribute [rw] screen_viewing_url
     #   The screen viewing URL.
+    #
+    #   **This parameter is is no longer supported and no longer used by the
+    #   Amazon Chime SDK.**
     #   @return [String]
     #
     # @!attribute [rw] signaling_url
@@ -6502,6 +6113,13 @@ module Aws::Chime
     #
     # @!attribute [rw] turn_control_url
     #   The turn control URL.
+    #
+    #   **This parameter is is no longer supported and no longer used by the
+    #   Amazon Chime SDK.**
+    #   @return [String]
+    #
+    # @!attribute [rw] event_ingestion_url
+    #   The event ingestion URL to which you send client meeting events.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/MediaPlacement AWS API Documentation
@@ -6513,7 +6131,8 @@ module Aws::Chime
       :screen_sharing_url,
       :screen_viewing_url,
       :signaling_url,
-      :turn_control_url)
+      :turn_control_url,
+      :event_ingestion_url)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -6533,7 +6152,7 @@ module Aws::Chime
     #   @return [Types::MediaPlacement]
     #
     # @!attribute [rw] media_region
-    #   The Region in which to create the meeting. Available values:
+    #   The Region in which you create the meeting. Available values:
     #   `af-south-1`, `ap-northeast-1`, `ap-northeast-2`, `ap-south-1`,
     #   `ap-southeast-1`, `ap-southeast-2`, `ca-central-1`, `eu-central-1`,
     #   `eu-north-1`, `eu-south-1`, `eu-west-1`, `eu-west-2`, `eu-west-3`,
@@ -6551,18 +6170,10 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The configuration for resource targets to receive notifications when
-    # Amazon Chime SDK meeting and attendee events occur. The Amazon Chime
-    # SDK supports resource targets located in the US East (N. Virginia) AWS
+    # The resource target configurations for receiving Amazon Chime SDK
+    # meeting and attendee event notifications. The Amazon Chime SDK
+    # supports resource targets located in the US East (N. Virginia) AWS
     # Region (`us-east-1`).
-    #
-    # @note When making an API call, you may pass MeetingNotificationConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         sns_topic_arn: "Arn",
-    #         sqs_queue_arn: "Arn",
-    #       }
     #
     # @!attribute [rw] sns_topic_arn
     #   The SNS topic ARN.
@@ -6642,14 +6253,6 @@ module Aws::Chime
 
     # Membership details, such as member ID and member role.
     #
-    # @note When making an API call, you may pass MembershipItem
-    #   data as a hash:
-    #
-    #       {
-    #         member_id: "NonEmptyString",
-    #         role: "Administrator", # accepts Administrator, Member
-    #       }
-    #
     # @!attribute [rw] member_id
     #   The member ID.
     #   @return [String]
@@ -6667,10 +6270,10 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The endpoint of a meeting session.
+    # The websocket endpoint used to connect to Amazon Chime SDK messaging.
     #
     # @!attribute [rw] url
-    #   The URL of a meeting session endpoint.
+    #   The endpoint to which you establish a websocket connection.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/MessagingSessionEndpoint AWS API Documentation
@@ -6721,30 +6324,21 @@ module Aws::Chime
     # Origination settings enable your SIP hosts to receive inbound calls
     # using your Amazon Chime Voice Connector.
     #
-    # @note When making an API call, you may pass Origination
-    #   data as a hash:
+    # <note markdown="1"> The parameters listed below are not required, but you must use at
+    # least one.
     #
-    #       {
-    #         routes: [
-    #           {
-    #             host: "String",
-    #             port: 1,
-    #             protocol: "TCP", # accepts TCP, UDP
-    #             priority: 1,
-    #             weight: 1,
-    #           },
-    #         ],
-    #         disabled: false,
-    #       }
+    #  </note>
     #
     # @!attribute [rw] routes
     #   The call distribution properties defined for your SIP hosts. Valid
-    #   range: Minimum value of 1. Maximum value of 20.
+    #   range: Minimum value of 1. Maximum value of 20. This parameter is
+    #   not required, but you must specify this parameter or `Disabled`.
     #   @return [Array<Types::OriginationRoute>]
     #
     # @!attribute [rw] disabled
     #   When origination settings are disabled, inbound calls are not
-    #   enabled for your Amazon Chime Voice Connector.
+    #   enabled for your Amazon Chime Voice Connector. This parameter is not
+    #   required, but you must specify this parameter or `Routes`.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/Origination AWS API Documentation
@@ -6761,16 +6355,10 @@ module Aws::Chime
     # Connector. Limit: Ten origination routes for each Amazon Chime Voice
     # Connector.
     #
-    # @note When making an API call, you may pass OriginationRoute
-    #   data as a hash:
+    # <note markdown="1"> The parameters listed below are not required, but you must use at
+    # least one.
     #
-    #       {
-    #         host: "String",
-    #         port: 1,
-    #         protocol: "TCP", # accepts TCP, UDP
-    #         priority: 1,
-    #         weight: 1,
-    #       }
+    #  </note>
     #
     # @!attribute [rw] host
     #   The FQDN or IP address to contact for origination traffic.
@@ -6792,7 +6380,7 @@ module Aws::Chime
     #
     # @!attribute [rw] weight
     #   The weight associated with the host. If hosts are equal in priority,
-    #   calls are distributed among them based on their relative weight.
+    #   calls are redistributed among them based on their relative weight.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/OriginationRoute AWS API Documentation
@@ -6836,6 +6424,10 @@ module Aws::Chime
     #
     # @!attribute [rw] e164_phone_number
     #   The phone number, in E.164 format.
+    #   @return [String]
+    #
+    # @!attribute [rw] country
+    #   The phone number country. Format: ISO 3166-1 alpha-2.
     #   @return [String]
     #
     # @!attribute [rw] type
@@ -6883,6 +6475,7 @@ module Aws::Chime
     class PhoneNumber < Struct.new(
       :phone_number_id,
       :e164_phone_number,
+      :country,
       :type,
       :product_type,
       :status,
@@ -6970,6 +6563,25 @@ module Aws::Chime
       include Aws::Structure
     end
 
+    # The phone number country.
+    #
+    # @!attribute [rw] country_code
+    #   The phone number country code. Format: ISO 3166-1 alpha-2.
+    #   @return [String]
+    #
+    # @!attribute [rw] supported_phone_number_types
+    #   The supported phone number types.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/PhoneNumberCountry AWS API Documentation
+    #
+    class PhoneNumberCountry < Struct.new(
+      :country_code,
+      :supported_phone_number_types)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # If the phone number action fails for one or more of the phone numbers
     # in the request, a list of the phone numbers is returned, along with
     # error codes and error messages.
@@ -7016,11 +6628,11 @@ module Aws::Chime
     #   @return [Array<Types::OrderedPhoneNumber>]
     #
     # @!attribute [rw] created_timestamp
-    #   The phone number order creation timestamp, in ISO 8601 format.
+    #   The phone number order creation time stamp, in ISO 8601 format.
     #   @return [Time]
     #
     # @!attribute [rw] updated_timestamp
-    #   The updated phone number order timestamp, in ISO 8601 format.
+    #   The updated phone number order time stamp, in ISO 8601 format.
     #   @return [Time]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/PhoneNumberOrder AWS API Documentation
@@ -7093,15 +6705,15 @@ module Aws::Chime
     #   @return [Array<String>]
     #
     # @!attribute [rw] created_timestamp
-    #   The created timestamp, in ISO 8601 format.
+    #   The created time stamp, in ISO 8601 format.
     #   @return [Time]
     #
     # @!attribute [rw] updated_timestamp
-    #   The updated timestamp, in ISO 8601 format.
+    #   The updated time stamp, in ISO 8601 format.
     #   @return [Time]
     #
     # @!attribute [rw] ended_timestamp
-    #   The ended timestamp, in ISO 8601 format.
+    #   The ended time stamp, in ISO 8601 format.
     #   @return [Time]
     #
     # @!attribute [rw] participants
@@ -7142,20 +6754,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutAppInstanceRetentionSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #         app_instance_retention_settings: { # required
-    #           channel_retention_settings: {
-    #             retention_days: 1,
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] app_instance_retention_settings
@@ -7188,25 +6788,12 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutAppInstanceStreamingConfigurationsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #         app_instance_streaming_configurations: [ # required
-    #           {
-    #             app_instance_data_type: "Channel", # required, accepts Channel, ChannelMessage
-    #             resource_arn: "Arn", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] app_instance_streaming_configurations
-    #   The streaming configurations set for an app instance.
+    #   The streaming configurations set for an `AppInstance`.
     #   @return [Array<Types::AppInstanceStreamingConfiguration>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/PutAppInstanceStreamingConfigurationsRequest AWS API Documentation
@@ -7219,7 +6806,7 @@ module Aws::Chime
     end
 
     # @!attribute [rw] app_instance_streaming_configurations
-    #   The streaming configurations of an app instance.
+    #   The streaming configurations of an `AppInstance`.
     #   @return [Array<Types::AppInstanceStreamingConfiguration>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/PutAppInstanceStreamingConfigurationsResponse AWS API Documentation
@@ -7230,16 +6817,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutEventsConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         bot_id: "NonEmptyString", # required
-    #         outbound_events_https_endpoint: "SensitiveString",
-    #         lambda_function_arn: "SensitiveString",
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -7269,7 +6846,7 @@ module Aws::Chime
 
     # @!attribute [rw] events_configuration
     #   The configuration that allows a bot to receive outgoing events. Can
-    #   be either an HTTPS endpoint or a Lambda function ARN.
+    #   be an HTTPS endpoint or an AWS Lambda function ARN.
     #   @return [Types::EventsConfiguration]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/PutEventsConfigurationResponse AWS API Documentation
@@ -7280,21 +6857,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutRetentionSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         retention_settings: { # required
-    #           room_retention_settings: {
-    #             retention_days: 1,
-    #           },
-    #           conversation_retention_settings: {
-    #             retention_days: 1,
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -7330,18 +6892,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutSipMediaApplicationLoggingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         sip_media_application_id: "NonEmptyString", # required
-    #         sip_media_application_logging_configuration: {
-    #           enable_sip_media_application_message_logs: false,
-    #         },
-    #       }
-    #
     # @!attribute [rw] sip_media_application_id
-    #   The ID of the specified SIP media application
+    #   The SIP media application ID.
     #   @return [String]
     #
     # @!attribute [rw] sip_media_application_logging_configuration
@@ -7358,7 +6910,7 @@ module Aws::Chime
     end
 
     # @!attribute [rw] sip_media_application_logging_configuration
-    #   The actual logging configuration.
+    #   The logging configuration of the SIP media application.
     #   @return [Types::SipMediaApplicationLoggingConfiguration]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/PutSipMediaApplicationLoggingConfigurationResponse AWS API Documentation
@@ -7369,22 +6921,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutVoiceConnectorEmergencyCallingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         emergency_calling_configuration: { # required
-    #           dnis: [
-    #             {
-    #               emergency_phone_number: "E164PhoneNumber", # required
-    #               test_phone_number: "E164PhoneNumber",
-    #               calling_country: "Alpha2CountryCode", # required
-    #             },
-    #           ],
-    #         },
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -7414,16 +6950,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutVoiceConnectorLoggingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         logging_configuration: { # required
-    #           enable_sip_logs: false,
-    #         },
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -7453,25 +6979,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutVoiceConnectorOriginationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         origination: { # required
-    #           routes: [
-    #             {
-    #               host: "String",
-    #               port: 1,
-    #               protocol: "TCP", # accepts TCP, UDP
-    #               priority: 1,
-    #               weight: 1,
-    #             },
-    #           ],
-    #           disabled: false,
-    #         },
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -7501,17 +7008,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutVoiceConnectorProxyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString128", # required
-    #         default_session_expiry_minutes: 1, # required
-    #         phone_number_pool_countries: ["Country"], # required
-    #         fall_back_phone_number: "E164PhoneNumber",
-    #         disabled: false,
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime voice connector ID.
     #   @return [String]
@@ -7557,22 +7053,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutVoiceConnectorStreamingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         streaming_configuration: { # required
-    #           data_retention_in_hours: 1, # required
-    #           disabled: false,
-    #           streaming_notification_targets: [
-    #             {
-    #               notification_target: "EventBridge", # required, accepts EventBridge, SNS, SQS
-    #             },
-    #           ],
-    #         },
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -7602,19 +7082,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutVoiceConnectorTerminationCredentialsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         credentials: [
-    #           {
-    #             username: "SensitiveString",
-    #             password: "SensitiveString",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -7632,20 +7099,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutVoiceConnectorTerminationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         termination: { # required
-    #           cps_limit: 1,
-    #           default_phone_number: "E164PhoneNumber",
-    #           calling_regions: ["CallingRegion"],
-    #           cidr_allowed_list: ["String"],
-    #           disabled: false,
-    #         },
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -7675,14 +7128,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RedactChannelMessageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         message_id: "MessageId", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel containing the messages that you want to
     #   redact.
@@ -7692,11 +7137,16 @@ module Aws::Chime
     #   The ID of the message being redacted.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/RedactChannelMessageRequest AWS API Documentation
     #
     class RedactChannelMessageRequest < Struct.new(
       :channel_arn,
-      :message_id)
+      :message_id,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -7719,15 +7169,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RedactConversationMessageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         conversation_id: "NonEmptyString", # required
-    #         message_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -7754,15 +7195,6 @@ module Aws::Chime
     #
     class RedactConversationMessageResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass RedactRoomMessageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         room_id: "NonEmptyString", # required
-    #         message_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -7789,14 +7221,6 @@ module Aws::Chime
     #
     class RedactRoomMessageResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass RegenerateSecurityTokenRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         bot_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -7816,7 +7240,7 @@ module Aws::Chime
 
     # @!attribute [rw] bot
     #   A resource that allows Enterprise account administrators to
-    #   configure an interface to receive events from Amazon Chime.
+    #   configure an interface that receives events from Amazon Chime.
     #   @return [Types::Bot]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/RegenerateSecurityTokenResponse AWS API Documentation
@@ -7827,14 +7251,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ResetPersonalPINRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         user_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -7881,13 +7297,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RestorePhoneNumberRequest
-    #   data as a hash:
-    #
-    #       {
-    #         phone_number_id: "NonEmptyString", # required
-    #       }
-    #
     # @!attribute [rw] phone_number_id
     #   The phone number.
     #   @return [String]
@@ -7913,20 +7322,8 @@ module Aws::Chime
     end
 
     # The retention settings for an Amazon Chime Enterprise account that
-    # determine how long to retain items such as chat room messages and chat
-    # conversation messages.
-    #
-    # @note When making an API call, you may pass RetentionSettings
-    #   data as a hash:
-    #
-    #       {
-    #         room_retention_settings: {
-    #           retention_days: 1,
-    #         },
-    #         conversation_retention_settings: {
-    #           retention_days: 1,
-    #         },
-    #       }
+    # determine how long to retain items such as chat-room messages and
+    # chat-conversation messages.
     #
     # @!attribute [rw] room_retention_settings
     #   The chat room retention settings.
@@ -8019,18 +7416,11 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The retention settings that determine how long to retain chat room
+    # The retention settings that determine how long to retain chat-room
     # messages for an Amazon Chime Enterprise account.
     #
-    # @note When making an API call, you may pass RoomRetentionSettings
-    #   data as a hash:
-    #
-    #       {
-    #         retention_days: 1,
-    #       }
-    #
     # @!attribute [rw] retention_days
-    #   The number of days for which to retain chat room messages.
+    #   The number of days for which to retain chat-room messages.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/RoomRetentionSettings AWS API Documentation
@@ -8041,37 +7431,32 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SearchAvailablePhoneNumbersRequest
-    #   data as a hash:
-    #
-    #       {
-    #         area_code: "String",
-    #         city: "String",
-    #         country: "String",
-    #         state: "String",
-    #         toll_free_prefix: "TollFreePrefix",
-    #         max_results: 1,
-    #         next_token: "String",
-    #       }
-    #
     # @!attribute [rw] area_code
-    #   The area code used to filter results.
+    #   The area code used to filter results. Only applies to the US.
     #   @return [String]
     #
     # @!attribute [rw] city
-    #   The city used to filter results.
+    #   The city used to filter results. Only applies to the US.
     #   @return [String]
     #
     # @!attribute [rw] country
-    #   The country used to filter results.
+    #   The country used to filter results. Defaults to the US Format: ISO
+    #   3166-1 alpha-2.
     #   @return [String]
     #
     # @!attribute [rw] state
-    #   The state used to filter results.
+    #   The state used to filter results. Required only if you provide
+    #   `City`. Only applies to the US.
     #   @return [String]
     #
     # @!attribute [rw] toll_free_prefix
-    #   The toll-free prefix that you use to filter results.
+    #   The toll-free prefix that you use to filter results. Only applies to
+    #   the US.
+    #   @return [String]
+    #
+    # @!attribute [rw] phone_number_type
+    #   The phone number type used to filter results. Required for non-US
+    #   numbers.
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -8079,7 +7464,7 @@ module Aws::Chime
     #   @return [Integer]
     #
     # @!attribute [rw] next_token
-    #   The token to use to retrieve the next page of results.
+    #   The token used to retrieve the next page of results.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/SearchAvailablePhoneNumbersRequest AWS API Documentation
@@ -8090,6 +7475,7 @@ module Aws::Chime
       :country,
       :state,
       :toll_free_prefix,
+      :phone_number_type,
       :max_results,
       :next_token)
       SENSITIVE = []
@@ -8100,26 +7486,41 @@ module Aws::Chime
     #   List of phone numbers, in E.164 format.
     #   @return [Array<String>]
     #
+    # @!attribute [rw] next_token
+    #   The token used to retrieve the next page of search results.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/SearchAvailablePhoneNumbersResponse AWS API Documentation
     #
     class SearchAvailablePhoneNumbersResponse < Struct.new(
-      :e164_phone_numbers)
-      SENSITIVE = []
+      :e164_phone_numbers,
+      :next_token)
+      SENSITIVE = [:e164_phone_numbers]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SendChannelMessageRequest
-    #   data as a hash:
+    # The video streams to capture for a specified media capture pipeline.
+    # The total number of video streams can't exceed 25.
     #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         content: "NonEmptyContent", # required
-    #         type: "STANDARD", # required, accepts STANDARD, CONTROL
-    #         persistence: "PERSISTENT", # required, accepts PERSISTENT, NON_PERSISTENT
-    #         metadata: "Metadata",
-    #         client_request_token: "ClientRequestToken", # required
-    #       }
+    # @!attribute [rw] attendee_ids
+    #   The attendee IDs of the streams selected for a media capture
+    #   pipeline.
+    #   @return [Array<String>]
     #
+    # @!attribute [rw] external_user_ids
+    #   The external user IDs of the streams selected for a media capture
+    #   pipeline.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/SelectedVideoStreams AWS API Documentation
+    #
+    class SelectedVideoStreams < Struct.new(
+      :attendee_ids,
+      :external_user_ids)
+      SENSITIVE = [:external_user_ids]
+      include Aws::Structure
+    end
+
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -8148,6 +7549,10 @@ module Aws::Chime
     #   not need to pass this option.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/SendChannelMessageRequest AWS API Documentation
     #
     class SendChannelMessageRequest < Struct.new(
@@ -8156,7 +7561,8 @@ module Aws::Chime
       :type,
       :persistence,
       :metadata,
-      :client_request_token)
+      :client_request_token,
+      :chime_bearer)
       SENSITIVE = [:content, :metadata, :client_request_token]
       include Aws::Structure
     end
@@ -8215,13 +7621,6 @@ module Aws::Chime
     # An Active Directory (AD) group whose members are granted permission to
     # act as delegates.
     #
-    # @note When making an API call, you may pass SigninDelegateGroup
-    #   data as a hash:
-    #
-    #       {
-    #         group_name: "NonEmptyString",
-    #       }
-    #
     # @!attribute [rw] group_name
     #   The group name.
     #   @return [String]
@@ -8234,8 +7633,8 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # The SIP media application details, including name and endpoints. An
-    # AWS account can have multiple SIP media applications.
+    # The details of the SIP media application, including name and
+    # endpoints. An AWS account can have multiple SIP media applications.
     #
     # @!attribute [rw] sip_media_application_id
     #   The SIP media application ID.
@@ -8289,18 +7688,12 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Endpoints to specify as part of a SIP media application.
-    #
-    # @note When making an API call, you may pass SipMediaApplicationEndpoint
-    #   data as a hash:
-    #
-    #       {
-    #         lambda_arn: "FunctionArn",
-    #       }
+    # The endpoint assigned to the SIP media application.
     #
     # @!attribute [rw] lambda_arn
-    #   Valid Amazon Resource Name (ARN) of the Lambda function of the same
-    #   AWS Region where the SIP media application is created.
+    #   Valid Amazon Resource Name (ARN) of the Lambda function, version, or
+    #   alias. The function must be created in the same AWS Region as the
+    #   SIP media application.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/SipMediaApplicationEndpoint AWS API Documentation
@@ -8312,13 +7705,6 @@ module Aws::Chime
     end
 
     # Logging configuration of the SIP media application.
-    #
-    # @note When making an API call, you may pass SipMediaApplicationLoggingConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         enable_sip_media_application_message_logs: false,
-    #       }
     #
     # @!attribute [rw] enable_sip_media_application_message_logs
     #   Enables application message logs for the SIP media application.
@@ -8344,13 +7730,13 @@ module Aws::Chime
     #   @return [String]
     #
     # @!attribute [rw] disabled
-    #   Indicates if the SIP rule is enabled or disabled. You must disable a
-    #   rule before you can delete it.
+    #   Indicates whether the SIP rule is enabled or disabled. You must
+    #   disable a rule before you can delete it.
     #   @return [Boolean]
     #
     # @!attribute [rw] trigger_type
-    #   The type of trigger whose value is assigned to the SIP rule in
-    #   `TriggerValue`.
+    #   The type of trigger assigned to the SIP rule in `TriggerValue`,
+    #   currently `RequestUriHostname` or `ToPhoneNumber`.
     #   @return [String]
     #
     # @!attribute [rw] trigger_value
@@ -8363,17 +7749,17 @@ module Aws::Chime
     #   @return [String]
     #
     # @!attribute [rw] target_applications
-    #   List of SIP media applications with priority and AWS Region. You can
-    #   only use one SIP application per AWS Region and priority
-    #   combination.
+    #   Target SIP media application and other details, such as priority and
+    #   AWS Region, to be specified in the SIP rule. Only one SIP rule per
+    #   AWS Region can be provided.
     #   @return [Array<Types::SipRuleTargetApplication>]
     #
     # @!attribute [rw] created_timestamp
-    #   The SIP rule created timestamp, in ISO 8601 format.
+    #   The time at which the SIP rule was created, in ISO 8601 format.
     #   @return [Time]
     #
     # @!attribute [rw] updated_timestamp
-    #   The SIP rule updated timestamp, in ISO 8601 format.
+    #   The time at which the SIP rule was last updated, in ISO 8601 format.
     #   @return [Time]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/SipRule AWS API Documentation
@@ -8391,18 +7777,9 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # Target SIP media application along with other details like priority
-    # and AWS Region to be specified in the SIP rule. Only one SIP rule per
-    # AWS Region can be provided.
-    #
-    # @note When making an API call, you may pass SipRuleTargetApplication
-    #   data as a hash:
-    #
-    #       {
-    #         sip_media_application_id: "NonEmptyString",
-    #         priority: 1,
-    #         aws_region: "String",
-    #       }
+    # Target SIP media application and other details, such as priority and
+    # AWS Region, to be specified in the SIP rule. Only one SIP rule per AWS
+    # Region can be provided.
     #
     # @!attribute [rw] sip_media_application_id
     #   The SIP media application ID.
@@ -8413,7 +7790,7 @@ module Aws::Chime
     #   @return [Integer]
     #
     # @!attribute [rw] aws_region
-    #   AWS Region of target application.
+    #   The AWS Region of the target application.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/SipRuleTargetApplication AWS API Documentation
@@ -8426,23 +7803,64 @@ module Aws::Chime
       include Aws::Structure
     end
 
+    # Source configuration for a specified media capture pipeline.
+    #
+    # @!attribute [rw] selected_video_streams
+    #   The selected video streams to capture for a specified media capture
+    #   pipeline. The number of video streams can't exceed 25.
+    #   @return [Types::SelectedVideoStreams]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/SourceConfiguration AWS API Documentation
+    #
+    class SourceConfiguration < Struct.new(
+      :selected_video_streams)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] meeting_id
+    #   The unique ID of the meeting being transcribed.
+    #   @return [String]
+    #
+    # @!attribute [rw] transcription_configuration
+    #   The configuration for the current transcription operation. Must
+    #   contain `EngineTranscribeSettings` or
+    #   `EngineTranscribeMedicalSettings`.
+    #   @return [Types::TranscriptionConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/StartMeetingTranscriptionRequest AWS API Documentation
+    #
+    class StartMeetingTranscriptionRequest < Struct.new(
+      :meeting_id,
+      :transcription_configuration)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/StartMeetingTranscriptionResponse AWS API Documentation
+    #
+    class StartMeetingTranscriptionResponse < Aws::EmptyStructure; end
+
+    # @!attribute [rw] meeting_id
+    #   The unique ID of the meeting for which you stop transcription.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/StopMeetingTranscriptionRequest AWS API Documentation
+    #
+    class StopMeetingTranscriptionRequest < Struct.new(
+      :meeting_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/StopMeetingTranscriptionResponse AWS API Documentation
+    #
+    class StopMeetingTranscriptionResponse < Aws::EmptyStructure; end
+
     # The streaming configuration associated with an Amazon Chime Voice
     # Connector. Specifies whether media streaming is enabled for sending to
     # Amazon Kinesis, and shows the retention period for the Amazon Kinesis
     # data, in hours.
-    #
-    # @note When making an API call, you may pass StreamingConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         data_retention_in_hours: 1, # required
-    #         disabled: false,
-    #         streaming_notification_targets: [
-    #           {
-    #             notification_target: "EventBridge", # required, accepts EventBridge, SNS, SQS
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] data_retention_in_hours
     #   The retention period, in hours, for the Amazon Kinesis data.
@@ -8468,13 +7886,6 @@ module Aws::Chime
 
     # The targeted recipient for a streaming configuration notification.
     #
-    # @note When making an API call, you may pass StreamingNotificationTarget
-    #   data as a hash:
-    #
-    #       {
-    #         notification_target: "EventBridge", # required, accepts EventBridge, SNS, SQS
-    #       }
-    #
     # @!attribute [rw] notification_target
     #   The streaming notification target.
     #   @return [String]
@@ -8488,14 +7899,6 @@ module Aws::Chime
     end
 
     # Describes a tag applied to a resource.
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey", # required
-    #         value: "TagValue", # required
-    #       }
     #
     # @!attribute [rw] key
     #   The key of the tag.
@@ -8514,20 +7917,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagAttendeeRequest
-    #   data as a hash:
-    #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         attendee_id: "GuidString", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -8550,19 +7939,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagMeetingRequest
-    #   data as a hash:
-    #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -8580,19 +7956,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "Arn", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The resource ARN.
     #   @return [String]
@@ -8612,15 +7975,6 @@ module Aws::Chime
 
     # Settings that allow management of telephony permissions for an Amazon
     # Chime user, such as inbound and outbound calling and text messaging.
-    #
-    # @note When making an API call, you may pass TelephonySettings
-    #   data as a hash:
-    #
-    #       {
-    #         inbound_calling: false, # required
-    #         outbound_calling: false, # required
-    #         sms: false, # required
-    #       }
     #
     # @!attribute [rw] inbound_calling
     #   Allows or denies inbound calling.
@@ -8646,17 +8000,6 @@ module Aws::Chime
 
     # Termination settings enable your SIP hosts to make outbound calls
     # using your Amazon Chime Voice Connector.
-    #
-    # @note When making an API call, you may pass Termination
-    #   data as a hash:
-    #
-    #       {
-    #         cps_limit: 1,
-    #         default_phone_number: "E164PhoneNumber",
-    #         calling_regions: ["CallingRegion"],
-    #         cidr_allowed_list: ["String"],
-    #         disabled: false,
-    #       }
     #
     # @!attribute [rw] cps_limit
     #   The limit on calls per second. Max value based on account service
@@ -8731,6 +8074,29 @@ module Aws::Chime
       include Aws::Structure
     end
 
+    # The configuration for the current transcription operation. Must
+    # contain `EngineTranscribeSettings` or
+    # `EngineTranscribeMedicalSettings`.
+    #
+    # @!attribute [rw] engine_transcribe_settings
+    #   The transcription configuration settings passed to Amazon
+    #   Transcribe.
+    #   @return [Types::EngineTranscribeSettings]
+    #
+    # @!attribute [rw] engine_transcribe_medical_settings
+    #   The transcription configuration settings passed to Amazon Transcribe
+    #   Medical.
+    #   @return [Types::EngineTranscribeMedicalSettings]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/TranscriptionConfiguration AWS API Documentation
+    #
+    class TranscriptionConfiguration < Struct.new(
+      :engine_transcribe_settings,
+      :engine_transcribe_medical_settings)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The client is not currently authorized to make the request.
     #
     # @!attribute [rw] code
@@ -8766,15 +8132,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagAttendeeRequest
-    #   data as a hash:
-    #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         attendee_id: "GuidString", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -8793,18 +8150,10 @@ module Aws::Chime
       :meeting_id,
       :attendee_id,
       :tag_keys)
-      SENSITIVE = []
+      SENSITIVE = [:tag_keys]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagMeetingRequest
-    #   data as a hash:
-    #
-    #       {
-    #         meeting_id: "GuidString", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] meeting_id
     #   The Amazon Chime SDK meeting ID.
     #   @return [String]
@@ -8818,18 +8167,10 @@ module Aws::Chime
     class UntagMeetingRequest < Struct.new(
       :meeting_id,
       :tag_keys)
-      SENSITIVE = []
+      SENSITIVE = [:tag_keys]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "Arn", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The resource ARN.
     #   @return [String]
@@ -8843,18 +8184,10 @@ module Aws::Chime
     class UntagResourceRequest < Struct.new(
       :resource_arn,
       :tag_keys)
-      SENSITIVE = [:resource_arn]
+      SENSITIVE = [:resource_arn, :tag_keys]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateAccountRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         name: "AccountName",
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -8863,18 +8196,23 @@ module Aws::Chime
     #   The new name for the specified Amazon Chime account.
     #   @return [String]
     #
+    # @!attribute [rw] default_license
+    #   The default license applied when you add users to an Amazon Chime
+    #   account.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/UpdateAccountRequest AWS API Documentation
     #
     class UpdateAccountRequest < Struct.new(
       :account_id,
-      :name)
+      :name,
+      :default_license)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # @!attribute [rw] account
-    #   The Amazon Chime account details. An AWS account can have multiple
-    #   Amazon Chime accounts.
+    #   The updated Amazon Chime account details.
     #   @return [Types::Account]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/UpdateAccountResponse AWS API Documentation
@@ -8885,17 +8223,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateAccountSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         account_settings: { # required
-    #           disable_remote_control: false,
-    #           enable_dial_out: false,
-    #         },
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -8917,17 +8244,8 @@ module Aws::Chime
     #
     class UpdateAccountSettingsResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UpdateAppInstanceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_arn: "ChimeArn", # required
-    #         name: "NonEmptyResourceName", # required
-    #         metadata: "Metadata",
-    #       }
-    #
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @!attribute [rw] name
@@ -8949,7 +8267,7 @@ module Aws::Chime
     end
 
     # @!attribute [rw] app_instance_arn
-    #   The ARN of the app instance.
+    #   The ARN of the `AppInstance`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/UpdateAppInstanceResponse AWS API Documentation
@@ -8960,25 +8278,16 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateAppInstanceUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_instance_user_arn: "ChimeArn", # required
-    #         name: "UserName", # required
-    #         metadata: "Metadata",
-    #       }
-    #
     # @!attribute [rw] app_instance_user_arn
-    #   The ARN of the app instance user.
+    #   The ARN of the `AppInstanceUser`.
     #   @return [String]
     #
     # @!attribute [rw] name
-    #   The name of the app instance user.
+    #   The name of the `AppInstanceUser`.
     #   @return [String]
     #
     # @!attribute [rw] metadata
-    #   The metadata of the app instance user.
+    #   The metadata of the `AppInstanceUser`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/UpdateAppInstanceUserRequest AWS API Documentation
@@ -8992,7 +8301,7 @@ module Aws::Chime
     end
 
     # @!attribute [rw] app_instance_user_arn
-    #   The ARN of the app instance user.
+    #   The ARN of the `AppInstanceUser`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/UpdateAppInstanceUserResponse AWS API Documentation
@@ -9003,15 +8312,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateBotRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         bot_id: "NonEmptyString", # required
-    #         disabled: false,
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -9046,16 +8346,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateChannelMessageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         message_id: "MessageId", # required
-    #         content: "Content",
-    #         metadata: "Metadata",
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -9072,13 +8362,18 @@ module Aws::Chime
     #   The metadata of the message being updated.
     #   @return [String]
     #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/UpdateChannelMessageRequest AWS API Documentation
     #
     class UpdateChannelMessageRequest < Struct.new(
       :channel_arn,
       :message_id,
       :content,
-      :metadata)
+      :metadata,
+      :chime_bearer)
       SENSITIVE = [:content, :metadata]
       include Aws::Structure
     end
@@ -9100,21 +8395,19 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateChannelReadMarkerRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
+    #   @return [String]
+    #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/UpdateChannelReadMarkerRequest AWS API Documentation
     #
     class UpdateChannelReadMarkerRequest < Struct.new(
-      :channel_arn)
+      :channel_arn,
+      :chime_bearer)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -9131,16 +8424,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_arn: "ChimeArn", # required
-    #         name: "NonEmptyResourceName", # required
-    #         mode: "UNRESTRICTED", # required, accepts UNRESTRICTED, RESTRICTED
-    #         metadata: "Metadata",
-    #       }
-    #
     # @!attribute [rw] channel_arn
     #   The ARN of the channel.
     #   @return [String]
@@ -9154,7 +8437,11 @@ module Aws::Chime
     #   @return [String]
     #
     # @!attribute [rw] metadata
-    #   The metadata of the channel.
+    #   The metadata for the update request.
+    #   @return [String]
+    #
+    # @!attribute [rw] chime_bearer
+    #   The `AppInstanceUserArn` of the user that makes the API call.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/UpdateChannelRequest AWS API Documentation
@@ -9163,7 +8450,8 @@ module Aws::Chime
       :channel_arn,
       :name,
       :mode,
-      :metadata)
+      :metadata,
+      :chime_bearer)
       SENSITIVE = [:name, :metadata]
       include Aws::Structure
     end
@@ -9180,18 +8468,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateGlobalSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         business_calling: { # required
-    #           cdr_bucket: "String",
-    #         },
-    #         voice_connector: { # required
-    #           cdr_bucket: "String",
-    #         },
-    #       }
-    #
     # @!attribute [rw] business_calling
     #   The Amazon Chime Business Calling settings.
     #   @return [Types::BusinessCallingSettings]
@@ -9209,15 +8485,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdatePhoneNumberRequest
-    #   data as a hash:
-    #
-    #       {
-    #         phone_number_id: "String", # required
-    #         product_type: "BusinessCalling", # accepts BusinessCalling, VoiceConnector
-    #         calling_name: "CallingName",
-    #       }
-    #
     # @!attribute [rw] phone_number_id
     #   The phone number ID.
     #   @return [String]
@@ -9242,15 +8509,6 @@ module Aws::Chime
 
     # The phone number ID, product type, or calling name fields to update,
     # used with the BatchUpdatePhoneNumber and UpdatePhoneNumber actions.
-    #
-    # @note When making an API call, you may pass UpdatePhoneNumberRequestItem
-    #   data as a hash:
-    #
-    #       {
-    #         phone_number_id: "NonEmptyString", # required
-    #         product_type: "BusinessCalling", # accepts BusinessCalling, VoiceConnector
-    #         calling_name: "CallingName",
-    #       }
     #
     # @!attribute [rw] phone_number_id
     #   The phone number ID to update.
@@ -9286,13 +8544,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdatePhoneNumberSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         calling_name: "CallingName", # required
-    #       }
-    #
     # @!attribute [rw] calling_name
     #   The default outbound calling name for the account.
     #   @return [String]
@@ -9305,16 +8556,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateProxySessionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString128", # required
-    #         proxy_session_id: "NonEmptyString128", # required
-    #         capabilities: ["Voice"], # required, accepts Voice, SMS
-    #         expiry_minutes: 1,
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime voice connector ID.
     #   @return [String]
@@ -9354,16 +8595,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateRoomMembershipRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         room_id: "NonEmptyString", # required
-    #         member_id: "NonEmptyString", # required
-    #         role: "Administrator", # accepts Administrator, Member
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -9403,15 +8634,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateRoomRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         room_id: "NonEmptyString", # required
-    #         name: "SensitiveString",
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -9446,19 +8668,41 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateSipMediaApplicationRequest
-    #   data as a hash:
+    # @!attribute [rw] sip_media_application_id
+    #   The ID of the SIP media application handling the call.
+    #   @return [String]
     #
-    #       {
-    #         sip_media_application_id: "NonEmptyString", # required
-    #         name: "SipMediaApplicationName",
-    #         endpoints: [
-    #           {
-    #             lambda_arn: "FunctionArn",
-    #           },
-    #         ],
-    #       }
+    # @!attribute [rw] transaction_id
+    #   The ID of the call transaction.
+    #   @return [String]
     #
+    # @!attribute [rw] arguments
+    #   Arguments made available to the Lambda function as part of the
+    #   `CALL_UPDATE_REQUESTED` event. Can contain 0-20 key-value pairs.
+    #   @return [Hash<String,String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/UpdateSipMediaApplicationCallRequest AWS API Documentation
+    #
+    class UpdateSipMediaApplicationCallRequest < Struct.new(
+      :sip_media_application_id,
+      :transaction_id,
+      :arguments)
+      SENSITIVE = [:arguments]
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] sip_media_application_call
+    #   A `Call` instance for a SIP media application.
+    #   @return [Types::SipMediaApplicationCall]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/UpdateSipMediaApplicationCallResponse AWS API Documentation
+    #
+    class UpdateSipMediaApplicationCallResponse < Struct.new(
+      :sip_media_application_call)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] sip_media_application_id
     #   The SIP media application ID.
     #   @return [String]
@@ -9493,22 +8737,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateSipRuleRequest
-    #   data as a hash:
-    #
-    #       {
-    #         sip_rule_id: "NonEmptyString", # required
-    #         name: "SipRuleName", # required
-    #         disabled: false,
-    #         target_applications: [
-    #           {
-    #             sip_media_application_id: "NonEmptyString",
-    #             priority: 1,
-    #             aws_region: "String",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] sip_rule_id
     #   The SIP rule ID.
     #   @return [String]
@@ -9548,20 +8776,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateUserRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "NonEmptyString", # required
-    #         user_id: "NonEmptyString", # required
-    #         license_type: "Basic", # accepts Basic, Plus, Pro, ProTrial
-    #         user_type: "PrivateUser", # accepts PrivateUser, SharedDevice
-    #         alexa_for_business_metadata: {
-    #           is_alexa_for_business_enabled: false,
-    #           alexa_for_business_room_arn: "SensitiveString",
-    #         },
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -9597,19 +8811,6 @@ module Aws::Chime
 
     # The user ID and user fields to update, used with the BatchUpdateUser
     # action.
-    #
-    # @note When making an API call, you may pass UpdateUserRequestItem
-    #   data as a hash:
-    #
-    #       {
-    #         user_id: "NonEmptyString", # required
-    #         license_type: "Basic", # accepts Basic, Plus, Pro, ProTrial
-    #         user_type: "PrivateUser", # accepts PrivateUser, SharedDevice
-    #         alexa_for_business_metadata: {
-    #           is_alexa_for_business_enabled: false,
-    #           alexa_for_business_room_arn: "SensitiveString",
-    #         },
-    #       }
     #
     # @!attribute [rw] user_id
     #   The user ID.
@@ -9650,21 +8851,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateUserSettingsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         account_id: "String", # required
-    #         user_id: "String", # required
-    #         user_settings: { # required
-    #           telephony: { # required
-    #             inbound_calling: false, # required
-    #             outbound_calling: false, # required
-    #             sms: false, # required
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] account_id
     #   The Amazon Chime account ID.
     #   @return [String]
@@ -9687,20 +8873,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateVoiceConnectorGroupRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_group_id: "NonEmptyString", # required
-    #         name: "VoiceConnectorGroupName", # required
-    #         voice_connector_items: [ # required
-    #           {
-    #             voice_connector_id: "NonEmptyString", # required
-    #             priority: 1, # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] voice_connector_group_id
     #   The Amazon Chime Voice Connector group ID.
     #   @return [String]
@@ -9735,15 +8907,6 @@ module Aws::Chime
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateVoiceConnectorRequest
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         name: "VoiceConnectorName", # required
-    #         require_encryption: false, # required
-    #       }
-    #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
     #   @return [String]
@@ -9883,17 +9046,6 @@ module Aws::Chime
     # Settings associated with an Amazon Chime user, including inbound and
     # outbound calling and text messaging.
     #
-    # @note When making an API call, you may pass UserSettings
-    #   data as a hash:
-    #
-    #       {
-    #         telephony: { # required
-    #           inbound_calling: false, # required
-    #           outbound_calling: false, # required
-    #           sms: false, # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] telephony
     #   The telephony settings associated with the user.
     #   @return [Types::TelephonySettings]
@@ -9902,6 +9054,97 @@ module Aws::Chime
     #
     class UserSettings < Struct.new(
       :telephony)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] aws_account_id
+    #   The AWS account ID.
+    #   @return [String]
+    #
+    # @!attribute [rw] street_number
+    #   The address street number, such as `200` or `2121`.
+    #   @return [String]
+    #
+    # @!attribute [rw] street_info
+    #   The address street information, such as `8th Avenue`.
+    #   @return [String]
+    #
+    # @!attribute [rw] city
+    #   The address city, such as `Portland`.
+    #   @return [String]
+    #
+    # @!attribute [rw] state
+    #   The address state, such as `ME`.
+    #   @return [String]
+    #
+    # @!attribute [rw] country
+    #   The address country, such as `US`.
+    #   @return [String]
+    #
+    # @!attribute [rw] postal_code
+    #   The address postal code, such as `04352`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ValidateE911AddressRequest AWS API Documentation
+    #
+    class ValidateE911AddressRequest < Struct.new(
+      :aws_account_id,
+      :street_number,
+      :street_info,
+      :city,
+      :state,
+      :country,
+      :postal_code)
+      SENSITIVE = [:street_number, :street_info, :city, :state, :country, :postal_code]
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] validation_result
+    #   Number indicating the result of address validation. `0` means the
+    #   address was perfect as is and successfully validated. `1` means the
+    #   address was corrected. `2` means the address sent was not close
+    #   enough and was not validated.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] address_external_id
+    #   The ID that represents the address.
+    #   @return [String]
+    #
+    # @!attribute [rw] address
+    #   The validated address.
+    #   @return [Types::Address]
+    #
+    # @!attribute [rw] candidate_address_list
+    #   The list of address suggestions.
+    #   @return [Array<Types::CandidateAddress>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/ValidateE911AddressResponse AWS API Documentation
+    #
+    class ValidateE911AddressResponse < Struct.new(
+      :validation_result,
+      :address_external_id,
+      :address,
+      :candidate_address_list)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The video artifact configuration object.
+    #
+    # @!attribute [rw] state
+    #   Indicates whether the video artifact is enabled or disabled.
+    #   @return [String]
+    #
+    # @!attribute [rw] mux_type
+    #   The MUX type of the video artifact configuration object.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/VideoArtifactsConfiguration AWS API Documentation
+    #
+    class VideoArtifactsConfiguration < Struct.new(
+      :state,
+      :mux_type)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -9941,6 +9184,10 @@ module Aws::Chime
     #   format.
     #   @return [Time]
     #
+    # @!attribute [rw] voice_connector_arn
+    #   The ARN of the specified Amazon Chime Voice Connector.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/VoiceConnector AWS API Documentation
     #
     class VoiceConnector < Struct.new(
@@ -9950,7 +9197,8 @@ module Aws::Chime
       :outbound_host_name,
       :require_encryption,
       :created_timestamp,
-      :updated_timestamp)
+      :updated_timestamp,
+      :voice_connector_arn)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -9974,14 +9222,18 @@ module Aws::Chime
     #   @return [Array<Types::VoiceConnectorItem>]
     #
     # @!attribute [rw] created_timestamp
-    #   The Amazon Chime Voice Connector group creation timestamp, in ISO
+    #   The Amazon Chime Voice Connector group creation time stamp, in ISO
     #   8601 format.
     #   @return [Time]
     #
     # @!attribute [rw] updated_timestamp
-    #   The updated Amazon Chime Voice Connector group timestamp, in ISO
+    #   The updated Amazon Chime Voice Connector group time stamp, in ISO
     #   8601 format.
     #   @return [Time]
+    #
+    # @!attribute [rw] voice_connector_group_arn
+    #   The ARN of the specified Amazon Chime Voice Connector group.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/chime-2018-05-01/VoiceConnectorGroup AWS API Documentation
     #
@@ -9990,7 +9242,8 @@ module Aws::Chime
       :name,
       :voice_connector_items,
       :created_timestamp,
-      :updated_timestamp)
+      :updated_timestamp,
+      :voice_connector_group_arn)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -9999,14 +9252,6 @@ module Aws::Chime
     # Connectors to which to route inbound calls. Includes priority
     # configuration settings. Limit: 3 `VoiceConnectorItems` per Amazon
     # Chime Voice Connector group.
-    #
-    # @note When making an API call, you may pass VoiceConnectorItem
-    #   data as a hash:
-    #
-    #       {
-    #         voice_connector_id: "NonEmptyString", # required
-    #         priority: 1, # required
-    #       }
     #
     # @!attribute [rw] voice_connector_id
     #   The Amazon Chime Voice Connector ID.
@@ -10030,13 +9275,6 @@ module Aws::Chime
     # The Amazon Chime Voice Connector settings. Includes any Amazon S3
     # buckets designated for storing call detail records.
     #
-    # @note When making an API call, you may pass VoiceConnectorSettings
-    #   data as a hash:
-    #
-    #       {
-    #         cdr_bucket: "String",
-    #       }
-    #
     # @!attribute [rw] cdr_bucket
     #   The Amazon S3 bucket designated for call detail record storage.
     #   @return [String]
@@ -10051,3 +9289,4 @@ module Aws::Chime
 
   end
 end
+

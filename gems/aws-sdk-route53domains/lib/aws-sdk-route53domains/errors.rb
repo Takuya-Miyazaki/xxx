@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -27,6 +27,7 @@ module Aws::Route53Domains
   # See {Seahorse::Client::RequestContext} for more information.
   #
   # ## Error Classes
+  # * {DnssecLimitExceeded}
   # * {DomainLimitExceeded}
   # * {DuplicateRequest}
   # * {InvalidInput}
@@ -39,6 +40,21 @@ module Aws::Route53Domains
   module Errors
 
     extend Aws::Errors::DynamicErrors
+
+    class DnssecLimitExceeded < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Route53Domains::Types::DnssecLimitExceeded] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
 
     class DomainLimitExceeded < ServiceError
 
@@ -62,6 +78,11 @@ module Aws::Route53Domains
       # @param [Aws::Route53Domains::Types::DuplicateRequest] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
+      end
+
+      # @return [String]
+      def request_id
+        @data[:request_id]
       end
 
       # @return [String]

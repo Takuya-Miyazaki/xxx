@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -28,13 +28,18 @@ module Aws::SNS
   #
   # ## Error Classes
   # * {AuthorizationErrorException}
+  # * {BatchEntryIdsNotDistinctException}
+  # * {BatchRequestTooLongException}
   # * {ConcurrentAccessException}
+  # * {EmptyBatchRequestException}
   # * {EndpointDisabledException}
   # * {FilterPolicyLimitExceededException}
   # * {InternalErrorException}
+  # * {InvalidBatchEntryIdException}
   # * {InvalidParameterException}
   # * {InvalidParameterValueException}
   # * {InvalidSecurityException}
+  # * {InvalidStateException}
   # * {KMSAccessDeniedException}
   # * {KMSDisabledException}
   # * {KMSInvalidStateException}
@@ -42,14 +47,20 @@ module Aws::SNS
   # * {KMSOptInRequired}
   # * {KMSThrottlingException}
   # * {NotFoundException}
+  # * {OptedOutException}
   # * {PlatformApplicationDisabledException}
+  # * {ReplayLimitExceededException}
   # * {ResourceNotFoundException}
   # * {StaleTagException}
   # * {SubscriptionLimitExceededException}
   # * {TagLimitExceededException}
   # * {TagPolicyException}
   # * {ThrottledException}
+  # * {TooManyEntriesInBatchRequestException}
   # * {TopicLimitExceededException}
+  # * {UserErrorException}
+  # * {ValidationException}
+  # * {VerificationException}
   #
   # Additionally, error classes are dynamically generated for service errors based on the error code
   # if they are not defined above.
@@ -72,11 +83,56 @@ module Aws::SNS
       end
     end
 
+    class BatchEntryIdsNotDistinctException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::BatchEntryIdsNotDistinctException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class BatchRequestTooLongException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::BatchRequestTooLongException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class ConcurrentAccessException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::SNS::Types::ConcurrentAccessException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class EmptyBatchRequestException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::EmptyBatchRequestException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -132,6 +188,21 @@ module Aws::SNS
       end
     end
 
+    class InvalidBatchEntryIdException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::InvalidBatchEntryIdException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class InvalidParameterException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -167,6 +238,21 @@ module Aws::SNS
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::SNS::Types::InvalidSecurityException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class InvalidStateException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::InvalidStateException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -282,11 +368,41 @@ module Aws::SNS
       end
     end
 
+    class OptedOutException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::OptedOutException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class PlatformApplicationDisabledException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::SNS::Types::PlatformApplicationDisabledException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ReplayLimitExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::ReplayLimitExceededException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -387,6 +503,21 @@ module Aws::SNS
       end
     end
 
+    class TooManyEntriesInBatchRequestException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::TooManyEntriesInBatchRequestException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class TopicLimitExceededException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -399,6 +530,56 @@ module Aws::SNS
       # @return [String]
       def message
         @message || @data[:message]
+      end
+    end
+
+    class UserErrorException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::UserErrorException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ValidationException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::ValidationException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class VerificationException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::SNS::Types::VerificationException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+
+      # @return [String]
+      def status
+        @data[:status]
       end
     end
 

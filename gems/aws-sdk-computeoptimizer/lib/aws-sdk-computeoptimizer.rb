@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-computeoptimizer/types'
-require_relative 'aws-sdk-computeoptimizer/client_api'
-require_relative 'aws-sdk-computeoptimizer/client'
-require_relative 'aws-sdk-computeoptimizer/errors'
-require_relative 'aws-sdk-computeoptimizer/resource'
-require_relative 'aws-sdk-computeoptimizer/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:computeoptimizer)
 
 # This module provides support for AWS Compute Optimizer. This module is available in the
 # `aws-sdk-computeoptimizer` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-computeoptimizer/customizations'
 # structure.
 #
 #     compute_optimizer = Aws::ComputeOptimizer::Client.new
-#     resp = compute_optimizer.describe_recommendation_export_jobs(params)
+#     resp = compute_optimizer.delete_recommendation_preferences(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-computeoptimizer/customizations'
 #
 # @!group service
 module Aws::ComputeOptimizer
+  autoload :Types, 'aws-sdk-computeoptimizer/types'
+  autoload :ClientApi, 'aws-sdk-computeoptimizer/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-computeoptimizer/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-computeoptimizer/client'
+  autoload :Errors, 'aws-sdk-computeoptimizer/errors'
+  autoload :Resource, 'aws-sdk-computeoptimizer/resource'
+  autoload :EndpointParameters, 'aws-sdk-computeoptimizer/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-computeoptimizer/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-computeoptimizer/endpoints'
 
-  GEM_VERSION = '1.11.0'
+  GEM_VERSION = '1.68.0'
 
 end
+
+require_relative 'aws-sdk-computeoptimizer/customizations'

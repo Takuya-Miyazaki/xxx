@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-robomaker/types'
-require_relative 'aws-sdk-robomaker/client_api'
-require_relative 'aws-sdk-robomaker/client'
-require_relative 'aws-sdk-robomaker/errors'
-require_relative 'aws-sdk-robomaker/resource'
-require_relative 'aws-sdk-robomaker/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:robomaker)
 
 # This module provides support for AWS RoboMaker. This module is available in the
 # `aws-sdk-robomaker` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-robomaker/customizations'
 #
 # @!group service
 module Aws::RoboMaker
+  autoload :Types, 'aws-sdk-robomaker/types'
+  autoload :ClientApi, 'aws-sdk-robomaker/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-robomaker/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-robomaker/client'
+  autoload :Errors, 'aws-sdk-robomaker/errors'
+  autoload :Resource, 'aws-sdk-robomaker/resource'
+  autoload :EndpointParameters, 'aws-sdk-robomaker/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-robomaker/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-robomaker/endpoints'
 
-  GEM_VERSION = '1.31.0'
+  GEM_VERSION = '1.77.0'
 
 end
+
+require_relative 'aws-sdk-robomaker/customizations'

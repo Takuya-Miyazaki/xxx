@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-appsync/types'
-require_relative 'aws-sdk-appsync/client_api'
-require_relative 'aws-sdk-appsync/client'
-require_relative 'aws-sdk-appsync/errors'
-require_relative 'aws-sdk-appsync/resource'
-require_relative 'aws-sdk-appsync/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:appsync)
 
 # This module provides support for AWS AppSync. This module is available in the
 # `aws-sdk-appsync` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-appsync/customizations'
 # structure.
 #
 #     app_sync = Aws::AppSync::Client.new
-#     resp = app_sync.create_api_cache(params)
+#     resp = app_sync.associate_api(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-appsync/customizations'
 #
 # @!group service
 module Aws::AppSync
+  autoload :Types, 'aws-sdk-appsync/types'
+  autoload :ClientApi, 'aws-sdk-appsync/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-appsync/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-appsync/client'
+  autoload :Errors, 'aws-sdk-appsync/errors'
+  autoload :Resource, 'aws-sdk-appsync/resource'
+  autoload :EndpointParameters, 'aws-sdk-appsync/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-appsync/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-appsync/endpoints'
 
-  GEM_VERSION = '1.37.0'
+  GEM_VERSION = '1.89.0'
 
 end
+
+require_relative 'aws-sdk-appsync/customizations'

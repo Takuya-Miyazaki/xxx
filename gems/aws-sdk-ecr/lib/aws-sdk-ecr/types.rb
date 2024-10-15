@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -60,19 +60,60 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchCheckLayerAvailabilityRequest
-    #   data as a hash:
+    # The image details of the Amazon ECR container image.
     #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         layer_digests: ["BatchedOperationLayerDigest"], # required
-    #       }
+    # @!attribute [rw] architecture
+    #   The architecture of the Amazon ECR container image.
+    #   @return [String]
     #
+    # @!attribute [rw] author
+    #   The image author of the Amazon ECR container image.
+    #   @return [String]
+    #
+    # @!attribute [rw] image_hash
+    #   The image hash of the Amazon ECR container image.
+    #   @return [String]
+    #
+    # @!attribute [rw] image_tags
+    #   The image tags attached to the Amazon ECR container image.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] platform
+    #   The platform of the Amazon ECR container image.
+    #   @return [String]
+    #
+    # @!attribute [rw] pushed_at
+    #   The date and time the Amazon ECR container image was pushed.
+    #   @return [Time]
+    #
+    # @!attribute [rw] registry
+    #   The registry the Amazon ECR container image belongs to.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_name
+    #   The name of the repository the Amazon ECR container image resides
+    #   in.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/AwsEcrContainerImageDetails AWS API Documentation
+    #
+    class AwsEcrContainerImageDetails < Struct.new(
+      :architecture,
+      :author,
+      :image_hash,
+      :image_tags,
+      :platform,
+      :pushed_at,
+      :registry,
+      :repository_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   image layers to check. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the image layers to check. If you do not specify a
+    #   registry, the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -115,24 +156,10 @@ module Aws::ECR
     # Deletes specified images within a specified repository. Images are
     # specified with either the `imageTag` or `imageDigest`.
     #
-    # @note When making an API call, you may pass BatchDeleteImageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         image_ids: [ # required
-    #           {
-    #             image_digest: "ImageDigest",
-    #             image_tag: "ImageTag",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   image to delete. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the image to delete. If you do not specify a registry, the
+    #   default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -172,25 +199,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchGetImageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         image_ids: [ # required
-    #           {
-    #             image_digest: "ImageDigest",
-    #             image_tag: "ImageTag",
-    #           },
-    #         ],
-    #         accepted_media_types: ["MediaType"],
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   images to describe. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the images to describe. If you do not specify a registry,
+    #   the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -240,20 +252,39 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CompleteLayerUploadRequest
-    #   data as a hash:
+    # @!attribute [rw] repository_names
+    #   One or more repository names to get the scanning configuration for.
+    #   @return [Array<String>]
     #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         upload_id: "UploadId", # required
-    #         layer_digests: ["LayerDigest"], # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/BatchGetRepositoryScanningConfigurationRequest AWS API Documentation
     #
+    class BatchGetRepositoryScanningConfigurationRequest < Struct.new(
+      :repository_names)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] scanning_configurations
+    #   The scanning configuration for the requested repositories.
+    #   @return [Array<Types::RepositoryScanningConfiguration>]
+    #
+    # @!attribute [rw] failures
+    #   Any failures associated with the call.
+    #   @return [Array<Types::RepositoryScanningConfigurationFailure>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/BatchGetRepositoryScanningConfigurationResponse AWS API Documentation
+    #
+    class BatchGetRepositoryScanningConfigurationResponse < Struct.new(
+      :scanning_configurations,
+      :failures)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry to which to upload
-    #   layers. If you do not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry to
+    #   which to upload layers. If you do not specify a registry, the
+    #   default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -307,32 +338,219 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateRepositoryRequest
-    #   data as a hash:
+    # @!attribute [rw] ecr_repository_prefix
+    #   The repository name prefix to use when caching images from the
+    #   source registry.
+    #   @return [String]
     #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         tags: [
-    #           {
-    #             key: "TagKey",
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #         image_tag_mutability: "MUTABLE", # accepts MUTABLE, IMMUTABLE
-    #         image_scanning_configuration: {
-    #           scan_on_push: false,
-    #         },
-    #         encryption_configuration: {
-    #           encryption_type: "AES256", # required, accepts AES256, KMS
-    #           kms_key: "KmsKey",
-    #         },
-    #       }
+    # @!attribute [rw] upstream_registry_url
+    #   The registry URL of the upstream public registry to use as the
+    #   source for the pull through cache rule. The following is the syntax
+    #   to use for each supported upstream registry.
+    #
+    #   * Amazon ECR Public (`ecr-public`) - `public.ecr.aws`
+    #
+    #   * Docker Hub (`docker-hub`) - `registry-1.docker.io`
+    #
+    #   * Quay (`quay`) - `quay.io`
+    #
+    #   * Kubernetes (`k8s`) - `registry.k8s.io`
+    #
+    #   * GitHub Container Registry (`github-container-registry`) -
+    #     `ghcr.io`
+    #
+    #   * Microsoft Azure Container Registry (`azure-container-registry`) -
+    #     `<custom>.azurecr.io`
+    #   @return [String]
+    #
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry to
+    #   create the pull through cache rule for. If you do not specify a
+    #   registry, the default registry is assumed.
+    #   @return [String]
+    #
+    # @!attribute [rw] upstream_registry
+    #   The name of the upstream registry.
+    #   @return [String]
+    #
+    # @!attribute [rw] credential_arn
+    #   The Amazon Resource Name (ARN) of the Amazon Web Services Secrets
+    #   Manager secret that identifies the credentials to authenticate to
+    #   the upstream registry.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CreatePullThroughCacheRuleRequest AWS API Documentation
+    #
+    class CreatePullThroughCacheRuleRequest < Struct.new(
+      :ecr_repository_prefix,
+      :upstream_registry_url,
+      :registry_id,
+      :upstream_registry,
+      :credential_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] ecr_repository_prefix
+    #   The Amazon ECR repository prefix associated with the pull through
+    #   cache rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] upstream_registry_url
+    #   The upstream registry URL associated with the pull through cache
+    #   rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
+    #   The date and time, in JavaScript date format, when the pull through
+    #   cache rule was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] registry_id
+    #   The registry ID associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] upstream_registry
+    #   The name of the upstream registry associated with the pull through
+    #   cache rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] credential_arn
+    #   The Amazon Resource Name (ARN) of the Amazon Web Services Secrets
+    #   Manager secret associated with the pull through cache rule.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CreatePullThroughCacheRuleResponse AWS API Documentation
+    #
+    class CreatePullThroughCacheRuleResponse < Struct.new(
+      :ecr_repository_prefix,
+      :upstream_registry_url,
+      :created_at,
+      :registry_id,
+      :upstream_registry,
+      :credential_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] prefix
+    #   The repository namespace prefix to associate with the template. All
+    #   repositories created using this namespace prefix will have the
+    #   settings defined in this template applied. For example, a prefix of
+    #   `prod` would apply to all repositories beginning with `prod/`.
+    #   Similarly, a prefix of `prod/team` would apply to all repositories
+    #   beginning with `prod/team/`.
+    #
+    #   To apply a template to all repositories in your registry that don't
+    #   have an associated creation template, you can use `ROOT` as the
+    #   prefix.
+    #
+    #   There is always an assumed `/` applied to the end of the prefix. If
+    #   you specify `ecr-public` as the prefix, Amazon ECR treats that as
+    #   `ecr-public/`. When using a pull through cache rule, the repository
+    #   prefix you specify during rule creation is what you should specify
+    #   as your repository creation template prefix as well.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   A description for the repository creation template.
+    #   @return [String]
+    #
+    # @!attribute [rw] encryption_configuration
+    #   The encryption configuration to use for repositories created using
+    #   the template.
+    #   @return [Types::EncryptionConfigurationForRepositoryCreationTemplate]
+    #
+    # @!attribute [rw] resource_tags
+    #   The metadata to apply to the repository to help you categorize and
+    #   organize. Each tag consists of a key and an optional value, both of
+    #   which you define. Tag keys can have a maximum character length of
+    #   128 characters, and tag values can have a maximum length of 256
+    #   characters.
+    #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] image_tag_mutability
+    #   The tag mutability setting for the repository. If this parameter is
+    #   omitted, the default setting of `MUTABLE` will be used which will
+    #   allow image tags to be overwritten. If `IMMUTABLE` is specified, all
+    #   image tags within the repository will be immutable which will
+    #   prevent them from being overwritten.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_policy
+    #   The repository policy to apply to repositories created using the
+    #   template. A repository policy is a permissions policy associated
+    #   with a repository to control access permissions.
+    #   @return [String]
+    #
+    # @!attribute [rw] lifecycle_policy
+    #   The lifecycle policy to use for repositories created using the
+    #   template.
+    #   @return [String]
+    #
+    # @!attribute [rw] applied_for
+    #   A list of enumerable strings representing the Amazon ECR repository
+    #   creation scenarios that this template will apply towards. The two
+    #   supported scenarios are `PULL_THROUGH_CACHE` and `REPLICATION`
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] custom_role_arn
+    #   The ARN of the role to be assumed by Amazon ECR. This role must be
+    #   in the same account as the registry that you are configuring. Amazon
+    #   ECR will assume your supplied role when the customRoleArn is
+    #   specified. When this field isn't specified, Amazon ECR will use the
+    #   service-linked role for the repository creation template.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CreateRepositoryCreationTemplateRequest AWS API Documentation
+    #
+    class CreateRepositoryCreationTemplateRequest < Struct.new(
+      :prefix,
+      :description,
+      :encryption_configuration,
+      :resource_tags,
+      :image_tag_mutability,
+      :repository_policy,
+      :lifecycle_policy,
+      :applied_for,
+      :custom_role_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] registry_id
+    #   The registry ID associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_creation_template
+    #   The details of the repository creation template associated with the
+    #   request.
+    #   @return [Types::RepositoryCreationTemplate]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CreateRepositoryCreationTemplateResponse AWS API Documentation
+    #
+    class CreateRepositoryCreationTemplateResponse < Struct.new(
+      :registry_id,
+      :repository_creation_template)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry to
+    #   create the repository. If you do not specify a registry, the default
+    #   registry is assumed.
+    #   @return [String]
     #
     # @!attribute [rw] repository_name
     #   The name to use for the repository. The repository name may be
     #   specified on its own (such as `nginx-web-app`) or it can be
     #   prepended with a namespace to group the repository into a category
     #   (such as `project-a/nginx-web-app`).
+    #
+    #   The repository name must start with a letter and can only contain
+    #   lowercase letters, numbers, hyphens, underscores, and forward
+    #   slashes.
     #   @return [String]
     #
     # @!attribute [rw] tags
@@ -365,6 +583,7 @@ module Aws::ECR
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CreateRepositoryRequest AWS API Documentation
     #
     class CreateRepositoryRequest < Struct.new(
+      :registry_id,
       :repository_name,
       :tags,
       :image_tag_mutability,
@@ -386,18 +605,94 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteLifecyclePolicyRequest
-    #   data as a hash:
+    # The CVSS score for a finding.
     #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #       }
+    # @!attribute [rw] base_score
+    #   The base CVSS score used for the finding.
+    #   @return [Float]
     #
+    # @!attribute [rw] scoring_vector
+    #   The vector string of the CVSS score.
+    #   @return [String]
+    #
+    # @!attribute [rw] source
+    #   The source of the CVSS score.
+    #   @return [String]
+    #
+    # @!attribute [rw] version
+    #   The version of CVSS used for the score.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CvssScore AWS API Documentation
+    #
+    class CvssScore < Struct.new(
+      :base_score,
+      :scoring_vector,
+      :source,
+      :version)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Details on adjustments Amazon Inspector made to the CVSS score for a
+    # finding.
+    #
+    # @!attribute [rw] metric
+    #   The metric used to adjust the CVSS score.
+    #   @return [String]
+    #
+    # @!attribute [rw] reason
+    #   The reason the CVSS score has been adjustment.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CvssScoreAdjustment AWS API Documentation
+    #
+    class CvssScoreAdjustment < Struct.new(
+      :metric,
+      :reason)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about the CVSS score.
+    #
+    # @!attribute [rw] adjustments
+    #   An object that contains details about adjustment Amazon Inspector
+    #   made to the CVSS score.
+    #   @return [Array<Types::CvssScoreAdjustment>]
+    #
+    # @!attribute [rw] score
+    #   The CVSS score.
+    #   @return [Float]
+    #
+    # @!attribute [rw] score_source
+    #   The source for the CVSS score.
+    #   @return [String]
+    #
+    # @!attribute [rw] scoring_vector
+    #   The vector for the CVSS score.
+    #   @return [String]
+    #
+    # @!attribute [rw] version
+    #   The CVSS version used in scoring.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CvssScoreDetails AWS API Documentation
+    #
+    class CvssScoreDetails < Struct.new(
+      :adjustments,
+      :score,
+      :score_source,
+      :scoring_vector,
+      :version)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry
-    #   is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the
+    #   default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -440,6 +735,60 @@ module Aws::ECR
       include Aws::Structure
     end
 
+    # @!attribute [rw] ecr_repository_prefix
+    #   The Amazon ECR repository prefix associated with the pull through
+    #   cache rule to delete.
+    #   @return [String]
+    #
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the pull through cache rule. If you do not specify a
+    #   registry, the default registry is assumed.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DeletePullThroughCacheRuleRequest AWS API Documentation
+    #
+    class DeletePullThroughCacheRuleRequest < Struct.new(
+      :ecr_repository_prefix,
+      :registry_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] ecr_repository_prefix
+    #   The Amazon ECR repository prefix associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] upstream_registry_url
+    #   The upstream registry URL associated with the pull through cache
+    #   rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
+    #   The timestamp associated with the pull through cache rule.
+    #   @return [Time]
+    #
+    # @!attribute [rw] registry_id
+    #   The registry ID associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] credential_arn
+    #   The Amazon Resource Name (ARN) of the Amazon Web Services Secrets
+    #   Manager secret associated with the pull through cache rule.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DeletePullThroughCacheRuleResponse AWS API Documentation
+    #
+    class DeletePullThroughCacheRuleResponse < Struct.new(
+      :ecr_repository_prefix,
+      :upstream_registry_url,
+      :created_at,
+      :registry_id,
+      :credential_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @api private
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DeleteRegistryPolicyRequest AWS API Documentation
@@ -463,18 +812,40 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteRepositoryPolicyRequest
-    #   data as a hash:
+    # @!attribute [rw] prefix
+    #   The repository namespace prefix associated with the repository
+    #   creation template.
+    #   @return [String]
     #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DeleteRepositoryCreationTemplateRequest AWS API Documentation
     #
+    class DeleteRepositoryCreationTemplateRequest < Struct.new(
+      :prefix)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository policy to delete. If you do not specify a registry, the
-    #   default registry is assumed.
+    #   The registry ID associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_creation_template
+    #   The details of the repository creation template that was deleted.
+    #   @return [Types::RepositoryCreationTemplate]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DeleteRepositoryCreationTemplateResponse AWS API Documentation
+    #
+    class DeleteRepositoryCreationTemplateResponse < Struct.new(
+      :registry_id,
+      :repository_creation_template)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository policy to delete. If you do not specify a
+    #   registry, the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -513,19 +884,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteRepositoryRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         force: false,
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository to delete. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository to delete. If you do not specify a registry,
+    #   the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -533,7 +895,9 @@ module Aws::ECR
     #   @return [String]
     #
     # @!attribute [rw] force
-    #   If a repository contains images, forces the deletion.
+    #   If true, deleting the repository force deletes the contents of the
+    #   repository. If false, the repository must be empty before attempting
+    #   to delete it.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DeleteRepositoryRequest AWS API Documentation
@@ -558,24 +922,59 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeImageScanFindingsRequest
-    #   data as a hash:
+    # @!attribute [rw] repository_name
+    #   The name of the repository that the image is in.
+    #   @return [String]
     #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         image_id: { # required
-    #           image_digest: "ImageDigest",
-    #           image_tag: "ImageTag",
-    #         },
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
+    # @!attribute [rw] image_id
+    #   An object with identifying information for an image in an Amazon ECR
+    #   repository.
+    #   @return [Types::ImageIdentifier]
     #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to describe the image scan findings for. If you
-    #   do not specify a registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry. If
+    #   you do not specify a registry, the default registry is assumed.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribeImageReplicationStatusRequest AWS API Documentation
+    #
+    class DescribeImageReplicationStatusRequest < Struct.new(
+      :repository_name,
+      :image_id,
+      :registry_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] repository_name
+    #   The repository name associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] image_id
+    #   An object with identifying information for an image in an Amazon ECR
+    #   repository.
+    #   @return [Types::ImageIdentifier]
+    #
+    # @!attribute [rw] replication_statuses
+    #   The replication status details for the images in the specified
+    #   repository.
+    #   @return [Array<Types::ImageReplicationStatus>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribeImageReplicationStatusResponse AWS API Documentation
+    #
+    class DescribeImageReplicationStatusResponse < Struct.new(
+      :repository_name,
+      :image_id,
+      :replication_statuses)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to describe the image scan findings
+    #   for. If you do not specify a registry, the default registry is
+    #   assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -584,7 +983,8 @@ module Aws::ECR
     #   @return [String]
     #
     # @!attribute [rw] image_id
-    #   An object with identifying information for an Amazon ECR image.
+    #   An object with identifying information for an image in an Amazon ECR
+    #   repository.
     #   @return [Types::ImageIdentifier]
     #
     # @!attribute [rw] next_token
@@ -629,7 +1029,8 @@ module Aws::ECR
     #   @return [String]
     #
     # @!attribute [rw] image_id
-    #   An object with identifying information for an Amazon ECR image.
+    #   An object with identifying information for an image in an Amazon ECR
+    #   repository.
     #   @return [Types::ImageIdentifier]
     #
     # @!attribute [rw] image_scan_status
@@ -663,13 +1064,6 @@ module Aws::ECR
 
     # An object representing a filter on a DescribeImages operation.
     #
-    # @note When making an API call, you may pass DescribeImagesFilter
-    #   data as a hash:
-    #
-    #       {
-    #         tag_status: "TAGGED", # accepts TAGGED, UNTAGGED, ANY
-    #       }
-    #
     # @!attribute [rw] tag_status
     #   The tag status with which to filter your DescribeImages results. You
     #   can filter results based on whether they are `TAGGED` or `UNTAGGED`.
@@ -683,29 +1077,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeImagesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         image_ids: [
-    #           {
-    #             image_digest: "ImageDigest",
-    #             image_tag: "ImageTag",
-    #           },
-    #         ],
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #         filter: {
-    #           tag_status: "TAGGED", # accepts TAGGED, UNTAGGED, ANY
-    #         },
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to describe images. If you do not specify a
-    #   registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to describe images. If you do not
+    #   specify a registry, the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -777,6 +1152,73 @@ module Aws::ECR
       include Aws::Structure
     end
 
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry to
+    #   return the pull through cache rules for. If you do not specify a
+    #   registry, the default registry is assumed.
+    #   @return [String]
+    #
+    # @!attribute [rw] ecr_repository_prefixes
+    #   The Amazon ECR repository prefixes associated with the pull through
+    #   cache rules to return. If no repository prefix value is specified,
+    #   all pull through cache rules are returned.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] next_token
+    #   The `nextToken` value returned from a previous paginated
+    #   `DescribePullThroughCacheRulesRequest` request where `maxResults`
+    #   was used and the results exceeded the value of that parameter.
+    #   Pagination continues from the end of the previous results that
+    #   returned the `nextToken` value. This value is null when there are no
+    #   more results to return.
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of pull through cache rules returned by
+    #   `DescribePullThroughCacheRulesRequest` in paginated output. When
+    #   this parameter is used, `DescribePullThroughCacheRulesRequest` only
+    #   returns `maxResults` results in a single page along with a
+    #   `nextToken` response element. The remaining results of the initial
+    #   request can be seen by sending another
+    #   `DescribePullThroughCacheRulesRequest` request with the returned
+    #   `nextToken` value. This value can be between 1 and 1000. If this
+    #   parameter is not used, then `DescribePullThroughCacheRulesRequest`
+    #   returns up to 100 results and a `nextToken` value, if applicable.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribePullThroughCacheRulesRequest AWS API Documentation
+    #
+    class DescribePullThroughCacheRulesRequest < Struct.new(
+      :registry_id,
+      :ecr_repository_prefixes,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] pull_through_cache_rules
+    #   The details of the pull through cache rules.
+    #   @return [Array<Types::PullThroughCacheRule>]
+    #
+    # @!attribute [rw] next_token
+    #   The `nextToken` value to include in a future
+    #   `DescribePullThroughCacheRulesRequest` request. When the results of
+    #   a `DescribePullThroughCacheRulesRequest` request exceed
+    #   `maxResults`, this value can be used to retrieve the next page of
+    #   results. This value is null when there are no more results to
+    #   return.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribePullThroughCacheRulesResponse AWS API Documentation
+    #
+    class DescribePullThroughCacheRulesResponse < Struct.new(
+      :pull_through_cache_rules,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @api private
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribeRegistryRequest AWS API Documentation
@@ -784,7 +1226,7 @@ module Aws::ECR
     class DescribeRegistryRequest < Aws::EmptyStructure; end
 
     # @!attribute [rw] registry_id
-    #   The ID of the registry.
+    #   The registry ID associated with the request.
     #   @return [String]
     #
     # @!attribute [rw] replication_configuration
@@ -800,20 +1242,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeRepositoriesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_names: ["RepositoryName"],
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repositories to be described. If you do not specify a registry, the
-    #   default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repositories to be described. If you do not specify a
+    #   registry, the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_names
@@ -882,6 +1314,78 @@ module Aws::ECR
       include Aws::Structure
     end
 
+    # @!attribute [rw] prefixes
+    #   The repository namespace prefixes associated with the repository
+    #   creation templates to describe. If this value is not specified, all
+    #   repository creation templates are returned.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] next_token
+    #   The `nextToken` value returned from a previous paginated
+    #   `DescribeRepositoryCreationTemplates` request where `maxResults` was
+    #   used and the results exceeded the value of that parameter.
+    #   Pagination continues from the end of the previous results that
+    #   returned the `nextToken` value. This value is `null` when there are
+    #   no more results to return.
+    #
+    #   <note markdown="1"> This token should be treated as an opaque identifier that is only
+    #   used to retrieve the next items in a list and not for other
+    #   programmatic purposes.
+    #
+    #    </note>
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of repository results returned by
+    #   `DescribeRepositoryCreationTemplatesRequest` in paginated output.
+    #   When this parameter is used,
+    #   `DescribeRepositoryCreationTemplatesRequest` only returns
+    #   `maxResults` results in a single page along with a `nextToken`
+    #   response element. The remaining results of the initial request can
+    #   be seen by sending another
+    #   `DescribeRepositoryCreationTemplatesRequest` request with the
+    #   returned `nextToken` value. This value can be between 1 and 1000. If
+    #   this parameter is not used, then
+    #   `DescribeRepositoryCreationTemplatesRequest` returns up to 100
+    #   results and a `nextToken` value, if applicable.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribeRepositoryCreationTemplatesRequest AWS API Documentation
+    #
+    class DescribeRepositoryCreationTemplatesRequest < Struct.new(
+      :prefixes,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] registry_id
+    #   The registry ID associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_creation_templates
+    #   The details of the repository creation templates.
+    #   @return [Array<Types::RepositoryCreationTemplate>]
+    #
+    # @!attribute [rw] next_token
+    #   The `nextToken` value to include in a future
+    #   `DescribeRepositoryCreationTemplates` request. When the results of a
+    #   `DescribeRepositoryCreationTemplates` request exceed `maxResults`,
+    #   this value can be used to retrieve the next page of results. This
+    #   value is `null` when there are no more results to return.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribeRepositoryCreationTemplatesResponse AWS API Documentation
+    #
+    class DescribeRepositoryCreationTemplatesResponse < Struct.new(
+      :registry_id,
+      :repository_creation_templates,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The specified layer upload does not contain any layer parts.
     #
     # @!attribute [rw] message
@@ -902,58 +1406,54 @@ module Aws::ECR
     # By default, when no encryption configuration is set or the `AES256`
     # encryption type is used, Amazon ECR uses server-side encryption with
     # Amazon S3-managed encryption keys which encrypts your data at rest
-    # using an AES-256 encryption algorithm. This does not require any
-    # action on your part.
+    # using an AES256 encryption algorithm. This does not require any action
+    # on your part.
     #
     # For more control over the encryption of the contents of your
-    # repository, you can use server-side encryption with customer master
-    # keys (CMKs) stored in AWS Key Management Service (AWS KMS) to encrypt
-    # your images. For more information, see [Amazon ECR encryption at
-    # rest][1] in the *Amazon Elastic Container Registry User Guide*.
+    # repository, you can use server-side encryption with Key Management
+    # Service key stored in Key Management Service (KMS) to encrypt your
+    # images. For more information, see [Amazon ECR encryption at rest][1]
+    # in the *Amazon Elastic Container Registry User Guide*.
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/encryption-at-rest.html
     #
-    # @note When making an API call, you may pass EncryptionConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         encryption_type: "AES256", # required, accepts AES256, KMS
-    #         kms_key: "KmsKey",
-    #       }
-    #
     # @!attribute [rw] encryption_type
     #   The encryption type to use.
     #
     #   If you use the `KMS` encryption type, the contents of the repository
-    #   will be encrypted using server-side encryption with customer master
-    #   keys (CMKs) stored in AWS KMS. When you use AWS KMS to encrypt your
-    #   data, you can either use the default AWS managed CMK for Amazon ECR,
-    #   or specify your own CMK, which you already created. For more
-    #   information, see [Protecting Data Using Server-Side Encryption with
-    #   CMKs Stored in AWS Key Management Service (SSE-KMS)][1] in the
-    #   *Amazon Simple Storage Service Console Developer Guide.*.
+    #   will be encrypted using server-side encryption with Key Management
+    #   Service key stored in KMS. When you use KMS to encrypt your data,
+    #   you can either use the default Amazon Web Services managed KMS key
+    #   for Amazon ECR, or specify your own KMS key, which you already
+    #   created.
+    #
+    #   If you use the `KMS_DSSE` encryption type, the contents of the
+    #   repository will be encrypted with two layers of encryption using
+    #   server-side encryption with the KMS Management Service key stored in
+    #   KMS. Similar to the `KMS` encryption type, you can either use the
+    #   default Amazon Web Services managed KMS key for Amazon ECR, or
+    #   specify your own KMS key, which you've already created.
     #
     #   If you use the `AES256` encryption type, Amazon ECR uses server-side
     #   encryption with Amazon S3-managed encryption keys which encrypts the
-    #   images in the repository using an AES-256 encryption algorithm. For
-    #   more information, see [Protecting Data Using Server-Side Encryption
-    #   with Amazon S3-Managed Encryption Keys (SSE-S3)][2] in the *Amazon
-    #   Simple Storage Service Console Developer Guide.*.
+    #   images in the repository using an AES256 encryption algorithm.
+    #
+    #   For more information, see [Amazon ECR encryption at rest][1] in the
+    #   *Amazon Elastic Container Registry User Guide*.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingKMSEncryption.html
-    #   [2]: https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html
+    #   [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/encryption-at-rest.html
     #   @return [String]
     #
     # @!attribute [rw] kms_key
-    #   If you use the `KMS` encryption type, specify the CMK to use for
-    #   encryption. The alias, key ID, or full ARN of the CMK can be
+    #   If you use the `KMS` encryption type, specify the KMS key to use for
+    #   encryption. The alias, key ID, or full ARN of the KMS key can be
     #   specified. The key must exist in the same Region as the repository.
-    #   If no key is specified, the default AWS managed CMK for Amazon ECR
-    #   will be used.
+    #   If no key is specified, the default Amazon Web Services managed KMS
+    #   key for Amazon ECR will be used.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/EncryptionConfiguration AWS API Documentation
@@ -965,17 +1465,187 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetAuthorizationTokenRequest
-    #   data as a hash:
+    # The encryption configuration to associate with the repository creation
+    # template.
     #
-    #       {
-    #         registry_ids: ["RegistryId"],
-    #       }
+    # @!attribute [rw] encryption_type
+    #   The encryption type to use.
     #
+    #   If you use the `KMS` encryption type, the contents of the repository
+    #   will be encrypted using server-side encryption with Key Management
+    #   Service key stored in KMS. When you use KMS to encrypt your data,
+    #   you can either use the default Amazon Web Services managed KMS key
+    #   for Amazon ECR, or specify your own KMS key, which you already
+    #   created. For more information, see [Protecting data using
+    #   server-side encryption with an KMS key stored in Key Management
+    #   Service (SSE-KMS)][1] in the *Amazon Simple Storage Service Console
+    #   Developer Guide*.
+    #
+    #   If you use the `AES256` encryption type, Amazon ECR uses server-side
+    #   encryption with Amazon S3-managed encryption keys which encrypts the
+    #   images in the repository using an AES256 encryption algorithm. For
+    #   more information, see [Protecting data using server-side encryption
+    #   with Amazon S3-managed encryption keys (SSE-S3)][2] in the *Amazon
+    #   Simple Storage Service Console Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingKMSEncryption.html
+    #   [2]: https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html
+    #   @return [String]
+    #
+    # @!attribute [rw] kms_key
+    #   If you use the `KMS` encryption type, specify the KMS key to use for
+    #   encryption. The full ARN of the KMS key must be specified. The key
+    #   must exist in the same Region as the repository. If no key is
+    #   specified, the default Amazon Web Services managed KMS key for
+    #   Amazon ECR will be used.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/EncryptionConfigurationForRepositoryCreationTemplate AWS API Documentation
+    #
+    class EncryptionConfigurationForRepositoryCreationTemplate < Struct.new(
+      :encryption_type,
+      :kms_key)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The details of an enhanced image scan. This is returned when enhanced
+    # scanning is enabled for your private registry.
+    #
+    # @!attribute [rw] aws_account_id
+    #   The Amazon Web Services account ID associated with the image.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   The description of the finding.
+    #   @return [String]
+    #
+    # @!attribute [rw] finding_arn
+    #   The Amazon Resource Number (ARN) of the finding.
+    #   @return [String]
+    #
+    # @!attribute [rw] first_observed_at
+    #   The date and time that the finding was first observed.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_observed_at
+    #   The date and time that the finding was last observed.
+    #   @return [Time]
+    #
+    # @!attribute [rw] package_vulnerability_details
+    #   An object that contains the details of a package vulnerability
+    #   finding.
+    #   @return [Types::PackageVulnerabilityDetails]
+    #
+    # @!attribute [rw] remediation
+    #   An object that contains the details about how to remediate a
+    #   finding.
+    #   @return [Types::Remediation]
+    #
+    # @!attribute [rw] resources
+    #   Contains information on the resources involved in a finding.
+    #   @return [Array<Types::Resource>]
+    #
+    # @!attribute [rw] score
+    #   The Amazon Inspector score given to the finding.
+    #   @return [Float]
+    #
+    # @!attribute [rw] score_details
+    #   An object that contains details of the Amazon Inspector score.
+    #   @return [Types::ScoreDetails]
+    #
+    # @!attribute [rw] severity
+    #   The severity of the finding.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The status of the finding.
+    #   @return [String]
+    #
+    # @!attribute [rw] title
+    #   The title of the finding.
+    #   @return [String]
+    #
+    # @!attribute [rw] type
+    #   The type of the finding.
+    #   @return [String]
+    #
+    # @!attribute [rw] updated_at
+    #   The date and time the finding was last updated at.
+    #   @return [Time]
+    #
+    # @!attribute [rw] fix_available
+    #   Details on whether a fix is available through a version update. This
+    #   value can be `YES`, `NO`, or `PARTIAL`. A `PARTIAL` fix means that
+    #   some, but not all, of the packages identified in the finding have
+    #   fixes available through updated versions.
+    #   @return [String]
+    #
+    # @!attribute [rw] exploit_available
+    #   If a finding discovered in your environment has an exploit
+    #   available.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/EnhancedImageScanFinding AWS API Documentation
+    #
+    class EnhancedImageScanFinding < Struct.new(
+      :aws_account_id,
+      :description,
+      :finding_arn,
+      :first_observed_at,
+      :last_observed_at,
+      :package_vulnerability_details,
+      :remediation,
+      :resources,
+      :score,
+      :score_details,
+      :severity,
+      :status,
+      :title,
+      :type,
+      :updated_at,
+      :fix_available,
+      :exploit_available)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] name
+    #   Basic scan type version name.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/GetAccountSettingRequest AWS API Documentation
+    #
+    class GetAccountSettingRequest < Struct.new(
+      :name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] name
+    #   Retrieves the basic scan type version name.
+    #   @return [String]
+    #
+    # @!attribute [rw] value
+    #   Retrieves the value that specifies what basic scan type is being
+    #   used: `AWS_NATIVE` or `CLAIR`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/GetAccountSettingResponse AWS API Documentation
+    #
+    class GetAccountSettingResponse < Struct.new(
+      :name,
+      :value)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] registry_ids
-    #   A list of AWS account IDs that are associated with the registries
-    #   for which to get AuthorizationData objects. If you do not specify a
-    #   registry, the default registry is assumed.
+    #   A list of Amazon Web Services account IDs that are associated with
+    #   the registries for which to get AuthorizationData objects. If you do
+    #   not specify a registry, the default registry is assumed.
     #   @return [Array<String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/GetAuthorizationTokenRequest AWS API Documentation
@@ -999,19 +1669,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetDownloadUrlForLayerRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         layer_digest: "LayerDigest", # required
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   image layer to download. If you do not specify a registry, the
-    #   default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the image layer to download. If you do not specify a
+    #   registry, the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -1050,29 +1711,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetLifecyclePolicyPreviewRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         image_ids: [
-    #           {
-    #             image_digest: "ImageDigest",
-    #             image_tag: "ImageTag",
-    #           },
-    #         ],
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #         filter: {
-    #           tag_status: "TAGGED", # accepts TAGGED, UNTAGGED, ANY
-    #         },
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry
-    #   is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the
+    #   default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -1171,18 +1813,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetLifecyclePolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry
-    #   is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the
+    #   default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -1232,7 +1866,7 @@ module Aws::ECR
     class GetRegistryPolicyRequest < Aws::EmptyStructure; end
 
     # @!attribute [rw] registry_id
-    #   The ID of the registry.
+    #   The registry ID associated with the request.
     #   @return [String]
     #
     # @!attribute [rw] policy_text
@@ -1248,18 +1882,33 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetRepositoryPolicyRequest
-    #   data as a hash:
+    # @api private
     #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/GetRegistryScanningConfigurationRequest AWS API Documentation
     #
+    class GetRegistryScanningConfigurationRequest < Aws::EmptyStructure; end
+
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry
-    #   is assumed.
+    #   The registry ID associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] scanning_configuration
+    #   The scanning configuration for the registry.
+    #   @return [Types::RegistryScanningConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/GetRegistryScanningConfigurationResponse AWS API Documentation
+    #
+    class GetRegistryScanningConfigurationResponse < Struct.new(
+      :registry_id,
+      :scanning_configuration)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the
+    #   default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -1300,8 +1949,8 @@ module Aws::ECR
     # An object representing an Amazon ECR image.
     #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry containing the
-    #   image.
+    #   The Amazon Web Services account ID associated with the registry
+    #   containing the image.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -1352,8 +2001,8 @@ module Aws::ECR
     # operation.
     #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry to which this image
-    #   belongs.
+    #   The Amazon Web Services account ID associated with the registry to
+    #   which this image belongs.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -1404,6 +2053,21 @@ module Aws::ECR
     #   The artifact media type of the image.
     #   @return [String]
     #
+    # @!attribute [rw] last_recorded_pull_time
+    #   The date and time, expressed in standard JavaScript date format,
+    #   when Amazon ECR recorded the last image pull.
+    #
+    #   <note markdown="1"> Amazon ECR refreshes the last image pull timestamp at least once
+    #   every 24 hours. For example, if you pull an image once a day then
+    #   the `lastRecordedPullTime` timestamp will indicate the exact time
+    #   that the image was last pulled. However, if you pull an image once
+    #   an hour, because Amazon ECR refreshes the `lastRecordedPullTime`
+    #   timestamp at least once every 24 hours, the result may not be the
+    #   exact time that the image was last pulled.
+    #
+    #    </note>
+    #   @return [Time]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ImageDetail AWS API Documentation
     #
     class ImageDetail < Struct.new(
@@ -1416,7 +2080,8 @@ module Aws::ECR
       :image_scan_status,
       :image_scan_findings_summary,
       :image_manifest_media_type,
-      :artifact_media_type)
+      :artifact_media_type,
+      :last_recorded_pull_time)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1459,15 +2124,8 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # An object with identifying information for an Amazon ECR image.
-    #
-    # @note When making an API call, you may pass ImageIdentifier
-    #   data as a hash:
-    #
-    #       {
-    #         image_digest: "ImageDigest",
-    #         image_tag: "ImageTag",
-    #       }
+    # An object with identifying information for an image in an Amazon ECR
+    # repository.
     #
     # @!attribute [rw] image_digest
     #   The `sha256` digest of the image manifest.
@@ -1495,6 +2153,36 @@ module Aws::ECR
     #
     class ImageNotFoundException < Struct.new(
       :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The status of the replication process for an image.
+    #
+    # @!attribute [rw] region
+    #   The destination Region for the image replication.
+    #   @return [String]
+    #
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry to
+    #   which the image belongs.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The image replication status.
+    #   @return [String]
+    #
+    # @!attribute [rw] failure_code
+    #   The failure code for a replication that has failed.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ImageReplicationStatus AWS API Documentation
+    #
+    class ImageReplicationStatus < Struct.new(
+      :region,
+      :registry_id,
+      :status,
+      :failure_code)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1545,21 +2233,26 @@ module Aws::ECR
     #   The time when the vulnerability data was last scanned.
     #   @return [Time]
     #
+    # @!attribute [rw] finding_severity_counts
+    #   The image vulnerability counts, sorted by severity.
+    #   @return [Hash<String,Integer>]
+    #
     # @!attribute [rw] findings
     #   The findings from the image scan.
     #   @return [Array<Types::ImageScanFinding>]
     #
-    # @!attribute [rw] finding_severity_counts
-    #   The image vulnerability counts, sorted by severity.
-    #   @return [Hash<String,Integer>]
+    # @!attribute [rw] enhanced_findings
+    #   Details about the enhanced scan findings from Amazon Inspector.
+    #   @return [Array<Types::EnhancedImageScanFinding>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ImageScanFindings AWS API Documentation
     #
     class ImageScanFindings < Struct.new(
       :image_scan_completed_at,
       :vulnerability_source_updated_at,
+      :finding_severity_counts,
       :findings,
-      :finding_severity_counts)
+      :enhanced_findings)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1609,19 +2302,16 @@ module Aws::ECR
 
     # The image scanning configuration for a repository.
     #
-    # @note When making an API call, you may pass ImageScanningConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         scan_on_push: false,
-    #       }
-    #
     # @!attribute [rw] scan_on_push
     #   The setting that determines whether images are scanned after being
     #   pushed to a repository. If set to `true`, images will be scanned
     #   after being pushed. If this parameter is not specified, it will
     #   default to `false` and images will not be scanned unless a scan is
-    #   manually started with the StartImageScan API.
+    #   manually started with the [API\_StartImageScan][1] API.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonECR/latest/APIReference/API_StartImageScan.html
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ImageScanningConfiguration AWS API Documentation
@@ -1646,18 +2336,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass InitiateLayerUploadRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry to which you intend
-    #   to upload layers. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry to
+    #   which you intend to upload layers. If you do not specify a registry,
+    #   the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -1779,7 +2461,7 @@ module Aws::ECR
     #   @return [String]
     #
     # @!attribute [rw] kms_error
-    #   The error code returned by AWS KMS.
+    #   The error code returned by KMS.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/KmsException AWS API Documentation
@@ -1920,13 +2602,6 @@ module Aws::ECR
 
     # The filter for the lifecycle policy preview.
     #
-    # @note When making an API call, you may pass LifecyclePolicyPreviewFilter
-    #   data as a hash:
-    #
-    #       {
-    #         tag_status: "TAGGED", # accepts TAGGED, UNTAGGED, ANY
-    #       }
-    #
     # @!attribute [rw] tag_status
     #   The tag status of the image.
     #   @return [String]
@@ -2030,8 +2705,8 @@ module Aws::ECR
     end
 
     # The operation did not succeed because it would have exceeded a service
-    # limit for your account. For more information, see [Amazon ECR Service
-    # Quotas][1] in the Amazon Elastic Container Registry User Guide.
+    # limit for your account. For more information, see [Amazon ECR service
+    # quotas][1] in the Amazon Elastic Container Registry User Guide.
     #
     #
     #
@@ -2051,13 +2726,6 @@ module Aws::ECR
 
     # An object representing a filter on a ListImages operation.
     #
-    # @note When making an API call, you may pass ListImagesFilter
-    #   data as a hash:
-    #
-    #       {
-    #         tag_status: "TAGGED", # accepts TAGGED, UNTAGGED, ANY
-    #       }
-    #
     # @!attribute [rw] tag_status
     #   The tag status with which to filter your ListImages results. You can
     #   filter results based on whether they are `TAGGED` or `UNTAGGED`.
@@ -2071,23 +2739,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListImagesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #         filter: {
-    #           tag_status: "TAGGED", # accepts TAGGED, UNTAGGED, ANY
-    #         },
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to list images. If you do not specify a
-    #   registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to list images. If you do not
+    #   specify a registry, the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -2156,13 +2811,6 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) that identifies the resource for
     #   which to list the tags. Currently, the only supported resource is an
@@ -2189,22 +2837,185 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutImageRequest
-    #   data as a hash:
+    # Information about a package vulnerability finding.
     #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         image_manifest: "ImageManifest", # required
-    #         image_manifest_media_type: "MediaType",
-    #         image_tag: "ImageTag",
-    #         image_digest: "ImageDigest",
-    #       }
+    # @!attribute [rw] cvss
+    #   An object that contains details about the CVSS score of a finding.
+    #   @return [Array<Types::CvssScore>]
+    #
+    # @!attribute [rw] reference_urls
+    #   One or more URLs that contain details about this vulnerability type.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] related_vulnerabilities
+    #   One or more vulnerabilities related to the one identified in this
+    #   finding.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] source
+    #   The source of the vulnerability information.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_url
+    #   A URL to the source of the vulnerability information.
+    #   @return [String]
+    #
+    # @!attribute [rw] vendor_created_at
+    #   The date and time that this vulnerability was first added to the
+    #   vendor's database.
+    #   @return [Time]
+    #
+    # @!attribute [rw] vendor_severity
+    #   The severity the vendor has given to this vulnerability type.
+    #   @return [String]
+    #
+    # @!attribute [rw] vendor_updated_at
+    #   The date and time the vendor last updated this vulnerability in
+    #   their database.
+    #   @return [Time]
+    #
+    # @!attribute [rw] vulnerability_id
+    #   The ID given to this vulnerability.
+    #   @return [String]
+    #
+    # @!attribute [rw] vulnerable_packages
+    #   The packages impacted by this vulnerability.
+    #   @return [Array<Types::VulnerablePackage>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PackageVulnerabilityDetails AWS API Documentation
+    #
+    class PackageVulnerabilityDetails < Struct.new(
+      :cvss,
+      :reference_urls,
+      :related_vulnerabilities,
+      :source,
+      :source_url,
+      :vendor_created_at,
+      :vendor_severity,
+      :vendor_updated_at,
+      :vulnerability_id,
+      :vulnerable_packages)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The details of a pull through cache rule.
+    #
+    # @!attribute [rw] ecr_repository_prefix
+    #   The Amazon ECR repository prefix associated with the pull through
+    #   cache rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] upstream_registry_url
+    #   The upstream registry URL associated with the pull through cache
+    #   rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
+    #   The date and time the pull through cache was created.
+    #   @return [Time]
     #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to put the image. If you do not specify a
-    #   registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry the
+    #   pull through cache rule is associated with.
+    #   @return [String]
+    #
+    # @!attribute [rw] credential_arn
+    #   The ARN of the Secrets Manager secret associated with the pull
+    #   through cache rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] upstream_registry
+    #   The name of the upstream source registry associated with the pull
+    #   through cache rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] updated_at
+    #   The date and time, in JavaScript date format, when the pull through
+    #   cache rule was last updated.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PullThroughCacheRule AWS API Documentation
+    #
+    class PullThroughCacheRule < Struct.new(
+      :ecr_repository_prefix,
+      :upstream_registry_url,
+      :created_at,
+      :registry_id,
+      :credential_arn,
+      :upstream_registry,
+      :updated_at)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # A pull through cache rule with these settings already exists for the
+    # private registry.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PullThroughCacheRuleAlreadyExistsException AWS API Documentation
+    #
+    class PullThroughCacheRuleAlreadyExistsException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The pull through cache rule was not found. Specify a valid pull
+    # through cache rule and try again.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PullThroughCacheRuleNotFoundException AWS API Documentation
+    #
+    class PullThroughCacheRuleNotFoundException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] name
+    #   Basic scan type version name.
+    #   @return [String]
+    #
+    # @!attribute [rw] value
+    #   Setting value that determines what basic scan type is being used:
+    #   `AWS_NATIVE` or `CLAIR`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PutAccountSettingRequest AWS API Documentation
+    #
+    class PutAccountSettingRequest < Struct.new(
+      :name,
+      :value)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] name
+    #   Retrieves the the basic scan type version name.
+    #   @return [String]
+    #
+    # @!attribute [rw] value
+    #   Retrieves the basic scan type value, either `AWS_NATIVE` or `-`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PutAccountSettingResponse AWS API Documentation
+    #
+    class PutAccountSettingResponse < Struct.new(
+      :name,
+      :value)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to put the image. If you do not
+    #   specify a registry, the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -2256,22 +3067,11 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutImageScanningConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         image_scanning_configuration: { # required
-    #           scan_on_push: false,
-    #         },
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to update the image scanning configuration
-    #   setting. If you do not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to update the image scanning
+    #   configuration setting. If you do not specify a registry, the default
+    #   registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -2317,19 +3117,11 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutImageTagMutabilityRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         image_tag_mutability: "MUTABLE", # required, accepts MUTABLE, IMMUTABLE
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to update the image tag mutability settings. If
-    #   you do not specify a registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to update the image tag mutability
+    #   settings. If you do not specify a registry, the default registry is
+    #   assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -2376,19 +3168,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutLifecyclePolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         lifecycle_policy_text: "LifecyclePolicyText", # required
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do  not specify a registry, the default registry
-    #   is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do  not specify a registry, the
+    #   default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -2431,13 +3214,6 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutRegistryPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         policy_text: "RegistryPolicyText", # required
-    #       }
-    #
     # @!attribute [rw] policy_text
     #   The JSON policy text to apply to your registry. The policy text
     #   follows the same format as IAM policy text. For more information,
@@ -2458,7 +3234,7 @@ module Aws::ECR
     end
 
     # @!attribute [rw] registry_id
-    #   The registry ID.
+    #   The registry ID associated with the request.
     #   @return [String]
     #
     # @!attribute [rw] policy_text
@@ -2474,24 +3250,49 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutReplicationConfigurationRequest
-    #   data as a hash:
+    # @!attribute [rw] scan_type
+    #   The scanning type to set for the registry.
     #
-    #       {
-    #         replication_configuration: { # required
-    #           rules: [ # required
-    #             {
-    #               destinations: [ # required
-    #                 {
-    #                   region: "Region", # required
-    #                   registry_id: "RegistryId", # required
-    #                 },
-    #               ],
-    #             },
-    #           ],
-    #         },
-    #       }
+    #   When a registry scanning configuration is not defined, by default
+    #   the `BASIC` scan type is used. When basic scanning is used, you may
+    #   specify filters to determine which individual repositories, or all
+    #   repositories, are scanned when new images are pushed to those
+    #   repositories. Alternatively, you can do manual scans of images with
+    #   basic scanning.
     #
+    #   When the `ENHANCED` scan type is set, Amazon Inspector provides
+    #   automated vulnerability scanning. You may choose between continuous
+    #   scanning or scan on push and you may specify filters to determine
+    #   which individual repositories, or all repositories, are scanned.
+    #   @return [String]
+    #
+    # @!attribute [rw] rules
+    #   The scanning rules to use for the registry. A scanning rule is used
+    #   to determine which repository filters are used and at what frequency
+    #   scanning will occur.
+    #   @return [Array<Types::RegistryScanningRule>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PutRegistryScanningConfigurationRequest AWS API Documentation
+    #
+    class PutRegistryScanningConfigurationRequest < Struct.new(
+      :scan_type,
+      :rules)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] registry_scanning_configuration
+    #   The scanning configuration for your registry.
+    #   @return [Types::RegistryScanningConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PutRegistryScanningConfigurationResponse AWS API Documentation
+    #
+    class PutRegistryScanningConfigurationResponse < Struct.new(
+      :registry_scanning_configuration)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] replication_configuration
     #   An object representing the replication configuration for a registry.
     #   @return [Types::ReplicationConfiguration]
@@ -2512,6 +3313,26 @@ module Aws::ECR
     #
     class PutReplicationConfigurationResponse < Struct.new(
       :replication_configuration)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Details about the recommended course of action to remediate the
+    # finding.
+    #
+    # @!attribute [rw] url
+    #   The URL address to the CVE remediation recommendations.
+    #   @return [String]
+    #
+    # @!attribute [rw] text
+    #   The recommended course of action to remediate the finding.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/Recommendation AWS API Documentation
+    #
+    class Recommendation < Struct.new(
+      :url,
+      :text)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2542,29 +3363,70 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # The replication configuration for a registry.
+    # The scanning configuration for a private registry.
     #
-    # @note When making an API call, you may pass ReplicationConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         rules: [ # required
-    #           {
-    #             destinations: [ # required
-    #               {
-    #                 region: "Region", # required
-    #                 registry_id: "RegistryId", # required
-    #               },
-    #             ],
-    #           },
-    #         ],
-    #       }
+    # @!attribute [rw] scan_type
+    #   The type of scanning configured for the registry.
+    #   @return [String]
     #
     # @!attribute [rw] rules
-    #   An array of objects representing the replication rules for a
-    #   replication configuration. A replication configuration may contain
-    #   only one replication rule but the rule may contain one or more
-    #   replication destinations.
+    #   The scanning rules associated with the registry.
+    #   @return [Array<Types::RegistryScanningRule>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/RegistryScanningConfiguration AWS API Documentation
+    #
+    class RegistryScanningConfiguration < Struct.new(
+      :scan_type,
+      :rules)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The details of a scanning rule for a private registry.
+    #
+    # @!attribute [rw] scan_frequency
+    #   The frequency that scans are performed at for a private registry.
+    #   When the `ENHANCED` scan type is specified, the supported scan
+    #   frequencies are `CONTINUOUS_SCAN` and `SCAN_ON_PUSH`. When the
+    #   `BASIC` scan type is specified, the `SCAN_ON_PUSH` scan frequency is
+    #   supported. If scan on push is not specified, then the `MANUAL` scan
+    #   frequency is set by default.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_filters
+    #   The repository filters associated with the scanning configuration
+    #   for a private registry.
+    #   @return [Array<Types::ScanningRepositoryFilter>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/RegistryScanningRule AWS API Documentation
+    #
+    class RegistryScanningRule < Struct.new(
+      :scan_frequency,
+      :repository_filters)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information on how to remediate a finding.
+    #
+    # @!attribute [rw] recommendation
+    #   An object that contains information about the recommended course of
+    #   action to remediate the finding.
+    #   @return [Types::Recommendation]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/Remediation AWS API Documentation
+    #
+    class Remediation < Struct.new(
+      :recommendation)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The replication configuration for a registry.
+    #
+    # @!attribute [rw] rules
+    #   An array of objects representing the replication destinations and
+    #   repository filters for a replication configuration.
     #   @return [Array<Types::ReplicationRule>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ReplicationConfiguration AWS API Documentation
@@ -2575,23 +3437,17 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # An array of objects representing the details of a replication
-    # destination.
-    #
-    # @note When making an API call, you may pass ReplicationDestination
-    #   data as a hash:
-    #
-    #       {
-    #         region: "Region", # required
-    #         registry_id: "RegistryId", # required
-    #       }
+    # An array of objects representing the destination for a replication
+    # rule.
     #
     # @!attribute [rw] region
-    #   A Region to replicate to.
+    #   The Region to replicate to.
     #   @return [String]
     #
     # @!attribute [rw] registry_id
-    #   The account ID of the destination registry to replicate to.
+    #   The Amazon Web Services account ID of the Amazon ECR private
+    #   registry to replicate to. When configuring cross-Region replication
+    #   within your own registry, specify your own account ID.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ReplicationDestination AWS API Documentation
@@ -2603,32 +3459,26 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # An array of objects representing the replication destinations for a
-    # replication configuration. A replication configuration may contain
-    # only one replication rule but the rule may contain one or more
-    # replication destinations.
-    #
-    # @note When making an API call, you may pass ReplicationRule
-    #   data as a hash:
-    #
-    #       {
-    #         destinations: [ # required
-    #           {
-    #             region: "Region", # required
-    #             registry_id: "RegistryId", # required
-    #           },
-    #         ],
-    #       }
+    # An array of objects representing the replication destinations and
+    # repository filters for a replication configuration.
     #
     # @!attribute [rw] destinations
-    #   An array of objects representing the details of a replication
-    #   destination.
+    #   An array of objects representing the destination for a replication
+    #   rule.
     #   @return [Array<Types::ReplicationDestination>]
+    #
+    # @!attribute [rw] repository_filters
+    #   An array of objects representing the filters for a replication rule.
+    #   Specifying a repository filter for a replication rule provides a
+    #   method for controlling which repositories in a private registry are
+    #   replicated.
+    #   @return [Array<Types::RepositoryFilter>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ReplicationRule AWS API Documentation
     #
     class ReplicationRule < Struct.new(
-      :destinations)
+      :destinations,
+      :repository_filters)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2638,14 +3488,14 @@ module Aws::ECR
     # @!attribute [rw] repository_arn
     #   The Amazon Resource Name (ARN) that identifies the repository. The
     #   ARN contains the `arn:aws:ecr` namespace, followed by the region of
-    #   the repository, AWS account ID of the repository owner, repository
-    #   namespace, and repository name. For example,
-    #   `arn:aws:ecr:region:012345678910:repository/test`.
+    #   the repository, Amazon Web Services account ID of the repository
+    #   owner, repository namespace, and repository name. For example,
+    #   `arn:aws:ecr:region:012345678910:repository-namespace/repository-name`.
     #   @return [String]
     #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -2704,6 +3554,118 @@ module Aws::ECR
       include Aws::Structure
     end
 
+    # The details of the repository creation template associated with the
+    # request.
+    #
+    # @!attribute [rw] prefix
+    #   The repository namespace prefix associated with the repository
+    #   creation template.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   The description associated with the repository creation template.
+    #   @return [String]
+    #
+    # @!attribute [rw] encryption_configuration
+    #   The encryption configuration associated with the repository creation
+    #   template.
+    #   @return [Types::EncryptionConfigurationForRepositoryCreationTemplate]
+    #
+    # @!attribute [rw] resource_tags
+    #   The metadata to apply to the repository to help you categorize and
+    #   organize. Each tag consists of a key and an optional value, both of
+    #   which you define. Tag keys can have a maximum character length of
+    #   128 characters, and tag values can have a maximum length of 256
+    #   characters.
+    #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] image_tag_mutability
+    #   The tag mutability setting for the repository. If this parameter is
+    #   omitted, the default setting of MUTABLE will be used which will
+    #   allow image tags to be overwritten. If IMMUTABLE is specified, all
+    #   image tags within the repository will be immutable which will
+    #   prevent them from being overwritten.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_policy
+    #   he repository policy to apply to repositories created using the
+    #   template. A repository policy is a permissions policy associated
+    #   with a repository to control access permissions.
+    #   @return [String]
+    #
+    # @!attribute [rw] lifecycle_policy
+    #   The lifecycle policy to use for repositories created using the
+    #   template.
+    #   @return [String]
+    #
+    # @!attribute [rw] applied_for
+    #   A list of enumerable Strings representing the repository creation
+    #   scenarios that this template will apply towards. The two supported
+    #   scenarios are PULL\_THROUGH\_CACHE and REPLICATION
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] custom_role_arn
+    #   The ARN of the role to be assumed by Amazon ECR. Amazon ECR will
+    #   assume your supplied role when the customRoleArn is specified. When
+    #   this field isn't specified, Amazon ECR will use the service-linked
+    #   role for the repository creation template.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
+    #   The date and time, in JavaScript date format, when the repository
+    #   creation template was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] updated_at
+    #   The date and time, in JavaScript date format, when the repository
+    #   creation template was last updated.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/RepositoryCreationTemplate AWS API Documentation
+    #
+    class RepositoryCreationTemplate < Struct.new(
+      :prefix,
+      :description,
+      :encryption_configuration,
+      :resource_tags,
+      :image_tag_mutability,
+      :repository_policy,
+      :lifecycle_policy,
+      :applied_for,
+      :custom_role_arn,
+      :created_at,
+      :updated_at)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The filter settings used with image replication. Specifying a
+    # repository filter to a replication rule provides a method for
+    # controlling which repositories in a private registry are replicated.
+    # If no filters are added, the contents of all repositories are
+    # replicated.
+    #
+    # @!attribute [rw] filter
+    #   The repository filter details. When the `PREFIX_MATCH` filter type
+    #   is specified, this value is required and should be the repository
+    #   name prefix to configure replication for.
+    #   @return [String]
+    #
+    # @!attribute [rw] filter_type
+    #   The repository filter type. The only supported value is
+    #   `PREFIX_MATCH`, which is a repository name prefix specified with the
+    #   `filter` parameter.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/RepositoryFilter AWS API Documentation
+    #
+    class RepositoryFilter < Struct.new(
+      :filter,
+      :filter_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The specified repository contains images. To delete a repository that
     # contains images, you must force the deletion with the `force`
     # parameter.
@@ -2751,6 +3713,110 @@ module Aws::ECR
       include Aws::Structure
     end
 
+    # The details of the scanning configuration for a repository.
+    #
+    # @!attribute [rw] repository_arn
+    #   The ARN of the repository.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_name
+    #   The name of the repository.
+    #   @return [String]
+    #
+    # @!attribute [rw] scan_on_push
+    #   Whether or not scan on push is configured for the repository.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] scan_frequency
+    #   The scan frequency for the repository.
+    #   @return [String]
+    #
+    # @!attribute [rw] applied_scan_filters
+    #   The scan filters applied to the repository.
+    #   @return [Array<Types::ScanningRepositoryFilter>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/RepositoryScanningConfiguration AWS API Documentation
+    #
+    class RepositoryScanningConfiguration < Struct.new(
+      :repository_arn,
+      :repository_name,
+      :scan_on_push,
+      :scan_frequency,
+      :applied_scan_filters)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The details about any failures associated with the scanning
+    # configuration of a repository.
+    #
+    # @!attribute [rw] repository_name
+    #   The name of the repository.
+    #   @return [String]
+    #
+    # @!attribute [rw] failure_code
+    #   The failure code.
+    #   @return [String]
+    #
+    # @!attribute [rw] failure_reason
+    #   The reason for the failure.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/RepositoryScanningConfigurationFailure AWS API Documentation
+    #
+    class RepositoryScanningConfigurationFailure < Struct.new(
+      :repository_name,
+      :failure_code,
+      :failure_reason)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Details about the resource involved in a finding.
+    #
+    # @!attribute [rw] details
+    #   An object that contains details about the resource involved in a
+    #   finding.
+    #   @return [Types::ResourceDetails]
+    #
+    # @!attribute [rw] id
+    #   The ID of the resource.
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   The tags attached to the resource.
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] type
+    #   The type of resource.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/Resource AWS API Documentation
+    #
+    class Resource < Struct.new(
+      :details,
+      :id,
+      :tags,
+      :type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains details about the resource involved in the finding.
+    #
+    # @!attribute [rw] aws_ecr_container_image
+    #   An object that contains details about the Amazon ECR container image
+    #   involved in the finding.
+    #   @return [Types::AwsEcrContainerImageDetails]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ResourceDetails AWS API Documentation
+    #
+    class ResourceDetails < Struct.new(
+      :aws_ecr_container_image)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The specified image scan could not be found. Ensure that image
     # scanning is enabled on the repository and try again.
     #
@@ -2760,6 +3826,61 @@ module Aws::ECR
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ScanNotFoundException AWS API Documentation
     #
     class ScanNotFoundException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The details of a scanning repository filter. For more information on
+    # how to use filters, see [Using filters][1] in the *Amazon Elastic
+    # Container Registry User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html#image-scanning-filters
+    #
+    # @!attribute [rw] filter
+    #   The filter to use when scanning.
+    #   @return [String]
+    #
+    # @!attribute [rw] filter_type
+    #   The type associated with the filter.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ScanningRepositoryFilter AWS API Documentation
+    #
+    class ScanningRepositoryFilter < Struct.new(
+      :filter,
+      :filter_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about the Amazon Inspector score given to a finding.
+    #
+    # @!attribute [rw] cvss
+    #   An object that contains details about the CVSS score given to a
+    #   finding.
+    #   @return [Types::CvssScoreDetails]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ScoreDetails AWS API Documentation
+    #
+    class ScoreDetails < Struct.new(
+      :cvss)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The ARN of the secret specified in the pull through cache rule was not
+    # found. Update the pull through cache rule with a valid secret ARN and
+    # try again.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/SecretNotFoundException AWS API Documentation
+    #
+    class SecretNotFoundException < Struct.new(
       :message)
       SENSITIVE = []
       include Aws::Structure
@@ -2779,20 +3900,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SetRepositoryPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         policy_text: "RepositoryPolicyText", # required
-    #         force: false,
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry
-    #   is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the
+    #   default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -2801,7 +3912,7 @@ module Aws::ECR
     #
     # @!attribute [rw] policy_text
     #   The JSON repository policy text to apply to the repository. For more
-    #   information, see [Amazon ECR Repository Policies][1] in the *Amazon
+    #   information, see [Amazon ECR repository policies][1] in the *Amazon
     #   Elastic Container Registry User Guide*.
     #
     #
@@ -2849,22 +3960,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass StartImageScanRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         image_id: { # required
-    #           image_digest: "ImageDigest",
-    #           image_tag: "ImageTag",
-    #         },
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to start an image scan request. If you do not
-    #   specify a registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to start an image scan request. If
+    #   you do not specify a registry, the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -2872,7 +3971,8 @@ module Aws::ECR
     #   @return [String]
     #
     # @!attribute [rw] image_id
-    #   An object with identifying information for an Amazon ECR image.
+    #   An object with identifying information for an image in an Amazon ECR
+    #   repository.
     #   @return [Types::ImageIdentifier]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/StartImageScanRequest AWS API Documentation
@@ -2894,7 +3994,8 @@ module Aws::ECR
     #   @return [String]
     #
     # @!attribute [rw] image_id
-    #   An object with identifying information for an Amazon ECR image.
+    #   An object with identifying information for an image in an Amazon ECR
+    #   repository.
     #   @return [Types::ImageIdentifier]
     #
     # @!attribute [rw] image_scan_status
@@ -2912,19 +4013,10 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass StartLifecyclePolicyPreviewRequest
-    #   data as a hash:
-    #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         lifecycle_policy_text: "LifecyclePolicyText",
-    #       }
-    #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry
-    #   is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the
+    #   default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -2973,19 +4065,11 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # The metadata that you apply to a resource to help you categorize and
-    # organize them. Each tag consists of a key and an optional value, both
-    # of which you define. Tag keys can have a maximum character length of
-    # 128 characters, and tag values can have a maximum length of 256
+    # The metadata to apply to a resource to help you categorize and
+    # organize them. Each tag consists of a key and a value, both of which
+    # you define. Tag keys can have a maximum character length of 128
+    # characters, and tag values can have a maximum length of 256
     # characters.
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey",
-    #         value: "TagValue",
-    #       }
     #
     # @!attribute [rw] key
     #   One part of a key-value pair that make up a tag. A `key` is a
@@ -2994,8 +4078,7 @@ module Aws::ECR
     #   @return [String]
     #
     # @!attribute [rw] value
-    #   The optional part of a key-value pair that make up a tag. A `value`
-    #   acts as a descriptor within a tag category (key).
+    #   A `value` acts as a descriptor within a tag category (key).
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/Tag AWS API Documentation
@@ -3007,19 +4090,6 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "Arn", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey",
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the the resource to which to add
     #   tags. Currently, the only supported resource is an Amazon ECR
@@ -3046,6 +4116,34 @@ module Aws::ECR
     #
     class TagResourceResponse < Aws::EmptyStructure; end
 
+    # The repository creation template already exists. Specify a unique
+    # prefix and try again.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/TemplateAlreadyExistsException AWS API Documentation
+    #
+    class TemplateAlreadyExistsException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The specified repository creation template can't be found. Verify the
+    # registry ID and prefix and try again.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/TemplateNotFoundException AWS API Documentation
+    #
+    class TemplateNotFoundException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The list of tags on the repository is over the limit. The maximum
     # number of tags that can be applied to a repository is 50.
     #
@@ -3055,6 +4153,64 @@ module Aws::ECR
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/TooManyTagsException AWS API Documentation
     #
     class TooManyTagsException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The secret is unable to be accessed. Verify the resource permissions
+    # for the secret and try again.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UnableToAccessSecretException AWS API Documentation
+    #
+    class UnableToAccessSecretException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The secret is accessible but is unable to be decrypted. Verify the
+    # resource permisisons and try again.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UnableToDecryptSecretValueException AWS API Documentation
+    #
+    class UnableToDecryptSecretValueException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The image or images were unable to be pulled using the pull through
+    # cache rule. This is usually caused because of an issue with the
+    # Secrets Manager secret containing the credentials for the upstream
+    # registry.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UnableToGetUpstreamImageException AWS API Documentation
+    #
+    class UnableToGetUpstreamImageException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # There was an issue getting the upstream layer matching the pull
+    # through cache rule.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UnableToGetUpstreamLayerException AWS API Documentation
+    #
+    class UnableToGetUpstreamLayerException < Struct.new(
       :message)
       SENSITIVE = []
       include Aws::Structure
@@ -3073,14 +4229,19 @@ module Aws::ECR
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
+    # The specified upstream registry isn't supported.
     #
-    #       {
-    #         resource_arn: "Arn", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
+    # @!attribute [rw] message
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UnsupportedUpstreamRegistryException AWS API Documentation
+    #
+    class UnsupportedUpstreamRegistryException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the resource from which to remove
     #   tags. Currently, the only supported resource is an Amazon ECR
@@ -3104,22 +4265,165 @@ module Aws::ECR
     #
     class UntagResourceResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UploadLayerPartRequest
-    #   data as a hash:
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry
+    #   associated with the pull through cache rule. If you do not specify a
+    #   registry, the default registry is assumed.
+    #   @return [String]
     #
-    #       {
-    #         registry_id: "RegistryId",
-    #         repository_name: "RepositoryName", # required
-    #         upload_id: "UploadId", # required
-    #         part_first_byte: 1, # required
-    #         part_last_byte: 1, # required
-    #         layer_part_blob: "data", # required
-    #       }
+    # @!attribute [rw] ecr_repository_prefix
+    #   The repository name prefix to use when caching images from the
+    #   source registry.
+    #   @return [String]
+    #
+    # @!attribute [rw] credential_arn
+    #   The Amazon Resource Name (ARN) of the Amazon Web Services Secrets
+    #   Manager secret that identifies the credentials to authenticate to
+    #   the upstream registry.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UpdatePullThroughCacheRuleRequest AWS API Documentation
+    #
+    class UpdatePullThroughCacheRuleRequest < Struct.new(
+      :registry_id,
+      :ecr_repository_prefix,
+      :credential_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] ecr_repository_prefix
+    #   The Amazon ECR repository prefix associated with the pull through
+    #   cache rule.
+    #   @return [String]
     #
     # @!attribute [rw] registry_id
-    #   The AWS account ID associated with the registry to which you are
-    #   uploading layer parts. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The registry ID associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] updated_at
+    #   The date and time, in JavaScript date format, when the pull through
+    #   cache rule was updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] credential_arn
+    #   The Amazon Resource Name (ARN) of the Amazon Web Services Secrets
+    #   Manager secret associated with the pull through cache rule.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UpdatePullThroughCacheRuleResponse AWS API Documentation
+    #
+    class UpdatePullThroughCacheRuleResponse < Struct.new(
+      :ecr_repository_prefix,
+      :registry_id,
+      :updated_at,
+      :credential_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] prefix
+    #   The repository namespace prefix that matches an existing repository
+    #   creation template in the registry. All repositories created using
+    #   this namespace prefix will have the settings defined in this
+    #   template applied. For example, a prefix of `prod` would apply to all
+    #   repositories beginning with `prod/`. This includes a repository
+    #   named `prod/team1` as well as a repository named `prod/repository1`.
+    #
+    #   To apply a template to all repositories in your registry that don't
+    #   have an associated creation template, you can use `ROOT` as the
+    #   prefix.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   A description for the repository creation template.
+    #   @return [String]
+    #
+    # @!attribute [rw] encryption_configuration
+    #   The encryption configuration to associate with the repository
+    #   creation template.
+    #   @return [Types::EncryptionConfigurationForRepositoryCreationTemplate]
+    #
+    # @!attribute [rw] resource_tags
+    #   The metadata to apply to the repository to help you categorize and
+    #   organize. Each tag consists of a key and an optional value, both of
+    #   which you define. Tag keys can have a maximum character length of
+    #   128 characters, and tag values can have a maximum length of 256
+    #   characters.
+    #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] image_tag_mutability
+    #   Updates the tag mutability setting for the repository. If this
+    #   parameter is omitted, the default setting of `MUTABLE` will be used
+    #   which will allow image tags to be overwritten. If `IMMUTABLE` is
+    #   specified, all image tags within the repository will be immutable
+    #   which will prevent them from being overwritten.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_policy
+    #   Updates the repository policy created using the template. A
+    #   repository policy is a permissions policy associated with a
+    #   repository to control access permissions.
+    #   @return [String]
+    #
+    # @!attribute [rw] lifecycle_policy
+    #   Updates the lifecycle policy associated with the specified
+    #   repository creation template.
+    #   @return [String]
+    #
+    # @!attribute [rw] applied_for
+    #   Updates the list of enumerable strings representing the Amazon ECR
+    #   repository creation scenarios that this template will apply towards.
+    #   The two supported scenarios are `PULL_THROUGH_CACHE` and
+    #   `REPLICATION`
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] custom_role_arn
+    #   The ARN of the role to be assumed by Amazon ECR. This role must be
+    #   in the same account as the registry that you are configuring. Amazon
+    #   ECR will assume your supplied role when the customRoleArn is
+    #   specified. When this field isn't specified, Amazon ECR will use the
+    #   service-linked role for the repository creation template.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UpdateRepositoryCreationTemplateRequest AWS API Documentation
+    #
+    class UpdateRepositoryCreationTemplateRequest < Struct.new(
+      :prefix,
+      :description,
+      :encryption_configuration,
+      :resource_tags,
+      :image_tag_mutability,
+      :repository_policy,
+      :lifecycle_policy,
+      :applied_for,
+      :custom_role_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] registry_id
+    #   The registry ID associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_creation_template
+    #   The details of the repository creation template associated with the
+    #   request.
+    #   @return [Types::RepositoryCreationTemplate]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UpdateRepositoryCreationTemplateResponse AWS API Documentation
+    #
+    class UpdateRepositoryCreationTemplateResponse < Struct.new(
+      :registry_id,
+      :repository_creation_template)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] registry_id
+    #   The Amazon Web Services account ID associated with the registry to
+    #   which you are uploading layer parts. If you do not specify a
+    #   registry, the default registry is assumed.
     #   @return [String]
     #
     # @!attribute [rw] repository_name
@@ -3200,6 +4504,74 @@ module Aws::ECR
       include Aws::Structure
     end
 
+    # @!attribute [rw] ecr_repository_prefix
+    #   The repository name prefix associated with the pull through cache
+    #   rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] registry_id
+    #   The registry ID associated with the pull through cache rule. If you
+    #   do not specify a registry, the default registry is assumed.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ValidatePullThroughCacheRuleRequest AWS API Documentation
+    #
+    class ValidatePullThroughCacheRuleRequest < Struct.new(
+      :ecr_repository_prefix,
+      :registry_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] ecr_repository_prefix
+    #   The Amazon ECR repository prefix associated with the pull through
+    #   cache rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] registry_id
+    #   The registry ID associated with the request.
+    #   @return [String]
+    #
+    # @!attribute [rw] upstream_registry_url
+    #   The upstream registry URL associated with the pull through cache
+    #   rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] credential_arn
+    #   The Amazon Resource Name (ARN) of the Amazon Web Services Secrets
+    #   Manager secret associated with the pull through cache rule.
+    #   @return [String]
+    #
+    # @!attribute [rw] is_valid
+    #   Whether or not the pull through cache rule was validated. If `true`,
+    #   Amazon ECR was able to reach the upstream registry and
+    #   authentication was successful. If `false`, there was an issue and
+    #   validation failed. The `failure` reason indicates the cause.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] failure
+    #   The reason the validation failed. For more details about possible
+    #   causes and how to address them, see [Using pull through cache
+    #   rules][1] in the *Amazon Elastic Container Registry User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/pull-through-cache.html
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ValidatePullThroughCacheRuleResponse AWS API Documentation
+    #
+    class ValidatePullThroughCacheRuleResponse < Struct.new(
+      :ecr_repository_prefix,
+      :registry_id,
+      :upstream_registry_url,
+      :credential_arn,
+      :is_valid,
+      :failure)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # There was an exception validating this request.
     #
     # @!attribute [rw] message
@@ -3213,5 +4585,60 @@ module Aws::ECR
       include Aws::Structure
     end
 
+    # Information on the vulnerable package identified by a finding.
+    #
+    # @!attribute [rw] arch
+    #   The architecture of the vulnerable package.
+    #   @return [String]
+    #
+    # @!attribute [rw] epoch
+    #   The epoch of the vulnerable package.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] file_path
+    #   The file path of the vulnerable package.
+    #   @return [String]
+    #
+    # @!attribute [rw] name
+    #   The name of the vulnerable package.
+    #   @return [String]
+    #
+    # @!attribute [rw] package_manager
+    #   The package manager of the vulnerable package.
+    #   @return [String]
+    #
+    # @!attribute [rw] release
+    #   The release of the vulnerable package.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_layer_hash
+    #   The source layer hash of the vulnerable package.
+    #   @return [String]
+    #
+    # @!attribute [rw] version
+    #   The version of the vulnerable package.
+    #   @return [String]
+    #
+    # @!attribute [rw] fixed_in_version
+    #   The version of the package that contains the vulnerability fix.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/VulnerablePackage AWS API Documentation
+    #
+    class VulnerablePackage < Struct.new(
+      :arch,
+      :epoch,
+      :file_path,
+      :name,
+      :package_manager,
+      :release,
+      :source_layer_hash,
+      :version,
+      :fixed_in_version)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
   end
 end
+

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -119,16 +119,6 @@ module Aws::ConnectContactLens
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListRealtimeContactAnalysisSegmentsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         instance_id: "InstanceId", # required
-    #         contact_id: "ContactId", # required
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] instance_id
     #   The identifier of the Amazon Connect instance.
     #   @return [String]
@@ -138,7 +128,7 @@ module Aws::ConnectContactLens
     #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The maximimum number of results to return per page.
+    #   The maximum number of results to return per page.
     #   @return [Integer]
     #
     # @!attribute [rw] next_token
@@ -208,6 +198,52 @@ module Aws::ConnectContactLens
       include Aws::Structure
     end
 
+    # Information about the post-contact summary.
+    #
+    # @!attribute [rw] content
+    #   The content of the summary.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   Whether the summary was successfully COMPLETED or FAILED to be
+    #   generated.
+    #   @return [String]
+    #
+    # @!attribute [rw] failure_code
+    #   If the summary failed to be generated, one of the following failure
+    #   codes occurs:
+    #
+    #   * `QUOTA_EXCEEDED`: The number of concurrent analytics jobs reached
+    #     your service quota.
+    #
+    #   * `INSUFFICIENT_CONVERSATION_CONTENT`: The conversation needs to
+    #     have at least one turn from both the participants in order to
+    #     generate the summary.
+    #
+    #   * `FAILED_SAFETY_GUIDELINES`: The generated summary cannot be
+    #     provided because it failed to meet system safety guidelines.
+    #
+    #   * `INVALID_ANALYSIS_CONFIGURATION`: This code occurs when, for
+    #     example, you're using a [language][1] that isn't supported by
+    #     generative AI-powered post-contact summaries.
+    #
+    #   * `INTERNAL_ERROR`: Internal system error.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/connect/latest/adminguide/supported-languages.html#supported-languages-contact-lens
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/connect-contact-lens-2020-08-21/PostContactSummary AWS API Documentation
+    #
+    class PostContactSummary < Struct.new(
+      :content,
+      :status,
+      :failure_code)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # An analyzed segment for a real-time analysis session.
     #
     # @!attribute [rw] transcript
@@ -218,11 +254,16 @@ module Aws::ConnectContactLens
     #   The matched category rules.
     #   @return [Types::Categories]
     #
+    # @!attribute [rw] post_contact_summary
+    #   Information about the post-contact summary.
+    #   @return [Types::PostContactSummary]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/connect-contact-lens-2020-08-21/RealtimeContactAnalysisSegment AWS API Documentation
     #
     class RealtimeContactAnalysisSegment < Struct.new(
       :transcript,
-      :categories)
+      :categories,
+      :post_contact_summary)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -260,7 +301,8 @@ module Aws::ConnectContactLens
     #   @return [String]
     #
     # @!attribute [rw] participant_id
-    #   The identifier of the participant.
+    #   The identifier of the participant. Valid values are CUSTOMER or
+    #   AGENT.
     #   @return [String]
     #
     # @!attribute [rw] participant_role
@@ -281,7 +323,7 @@ module Aws::ConnectContactLens
     #   @return [Integer]
     #
     # @!attribute [rw] sentiment
-    #   The sentiment of the detected for this piece of transcript.
+    #   The sentiment detected for this piece of transcript.
     #   @return [String]
     #
     # @!attribute [rw] issues_detected
@@ -305,3 +347,4 @@ module Aws::ConnectContactLens
 
   end
 end
+

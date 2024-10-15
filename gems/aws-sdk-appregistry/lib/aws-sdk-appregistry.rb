@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-appregistry/types'
-require_relative 'aws-sdk-appregistry/client_api'
-require_relative 'aws-sdk-appregistry/client'
-require_relative 'aws-sdk-appregistry/errors'
-require_relative 'aws-sdk-appregistry/resource'
-require_relative 'aws-sdk-appregistry/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:appregistry)
 
 # This module provides support for AWS Service Catalog App Registry. This module is available in the
 # `aws-sdk-appregistry` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-appregistry/customizations'
 #
 # @!group service
 module Aws::AppRegistry
+  autoload :Types, 'aws-sdk-appregistry/types'
+  autoload :ClientApi, 'aws-sdk-appregistry/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-appregistry/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-appregistry/client'
+  autoload :Errors, 'aws-sdk-appregistry/errors'
+  autoload :Resource, 'aws-sdk-appregistry/resource'
+  autoload :EndpointParameters, 'aws-sdk-appregistry/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-appregistry/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-appregistry/endpoints'
 
-  GEM_VERSION = '1.3.0'
+  GEM_VERSION = '1.45.0'
 
 end
+
+require_relative 'aws-sdk-appregistry/customizations'

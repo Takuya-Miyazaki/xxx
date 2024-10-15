@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:glue)
 
 module Aws::Glue
   # An API client for Glue.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::Glue
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::Glue::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::Glue
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::Glue
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::Glue
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::Glue
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::Glue
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::Glue
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +341,112 @@ module Aws::Glue
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::Glue::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::Glue::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -341,7 +458,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the catalog in which the partition is to be created.
-    #   Currently, this should be the AWS account ID.
+    #   Currently, this should be the Amazon Web Services account ID.
     #
     # @option params [required, String] :database_name
     #   The name of the metadata database in which the partition is to be
@@ -381,6 +498,7 @@ module Aws::Glue
     #             },
     #           ],
     #           location: "LocationString",
+    #           additional_locations: ["LocationString"],
     #           input_format: "FormatString",
     #           output_format: "FormatString",
     #           compressed: false,
@@ -449,7 +567,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which the connections reside. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, Array<String>] :connection_name_list
     #   A list of names of the connections to delete.
@@ -487,7 +605,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partition to be deleted resides.
-    #   If none is provided, the AWS account ID is used by default.
+    #   If none is provided, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database in which the table in question
@@ -537,8 +656,8 @@ module Aws::Glue
     # Deletes multiple tables at once.
     #
     # <note markdown="1"> After completing this operation, you no longer have access to the
-    # table versions and partitions that belong to the deleted table. AWS
-    # Glue deletes these "orphaned" resources asynchronously in a timely
+    # table versions and partitions that belong to the deleted table. Glue
+    # deletes these "orphaned" resources asynchronously in a timely
     # manner, at the discretion of the service.
     #
     #  To ensure the immediate deletion of all related resources, before
@@ -551,7 +670,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the table resides. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database in which the tables to delete reside.
@@ -559,6 +678,9 @@ module Aws::Glue
     #
     # @option params [required, Array<String>] :tables_to_delete
     #   A list of the table to delete.
+    #
+    # @option params [String] :transaction_id
+    #   The transaction ID at which to delete the table contents.
     #
     # @return [Types::BatchDeleteTableResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -570,6 +692,7 @@ module Aws::Glue
     #     catalog_id: "CatalogIdString",
     #     database_name: "NameString", # required
     #     tables_to_delete: ["NameString"], # required
+    #     transaction_id: "TransactionIdString",
     #   })
     #
     # @example Response structure
@@ -592,7 +715,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the tables reside. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The database in the catalog in which the table resides. For Hive
@@ -636,6 +759,60 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Retrieves information about a list of blueprints.
+    #
+    # @option params [required, Array<String>] :names
+    #   A list of blueprint names.
+    #
+    # @option params [Boolean] :include_blueprint
+    #   Specifies whether or not to include the blueprint in the response.
+    #
+    # @option params [Boolean] :include_parameter_spec
+    #   Specifies whether or not to include the parameters, as a JSON string,
+    #   for the blueprint in the response.
+    #
+    # @return [Types::BatchGetBlueprintsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::BatchGetBlueprintsResponse#blueprints #blueprints} => Array&lt;Types::Blueprint&gt;
+    #   * {Types::BatchGetBlueprintsResponse#missing_blueprints #missing_blueprints} => Array&lt;String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.batch_get_blueprints({
+    #     names: ["OrchestrationNameString"], # required
+    #     include_blueprint: false,
+    #     include_parameter_spec: false,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.blueprints #=> Array
+    #   resp.blueprints[0].name #=> String
+    #   resp.blueprints[0].description #=> String
+    #   resp.blueprints[0].created_on #=> Time
+    #   resp.blueprints[0].last_modified_on #=> Time
+    #   resp.blueprints[0].parameter_spec #=> String
+    #   resp.blueprints[0].blueprint_location #=> String
+    #   resp.blueprints[0].blueprint_service_location #=> String
+    #   resp.blueprints[0].status #=> String, one of "CREATING", "ACTIVE", "UPDATING", "FAILED"
+    #   resp.blueprints[0].error_message #=> String
+    #   resp.blueprints[0].last_active_definition.description #=> String
+    #   resp.blueprints[0].last_active_definition.last_modified_on #=> Time
+    #   resp.blueprints[0].last_active_definition.parameter_spec #=> String
+    #   resp.blueprints[0].last_active_definition.blueprint_location #=> String
+    #   resp.blueprints[0].last_active_definition.blueprint_service_location #=> String
+    #   resp.missing_blueprints #=> Array
+    #   resp.missing_blueprints[0] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/BatchGetBlueprints AWS API Documentation
+    #
+    # @overload batch_get_blueprints(params = {})
+    # @param [Hash] params ({})
+    def batch_get_blueprints(params = {}, options = {})
+      req = build_request(:batch_get_blueprints, params)
+      req.send_request(options)
+    end
+
     # Returns a list of resource metadata for a given list of crawler names.
     # After calling the `ListCrawlers` operation, you can call this
     # operation to access the data to which you have been granted
@@ -667,11 +844,16 @@ module Aws::Glue
     #   resp.crawlers[0].targets.s3_targets[0].exclusions #=> Array
     #   resp.crawlers[0].targets.s3_targets[0].exclusions[0] #=> String
     #   resp.crawlers[0].targets.s3_targets[0].connection_name #=> String
+    #   resp.crawlers[0].targets.s3_targets[0].sample_size #=> Integer
+    #   resp.crawlers[0].targets.s3_targets[0].event_queue_arn #=> String
+    #   resp.crawlers[0].targets.s3_targets[0].dlq_event_queue_arn #=> String
     #   resp.crawlers[0].targets.jdbc_targets #=> Array
     #   resp.crawlers[0].targets.jdbc_targets[0].connection_name #=> String
     #   resp.crawlers[0].targets.jdbc_targets[0].path #=> String
     #   resp.crawlers[0].targets.jdbc_targets[0].exclusions #=> Array
     #   resp.crawlers[0].targets.jdbc_targets[0].exclusions[0] #=> String
+    #   resp.crawlers[0].targets.jdbc_targets[0].enable_additional_metadata #=> Array
+    #   resp.crawlers[0].targets.jdbc_targets[0].enable_additional_metadata[0] #=> String, one of "COMMENTS", "RAWTYPES"
     #   resp.crawlers[0].targets.mongo_db_targets #=> Array
     #   resp.crawlers[0].targets.mongo_db_targets[0].connection_name #=> String
     #   resp.crawlers[0].targets.mongo_db_targets[0].path #=> String
@@ -684,11 +866,34 @@ module Aws::Glue
     #   resp.crawlers[0].targets.catalog_targets[0].database_name #=> String
     #   resp.crawlers[0].targets.catalog_targets[0].tables #=> Array
     #   resp.crawlers[0].targets.catalog_targets[0].tables[0] #=> String
+    #   resp.crawlers[0].targets.catalog_targets[0].connection_name #=> String
+    #   resp.crawlers[0].targets.catalog_targets[0].event_queue_arn #=> String
+    #   resp.crawlers[0].targets.catalog_targets[0].dlq_event_queue_arn #=> String
+    #   resp.crawlers[0].targets.delta_targets #=> Array
+    #   resp.crawlers[0].targets.delta_targets[0].delta_tables #=> Array
+    #   resp.crawlers[0].targets.delta_targets[0].delta_tables[0] #=> String
+    #   resp.crawlers[0].targets.delta_targets[0].connection_name #=> String
+    #   resp.crawlers[0].targets.delta_targets[0].write_manifest #=> Boolean
+    #   resp.crawlers[0].targets.delta_targets[0].create_native_delta_table #=> Boolean
+    #   resp.crawlers[0].targets.iceberg_targets #=> Array
+    #   resp.crawlers[0].targets.iceberg_targets[0].paths #=> Array
+    #   resp.crawlers[0].targets.iceberg_targets[0].paths[0] #=> String
+    #   resp.crawlers[0].targets.iceberg_targets[0].connection_name #=> String
+    #   resp.crawlers[0].targets.iceberg_targets[0].exclusions #=> Array
+    #   resp.crawlers[0].targets.iceberg_targets[0].exclusions[0] #=> String
+    #   resp.crawlers[0].targets.iceberg_targets[0].maximum_traversal_depth #=> Integer
+    #   resp.crawlers[0].targets.hudi_targets #=> Array
+    #   resp.crawlers[0].targets.hudi_targets[0].paths #=> Array
+    #   resp.crawlers[0].targets.hudi_targets[0].paths[0] #=> String
+    #   resp.crawlers[0].targets.hudi_targets[0].connection_name #=> String
+    #   resp.crawlers[0].targets.hudi_targets[0].exclusions #=> Array
+    #   resp.crawlers[0].targets.hudi_targets[0].exclusions[0] #=> String
+    #   resp.crawlers[0].targets.hudi_targets[0].maximum_traversal_depth #=> Integer
     #   resp.crawlers[0].database_name #=> String
     #   resp.crawlers[0].description #=> String
     #   resp.crawlers[0].classifiers #=> Array
     #   resp.crawlers[0].classifiers[0] #=> String
-    #   resp.crawlers[0].recrawl_policy.recrawl_behavior #=> String, one of "CRAWL_EVERYTHING", "CRAWL_NEW_FOLDERS_ONLY"
+    #   resp.crawlers[0].recrawl_policy.recrawl_behavior #=> String, one of "CRAWL_EVERYTHING", "CRAWL_NEW_FOLDERS_ONLY", "CRAWL_EVENT_MODE"
     #   resp.crawlers[0].schema_change_policy.update_behavior #=> String, one of "LOG", "UPDATE_IN_DATABASE"
     #   resp.crawlers[0].schema_change_policy.delete_behavior #=> String, one of "LOG", "DELETE_FROM_DATABASE", "DEPRECATE_IN_DATABASE"
     #   resp.crawlers[0].lineage_configuration.crawler_lineage_settings #=> String, one of "ENABLE", "DISABLE"
@@ -708,6 +913,8 @@ module Aws::Glue
     #   resp.crawlers[0].version #=> Integer
     #   resp.crawlers[0].configuration #=> String
     #   resp.crawlers[0].crawler_security_configuration #=> String
+    #   resp.crawlers[0].lake_formation_configuration.use_lake_formation_credentials #=> Boolean
+    #   resp.crawlers[0].lake_formation_configuration.account_id #=> String
     #   resp.crawlers_not_found #=> Array
     #   resp.crawlers_not_found[0] #=> String
     #
@@ -717,6 +924,113 @@ module Aws::Glue
     # @param [Hash] params ({})
     def batch_get_crawlers(params = {}, options = {})
       req = build_request(:batch_get_crawlers, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the details for the custom patterns specified by a list of
+    # names.
+    #
+    # @option params [required, Array<String>] :names
+    #   A list of names of the custom patterns that you want to retrieve.
+    #
+    # @return [Types::BatchGetCustomEntityTypesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::BatchGetCustomEntityTypesResponse#custom_entity_types #custom_entity_types} => Array&lt;Types::CustomEntityType&gt;
+    #   * {Types::BatchGetCustomEntityTypesResponse#custom_entity_types_not_found #custom_entity_types_not_found} => Array&lt;String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.batch_get_custom_entity_types({
+    #     names: ["NameString"], # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.custom_entity_types #=> Array
+    #   resp.custom_entity_types[0].name #=> String
+    #   resp.custom_entity_types[0].regex_string #=> String
+    #   resp.custom_entity_types[0].context_words #=> Array
+    #   resp.custom_entity_types[0].context_words[0] #=> String
+    #   resp.custom_entity_types_not_found #=> Array
+    #   resp.custom_entity_types_not_found[0] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/BatchGetCustomEntityTypes AWS API Documentation
+    #
+    # @overload batch_get_custom_entity_types(params = {})
+    # @param [Hash] params ({})
+    def batch_get_custom_entity_types(params = {}, options = {})
+      req = build_request(:batch_get_custom_entity_types, params)
+      req.send_request(options)
+    end
+
+    # Retrieves a list of data quality results for the specified result IDs.
+    #
+    # @option params [required, Array<String>] :result_ids
+    #   A list of unique result IDs for the data quality results.
+    #
+    # @return [Types::BatchGetDataQualityResultResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::BatchGetDataQualityResultResponse#results #results} => Array&lt;Types::DataQualityResult&gt;
+    #   * {Types::BatchGetDataQualityResultResponse#results_not_found #results_not_found} => Array&lt;String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.batch_get_data_quality_result({
+    #     result_ids: ["HashString"], # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.results #=> Array
+    #   resp.results[0].result_id #=> String
+    #   resp.results[0].profile_id #=> String
+    #   resp.results[0].score #=> Float
+    #   resp.results[0].data_source.glue_table.database_name #=> String
+    #   resp.results[0].data_source.glue_table.table_name #=> String
+    #   resp.results[0].data_source.glue_table.catalog_id #=> String
+    #   resp.results[0].data_source.glue_table.connection_name #=> String
+    #   resp.results[0].data_source.glue_table.additional_options #=> Hash
+    #   resp.results[0].data_source.glue_table.additional_options["NameString"] #=> String
+    #   resp.results[0].ruleset_name #=> String
+    #   resp.results[0].evaluation_context #=> String
+    #   resp.results[0].started_on #=> Time
+    #   resp.results[0].completed_on #=> Time
+    #   resp.results[0].job_name #=> String
+    #   resp.results[0].job_run_id #=> String
+    #   resp.results[0].ruleset_evaluation_run_id #=> String
+    #   resp.results[0].rule_results #=> Array
+    #   resp.results[0].rule_results[0].name #=> String
+    #   resp.results[0].rule_results[0].description #=> String
+    #   resp.results[0].rule_results[0].evaluation_message #=> String
+    #   resp.results[0].rule_results[0].result #=> String, one of "PASS", "FAIL", "ERROR"
+    #   resp.results[0].rule_results[0].evaluated_metrics #=> Hash
+    #   resp.results[0].rule_results[0].evaluated_metrics["NameString"] #=> Float
+    #   resp.results[0].rule_results[0].evaluated_rule #=> String
+    #   resp.results[0].analyzer_results #=> Array
+    #   resp.results[0].analyzer_results[0].name #=> String
+    #   resp.results[0].analyzer_results[0].description #=> String
+    #   resp.results[0].analyzer_results[0].evaluation_message #=> String
+    #   resp.results[0].analyzer_results[0].evaluated_metrics #=> Hash
+    #   resp.results[0].analyzer_results[0].evaluated_metrics["NameString"] #=> Float
+    #   resp.results[0].observations #=> Array
+    #   resp.results[0].observations[0].description #=> String
+    #   resp.results[0].observations[0].metric_based_observation.metric_name #=> String
+    #   resp.results[0].observations[0].metric_based_observation.statistic_id #=> String
+    #   resp.results[0].observations[0].metric_based_observation.metric_values.actual_value #=> Float
+    #   resp.results[0].observations[0].metric_based_observation.metric_values.expected_value #=> Float
+    #   resp.results[0].observations[0].metric_based_observation.metric_values.lower_limit #=> Float
+    #   resp.results[0].observations[0].metric_based_observation.metric_values.upper_limit #=> Float
+    #   resp.results[0].observations[0].metric_based_observation.new_rules #=> Array
+    #   resp.results[0].observations[0].metric_based_observation.new_rules[0] #=> String
+    #   resp.results_not_found #=> Array
+    #   resp.results_not_found[0] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/BatchGetDataQualityResult AWS API Documentation
+    #
+    # @overload batch_get_data_quality_result(params = {})
+    # @param [Hash] params ({})
+    def batch_get_data_quality_result(params = {}, options = {})
+      req = build_request(:batch_get_data_quality_result, params)
       req.send_request(options)
     end
 
@@ -754,7 +1068,7 @@ module Aws::Glue
     #   resp.dev_endpoints[0].zeppelin_remote_spark_interpreter_port #=> Integer
     #   resp.dev_endpoints[0].public_address #=> String
     #   resp.dev_endpoints[0].status #=> String
-    #   resp.dev_endpoints[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.dev_endpoints[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.dev_endpoints[0].glue_version #=> String
     #   resp.dev_endpoints[0].number_of_workers #=> Integer
     #   resp.dev_endpoints[0].number_of_nodes #=> Integer
@@ -809,6 +1123,8 @@ module Aws::Glue
     #
     #   resp.jobs #=> Array
     #   resp.jobs[0].name #=> String
+    #   resp.jobs[0].job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.jobs[0].job_run_queuing_enabled #=> Boolean
     #   resp.jobs[0].description #=> String
     #   resp.jobs[0].log_uri #=> String
     #   resp.jobs[0].role #=> String
@@ -818,6 +1134,7 @@ module Aws::Glue
     #   resp.jobs[0].command.name #=> String
     #   resp.jobs[0].command.script_location #=> String
     #   resp.jobs[0].command.python_version #=> String
+    #   resp.jobs[0].command.runtime #=> String
     #   resp.jobs[0].default_arguments #=> Hash
     #   resp.jobs[0].default_arguments["GenericString"] #=> String
     #   resp.jobs[0].non_overridable_arguments #=> Hash
@@ -828,11 +1145,879 @@ module Aws::Glue
     #   resp.jobs[0].allocated_capacity #=> Integer
     #   resp.jobs[0].timeout #=> Integer
     #   resp.jobs[0].max_capacity #=> Float
-    #   resp.jobs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.jobs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.jobs[0].number_of_workers #=> Integer
     #   resp.jobs[0].security_configuration #=> String
     #   resp.jobs[0].notification_property.notify_delay_after #=> Integer
     #   resp.jobs[0].glue_version #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.connector_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.connection_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.schema_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connector_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.filter_predicate #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.partition_column #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.lower_bound #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.upper_bound #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.num_partitions #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.job_bookmark_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.job_bookmark_keys[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.job_bookmark_keys_sort_order #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.data_type_mapping #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.data_type_mapping["JDBCDataType"] #=> String, one of "DATE", "STRING", "TIMESTAMP", "INT", "FLOAT", "LONG", "BIGDECIMAL", "BYTE", "SHORT", "DOUBLE"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connection_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.connector_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_source.redshift_tmp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_source.tmp_dir_iam_role #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.partition_predicate #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.paths[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.compression_type #=> String, one of "gzip", "bzip2"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.exclusions #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.exclusions[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.group_size #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.group_files #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.recurse #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.max_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.max_files_in_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.sample_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.separator #=> String, one of "comma", "ctrla", "pipe", "semicolon", "tab"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.escaper #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.quote_char #=> String, one of "quote", "quillemet", "single_quote", "disabled"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.multiline #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.with_header #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.write_header #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.skip_first #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.optimize_performance #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.paths[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.compression_type #=> String, one of "gzip", "bzip2"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.exclusions #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.exclusions[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.group_size #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.group_files #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.recurse #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.max_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.max_files_in_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.sample_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.json_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.multiline #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.paths[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.compression_type #=> String, one of "snappy", "lzo", "gzip", "uncompressed", "none"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.exclusions #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.exclusions[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.group_size #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.group_files #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.recurse #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.max_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.max_files_in_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.sample_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].relational_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].relational_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].relational_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamo_db_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamo_db_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamo_db_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connection_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connector_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.connector_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.redshift_tmp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.tmp_dir_iam_role #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.table_location #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.upsert_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.upsert_keys[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.compression #=> String, one of "snappy", "lzo", "gzip", "uncompressed", "none"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.compression #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.format #=> String, one of "json", "csv", "avro", "orc", "parquet", "hudi", "delta"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].to_key #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].from_path #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].from_path[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].from_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].to_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].dropped #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].children #=> Types::Mappings
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.paths[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.paths[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.paths[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.paths[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.source_path #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.source_path[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.target_path #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.target_path[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.topk #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.prob #=> Float
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.join_type #=> String, one of "equijoin", "left", "right", "outer", "leftsemi", "leftanti"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.columns[0].from #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.columns[0].keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.columns[0].keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.columns[0].keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.paths[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.paths[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_from_collection.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_from_collection.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_from_collection.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_from_collection.index #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].fill_missing_values.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].fill_missing_values.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].fill_missing_values.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].fill_missing_values.imputed_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].fill_missing_values.filled_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.logical_operator #=> String, one of "AND", "OR"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].operation #=> String, one of "EQ", "LT", "GT", "LTE", "GTE", "REGEX", "ISNULL"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].negated #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].values #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].values[0].type #=> String, one of "COLUMNEXTRACTED", "CONSTANT"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].values[0].value #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].values[0].value[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.code #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.class_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.sql_query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.sql_aliases #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.sql_aliases[0].from #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.sql_aliases[0].alias #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.window_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.detect_schema #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.endpoint_url #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.stream_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.classification #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.delimiter #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.starting_position #=> String, one of "latest", "trim_horizon", "earliest", "timestamp"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_fetch_time_in_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_fetch_records_per_shard #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_record_per_read #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.add_idle_time_between_reads #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.idle_time_between_reads_in_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.describe_shard_interval #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.num_retries #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.avoid_empty_batches #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.stream_arn #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.role_arn #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.role_session_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.add_record_timestamp #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.starting_timestamp #=> Time
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.data_preview_options.polling_time #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.bootstrap_servers #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.security_protocol #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.topic_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.assign #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.subscribe_pattern #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.classification #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.delimiter #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.starting_offsets #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.ending_offsets #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.poll_timeout_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.num_retries #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.max_offsets_per_trigger #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.min_partitions #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.include_headers #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.add_record_timestamp #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.starting_timestamp #=> Time
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.window_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.detect_schema #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.data_preview_options.polling_time #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.window_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.detect_schema #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.endpoint_url #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.stream_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.classification #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.delimiter #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.starting_position #=> String, one of "latest", "trim_horizon", "earliest", "timestamp"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_fetch_time_in_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_fetch_records_per_shard #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_record_per_read #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.add_idle_time_between_reads #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.idle_time_between_reads_in_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.describe_shard_interval #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.num_retries #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.avoid_empty_batches #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.stream_arn #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.role_arn #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.role_session_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.add_record_timestamp #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.starting_timestamp #=> Time
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.data_preview_options.polling_time #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.window_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.detect_schema #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.bootstrap_servers #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.security_protocol #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.topic_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.assign #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.subscribe_pattern #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.classification #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.delimiter #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.starting_offsets #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.ending_offsets #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.poll_timeout_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.num_retries #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.max_offsets_per_trigger #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.min_partitions #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.include_headers #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.add_record_timestamp #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.starting_timestamp #=> Time
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.data_preview_options.polling_time #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_check_box_list.is_empty #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_check_box_list.is_null_string #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_check_box_list.is_neg_one #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list[0].datatype.id #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list[0].datatype.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.source #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.primary_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.primary_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.primary_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].union.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].union.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].union.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].union.union_type #=> String, one of "ALL", "DISTINCT"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.pii_type #=> String, one of "RowAudit", "RowMasking", "ColumnAudit", "ColumnMasking"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.entity_types_to_detect #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.entity_types_to_detect[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.output_column_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.sample_fraction #=> Float
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.threshold_fraction #=> Float
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.mask_value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.groups #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.groups[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.groups[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.aggs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.aggs[0].column #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.aggs[0].column[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.aggs[0].agg_func #=> String, one of "avg", "countDistinct", "count", "first", "last", "kurtosis", "max", "min", "skewness", "stddev_samp", "stddev_pop", "sum", "sumDistinct", "var_samp", "var_pop"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.columns[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.columns[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.partition_predicate #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.transform_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].type #=> String, one of "str", "int", "float", "complex", "bool", "list", "null"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].validation_rule #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].validation_message #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].value #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].value[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].list_type #=> String, one of "str", "int", "float", "complex", "bool", "list", "null"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].is_optional #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.function_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.version #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.ruleset #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.output #=> String, one of "PrimaryInput", "EvaluationResults"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.evaluation_context #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.results_s3_prefix #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.cloud_watch_metrics_enabled #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.results_publishing_enabled #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.stop_job_on_failure_options.stop_job_on_failure_timing #=> String, one of "Immediate", "AfterDataLoad"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.additional_hudi_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.additional_hudi_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.additional_hudi_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.additional_hudi_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.paths[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_hudi_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_hudi_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.sample_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.compression #=> String, one of "gzip", "lzo", "uncompressed", "snappy"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.format #=> String, one of "json", "csv", "avro", "orc", "parquet", "hudi", "delta"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.connection_type #=> String, one of "sqlserver", "mysql", "oracle", "postgresql", "redshift"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.redshift_tmp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.additional_delta_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.additional_delta_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.additional_delta_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.additional_delta_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.paths[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_delta_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_delta_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.sample_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.compression #=> String, one of "uncompressed", "snappy"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.format #=> String, one of "json", "csv", "avro", "orc", "parquet", "hudi", "delta"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.access_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.source_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.connection.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.connection.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.connection.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.schema.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.schema.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.schema.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_database.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_database.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_database.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_table.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_table.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_table.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_redshift_schema #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_redshift_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.temp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.iam_role.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.iam_role.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.iam_role.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.advanced_options #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.advanced_options[0].key #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.advanced_options[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.sample_query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.pre_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.post_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_prefix #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.upsert #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_when_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_when_not_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_clause #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.crawler_connection #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.staging_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.access_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.source_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.connection.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.connection.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.connection.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.schema.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.schema.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.schema.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_database.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_database.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_database.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_table.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_table.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_table.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_redshift_schema #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_redshift_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.temp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.iam_role.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.iam_role.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.iam_role.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.advanced_options #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.advanced_options[0].key #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.advanced_options[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.sample_query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.pre_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.post_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_prefix #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.upsert #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_when_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_when_not_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_clause #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.crawler_connection #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.staging_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_data_sources #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_data_sources["NodeName"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.ruleset #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.evaluation_context #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.results_s3_prefix #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.cloud_watch_metrics_enabled #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.results_publishing_enabled #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_options["AdditionalOptionKeys"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.stop_job_on_failure_options.stop_job_on_failure_timing #=> String, one of "Immediate", "AfterDataLoad"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_reference.recipe_arn #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_reference.recipe_version #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].action.operation #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].action.parameters #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].action.parameters["ParameterName"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions[0].condition #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions[0].target_column #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.source_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.connection.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.connection.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.connection.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.schema #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.temp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.iam_role.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.iam_role.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.iam_role.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.sample_query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.pre_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.post_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.upsert #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_when_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_when_not_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_clause #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.staging_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.auto_pushdown #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.source_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.connection.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.connection.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.connection.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.schema #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.temp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.iam_role.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.iam_role.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.iam_role.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.sample_query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.pre_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.post_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.upsert #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_when_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_when_not_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_clause #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.staging_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.auto_pushdown #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.data #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.data["GenericString"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.data #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.data["GenericString"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.inputs[0] #=> String
+    #   resp.jobs[0].execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.jobs[0].source_control_details.provider #=> String, one of "GITHUB", "GITLAB", "BITBUCKET", "AWS_CODE_COMMIT"
+    #   resp.jobs[0].source_control_details.repository #=> String
+    #   resp.jobs[0].source_control_details.owner #=> String
+    #   resp.jobs[0].source_control_details.branch #=> String
+    #   resp.jobs[0].source_control_details.folder #=> String
+    #   resp.jobs[0].source_control_details.last_commit_id #=> String
+    #   resp.jobs[0].source_control_details.auth_strategy #=> String, one of "PERSONAL_ACCESS_TOKEN", "AWS_SECRETS_MANAGER"
+    #   resp.jobs[0].source_control_details.auth_token #=> String
+    #   resp.jobs[0].maintenance_window #=> String
+    #   resp.jobs[0].profile_name #=> String
     #   resp.jobs_not_found #=> Array
     #   resp.jobs_not_found[0] #=> String
     #
@@ -849,7 +2034,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partitions in question reside. If
-    #   none is supplied, the AWS account ID is used by default.
+    #   none is supplied, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the partitions reside.
@@ -894,6 +2080,8 @@ module Aws::Glue
     #   resp.partitions[0].storage_descriptor.columns[0].parameters #=> Hash
     #   resp.partitions[0].storage_descriptor.columns[0].parameters["KeyString"] #=> String
     #   resp.partitions[0].storage_descriptor.location #=> String
+    #   resp.partitions[0].storage_descriptor.additional_locations #=> Array
+    #   resp.partitions[0].storage_descriptor.additional_locations[0] #=> String
     #   resp.partitions[0].storage_descriptor.input_format #=> String
     #   resp.partitions[0].storage_descriptor.output_format #=> String
     #   resp.partitions[0].storage_descriptor.compressed #=> Boolean
@@ -938,6 +2126,81 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Returns the configuration for the specified table optimizers.
+    #
+    # @option params [required, Array<Types::BatchGetTableOptimizerEntry>] :entries
+    #   A list of `BatchGetTableOptimizerEntry` objects specifying the table
+    #   optimizers to retrieve.
+    #
+    # @return [Types::BatchGetTableOptimizerResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::BatchGetTableOptimizerResponse#table_optimizers #table_optimizers} => Array&lt;Types::BatchTableOptimizer&gt;
+    #   * {Types::BatchGetTableOptimizerResponse#failures #failures} => Array&lt;Types::BatchGetTableOptimizerError&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.batch_get_table_optimizer({
+    #     entries: [ # required
+    #       {
+    #         catalog_id: "CatalogIdString",
+    #         database_name: "databaseNameString",
+    #         table_name: "tableNameString",
+    #         type: "compaction", # accepts compaction, retention, orphan_file_deletion
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.table_optimizers #=> Array
+    #   resp.table_optimizers[0].catalog_id #=> String
+    #   resp.table_optimizers[0].database_name #=> String
+    #   resp.table_optimizers[0].table_name #=> String
+    #   resp.table_optimizers[0].table_optimizer.type #=> String, one of "compaction", "retention", "orphan_file_deletion"
+    #   resp.table_optimizers[0].table_optimizer.configuration.role_arn #=> String
+    #   resp.table_optimizers[0].table_optimizer.configuration.enabled #=> Boolean
+    #   resp.table_optimizers[0].table_optimizer.configuration.retention_configuration.iceberg_configuration.snapshot_retention_period_in_days #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.configuration.retention_configuration.iceberg_configuration.number_of_snapshots_to_retain #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.configuration.retention_configuration.iceberg_configuration.clean_expired_files #=> Boolean
+    #   resp.table_optimizers[0].table_optimizer.configuration.orphan_file_deletion_configuration.iceberg_configuration.orphan_file_retention_period_in_days #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.configuration.orphan_file_deletion_configuration.iceberg_configuration.location #=> String
+    #   resp.table_optimizers[0].table_optimizer.last_run.event_type #=> String, one of "starting", "completed", "failed", "in_progress"
+    #   resp.table_optimizers[0].table_optimizer.last_run.start_timestamp #=> Time
+    #   resp.table_optimizers[0].table_optimizer.last_run.end_timestamp #=> Time
+    #   resp.table_optimizers[0].table_optimizer.last_run.metrics.number_of_bytes_compacted #=> String
+    #   resp.table_optimizers[0].table_optimizer.last_run.metrics.number_of_files_compacted #=> String
+    #   resp.table_optimizers[0].table_optimizer.last_run.metrics.number_of_dpus #=> String
+    #   resp.table_optimizers[0].table_optimizer.last_run.metrics.job_duration_in_hour #=> String
+    #   resp.table_optimizers[0].table_optimizer.last_run.error #=> String
+    #   resp.table_optimizers[0].table_optimizer.last_run.compaction_metrics.iceberg_metrics.number_of_bytes_compacted #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.last_run.compaction_metrics.iceberg_metrics.number_of_files_compacted #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.last_run.compaction_metrics.iceberg_metrics.number_of_dpus #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.last_run.compaction_metrics.iceberg_metrics.job_duration_in_hour #=> Float
+    #   resp.table_optimizers[0].table_optimizer.last_run.retention_metrics.iceberg_metrics.number_of_data_files_deleted #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.last_run.retention_metrics.iceberg_metrics.number_of_manifest_files_deleted #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.last_run.retention_metrics.iceberg_metrics.number_of_manifest_lists_deleted #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.last_run.retention_metrics.iceberg_metrics.number_of_dpus #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.last_run.retention_metrics.iceberg_metrics.job_duration_in_hour #=> Float
+    #   resp.table_optimizers[0].table_optimizer.last_run.orphan_file_deletion_metrics.iceberg_metrics.number_of_orphan_files_deleted #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.last_run.orphan_file_deletion_metrics.iceberg_metrics.number_of_dpus #=> Integer
+    #   resp.table_optimizers[0].table_optimizer.last_run.orphan_file_deletion_metrics.iceberg_metrics.job_duration_in_hour #=> Float
+    #   resp.failures #=> Array
+    #   resp.failures[0].error.error_code #=> String
+    #   resp.failures[0].error.error_message #=> String
+    #   resp.failures[0].catalog_id #=> String
+    #   resp.failures[0].database_name #=> String
+    #   resp.failures[0].table_name #=> String
+    #   resp.failures[0].type #=> String, one of "compaction", "retention", "orphan_file_deletion"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/BatchGetTableOptimizer AWS API Documentation
+    #
+    # @overload batch_get_table_optimizer(params = {})
+    # @param [Hash] params ({})
+    def batch_get_table_optimizer(params = {}, options = {})
+      req = build_request(:batch_get_table_optimizer, params)
+      req.send_request(options)
+    end
+
     # Returns a list of resource metadata for a given list of trigger names.
     # After calling the `ListTriggers` operation, you can call this
     # operation to access the data to which you have been granted
@@ -965,7 +2228,7 @@ module Aws::Glue
     #   resp.triggers[0].name #=> String
     #   resp.triggers[0].workflow_name #=> String
     #   resp.triggers[0].id #=> String
-    #   resp.triggers[0].type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND"
+    #   resp.triggers[0].type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND", "EVENT"
     #   resp.triggers[0].state #=> String, one of "CREATING", "CREATED", "ACTIVATING", "ACTIVATED", "DEACTIVATING", "DEACTIVATED", "DELETING", "UPDATING"
     #   resp.triggers[0].description #=> String
     #   resp.triggers[0].schedule #=> String
@@ -981,9 +2244,11 @@ module Aws::Glue
     #   resp.triggers[0].predicate.conditions #=> Array
     #   resp.triggers[0].predicate.conditions[0].logical_operator #=> String, one of "EQUALS"
     #   resp.triggers[0].predicate.conditions[0].job_name #=> String
-    #   resp.triggers[0].predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.triggers[0].predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.triggers[0].predicate.conditions[0].crawler_name #=> String
-    #   resp.triggers[0].predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.triggers[0].predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
+    #   resp.triggers[0].event_batching_condition.batch_size #=> Integer
+    #   resp.triggers[0].event_batching_condition.batch_window #=> Integer
     #   resp.triggers_not_found #=> Array
     #   resp.triggers_not_found[0] #=> String
     #
@@ -1046,6 +2311,8 @@ module Aws::Glue
     #   resp.workflows[0].last_run.statistics.stopped_actions #=> Integer
     #   resp.workflows[0].last_run.statistics.succeeded_actions #=> Integer
     #   resp.workflows[0].last_run.statistics.running_actions #=> Integer
+    #   resp.workflows[0].last_run.statistics.errored_actions #=> Integer
+    #   resp.workflows[0].last_run.statistics.waiting_actions #=> Integer
     #   resp.workflows[0].last_run.graph.nodes #=> Array
     #   resp.workflows[0].last_run.graph.nodes[0].type #=> String, one of "CRAWLER", "JOB", "TRIGGER"
     #   resp.workflows[0].last_run.graph.nodes[0].name #=> String
@@ -1053,7 +2320,7 @@ module Aws::Glue
     #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.name #=> String
     #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.workflow_name #=> String
     #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.id #=> String
-    #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND"
+    #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND", "EVENT"
     #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.state #=> String, one of "CREATING", "CREATED", "ACTIVATING", "ACTIVATED", "DEACTIVATING", "DEACTIVATED", "DELETING", "UPDATING"
     #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.description #=> String
     #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.schedule #=> String
@@ -1069,19 +2336,23 @@ module Aws::Glue
     #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions #=> Array
     #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].logical_operator #=> String, one of "EQUALS"
     #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].job_name #=> String
-    #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawler_name #=> String
-    #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
+    #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_size #=> Integer
+    #   resp.workflows[0].last_run.graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_window #=> Integer
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs #=> Array
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].id #=> String
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].attempt #=> Integer
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].previous_run_id #=> String
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].trigger_name #=> String
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].job_name #=> String
+    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].job_run_queuing_enabled #=> Boolean
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].started_on #=> Time
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].last_modified_on #=> Time
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].completed_on #=> Time
-    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].arguments #=> Hash
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].arguments["GenericString"] #=> String
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].error_message #=> String
@@ -1092,14 +2363,19 @@ module Aws::Glue
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].execution_time #=> Integer
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].timeout #=> Integer
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].max_capacity #=> Float
-    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].number_of_workers #=> Integer
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].security_configuration #=> String
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].log_group_name #=> String
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].notification_property.notify_delay_after #=> Integer
     #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].glue_version #=> String
+    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].dpu_seconds #=> Float
+    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].maintenance_window #=> String
+    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].profile_name #=> String
+    #   resp.workflows[0].last_run.graph.nodes[0].job_details.job_runs[0].state_detail #=> String
     #   resp.workflows[0].last_run.graph.nodes[0].crawler_details.crawls #=> Array
-    #   resp.workflows[0].last_run.graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.workflows[0].last_run.graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
     #   resp.workflows[0].last_run.graph.nodes[0].crawler_details.crawls[0].started_on #=> Time
     #   resp.workflows[0].last_run.graph.nodes[0].crawler_details.crawls[0].completed_on #=> Time
     #   resp.workflows[0].last_run.graph.nodes[0].crawler_details.crawls[0].error_message #=> String
@@ -1108,6 +2384,8 @@ module Aws::Glue
     #   resp.workflows[0].last_run.graph.edges #=> Array
     #   resp.workflows[0].last_run.graph.edges[0].source_id #=> String
     #   resp.workflows[0].last_run.graph.edges[0].destination_id #=> String
+    #   resp.workflows[0].last_run.starting_event_batch_condition.batch_size #=> Integer
+    #   resp.workflows[0].last_run.starting_event_batch_condition.batch_window #=> Integer
     #   resp.workflows[0].graph.nodes #=> Array
     #   resp.workflows[0].graph.nodes[0].type #=> String, one of "CRAWLER", "JOB", "TRIGGER"
     #   resp.workflows[0].graph.nodes[0].name #=> String
@@ -1115,7 +2393,7 @@ module Aws::Glue
     #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.name #=> String
     #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.workflow_name #=> String
     #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.id #=> String
-    #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND"
+    #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND", "EVENT"
     #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.state #=> String, one of "CREATING", "CREATED", "ACTIVATING", "ACTIVATED", "DEACTIVATING", "DEACTIVATED", "DELETING", "UPDATING"
     #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.description #=> String
     #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.schedule #=> String
@@ -1131,19 +2409,23 @@ module Aws::Glue
     #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.predicate.conditions #=> Array
     #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].logical_operator #=> String, one of "EQUALS"
     #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].job_name #=> String
-    #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawler_name #=> String
-    #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
+    #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_size #=> Integer
+    #   resp.workflows[0].graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_window #=> Integer
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs #=> Array
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].id #=> String
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].attempt #=> Integer
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].previous_run_id #=> String
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].trigger_name #=> String
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].job_name #=> String
+    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].job_run_queuing_enabled #=> Boolean
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].started_on #=> Time
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].last_modified_on #=> Time
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].completed_on #=> Time
-    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].arguments #=> Hash
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].arguments["GenericString"] #=> String
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].error_message #=> String
@@ -1154,14 +2436,19 @@ module Aws::Glue
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].execution_time #=> Integer
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].timeout #=> Integer
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].max_capacity #=> Float
-    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].number_of_workers #=> Integer
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].security_configuration #=> String
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].log_group_name #=> String
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].notification_property.notify_delay_after #=> Integer
     #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].glue_version #=> String
+    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].dpu_seconds #=> Float
+    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].maintenance_window #=> String
+    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].profile_name #=> String
+    #   resp.workflows[0].graph.nodes[0].job_details.job_runs[0].state_detail #=> String
     #   resp.workflows[0].graph.nodes[0].crawler_details.crawls #=> Array
-    #   resp.workflows[0].graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.workflows[0].graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
     #   resp.workflows[0].graph.nodes[0].crawler_details.crawls[0].started_on #=> Time
     #   resp.workflows[0].graph.nodes[0].crawler_details.crawls[0].completed_on #=> Time
     #   resp.workflows[0].graph.nodes[0].crawler_details.crawls[0].error_message #=> String
@@ -1171,6 +2458,8 @@ module Aws::Glue
     #   resp.workflows[0].graph.edges[0].source_id #=> String
     #   resp.workflows[0].graph.edges[0].destination_id #=> String
     #   resp.workflows[0].max_concurrent_runs #=> Integer
+    #   resp.workflows[0].blueprint_details.blueprint_name #=> String
+    #   resp.workflows[0].blueprint_details.run_id #=> String
     #   resp.missing_workflows #=> Array
     #   resp.missing_workflows[0] #=> String
     #
@@ -1180,6 +2469,47 @@ module Aws::Glue
     # @param [Hash] params ({})
     def batch_get_workflows(params = {}, options = {})
       req = build_request(:batch_get_workflows, params)
+      req.send_request(options)
+    end
+
+    # Annotate datapoints over time for a specific data quality statistic.
+    #
+    # @option params [required, Array<Types::DatapointInclusionAnnotation>] :inclusion_annotations
+    #   A list of `DatapointInclusionAnnotation`'s.
+    #
+    # @option params [String] :client_token
+    #   Client Token.
+    #
+    # @return [Types::BatchPutDataQualityStatisticAnnotationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::BatchPutDataQualityStatisticAnnotationResponse#failed_inclusion_annotations #failed_inclusion_annotations} => Array&lt;Types::AnnotationError&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.batch_put_data_quality_statistic_annotation({
+    #     inclusion_annotations: [ # required
+    #       {
+    #         profile_id: "HashString",
+    #         statistic_id: "HashString",
+    #         inclusion_annotation: "INCLUDE", # accepts INCLUDE, EXCLUDE
+    #       },
+    #     ],
+    #     client_token: "HashString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.failed_inclusion_annotations #=> Array
+    #   resp.failed_inclusion_annotations[0].profile_id #=> String
+    #   resp.failed_inclusion_annotations[0].statistic_id #=> String
+    #   resp.failed_inclusion_annotations[0].failure_reason #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/BatchPutDataQualityStatisticAnnotation AWS API Documentation
+    #
+    # @overload batch_put_data_quality_statistic_annotation(params = {})
+    # @param [Hash] params ({})
+    def batch_put_data_quality_statistic_annotation(params = {}, options = {})
+      req = build_request(:batch_put_data_quality_statistic_annotation, params)
       req.send_request(options)
     end
 
@@ -1228,7 +2558,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the catalog in which the partition is to be updated.
-    #   Currently, this should be the AWS account ID.
+    #   Currently, this should be the Amazon Web Services account ID.
     #
     # @option params [required, String] :database_name
     #   The name of the metadata database in which the partition is to be
@@ -1270,6 +2600,7 @@ module Aws::Glue
     #               },
     #             ],
     #             location: "LocationString",
+    #             additional_locations: ["LocationString"],
     #             input_format: "FormatString",
     #             output_format: "FormatString",
     #             compressed: false,
@@ -1335,11 +2666,57 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Cancels the specified recommendation run that was being used to
+    # generate rules.
+    #
+    # @option params [required, String] :run_id
+    #   The unique run identifier associated with this run.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.cancel_data_quality_rule_recommendation_run({
+    #     run_id: "HashString", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CancelDataQualityRuleRecommendationRun AWS API Documentation
+    #
+    # @overload cancel_data_quality_rule_recommendation_run(params = {})
+    # @param [Hash] params ({})
+    def cancel_data_quality_rule_recommendation_run(params = {}, options = {})
+      req = build_request(:cancel_data_quality_rule_recommendation_run, params)
+      req.send_request(options)
+    end
+
+    # Cancels a run where a ruleset is being evaluated against a data
+    # source.
+    #
+    # @option params [required, String] :run_id
+    #   The unique run identifier associated with this run.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.cancel_data_quality_ruleset_evaluation_run({
+    #     run_id: "HashString", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CancelDataQualityRulesetEvaluationRun AWS API Documentation
+    #
+    # @overload cancel_data_quality_ruleset_evaluation_run(params = {})
+    # @param [Hash] params ({})
+    def cancel_data_quality_ruleset_evaluation_run(params = {}, options = {})
+      req = build_request(:cancel_data_quality_ruleset_evaluation_run, params)
+      req.send_request(options)
+    end
+
     # Cancels (stops) a task run. Machine learning task runs are
-    # asynchronous tasks that AWS Glue runs on your behalf as part of
-    # various machine learning workflows. You can cancel a machine learning
-    # task run at any time by calling `CancelMLTaskRun` with a task run's
-    # parent transform's `TransformID` and the task run's `TaskRunId`.
+    # asynchronous tasks that Glue runs on your behalf as part of various
+    # machine learning workflows. You can cancel a machine learning task run
+    # at any time by calling `CancelMLTaskRun` with a task run's parent
+    # transform's `TransformID` and the task run's `TaskRunId`.
     #
     # @option params [required, String] :transform_id
     #   The unique identifier of the machine learning transform.
@@ -1375,14 +2752,44 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Cancels the statement.
+    #
+    # @option params [required, String] :session_id
+    #   The Session ID of the statement to be cancelled.
+    #
+    # @option params [required, Integer] :id
+    #   The ID of the statement to be cancelled.
+    #
+    # @option params [String] :request_origin
+    #   The origin of the request to cancel the statement.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.cancel_statement({
+    #     session_id: "NameString", # required
+    #     id: 1, # required
+    #     request_origin: "OrchestrationNameString",
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CancelStatement AWS API Documentation
+    #
+    # @overload cancel_statement(params = {})
+    # @param [Hash] params ({})
+    def cancel_statement(params = {}, options = {})
+      req = build_request(:cancel_statement, params)
+      req.send_request(options)
+    end
+
     # Validates the supplied schema. This call has no side effects, it
     # simply validates using the supplied schema using `DataFormat` as the
     # format. Since it does not take a schema set name, no compatibility
     # checks are performed.
     #
     # @option params [required, String] :data_format
-    #   The data format of the schema definition. Currently only `AVRO` is
-    #   supported.
+    #   The data format of the schema definition. Currently `AVRO`, `JSON` and
+    #   `PROTOBUF` are supported.
     #
     # @option params [required, String] :schema_definition
     #   The definition of the schema that has to be validated.
@@ -1395,7 +2802,7 @@ module Aws::Glue
     # @example Request syntax with placeholder values
     #
     #   resp = client.check_schema_version_validity({
-    #     data_format: "AVRO", # required, accepts AVRO
+    #     data_format: "AVRO", # required, accepts AVRO, JSON, PROTOBUF
     #     schema_definition: "SchemaDefinitionString", # required
     #   })
     #
@@ -1410,6 +2817,48 @@ module Aws::Glue
     # @param [Hash] params ({})
     def check_schema_version_validity(params = {}, options = {})
       req = build_request(:check_schema_version_validity, params)
+      req.send_request(options)
+    end
+
+    # Registers a blueprint with Glue.
+    #
+    # @option params [required, String] :name
+    #   The name of the blueprint.
+    #
+    # @option params [String] :description
+    #   A description of the blueprint.
+    #
+    # @option params [required, String] :blueprint_location
+    #   Specifies a path in Amazon S3 where the blueprint is published.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   The tags to be applied to this blueprint.
+    #
+    # @return [Types::CreateBlueprintResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateBlueprintResponse#name #name} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_blueprint({
+    #     name: "OrchestrationNameString", # required
+    #     description: "Generic512CharString",
+    #     blueprint_location: "OrchestrationS3Location", # required
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CreateBlueprint AWS API Documentation
+    #
+    # @overload create_blueprint(params = {})
+    # @param [Hash] params ({})
+    def create_blueprint(params = {}, options = {})
+      req = build_request(:create_blueprint, params)
       req.send_request(options)
     end
 
@@ -1457,6 +2906,9 @@ module Aws::Glue
     #       header: ["NameString"],
     #       disable_value_trimming: false,
     #       allow_single_column: false,
+    #       custom_datatype_configured: false,
+    #       custom_datatypes: ["NameString"],
+    #       serde: "OpenCSVSerDe", # accepts OpenCSVSerDe, LazySimpleSerDe, None
     #     },
     #   })
     #
@@ -1471,14 +2923,22 @@ module Aws::Glue
 
     # Creates a connection definition in the Data Catalog.
     #
+    # Connections used for creating federated resources require the IAM
+    # `glue:PassConnection` permission.
+    #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which to create the connection. If none
-    #   is provided, the AWS account ID is used by default.
+    #   is provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, Types::ConnectionInput] :connection_input
     #   A `ConnectionInput` object defining the connection to create.
     #
-    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    # @option params [Hash<String,String>] :tags
+    #   The tags you assign to the connection.
+    #
+    # @return [Types::CreateConnectionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateConnectionResponse#create_connection_status #create_connection_status} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -1487,18 +2947,48 @@ module Aws::Glue
     #     connection_input: { # required
     #       name: "NameString", # required
     #       description: "DescriptionString",
-    #       connection_type: "JDBC", # required, accepts JDBC, SFTP, MONGODB, KAFKA, NETWORK, MARKETPLACE, CUSTOM
+    #       connection_type: "JDBC", # required, accepts JDBC, SFTP, MONGODB, KAFKA, NETWORK, MARKETPLACE, CUSTOM, SALESFORCE, VIEW_VALIDATION_REDSHIFT, VIEW_VALIDATION_ATHENA
     #       match_criteria: ["NameString"],
     #       connection_properties: { # required
     #         "HOST" => "ValueString",
+    #       },
+    #       athena_properties: {
+    #         "PropertyKey" => "PropertyValue",
     #       },
     #       physical_connection_requirements: {
     #         subnet_id: "NameString",
     #         security_group_id_list: ["NameString"],
     #         availability_zone: "NameString",
     #       },
+    #       authentication_configuration: {
+    #         authentication_type: "BASIC", # accepts BASIC, OAUTH2, CUSTOM
+    #         o_auth_2_properties: {
+    #           o_auth_2_grant_type: "AUTHORIZATION_CODE", # accepts AUTHORIZATION_CODE, CLIENT_CREDENTIALS, JWT_BEARER
+    #           o_auth_2_client_application: {
+    #             user_managed_client_application_client_id: "UserManagedClientApplicationClientId",
+    #             aws_managed_client_application_reference: "AWSManagedClientApplicationReference",
+    #           },
+    #           token_url: "TokenUrl",
+    #           token_url_parameters_map: {
+    #             "TokenUrlParameterKey" => "TokenUrlParameterValue",
+    #           },
+    #           authorization_code_properties: {
+    #             authorization_code: "AuthorizationCode",
+    #             redirect_uri: "RedirectUri",
+    #           },
+    #         },
+    #         secret_arn: "SecretArn",
+    #       },
+    #       validate_credentials: false,
+    #     },
+    #     tags: {
+    #       "TagKey" => "TagValue",
     #     },
     #   })
+    #
+    # @example Response structure
+    #
+    #   resp.create_connection_status #=> String, one of "READY", "IN_PROGRESS", "FAILED"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CreateConnection AWS API Documentation
     #
@@ -1522,7 +3012,7 @@ module Aws::Glue
     #   new crawler to access customer resources.
     #
     # @option params [String] :database_name
-    #   The AWS Glue database where results are written, such as:
+    #   The Glue database where results are written, such as:
     #   `arn:aws:daylight:us-east-1::database/sometable/*`.
     #
     # @option params [String] :description
@@ -1559,10 +3049,13 @@ module Aws::Glue
     # @option params [Types::LineageConfiguration] :lineage_configuration
     #   Specifies data lineage configuration settings for the crawler.
     #
+    # @option params [Types::LakeFormationConfiguration] :lake_formation_configuration
+    #   Specifies Lake Formation configuration settings for the crawler.
+    #
     # @option params [String] :configuration
     #   Crawler configuration information. This versioned JSON string allows
     #   users to specify aspects of a crawler's behavior. For more
-    #   information, see [Configuring a Crawler][1].
+    #   information, see [Setting crawler configuration options][1].
     #
     #
     #
@@ -1574,8 +3067,8 @@ module Aws::Glue
     #
     # @option params [Hash<String,String>] :tags
     #   The tags to use with this crawler request. You may use tags to limit
-    #   access to the crawler. For more information about tags in AWS Glue,
-    #   see [AWS Tags in AWS Glue][1] in the developer guide.
+    #   access to the crawler. For more information about tags in Glue, see
+    #   [Amazon Web Services Tags in Glue][1] in the developer guide.
     #
     #
     #
@@ -1596,6 +3089,9 @@ module Aws::Glue
     #           path: "Path",
     #           exclusions: ["Path"],
     #           connection_name: "ConnectionName",
+    #           sample_size: 1,
+    #           event_queue_arn: "EventQueueArn",
+    #           dlq_event_queue_arn: "EventQueueArn",
     #         },
     #       ],
     #       jdbc_targets: [
@@ -1603,6 +3099,7 @@ module Aws::Glue
     #           connection_name: "ConnectionName",
     #           path: "Path",
     #           exclusions: ["Path"],
+    #           enable_additional_metadata: ["COMMENTS"], # accepts COMMENTS, RAWTYPES
     #         },
     #       ],
     #       mongo_db_targets: [
@@ -1623,6 +3120,33 @@ module Aws::Glue
     #         {
     #           database_name: "NameString", # required
     #           tables: ["NameString"], # required
+    #           connection_name: "ConnectionName",
+    #           event_queue_arn: "EventQueueArn",
+    #           dlq_event_queue_arn: "EventQueueArn",
+    #         },
+    #       ],
+    #       delta_targets: [
+    #         {
+    #           delta_tables: ["Path"],
+    #           connection_name: "ConnectionName",
+    #           write_manifest: false,
+    #           create_native_delta_table: false,
+    #         },
+    #       ],
+    #       iceberg_targets: [
+    #         {
+    #           paths: ["Path"],
+    #           connection_name: "ConnectionName",
+    #           exclusions: ["Path"],
+    #           maximum_traversal_depth: 1,
+    #         },
+    #       ],
+    #       hudi_targets: [
+    #         {
+    #           paths: ["Path"],
+    #           connection_name: "ConnectionName",
+    #           exclusions: ["Path"],
+    #           maximum_traversal_depth: 1,
     #         },
     #       ],
     #     },
@@ -1634,10 +3158,14 @@ module Aws::Glue
     #       delete_behavior: "LOG", # accepts LOG, DELETE_FROM_DATABASE, DEPRECATE_IN_DATABASE
     #     },
     #     recrawl_policy: {
-    #       recrawl_behavior: "CRAWL_EVERYTHING", # accepts CRAWL_EVERYTHING, CRAWL_NEW_FOLDERS_ONLY
+    #       recrawl_behavior: "CRAWL_EVERYTHING", # accepts CRAWL_EVERYTHING, CRAWL_NEW_FOLDERS_ONLY, CRAWL_EVENT_MODE
     #     },
     #     lineage_configuration: {
     #       crawler_lineage_settings: "ENABLE", # accepts ENABLE, DISABLE
+    #     },
+    #     lake_formation_configuration: {
+    #       use_lake_formation_credentials: false,
+    #       account_id: "AccountId",
     #     },
     #     configuration: "CrawlerConfiguration",
     #     crawler_security_configuration: "CrawlerSecurityConfiguration",
@@ -1655,14 +3183,137 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Creates a custom pattern that is used to detect sensitive data across
+    # the columns and rows of your structured data.
+    #
+    # Each custom pattern you create specifies a regular expression and an
+    # optional list of context words. If no context words are passed only a
+    # regular expression is checked.
+    #
+    # @option params [required, String] :name
+    #   A name for the custom pattern that allows it to be retrieved or
+    #   deleted later. This name must be unique per Amazon Web Services
+    #   account.
+    #
+    # @option params [required, String] :regex_string
+    #   A regular expression string that is used for detecting sensitive data
+    #   in a custom pattern.
+    #
+    # @option params [Array<String>] :context_words
+    #   A list of context words. If none of these context words are found
+    #   within the vicinity of the regular expression the data will not be
+    #   detected as sensitive data.
+    #
+    #   If no context words are passed only a regular expression is checked.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   A list of tags applied to the custom entity type.
+    #
+    # @return [Types::CreateCustomEntityTypeResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateCustomEntityTypeResponse#name #name} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_custom_entity_type({
+    #     name: "NameString", # required
+    #     regex_string: "NameString", # required
+    #     context_words: ["NameString"],
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CreateCustomEntityType AWS API Documentation
+    #
+    # @overload create_custom_entity_type(params = {})
+    # @param [Hash] params ({})
+    def create_custom_entity_type(params = {}, options = {})
+      req = build_request(:create_custom_entity_type, params)
+      req.send_request(options)
+    end
+
+    # Creates a data quality ruleset with DQDL rules applied to a specified
+    # Glue table.
+    #
+    # You create the ruleset using the Data Quality Definition Language
+    # (DQDL). For more information, see the Glue developer guide.
+    #
+    # @option params [required, String] :name
+    #   A unique name for the data quality ruleset.
+    #
+    # @option params [String] :description
+    #   A description of the data quality ruleset.
+    #
+    # @option params [required, String] :ruleset
+    #   A Data Quality Definition Language (DQDL) ruleset. For more
+    #   information, see the Glue developer guide.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   A list of tags applied to the data quality ruleset.
+    #
+    # @option params [Types::DataQualityTargetTable] :target_table
+    #   A target table associated with the data quality ruleset.
+    #
+    # @option params [String] :data_quality_security_configuration
+    #   The name of the security configuration created with the data quality
+    #   encryption option.
+    #
+    # @option params [String] :client_token
+    #   Used for idempotency and is recommended to be set to a random ID (such
+    #   as a UUID) to avoid creating or starting multiple instances of the
+    #   same resource.
+    #
+    # @return [Types::CreateDataQualityRulesetResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateDataQualityRulesetResponse#name #name} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_data_quality_ruleset({
+    #     name: "NameString", # required
+    #     description: "DescriptionString",
+    #     ruleset: "DataQualityRulesetString", # required
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #     target_table: {
+    #       table_name: "NameString", # required
+    #       database_name: "NameString", # required
+    #       catalog_id: "NameString",
+    #     },
+    #     data_quality_security_configuration: "NameString",
+    #     client_token: "HashString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CreateDataQualityRuleset AWS API Documentation
+    #
+    # @overload create_data_quality_ruleset(params = {})
+    # @param [Hash] params ({})
+    def create_data_quality_ruleset(params = {}, options = {})
+      req = build_request(:create_data_quality_ruleset, params)
+      req.send_request(options)
+    end
+
     # Creates a new database in a Data Catalog.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which to create the database. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, Types::DatabaseInput] :database_input
     #   The metadata for the database.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   The tags you assign to the database.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -1688,7 +3339,15 @@ module Aws::Glue
     #       target_database: {
     #         catalog_id: "CatalogIdString",
     #         database_name: "NameString",
+    #         region: "NameString",
     #       },
+    #       federated_database: {
+    #         identifier: "FederationIdentifier",
+    #         connection_name: "NameString",
+    #       },
+    #     },
+    #     tags: {
+    #       "TagKey" => "TagValue",
     #     },
     #   })
     #
@@ -1736,8 +3395,8 @@ module Aws::Glue
     #    </note>
     #
     # @option params [Integer] :number_of_nodes
-    #   The number of AWS Glue Data Processing Units (DPUs) to allocate to
-    #   this `DevEndpoint`.
+    #   The number of Glue Data Processing Units (DPUs) to allocate to this
+    #   `DevEndpoint`.
     #
     # @option params [String] :worker_type
     #   The type of predefined worker that is allocated to the development
@@ -1760,10 +3419,10 @@ module Aws::Glue
     #
     # @option params [String] :glue_version
     #   Glue version determines the versions of Apache Spark and Python that
-    #   AWS Glue supports. The Python version indicates the version supported
-    #   for running your ETL scripts on development endpoints.
+    #   Glue supports. The Python version indicates the version supported for
+    #   running your ETL scripts on development endpoints.
     #
-    #   For more information about the available AWS Glue versions and
+    #   For more information about the available Glue versions and
     #   corresponding Spark and Python versions, see [Glue version][1] in the
     #   developer guide.
     #
@@ -1811,8 +3470,8 @@ module Aws::Glue
     #
     # @option params [Hash<String,String>] :tags
     #   The tags to use with this DevEndpoint. You may use tags to limit
-    #   access to the DevEndpoint. For more information about tags in AWS
-    #   Glue, see [AWS Tags in AWS Glue][1] in the developer guide.
+    #   access to the DevEndpoint. For more information about tags in Glue,
+    #   see [Amazon Web Services Tags in Glue][1] in the developer guide.
     #
     #
     #
@@ -1853,7 +3512,7 @@ module Aws::Glue
     #     public_key: "GenericString",
     #     public_keys: ["GenericString"],
     #     number_of_nodes: 1,
-    #     worker_type: "Standard", # accepts Standard, G.1X, G.2X
+    #     worker_type: "Standard", # accepts Standard, G.1X, G.2X, G.025X, G.4X, G.8X, Z.2X
     #     glue_version: "GlueVersionString",
     #     number_of_workers: 1,
     #     extra_python_libs_s3_path: "GenericString",
@@ -1878,7 +3537,7 @@ module Aws::Glue
     #   resp.yarn_endpoint_address #=> String
     #   resp.zeppelin_remote_spark_interpreter_port #=> Integer
     #   resp.number_of_nodes #=> Integer
-    #   resp.worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.glue_version #=> String
     #   resp.number_of_workers #=> Integer
     #   resp.availability_zone #=> String
@@ -1906,6 +3565,30 @@ module Aws::Glue
     #   The name you assign to this job definition. It must be unique in your
     #   account.
     #
+    # @option params [String] :job_mode
+    #   A mode that describes how a job was created. Valid values are:
+    #
+    #   * `SCRIPT` - The job was created using the Glue Studio script editor.
+    #
+    #   * `VISUAL` - The job was created using the Glue Studio visual editor.
+    #
+    #   * `NOTEBOOK` - The job was created using an interactive sessions
+    #     notebook.
+    #
+    #   When the `JobMode` field is missing or null, `SCRIPT` is assigned as
+    #   the default value.
+    #
+    # @option params [Boolean] :job_run_queuing_enabled
+    #   Specifies whether job run queuing is enabled for the job runs for this
+    #   job.
+    #
+    #   A value of true means job run queuing is enabled for the job runs. If
+    #   false or not populated, the job runs will not be considered for
+    #   queueing.
+    #
+    #   If this field does not match the value set in the job run, then the
+    #   value from the job run field will be used.
+    #
     # @option params [String] :description
     #   Description of the job being defined.
     #
@@ -1921,29 +3604,41 @@ module Aws::Glue
     #   runs allowed for this job.
     #
     # @option params [required, Types::JobCommand] :command
-    #   The `JobCommand` that executes this job.
+    #   The `JobCommand` that runs this job.
     #
     # @option params [Hash<String,String>] :default_arguments
-    #   The default arguments for this job.
+    #   The default arguments for every run of this job, specified as
+    #   name-value pairs.
     #
     #   You can specify arguments here that your own job-execution script
-    #   consumes, as well as arguments that AWS Glue itself consumes.
+    #   consumes, as well as arguments that Glue itself consumes.
+    #
+    #   Job arguments may be logged. Do not pass plaintext secrets as
+    #   arguments. Retrieve secrets from a Glue Connection, Secrets Manager or
+    #   other secret management mechanism if you intend to keep them within
+    #   the Job.
     #
     #   For information about how to specify and consume your own Job
-    #   arguments, see the [Calling AWS Glue APIs in Python][1] topic in the
+    #   arguments, see the [Calling Glue APIs in Python][1] topic in the
     #   developer guide.
     #
-    #   For information about the key-value pairs that AWS Glue consumes to
-    #   set up your job, see the [Special Parameters Used by AWS Glue][2]
+    #   For information about the arguments you can provide to this field when
+    #   configuring Spark jobs, see the [Special Parameters Used by Glue][2]
     #   topic in the developer guide.
+    #
+    #   For information about the arguments you can provide to this field when
+    #   configuring Ray jobs, see [Using job parameters in Ray jobs][3] in the
+    #   developer guide.
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-python-calling.html
     #   [2]: https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-glue-arguments.html
+    #   [3]: https://docs.aws.amazon.com/glue/latest/dg/author-job-ray-job-parameters.html
     #
     # @option params [Hash<String,String>] :non_overridable_arguments
-    #   Non-overridable arguments for this job, specified as name-value pairs.
+    #   Arguments for this job that are not overridden when providing job
+    #   arguments in a job run, specified as name-value pairs.
     #
     # @option params [Types::ConnectionsList] :connections
     #   The connections used for this job.
@@ -1954,11 +3649,11 @@ module Aws::Glue
     # @option params [Integer] :allocated_capacity
     #   This parameter is deprecated. Use `MaxCapacity` instead.
     #
-    #   The number of AWS Glue data processing units (DPUs) to allocate to
-    #   this Job. You can allocate from 2 to 100 DPUs; the default is 10. A
-    #   DPU is a relative measure of processing power that consists of 4 vCPUs
-    #   of compute capacity and 16 GB of memory. For more information, see the
-    #   [AWS Glue pricing page][1].
+    #   The number of Glue data processing units (DPUs) to allocate to this
+    #   Job. You can allocate a minimum of 2 DPUs; the default is 10. A DPU is
+    #   a relative measure of processing power that consists of 4 vCPUs of
+    #   compute capacity and 16 GB of memory. For more information, see the
+    #   [Glue pricing page][1].
     #
     #
     #
@@ -1967,19 +3662,30 @@ module Aws::Glue
     # @option params [Integer] :timeout
     #   The job timeout in minutes. This is the maximum time that a job run
     #   can consume resources before it is terminated and enters `TIMEOUT`
-    #   status. The default is 2,880 minutes (48 hours).
+    #   status. The default is 2,880 minutes (48 hours) for batch jobs.
+    #
+    #   Streaming jobs must have timeout values less than 7 days or 10080
+    #   minutes. When the value is left blank, the job will be restarted after
+    #   7 days based if you have not setup a maintenance window. If you have
+    #   setup maintenance window, it will be restarted during the maintenance
+    #   window after 7 days.
     #
     # @option params [Float] :max_capacity
-    #   The number of AWS Glue data processing units (DPUs) that can be
-    #   allocated when this job runs. A DPU is a relative measure of
-    #   processing power that consists of 4 vCPUs of compute capacity and 16
-    #   GB of memory. For more information, see the [AWS Glue pricing
-    #   page][1].
+    #   For Glue version 1.0 or earlier jobs, using the standard worker type,
+    #   the number of Glue data processing units (DPUs) that can be allocated
+    #   when this job runs. A DPU is a relative measure of processing power
+    #   that consists of 4 vCPUs of compute capacity and 16 GB of memory. For
+    #   more information, see the [ Glue pricing page][1].
     #
-    #   Do not set `Max Capacity` if using `WorkerType` and `NumberOfWorkers`.
+    #   For Glue version 2.0+ jobs, you cannot specify a `Maximum capacity`.
+    #   Instead, you should specify a `Worker type` and the `Number of
+    #   workers`.
+    #
+    #   Do not set `MaxCapacity` if using `WorkerType` and `NumberOfWorkers`.
     #
     #   The value that can be allocated for `MaxCapacity` depends on whether
-    #   you are running a Python shell job or an Apache Spark ETL job:
+    #   you are running a Python shell job, an Apache Spark ETL job, or an
+    #   Apache Spark streaming ETL job:
     #
     #   * When you specify a Python shell job
     #     (`JobCommand.Name`="pythonshell"), you can allocate either 0.0625
@@ -2001,8 +3707,8 @@ module Aws::Glue
     #
     # @option params [Hash<String,String>] :tags
     #   The tags to use with this job. You may use tags to limit access to the
-    #   job. For more information about tags in AWS Glue, see [AWS Tags in AWS
-    #   Glue][1] in the developer guide.
+    #   job. For more information about tags in Glue, see [Amazon Web Services
+    #   Tags in Glue][1] in the developer guide.
     #
     #
     #
@@ -2012,11 +3718,15 @@ module Aws::Glue
     #   Specifies configuration properties of a job notification.
     #
     # @option params [String] :glue_version
-    #   Glue version determines the versions of Apache Spark and Python that
-    #   AWS Glue supports. The Python version indicates the version supported
-    #   for jobs of type Spark.
+    #   In Spark jobs, `GlueVersion` determines the versions of Apache Spark
+    #   and Python that Glue available in a job. The Python version indicates
+    #   the version supported for jobs of type Spark.
     #
-    #   For more information about the available AWS Glue versions and
+    #   Ray jobs should set `GlueVersion` to `4.0` or greater. However, the
+    #   versions of Ray, Python and additional libraries available in your Ray
+    #   job are determined by the `Runtime` parameter of the Job command.
+    #
+    #   For more information about the available Glue versions and
     #   corresponding Spark and Python versions, see [Glue version][1] in the
     #   developer guide.
     #
@@ -2031,67 +3741,86 @@ module Aws::Glue
     #   The number of workers of a defined `workerType` that are allocated
     #   when a job runs.
     #
-    #   The maximum number of workers you can define are 299 for `G.1X`, and
-    #   149 for `G.2X`.
-    #
     # @option params [String] :worker_type
     #   The type of predefined worker that is allocated when a job runs.
-    #   Accepts a value of Standard, G.1X, or G.2X.
+    #   Accepts a value of G.1X, G.2X, G.4X, G.8X or G.025X for Spark jobs.
+    #   Accepts the value Z.2X for Ray jobs.
     #
-    #   * For the `Standard` worker type, each worker provides 4 vCPU, 16 GB
-    #     of memory and a 50GB disk, and 2 executors per worker.
+    #   * For the `G.1X` worker type, each worker maps to 1 DPU (4 vCPUs, 16
+    #     GB of memory) with 84GB disk (approximately 34GB free), and provides
+    #     1 executor per worker. We recommend this worker type for workloads
+    #     such as data transforms, joins, and queries, to offers a scalable
+    #     and cost effective way to run most jobs.
     #
-    #   * For the `G.1X` worker type, each worker maps to 1 DPU (4 vCPU, 16 GB
-    #     of memory, 64 GB disk), and provides 1 executor per worker. We
-    #     recommend this worker type for memory-intensive jobs.
+    #   * For the `G.2X` worker type, each worker maps to 2 DPU (8 vCPUs, 32
+    #     GB of memory) with 128GB disk (approximately 77GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     workloads such as data transforms, joins, and queries, to offers a
+    #     scalable and cost effective way to run most jobs.
     #
-    #   * For the `G.2X` worker type, each worker maps to 2 DPU (8 vCPU, 32 GB
-    #     of memory, 128 GB disk), and provides 1 executor per worker. We
-    #     recommend this worker type for memory-intensive jobs.
+    #   * For the `G.4X` worker type, each worker maps to 4 DPU (16 vCPUs, 64
+    #     GB of memory) with 256GB disk (approximately 235GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     jobs whose workloads contain your most demanding transforms,
+    #     aggregations, joins, and queries. This worker type is available only
+    #     for Glue version 3.0 or later Spark ETL jobs in the following Amazon
+    #     Web Services Regions: US East (Ohio), US East (N. Virginia), US West
+    #     (Oregon), Asia Pacific (Singapore), Asia Pacific (Sydney), Asia
+    #     Pacific (Tokyo), Canada (Central), Europe (Frankfurt), Europe
+    #     (Ireland), and Europe (Stockholm).
+    #
+    #   * For the `G.8X` worker type, each worker maps to 8 DPU (32 vCPUs, 128
+    #     GB of memory) with 512GB disk (approximately 487GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     jobs whose workloads contain your most demanding transforms,
+    #     aggregations, joins, and queries. This worker type is available only
+    #     for Glue version 3.0 or later Spark ETL jobs, in the same Amazon Web
+    #     Services Regions as supported for the `G.4X` worker type.
+    #
+    #   * For the `G.025X` worker type, each worker maps to 0.25 DPU (2 vCPUs,
+    #     4 GB of memory) with 84GB disk (approximately 34GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     low volume streaming jobs. This worker type is only available for
+    #     Glue version 3.0 streaming jobs.
+    #
+    #   * For the `Z.2X` worker type, each worker maps to 2 M-DPU (8vCPUs, 64
+    #     GB of memory) with 128 GB disk (approximately 120GB free), and
+    #     provides up to 8 Ray workers based on the autoscaler.
+    #
+    # @option params [Hash<String,Types::CodeGenConfigurationNode>] :code_gen_configuration_nodes
+    #   The representation of a directed acyclic graph on which both the Glue
+    #   Studio visual component and Glue Studio code generation is based.
+    #
+    # @option params [String] :execution_class
+    #   Indicates whether the job is run with a standard or flexible execution
+    #   class. The standard execution-class is ideal for time-sensitive
+    #   workloads that require fast job startup and dedicated resources.
+    #
+    #   The flexible execution class is appropriate for time-insensitive jobs
+    #   whose start and completion times may vary.
+    #
+    #   Only jobs with Glue version 3.0 and above and command type `glueetl`
+    #   will be allowed to set `ExecutionClass` to `FLEX`. The flexible
+    #   execution class is available for Spark jobs.
+    #
+    # @option params [Types::SourceControlDetails] :source_control_details
+    #   The details for a source control configuration for a job, allowing
+    #   synchronization of job artifacts to or from a remote repository.
+    #
+    # @option params [String] :maintenance_window
+    #   This field specifies a day of the week and hour for a maintenance
+    #   window for streaming jobs. Glue periodically performs maintenance
+    #   activities. During these maintenance windows, Glue will need to
+    #   restart your streaming jobs.
+    #
+    #   Glue will restart the job within 3 hours of the specified maintenance
+    #   window. For instance, if you set up the maintenance window for Monday
+    #   at 10:00AM GMT, your jobs will be restarted between 10:00AM GMT to
+    #   1:00PM GMT.
     #
     # @return [Types::CreateJobResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateJobResponse#name #name} => String
-    #
-    # @example Request syntax with placeholder values
-    #
-    #   resp = client.create_job({
-    #     name: "NameString", # required
-    #     description: "DescriptionString",
-    #     log_uri: "UriString",
-    #     role: "RoleString", # required
-    #     execution_property: {
-    #       max_concurrent_runs: 1,
-    #     },
-    #     command: { # required
-    #       name: "GenericString",
-    #       script_location: "ScriptLocationString",
-    #       python_version: "PythonVersionString",
-    #     },
-    #     default_arguments: {
-    #       "GenericString" => "GenericString",
-    #     },
-    #     non_overridable_arguments: {
-    #       "GenericString" => "GenericString",
-    #     },
-    #     connections: {
-    #       connections: ["GenericString"],
-    #     },
-    #     max_retries: 1,
-    #     allocated_capacity: 1,
-    #     timeout: 1,
-    #     max_capacity: 1.0,
-    #     security_configuration: "NameString",
-    #     tags: {
-    #       "TagKey" => "TagValue",
-    #     },
-    #     notification_property: {
-    #       notify_delay_after: 1,
-    #     },
-    #     glue_version: "GlueVersionString",
-    #     number_of_workers: 1,
-    #     worker_type: "Standard", # accepts Standard, G.1X, G.2X
-    #   })
     #
     # @example Response structure
     #
@@ -2106,16 +3835,16 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Creates an AWS Glue machine learning transform. This operation creates
-    # the transform and all the necessary parameters to train it.
+    # Creates an Glue machine learning transform. This operation creates the
+    # transform and all the necessary parameters to train it.
     #
     # Call this operation as the first step in the process of using a
     # machine learning transform (such as the `FindMatches` transform) for
     # deduplicating data. You can provide an optional `Description`, in
     # addition to the parameters that you want to use for your algorithm.
     #
-    # You must also specify certain parameters for the tasks that AWS Glue
-    # runs on your behalf as part of learning from your data and creating a
+    # You must also specify certain parameters for the tasks that Glue runs
+    # on your behalf as part of learning from your data and creating a
     # high-quality machine learning transform. These parameters include
     # `Role`, and optionally, `AllocatedCapacity`, `Timeout`, and
     # `MaxRetries`. For more information, see [Jobs][1].
@@ -2132,7 +3861,7 @@ module Aws::Glue
     #   The default is an empty string.
     #
     # @option params [required, Array<Types::GlueTable>] :input_record_tables
-    #   A list of AWS Glue table definitions used by the transform.
+    #   A list of Glue table definitions used by the transform.
     #
     # @option params [required, Types::TransformParameters] :parameters
     #   The algorithmic parameters that are specific to the transform type
@@ -2140,13 +3869,13 @@ module Aws::Glue
     #
     # @option params [required, String] :role
     #   The name or Amazon Resource Name (ARN) of the IAM role with the
-    #   required permissions. The required permissions include both AWS Glue
-    #   service role permissions to AWS Glue resources, and Amazon S3
-    #   permissions required by the transform.
+    #   required permissions. The required permissions include both Glue
+    #   service role permissions to Glue resources, and Amazon S3 permissions
+    #   required by the transform.
     #
-    #   * This role needs AWS Glue service role permissions to allow access to
-    #     resources in AWS Glue. See [Attach a Policy to IAM Users That Access
-    #     AWS Glue][1].
+    #   * This role needs Glue service role permissions to allow access to
+    #     resources in Glue. See [Attach a Policy to IAM Users That Access
+    #     Glue][1].
     #
     #   * This role needs permission to your Amazon Simple Storage Service
     #     (Amazon S3) sources, targets, temporary directory, scripts, and any
@@ -2157,10 +3886,10 @@ module Aws::Glue
     #   [1]: https://docs.aws.amazon.com/glue/latest/dg/attach-policy-iam-user.html
     #
     # @option params [String] :glue_version
-    #   This value determines which version of AWS Glue this machine learning
+    #   This value determines which version of Glue this machine learning
     #   transform is compatible with. Glue 1.0 is recommended for most
     #   customers. If the value is not set, the Glue compatibility defaults to
-    #   Glue 0.9. For more information, see [AWS Glue Versions][1] in the
+    #   Glue 0.9. For more information, see [Glue Versions][1] in the
     #   developer guide.
     #
     #
@@ -2168,11 +3897,11 @@ module Aws::Glue
     #   [1]: https://docs.aws.amazon.com/glue/latest/dg/release-notes.html#release-notes-versions
     #
     # @option params [Float] :max_capacity
-    #   The number of AWS Glue data processing units (DPUs) that are allocated
-    #   to task runs for this transform. You can allocate from 2 to 100 DPUs;
-    #   the default is 10. A DPU is a relative measure of processing power
-    #   that consists of 4 vCPUs of compute capacity and 16 GB of memory. For
-    #   more information, see the [AWS Glue pricing page][1].
+    #   The number of Glue data processing units (DPUs) that are allocated to
+    #   task runs for this transform. You can allocate from 2 to 100 DPUs; the
+    #   default is 10. A DPU is a relative measure of processing power that
+    #   consists of 4 vCPUs of compute capacity and 16 GB of memory. For more
+    #   information, see the [Glue pricing page][1].
     #
     #   `MaxCapacity` is a mutually exclusive option with `NumberOfWorkers`
     #   and `WorkerType`.
@@ -2245,8 +3974,8 @@ module Aws::Glue
     # @option params [Hash<String,String>] :tags
     #   The tags to use with this machine learning transform. You may use tags
     #   to limit access to the machine learning transform. For more
-    #   information about tags in AWS Glue, see [AWS Tags in AWS Glue][1] in
-    #   the developer guide.
+    #   information about tags in Glue, see [Amazon Web Services Tags in
+    #   Glue][1] in the developer guide.
     #
     #
     #
@@ -2272,6 +4001,9 @@ module Aws::Glue
     #         table_name: "NameString", # required
     #         catalog_id: "NameString",
     #         connection_name: "NameString",
+    #         additional_options: {
+    #           "NameString" => "DescriptionString",
+    #         },
     #       },
     #     ],
     #     parameters: { # required
@@ -2286,7 +4018,7 @@ module Aws::Glue
     #     role: "RoleString", # required
     #     glue_version: "GlueVersionString",
     #     max_capacity: 1.0,
-    #     worker_type: "Standard", # accepts Standard, G.1X, G.2X
+    #     worker_type: "Standard", # accepts Standard, G.1X, G.2X, G.025X, G.4X, G.8X, Z.2X
     #     number_of_workers: 1,
     #     timeout: 1,
     #     max_retries: 1,
@@ -2318,8 +4050,8 @@ module Aws::Glue
     # Creates a new partition.
     #
     # @option params [String] :catalog_id
-    #   The AWS account ID of the catalog in which the partition is to be
-    #   created.
+    #   The Amazon Web Services account ID of the catalog in which the
+    #   partition is to be created.
     #
     # @option params [required, String] :database_name
     #   The name of the metadata database in which the partition is to be
@@ -2355,6 +4087,7 @@ module Aws::Glue
     #           },
     #         ],
     #         location: "LocationString",
+    #         additional_locations: ["LocationString"],
     #         input_format: "FormatString",
     #         output_format: "FormatString",
     #         compressed: false,
@@ -2463,8 +4196,8 @@ module Aws::Glue
     #   will not be any default value for this.
     #
     # @option params [Hash<String,String>] :tags
-    #   AWS tags that contain a key value pair and may be searched by console,
-    #   command line, or API.
+    #   Amazon Web Services tags that contain a key value pair and may be
+    #   searched by console, command line, or API.
     #
     # @return [Types::CreateRegistryResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2527,63 +4260,62 @@ module Aws::Glue
     #   mark. No whitespace.
     #
     # @option params [required, String] :data_format
-    #   The data format of the schema definition. Currently only `AVRO` is
-    #   supported.
+    #   The data format of the schema definition. Currently `AVRO`, `JSON` and
+    #   `PROTOBUF` are supported.
     #
     # @option params [String] :compatibility
     #   The compatibility mode of the schema. The possible values are:
     #
-    #   * *NONE*\: No compatibility mode applies. You can use this choice in
+    #   * *NONE*: No compatibility mode applies. You can use this choice in
     #     development scenarios or if you do not know the compatibility mode
     #     that you want to apply to schemas. Any new version added will be
     #     accepted without undergoing a compatibility check.
     #
-    #   * *DISABLED*\: This compatibility choice prevents versioning for a
+    #   * *DISABLED*: This compatibility choice prevents versioning for a
     #     particular schema. You can use this choice to prevent future
     #     versioning of a schema.
     #
-    #   * *BACKWARD*\: This compatibility choice is recommended as it allows
+    #   * *BACKWARD*: This compatibility choice is recommended as it allows
     #     data receivers to read both the current and one previous schema
     #     version. This means that for instance, a new schema version cannot
     #     drop data fields or change the type of these fields, so they can't
     #     be read by readers using the previous version.
     #
-    #   * *BACKWARD\_ALL*\: This compatibility choice allows data receivers to
+    #   * *BACKWARD\_ALL*: This compatibility choice allows data receivers to
     #     read both the current and all previous schema versions. You can use
     #     this choice when you need to delete fields or add optional fields,
     #     and check compatibility against all previous schema versions.
     #
-    #   * *FORWARD*\: This compatibility choice allows data receivers to read
+    #   * *FORWARD*: This compatibility choice allows data receivers to read
     #     both the current and one next schema version, but not necessarily
     #     later versions. You can use this choice when you need to add fields
     #     or delete optional fields, but only check compatibility against the
     #     last schema version.
     #
-    #   * *FORWARD\_ALL*\: This compatibility choice allows data receivers to
+    #   * *FORWARD\_ALL*: This compatibility choice allows data receivers to
     #     read written by producers of any new registered schema. You can use
     #     this choice when you need to add fields or delete optional fields,
     #     and check compatibility against all previous schema versions.
     #
-    #   * *FULL*\: This compatibility choice allows data receivers to read
-    #     data written by producers using the previous or next version of the
+    #   * *FULL*: This compatibility choice allows data receivers to read data
+    #     written by producers using the previous or next version of the
     #     schema, but not necessarily earlier or later versions. You can use
     #     this choice when you need to add or remove optional fields, but only
     #     check compatibility against the last schema version.
     #
-    #   * *FULL\_ALL*\: This compatibility choice allows data receivers to
-    #     read data written by producers using all previous schema versions.
-    #     You can use this choice when you need to add or remove optional
-    #     fields, and check compatibility against all previous schema
-    #     versions.
+    #   * *FULL\_ALL*: This compatibility choice allows data receivers to read
+    #     data written by producers using all previous schema versions. You
+    #     can use this choice when you need to add or remove optional fields,
+    #     and check compatibility against all previous schema versions.
     #
     # @option params [String] :description
     #   An optional description of the schema. If description is not provided,
     #   there will not be any automatic default value for this.
     #
     # @option params [Hash<String,String>] :tags
-    #   AWS tags that contain a key value pair and may be searched by console,
-    #   command line, or API. If specified, follows the AWS tags-on-create
-    #   pattern.
+    #   Amazon Web Services tags that contain a key value pair and may be
+    #   searched by console, command line, or API. If specified, follows the
+    #   Amazon Web Services tags-on-create pattern.
     #
     # @option params [String] :schema_definition
     #   The schema definition using the `DataFormat` setting for `SchemaName`.
@@ -2613,7 +4345,7 @@ module Aws::Glue
     #       registry_arn: "GlueResourceArn",
     #     },
     #     schema_name: "SchemaRegistryNameString", # required
-    #     data_format: "AVRO", # required, accepts AVRO
+    #     data_format: "AVRO", # required, accepts AVRO, JSON, PROTOBUF
     #     compatibility: "NONE", # accepts NONE, DISABLED, BACKWARD, BACKWARD_ALL, FORWARD, FORWARD_ALL, FULL, FULL_ALL
     #     description: "DescriptionString",
     #     tags: {
@@ -2629,7 +4361,7 @@ module Aws::Glue
     #   resp.schema_name #=> String
     #   resp.schema_arn #=> String
     #   resp.description #=> String
-    #   resp.data_format #=> String, one of "AVRO"
+    #   resp.data_format #=> String, one of "AVRO", "JSON", "PROTOBUF"
     #   resp.compatibility #=> String, one of "NONE", "DISABLED", "BACKWARD", "BACKWARD_ALL", "FORWARD", "FORWARD_ALL", "FULL", "FULL_ALL"
     #   resp.schema_checkpoint #=> Integer
     #   resp.latest_schema_version #=> Integer
@@ -2707,10 +4439,10 @@ module Aws::Glue
     end
 
     # Creates a new security configuration. A security configuration is a
-    # set of security properties that can be used by AWS Glue. You can use a
+    # set of security properties that can be used by Glue. You can use a
     # security configuration to encrypt data at rest. For information about
-    # using security configurations in AWS Glue, see [Encrypting Data
-    # Written by Crawlers, Jobs, and Development Endpoints][1].
+    # using security configurations in Glue, see [Encrypting Data Written by
+    # Crawlers, Jobs, and Development Endpoints][1].
     #
     #
     #
@@ -2763,11 +4495,172 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Creates a new session.
+    #
+    # @option params [required, String] :id
+    #   The ID of the session request.
+    #
+    # @option params [String] :description
+    #   The description of the session.
+    #
+    # @option params [required, String] :role
+    #   The IAM Role ARN
+    #
+    # @option params [required, Types::SessionCommand] :command
+    #   The `SessionCommand` that runs the job.
+    #
+    # @option params [Integer] :timeout
+    #   The number of minutes before session times out. Default for Spark ETL
+    #   jobs is 48 hours (2880 minutes), the maximum session lifetime for this
+    #   job type. Consult the documentation for other job types.
+    #
+    # @option params [Integer] :idle_timeout
+    #   The number of minutes when idle before session times out. Default for
+    #   Spark ETL jobs is value of Timeout. Consult the documentation for
+    #   other job types.
+    #
+    # @option params [Hash<String,String>] :default_arguments
+    #   A map array of key-value pairs. Max is 75 pairs.
+    #
+    # @option params [Types::ConnectionsList] :connections
+    #   The number of connections to use for the session.
+    #
+    # @option params [Float] :max_capacity
+    #   The number of Glue data processing units (DPUs) that can be allocated
+    #   when the job runs. A DPU is a relative measure of processing power
+    #   that consists of 4 vCPUs of compute capacity and 16 GB memory.
+    #
+    # @option params [Integer] :number_of_workers
+    #   The number of workers of a defined `WorkerType` to use for the
+    #   session.
+    #
+    # @option params [String] :worker_type
+    #   The type of predefined worker that is allocated when a job runs.
+    #   Accepts a value of G.1X, G.2X, G.4X, or G.8X for Spark jobs. Accepts
+    #   the value Z.2X for Ray notebooks.
+    #
+    #   * For the `G.1X` worker type, each worker maps to 1 DPU (4 vCPUs, 16
+    #     GB of memory) with 84GB disk (approximately 34GB free), and provides
+    #     1 executor per worker. We recommend this worker type for workloads
+    #     such as data transforms, joins, and queries, to offers a scalable
+    #     and cost effective way to run most jobs.
+    #
+    #   * For the `G.2X` worker type, each worker maps to 2 DPU (8 vCPUs, 32
+    #     GB of memory) with 128GB disk (approximately 77GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     workloads such as data transforms, joins, and queries, to offers a
+    #     scalable and cost effective way to run most jobs.
+    #
+    #   * For the `G.4X` worker type, each worker maps to 4 DPU (16 vCPUs, 64
+    #     GB of memory) with 256GB disk (approximately 235GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     jobs whose workloads contain your most demanding transforms,
+    #     aggregations, joins, and queries. This worker type is available only
+    #     for Glue version 3.0 or later Spark ETL jobs in the following Amazon
+    #     Web Services Regions: US East (Ohio), US East (N. Virginia), US West
+    #     (Oregon), Asia Pacific (Singapore), Asia Pacific (Sydney), Asia
+    #     Pacific (Tokyo), Canada (Central), Europe (Frankfurt), Europe
+    #     (Ireland), and Europe (Stockholm).
+    #
+    #   * For the `G.8X` worker type, each worker maps to 8 DPU (32 vCPUs, 128
+    #     GB of memory) with 512GB disk (approximately 487GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     jobs whose workloads contain your most demanding transforms,
+    #     aggregations, joins, and queries. This worker type is available only
+    #     for Glue version 3.0 or later Spark ETL jobs, in the same Amazon Web
+    #     Services Regions as supported for the `G.4X` worker type.
+    #
+    #   * For the `Z.2X` worker type, each worker maps to 2 M-DPU (8vCPUs, 64
+    #     GB of memory) with 128 GB disk (approximately 120GB free), and
+    #     provides up to 8 Ray workers based on the autoscaler.
+    #
+    # @option params [String] :security_configuration
+    #   The name of the SecurityConfiguration structure to be used with the
+    #   session
+    #
+    # @option params [String] :glue_version
+    #   The Glue version determines the versions of Apache Spark and Python
+    #   that Glue supports. The GlueVersion must be greater than 2.0.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   The map of key value pairs (tags) belonging to the session.
+    #
+    # @option params [String] :request_origin
+    #   The origin of the request.
+    #
+    # @return [Types::CreateSessionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateSessionResponse#session #session} => Types::Session
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_session({
+    #     id: "NameString", # required
+    #     description: "DescriptionString",
+    #     role: "OrchestrationRoleArn", # required
+    #     command: { # required
+    #       name: "NameString",
+    #       python_version: "PythonVersionString",
+    #     },
+    #     timeout: 1,
+    #     idle_timeout: 1,
+    #     default_arguments: {
+    #       "OrchestrationNameString" => "OrchestrationArgumentsValue",
+    #     },
+    #     connections: {
+    #       connections: ["GenericString"],
+    #     },
+    #     max_capacity: 1.0,
+    #     number_of_workers: 1,
+    #     worker_type: "Standard", # accepts Standard, G.1X, G.2X, G.025X, G.4X, G.8X, Z.2X
+    #     security_configuration: "NameString",
+    #     glue_version: "GlueVersionString",
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #     request_origin: "OrchestrationNameString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.session.id #=> String
+    #   resp.session.created_on #=> Time
+    #   resp.session.status #=> String, one of "PROVISIONING", "READY", "FAILED", "TIMEOUT", "STOPPING", "STOPPED"
+    #   resp.session.error_message #=> String
+    #   resp.session.description #=> String
+    #   resp.session.role #=> String
+    #   resp.session.command.name #=> String
+    #   resp.session.command.python_version #=> String
+    #   resp.session.default_arguments #=> Hash
+    #   resp.session.default_arguments["OrchestrationNameString"] #=> String
+    #   resp.session.connections.connections #=> Array
+    #   resp.session.connections.connections[0] #=> String
+    #   resp.session.progress #=> Float
+    #   resp.session.max_capacity #=> Float
+    #   resp.session.security_configuration #=> String
+    #   resp.session.glue_version #=> String
+    #   resp.session.number_of_workers #=> Integer
+    #   resp.session.worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
+    #   resp.session.completed_on #=> Time
+    #   resp.session.execution_time #=> Float
+    #   resp.session.dpu_seconds #=> Float
+    #   resp.session.idle_timeout #=> Integer
+    #   resp.session.profile_name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CreateSession AWS API Documentation
+    #
+    # @overload create_session(params = {})
+    # @param [Hash] params ({})
+    def create_session(params = {}, options = {})
+      req = build_request(:create_session, params)
+      req.send_request(options)
+    end
+
     # Creates a new table definition in the Data Catalog.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which to create the `Table`. If none is
-    #   supplied, the AWS account ID is used by default.
+    #   supplied, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The catalog database in which to create the new table. For Hive
@@ -2780,6 +4673,13 @@ module Aws::Glue
     # @option params [Array<Types::PartitionIndex>] :partition_indexes
     #   A list of partition indexes, `PartitionIndex` structures, to create in
     #   the table.
+    #
+    # @option params [String] :transaction_id
+    #   The ID of the transaction.
+    #
+    # @option params [Types::OpenTableFormatInput] :open_table_format_input
+    #   Specifies an `OpenTableFormatInput` structure when creating an open
+    #   format table.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -2807,6 +4707,7 @@ module Aws::Glue
     #           },
     #         ],
     #         location: "LocationString",
+    #         additional_locations: ["LocationString"],
     #         input_format: "FormatString",
     #         output_format: "FormatString",
     #         compressed: false,
@@ -2866,6 +4767,21 @@ module Aws::Glue
     #         catalog_id: "CatalogIdString",
     #         database_name: "NameString",
     #         name: "NameString",
+    #         region: "NameString",
+    #       },
+    #       view_definition: {
+    #         is_protected: false,
+    #         definer: "ArnString",
+    #         representations: [
+    #           {
+    #             dialect: "REDSHIFT", # accepts REDSHIFT, ATHENA, SPARK
+    #             dialect_version: "ViewDialectVersionString",
+    #             view_original_text: "ViewTextString",
+    #             validation_connection: "NameString",
+    #             view_expanded_text: "ViewTextString",
+    #           },
+    #         ],
+    #         sub_objects: ["ArnString"],
     #       },
     #     },
     #     partition_indexes: [
@@ -2874,6 +4790,13 @@ module Aws::Glue
     #         index_name: "NameString", # required
     #       },
     #     ],
+    #     transaction_id: "TransactionIdString",
+    #     open_table_format_input: {
+    #       iceberg_input: {
+    #         metadata_operation: "CREATE", # required, accepts CREATE
+    #         version: "VersionString",
+    #       },
+    #     },
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CreateTable AWS API Documentation
@@ -2882,6 +4805,63 @@ module Aws::Glue
     # @param [Hash] params ({})
     def create_table(params = {}, options = {})
       req = build_request(:create_table, params)
+      req.send_request(options)
+    end
+
+    # Creates a new table optimizer for a specific function. `compaction` is
+    # the only currently supported optimizer type.
+    #
+    # @option params [required, String] :catalog_id
+    #   The Catalog ID of the table.
+    #
+    # @option params [required, String] :database_name
+    #   The name of the database in the catalog in which the table resides.
+    #
+    # @option params [required, String] :table_name
+    #   The name of the table.
+    #
+    # @option params [required, String] :type
+    #   The type of table optimizer. Currently, the only valid value is
+    #   `compaction`.
+    #
+    # @option params [required, Types::TableOptimizerConfiguration] :table_optimizer_configuration
+    #   A `TableOptimizerConfiguration` object representing the configuration
+    #   of a table optimizer.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_table_optimizer({
+    #     catalog_id: "CatalogIdString", # required
+    #     database_name: "NameString", # required
+    #     table_name: "NameString", # required
+    #     type: "compaction", # required, accepts compaction, retention, orphan_file_deletion
+    #     table_optimizer_configuration: { # required
+    #       role_arn: "ArnString",
+    #       enabled: false,
+    #       retention_configuration: {
+    #         iceberg_configuration: {
+    #           snapshot_retention_period_in_days: 1,
+    #           number_of_snapshots_to_retain: 1,
+    #           clean_expired_files: false,
+    #         },
+    #       },
+    #       orphan_file_deletion_configuration: {
+    #         iceberg_configuration: {
+    #           orphan_file_retention_period_in_days: 1,
+    #           location: "MessageString",
+    #         },
+    #       },
+    #     },
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CreateTableOptimizer AWS API Documentation
+    #
+    # @overload create_table_optimizer(params = {})
+    # @param [Hash] params ({})
+    def create_table_optimizer(params = {}, options = {})
+      req = build_request(:create_table_optimizer, params)
       req.send_request(options)
     end
 
@@ -2924,12 +4904,16 @@ module Aws::Glue
     #
     # @option params [Hash<String,String>] :tags
     #   The tags to use with this trigger. You may use tags to limit access to
-    #   the trigger. For more information about tags in AWS Glue, see [AWS
-    #   Tags in AWS Glue][1] in the developer guide.
+    #   the trigger. For more information about tags in Glue, see [Amazon Web
+    #   Services Tags in Glue][1] in the developer guide.
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/glue/latest/dg/monitor-tags.html
+    #
+    # @option params [Types::EventBatchingCondition] :event_batching_condition
+    #   Batch condition that must be met (specified number of events received
+    #   or batch time window expired) before EventBridge event trigger fires.
     #
     # @return [Types::CreateTriggerResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2940,7 +4924,7 @@ module Aws::Glue
     #   resp = client.create_trigger({
     #     name: "NameString", # required
     #     workflow_name: "NameString",
-    #     type: "SCHEDULED", # required, accepts SCHEDULED, CONDITIONAL, ON_DEMAND
+    #     type: "SCHEDULED", # required, accepts SCHEDULED, CONDITIONAL, ON_DEMAND, EVENT
     #     schedule: "GenericString",
     #     predicate: {
     #       logical: "AND", # accepts AND, ANY
@@ -2948,9 +4932,9 @@ module Aws::Glue
     #         {
     #           logical_operator: "EQUALS", # accepts EQUALS
     #           job_name: "NameString",
-    #           state: "STARTING", # accepts STARTING, RUNNING, STOPPING, STOPPED, SUCCEEDED, FAILED, TIMEOUT
+    #           state: "STARTING", # accepts STARTING, RUNNING, STOPPING, STOPPED, SUCCEEDED, FAILED, TIMEOUT, ERROR, WAITING, EXPIRED
     #           crawler_name: "NameString",
-    #           crawl_state: "RUNNING", # accepts RUNNING, CANCELLING, CANCELLED, SUCCEEDED, FAILED
+    #           crawl_state: "RUNNING", # accepts RUNNING, CANCELLING, CANCELLED, SUCCEEDED, FAILED, ERROR
     #         },
     #       ],
     #     },
@@ -2973,6 +4957,10 @@ module Aws::Glue
     #     tags: {
     #       "TagKey" => "TagValue",
     #     },
+    #     event_batching_condition: {
+    #       batch_size: 1, # required
+    #       batch_window: 1,
+    #     },
     #   })
     #
     # @example Response structure
@@ -2988,11 +4976,71 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Creates an Glue usage profile.
+    #
+    # @option params [required, String] :name
+    #   The name of the usage profile.
+    #
+    # @option params [String] :description
+    #   A description of the usage profile.
+    #
+    # @option params [required, Types::ProfileConfiguration] :configuration
+    #   A `ProfileConfiguration` object specifying the job and session values
+    #   for the profile.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   A list of tags applied to the usage profile.
+    #
+    # @return [Types::CreateUsageProfileResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateUsageProfileResponse#name #name} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_usage_profile({
+    #     name: "NameString", # required
+    #     description: "DescriptionString",
+    #     configuration: { # required
+    #       session_configuration: {
+    #         "NameString" => {
+    #           default_value: "ConfigValueString",
+    #           allowed_values: ["ConfigValueString"],
+    #           min_value: "ConfigValueString",
+    #           max_value: "ConfigValueString",
+    #         },
+    #       },
+    #       job_configuration: {
+    #         "NameString" => {
+    #           default_value: "ConfigValueString",
+    #           allowed_values: ["ConfigValueString"],
+    #           min_value: "ConfigValueString",
+    #           max_value: "ConfigValueString",
+    #         },
+    #       },
+    #     },
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/CreateUsageProfile AWS API Documentation
+    #
+    # @overload create_usage_profile(params = {})
+    # @param [Hash] params ({})
+    def create_usage_profile(params = {}, options = {})
+      req = build_request(:create_usage_profile, params)
+      req.send_request(options)
+    end
+
     # Creates a new function definition in the Data Catalog.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which to create the function. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database in which to create the function.
@@ -3085,6 +5133,34 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Deletes an existing blueprint.
+    #
+    # @option params [required, String] :name
+    #   The name of the blueprint to delete.
+    #
+    # @return [Types::DeleteBlueprintResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteBlueprintResponse#name #name} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_blueprint({
+    #     name: "NameString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/DeleteBlueprint AWS API Documentation
+    #
+    # @overload delete_blueprint(params = {})
+    # @param [Hash] params ({})
+    def delete_blueprint(params = {}, options = {})
+      req = build_request(:delete_blueprint, params)
+      req.send_request(options)
+    end
+
     # Removes a classifier from the Data Catalog.
     #
     # @option params [required, String] :name
@@ -3114,7 +5190,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partitions in question reside. If
-    #   none is supplied, the AWS account ID is used by default.
+    #   none is supplied, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the partitions reside.
@@ -3156,7 +5233,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partitions in question reside. If
-    #   none is supplied, the AWS account ID is used by default.
+    #   none is supplied, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the partitions reside.
@@ -3191,7 +5269,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which the connection resides. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :connection_name
     #   The name of the connection to delete.
@@ -3214,7 +5292,7 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Removes a specified crawler from the AWS Glue Data Catalog, unless the
+    # Removes a specified crawler from the Glue Data Catalog, unless the
     # crawler state is `RUNNING`.
     #
     # @option params [required, String] :name
@@ -3237,12 +5315,62 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Deletes a custom pattern by specifying its name.
+    #
+    # @option params [required, String] :name
+    #   The name of the custom pattern that you want to delete.
+    #
+    # @return [Types::DeleteCustomEntityTypeResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteCustomEntityTypeResponse#name #name} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_custom_entity_type({
+    #     name: "NameString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/DeleteCustomEntityType AWS API Documentation
+    #
+    # @overload delete_custom_entity_type(params = {})
+    # @param [Hash] params ({})
+    def delete_custom_entity_type(params = {}, options = {})
+      req = build_request(:delete_custom_entity_type, params)
+      req.send_request(options)
+    end
+
+    # Deletes a data quality ruleset.
+    #
+    # @option params [required, String] :name
+    #   A name for the data quality ruleset.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_data_quality_ruleset({
+    #     name: "NameString", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/DeleteDataQualityRuleset AWS API Documentation
+    #
+    # @overload delete_data_quality_ruleset(params = {})
+    # @param [Hash] params ({})
+    def delete_data_quality_ruleset(params = {}, options = {})
+      req = build_request(:delete_data_quality_ruleset, params)
+      req.send_request(options)
+    end
+
     # Removes a specified database from a Data Catalog.
     #
     # <note markdown="1"> After completing this operation, you no longer have access to the
     # tables (and all table versions and partitions that might belong to the
-    # tables) and the user-defined functions in the deleted database. AWS
-    # Glue deletes these "orphaned" resources asynchronously in a timely
+    # tables) and the user-defined functions in the deleted database. Glue
+    # deletes these "orphaned" resources asynchronously in a timely
     # manner, at the discretion of the service.
     #
     #  To ensure the immediate deletion of all related resources, before
@@ -3256,7 +5384,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which the database resides. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :name
     #   The name of the database to delete. For Hive compatibility, this must
@@ -3331,12 +5459,12 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Deletes an AWS Glue machine learning transform. Machine learning
+    # Deletes an Glue machine learning transform. Machine learning
     # transforms are a special type of transform that use machine learning
     # to learn the details of the transformation to be performed by learning
     # from examples provided by humans. These transformations are then saved
-    # by AWS Glue. If you no longer need a transform, you can delete it by
-    # calling `DeleteMLTransforms`. However, any AWS Glue jobs that still
+    # by Glue. If you no longer need a transform, you can delete it by
+    # calling `DeleteMLTransforms`. However, any Glue jobs that still
     # reference the deleted transform will no longer succeed.
     #
     # @option params [required, String] :transform_id
@@ -3369,7 +5497,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partition to be deleted resides.
-    #   If none is provided, the AWS account ID is used by default.
+    #   If none is provided, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database in which the table in question
@@ -3440,7 +5569,7 @@ module Aws::Glue
     # Delete the entire registry including schema and all of its versions.
     # To get the status of the delete operation, you can call the
     # `GetRegistry` API after the asynchronous call. Deleting a registry
-    # will disable all online operations for the registry such as the
+    # will deactivate all online operations for the registry such as the
     # `UpdateRegistry`, `CreateSchema`, `UpdateSchema`, and
     # `RegisterSchemaVersion` APIs.
     #
@@ -3484,8 +5613,7 @@ module Aws::Glue
     #   The hash value returned when this policy was set.
     #
     # @option params [String] :resource_arn
-    #   The ARN of the AWS Glue resource for the resource policy to be
-    #   deleted.
+    #   The ARN of the Glue resource for the resource policy to be deleted.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -3508,7 +5636,7 @@ module Aws::Glue
     # Deletes the entire schema set, including the schema set and all of its
     # versions. To get the status of the delete operation, you can call
     # `GetSchema` API after the asynchronous call. Deleting a registry will
-    # disable all online operations for the schema, such as the
+    # deactivate all online operations for the schema, such as the
     # `GetSchemaByDefinition`, and `RegisterSchemaVersion` APIs.
     #
     # @option params [required, Types::SchemaId] :schema_id
@@ -3630,11 +5758,43 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Deletes the session.
+    #
+    # @option params [required, String] :id
+    #   The ID of the session to be deleted.
+    #
+    # @option params [String] :request_origin
+    #   The name of the origin of the delete session request.
+    #
+    # @return [Types::DeleteSessionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteSessionResponse#id #id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_session({
+    #     id: "NameString", # required
+    #     request_origin: "OrchestrationNameString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/DeleteSession AWS API Documentation
+    #
+    # @overload delete_session(params = {})
+    # @param [Hash] params ({})
+    def delete_session(params = {}, options = {})
+      req = build_request(:delete_session, params)
+      req.send_request(options)
+    end
+
     # Removes a table definition from the Data Catalog.
     #
     # <note markdown="1"> After completing this operation, you no longer have access to the
-    # table versions and partitions that belong to the deleted table. AWS
-    # Glue deletes these "orphaned" resources asynchronously in a timely
+    # table versions and partitions that belong to the deleted table. Glue
+    # deletes these "orphaned" resources asynchronously in a timely
     # manner, at the discretion of the service.
     #
     #  To ensure the immediate deletion of all related resources, before
@@ -3647,7 +5807,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the table resides. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database in which the table resides. For Hive
@@ -3657,6 +5817,9 @@ module Aws::Glue
     #   The name of the table to be deleted. For Hive compatibility, this name
     #   is entirely lowercase.
     #
+    # @option params [String] :transaction_id
+    #   The transaction ID at which to delete the table contents.
+    #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
     # @example Request syntax with placeholder values
@@ -3665,6 +5828,7 @@ module Aws::Glue
     #     catalog_id: "CatalogIdString",
     #     database_name: "NameString", # required
     #     name: "NameString", # required
+    #     transaction_id: "TransactionIdString",
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/DeleteTable AWS API Documentation
@@ -3676,11 +5840,46 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Deletes an optimizer and all associated metadata for a table. The
+    # optimization will no longer be performed on the table.
+    #
+    # @option params [required, String] :catalog_id
+    #   The Catalog ID of the table.
+    #
+    # @option params [required, String] :database_name
+    #   The name of the database in the catalog in which the table resides.
+    #
+    # @option params [required, String] :table_name
+    #   The name of the table.
+    #
+    # @option params [required, String] :type
+    #   The type of table optimizer.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_table_optimizer({
+    #     catalog_id: "CatalogIdString", # required
+    #     database_name: "NameString", # required
+    #     table_name: "NameString", # required
+    #     type: "compaction", # required, accepts compaction, retention, orphan_file_deletion
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/DeleteTableOptimizer AWS API Documentation
+    #
+    # @overload delete_table_optimizer(params = {})
+    # @param [Hash] params ({})
+    def delete_table_optimizer(params = {}, options = {})
+      req = build_request(:delete_table_optimizer, params)
+      req.send_request(options)
+    end
+
     # Deletes a specified version of a table.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the tables reside. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The database in the catalog in which the table resides. For Hive
@@ -3743,11 +5942,34 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Deletes the Glue specified usage profile.
+    #
+    # @option params [required, String] :name
+    #   The name of the usage profile to delete.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_usage_profile({
+    #     name: "NameString", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/DeleteUsageProfile AWS API Documentation
+    #
+    # @overload delete_usage_profile(params = {})
+    # @param [Hash] params ({})
+    def delete_usage_profile(params = {}, options = {})
+      req = build_request(:delete_usage_profile, params)
+      req.send_request(options)
+    end
+
     # Deletes an existing function definition from the Data Catalog.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the function to be deleted is
-    #   located. If none is supplied, the AWS account ID is used by default.
+    #   located. If none is supplied, the Amazon Web Services account ID is
+    #   used by default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the function is located.
@@ -3802,11 +6024,151 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Retrieves the details of a blueprint.
+    #
+    # @option params [required, String] :name
+    #   The name of the blueprint.
+    #
+    # @option params [Boolean] :include_blueprint
+    #   Specifies whether or not to include the blueprint in the response.
+    #
+    # @option params [Boolean] :include_parameter_spec
+    #   Specifies whether or not to include the parameter specification.
+    #
+    # @return [Types::GetBlueprintResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetBlueprintResponse#blueprint #blueprint} => Types::Blueprint
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_blueprint({
+    #     name: "NameString", # required
+    #     include_blueprint: false,
+    #     include_parameter_spec: false,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.blueprint.name #=> String
+    #   resp.blueprint.description #=> String
+    #   resp.blueprint.created_on #=> Time
+    #   resp.blueprint.last_modified_on #=> Time
+    #   resp.blueprint.parameter_spec #=> String
+    #   resp.blueprint.blueprint_location #=> String
+    #   resp.blueprint.blueprint_service_location #=> String
+    #   resp.blueprint.status #=> String, one of "CREATING", "ACTIVE", "UPDATING", "FAILED"
+    #   resp.blueprint.error_message #=> String
+    #   resp.blueprint.last_active_definition.description #=> String
+    #   resp.blueprint.last_active_definition.last_modified_on #=> Time
+    #   resp.blueprint.last_active_definition.parameter_spec #=> String
+    #   resp.blueprint.last_active_definition.blueprint_location #=> String
+    #   resp.blueprint.last_active_definition.blueprint_service_location #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetBlueprint AWS API Documentation
+    #
+    # @overload get_blueprint(params = {})
+    # @param [Hash] params ({})
+    def get_blueprint(params = {}, options = {})
+      req = build_request(:get_blueprint, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the details of a blueprint run.
+    #
+    # @option params [required, String] :blueprint_name
+    #   The name of the blueprint.
+    #
+    # @option params [required, String] :run_id
+    #   The run ID for the blueprint run you want to retrieve.
+    #
+    # @return [Types::GetBlueprintRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetBlueprintRunResponse#blueprint_run #blueprint_run} => Types::BlueprintRun
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_blueprint_run({
+    #     blueprint_name: "OrchestrationNameString", # required
+    #     run_id: "IdString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.blueprint_run.blueprint_name #=> String
+    #   resp.blueprint_run.run_id #=> String
+    #   resp.blueprint_run.workflow_name #=> String
+    #   resp.blueprint_run.state #=> String, one of "RUNNING", "SUCCEEDED", "FAILED", "ROLLING_BACK"
+    #   resp.blueprint_run.started_on #=> Time
+    #   resp.blueprint_run.completed_on #=> Time
+    #   resp.blueprint_run.error_message #=> String
+    #   resp.blueprint_run.rollback_error_message #=> String
+    #   resp.blueprint_run.parameters #=> String
+    #   resp.blueprint_run.role_arn #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetBlueprintRun AWS API Documentation
+    #
+    # @overload get_blueprint_run(params = {})
+    # @param [Hash] params ({})
+    def get_blueprint_run(params = {}, options = {})
+      req = build_request(:get_blueprint_run, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the details of blueprint runs for a specified blueprint.
+    #
+    # @option params [required, String] :blueprint_name
+    #   The name of the blueprint.
+    #
+    # @option params [String] :next_token
+    #   A continuation token, if this is a continuation request.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of a list to return.
+    #
+    # @return [Types::GetBlueprintRunsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetBlueprintRunsResponse#blueprint_runs #blueprint_runs} => Array&lt;Types::BlueprintRun&gt;
+    #   * {Types::GetBlueprintRunsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_blueprint_runs({
+    #     blueprint_name: "NameString", # required
+    #     next_token: "GenericString",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.blueprint_runs #=> Array
+    #   resp.blueprint_runs[0].blueprint_name #=> String
+    #   resp.blueprint_runs[0].run_id #=> String
+    #   resp.blueprint_runs[0].workflow_name #=> String
+    #   resp.blueprint_runs[0].state #=> String, one of "RUNNING", "SUCCEEDED", "FAILED", "ROLLING_BACK"
+    #   resp.blueprint_runs[0].started_on #=> Time
+    #   resp.blueprint_runs[0].completed_on #=> Time
+    #   resp.blueprint_runs[0].error_message #=> String
+    #   resp.blueprint_runs[0].rollback_error_message #=> String
+    #   resp.blueprint_runs[0].parameters #=> String
+    #   resp.blueprint_runs[0].role_arn #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetBlueprintRuns AWS API Documentation
+    #
+    # @overload get_blueprint_runs(params = {})
+    # @param [Hash] params ({})
+    def get_blueprint_runs(params = {}, options = {})
+      req = build_request(:get_blueprint_runs, params)
+      req.send_request(options)
+    end
+
     # Retrieves the status of a migration operation.
     #
     # @option params [String] :catalog_id
-    #   The ID of the catalog to migrate. Currently, this should be the AWS
-    #   account ID.
+    #   The ID of the catalog to migrate. Currently, this should be the Amazon
+    #   Web Services account ID.
     #
     # @return [Types::GetCatalogImportStatusResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -3879,6 +6241,10 @@ module Aws::Glue
     #   resp.classifier.csv_classifier.header[0] #=> String
     #   resp.classifier.csv_classifier.disable_value_trimming #=> Boolean
     #   resp.classifier.csv_classifier.allow_single_column #=> Boolean
+    #   resp.classifier.csv_classifier.custom_datatype_configured #=> Boolean
+    #   resp.classifier.csv_classifier.custom_datatypes #=> Array
+    #   resp.classifier.csv_classifier.custom_datatypes[0] #=> String
+    #   resp.classifier.csv_classifier.serde #=> String, one of "OpenCSVSerDe", "LazySimpleSerDe", "None"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetClassifier AWS API Documentation
     #
@@ -3943,6 +6309,10 @@ module Aws::Glue
     #   resp.classifiers[0].csv_classifier.header[0] #=> String
     #   resp.classifiers[0].csv_classifier.disable_value_trimming #=> Boolean
     #   resp.classifiers[0].csv_classifier.allow_single_column #=> Boolean
+    #   resp.classifiers[0].csv_classifier.custom_datatype_configured #=> Boolean
+    #   resp.classifiers[0].csv_classifier.custom_datatypes #=> Array
+    #   resp.classifiers[0].csv_classifier.custom_datatypes[0] #=> String
+    #   resp.classifiers[0].csv_classifier.serde #=> String, one of "OpenCSVSerDe", "LazySimpleSerDe", "None"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetClassifiers AWS API Documentation
@@ -3961,7 +6331,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partitions in question reside. If
-    #   none is supplied, the AWS account ID is used by default.
+    #   none is supplied, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the partitions reside.
@@ -4046,7 +6417,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partitions in question reside. If
-    #   none is supplied, the AWS account ID is used by default.
+    #   none is supplied, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the partitions reside.
@@ -4120,22 +6492,133 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Get the associated metadata/information for a task run, given a task
+    # run ID.
+    #
+    # @option params [required, String] :column_statistics_task_run_id
+    #   The identifier for the particular column statistics task run.
+    #
+    # @return [Types::GetColumnStatisticsTaskRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetColumnStatisticsTaskRunResponse#column_statistics_task_run #column_statistics_task_run} => Types::ColumnStatisticsTaskRun
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_column_statistics_task_run({
+    #     column_statistics_task_run_id: "HashString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.column_statistics_task_run.customer_id #=> String
+    #   resp.column_statistics_task_run.column_statistics_task_run_id #=> String
+    #   resp.column_statistics_task_run.database_name #=> String
+    #   resp.column_statistics_task_run.table_name #=> String
+    #   resp.column_statistics_task_run.column_name_list #=> Array
+    #   resp.column_statistics_task_run.column_name_list[0] #=> String
+    #   resp.column_statistics_task_run.catalog_id #=> String
+    #   resp.column_statistics_task_run.role #=> String
+    #   resp.column_statistics_task_run.sample_size #=> Float
+    #   resp.column_statistics_task_run.security_configuration #=> String
+    #   resp.column_statistics_task_run.number_of_workers #=> Integer
+    #   resp.column_statistics_task_run.worker_type #=> String
+    #   resp.column_statistics_task_run.status #=> String, one of "STARTING", "RUNNING", "SUCCEEDED", "FAILED", "STOPPED"
+    #   resp.column_statistics_task_run.creation_time #=> Time
+    #   resp.column_statistics_task_run.last_updated #=> Time
+    #   resp.column_statistics_task_run.start_time #=> Time
+    #   resp.column_statistics_task_run.end_time #=> Time
+    #   resp.column_statistics_task_run.error_message #=> String
+    #   resp.column_statistics_task_run.dpu_seconds #=> Float
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetColumnStatisticsTaskRun AWS API Documentation
+    #
+    # @overload get_column_statistics_task_run(params = {})
+    # @param [Hash] params ({})
+    def get_column_statistics_task_run(params = {}, options = {})
+      req = build_request(:get_column_statistics_task_run, params)
+      req.send_request(options)
+    end
+
+    # Retrieves information about all runs associated with the specified
+    # table.
+    #
+    # @option params [required, String] :database_name
+    #   The name of the database where the table resides.
+    #
+    # @option params [required, String] :table_name
+    #   The name of the table.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of the response.
+    #
+    # @option params [String] :next_token
+    #   A continuation token, if this is a continuation call.
+    #
+    # @return [Types::GetColumnStatisticsTaskRunsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetColumnStatisticsTaskRunsResponse#column_statistics_task_runs #column_statistics_task_runs} => Array&lt;Types::ColumnStatisticsTaskRun&gt;
+    #   * {Types::GetColumnStatisticsTaskRunsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_column_statistics_task_runs({
+    #     database_name: "DatabaseName", # required
+    #     table_name: "NameString", # required
+    #     max_results: 1,
+    #     next_token: "Token",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.column_statistics_task_runs #=> Array
+    #   resp.column_statistics_task_runs[0].customer_id #=> String
+    #   resp.column_statistics_task_runs[0].column_statistics_task_run_id #=> String
+    #   resp.column_statistics_task_runs[0].database_name #=> String
+    #   resp.column_statistics_task_runs[0].table_name #=> String
+    #   resp.column_statistics_task_runs[0].column_name_list #=> Array
+    #   resp.column_statistics_task_runs[0].column_name_list[0] #=> String
+    #   resp.column_statistics_task_runs[0].catalog_id #=> String
+    #   resp.column_statistics_task_runs[0].role #=> String
+    #   resp.column_statistics_task_runs[0].sample_size #=> Float
+    #   resp.column_statistics_task_runs[0].security_configuration #=> String
+    #   resp.column_statistics_task_runs[0].number_of_workers #=> Integer
+    #   resp.column_statistics_task_runs[0].worker_type #=> String
+    #   resp.column_statistics_task_runs[0].status #=> String, one of "STARTING", "RUNNING", "SUCCEEDED", "FAILED", "STOPPED"
+    #   resp.column_statistics_task_runs[0].creation_time #=> Time
+    #   resp.column_statistics_task_runs[0].last_updated #=> Time
+    #   resp.column_statistics_task_runs[0].start_time #=> Time
+    #   resp.column_statistics_task_runs[0].end_time #=> Time
+    #   resp.column_statistics_task_runs[0].error_message #=> String
+    #   resp.column_statistics_task_runs[0].dpu_seconds #=> Float
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetColumnStatisticsTaskRuns AWS API Documentation
+    #
+    # @overload get_column_statistics_task_runs(params = {})
+    # @param [Hash] params ({})
+    def get_column_statistics_task_runs(params = {}, options = {})
+      req = build_request(:get_column_statistics_task_runs, params)
+      req.send_request(options)
+    end
+
     # Retrieves a connection definition from the Data Catalog.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which the connection resides. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :name
     #   The name of the connection definition to retrieve.
     #
     # @option params [Boolean] :hide_password
     #   Allows you to retrieve the connection metadata without returning the
-    #   password. For instance, the AWS Glue console uses this flag to
-    #   retrieve the connection, and does not display the password. Set this
-    #   parameter when the caller might not have permission to use the AWS KMS
-    #   key to decrypt the password, but it does have permission to access the
-    #   rest of the connection properties.
+    #   password. For instance, the Glue console uses this flag to retrieve
+    #   the connection, and does not display the password. Set this parameter
+    #   when the caller might not have permission to use the KMS key to
+    #   decrypt the password, but it does have permission to access the rest
+    #   of the connection properties.
     #
     # @return [Types::GetConnectionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4153,11 +6636,13 @@ module Aws::Glue
     #
     #   resp.connection.name #=> String
     #   resp.connection.description #=> String
-    #   resp.connection.connection_type #=> String, one of "JDBC", "SFTP", "MONGODB", "KAFKA", "NETWORK", "MARKETPLACE", "CUSTOM"
+    #   resp.connection.connection_type #=> String, one of "JDBC", "SFTP", "MONGODB", "KAFKA", "NETWORK", "MARKETPLACE", "CUSTOM", "SALESFORCE", "VIEW_VALIDATION_REDSHIFT", "VIEW_VALIDATION_ATHENA"
     #   resp.connection.match_criteria #=> Array
     #   resp.connection.match_criteria[0] #=> String
     #   resp.connection.connection_properties #=> Hash
     #   resp.connection.connection_properties["ConnectionPropertyKey"] #=> String
+    #   resp.connection.athena_properties #=> Hash
+    #   resp.connection.athena_properties["PropertyKey"] #=> String
     #   resp.connection.physical_connection_requirements.subnet_id #=> String
     #   resp.connection.physical_connection_requirements.security_group_id_list #=> Array
     #   resp.connection.physical_connection_requirements.security_group_id_list[0] #=> String
@@ -4165,6 +6650,17 @@ module Aws::Glue
     #   resp.connection.creation_time #=> Time
     #   resp.connection.last_updated_time #=> Time
     #   resp.connection.last_updated_by #=> String
+    #   resp.connection.status #=> String, one of "READY", "IN_PROGRESS", "FAILED"
+    #   resp.connection.status_reason #=> String
+    #   resp.connection.last_connection_validation_time #=> Time
+    #   resp.connection.authentication_configuration.authentication_type #=> String, one of "BASIC", "OAUTH2", "CUSTOM"
+    #   resp.connection.authentication_configuration.secret_arn #=> String
+    #   resp.connection.authentication_configuration.o_auth_2_properties.o_auth_2_grant_type #=> String, one of "AUTHORIZATION_CODE", "CLIENT_CREDENTIALS", "JWT_BEARER"
+    #   resp.connection.authentication_configuration.o_auth_2_properties.o_auth_2_client_application.user_managed_client_application_client_id #=> String
+    #   resp.connection.authentication_configuration.o_auth_2_properties.o_auth_2_client_application.aws_managed_client_application_reference #=> String
+    #   resp.connection.authentication_configuration.o_auth_2_properties.token_url #=> String
+    #   resp.connection.authentication_configuration.o_auth_2_properties.token_url_parameters_map #=> Hash
+    #   resp.connection.authentication_configuration.o_auth_2_properties.token_url_parameters_map["TokenUrlParameterKey"] #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetConnection AWS API Documentation
     #
@@ -4179,18 +6675,18 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which the connections reside. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [Types::GetConnectionsFilter] :filter
     #   A filter that controls which connections are returned.
     #
     # @option params [Boolean] :hide_password
     #   Allows you to retrieve the connection metadata without returning the
-    #   password. For instance, the AWS Glue console uses this flag to
-    #   retrieve the connection, and does not display the password. Set this
-    #   parameter when the caller might not have permission to use the AWS KMS
-    #   key to decrypt the password, but it does have permission to access the
-    #   rest of the connection properties.
+    #   password. For instance, the Glue console uses this flag to retrieve
+    #   the connection, and does not display the password. Set this parameter
+    #   when the caller might not have permission to use the KMS key to
+    #   decrypt the password, but it does have permission to access the rest
+    #   of the connection properties.
     #
     # @option params [String] :next_token
     #   A continuation token, if this is a continuation call.
@@ -4211,7 +6707,7 @@ module Aws::Glue
     #     catalog_id: "CatalogIdString",
     #     filter: {
     #       match_criteria: ["NameString"],
-    #       connection_type: "JDBC", # accepts JDBC, SFTP, MONGODB, KAFKA, NETWORK, MARKETPLACE, CUSTOM
+    #       connection_type: "JDBC", # accepts JDBC, SFTP, MONGODB, KAFKA, NETWORK, MARKETPLACE, CUSTOM, SALESFORCE, VIEW_VALIDATION_REDSHIFT, VIEW_VALIDATION_ATHENA
     #     },
     #     hide_password: false,
     #     next_token: "Token",
@@ -4223,11 +6719,13 @@ module Aws::Glue
     #   resp.connection_list #=> Array
     #   resp.connection_list[0].name #=> String
     #   resp.connection_list[0].description #=> String
-    #   resp.connection_list[0].connection_type #=> String, one of "JDBC", "SFTP", "MONGODB", "KAFKA", "NETWORK", "MARKETPLACE", "CUSTOM"
+    #   resp.connection_list[0].connection_type #=> String, one of "JDBC", "SFTP", "MONGODB", "KAFKA", "NETWORK", "MARKETPLACE", "CUSTOM", "SALESFORCE", "VIEW_VALIDATION_REDSHIFT", "VIEW_VALIDATION_ATHENA"
     #   resp.connection_list[0].match_criteria #=> Array
     #   resp.connection_list[0].match_criteria[0] #=> String
     #   resp.connection_list[0].connection_properties #=> Hash
     #   resp.connection_list[0].connection_properties["ConnectionPropertyKey"] #=> String
+    #   resp.connection_list[0].athena_properties #=> Hash
+    #   resp.connection_list[0].athena_properties["PropertyKey"] #=> String
     #   resp.connection_list[0].physical_connection_requirements.subnet_id #=> String
     #   resp.connection_list[0].physical_connection_requirements.security_group_id_list #=> Array
     #   resp.connection_list[0].physical_connection_requirements.security_group_id_list[0] #=> String
@@ -4235,6 +6733,17 @@ module Aws::Glue
     #   resp.connection_list[0].creation_time #=> Time
     #   resp.connection_list[0].last_updated_time #=> Time
     #   resp.connection_list[0].last_updated_by #=> String
+    #   resp.connection_list[0].status #=> String, one of "READY", "IN_PROGRESS", "FAILED"
+    #   resp.connection_list[0].status_reason #=> String
+    #   resp.connection_list[0].last_connection_validation_time #=> Time
+    #   resp.connection_list[0].authentication_configuration.authentication_type #=> String, one of "BASIC", "OAUTH2", "CUSTOM"
+    #   resp.connection_list[0].authentication_configuration.secret_arn #=> String
+    #   resp.connection_list[0].authentication_configuration.o_auth_2_properties.o_auth_2_grant_type #=> String, one of "AUTHORIZATION_CODE", "CLIENT_CREDENTIALS", "JWT_BEARER"
+    #   resp.connection_list[0].authentication_configuration.o_auth_2_properties.o_auth_2_client_application.user_managed_client_application_client_id #=> String
+    #   resp.connection_list[0].authentication_configuration.o_auth_2_properties.o_auth_2_client_application.aws_managed_client_application_reference #=> String
+    #   resp.connection_list[0].authentication_configuration.o_auth_2_properties.token_url #=> String
+    #   resp.connection_list[0].authentication_configuration.o_auth_2_properties.token_url_parameters_map #=> Hash
+    #   resp.connection_list[0].authentication_configuration.o_auth_2_properties.token_url_parameters_map["TokenUrlParameterKey"] #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetConnections AWS API Documentation
@@ -4270,11 +6779,16 @@ module Aws::Glue
     #   resp.crawler.targets.s3_targets[0].exclusions #=> Array
     #   resp.crawler.targets.s3_targets[0].exclusions[0] #=> String
     #   resp.crawler.targets.s3_targets[0].connection_name #=> String
+    #   resp.crawler.targets.s3_targets[0].sample_size #=> Integer
+    #   resp.crawler.targets.s3_targets[0].event_queue_arn #=> String
+    #   resp.crawler.targets.s3_targets[0].dlq_event_queue_arn #=> String
     #   resp.crawler.targets.jdbc_targets #=> Array
     #   resp.crawler.targets.jdbc_targets[0].connection_name #=> String
     #   resp.crawler.targets.jdbc_targets[0].path #=> String
     #   resp.crawler.targets.jdbc_targets[0].exclusions #=> Array
     #   resp.crawler.targets.jdbc_targets[0].exclusions[0] #=> String
+    #   resp.crawler.targets.jdbc_targets[0].enable_additional_metadata #=> Array
+    #   resp.crawler.targets.jdbc_targets[0].enable_additional_metadata[0] #=> String, one of "COMMENTS", "RAWTYPES"
     #   resp.crawler.targets.mongo_db_targets #=> Array
     #   resp.crawler.targets.mongo_db_targets[0].connection_name #=> String
     #   resp.crawler.targets.mongo_db_targets[0].path #=> String
@@ -4287,11 +6801,34 @@ module Aws::Glue
     #   resp.crawler.targets.catalog_targets[0].database_name #=> String
     #   resp.crawler.targets.catalog_targets[0].tables #=> Array
     #   resp.crawler.targets.catalog_targets[0].tables[0] #=> String
+    #   resp.crawler.targets.catalog_targets[0].connection_name #=> String
+    #   resp.crawler.targets.catalog_targets[0].event_queue_arn #=> String
+    #   resp.crawler.targets.catalog_targets[0].dlq_event_queue_arn #=> String
+    #   resp.crawler.targets.delta_targets #=> Array
+    #   resp.crawler.targets.delta_targets[0].delta_tables #=> Array
+    #   resp.crawler.targets.delta_targets[0].delta_tables[0] #=> String
+    #   resp.crawler.targets.delta_targets[0].connection_name #=> String
+    #   resp.crawler.targets.delta_targets[0].write_manifest #=> Boolean
+    #   resp.crawler.targets.delta_targets[0].create_native_delta_table #=> Boolean
+    #   resp.crawler.targets.iceberg_targets #=> Array
+    #   resp.crawler.targets.iceberg_targets[0].paths #=> Array
+    #   resp.crawler.targets.iceberg_targets[0].paths[0] #=> String
+    #   resp.crawler.targets.iceberg_targets[0].connection_name #=> String
+    #   resp.crawler.targets.iceberg_targets[0].exclusions #=> Array
+    #   resp.crawler.targets.iceberg_targets[0].exclusions[0] #=> String
+    #   resp.crawler.targets.iceberg_targets[0].maximum_traversal_depth #=> Integer
+    #   resp.crawler.targets.hudi_targets #=> Array
+    #   resp.crawler.targets.hudi_targets[0].paths #=> Array
+    #   resp.crawler.targets.hudi_targets[0].paths[0] #=> String
+    #   resp.crawler.targets.hudi_targets[0].connection_name #=> String
+    #   resp.crawler.targets.hudi_targets[0].exclusions #=> Array
+    #   resp.crawler.targets.hudi_targets[0].exclusions[0] #=> String
+    #   resp.crawler.targets.hudi_targets[0].maximum_traversal_depth #=> Integer
     #   resp.crawler.database_name #=> String
     #   resp.crawler.description #=> String
     #   resp.crawler.classifiers #=> Array
     #   resp.crawler.classifiers[0] #=> String
-    #   resp.crawler.recrawl_policy.recrawl_behavior #=> String, one of "CRAWL_EVERYTHING", "CRAWL_NEW_FOLDERS_ONLY"
+    #   resp.crawler.recrawl_policy.recrawl_behavior #=> String, one of "CRAWL_EVERYTHING", "CRAWL_NEW_FOLDERS_ONLY", "CRAWL_EVENT_MODE"
     #   resp.crawler.schema_change_policy.update_behavior #=> String, one of "LOG", "UPDATE_IN_DATABASE"
     #   resp.crawler.schema_change_policy.delete_behavior #=> String, one of "LOG", "DELETE_FROM_DATABASE", "DEPRECATE_IN_DATABASE"
     #   resp.crawler.lineage_configuration.crawler_lineage_settings #=> String, one of "ENABLE", "DISABLE"
@@ -4311,6 +6848,8 @@ module Aws::Glue
     #   resp.crawler.version #=> Integer
     #   resp.crawler.configuration #=> String
     #   resp.crawler.crawler_security_configuration #=> String
+    #   resp.crawler.lake_formation_configuration.use_lake_formation_credentials #=> Boolean
+    #   resp.crawler.lake_formation_configuration.account_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetCrawler AWS API Documentation
     #
@@ -4401,11 +6940,16 @@ module Aws::Glue
     #   resp.crawlers[0].targets.s3_targets[0].exclusions #=> Array
     #   resp.crawlers[0].targets.s3_targets[0].exclusions[0] #=> String
     #   resp.crawlers[0].targets.s3_targets[0].connection_name #=> String
+    #   resp.crawlers[0].targets.s3_targets[0].sample_size #=> Integer
+    #   resp.crawlers[0].targets.s3_targets[0].event_queue_arn #=> String
+    #   resp.crawlers[0].targets.s3_targets[0].dlq_event_queue_arn #=> String
     #   resp.crawlers[0].targets.jdbc_targets #=> Array
     #   resp.crawlers[0].targets.jdbc_targets[0].connection_name #=> String
     #   resp.crawlers[0].targets.jdbc_targets[0].path #=> String
     #   resp.crawlers[0].targets.jdbc_targets[0].exclusions #=> Array
     #   resp.crawlers[0].targets.jdbc_targets[0].exclusions[0] #=> String
+    #   resp.crawlers[0].targets.jdbc_targets[0].enable_additional_metadata #=> Array
+    #   resp.crawlers[0].targets.jdbc_targets[0].enable_additional_metadata[0] #=> String, one of "COMMENTS", "RAWTYPES"
     #   resp.crawlers[0].targets.mongo_db_targets #=> Array
     #   resp.crawlers[0].targets.mongo_db_targets[0].connection_name #=> String
     #   resp.crawlers[0].targets.mongo_db_targets[0].path #=> String
@@ -4418,11 +6962,34 @@ module Aws::Glue
     #   resp.crawlers[0].targets.catalog_targets[0].database_name #=> String
     #   resp.crawlers[0].targets.catalog_targets[0].tables #=> Array
     #   resp.crawlers[0].targets.catalog_targets[0].tables[0] #=> String
+    #   resp.crawlers[0].targets.catalog_targets[0].connection_name #=> String
+    #   resp.crawlers[0].targets.catalog_targets[0].event_queue_arn #=> String
+    #   resp.crawlers[0].targets.catalog_targets[0].dlq_event_queue_arn #=> String
+    #   resp.crawlers[0].targets.delta_targets #=> Array
+    #   resp.crawlers[0].targets.delta_targets[0].delta_tables #=> Array
+    #   resp.crawlers[0].targets.delta_targets[0].delta_tables[0] #=> String
+    #   resp.crawlers[0].targets.delta_targets[0].connection_name #=> String
+    #   resp.crawlers[0].targets.delta_targets[0].write_manifest #=> Boolean
+    #   resp.crawlers[0].targets.delta_targets[0].create_native_delta_table #=> Boolean
+    #   resp.crawlers[0].targets.iceberg_targets #=> Array
+    #   resp.crawlers[0].targets.iceberg_targets[0].paths #=> Array
+    #   resp.crawlers[0].targets.iceberg_targets[0].paths[0] #=> String
+    #   resp.crawlers[0].targets.iceberg_targets[0].connection_name #=> String
+    #   resp.crawlers[0].targets.iceberg_targets[0].exclusions #=> Array
+    #   resp.crawlers[0].targets.iceberg_targets[0].exclusions[0] #=> String
+    #   resp.crawlers[0].targets.iceberg_targets[0].maximum_traversal_depth #=> Integer
+    #   resp.crawlers[0].targets.hudi_targets #=> Array
+    #   resp.crawlers[0].targets.hudi_targets[0].paths #=> Array
+    #   resp.crawlers[0].targets.hudi_targets[0].paths[0] #=> String
+    #   resp.crawlers[0].targets.hudi_targets[0].connection_name #=> String
+    #   resp.crawlers[0].targets.hudi_targets[0].exclusions #=> Array
+    #   resp.crawlers[0].targets.hudi_targets[0].exclusions[0] #=> String
+    #   resp.crawlers[0].targets.hudi_targets[0].maximum_traversal_depth #=> Integer
     #   resp.crawlers[0].database_name #=> String
     #   resp.crawlers[0].description #=> String
     #   resp.crawlers[0].classifiers #=> Array
     #   resp.crawlers[0].classifiers[0] #=> String
-    #   resp.crawlers[0].recrawl_policy.recrawl_behavior #=> String, one of "CRAWL_EVERYTHING", "CRAWL_NEW_FOLDERS_ONLY"
+    #   resp.crawlers[0].recrawl_policy.recrawl_behavior #=> String, one of "CRAWL_EVERYTHING", "CRAWL_NEW_FOLDERS_ONLY", "CRAWL_EVENT_MODE"
     #   resp.crawlers[0].schema_change_policy.update_behavior #=> String, one of "LOG", "UPDATE_IN_DATABASE"
     #   resp.crawlers[0].schema_change_policy.delete_behavior #=> String, one of "LOG", "DELETE_FROM_DATABASE", "DEPRECATE_IN_DATABASE"
     #   resp.crawlers[0].lineage_configuration.crawler_lineage_settings #=> String, one of "ENABLE", "DISABLE"
@@ -4442,6 +7009,8 @@ module Aws::Glue
     #   resp.crawlers[0].version #=> Integer
     #   resp.crawlers[0].configuration #=> String
     #   resp.crawlers[0].crawler_security_configuration #=> String
+    #   resp.crawlers[0].lake_formation_configuration.use_lake_formation_credentials #=> Boolean
+    #   resp.crawlers[0].lake_formation_configuration.account_id #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetCrawlers AWS API Documentation
@@ -4453,11 +7022,45 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Retrieves the details of a custom pattern by specifying its name.
+    #
+    # @option params [required, String] :name
+    #   The name of the custom pattern that you want to retrieve.
+    #
+    # @return [Types::GetCustomEntityTypeResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetCustomEntityTypeResponse#name #name} => String
+    #   * {Types::GetCustomEntityTypeResponse#regex_string #regex_string} => String
+    #   * {Types::GetCustomEntityTypeResponse#context_words #context_words} => Array&lt;String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_custom_entity_type({
+    #     name: "NameString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #   resp.regex_string #=> String
+    #   resp.context_words #=> Array
+    #   resp.context_words[0] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetCustomEntityType AWS API Documentation
+    #
+    # @overload get_custom_entity_type(params = {})
+    # @param [Hash] params ({})
+    def get_custom_entity_type(params = {}, options = {})
+      req = build_request(:get_custom_entity_type, params)
+      req.send_request(options)
+    end
+
     # Retrieves the security configuration for a specified catalog.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog to retrieve the security configuration for.
-    #   If none is provided, the AWS account ID is used by default.
+    #   If none is provided, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @return [Types::GetDataCatalogEncryptionSettingsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4471,8 +7074,9 @@ module Aws::Glue
     #
     # @example Response structure
     #
-    #   resp.data_catalog_encryption_settings.encryption_at_rest.catalog_encryption_mode #=> String, one of "DISABLED", "SSE-KMS"
+    #   resp.data_catalog_encryption_settings.encryption_at_rest.catalog_encryption_mode #=> String, one of "DISABLED", "SSE-KMS", "SSE-KMS-WITH-SERVICE-ROLE"
     #   resp.data_catalog_encryption_settings.encryption_at_rest.sse_aws_kms_key_id #=> String
+    #   resp.data_catalog_encryption_settings.encryption_at_rest.catalog_encryption_service_role #=> String
     #   resp.data_catalog_encryption_settings.connection_password_encryption.return_connection_password_encrypted #=> Boolean
     #   resp.data_catalog_encryption_settings.connection_password_encryption.aws_kms_key_id #=> String
     #
@@ -4485,11 +7089,345 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Retrieve the training status of the model along with more information
+    # (CompletedOn, StartedOn, FailureReason).
+    #
+    # @option params [String] :statistic_id
+    #   The Statistic ID.
+    #
+    # @option params [required, String] :profile_id
+    #   The Profile ID.
+    #
+    # @return [Types::GetDataQualityModelResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetDataQualityModelResponse#status #status} => String
+    #   * {Types::GetDataQualityModelResponse#started_on #started_on} => Time
+    #   * {Types::GetDataQualityModelResponse#completed_on #completed_on} => Time
+    #   * {Types::GetDataQualityModelResponse#failure_reason #failure_reason} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_data_quality_model({
+    #     statistic_id: "HashString",
+    #     profile_id: "HashString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.status #=> String, one of "RUNNING", "SUCCEEDED", "FAILED"
+    #   resp.started_on #=> Time
+    #   resp.completed_on #=> Time
+    #   resp.failure_reason #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetDataQualityModel AWS API Documentation
+    #
+    # @overload get_data_quality_model(params = {})
+    # @param [Hash] params ({})
+    def get_data_quality_model(params = {}, options = {})
+      req = build_request(:get_data_quality_model, params)
+      req.send_request(options)
+    end
+
+    # Retrieve a statistic's predictions for a given Profile ID.
+    #
+    # @option params [required, String] :statistic_id
+    #   The Statistic ID.
+    #
+    # @option params [required, String] :profile_id
+    #   The Profile ID.
+    #
+    # @return [Types::GetDataQualityModelResultResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetDataQualityModelResultResponse#completed_on #completed_on} => Time
+    #   * {Types::GetDataQualityModelResultResponse#model #model} => Array&lt;Types::StatisticModelResult&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_data_quality_model_result({
+    #     statistic_id: "HashString", # required
+    #     profile_id: "HashString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.completed_on #=> Time
+    #   resp.model #=> Array
+    #   resp.model[0].lower_bound #=> Float
+    #   resp.model[0].upper_bound #=> Float
+    #   resp.model[0].predicted_value #=> Float
+    #   resp.model[0].actual_value #=> Float
+    #   resp.model[0].date #=> Time
+    #   resp.model[0].inclusion_annotation #=> String, one of "INCLUDE", "EXCLUDE"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetDataQualityModelResult AWS API Documentation
+    #
+    # @overload get_data_quality_model_result(params = {})
+    # @param [Hash] params ({})
+    def get_data_quality_model_result(params = {}, options = {})
+      req = build_request(:get_data_quality_model_result, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the result of a data quality rule evaluation.
+    #
+    # @option params [required, String] :result_id
+    #   A unique result ID for the data quality result.
+    #
+    # @return [Types::GetDataQualityResultResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetDataQualityResultResponse#result_id #result_id} => String
+    #   * {Types::GetDataQualityResultResponse#profile_id #profile_id} => String
+    #   * {Types::GetDataQualityResultResponse#score #score} => Float
+    #   * {Types::GetDataQualityResultResponse#data_source #data_source} => Types::DataSource
+    #   * {Types::GetDataQualityResultResponse#ruleset_name #ruleset_name} => String
+    #   * {Types::GetDataQualityResultResponse#evaluation_context #evaluation_context} => String
+    #   * {Types::GetDataQualityResultResponse#started_on #started_on} => Time
+    #   * {Types::GetDataQualityResultResponse#completed_on #completed_on} => Time
+    #   * {Types::GetDataQualityResultResponse#job_name #job_name} => String
+    #   * {Types::GetDataQualityResultResponse#job_run_id #job_run_id} => String
+    #   * {Types::GetDataQualityResultResponse#ruleset_evaluation_run_id #ruleset_evaluation_run_id} => String
+    #   * {Types::GetDataQualityResultResponse#rule_results #rule_results} => Array&lt;Types::DataQualityRuleResult&gt;
+    #   * {Types::GetDataQualityResultResponse#analyzer_results #analyzer_results} => Array&lt;Types::DataQualityAnalyzerResult&gt;
+    #   * {Types::GetDataQualityResultResponse#observations #observations} => Array&lt;Types::DataQualityObservation&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_data_quality_result({
+    #     result_id: "HashString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.result_id #=> String
+    #   resp.profile_id #=> String
+    #   resp.score #=> Float
+    #   resp.data_source.glue_table.database_name #=> String
+    #   resp.data_source.glue_table.table_name #=> String
+    #   resp.data_source.glue_table.catalog_id #=> String
+    #   resp.data_source.glue_table.connection_name #=> String
+    #   resp.data_source.glue_table.additional_options #=> Hash
+    #   resp.data_source.glue_table.additional_options["NameString"] #=> String
+    #   resp.ruleset_name #=> String
+    #   resp.evaluation_context #=> String
+    #   resp.started_on #=> Time
+    #   resp.completed_on #=> Time
+    #   resp.job_name #=> String
+    #   resp.job_run_id #=> String
+    #   resp.ruleset_evaluation_run_id #=> String
+    #   resp.rule_results #=> Array
+    #   resp.rule_results[0].name #=> String
+    #   resp.rule_results[0].description #=> String
+    #   resp.rule_results[0].evaluation_message #=> String
+    #   resp.rule_results[0].result #=> String, one of "PASS", "FAIL", "ERROR"
+    #   resp.rule_results[0].evaluated_metrics #=> Hash
+    #   resp.rule_results[0].evaluated_metrics["NameString"] #=> Float
+    #   resp.rule_results[0].evaluated_rule #=> String
+    #   resp.analyzer_results #=> Array
+    #   resp.analyzer_results[0].name #=> String
+    #   resp.analyzer_results[0].description #=> String
+    #   resp.analyzer_results[0].evaluation_message #=> String
+    #   resp.analyzer_results[0].evaluated_metrics #=> Hash
+    #   resp.analyzer_results[0].evaluated_metrics["NameString"] #=> Float
+    #   resp.observations #=> Array
+    #   resp.observations[0].description #=> String
+    #   resp.observations[0].metric_based_observation.metric_name #=> String
+    #   resp.observations[0].metric_based_observation.statistic_id #=> String
+    #   resp.observations[0].metric_based_observation.metric_values.actual_value #=> Float
+    #   resp.observations[0].metric_based_observation.metric_values.expected_value #=> Float
+    #   resp.observations[0].metric_based_observation.metric_values.lower_limit #=> Float
+    #   resp.observations[0].metric_based_observation.metric_values.upper_limit #=> Float
+    #   resp.observations[0].metric_based_observation.new_rules #=> Array
+    #   resp.observations[0].metric_based_observation.new_rules[0] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetDataQualityResult AWS API Documentation
+    #
+    # @overload get_data_quality_result(params = {})
+    # @param [Hash] params ({})
+    def get_data_quality_result(params = {}, options = {})
+      req = build_request(:get_data_quality_result, params)
+      req.send_request(options)
+    end
+
+    # Gets the specified recommendation run that was used to generate rules.
+    #
+    # @option params [required, String] :run_id
+    #   The unique run identifier associated with this run.
+    #
+    # @return [Types::GetDataQualityRuleRecommendationRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#run_id #run_id} => String
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#data_source #data_source} => Types::DataSource
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#role #role} => String
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#number_of_workers #number_of_workers} => Integer
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#timeout #timeout} => Integer
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#status #status} => String
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#error_string #error_string} => String
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#started_on #started_on} => Time
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#last_modified_on #last_modified_on} => Time
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#completed_on #completed_on} => Time
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#execution_time #execution_time} => Integer
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#recommended_ruleset #recommended_ruleset} => String
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#created_ruleset_name #created_ruleset_name} => String
+    #   * {Types::GetDataQualityRuleRecommendationRunResponse#data_quality_security_configuration #data_quality_security_configuration} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_data_quality_rule_recommendation_run({
+    #     run_id: "HashString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.run_id #=> String
+    #   resp.data_source.glue_table.database_name #=> String
+    #   resp.data_source.glue_table.table_name #=> String
+    #   resp.data_source.glue_table.catalog_id #=> String
+    #   resp.data_source.glue_table.connection_name #=> String
+    #   resp.data_source.glue_table.additional_options #=> Hash
+    #   resp.data_source.glue_table.additional_options["NameString"] #=> String
+    #   resp.role #=> String
+    #   resp.number_of_workers #=> Integer
+    #   resp.timeout #=> Integer
+    #   resp.status #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.error_string #=> String
+    #   resp.started_on #=> Time
+    #   resp.last_modified_on #=> Time
+    #   resp.completed_on #=> Time
+    #   resp.execution_time #=> Integer
+    #   resp.recommended_ruleset #=> String
+    #   resp.created_ruleset_name #=> String
+    #   resp.data_quality_security_configuration #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetDataQualityRuleRecommendationRun AWS API Documentation
+    #
+    # @overload get_data_quality_rule_recommendation_run(params = {})
+    # @param [Hash] params ({})
+    def get_data_quality_rule_recommendation_run(params = {}, options = {})
+      req = build_request(:get_data_quality_rule_recommendation_run, params)
+      req.send_request(options)
+    end
+
+    # Returns an existing ruleset by identifier or name.
+    #
+    # @option params [required, String] :name
+    #   The name of the ruleset.
+    #
+    # @return [Types::GetDataQualityRulesetResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetDataQualityRulesetResponse#name #name} => String
+    #   * {Types::GetDataQualityRulesetResponse#description #description} => String
+    #   * {Types::GetDataQualityRulesetResponse#ruleset #ruleset} => String
+    #   * {Types::GetDataQualityRulesetResponse#target_table #target_table} => Types::DataQualityTargetTable
+    #   * {Types::GetDataQualityRulesetResponse#created_on #created_on} => Time
+    #   * {Types::GetDataQualityRulesetResponse#last_modified_on #last_modified_on} => Time
+    #   * {Types::GetDataQualityRulesetResponse#recommendation_run_id #recommendation_run_id} => String
+    #   * {Types::GetDataQualityRulesetResponse#data_quality_security_configuration #data_quality_security_configuration} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_data_quality_ruleset({
+    #     name: "NameString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #   resp.description #=> String
+    #   resp.ruleset #=> String
+    #   resp.target_table.table_name #=> String
+    #   resp.target_table.database_name #=> String
+    #   resp.target_table.catalog_id #=> String
+    #   resp.created_on #=> Time
+    #   resp.last_modified_on #=> Time
+    #   resp.recommendation_run_id #=> String
+    #   resp.data_quality_security_configuration #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetDataQualityRuleset AWS API Documentation
+    #
+    # @overload get_data_quality_ruleset(params = {})
+    # @param [Hash] params ({})
+    def get_data_quality_ruleset(params = {}, options = {})
+      req = build_request(:get_data_quality_ruleset, params)
+      req.send_request(options)
+    end
+
+    # Retrieves a specific run where a ruleset is evaluated against a data
+    # source.
+    #
+    # @option params [required, String] :run_id
+    #   The unique run identifier associated with this run.
+    #
+    # @return [Types::GetDataQualityRulesetEvaluationRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#run_id #run_id} => String
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#data_source #data_source} => Types::DataSource
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#role #role} => String
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#number_of_workers #number_of_workers} => Integer
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#timeout #timeout} => Integer
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#additional_run_options #additional_run_options} => Types::DataQualityEvaluationRunAdditionalRunOptions
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#status #status} => String
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#error_string #error_string} => String
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#started_on #started_on} => Time
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#last_modified_on #last_modified_on} => Time
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#completed_on #completed_on} => Time
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#execution_time #execution_time} => Integer
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#ruleset_names #ruleset_names} => Array&lt;String&gt;
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#result_ids #result_ids} => Array&lt;String&gt;
+    #   * {Types::GetDataQualityRulesetEvaluationRunResponse#additional_data_sources #additional_data_sources} => Hash&lt;String,Types::DataSource&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_data_quality_ruleset_evaluation_run({
+    #     run_id: "HashString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.run_id #=> String
+    #   resp.data_source.glue_table.database_name #=> String
+    #   resp.data_source.glue_table.table_name #=> String
+    #   resp.data_source.glue_table.catalog_id #=> String
+    #   resp.data_source.glue_table.connection_name #=> String
+    #   resp.data_source.glue_table.additional_options #=> Hash
+    #   resp.data_source.glue_table.additional_options["NameString"] #=> String
+    #   resp.role #=> String
+    #   resp.number_of_workers #=> Integer
+    #   resp.timeout #=> Integer
+    #   resp.additional_run_options.cloud_watch_metrics_enabled #=> Boolean
+    #   resp.additional_run_options.results_s3_prefix #=> String
+    #   resp.additional_run_options.composite_rule_evaluation_method #=> String, one of "COLUMN", "ROW"
+    #   resp.status #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.error_string #=> String
+    #   resp.started_on #=> Time
+    #   resp.last_modified_on #=> Time
+    #   resp.completed_on #=> Time
+    #   resp.execution_time #=> Integer
+    #   resp.ruleset_names #=> Array
+    #   resp.ruleset_names[0] #=> String
+    #   resp.result_ids #=> Array
+    #   resp.result_ids[0] #=> String
+    #   resp.additional_data_sources #=> Hash
+    #   resp.additional_data_sources["NameString"].glue_table.database_name #=> String
+    #   resp.additional_data_sources["NameString"].glue_table.table_name #=> String
+    #   resp.additional_data_sources["NameString"].glue_table.catalog_id #=> String
+    #   resp.additional_data_sources["NameString"].glue_table.connection_name #=> String
+    #   resp.additional_data_sources["NameString"].glue_table.additional_options #=> Hash
+    #   resp.additional_data_sources["NameString"].glue_table.additional_options["NameString"] #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetDataQualityRulesetEvaluationRun AWS API Documentation
+    #
+    # @overload get_data_quality_ruleset_evaluation_run(params = {})
+    # @param [Hash] params ({})
+    def get_data_quality_ruleset_evaluation_run(params = {}, options = {})
+      req = build_request(:get_data_quality_ruleset_evaluation_run, params)
+      req.send_request(options)
+    end
+
     # Retrieves the definition of a specified database.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which the database resides. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :name
     #   The name of the database to retrieve. For Hive compatibility, this
@@ -4520,7 +7458,10 @@ module Aws::Glue
     #   resp.database.create_table_default_permissions[0].permissions[0] #=> String, one of "ALL", "SELECT", "ALTER", "DROP", "DELETE", "INSERT", "CREATE_DATABASE", "CREATE_TABLE", "DATA_LOCATION_ACCESS"
     #   resp.database.target_database.catalog_id #=> String
     #   resp.database.target_database.database_name #=> String
+    #   resp.database.target_database.region #=> String
     #   resp.database.catalog_id #=> String
+    #   resp.database.federated_database.identifier #=> String
+    #   resp.database.federated_database.connection_name #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetDatabase AWS API Documentation
     #
@@ -4535,7 +7476,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog from which to retrieve `Databases`. If none
-    #   is provided, the AWS account ID is used by default.
+    #   is provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [String] :next_token
     #   A continuation token, if this is a continuation call.
@@ -4545,13 +7486,22 @@ module Aws::Glue
     #
     # @option params [String] :resource_share_type
     #   Allows you to specify that you want to list the databases shared with
-    #   your account. The allowable values are `FOREIGN` or `ALL`.
+    #   your account. The allowable values are `FEDERATED`, `FOREIGN` or
+    #   `ALL`.
+    #
+    #   * If set to `FEDERATED`, will list the federated databases
+    #     (referencing an external entity) shared with your account.
     #
     #   * If set to `FOREIGN`, will list the databases shared with your
     #     account.
     #
     #   * If set to `ALL`, will list the databases shared with your account,
     #     as well as the databases in yor local account.
+    #
+    # @option params [Array<String>] :attributes_to_get
+    #   Specifies the database fields returned by the `GetDatabases` call.
+    #   This parameter doesn’t accept an empty list. The request must include
+    #   the `NAME`.
     #
     # @return [Types::GetDatabasesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4566,7 +7516,8 @@ module Aws::Glue
     #     catalog_id: "CatalogIdString",
     #     next_token: "Token",
     #     max_results: 1,
-    #     resource_share_type: "FOREIGN", # accepts FOREIGN, ALL
+    #     resource_share_type: "FOREIGN", # accepts FOREIGN, ALL, FEDERATED
+    #     attributes_to_get: ["NAME"], # accepts NAME
     #   })
     #
     # @example Response structure
@@ -4584,7 +7535,10 @@ module Aws::Glue
     #   resp.database_list[0].create_table_default_permissions[0].permissions[0] #=> String, one of "ALL", "SELECT", "ALTER", "DROP", "DELETE", "INSERT", "CREATE_DATABASE", "CREATE_TABLE", "DATA_LOCATION_ACCESS"
     #   resp.database_list[0].target_database.catalog_id #=> String
     #   resp.database_list[0].target_database.database_name #=> String
+    #   resp.database_list[0].target_database.region #=> String
     #   resp.database_list[0].catalog_id #=> String
+    #   resp.database_list[0].federated_database.identifier #=> String
+    #   resp.database_list[0].federated_database.connection_name #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetDatabases AWS API Documentation
@@ -4639,9 +7593,9 @@ module Aws::Glue
     # Retrieves information about a specified development endpoint.
     #
     # <note markdown="1"> When you create a development endpoint in a virtual private cloud
-    # (VPC), AWS Glue returns only a private IP address, and the public IP
+    # (VPC), Glue returns only a private IP address, and the public IP
     # address field is not populated. When you create a non-VPC development
-    # endpoint, AWS Glue returns only a public IP address.
+    # endpoint, Glue returns only a public IP address.
     #
     #  </note>
     #
@@ -4670,7 +7624,7 @@ module Aws::Glue
     #   resp.dev_endpoint.zeppelin_remote_spark_interpreter_port #=> Integer
     #   resp.dev_endpoint.public_address #=> String
     #   resp.dev_endpoint.status #=> String
-    #   resp.dev_endpoint.worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.dev_endpoint.worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.dev_endpoint.glue_version #=> String
     #   resp.dev_endpoint.number_of_workers #=> Integer
     #   resp.dev_endpoint.number_of_nodes #=> Integer
@@ -4698,12 +7652,13 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Retrieves all the development endpoints in this AWS account.
+    # Retrieves all the development endpoints in this Amazon Web Services
+    # account.
     #
     # <note markdown="1"> When you create a development endpoint in a virtual private cloud
-    # (VPC), AWS Glue returns only a private IP address and the public IP
+    # (VPC), Glue returns only a private IP address and the public IP
     # address field is not populated. When you create a non-VPC development
-    # endpoint, AWS Glue returns only a public IP address.
+    # endpoint, Glue returns only a public IP address.
     #
     #  </note>
     #
@@ -4740,7 +7695,7 @@ module Aws::Glue
     #   resp.dev_endpoints[0].zeppelin_remote_spark_interpreter_port #=> Integer
     #   resp.dev_endpoints[0].public_address #=> String
     #   resp.dev_endpoints[0].status #=> String
-    #   resp.dev_endpoints[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.dev_endpoints[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.dev_endpoints[0].glue_version #=> String
     #   resp.dev_endpoints[0].number_of_workers #=> Integer
     #   resp.dev_endpoints[0].number_of_nodes #=> Integer
@@ -4787,6 +7742,8 @@ module Aws::Glue
     # @example Response structure
     #
     #   resp.job.name #=> String
+    #   resp.job.job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.job.job_run_queuing_enabled #=> Boolean
     #   resp.job.description #=> String
     #   resp.job.log_uri #=> String
     #   resp.job.role #=> String
@@ -4796,6 +7753,7 @@ module Aws::Glue
     #   resp.job.command.name #=> String
     #   resp.job.command.script_location #=> String
     #   resp.job.command.python_version #=> String
+    #   resp.job.command.runtime #=> String
     #   resp.job.default_arguments #=> Hash
     #   resp.job.default_arguments["GenericString"] #=> String
     #   resp.job.non_overridable_arguments #=> Hash
@@ -4806,11 +7764,879 @@ module Aws::Glue
     #   resp.job.allocated_capacity #=> Integer
     #   resp.job.timeout #=> Integer
     #   resp.job.max_capacity #=> Float
-    #   resp.job.worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.job.worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.job.number_of_workers #=> Integer
     #   resp.job.security_configuration #=> String
     #   resp.job.notification_property.notify_delay_after #=> Integer
     #   resp.job.glue_version #=> String
+    #   resp.job.code_gen_configuration_nodes #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].athena_connector_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].athena_connector_source.connection_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].athena_connector_source.connector_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].athena_connector_source.connection_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].athena_connector_source.connection_table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].athena_connector_source.schema_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connection_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connector_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connection_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.filter_predicate #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.partition_column #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.lower_bound #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.upper_bound #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.num_partitions #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.job_bookmark_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.job_bookmark_keys[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.job_bookmark_keys_sort_order #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.data_type_mapping #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.data_type_mapping["JDBCDataType"] #=> String, one of "DATE", "STRING", "TIMESTAMP", "INT", "FLOAT", "LONG", "BIGDECIMAL", "BYTE", "SHORT", "DOUBLE"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connection_table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.query #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_source.connection_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_source.connector_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_source.connection_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_source.additional_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_source.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_source.redshift_tmp_dir #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_source.tmp_dir_iam_role #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_source.partition_predicate #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_source.additional_options.bounded_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_source.additional_options.bounded_files #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.paths #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.paths[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.compression_type #=> String, one of "gzip", "bzip2"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.exclusions #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.exclusions[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.group_size #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.group_files #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.recurse #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.max_band #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.max_files_in_band #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.bounded_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.bounded_files #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.sample_path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.separator #=> String, one of "comma", "ctrla", "pipe", "semicolon", "tab"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.escaper #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.quote_char #=> String, one of "quote", "quillemet", "single_quote", "disabled"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.multiline #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.with_header #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.write_header #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.skip_first #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.optimize_performance #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.paths #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.paths[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.compression_type #=> String, one of "gzip", "bzip2"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.exclusions #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.exclusions[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.group_size #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.group_files #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.recurse #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.max_band #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.max_files_in_band #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.bounded_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.bounded_files #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.sample_path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.json_path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.multiline #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.paths #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.paths[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.compression_type #=> String, one of "snappy", "lzo", "gzip", "uncompressed", "none"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.exclusions #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.exclusions[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.group_size #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.group_files #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.recurse #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.max_band #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.max_files_in_band #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.bounded_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.bounded_files #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.sample_path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].relational_catalog_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].relational_catalog_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].relational_catalog_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamo_db_catalog_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamo_db_catalog_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamo_db_catalog_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connection_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connection_table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connector_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connection_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.additional_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.connection_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.connector_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.connection_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.additional_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_target.partition_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_target.partition_keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_target.partition_keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_target.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_target.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.redshift_tmp_dir #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.tmp_dir_iam_role #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.table_location #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.connection_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.upsert_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.upsert_keys[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_target.partition_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_target.partition_keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_target.partition_keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_target.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_target.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.partition_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.partition_keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.partition_keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.compression #=> String, one of "snappy", "lzo", "gzip", "uncompressed", "none"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.partition_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.partition_keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.partition_keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.compression #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.format #=> String, one of "json", "csv", "avro", "orc", "parquet", "hudi", "delta"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.mapping #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].to_key #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].from_path #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].from_path[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].from_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].to_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].dropped #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].children #=> Types::Mappings
+    #   resp.job.code_gen_configuration_nodes["NodeId"].select_fields.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].select_fields.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].select_fields.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].select_fields.paths #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].select_fields.paths[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].select_fields.paths[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_fields.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_fields.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_fields.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_fields.paths #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_fields.paths[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_fields.paths[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].rename_field.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].rename_field.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].rename_field.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].rename_field.source_path #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].rename_field.source_path[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].rename_field.target_path #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].rename_field.target_path[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spigot.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spigot.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spigot.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spigot.path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spigot.topk #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spigot.prob #=> Float
+    #   resp.job.code_gen_configuration_nodes["NodeId"].join.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].join.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].join.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].join.join_type #=> String, one of "equijoin", "left", "right", "outer", "leftsemi", "leftanti"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].join.columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].join.columns[0].from #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].join.columns[0].keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].join.columns[0].keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].join.columns[0].keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].split_fields.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].split_fields.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].split_fields.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].split_fields.paths #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].split_fields.paths[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].split_fields.paths[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].select_from_collection.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].select_from_collection.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].select_from_collection.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].select_from_collection.index #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].fill_missing_values.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].fill_missing_values.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].fill_missing_values.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].fill_missing_values.imputed_path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].fill_missing_values.filled_path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.logical_operator #=> String, one of "AND", "OR"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.filters #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.filters[0].operation #=> String, one of "EQ", "LT", "GT", "LTE", "GTE", "REGEX", "ISNULL"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.filters[0].negated #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.filters[0].values #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.filters[0].values[0].type #=> String, one of "COLUMNEXTRACTED", "CONSTANT"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.filters[0].values[0].value #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].filter.filters[0].values[0].value[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].custom_code.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].custom_code.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].custom_code.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].custom_code.code #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].custom_code.class_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].custom_code.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].custom_code.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].custom_code.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].custom_code.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.sql_query #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.sql_aliases #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.sql_aliases[0].from #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.sql_aliases[0].alias #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.window_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.detect_schema #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.endpoint_url #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.stream_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.classification #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.delimiter #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.starting_position #=> String, one of "latest", "trim_horizon", "earliest", "timestamp"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_fetch_time_in_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_fetch_records_per_shard #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_record_per_read #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.add_idle_time_between_reads #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.idle_time_between_reads_in_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.describe_shard_interval #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.num_retries #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_retry_interval_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.avoid_empty_batches #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.stream_arn #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.role_arn #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.role_session_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.add_record_timestamp #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.starting_timestamp #=> Time
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.data_preview_options.polling_time #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kinesis_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.bootstrap_servers #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.security_protocol #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.connection_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.topic_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.assign #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.subscribe_pattern #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.classification #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.delimiter #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.starting_offsets #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.ending_offsets #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.poll_timeout_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.num_retries #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.max_offsets_per_trigger #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.min_partitions #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.include_headers #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.add_record_timestamp #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.starting_timestamp #=> Time
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.window_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.detect_schema #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.data_preview_options.polling_time #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_kafka_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.window_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.detect_schema #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.endpoint_url #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.stream_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.classification #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.delimiter #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.starting_position #=> String, one of "latest", "trim_horizon", "earliest", "timestamp"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_fetch_time_in_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_fetch_records_per_shard #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_record_per_read #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.add_idle_time_between_reads #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.idle_time_between_reads_in_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.describe_shard_interval #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.num_retries #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_retry_interval_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.avoid_empty_batches #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.stream_arn #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.role_arn #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.role_session_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.add_record_timestamp #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.starting_timestamp #=> Time
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.data_preview_options.polling_time #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.window_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.detect_schema #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.bootstrap_servers #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.security_protocol #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.connection_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.topic_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.assign #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.subscribe_pattern #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.classification #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.delimiter #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.starting_offsets #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.ending_offsets #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.poll_timeout_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.num_retries #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.max_offsets_per_trigger #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.min_partitions #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.include_headers #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.add_record_timestamp #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.starting_timestamp #=> Time
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.data_preview_options.polling_time #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_kafka_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_null_fields.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_null_fields.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_null_fields.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_null_fields.null_check_box_list.is_empty #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_null_fields.null_check_box_list.is_null_string #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_null_fields.null_check_box_list.is_neg_one #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list[0].datatype.id #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list[0].datatype.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].merge.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].merge.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].merge.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].merge.source #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].merge.primary_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].merge.primary_keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].merge.primary_keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].union.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].union.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].union.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].union.union_type #=> String, one of "ALL", "DISTINCT"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].pii_detection.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].pii_detection.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].pii_detection.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].pii_detection.pii_type #=> String, one of "RowAudit", "RowMasking", "ColumnAudit", "ColumnMasking"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].pii_detection.entity_types_to_detect #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].pii_detection.entity_types_to_detect[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].pii_detection.output_column_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].pii_detection.sample_fraction #=> Float
+    #   resp.job.code_gen_configuration_nodes["NodeId"].pii_detection.threshold_fraction #=> Float
+    #   resp.job.code_gen_configuration_nodes["NodeId"].pii_detection.mask_value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].aggregate.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].aggregate.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].aggregate.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].aggregate.groups #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].aggregate.groups[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].aggregate.groups[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].aggregate.aggs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].aggregate.aggs[0].column #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].aggregate.aggs[0].column[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].aggregate.aggs[0].agg_func #=> String, one of "avg", "countDistinct", "count", "first", "last", "kurtosis", "max", "min", "skewness", "stddev_samp", "stddev_pop", "sum", "sumDistinct", "var_samp", "var_pop"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_duplicates.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_duplicates.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_duplicates.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_duplicates.columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_duplicates.columns[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].drop_duplicates.columns[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_target.partition_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_target.partition_keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_target.partition_keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_target.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_target.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_source.partition_predicate #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_source.additional_options.bounded_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].governed_catalog_source.additional_options.bounded_files #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].my_sql_catalog_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].my_sql_catalog_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].my_sql_catalog_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.transform_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].type #=> String, one of "str", "int", "float", "complex", "bool", "list", "null"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].validation_rule #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].validation_message #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].value #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].value[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].list_type #=> String, one of "str", "int", "float", "complex", "bool", "list", "null"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].is_optional #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.function_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.version #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality.ruleset #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality.output #=> String, one of "PrimaryInput", "EvaluationResults"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.evaluation_context #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.results_s3_prefix #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.cloud_watch_metrics_enabled #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.results_publishing_enabled #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality.stop_job_on_failure_options.stop_job_on_failure_timing #=> String, one of "Immediate", "AfterDataLoad"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.additional_hudi_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.additional_hudi_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_hudi_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_hudi_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_hudi_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_hudi_source.additional_hudi_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_hudi_source.additional_hudi_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.paths #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.paths[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_hudi_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_hudi_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.bounded_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.bounded_files #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.sample_path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.partition_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.partition_keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.partition_keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.additional_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.compression #=> String, one of "gzip", "lzo", "uncompressed", "snappy"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.partition_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.partition_keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.partition_keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.format #=> String, one of "json", "csv", "avro", "orc", "parquet", "hudi", "delta"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.additional_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_jdbc_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_jdbc_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_jdbc_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_jdbc_source.connection_name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_jdbc_source.connection_type #=> String, one of "sqlserver", "mysql", "oracle", "postgresql", "redshift"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].direct_jdbc_source.redshift_tmp_dir #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.additional_delta_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.additional_delta_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_delta_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_delta_source.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_delta_source.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_delta_source.additional_delta_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_delta_source.additional_delta_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.paths #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.paths[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_delta_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_delta_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.bounded_size #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.bounded_files #=> Integer
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.sample_path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.partition_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.partition_keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.partition_keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.additional_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.partition_keys #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.partition_keys[0] #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.partition_keys[0][0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.path #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.compression #=> String, one of "uncompressed", "snappy"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.format #=> String, one of "json", "csv", "avro", "orc", "parquet", "hudi", "delta"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.additional_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.access_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.source_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.connection.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.connection.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.connection.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.schema.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.schema.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.schema.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_database.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_database.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_database.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_table.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_table.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_table.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_redshift_schema #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_redshift_table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.temp_dir #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.iam_role.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.iam_role.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.iam_role.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.advanced_options #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.advanced_options[0].key #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.advanced_options[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.sample_query #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.pre_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.post_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_prefix #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.upsert #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_when_matched #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_when_not_matched #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_clause #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.crawler_connection #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema[0].label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema[0].description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.staging_table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns[0].label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns[0].description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.access_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.source_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.connection.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.connection.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.connection.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.schema.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.schema.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.schema.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_database.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_database.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_database.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_table.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_table.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_table.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_redshift_schema #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_redshift_table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.temp_dir #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.iam_role.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.iam_role.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.iam_role.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.advanced_options #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.advanced_options[0].key #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.advanced_options[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.sample_query #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.pre_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.post_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_prefix #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.upsert #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_when_matched #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_when_not_matched #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_clause #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.crawler_connection #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema[0].label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema[0].description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.staging_table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns[0].label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns[0].description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].amazon_redshift_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_data_sources #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_data_sources["NodeName"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.ruleset #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.evaluation_context #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.results_s3_prefix #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.cloud_watch_metrics_enabled #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.results_publishing_enabled #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_options["AdditionalOptionKeys"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.stop_job_on_failure_options.stop_job_on_failure_timing #=> String, one of "Immediate", "AfterDataLoad"
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.recipe_reference.recipe_arn #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.recipe_reference.recipe_version #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.recipe_steps #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].action.operation #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].action.parameters #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].action.parameters["ParameterName"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions[0].condition #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions[0].target_column #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.source_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.connection.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.connection.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.connection.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.schema #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.temp_dir #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.iam_role.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.iam_role.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.iam_role.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.additional_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.sample_query #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.pre_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.post_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.upsert #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_when_matched #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_when_not_matched #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_clause #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.staging_table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns[0].label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns[0].description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.auto_pushdown #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema[0].label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema[0].description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.source_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.connection.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.connection.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.connection.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.schema #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.database #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.temp_dir #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.iam_role.value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.iam_role.label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.iam_role.description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.additional_options #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.sample_query #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.pre_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.post_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.upsert #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_action #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_when_matched #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_when_not_matched #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_clause #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.staging_table #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns[0].label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns[0].description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.auto_pushdown #=> Boolean
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema[0].value #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema[0].label #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema[0].description #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].snowflake_target.inputs[0] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_source.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_source.connection_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_source.data #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_source.data["GenericString"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas[0].columns #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas[0].columns[0].name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas[0].columns[0].type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_target.name #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_target.connection_type #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_target.data #=> Hash
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_target.data["GenericString"] #=> String
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_target.inputs #=> Array
+    #   resp.job.code_gen_configuration_nodes["NodeId"].connector_data_target.inputs[0] #=> String
+    #   resp.job.execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.job.source_control_details.provider #=> String, one of "GITHUB", "GITLAB", "BITBUCKET", "AWS_CODE_COMMIT"
+    #   resp.job.source_control_details.repository #=> String
+    #   resp.job.source_control_details.owner #=> String
+    #   resp.job.source_control_details.branch #=> String
+    #   resp.job.source_control_details.folder #=> String
+    #   resp.job.source_control_details.last_commit_id #=> String
+    #   resp.job.source_control_details.auth_strategy #=> String, one of "PERSONAL_ACCESS_TOKEN", "AWS_SECRETS_MANAGER"
+    #   resp.job.source_control_details.auth_token #=> String
+    #   resp.job.maintenance_window #=> String
+    #   resp.job.profile_name #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetJob AWS API Documentation
     #
@@ -4822,6 +8648,20 @@ module Aws::Glue
     end
 
     # Returns information on a job bookmark entry.
+    #
+    # For more information about enabling and using job bookmarks, see:
+    #
+    # * [Tracking processed data using job bookmarks][1]
+    #
+    # * [Job parameters used by Glue][2]
+    #
+    # * [Job structure][3]
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/glue/latest/dg/monitor-continuations.html
+    # [2]: https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-glue-arguments.html
+    # [3]: https://docs.aws.amazon.com/glue/latest/dg/aws-glue-api-jobs-job.html#aws-glue-api-jobs-job-Job
     #
     # @option params [required, String] :job_name
     #   The name of the job in question.
@@ -4859,7 +8699,8 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Retrieves the metadata for a given job run.
+    # Retrieves the metadata for a given job run. Job run history is
+    # accessible for 90 days for your workflow and job run.
     #
     # @option params [required, String] :job_name
     #   Name of the job definition being run.
@@ -4889,10 +8730,12 @@ module Aws::Glue
     #   resp.job_run.previous_run_id #=> String
     #   resp.job_run.trigger_name #=> String
     #   resp.job_run.job_name #=> String
+    #   resp.job_run.job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.job_run.job_run_queuing_enabled #=> Boolean
     #   resp.job_run.started_on #=> Time
     #   resp.job_run.last_modified_on #=> Time
     #   resp.job_run.completed_on #=> Time
-    #   resp.job_run.job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.job_run.job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.job_run.arguments #=> Hash
     #   resp.job_run.arguments["GenericString"] #=> String
     #   resp.job_run.error_message #=> String
@@ -4903,12 +8746,17 @@ module Aws::Glue
     #   resp.job_run.execution_time #=> Integer
     #   resp.job_run.timeout #=> Integer
     #   resp.job_run.max_capacity #=> Float
-    #   resp.job_run.worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.job_run.worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.job_run.number_of_workers #=> Integer
     #   resp.job_run.security_configuration #=> String
     #   resp.job_run.log_group_name #=> String
     #   resp.job_run.notification_property.notify_delay_after #=> Integer
     #   resp.job_run.glue_version #=> String
+    #   resp.job_run.dpu_seconds #=> Float
+    #   resp.job_run.execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.job_run.maintenance_window #=> String
+    #   resp.job_run.profile_name #=> String
+    #   resp.job_run.state_detail #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetJobRun AWS API Documentation
     #
@@ -4953,10 +8801,12 @@ module Aws::Glue
     #   resp.job_runs[0].previous_run_id #=> String
     #   resp.job_runs[0].trigger_name #=> String
     #   resp.job_runs[0].job_name #=> String
+    #   resp.job_runs[0].job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.job_runs[0].job_run_queuing_enabled #=> Boolean
     #   resp.job_runs[0].started_on #=> Time
     #   resp.job_runs[0].last_modified_on #=> Time
     #   resp.job_runs[0].completed_on #=> Time
-    #   resp.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.job_runs[0].arguments #=> Hash
     #   resp.job_runs[0].arguments["GenericString"] #=> String
     #   resp.job_runs[0].error_message #=> String
@@ -4967,12 +8817,17 @@ module Aws::Glue
     #   resp.job_runs[0].execution_time #=> Integer
     #   resp.job_runs[0].timeout #=> Integer
     #   resp.job_runs[0].max_capacity #=> Float
-    #   resp.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.job_runs[0].number_of_workers #=> Integer
     #   resp.job_runs[0].security_configuration #=> String
     #   resp.job_runs[0].log_group_name #=> String
     #   resp.job_runs[0].notification_property.notify_delay_after #=> Integer
     #   resp.job_runs[0].glue_version #=> String
+    #   resp.job_runs[0].dpu_seconds #=> Float
+    #   resp.job_runs[0].execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.job_runs[0].maintenance_window #=> String
+    #   resp.job_runs[0].profile_name #=> String
+    #   resp.job_runs[0].state_detail #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetJobRuns AWS API Documentation
@@ -5010,6 +8865,8 @@ module Aws::Glue
     #
     #   resp.jobs #=> Array
     #   resp.jobs[0].name #=> String
+    #   resp.jobs[0].job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.jobs[0].job_run_queuing_enabled #=> Boolean
     #   resp.jobs[0].description #=> String
     #   resp.jobs[0].log_uri #=> String
     #   resp.jobs[0].role #=> String
@@ -5019,6 +8876,7 @@ module Aws::Glue
     #   resp.jobs[0].command.name #=> String
     #   resp.jobs[0].command.script_location #=> String
     #   resp.jobs[0].command.python_version #=> String
+    #   resp.jobs[0].command.runtime #=> String
     #   resp.jobs[0].default_arguments #=> Hash
     #   resp.jobs[0].default_arguments["GenericString"] #=> String
     #   resp.jobs[0].non_overridable_arguments #=> Hash
@@ -5029,11 +8887,879 @@ module Aws::Glue
     #   resp.jobs[0].allocated_capacity #=> Integer
     #   resp.jobs[0].timeout #=> Integer
     #   resp.jobs[0].max_capacity #=> Float
-    #   resp.jobs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.jobs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.jobs[0].number_of_workers #=> Integer
     #   resp.jobs[0].security_configuration #=> String
     #   resp.jobs[0].notification_property.notify_delay_after #=> Integer
     #   resp.jobs[0].glue_version #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.connector_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.connection_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.schema_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].athena_connector_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connector_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.filter_predicate #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.partition_column #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.lower_bound #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.upper_bound #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.num_partitions #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.job_bookmark_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.job_bookmark_keys[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.job_bookmark_keys_sort_order #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.data_type_mapping #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.additional_options.data_type_mapping["JDBCDataType"] #=> String, one of "DATE", "STRING", "TIMESTAMP", "INT", "FLOAT", "LONG", "BIGDECIMAL", "BYTE", "SHORT", "DOUBLE"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.connection_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.connector_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_source.redshift_tmp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_source.tmp_dir_iam_role #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.partition_predicate #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.paths[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.compression_type #=> String, one of "gzip", "bzip2"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.exclusions #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.exclusions[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.group_size #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.group_files #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.recurse #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.max_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.max_files_in_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.additional_options.sample_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.separator #=> String, one of "comma", "ctrla", "pipe", "semicolon", "tab"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.escaper #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.quote_char #=> String, one of "quote", "quillemet", "single_quote", "disabled"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.multiline #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.with_header #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.write_header #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.skip_first #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.optimize_performance #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_csv_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.paths[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.compression_type #=> String, one of "gzip", "bzip2"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.exclusions #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.exclusions[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.group_size #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.group_files #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.recurse #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.max_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.max_files_in_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.additional_options.sample_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.json_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.multiline #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_json_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.paths[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.compression_type #=> String, one of "snappy", "lzo", "gzip", "uncompressed", "none"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.exclusions #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.exclusions[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.group_size #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.group_files #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.recurse #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.max_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.max_files_in_band #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.additional_options.sample_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_parquet_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].relational_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].relational_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].relational_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamo_db_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamo_db_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamo_db_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connection_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connector_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].jdbc_connector_target.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.connector_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_connector_target.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.redshift_tmp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.tmp_dir_iam_role #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.table_location #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.upsert_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].redshift_target.upsert_redshift_options.upsert_keys[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.compression #=> String, one of "snappy", "lzo", "gzip", "uncompressed", "none"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_glue_parquet_target.schema_change_policy.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.compression #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.format #=> String, one of "json", "csv", "avro", "orc", "parquet", "hudi", "delta"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_direct_target.schema_change_policy.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].to_key #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].from_path #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].from_path[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].from_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].to_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].dropped #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].apply_mapping.mapping[0].children #=> Types::Mappings
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.paths[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_fields.paths[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.paths[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_fields.paths[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.source_path #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.source_path[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.target_path #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].rename_field.target_path[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.topk #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spigot.prob #=> Float
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.join_type #=> String, one of "equijoin", "left", "right", "outer", "leftsemi", "leftanti"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.columns[0].from #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.columns[0].keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.columns[0].keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].join.columns[0].keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.paths[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].split_fields.paths[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_from_collection.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_from_collection.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_from_collection.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].select_from_collection.index #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].fill_missing_values.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].fill_missing_values.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].fill_missing_values.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].fill_missing_values.imputed_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].fill_missing_values.filled_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.logical_operator #=> String, one of "AND", "OR"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].operation #=> String, one of "EQ", "LT", "GT", "LTE", "GTE", "REGEX", "ISNULL"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].negated #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].values #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].values[0].type #=> String, one of "COLUMNEXTRACTED", "CONSTANT"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].values[0].value #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].filter.filters[0].values[0].value[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.code #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.class_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].custom_code.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.sql_query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.sql_aliases #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.sql_aliases[0].from #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.sql_aliases[0].alias #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].spark_sql.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.window_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.detect_schema #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.endpoint_url #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.stream_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.classification #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.delimiter #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.starting_position #=> String, one of "latest", "trim_horizon", "earliest", "timestamp"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_fetch_time_in_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_fetch_records_per_shard #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_record_per_read #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.add_idle_time_between_reads #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.idle_time_between_reads_in_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.describe_shard_interval #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.num_retries #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.max_retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.avoid_empty_batches #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.stream_arn #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.role_arn #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.role_session_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.add_record_timestamp #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.streaming_options.starting_timestamp #=> Time
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.data_preview_options.polling_time #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kinesis_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.bootstrap_servers #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.security_protocol #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.topic_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.assign #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.subscribe_pattern #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.classification #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.delimiter #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.starting_offsets #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.ending_offsets #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.poll_timeout_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.num_retries #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.max_offsets_per_trigger #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.min_partitions #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.include_headers #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.add_record_timestamp #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.streaming_options.starting_timestamp #=> Time
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.window_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.detect_schema #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.data_preview_options.polling_time #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_kafka_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.window_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.detect_schema #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.endpoint_url #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.stream_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.classification #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.delimiter #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.starting_position #=> String, one of "latest", "trim_horizon", "earliest", "timestamp"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_fetch_time_in_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_fetch_records_per_shard #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_record_per_read #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.add_idle_time_between_reads #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.idle_time_between_reads_in_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.describe_shard_interval #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.num_retries #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.max_retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.avoid_empty_batches #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.stream_arn #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.role_arn #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.role_session_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.add_record_timestamp #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.streaming_options.starting_timestamp #=> Time
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.data_preview_options.polling_time #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kinesis_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.window_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.detect_schema #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.bootstrap_servers #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.security_protocol #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.topic_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.assign #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.subscribe_pattern #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.classification #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.delimiter #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.starting_offsets #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.ending_offsets #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.poll_timeout_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.num_retries #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.retry_interval_ms #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.max_offsets_per_trigger #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.min_partitions #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.include_headers #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.add_record_timestamp #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.emit_consumer_lag_metrics #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.streaming_options.starting_timestamp #=> Time
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.data_preview_options.polling_time #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_kafka_source.data_preview_options.record_polling_limit #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_check_box_list.is_empty #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_check_box_list.is_null_string #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_check_box_list.is_neg_one #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list[0].datatype.id #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_null_fields.null_text_list[0].datatype.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.source #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.primary_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.primary_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].merge.primary_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].union.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].union.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].union.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].union.union_type #=> String, one of "ALL", "DISTINCT"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.pii_type #=> String, one of "RowAudit", "RowMasking", "ColumnAudit", "ColumnMasking"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.entity_types_to_detect #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.entity_types_to_detect[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.output_column_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.sample_fraction #=> Float
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.threshold_fraction #=> Float
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].pii_detection.mask_value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.groups #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.groups[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.groups[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.aggs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.aggs[0].column #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.aggs[0].column[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].aggregate.aggs[0].agg_func #=> String, one of "avg", "countDistinct", "count", "first", "last", "kurtosis", "max", "min", "skewness", "stddev_samp", "stddev_pop", "sum", "sumDistinct", "var_samp", "var_pop"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.columns[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].drop_duplicates.columns[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.partition_predicate #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].governed_catalog_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].microsoft_sql_server_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].my_sql_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].oracle_sql_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].postgre_sql_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.transform_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].type #=> String, one of "str", "int", "float", "complex", "bool", "list", "null"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].validation_rule #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].validation_message #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].value #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].value[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].list_type #=> String, one of "str", "int", "float", "complex", "bool", "list", "null"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.parameters[0].is_optional #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.function_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.version #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].dynamic_transform.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.ruleset #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.output #=> String, one of "PrimaryInput", "EvaluationResults"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.evaluation_context #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.results_s3_prefix #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.cloud_watch_metrics_enabled #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.publishing_options.results_publishing_enabled #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality.stop_job_on_failure_options.stop_job_on_failure_timing #=> String, one of "Immediate", "AfterDataLoad"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.additional_hudi_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.additional_hudi_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_hudi_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.additional_hudi_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.additional_hudi_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_hudi_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.paths[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_hudi_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_hudi_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.additional_options.sample_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.compression #=> String, one of "gzip", "lzo", "uncompressed", "snappy"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.format #=> String, one of "json", "csv", "avro", "orc", "parquet", "hudi", "delta"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_hudi_direct_target.schema_change_policy.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.connection_name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.connection_type #=> String, one of "sqlserver", "mysql", "oracle", "postgresql", "redshift"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].direct_jdbc_source.redshift_tmp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.additional_delta_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.additional_delta_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_catalog_delta_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.additional_delta_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.additional_delta_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].catalog_delta_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.paths #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.paths[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_delta_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_delta_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.bounded_size #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.bounded_files #=> Integer
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.enable_sample_path #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.additional_options.sample_path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_catalog_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.partition_keys #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.partition_keys[0] #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.partition_keys[0][0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.path #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.compression #=> String, one of "uncompressed", "snappy"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.format #=> String, one of "json", "csv", "avro", "orc", "parquet", "hudi", "delta"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.enable_update_catalog #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.update_behavior #=> String, one of "UPDATE_IN_DATABASE", "LOG"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].s3_delta_direct_target.schema_change_policy.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.access_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.source_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.connection.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.connection.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.connection.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.schema.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.schema.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.schema.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_database.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_database.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_database.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_table.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_table.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_table.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_redshift_schema #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.catalog_redshift_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.temp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.iam_role.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.iam_role.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.iam_role.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.advanced_options #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.advanced_options[0].key #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.advanced_options[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.sample_query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.pre_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.post_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_prefix #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.upsert #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_when_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_when_not_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.merge_clause #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.crawler_connection #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.table_schema[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.staging_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_source.data.selected_columns[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.access_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.source_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.connection.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.connection.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.connection.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.schema.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.schema.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.schema.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_database.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_database.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_database.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_table.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_table.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_table.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_redshift_schema #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.catalog_redshift_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.temp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.iam_role.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.iam_role.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.iam_role.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.advanced_options #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.advanced_options[0].key #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.advanced_options[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.sample_query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.pre_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.post_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_prefix #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.upsert #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_when_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_when_not_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.merge_clause #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.crawler_connection #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.table_schema[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.staging_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.data.selected_columns[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].amazon_redshift_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_data_sources #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_data_sources["NodeName"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.ruleset #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.evaluation_context #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.results_s3_prefix #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.cloud_watch_metrics_enabled #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.publishing_options.results_publishing_enabled #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.additional_options["AdditionalOptionKeys"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].evaluate_data_quality_multi_frame.stop_job_on_failure_options.stop_job_on_failure_timing #=> String, one of "Immediate", "AfterDataLoad"
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_reference.recipe_arn #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_reference.recipe_version #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].action.operation #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].action.parameters #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].action.parameters["ParameterName"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions[0].condition #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].recipe.recipe_steps[0].condition_expressions[0].target_column #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.source_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.connection.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.connection.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.connection.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.schema #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.temp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.iam_role.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.iam_role.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.iam_role.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.sample_query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.pre_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.post_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.upsert #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_when_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_when_not_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.merge_clause #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.staging_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.selected_columns[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.auto_pushdown #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.data.table_schema[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.source_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.connection.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.connection.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.connection.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.schema #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.database #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.temp_dir #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.iam_role.value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.iam_role.label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.iam_role.description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.additional_options #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.additional_options["EnclosedInStringProperty"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.sample_query #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.pre_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.post_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.upsert #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_action #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_when_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_when_not_matched #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.merge_clause #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.staging_table #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.selected_columns[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.auto_pushdown #=> Boolean
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema[0].value #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema[0].label #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.data.table_schema[0].description #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].snowflake_target.inputs[0] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.data #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.data["GenericString"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas[0].columns #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas[0].columns[0].name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_source.output_schemas[0].columns[0].type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.name #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.connection_type #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.data #=> Hash
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.data["GenericString"] #=> String
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.inputs #=> Array
+    #   resp.jobs[0].code_gen_configuration_nodes["NodeId"].connector_data_target.inputs[0] #=> String
+    #   resp.jobs[0].execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.jobs[0].source_control_details.provider #=> String, one of "GITHUB", "GITLAB", "BITBUCKET", "AWS_CODE_COMMIT"
+    #   resp.jobs[0].source_control_details.repository #=> String
+    #   resp.jobs[0].source_control_details.owner #=> String
+    #   resp.jobs[0].source_control_details.branch #=> String
+    #   resp.jobs[0].source_control_details.folder #=> String
+    #   resp.jobs[0].source_control_details.last_commit_id #=> String
+    #   resp.jobs[0].source_control_details.auth_strategy #=> String, one of "PERSONAL_ACCESS_TOKEN", "AWS_SECRETS_MANAGER"
+    #   resp.jobs[0].source_control_details.auth_token #=> String
+    #   resp.jobs[0].maintenance_window #=> String
+    #   resp.jobs[0].profile_name #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetJobs AWS API Documentation
@@ -5046,8 +9772,8 @@ module Aws::Glue
     end
 
     # Gets details for a specific task run on a machine learning transform.
-    # Machine learning task runs are asynchronous tasks that AWS Glue runs
-    # on your behalf as part of various machine learning workflows. You can
+    # Machine learning task runs are asynchronous tasks that Glue runs on
+    # your behalf as part of various machine learning workflows. You can
     # check the stats of any task run by calling `GetMLTaskRun` with the
     # `TaskRunID` and its parent transform's `TransformID`.
     #
@@ -5107,8 +9833,8 @@ module Aws::Glue
     end
 
     # Gets a list of runs for a machine learning transform. Machine learning
-    # task runs are asynchronous tasks that AWS Glue runs on your behalf as
-    # part of various machine learning workflows. You can get a sortable,
+    # task runs are asynchronous tasks that Glue runs on your behalf as part
+    # of various machine learning workflows. You can get a sortable,
     # filterable list of machine learning task runs by calling
     # `GetMLTaskRuns` with their parent transform's `TransformID` and other
     # optional parameters as documented in this section.
@@ -5188,12 +9914,12 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Gets an AWS Glue machine learning transform artifact and all its
+    # Gets an Glue machine learning transform artifact and all its
     # corresponding metadata. Machine learning transforms are a special type
     # of transform that use machine learning to learn the details of the
     # transformation to be performed by learning from examples provided by
-    # humans. These transformations are then saved by AWS Glue. You can
-    # retrieve their metadata by calling `GetMLTransform`.
+    # humans. These transformations are then saved by Glue. You can retrieve
+    # their metadata by calling `GetMLTransform`.
     #
     # @option params [required, String] :transform_id
     #   The unique identifier of the transform, generated at the time that the
@@ -5240,6 +9966,8 @@ module Aws::Glue
     #   resp.input_record_tables[0].table_name #=> String
     #   resp.input_record_tables[0].catalog_id #=> String
     #   resp.input_record_tables[0].connection_name #=> String
+    #   resp.input_record_tables[0].additional_options #=> Hash
+    #   resp.input_record_tables[0].additional_options["NameString"] #=> String
     #   resp.parameters.transform_type #=> String, one of "FIND_MATCHES"
     #   resp.parameters.find_matches_parameters.primary_key_column_name #=> String
     #   resp.parameters.find_matches_parameters.precision_recall_tradeoff #=> Float
@@ -5264,7 +9992,7 @@ module Aws::Glue
     #   resp.role #=> String
     #   resp.glue_version #=> String
     #   resp.max_capacity #=> Float
-    #   resp.worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.number_of_workers #=> Integer
     #   resp.timeout #=> Integer
     #   resp.max_retries #=> Integer
@@ -5281,11 +10009,11 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Gets a sortable, filterable list of existing AWS Glue machine learning
+    # Gets a sortable, filterable list of existing Glue machine learning
     # transforms. Machine learning transforms are a special type of
     # transform that use machine learning to learn the details of the
     # transformation to be performed by learning from examples provided by
-    # humans. These transformations are then saved by AWS Glue, and you can
+    # humans. These transformations are then saved by Glue, and you can
     # retrieve their metadata by calling `GetMLTransforms`.
     #
     # @option params [String] :next_token
@@ -5348,6 +10076,8 @@ module Aws::Glue
     #   resp.transforms[0].input_record_tables[0].table_name #=> String
     #   resp.transforms[0].input_record_tables[0].catalog_id #=> String
     #   resp.transforms[0].input_record_tables[0].connection_name #=> String
+    #   resp.transforms[0].input_record_tables[0].additional_options #=> Hash
+    #   resp.transforms[0].input_record_tables[0].additional_options["NameString"] #=> String
     #   resp.transforms[0].parameters.transform_type #=> String, one of "FIND_MATCHES"
     #   resp.transforms[0].parameters.find_matches_parameters.primary_key_column_name #=> String
     #   resp.transforms[0].parameters.find_matches_parameters.precision_recall_tradeoff #=> Float
@@ -5372,7 +10102,7 @@ module Aws::Glue
     #   resp.transforms[0].role #=> String
     #   resp.transforms[0].glue_version #=> String
     #   resp.transforms[0].max_capacity #=> Float
-    #   resp.transforms[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.transforms[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.transforms[0].number_of_workers #=> Integer
     #   resp.transforms[0].timeout #=> Integer
     #   resp.transforms[0].max_retries #=> Integer
@@ -5466,7 +10196,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partition in question resides. If
-    #   none is provided, the AWS account ID is used by default.
+    #   none is provided, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the partition resides.
@@ -5479,7 +10210,7 @@ module Aws::Glue
     #
     # @return [Types::GetPartitionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
-    #   * {Types::GetPartitionResponse#partition #partition} => Types::Partition
+    #   * {Types::GetPartitionResponse#partition #data.partition} => Types::Partition (This method conflicts with a method on Response, call it through the data member)
     #
     # @example Request syntax with placeholder values
     #
@@ -5492,50 +10223,52 @@ module Aws::Glue
     #
     # @example Response structure
     #
-    #   resp.partition.values #=> Array
-    #   resp.partition.values[0] #=> String
-    #   resp.partition.database_name #=> String
-    #   resp.partition.table_name #=> String
-    #   resp.partition.creation_time #=> Time
-    #   resp.partition.last_access_time #=> Time
-    #   resp.partition.storage_descriptor.columns #=> Array
-    #   resp.partition.storage_descriptor.columns[0].name #=> String
-    #   resp.partition.storage_descriptor.columns[0].type #=> String
-    #   resp.partition.storage_descriptor.columns[0].comment #=> String
-    #   resp.partition.storage_descriptor.columns[0].parameters #=> Hash
-    #   resp.partition.storage_descriptor.columns[0].parameters["KeyString"] #=> String
-    #   resp.partition.storage_descriptor.location #=> String
-    #   resp.partition.storage_descriptor.input_format #=> String
-    #   resp.partition.storage_descriptor.output_format #=> String
-    #   resp.partition.storage_descriptor.compressed #=> Boolean
-    #   resp.partition.storage_descriptor.number_of_buckets #=> Integer
-    #   resp.partition.storage_descriptor.serde_info.name #=> String
-    #   resp.partition.storage_descriptor.serde_info.serialization_library #=> String
-    #   resp.partition.storage_descriptor.serde_info.parameters #=> Hash
-    #   resp.partition.storage_descriptor.serde_info.parameters["KeyString"] #=> String
-    #   resp.partition.storage_descriptor.bucket_columns #=> Array
-    #   resp.partition.storage_descriptor.bucket_columns[0] #=> String
-    #   resp.partition.storage_descriptor.sort_columns #=> Array
-    #   resp.partition.storage_descriptor.sort_columns[0].column #=> String
-    #   resp.partition.storage_descriptor.sort_columns[0].sort_order #=> Integer
-    #   resp.partition.storage_descriptor.parameters #=> Hash
-    #   resp.partition.storage_descriptor.parameters["KeyString"] #=> String
-    #   resp.partition.storage_descriptor.skewed_info.skewed_column_names #=> Array
-    #   resp.partition.storage_descriptor.skewed_info.skewed_column_names[0] #=> String
-    #   resp.partition.storage_descriptor.skewed_info.skewed_column_values #=> Array
-    #   resp.partition.storage_descriptor.skewed_info.skewed_column_values[0] #=> String
-    #   resp.partition.storage_descriptor.skewed_info.skewed_column_value_location_maps #=> Hash
-    #   resp.partition.storage_descriptor.skewed_info.skewed_column_value_location_maps["ColumnValuesString"] #=> String
-    #   resp.partition.storage_descriptor.stored_as_sub_directories #=> Boolean
-    #   resp.partition.storage_descriptor.schema_reference.schema_id.schema_arn #=> String
-    #   resp.partition.storage_descriptor.schema_reference.schema_id.schema_name #=> String
-    #   resp.partition.storage_descriptor.schema_reference.schema_id.registry_name #=> String
-    #   resp.partition.storage_descriptor.schema_reference.schema_version_id #=> String
-    #   resp.partition.storage_descriptor.schema_reference.schema_version_number #=> Integer
-    #   resp.partition.parameters #=> Hash
-    #   resp.partition.parameters["KeyString"] #=> String
-    #   resp.partition.last_analyzed_time #=> Time
-    #   resp.partition.catalog_id #=> String
+    #   resp.data.partition.values #=> Array
+    #   resp.data.partition.values[0] #=> String
+    #   resp.data.partition.database_name #=> String
+    #   resp.data.partition.table_name #=> String
+    #   resp.data.partition.creation_time #=> Time
+    #   resp.data.partition.last_access_time #=> Time
+    #   resp.data.partition.storage_descriptor.columns #=> Array
+    #   resp.data.partition.storage_descriptor.columns[0].name #=> String
+    #   resp.data.partition.storage_descriptor.columns[0].type #=> String
+    #   resp.data.partition.storage_descriptor.columns[0].comment #=> String
+    #   resp.data.partition.storage_descriptor.columns[0].parameters #=> Hash
+    #   resp.data.partition.storage_descriptor.columns[0].parameters["KeyString"] #=> String
+    #   resp.data.partition.storage_descriptor.location #=> String
+    #   resp.data.partition.storage_descriptor.additional_locations #=> Array
+    #   resp.data.partition.storage_descriptor.additional_locations[0] #=> String
+    #   resp.data.partition.storage_descriptor.input_format #=> String
+    #   resp.data.partition.storage_descriptor.output_format #=> String
+    #   resp.data.partition.storage_descriptor.compressed #=> Boolean
+    #   resp.data.partition.storage_descriptor.number_of_buckets #=> Integer
+    #   resp.data.partition.storage_descriptor.serde_info.name #=> String
+    #   resp.data.partition.storage_descriptor.serde_info.serialization_library #=> String
+    #   resp.data.partition.storage_descriptor.serde_info.parameters #=> Hash
+    #   resp.data.partition.storage_descriptor.serde_info.parameters["KeyString"] #=> String
+    #   resp.data.partition.storage_descriptor.bucket_columns #=> Array
+    #   resp.data.partition.storage_descriptor.bucket_columns[0] #=> String
+    #   resp.data.partition.storage_descriptor.sort_columns #=> Array
+    #   resp.data.partition.storage_descriptor.sort_columns[0].column #=> String
+    #   resp.data.partition.storage_descriptor.sort_columns[0].sort_order #=> Integer
+    #   resp.data.partition.storage_descriptor.parameters #=> Hash
+    #   resp.data.partition.storage_descriptor.parameters["KeyString"] #=> String
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_names #=> Array
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_names[0] #=> String
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_values #=> Array
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_values[0] #=> String
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_value_location_maps #=> Hash
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_value_location_maps["ColumnValuesString"] #=> String
+    #   resp.data.partition.storage_descriptor.stored_as_sub_directories #=> Boolean
+    #   resp.data.partition.storage_descriptor.schema_reference.schema_id.schema_arn #=> String
+    #   resp.data.partition.storage_descriptor.schema_reference.schema_id.schema_name #=> String
+    #   resp.data.partition.storage_descriptor.schema_reference.schema_id.registry_name #=> String
+    #   resp.data.partition.storage_descriptor.schema_reference.schema_version_id #=> String
+    #   resp.data.partition.storage_descriptor.schema_reference.schema_version_number #=> Integer
+    #   resp.data.partition.parameters #=> Hash
+    #   resp.data.partition.parameters["KeyString"] #=> String
+    #   resp.data.partition.last_analyzed_time #=> Time
+    #   resp.data.partition.catalog_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetPartition AWS API Documentation
     #
@@ -5606,7 +10339,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partitions in question reside. If
-    #   none is provided, the AWS account ID is used by default.
+    #   none is provided, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the partitions reside.
@@ -5621,7 +10355,7 @@ module Aws::Glue
     #   clause. The SQL statement parser [JSQLParser][1] parses the
     #   expression.
     #
-    #   *Operators*\: The following are the operators that you can use in the
+    #   *Operators*: The following are the operators that you can use in the
     #   `Expression` API call:
     #
     #   =
@@ -5674,7 +10408,7 @@ module Aws::Glue
     #
     #   : Logical operators.
     #
-    #   *Supported Partition Key Types*\: The following are the supported
+    #   *Supported Partition Key Types*: The following are the supported
     #   partition keys.
     #
     #   * `string`
@@ -5695,13 +10429,13 @@ module Aws::Glue
     #
     #   * `decimal`
     #
-    #   If an invalid type is encountered, an exception is thrown.
+    #   If an type is encountered that is not valid, an exception is thrown.
     #
     #   The following list shows the valid operators on each type. When you
     #   define a crawler, the `partitionKey` type is created as a `STRING`, to
     #   be compatible with the catalog partitions.
     #
-    #   *Sample API Call*\:
+    #   *Sample API Call*:
     #
     #
     #
@@ -5716,6 +10450,20 @@ module Aws::Glue
     #
     # @option params [Integer] :max_results
     #   The maximum number of partitions to return in a single response.
+    #
+    # @option params [Boolean] :exclude_column_schema
+    #   When true, specifies not returning the partition column schema. Useful
+    #   when you are interested only in other partition attributes such as
+    #   partition values or location. This approach avoids the problem of a
+    #   large response by not returning duplicate data.
+    #
+    # @option params [String] :transaction_id
+    #   The transaction ID at which to read the partition contents.
+    #
+    # @option params [Time,DateTime,Date,Integer,String] :query_as_of_time
+    #   The time as of when to read the partition contents. If not set, the
+    #   most recent transaction commit time will be used. Cannot be specified
+    #   along with `TransactionId`.
     #
     # @return [Types::GetPartitionsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -5737,6 +10485,9 @@ module Aws::Glue
     #       total_segments: 1, # required
     #     },
     #     max_results: 1,
+    #     exclude_column_schema: false,
+    #     transaction_id: "TransactionIdString",
+    #     query_as_of_time: Time.now,
     #   })
     #
     # @example Response structure
@@ -5755,6 +10506,8 @@ module Aws::Glue
     #   resp.partitions[0].storage_descriptor.columns[0].parameters #=> Hash
     #   resp.partitions[0].storage_descriptor.columns[0].parameters["KeyString"] #=> String
     #   resp.partitions[0].storage_descriptor.location #=> String
+    #   resp.partitions[0].storage_descriptor.additional_locations #=> Array
+    #   resp.partitions[0].storage_descriptor.additional_locations[0] #=> String
     #   resp.partitions[0].storage_descriptor.input_format #=> String
     #   resp.partitions[0].storage_descriptor.output_format #=> String
     #   resp.partitions[0].storage_descriptor.compressed #=> Boolean
@@ -5820,9 +10573,8 @@ module Aws::Glue
     #   Currently, these key-value pairs are supported:
     #
     #   * `inferSchema`  —  Specifies whether to set `inferSchema` to true or
-    #     false for the default script generated by an AWS Glue job. For
-    #     example, to set `inferSchema` to true, pass the following key value
-    #     pair:
+    #     false for the default script generated by an Glue job. For example,
+    #     to set `inferSchema` to true, pass the following key value pair:
     #
     #     `--additional-plan-options-map '\{"inferSchema":"true"\}'`
     #
@@ -5939,13 +10691,13 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Retrieves the security configurations for the resource policies set on
-    # individual resources, and also the account-level policy.
+    # Retrieves the resource policies set on individual resources by
+    # Resource Access Manager during cross-account permission grants. Also
+    # retrieves the Data Catalog resource policy.
     #
-    # This operation also returns the Data Catalog resource policy. However,
-    # if you enabled metadata encryption in Data Catalog settings, and you
-    # do not have permission on the AWS KMS key, the operation can't return
-    # the Data Catalog resource policy.
+    # If you enabled metadata encryption in Data Catalog settings, and you
+    # do not have permission on the KMS key, the operation can't return the
+    # Data Catalog resource policy.
     #
     # @option params [String] :next_token
     #   A continuation token, if this is a continuation request.
@@ -5988,13 +10740,14 @@ module Aws::Glue
     # Retrieves a specified resource policy.
     #
     # @option params [String] :resource_arn
-    #   The ARN of the AWS Glue resource for the resource policy to be
-    #   retrieved. For more information about AWS Glue resource ARNs, see the
-    #   [AWS Glue ARN string pattern][1]
+    #   The ARN of the Glue resource for which to retrieve the resource
+    #   policy. If not supplied, the Data Catalog resource policy is returned.
+    #   Use `GetResourcePolicies` to view all existing resource policies. For
+    #   more information see [Specifying Glue Resource ARNs][1].
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/glue/latest/dg/aws-glue-api-common.html#aws-glue-api-regex-aws-glue-arn-id
+    #   [1]: https://docs.aws.amazon.com/glue/latest/dg/glue-specifying-resource-arns.html
     #
     # @return [Types::GetResourcePolicyResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -6071,7 +10824,7 @@ module Aws::Glue
     #   resp.schema_name #=> String
     #   resp.schema_arn #=> String
     #   resp.description #=> String
-    #   resp.data_format #=> String, one of "AVRO"
+    #   resp.data_format #=> String, one of "AVRO", "JSON", "PROTOBUF"
     #   resp.compatibility #=> String, one of "NONE", "DISABLED", "BACKWARD", "BACKWARD_ALL", "FORWARD", "FORWARD_ALL", "FULL", "FULL_ALL"
     #   resp.schema_checkpoint #=> Integer
     #   resp.latest_schema_version #=> Integer
@@ -6132,7 +10885,7 @@ module Aws::Glue
     #
     #   resp.schema_version_id #=> String
     #   resp.schema_arn #=> String
-    #   resp.data_format #=> String, one of "AVRO"
+    #   resp.data_format #=> String, one of "AVRO", "JSON", "PROTOBUF"
     #   resp.status #=> String, one of "AVAILABLE", "PENDING", "FAILURE", "DELETING"
     #   resp.created_time #=> String
     #
@@ -6197,7 +10950,7 @@ module Aws::Glue
     #
     #   resp.schema_version_id #=> String
     #   resp.schema_definition #=> String
-    #   resp.data_format #=> String, one of "AVRO"
+    #   resp.data_format #=> String, one of "AVRO", "JSON", "PROTOBUF"
     #   resp.schema_arn #=> String
     #   resp.version_number #=> Integer
     #   resp.status #=> String, one of "AVAILABLE", "PENDING", "FAILURE", "DELETING"
@@ -6354,12 +11107,114 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Retrieves the session.
+    #
+    # @option params [required, String] :id
+    #   The ID of the session.
+    #
+    # @option params [String] :request_origin
+    #   The origin of the request.
+    #
+    # @return [Types::GetSessionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetSessionResponse#session #session} => Types::Session
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_session({
+    #     id: "NameString", # required
+    #     request_origin: "OrchestrationNameString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.session.id #=> String
+    #   resp.session.created_on #=> Time
+    #   resp.session.status #=> String, one of "PROVISIONING", "READY", "FAILED", "TIMEOUT", "STOPPING", "STOPPED"
+    #   resp.session.error_message #=> String
+    #   resp.session.description #=> String
+    #   resp.session.role #=> String
+    #   resp.session.command.name #=> String
+    #   resp.session.command.python_version #=> String
+    #   resp.session.default_arguments #=> Hash
+    #   resp.session.default_arguments["OrchestrationNameString"] #=> String
+    #   resp.session.connections.connections #=> Array
+    #   resp.session.connections.connections[0] #=> String
+    #   resp.session.progress #=> Float
+    #   resp.session.max_capacity #=> Float
+    #   resp.session.security_configuration #=> String
+    #   resp.session.glue_version #=> String
+    #   resp.session.number_of_workers #=> Integer
+    #   resp.session.worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
+    #   resp.session.completed_on #=> Time
+    #   resp.session.execution_time #=> Float
+    #   resp.session.dpu_seconds #=> Float
+    #   resp.session.idle_timeout #=> Integer
+    #   resp.session.profile_name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetSession AWS API Documentation
+    #
+    # @overload get_session(params = {})
+    # @param [Hash] params ({})
+    def get_session(params = {}, options = {})
+      req = build_request(:get_session, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the statement.
+    #
+    # @option params [required, String] :session_id
+    #   The Session ID of the statement.
+    #
+    # @option params [required, Integer] :id
+    #   The Id of the statement.
+    #
+    # @option params [String] :request_origin
+    #   The origin of the request.
+    #
+    # @return [Types::GetStatementResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetStatementResponse#statement #statement} => Types::Statement
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_statement({
+    #     session_id: "NameString", # required
+    #     id: 1, # required
+    #     request_origin: "OrchestrationNameString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.statement.id #=> Integer
+    #   resp.statement.code #=> String
+    #   resp.statement.state #=> String, one of "WAITING", "RUNNING", "AVAILABLE", "CANCELLING", "CANCELLED", "ERROR"
+    #   resp.statement.output.data.text_plain #=> String
+    #   resp.statement.output.execution_count #=> Integer
+    #   resp.statement.output.status #=> String, one of "WAITING", "RUNNING", "AVAILABLE", "CANCELLING", "CANCELLED", "ERROR"
+    #   resp.statement.output.error_name #=> String
+    #   resp.statement.output.error_value #=> String
+    #   resp.statement.output.traceback #=> Array
+    #   resp.statement.output.traceback[0] #=> String
+    #   resp.statement.progress #=> Float
+    #   resp.statement.started_on #=> Integer
+    #   resp.statement.completed_on #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetStatement AWS API Documentation
+    #
+    # @overload get_statement(params = {})
+    # @param [Hash] params ({})
+    def get_statement(params = {}, options = {})
+      req = build_request(:get_statement, params)
+      req.send_request(options)
+    end
+
     # Retrieves the `Table` definition in a Data Catalog for a specified
     # table.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the table resides. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The name of the database in the catalog in which the table resides.
@@ -6368,6 +11223,18 @@ module Aws::Glue
     # @option params [required, String] :name
     #   The name of the table for which to retrieve the definition. For Hive
     #   compatibility, this name is entirely lowercase.
+    #
+    # @option params [String] :transaction_id
+    #   The transaction ID at which to read the table contents.
+    #
+    # @option params [Time,DateTime,Date,Integer,String] :query_as_of_time
+    #   The time as of when to read the table contents. If not set, the most
+    #   recent transaction commit time will be used. Cannot be specified along
+    #   with `TransactionId`.
+    #
+    # @option params [Boolean] :include_status_details
+    #   Specifies whether to include status details related to a request to
+    #   create or update an Glue Data Catalog view.
     #
     # @return [Types::GetTableResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -6379,6 +11246,9 @@ module Aws::Glue
     #     catalog_id: "CatalogIdString",
     #     database_name: "NameString", # required
     #     name: "NameString", # required
+    #     transaction_id: "TransactionIdString",
+    #     query_as_of_time: Time.now,
+    #     include_status_details: false,
     #   })
     #
     # @example Response structure
@@ -6399,6 +11269,8 @@ module Aws::Glue
     #   resp.table.storage_descriptor.columns[0].parameters #=> Hash
     #   resp.table.storage_descriptor.columns[0].parameters["KeyString"] #=> String
     #   resp.table.storage_descriptor.location #=> String
+    #   resp.table.storage_descriptor.additional_locations #=> Array
+    #   resp.table.storage_descriptor.additional_locations[0] #=> String
     #   resp.table.storage_descriptor.input_format #=> String
     #   resp.table.storage_descriptor.output_format #=> String
     #   resp.table.storage_descriptor.compressed #=> Boolean
@@ -6442,7 +11314,41 @@ module Aws::Glue
     #   resp.table.target_table.catalog_id #=> String
     #   resp.table.target_table.database_name #=> String
     #   resp.table.target_table.name #=> String
+    #   resp.table.target_table.region #=> String
     #   resp.table.catalog_id #=> String
+    #   resp.table.version_id #=> String
+    #   resp.table.federated_table.identifier #=> String
+    #   resp.table.federated_table.database_identifier #=> String
+    #   resp.table.federated_table.connection_name #=> String
+    #   resp.table.view_definition.is_protected #=> Boolean
+    #   resp.table.view_definition.definer #=> String
+    #   resp.table.view_definition.sub_objects #=> Array
+    #   resp.table.view_definition.sub_objects[0] #=> String
+    #   resp.table.view_definition.representations #=> Array
+    #   resp.table.view_definition.representations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table.view_definition.representations[0].dialect_version #=> String
+    #   resp.table.view_definition.representations[0].view_original_text #=> String
+    #   resp.table.view_definition.representations[0].view_expanded_text #=> String
+    #   resp.table.view_definition.representations[0].validation_connection #=> String
+    #   resp.table.view_definition.representations[0].is_stale #=> Boolean
+    #   resp.table.is_multi_dialect_view #=> Boolean
+    #   resp.table.status.requested_by #=> String
+    #   resp.table.status.updated_by #=> String
+    #   resp.table.status.request_time #=> Time
+    #   resp.table.status.update_time #=> Time
+    #   resp.table.status.action #=> String, one of "UPDATE", "CREATE"
+    #   resp.table.status.state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table.status.error.error_code #=> String
+    #   resp.table.status.error.error_message #=> String
+    #   resp.table.status.details.requested_change #=> Types::Table
+    #   resp.table.status.details.view_validations #=> Array
+    #   resp.table.status.details.view_validations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table.status.details.view_validations[0].dialect_version #=> String
+    #   resp.table.status.details.view_validations[0].view_validation_text #=> String
+    #   resp.table.status.details.view_validations[0].update_time #=> Time
+    #   resp.table.status.details.view_validations[0].state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table.status.details.view_validations[0].error.error_code #=> String
+    #   resp.table.status.details.view_validations[0].error.error_message #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetTable AWS API Documentation
     #
@@ -6453,11 +11359,85 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Returns the configuration of all optimizers associated with a
+    # specified table.
+    #
+    # @option params [required, String] :catalog_id
+    #   The Catalog ID of the table.
+    #
+    # @option params [required, String] :database_name
+    #   The name of the database in the catalog in which the table resides.
+    #
+    # @option params [required, String] :table_name
+    #   The name of the table.
+    #
+    # @option params [required, String] :type
+    #   The type of table optimizer.
+    #
+    # @return [Types::GetTableOptimizerResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetTableOptimizerResponse#catalog_id #catalog_id} => String
+    #   * {Types::GetTableOptimizerResponse#database_name #database_name} => String
+    #   * {Types::GetTableOptimizerResponse#table_name #table_name} => String
+    #   * {Types::GetTableOptimizerResponse#table_optimizer #table_optimizer} => Types::TableOptimizer
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_table_optimizer({
+    #     catalog_id: "CatalogIdString", # required
+    #     database_name: "NameString", # required
+    #     table_name: "NameString", # required
+    #     type: "compaction", # required, accepts compaction, retention, orphan_file_deletion
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.catalog_id #=> String
+    #   resp.database_name #=> String
+    #   resp.table_name #=> String
+    #   resp.table_optimizer.type #=> String, one of "compaction", "retention", "orphan_file_deletion"
+    #   resp.table_optimizer.configuration.role_arn #=> String
+    #   resp.table_optimizer.configuration.enabled #=> Boolean
+    #   resp.table_optimizer.configuration.retention_configuration.iceberg_configuration.snapshot_retention_period_in_days #=> Integer
+    #   resp.table_optimizer.configuration.retention_configuration.iceberg_configuration.number_of_snapshots_to_retain #=> Integer
+    #   resp.table_optimizer.configuration.retention_configuration.iceberg_configuration.clean_expired_files #=> Boolean
+    #   resp.table_optimizer.configuration.orphan_file_deletion_configuration.iceberg_configuration.orphan_file_retention_period_in_days #=> Integer
+    #   resp.table_optimizer.configuration.orphan_file_deletion_configuration.iceberg_configuration.location #=> String
+    #   resp.table_optimizer.last_run.event_type #=> String, one of "starting", "completed", "failed", "in_progress"
+    #   resp.table_optimizer.last_run.start_timestamp #=> Time
+    #   resp.table_optimizer.last_run.end_timestamp #=> Time
+    #   resp.table_optimizer.last_run.metrics.number_of_bytes_compacted #=> String
+    #   resp.table_optimizer.last_run.metrics.number_of_files_compacted #=> String
+    #   resp.table_optimizer.last_run.metrics.number_of_dpus #=> String
+    #   resp.table_optimizer.last_run.metrics.job_duration_in_hour #=> String
+    #   resp.table_optimizer.last_run.error #=> String
+    #   resp.table_optimizer.last_run.compaction_metrics.iceberg_metrics.number_of_bytes_compacted #=> Integer
+    #   resp.table_optimizer.last_run.compaction_metrics.iceberg_metrics.number_of_files_compacted #=> Integer
+    #   resp.table_optimizer.last_run.compaction_metrics.iceberg_metrics.number_of_dpus #=> Integer
+    #   resp.table_optimizer.last_run.compaction_metrics.iceberg_metrics.job_duration_in_hour #=> Float
+    #   resp.table_optimizer.last_run.retention_metrics.iceberg_metrics.number_of_data_files_deleted #=> Integer
+    #   resp.table_optimizer.last_run.retention_metrics.iceberg_metrics.number_of_manifest_files_deleted #=> Integer
+    #   resp.table_optimizer.last_run.retention_metrics.iceberg_metrics.number_of_manifest_lists_deleted #=> Integer
+    #   resp.table_optimizer.last_run.retention_metrics.iceberg_metrics.number_of_dpus #=> Integer
+    #   resp.table_optimizer.last_run.retention_metrics.iceberg_metrics.job_duration_in_hour #=> Float
+    #   resp.table_optimizer.last_run.orphan_file_deletion_metrics.iceberg_metrics.number_of_orphan_files_deleted #=> Integer
+    #   resp.table_optimizer.last_run.orphan_file_deletion_metrics.iceberg_metrics.number_of_dpus #=> Integer
+    #   resp.table_optimizer.last_run.orphan_file_deletion_metrics.iceberg_metrics.job_duration_in_hour #=> Float
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetTableOptimizer AWS API Documentation
+    #
+    # @overload get_table_optimizer(params = {})
+    # @param [Hash] params ({})
+    def get_table_optimizer(params = {}, options = {})
+      req = build_request(:get_table_optimizer, params)
+      req.send_request(options)
+    end
+
     # Retrieves a specified version of a table.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the tables reside. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The database in the catalog in which the table resides. For Hive
@@ -6502,6 +11482,8 @@ module Aws::Glue
     #   resp.table_version.table.storage_descriptor.columns[0].parameters #=> Hash
     #   resp.table_version.table.storage_descriptor.columns[0].parameters["KeyString"] #=> String
     #   resp.table_version.table.storage_descriptor.location #=> String
+    #   resp.table_version.table.storage_descriptor.additional_locations #=> Array
+    #   resp.table_version.table.storage_descriptor.additional_locations[0] #=> String
     #   resp.table_version.table.storage_descriptor.input_format #=> String
     #   resp.table_version.table.storage_descriptor.output_format #=> String
     #   resp.table_version.table.storage_descriptor.compressed #=> Boolean
@@ -6545,7 +11527,41 @@ module Aws::Glue
     #   resp.table_version.table.target_table.catalog_id #=> String
     #   resp.table_version.table.target_table.database_name #=> String
     #   resp.table_version.table.target_table.name #=> String
+    #   resp.table_version.table.target_table.region #=> String
     #   resp.table_version.table.catalog_id #=> String
+    #   resp.table_version.table.version_id #=> String
+    #   resp.table_version.table.federated_table.identifier #=> String
+    #   resp.table_version.table.federated_table.database_identifier #=> String
+    #   resp.table_version.table.federated_table.connection_name #=> String
+    #   resp.table_version.table.view_definition.is_protected #=> Boolean
+    #   resp.table_version.table.view_definition.definer #=> String
+    #   resp.table_version.table.view_definition.sub_objects #=> Array
+    #   resp.table_version.table.view_definition.sub_objects[0] #=> String
+    #   resp.table_version.table.view_definition.representations #=> Array
+    #   resp.table_version.table.view_definition.representations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table_version.table.view_definition.representations[0].dialect_version #=> String
+    #   resp.table_version.table.view_definition.representations[0].view_original_text #=> String
+    #   resp.table_version.table.view_definition.representations[0].view_expanded_text #=> String
+    #   resp.table_version.table.view_definition.representations[0].validation_connection #=> String
+    #   resp.table_version.table.view_definition.representations[0].is_stale #=> Boolean
+    #   resp.table_version.table.is_multi_dialect_view #=> Boolean
+    #   resp.table_version.table.status.requested_by #=> String
+    #   resp.table_version.table.status.updated_by #=> String
+    #   resp.table_version.table.status.request_time #=> Time
+    #   resp.table_version.table.status.update_time #=> Time
+    #   resp.table_version.table.status.action #=> String, one of "UPDATE", "CREATE"
+    #   resp.table_version.table.status.state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table_version.table.status.error.error_code #=> String
+    #   resp.table_version.table.status.error.error_message #=> String
+    #   resp.table_version.table.status.details.requested_change #=> Types::Table
+    #   resp.table_version.table.status.details.view_validations #=> Array
+    #   resp.table_version.table.status.details.view_validations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table_version.table.status.details.view_validations[0].dialect_version #=> String
+    #   resp.table_version.table.status.details.view_validations[0].view_validation_text #=> String
+    #   resp.table_version.table.status.details.view_validations[0].update_time #=> Time
+    #   resp.table_version.table.status.details.view_validations[0].state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table_version.table.status.details.view_validations[0].error.error_code #=> String
+    #   resp.table_version.table.status.details.view_validations[0].error.error_message #=> String
     #   resp.table_version.version_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetTableVersion AWS API Documentation
@@ -6562,7 +11578,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the tables reside. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The database in the catalog in which the table resides. For Hive
@@ -6614,6 +11630,8 @@ module Aws::Glue
     #   resp.table_versions[0].table.storage_descriptor.columns[0].parameters #=> Hash
     #   resp.table_versions[0].table.storage_descriptor.columns[0].parameters["KeyString"] #=> String
     #   resp.table_versions[0].table.storage_descriptor.location #=> String
+    #   resp.table_versions[0].table.storage_descriptor.additional_locations #=> Array
+    #   resp.table_versions[0].table.storage_descriptor.additional_locations[0] #=> String
     #   resp.table_versions[0].table.storage_descriptor.input_format #=> String
     #   resp.table_versions[0].table.storage_descriptor.output_format #=> String
     #   resp.table_versions[0].table.storage_descriptor.compressed #=> Boolean
@@ -6657,7 +11675,41 @@ module Aws::Glue
     #   resp.table_versions[0].table.target_table.catalog_id #=> String
     #   resp.table_versions[0].table.target_table.database_name #=> String
     #   resp.table_versions[0].table.target_table.name #=> String
+    #   resp.table_versions[0].table.target_table.region #=> String
     #   resp.table_versions[0].table.catalog_id #=> String
+    #   resp.table_versions[0].table.version_id #=> String
+    #   resp.table_versions[0].table.federated_table.identifier #=> String
+    #   resp.table_versions[0].table.federated_table.database_identifier #=> String
+    #   resp.table_versions[0].table.federated_table.connection_name #=> String
+    #   resp.table_versions[0].table.view_definition.is_protected #=> Boolean
+    #   resp.table_versions[0].table.view_definition.definer #=> String
+    #   resp.table_versions[0].table.view_definition.sub_objects #=> Array
+    #   resp.table_versions[0].table.view_definition.sub_objects[0] #=> String
+    #   resp.table_versions[0].table.view_definition.representations #=> Array
+    #   resp.table_versions[0].table.view_definition.representations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table_versions[0].table.view_definition.representations[0].dialect_version #=> String
+    #   resp.table_versions[0].table.view_definition.representations[0].view_original_text #=> String
+    #   resp.table_versions[0].table.view_definition.representations[0].view_expanded_text #=> String
+    #   resp.table_versions[0].table.view_definition.representations[0].validation_connection #=> String
+    #   resp.table_versions[0].table.view_definition.representations[0].is_stale #=> Boolean
+    #   resp.table_versions[0].table.is_multi_dialect_view #=> Boolean
+    #   resp.table_versions[0].table.status.requested_by #=> String
+    #   resp.table_versions[0].table.status.updated_by #=> String
+    #   resp.table_versions[0].table.status.request_time #=> Time
+    #   resp.table_versions[0].table.status.update_time #=> Time
+    #   resp.table_versions[0].table.status.action #=> String, one of "UPDATE", "CREATE"
+    #   resp.table_versions[0].table.status.state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table_versions[0].table.status.error.error_code #=> String
+    #   resp.table_versions[0].table.status.error.error_message #=> String
+    #   resp.table_versions[0].table.status.details.requested_change #=> Types::Table
+    #   resp.table_versions[0].table.status.details.view_validations #=> Array
+    #   resp.table_versions[0].table.status.details.view_validations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table_versions[0].table.status.details.view_validations[0].dialect_version #=> String
+    #   resp.table_versions[0].table.status.details.view_validations[0].view_validation_text #=> String
+    #   resp.table_versions[0].table.status.details.view_validations[0].update_time #=> Time
+    #   resp.table_versions[0].table.status.details.view_validations[0].state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table_versions[0].table.status.details.view_validations[0].error.error_code #=> String
+    #   resp.table_versions[0].table.status.details.view_validations[0].error.error_message #=> String
     #   resp.table_versions[0].version_id #=> String
     #   resp.next_token #=> String
     #
@@ -6675,7 +11727,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the tables reside. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The database in the catalog whose tables to list. For Hive
@@ -6690,6 +11742,29 @@ module Aws::Glue
     #
     # @option params [Integer] :max_results
     #   The maximum number of tables to return in a single response.
+    #
+    # @option params [String] :transaction_id
+    #   The transaction ID at which to read the table contents.
+    #
+    # @option params [Time,DateTime,Date,Integer,String] :query_as_of_time
+    #   The time as of when to read the table contents. If not set, the most
+    #   recent transaction commit time will be used. Cannot be specified along
+    #   with `TransactionId`.
+    #
+    # @option params [Boolean] :include_status_details
+    #   Specifies whether to include status details related to a request to
+    #   create or update an Glue Data Catalog view.
+    #
+    # @option params [Array<String>] :attributes_to_get
+    #   Specifies the table fields returned by the `GetTables` call. This
+    #   parameter doesn’t accept an empty list. The request must include
+    #   `NAME`.
+    #
+    #   The following are the valid combinations of values:
+    #
+    #   * `NAME` - Names of all tables in the database.
+    #
+    #   * `NAME`, `TABLE_TYPE` - Names of all tables and the table types.
     #
     # @return [Types::GetTablesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -6706,6 +11781,10 @@ module Aws::Glue
     #     expression: "FilterString",
     #     next_token: "Token",
     #     max_results: 1,
+    #     transaction_id: "TransactionIdString",
+    #     query_as_of_time: Time.now,
+    #     include_status_details: false,
+    #     attributes_to_get: ["NAME"], # accepts NAME, TABLE_TYPE
     #   })
     #
     # @example Response structure
@@ -6727,6 +11806,8 @@ module Aws::Glue
     #   resp.table_list[0].storage_descriptor.columns[0].parameters #=> Hash
     #   resp.table_list[0].storage_descriptor.columns[0].parameters["KeyString"] #=> String
     #   resp.table_list[0].storage_descriptor.location #=> String
+    #   resp.table_list[0].storage_descriptor.additional_locations #=> Array
+    #   resp.table_list[0].storage_descriptor.additional_locations[0] #=> String
     #   resp.table_list[0].storage_descriptor.input_format #=> String
     #   resp.table_list[0].storage_descriptor.output_format #=> String
     #   resp.table_list[0].storage_descriptor.compressed #=> Boolean
@@ -6770,7 +11851,41 @@ module Aws::Glue
     #   resp.table_list[0].target_table.catalog_id #=> String
     #   resp.table_list[0].target_table.database_name #=> String
     #   resp.table_list[0].target_table.name #=> String
+    #   resp.table_list[0].target_table.region #=> String
     #   resp.table_list[0].catalog_id #=> String
+    #   resp.table_list[0].version_id #=> String
+    #   resp.table_list[0].federated_table.identifier #=> String
+    #   resp.table_list[0].federated_table.database_identifier #=> String
+    #   resp.table_list[0].federated_table.connection_name #=> String
+    #   resp.table_list[0].view_definition.is_protected #=> Boolean
+    #   resp.table_list[0].view_definition.definer #=> String
+    #   resp.table_list[0].view_definition.sub_objects #=> Array
+    #   resp.table_list[0].view_definition.sub_objects[0] #=> String
+    #   resp.table_list[0].view_definition.representations #=> Array
+    #   resp.table_list[0].view_definition.representations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table_list[0].view_definition.representations[0].dialect_version #=> String
+    #   resp.table_list[0].view_definition.representations[0].view_original_text #=> String
+    #   resp.table_list[0].view_definition.representations[0].view_expanded_text #=> String
+    #   resp.table_list[0].view_definition.representations[0].validation_connection #=> String
+    #   resp.table_list[0].view_definition.representations[0].is_stale #=> Boolean
+    #   resp.table_list[0].is_multi_dialect_view #=> Boolean
+    #   resp.table_list[0].status.requested_by #=> String
+    #   resp.table_list[0].status.updated_by #=> String
+    #   resp.table_list[0].status.request_time #=> Time
+    #   resp.table_list[0].status.update_time #=> Time
+    #   resp.table_list[0].status.action #=> String, one of "UPDATE", "CREATE"
+    #   resp.table_list[0].status.state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table_list[0].status.error.error_code #=> String
+    #   resp.table_list[0].status.error.error_message #=> String
+    #   resp.table_list[0].status.details.requested_change #=> Types::Table
+    #   resp.table_list[0].status.details.view_validations #=> Array
+    #   resp.table_list[0].status.details.view_validations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table_list[0].status.details.view_validations[0].dialect_version #=> String
+    #   resp.table_list[0].status.details.view_validations[0].view_validation_text #=> String
+    #   resp.table_list[0].status.details.view_validations[0].update_time #=> Time
+    #   resp.table_list[0].status.details.view_validations[0].state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table_list[0].status.details.view_validations[0].error.error_code #=> String
+    #   resp.table_list[0].status.details.view_validations[0].error.error_message #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetTables AWS API Documentation
@@ -6832,7 +11947,7 @@ module Aws::Glue
     #   resp.trigger.name #=> String
     #   resp.trigger.workflow_name #=> String
     #   resp.trigger.id #=> String
-    #   resp.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND"
+    #   resp.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND", "EVENT"
     #   resp.trigger.state #=> String, one of "CREATING", "CREATED", "ACTIVATING", "ACTIVATED", "DEACTIVATING", "DEACTIVATED", "DELETING", "UPDATING"
     #   resp.trigger.description #=> String
     #   resp.trigger.schedule #=> String
@@ -6848,9 +11963,11 @@ module Aws::Glue
     #   resp.trigger.predicate.conditions #=> Array
     #   resp.trigger.predicate.conditions[0].logical_operator #=> String, one of "EQUALS"
     #   resp.trigger.predicate.conditions[0].job_name #=> String
-    #   resp.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.trigger.predicate.conditions[0].crawler_name #=> String
-    #   resp.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
+    #   resp.trigger.event_batching_condition.batch_size #=> Integer
+    #   resp.trigger.event_batching_condition.batch_window #=> Integer
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetTrigger AWS API Documentation
     #
@@ -6895,7 +12012,7 @@ module Aws::Glue
     #   resp.triggers[0].name #=> String
     #   resp.triggers[0].workflow_name #=> String
     #   resp.triggers[0].id #=> String
-    #   resp.triggers[0].type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND"
+    #   resp.triggers[0].type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND", "EVENT"
     #   resp.triggers[0].state #=> String, one of "CREATING", "CREATED", "ACTIVATING", "ACTIVATED", "DEACTIVATING", "DEACTIVATED", "DELETING", "UPDATING"
     #   resp.triggers[0].description #=> String
     #   resp.triggers[0].schedule #=> String
@@ -6911,9 +12028,11 @@ module Aws::Glue
     #   resp.triggers[0].predicate.conditions #=> Array
     #   resp.triggers[0].predicate.conditions[0].logical_operator #=> String, one of "EQUALS"
     #   resp.triggers[0].predicate.conditions[0].job_name #=> String
-    #   resp.triggers[0].predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.triggers[0].predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.triggers[0].predicate.conditions[0].crawler_name #=> String
-    #   resp.triggers[0].predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.triggers[0].predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
+    #   resp.triggers[0].event_batching_condition.batch_size #=> Integer
+    #   resp.triggers[0].event_batching_condition.batch_window #=> Integer
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetTriggers AWS API Documentation
@@ -6925,11 +12044,660 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Retrieves partition metadata from the Data Catalog that contains
+    # unfiltered metadata.
+    #
+    # For IAM authorization, the public IAM action associated with this API
+    # is `glue:GetPartition`.
+    #
+    # @option params [String] :region
+    #   Specified only if the base tables belong to a different Amazon Web
+    #   Services Region.
+    #
+    # @option params [required, String] :catalog_id
+    #   The catalog ID where the partition resides.
+    #
+    # @option params [required, String] :database_name
+    #   (Required) Specifies the name of a database that contains the
+    #   partition.
+    #
+    # @option params [required, String] :table_name
+    #   (Required) Specifies the name of a table that contains the partition.
+    #
+    # @option params [required, Array<String>] :partition_values
+    #   (Required) A list of partition key values.
+    #
+    # @option params [Types::AuditContext] :audit_context
+    #   A structure containing Lake Formation audit context information.
+    #
+    # @option params [required, Array<String>] :supported_permission_types
+    #   (Required) A list of supported permission types.
+    #
+    # @option params [Types::QuerySessionContext] :query_session_context
+    #   A structure used as a protocol between query engines and Lake
+    #   Formation or Glue. Contains both a Lake Formation generated
+    #   authorization identifier and information from the request's
+    #   authorization context.
+    #
+    # @return [Types::GetUnfilteredPartitionMetadataResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetUnfilteredPartitionMetadataResponse#partition #data.partition} => Types::Partition (This method conflicts with a method on Response, call it through the data member)
+    #   * {Types::GetUnfilteredPartitionMetadataResponse#authorized_columns #authorized_columns} => Array&lt;String&gt;
+    #   * {Types::GetUnfilteredPartitionMetadataResponse#is_registered_with_lake_formation #is_registered_with_lake_formation} => Boolean
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_unfiltered_partition_metadata({
+    #     region: "ValueString",
+    #     catalog_id: "CatalogIdString", # required
+    #     database_name: "NameString", # required
+    #     table_name: "NameString", # required
+    #     partition_values: ["ValueString"], # required
+    #     audit_context: {
+    #       additional_audit_context: "AuditContextString",
+    #       requested_columns: ["ColumnNameString"],
+    #       all_columns_requested: false,
+    #     },
+    #     supported_permission_types: ["COLUMN_PERMISSION"], # required, accepts COLUMN_PERMISSION, CELL_FILTER_PERMISSION, NESTED_PERMISSION, NESTED_CELL_PERMISSION
+    #     query_session_context: {
+    #       query_id: "HashString",
+    #       query_start_time: Time.now,
+    #       cluster_id: "NullableString",
+    #       query_authorization_id: "HashString",
+    #       additional_context: {
+    #         "ContextKey" => "ContextValue",
+    #       },
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.data.partition.values #=> Array
+    #   resp.data.partition.values[0] #=> String
+    #   resp.data.partition.database_name #=> String
+    #   resp.data.partition.table_name #=> String
+    #   resp.data.partition.creation_time #=> Time
+    #   resp.data.partition.last_access_time #=> Time
+    #   resp.data.partition.storage_descriptor.columns #=> Array
+    #   resp.data.partition.storage_descriptor.columns[0].name #=> String
+    #   resp.data.partition.storage_descriptor.columns[0].type #=> String
+    #   resp.data.partition.storage_descriptor.columns[0].comment #=> String
+    #   resp.data.partition.storage_descriptor.columns[0].parameters #=> Hash
+    #   resp.data.partition.storage_descriptor.columns[0].parameters["KeyString"] #=> String
+    #   resp.data.partition.storage_descriptor.location #=> String
+    #   resp.data.partition.storage_descriptor.additional_locations #=> Array
+    #   resp.data.partition.storage_descriptor.additional_locations[0] #=> String
+    #   resp.data.partition.storage_descriptor.input_format #=> String
+    #   resp.data.partition.storage_descriptor.output_format #=> String
+    #   resp.data.partition.storage_descriptor.compressed #=> Boolean
+    #   resp.data.partition.storage_descriptor.number_of_buckets #=> Integer
+    #   resp.data.partition.storage_descriptor.serde_info.name #=> String
+    #   resp.data.partition.storage_descriptor.serde_info.serialization_library #=> String
+    #   resp.data.partition.storage_descriptor.serde_info.parameters #=> Hash
+    #   resp.data.partition.storage_descriptor.serde_info.parameters["KeyString"] #=> String
+    #   resp.data.partition.storage_descriptor.bucket_columns #=> Array
+    #   resp.data.partition.storage_descriptor.bucket_columns[0] #=> String
+    #   resp.data.partition.storage_descriptor.sort_columns #=> Array
+    #   resp.data.partition.storage_descriptor.sort_columns[0].column #=> String
+    #   resp.data.partition.storage_descriptor.sort_columns[0].sort_order #=> Integer
+    #   resp.data.partition.storage_descriptor.parameters #=> Hash
+    #   resp.data.partition.storage_descriptor.parameters["KeyString"] #=> String
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_names #=> Array
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_names[0] #=> String
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_values #=> Array
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_values[0] #=> String
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_value_location_maps #=> Hash
+    #   resp.data.partition.storage_descriptor.skewed_info.skewed_column_value_location_maps["ColumnValuesString"] #=> String
+    #   resp.data.partition.storage_descriptor.stored_as_sub_directories #=> Boolean
+    #   resp.data.partition.storage_descriptor.schema_reference.schema_id.schema_arn #=> String
+    #   resp.data.partition.storage_descriptor.schema_reference.schema_id.schema_name #=> String
+    #   resp.data.partition.storage_descriptor.schema_reference.schema_id.registry_name #=> String
+    #   resp.data.partition.storage_descriptor.schema_reference.schema_version_id #=> String
+    #   resp.data.partition.storage_descriptor.schema_reference.schema_version_number #=> Integer
+    #   resp.data.partition.parameters #=> Hash
+    #   resp.data.partition.parameters["KeyString"] #=> String
+    #   resp.data.partition.last_analyzed_time #=> Time
+    #   resp.data.partition.catalog_id #=> String
+    #   resp.authorized_columns #=> Array
+    #   resp.authorized_columns[0] #=> String
+    #   resp.is_registered_with_lake_formation #=> Boolean
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetUnfilteredPartitionMetadata AWS API Documentation
+    #
+    # @overload get_unfiltered_partition_metadata(params = {})
+    # @param [Hash] params ({})
+    def get_unfiltered_partition_metadata(params = {}, options = {})
+      req = build_request(:get_unfiltered_partition_metadata, params)
+      req.send_request(options)
+    end
+
+    # Retrieves partition metadata from the Data Catalog that contains
+    # unfiltered metadata.
+    #
+    # For IAM authorization, the public IAM action associated with this API
+    # is `glue:GetPartitions`.
+    #
+    # @option params [String] :region
+    #   Specified only if the base tables belong to a different Amazon Web
+    #   Services Region.
+    #
+    # @option params [required, String] :catalog_id
+    #   The ID of the Data Catalog where the partitions in question reside. If
+    #   none is provided, the AWS account ID is used by default.
+    #
+    # @option params [required, String] :database_name
+    #   The name of the catalog database where the partitions reside.
+    #
+    # @option params [required, String] :table_name
+    #   The name of the table that contains the partition.
+    #
+    # @option params [String] :expression
+    #   An expression that filters the partitions to be returned.
+    #
+    #   The expression uses SQL syntax similar to the SQL `WHERE` filter
+    #   clause. The SQL statement parser [JSQLParser][1] parses the
+    #   expression.
+    #
+    #   *Operators*: The following are the operators that you can use in the
+    #   `Expression` API call:
+    #
+    #   =
+    #
+    #   : Checks whether the values of the two operands are equal; if yes,
+    #     then the condition becomes true.
+    #
+    #     Example: Assume 'variable a' holds 10 and 'variable b' holds 20.
+    #
+    #     (a = b) is not true.
+    #
+    #   &lt; &gt;
+    #
+    #   : Checks whether the values of two operands are equal; if the values
+    #     are not equal, then the condition becomes true.
+    #
+    #     Example: (a &lt; &gt; b) is true.
+    #
+    #   &gt;
+    #
+    #   : Checks whether the value of the left operand is greater than the
+    #     value of the right operand; if yes, then the condition becomes true.
+    #
+    #     Example: (a &gt; b) is not true.
+    #
+    #   &lt;
+    #
+    #   : Checks whether the value of the left operand is less than the value
+    #     of the right operand; if yes, then the condition becomes true.
+    #
+    #     Example: (a &lt; b) is true.
+    #
+    #   &gt;=
+    #
+    #   : Checks whether the value of the left operand is greater than or
+    #     equal to the value of the right operand; if yes, then the condition
+    #     becomes true.
+    #
+    #     Example: (a &gt;= b) is not true.
+    #
+    #   &lt;=
+    #
+    #   : Checks whether the value of the left operand is less than or equal
+    #     to the value of the right operand; if yes, then the condition
+    #     becomes true.
+    #
+    #     Example: (a &lt;= b) is true.
+    #
+    #   AND, OR, IN, BETWEEN, LIKE, NOT, IS NULL
+    #
+    #   : Logical operators.
+    #
+    #   *Supported Partition Key Types*: The following are the supported
+    #   partition keys.
+    #
+    #   * `string`
+    #
+    #   * `date`
+    #
+    #   * `timestamp`
+    #
+    #   * `int`
+    #
+    #   * `bigint`
+    #
+    #   * `long`
+    #
+    #   * `tinyint`
+    #
+    #   * `smallint`
+    #
+    #   * `decimal`
+    #
+    #   If an type is encountered that is not valid, an exception is thrown.
+    #
+    #
+    #
+    #   [1]: http://jsqlparser.sourceforge.net/home.php
+    #
+    # @option params [Types::AuditContext] :audit_context
+    #   A structure containing Lake Formation audit context information.
+    #
+    # @option params [required, Array<String>] :supported_permission_types
+    #   A list of supported permission types.
+    #
+    # @option params [String] :next_token
+    #   A continuation token, if this is not the first call to retrieve these
+    #   partitions.
+    #
+    # @option params [Types::Segment] :segment
+    #   The segment of the table's partitions to scan in this request.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of partitions to return in a single response.
+    #
+    # @option params [Types::QuerySessionContext] :query_session_context
+    #   A structure used as a protocol between query engines and Lake
+    #   Formation or Glue. Contains both a Lake Formation generated
+    #   authorization identifier and information from the request's
+    #   authorization context.
+    #
+    # @return [Types::GetUnfilteredPartitionsMetadataResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetUnfilteredPartitionsMetadataResponse#unfiltered_partitions #unfiltered_partitions} => Array&lt;Types::UnfilteredPartition&gt;
+    #   * {Types::GetUnfilteredPartitionsMetadataResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_unfiltered_partitions_metadata({
+    #     region: "ValueString",
+    #     catalog_id: "CatalogIdString", # required
+    #     database_name: "NameString", # required
+    #     table_name: "NameString", # required
+    #     expression: "PredicateString",
+    #     audit_context: {
+    #       additional_audit_context: "AuditContextString",
+    #       requested_columns: ["ColumnNameString"],
+    #       all_columns_requested: false,
+    #     },
+    #     supported_permission_types: ["COLUMN_PERMISSION"], # required, accepts COLUMN_PERMISSION, CELL_FILTER_PERMISSION, NESTED_PERMISSION, NESTED_CELL_PERMISSION
+    #     next_token: "Token",
+    #     segment: {
+    #       segment_number: 1, # required
+    #       total_segments: 1, # required
+    #     },
+    #     max_results: 1,
+    #     query_session_context: {
+    #       query_id: "HashString",
+    #       query_start_time: Time.now,
+    #       cluster_id: "NullableString",
+    #       query_authorization_id: "HashString",
+    #       additional_context: {
+    #         "ContextKey" => "ContextValue",
+    #       },
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.unfiltered_partitions #=> Array
+    #   resp.unfiltered_partitions[0].partition.values #=> Array
+    #   resp.unfiltered_partitions[0].partition.values[0] #=> String
+    #   resp.unfiltered_partitions[0].partition.database_name #=> String
+    #   resp.unfiltered_partitions[0].partition.table_name #=> String
+    #   resp.unfiltered_partitions[0].partition.creation_time #=> Time
+    #   resp.unfiltered_partitions[0].partition.last_access_time #=> Time
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.columns #=> Array
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.columns[0].name #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.columns[0].type #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.columns[0].comment #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.columns[0].parameters #=> Hash
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.columns[0].parameters["KeyString"] #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.location #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.additional_locations #=> Array
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.additional_locations[0] #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.input_format #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.output_format #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.compressed #=> Boolean
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.number_of_buckets #=> Integer
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.serde_info.name #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.serde_info.serialization_library #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.serde_info.parameters #=> Hash
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.serde_info.parameters["KeyString"] #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.bucket_columns #=> Array
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.bucket_columns[0] #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.sort_columns #=> Array
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.sort_columns[0].column #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.sort_columns[0].sort_order #=> Integer
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.parameters #=> Hash
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.parameters["KeyString"] #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.skewed_info.skewed_column_names #=> Array
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.skewed_info.skewed_column_names[0] #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.skewed_info.skewed_column_values #=> Array
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.skewed_info.skewed_column_values[0] #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.skewed_info.skewed_column_value_location_maps #=> Hash
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.skewed_info.skewed_column_value_location_maps["ColumnValuesString"] #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.stored_as_sub_directories #=> Boolean
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.schema_reference.schema_id.schema_arn #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.schema_reference.schema_id.schema_name #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.schema_reference.schema_id.registry_name #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.schema_reference.schema_version_id #=> String
+    #   resp.unfiltered_partitions[0].partition.storage_descriptor.schema_reference.schema_version_number #=> Integer
+    #   resp.unfiltered_partitions[0].partition.parameters #=> Hash
+    #   resp.unfiltered_partitions[0].partition.parameters["KeyString"] #=> String
+    #   resp.unfiltered_partitions[0].partition.last_analyzed_time #=> Time
+    #   resp.unfiltered_partitions[0].partition.catalog_id #=> String
+    #   resp.unfiltered_partitions[0].authorized_columns #=> Array
+    #   resp.unfiltered_partitions[0].authorized_columns[0] #=> String
+    #   resp.unfiltered_partitions[0].is_registered_with_lake_formation #=> Boolean
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetUnfilteredPartitionsMetadata AWS API Documentation
+    #
+    # @overload get_unfiltered_partitions_metadata(params = {})
+    # @param [Hash] params ({})
+    def get_unfiltered_partitions_metadata(params = {}, options = {})
+      req = build_request(:get_unfiltered_partitions_metadata, params)
+      req.send_request(options)
+    end
+
+    # Allows a third-party analytical engine to retrieve unfiltered table
+    # metadata from the Data Catalog.
+    #
+    # For IAM authorization, the public IAM action associated with this API
+    # is `glue:GetTable`.
+    #
+    # @option params [String] :region
+    #   Specified only if the base tables belong to a different Amazon Web
+    #   Services Region.
+    #
+    # @option params [required, String] :catalog_id
+    #   The catalog ID where the table resides.
+    #
+    # @option params [required, String] :database_name
+    #   (Required) Specifies the name of a database that contains the table.
+    #
+    # @option params [required, String] :name
+    #   (Required) Specifies the name of a table for which you are requesting
+    #   metadata.
+    #
+    # @option params [Types::AuditContext] :audit_context
+    #   A structure containing Lake Formation audit context information.
+    #
+    # @option params [required, Array<String>] :supported_permission_types
+    #   Indicates the level of filtering a third-party analytical engine is
+    #   capable of enforcing when calling the `GetUnfilteredTableMetadata` API
+    #   operation. Accepted values are:
+    #
+    #   * `COLUMN_PERMISSION` - Column permissions ensure that users can
+    #     access only specific columns in the table. If there are particular
+    #     columns contain sensitive data, data lake administrators can define
+    #     column filters that exclude access to specific columns.
+    #
+    #   * `CELL_FILTER_PERMISSION` - Cell-level filtering combines column
+    #     filtering (include or exclude columns) and row filter expressions to
+    #     restrict access to individual elements in the table.
+    #
+    #   * `NESTED_PERMISSION` - Nested permissions combines cell-level
+    #     filtering and nested column filtering to restrict access to columns
+    #     and/or nested columns in specific rows based on row filter
+    #     expressions.
+    #
+    #   * `NESTED_CELL_PERMISSION` - Nested cell permissions combines nested
+    #     permission with nested cell-level filtering. This allows different
+    #     subsets of nested columns to be restricted based on an array of row
+    #     filter expressions.
+    #
+    #   Note: Each of these permission types follows a hierarchical order
+    #   where each subsequent permission type includes all permission of the
+    #   previous type.
+    #
+    #   Important: If you provide a supported permission type that doesn't
+    #   match the user's level of permissions on the table, then Lake
+    #   Formation raises an exception. For example, if the third-party engine
+    #   calling the `GetUnfilteredTableMetadata` operation can enforce only
+    #   column-level filtering, and the user has nested cell filtering applied
+    #   on the table, Lake Formation throws an exception, and will not return
+    #   unfiltered table metadata and data access credentials.
+    #
+    # @option params [String] :parent_resource_arn
+    #   The resource ARN of the view.
+    #
+    # @option params [String] :root_resource_arn
+    #   The resource ARN of the root view in a chain of nested views.
+    #
+    # @option params [Types::SupportedDialect] :supported_dialect
+    #   A structure specifying the dialect and dialect version used by the
+    #   query engine.
+    #
+    # @option params [Array<String>] :permissions
+    #   The Lake Formation data permissions of the caller on the table. Used
+    #   to authorize the call when no view context is found.
+    #
+    # @option params [Types::QuerySessionContext] :query_session_context
+    #   A structure used as a protocol between query engines and Lake
+    #   Formation or Glue. Contains both a Lake Formation generated
+    #   authorization identifier and information from the request's
+    #   authorization context.
+    #
+    # @return [Types::GetUnfilteredTableMetadataResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetUnfilteredTableMetadataResponse#table #table} => Types::Table
+    #   * {Types::GetUnfilteredTableMetadataResponse#authorized_columns #authorized_columns} => Array&lt;String&gt;
+    #   * {Types::GetUnfilteredTableMetadataResponse#is_registered_with_lake_formation #is_registered_with_lake_formation} => Boolean
+    #   * {Types::GetUnfilteredTableMetadataResponse#cell_filters #cell_filters} => Array&lt;Types::ColumnRowFilter&gt;
+    #   * {Types::GetUnfilteredTableMetadataResponse#query_authorization_id #query_authorization_id} => String
+    #   * {Types::GetUnfilteredTableMetadataResponse#is_multi_dialect_view #is_multi_dialect_view} => Boolean
+    #   * {Types::GetUnfilteredTableMetadataResponse#resource_arn #resource_arn} => String
+    #   * {Types::GetUnfilteredTableMetadataResponse#is_protected #is_protected} => Boolean
+    #   * {Types::GetUnfilteredTableMetadataResponse#permissions #permissions} => Array&lt;String&gt;
+    #   * {Types::GetUnfilteredTableMetadataResponse#row_filter #row_filter} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_unfiltered_table_metadata({
+    #     region: "ValueString",
+    #     catalog_id: "CatalogIdString", # required
+    #     database_name: "NameString", # required
+    #     name: "NameString", # required
+    #     audit_context: {
+    #       additional_audit_context: "AuditContextString",
+    #       requested_columns: ["ColumnNameString"],
+    #       all_columns_requested: false,
+    #     },
+    #     supported_permission_types: ["COLUMN_PERMISSION"], # required, accepts COLUMN_PERMISSION, CELL_FILTER_PERMISSION, NESTED_PERMISSION, NESTED_CELL_PERMISSION
+    #     parent_resource_arn: "ArnString",
+    #     root_resource_arn: "ArnString",
+    #     supported_dialect: {
+    #       dialect: "REDSHIFT", # accepts REDSHIFT, ATHENA, SPARK
+    #       dialect_version: "ViewDialectVersionString",
+    #     },
+    #     permissions: ["ALL"], # accepts ALL, SELECT, ALTER, DROP, DELETE, INSERT, CREATE_DATABASE, CREATE_TABLE, DATA_LOCATION_ACCESS
+    #     query_session_context: {
+    #       query_id: "HashString",
+    #       query_start_time: Time.now,
+    #       cluster_id: "NullableString",
+    #       query_authorization_id: "HashString",
+    #       additional_context: {
+    #         "ContextKey" => "ContextValue",
+    #       },
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.table.name #=> String
+    #   resp.table.database_name #=> String
+    #   resp.table.description #=> String
+    #   resp.table.owner #=> String
+    #   resp.table.create_time #=> Time
+    #   resp.table.update_time #=> Time
+    #   resp.table.last_access_time #=> Time
+    #   resp.table.last_analyzed_time #=> Time
+    #   resp.table.retention #=> Integer
+    #   resp.table.storage_descriptor.columns #=> Array
+    #   resp.table.storage_descriptor.columns[0].name #=> String
+    #   resp.table.storage_descriptor.columns[0].type #=> String
+    #   resp.table.storage_descriptor.columns[0].comment #=> String
+    #   resp.table.storage_descriptor.columns[0].parameters #=> Hash
+    #   resp.table.storage_descriptor.columns[0].parameters["KeyString"] #=> String
+    #   resp.table.storage_descriptor.location #=> String
+    #   resp.table.storage_descriptor.additional_locations #=> Array
+    #   resp.table.storage_descriptor.additional_locations[0] #=> String
+    #   resp.table.storage_descriptor.input_format #=> String
+    #   resp.table.storage_descriptor.output_format #=> String
+    #   resp.table.storage_descriptor.compressed #=> Boolean
+    #   resp.table.storage_descriptor.number_of_buckets #=> Integer
+    #   resp.table.storage_descriptor.serde_info.name #=> String
+    #   resp.table.storage_descriptor.serde_info.serialization_library #=> String
+    #   resp.table.storage_descriptor.serde_info.parameters #=> Hash
+    #   resp.table.storage_descriptor.serde_info.parameters["KeyString"] #=> String
+    #   resp.table.storage_descriptor.bucket_columns #=> Array
+    #   resp.table.storage_descriptor.bucket_columns[0] #=> String
+    #   resp.table.storage_descriptor.sort_columns #=> Array
+    #   resp.table.storage_descriptor.sort_columns[0].column #=> String
+    #   resp.table.storage_descriptor.sort_columns[0].sort_order #=> Integer
+    #   resp.table.storage_descriptor.parameters #=> Hash
+    #   resp.table.storage_descriptor.parameters["KeyString"] #=> String
+    #   resp.table.storage_descriptor.skewed_info.skewed_column_names #=> Array
+    #   resp.table.storage_descriptor.skewed_info.skewed_column_names[0] #=> String
+    #   resp.table.storage_descriptor.skewed_info.skewed_column_values #=> Array
+    #   resp.table.storage_descriptor.skewed_info.skewed_column_values[0] #=> String
+    #   resp.table.storage_descriptor.skewed_info.skewed_column_value_location_maps #=> Hash
+    #   resp.table.storage_descriptor.skewed_info.skewed_column_value_location_maps["ColumnValuesString"] #=> String
+    #   resp.table.storage_descriptor.stored_as_sub_directories #=> Boolean
+    #   resp.table.storage_descriptor.schema_reference.schema_id.schema_arn #=> String
+    #   resp.table.storage_descriptor.schema_reference.schema_id.schema_name #=> String
+    #   resp.table.storage_descriptor.schema_reference.schema_id.registry_name #=> String
+    #   resp.table.storage_descriptor.schema_reference.schema_version_id #=> String
+    #   resp.table.storage_descriptor.schema_reference.schema_version_number #=> Integer
+    #   resp.table.partition_keys #=> Array
+    #   resp.table.partition_keys[0].name #=> String
+    #   resp.table.partition_keys[0].type #=> String
+    #   resp.table.partition_keys[0].comment #=> String
+    #   resp.table.partition_keys[0].parameters #=> Hash
+    #   resp.table.partition_keys[0].parameters["KeyString"] #=> String
+    #   resp.table.view_original_text #=> String
+    #   resp.table.view_expanded_text #=> String
+    #   resp.table.table_type #=> String
+    #   resp.table.parameters #=> Hash
+    #   resp.table.parameters["KeyString"] #=> String
+    #   resp.table.created_by #=> String
+    #   resp.table.is_registered_with_lake_formation #=> Boolean
+    #   resp.table.target_table.catalog_id #=> String
+    #   resp.table.target_table.database_name #=> String
+    #   resp.table.target_table.name #=> String
+    #   resp.table.target_table.region #=> String
+    #   resp.table.catalog_id #=> String
+    #   resp.table.version_id #=> String
+    #   resp.table.federated_table.identifier #=> String
+    #   resp.table.federated_table.database_identifier #=> String
+    #   resp.table.federated_table.connection_name #=> String
+    #   resp.table.view_definition.is_protected #=> Boolean
+    #   resp.table.view_definition.definer #=> String
+    #   resp.table.view_definition.sub_objects #=> Array
+    #   resp.table.view_definition.sub_objects[0] #=> String
+    #   resp.table.view_definition.representations #=> Array
+    #   resp.table.view_definition.representations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table.view_definition.representations[0].dialect_version #=> String
+    #   resp.table.view_definition.representations[0].view_original_text #=> String
+    #   resp.table.view_definition.representations[0].view_expanded_text #=> String
+    #   resp.table.view_definition.representations[0].validation_connection #=> String
+    #   resp.table.view_definition.representations[0].is_stale #=> Boolean
+    #   resp.table.is_multi_dialect_view #=> Boolean
+    #   resp.table.status.requested_by #=> String
+    #   resp.table.status.updated_by #=> String
+    #   resp.table.status.request_time #=> Time
+    #   resp.table.status.update_time #=> Time
+    #   resp.table.status.action #=> String, one of "UPDATE", "CREATE"
+    #   resp.table.status.state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table.status.error.error_code #=> String
+    #   resp.table.status.error.error_message #=> String
+    #   resp.table.status.details.requested_change #=> Types::Table
+    #   resp.table.status.details.view_validations #=> Array
+    #   resp.table.status.details.view_validations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table.status.details.view_validations[0].dialect_version #=> String
+    #   resp.table.status.details.view_validations[0].view_validation_text #=> String
+    #   resp.table.status.details.view_validations[0].update_time #=> Time
+    #   resp.table.status.details.view_validations[0].state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table.status.details.view_validations[0].error.error_code #=> String
+    #   resp.table.status.details.view_validations[0].error.error_message #=> String
+    #   resp.authorized_columns #=> Array
+    #   resp.authorized_columns[0] #=> String
+    #   resp.is_registered_with_lake_formation #=> Boolean
+    #   resp.cell_filters #=> Array
+    #   resp.cell_filters[0].column_name #=> String
+    #   resp.cell_filters[0].row_filter_expression #=> String
+    #   resp.query_authorization_id #=> String
+    #   resp.is_multi_dialect_view #=> Boolean
+    #   resp.resource_arn #=> String
+    #   resp.is_protected #=> Boolean
+    #   resp.permissions #=> Array
+    #   resp.permissions[0] #=> String, one of "ALL", "SELECT", "ALTER", "DROP", "DELETE", "INSERT", "CREATE_DATABASE", "CREATE_TABLE", "DATA_LOCATION_ACCESS"
+    #   resp.row_filter #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetUnfilteredTableMetadata AWS API Documentation
+    #
+    # @overload get_unfiltered_table_metadata(params = {})
+    # @param [Hash] params ({})
+    def get_unfiltered_table_metadata(params = {}, options = {})
+      req = build_request(:get_unfiltered_table_metadata, params)
+      req.send_request(options)
+    end
+
+    # Retrieves information about the specified Glue usage profile.
+    #
+    # @option params [required, String] :name
+    #   The name of the usage profile to retrieve.
+    #
+    # @return [Types::GetUsageProfileResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetUsageProfileResponse#name #name} => String
+    #   * {Types::GetUsageProfileResponse#description #description} => String
+    #   * {Types::GetUsageProfileResponse#configuration #configuration} => Types::ProfileConfiguration
+    #   * {Types::GetUsageProfileResponse#created_on #created_on} => Time
+    #   * {Types::GetUsageProfileResponse#last_modified_on #last_modified_on} => Time
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_usage_profile({
+    #     name: "NameString", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #   resp.description #=> String
+    #   resp.configuration.session_configuration #=> Hash
+    #   resp.configuration.session_configuration["NameString"].default_value #=> String
+    #   resp.configuration.session_configuration["NameString"].allowed_values #=> Array
+    #   resp.configuration.session_configuration["NameString"].allowed_values[0] #=> String
+    #   resp.configuration.session_configuration["NameString"].min_value #=> String
+    #   resp.configuration.session_configuration["NameString"].max_value #=> String
+    #   resp.configuration.job_configuration #=> Hash
+    #   resp.configuration.job_configuration["NameString"].default_value #=> String
+    #   resp.configuration.job_configuration["NameString"].allowed_values #=> Array
+    #   resp.configuration.job_configuration["NameString"].allowed_values[0] #=> String
+    #   resp.configuration.job_configuration["NameString"].min_value #=> String
+    #   resp.configuration.job_configuration["NameString"].max_value #=> String
+    #   resp.created_on #=> Time
+    #   resp.last_modified_on #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetUsageProfile AWS API Documentation
+    #
+    # @overload get_usage_profile(params = {})
+    # @param [Hash] params ({})
+    def get_usage_profile(params = {}, options = {})
+      req = build_request(:get_usage_profile, params)
+      req.send_request(options)
+    end
+
     # Retrieves a specified function definition from the Data Catalog.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the function to be retrieved is
-    #   located. If none is provided, the AWS account ID is used by default.
+    #   located. If none is provided, the Amazon Web Services account ID is
+    #   used by default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the function is located.
@@ -6975,7 +12743,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the functions to be retrieved are
-    #   located. If none is provided, the AWS account ID is used by default.
+    #   located. If none is provided, the Amazon Web Services account ID is
+    #   used by default.
     #
     # @option params [String] :database_name
     #   The name of the catalog database where the functions are located. If
@@ -7076,6 +12845,8 @@ module Aws::Glue
     #   resp.workflow.last_run.statistics.stopped_actions #=> Integer
     #   resp.workflow.last_run.statistics.succeeded_actions #=> Integer
     #   resp.workflow.last_run.statistics.running_actions #=> Integer
+    #   resp.workflow.last_run.statistics.errored_actions #=> Integer
+    #   resp.workflow.last_run.statistics.waiting_actions #=> Integer
     #   resp.workflow.last_run.graph.nodes #=> Array
     #   resp.workflow.last_run.graph.nodes[0].type #=> String, one of "CRAWLER", "JOB", "TRIGGER"
     #   resp.workflow.last_run.graph.nodes[0].name #=> String
@@ -7083,7 +12854,7 @@ module Aws::Glue
     #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.name #=> String
     #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.workflow_name #=> String
     #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.id #=> String
-    #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND"
+    #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND", "EVENT"
     #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.state #=> String, one of "CREATING", "CREATED", "ACTIVATING", "ACTIVATED", "DEACTIVATING", "DEACTIVATED", "DELETING", "UPDATING"
     #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.description #=> String
     #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.schedule #=> String
@@ -7099,19 +12870,23 @@ module Aws::Glue
     #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions #=> Array
     #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].logical_operator #=> String, one of "EQUALS"
     #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].job_name #=> String
-    #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawler_name #=> String
-    #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
+    #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_size #=> Integer
+    #   resp.workflow.last_run.graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_window #=> Integer
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs #=> Array
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].id #=> String
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].attempt #=> Integer
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].previous_run_id #=> String
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].trigger_name #=> String
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].job_name #=> String
+    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].job_run_queuing_enabled #=> Boolean
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].started_on #=> Time
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].last_modified_on #=> Time
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].completed_on #=> Time
-    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].arguments #=> Hash
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].arguments["GenericString"] #=> String
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].error_message #=> String
@@ -7122,14 +12897,19 @@ module Aws::Glue
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].execution_time #=> Integer
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].timeout #=> Integer
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].max_capacity #=> Float
-    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].number_of_workers #=> Integer
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].security_configuration #=> String
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].log_group_name #=> String
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].notification_property.notify_delay_after #=> Integer
     #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].glue_version #=> String
+    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].dpu_seconds #=> Float
+    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].maintenance_window #=> String
+    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].profile_name #=> String
+    #   resp.workflow.last_run.graph.nodes[0].job_details.job_runs[0].state_detail #=> String
     #   resp.workflow.last_run.graph.nodes[0].crawler_details.crawls #=> Array
-    #   resp.workflow.last_run.graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.workflow.last_run.graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
     #   resp.workflow.last_run.graph.nodes[0].crawler_details.crawls[0].started_on #=> Time
     #   resp.workflow.last_run.graph.nodes[0].crawler_details.crawls[0].completed_on #=> Time
     #   resp.workflow.last_run.graph.nodes[0].crawler_details.crawls[0].error_message #=> String
@@ -7138,6 +12918,8 @@ module Aws::Glue
     #   resp.workflow.last_run.graph.edges #=> Array
     #   resp.workflow.last_run.graph.edges[0].source_id #=> String
     #   resp.workflow.last_run.graph.edges[0].destination_id #=> String
+    #   resp.workflow.last_run.starting_event_batch_condition.batch_size #=> Integer
+    #   resp.workflow.last_run.starting_event_batch_condition.batch_window #=> Integer
     #   resp.workflow.graph.nodes #=> Array
     #   resp.workflow.graph.nodes[0].type #=> String, one of "CRAWLER", "JOB", "TRIGGER"
     #   resp.workflow.graph.nodes[0].name #=> String
@@ -7145,7 +12927,7 @@ module Aws::Glue
     #   resp.workflow.graph.nodes[0].trigger_details.trigger.name #=> String
     #   resp.workflow.graph.nodes[0].trigger_details.trigger.workflow_name #=> String
     #   resp.workflow.graph.nodes[0].trigger_details.trigger.id #=> String
-    #   resp.workflow.graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND"
+    #   resp.workflow.graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND", "EVENT"
     #   resp.workflow.graph.nodes[0].trigger_details.trigger.state #=> String, one of "CREATING", "CREATED", "ACTIVATING", "ACTIVATED", "DEACTIVATING", "DEACTIVATED", "DELETING", "UPDATING"
     #   resp.workflow.graph.nodes[0].trigger_details.trigger.description #=> String
     #   resp.workflow.graph.nodes[0].trigger_details.trigger.schedule #=> String
@@ -7161,19 +12943,23 @@ module Aws::Glue
     #   resp.workflow.graph.nodes[0].trigger_details.trigger.predicate.conditions #=> Array
     #   resp.workflow.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].logical_operator #=> String, one of "EQUALS"
     #   resp.workflow.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].job_name #=> String
-    #   resp.workflow.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.workflow.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.workflow.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawler_name #=> String
-    #   resp.workflow.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.workflow.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
+    #   resp.workflow.graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_size #=> Integer
+    #   resp.workflow.graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_window #=> Integer
     #   resp.workflow.graph.nodes[0].job_details.job_runs #=> Array
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].id #=> String
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].attempt #=> Integer
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].previous_run_id #=> String
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].trigger_name #=> String
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].job_name #=> String
+    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].job_run_queuing_enabled #=> Boolean
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].started_on #=> Time
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].last_modified_on #=> Time
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].completed_on #=> Time
-    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].arguments #=> Hash
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].arguments["GenericString"] #=> String
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].error_message #=> String
@@ -7184,14 +12970,19 @@ module Aws::Glue
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].execution_time #=> Integer
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].timeout #=> Integer
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].max_capacity #=> Float
-    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].number_of_workers #=> Integer
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].security_configuration #=> String
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].log_group_name #=> String
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].notification_property.notify_delay_after #=> Integer
     #   resp.workflow.graph.nodes[0].job_details.job_runs[0].glue_version #=> String
+    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].dpu_seconds #=> Float
+    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].maintenance_window #=> String
+    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].profile_name #=> String
+    #   resp.workflow.graph.nodes[0].job_details.job_runs[0].state_detail #=> String
     #   resp.workflow.graph.nodes[0].crawler_details.crawls #=> Array
-    #   resp.workflow.graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.workflow.graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
     #   resp.workflow.graph.nodes[0].crawler_details.crawls[0].started_on #=> Time
     #   resp.workflow.graph.nodes[0].crawler_details.crawls[0].completed_on #=> Time
     #   resp.workflow.graph.nodes[0].crawler_details.crawls[0].error_message #=> String
@@ -7201,6 +12992,8 @@ module Aws::Glue
     #   resp.workflow.graph.edges[0].source_id #=> String
     #   resp.workflow.graph.edges[0].destination_id #=> String
     #   resp.workflow.max_concurrent_runs #=> Integer
+    #   resp.workflow.blueprint_details.blueprint_name #=> String
+    #   resp.workflow.blueprint_details.run_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetWorkflow AWS API Documentation
     #
@@ -7211,7 +13004,8 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Retrieves the metadata for a given workflow run.
+    # Retrieves the metadata for a given workflow run. Job run history is
+    # accessible for 90 days for your workflow and job run.
     #
     # @option params [required, String] :name
     #   Name of the workflow being run.
@@ -7251,6 +13045,8 @@ module Aws::Glue
     #   resp.run.statistics.stopped_actions #=> Integer
     #   resp.run.statistics.succeeded_actions #=> Integer
     #   resp.run.statistics.running_actions #=> Integer
+    #   resp.run.statistics.errored_actions #=> Integer
+    #   resp.run.statistics.waiting_actions #=> Integer
     #   resp.run.graph.nodes #=> Array
     #   resp.run.graph.nodes[0].type #=> String, one of "CRAWLER", "JOB", "TRIGGER"
     #   resp.run.graph.nodes[0].name #=> String
@@ -7258,7 +13054,7 @@ module Aws::Glue
     #   resp.run.graph.nodes[0].trigger_details.trigger.name #=> String
     #   resp.run.graph.nodes[0].trigger_details.trigger.workflow_name #=> String
     #   resp.run.graph.nodes[0].trigger_details.trigger.id #=> String
-    #   resp.run.graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND"
+    #   resp.run.graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND", "EVENT"
     #   resp.run.graph.nodes[0].trigger_details.trigger.state #=> String, one of "CREATING", "CREATED", "ACTIVATING", "ACTIVATED", "DEACTIVATING", "DEACTIVATED", "DELETING", "UPDATING"
     #   resp.run.graph.nodes[0].trigger_details.trigger.description #=> String
     #   resp.run.graph.nodes[0].trigger_details.trigger.schedule #=> String
@@ -7274,19 +13070,23 @@ module Aws::Glue
     #   resp.run.graph.nodes[0].trigger_details.trigger.predicate.conditions #=> Array
     #   resp.run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].logical_operator #=> String, one of "EQUALS"
     #   resp.run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].job_name #=> String
-    #   resp.run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawler_name #=> String
-    #   resp.run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.run.graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
+    #   resp.run.graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_size #=> Integer
+    #   resp.run.graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_window #=> Integer
     #   resp.run.graph.nodes[0].job_details.job_runs #=> Array
     #   resp.run.graph.nodes[0].job_details.job_runs[0].id #=> String
     #   resp.run.graph.nodes[0].job_details.job_runs[0].attempt #=> Integer
     #   resp.run.graph.nodes[0].job_details.job_runs[0].previous_run_id #=> String
     #   resp.run.graph.nodes[0].job_details.job_runs[0].trigger_name #=> String
     #   resp.run.graph.nodes[0].job_details.job_runs[0].job_name #=> String
+    #   resp.run.graph.nodes[0].job_details.job_runs[0].job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.run.graph.nodes[0].job_details.job_runs[0].job_run_queuing_enabled #=> Boolean
     #   resp.run.graph.nodes[0].job_details.job_runs[0].started_on #=> Time
     #   resp.run.graph.nodes[0].job_details.job_runs[0].last_modified_on #=> Time
     #   resp.run.graph.nodes[0].job_details.job_runs[0].completed_on #=> Time
-    #   resp.run.graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.run.graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.run.graph.nodes[0].job_details.job_runs[0].arguments #=> Hash
     #   resp.run.graph.nodes[0].job_details.job_runs[0].arguments["GenericString"] #=> String
     #   resp.run.graph.nodes[0].job_details.job_runs[0].error_message #=> String
@@ -7297,14 +13097,19 @@ module Aws::Glue
     #   resp.run.graph.nodes[0].job_details.job_runs[0].execution_time #=> Integer
     #   resp.run.graph.nodes[0].job_details.job_runs[0].timeout #=> Integer
     #   resp.run.graph.nodes[0].job_details.job_runs[0].max_capacity #=> Float
-    #   resp.run.graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.run.graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.run.graph.nodes[0].job_details.job_runs[0].number_of_workers #=> Integer
     #   resp.run.graph.nodes[0].job_details.job_runs[0].security_configuration #=> String
     #   resp.run.graph.nodes[0].job_details.job_runs[0].log_group_name #=> String
     #   resp.run.graph.nodes[0].job_details.job_runs[0].notification_property.notify_delay_after #=> Integer
     #   resp.run.graph.nodes[0].job_details.job_runs[0].glue_version #=> String
+    #   resp.run.graph.nodes[0].job_details.job_runs[0].dpu_seconds #=> Float
+    #   resp.run.graph.nodes[0].job_details.job_runs[0].execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.run.graph.nodes[0].job_details.job_runs[0].maintenance_window #=> String
+    #   resp.run.graph.nodes[0].job_details.job_runs[0].profile_name #=> String
+    #   resp.run.graph.nodes[0].job_details.job_runs[0].state_detail #=> String
     #   resp.run.graph.nodes[0].crawler_details.crawls #=> Array
-    #   resp.run.graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.run.graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
     #   resp.run.graph.nodes[0].crawler_details.crawls[0].started_on #=> Time
     #   resp.run.graph.nodes[0].crawler_details.crawls[0].completed_on #=> Time
     #   resp.run.graph.nodes[0].crawler_details.crawls[0].error_message #=> String
@@ -7313,6 +13118,8 @@ module Aws::Glue
     #   resp.run.graph.edges #=> Array
     #   resp.run.graph.edges[0].source_id #=> String
     #   resp.run.graph.edges[0].destination_id #=> String
+    #   resp.run.starting_event_batch_condition.batch_size #=> Integer
+    #   resp.run.starting_event_batch_condition.batch_window #=> Integer
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetWorkflowRun AWS API Documentation
     #
@@ -7404,6 +13211,8 @@ module Aws::Glue
     #   resp.runs[0].statistics.stopped_actions #=> Integer
     #   resp.runs[0].statistics.succeeded_actions #=> Integer
     #   resp.runs[0].statistics.running_actions #=> Integer
+    #   resp.runs[0].statistics.errored_actions #=> Integer
+    #   resp.runs[0].statistics.waiting_actions #=> Integer
     #   resp.runs[0].graph.nodes #=> Array
     #   resp.runs[0].graph.nodes[0].type #=> String, one of "CRAWLER", "JOB", "TRIGGER"
     #   resp.runs[0].graph.nodes[0].name #=> String
@@ -7411,7 +13220,7 @@ module Aws::Glue
     #   resp.runs[0].graph.nodes[0].trigger_details.trigger.name #=> String
     #   resp.runs[0].graph.nodes[0].trigger_details.trigger.workflow_name #=> String
     #   resp.runs[0].graph.nodes[0].trigger_details.trigger.id #=> String
-    #   resp.runs[0].graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND"
+    #   resp.runs[0].graph.nodes[0].trigger_details.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND", "EVENT"
     #   resp.runs[0].graph.nodes[0].trigger_details.trigger.state #=> String, one of "CREATING", "CREATED", "ACTIVATING", "ACTIVATED", "DEACTIVATING", "DEACTIVATED", "DELETING", "UPDATING"
     #   resp.runs[0].graph.nodes[0].trigger_details.trigger.description #=> String
     #   resp.runs[0].graph.nodes[0].trigger_details.trigger.schedule #=> String
@@ -7427,19 +13236,23 @@ module Aws::Glue
     #   resp.runs[0].graph.nodes[0].trigger_details.trigger.predicate.conditions #=> Array
     #   resp.runs[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].logical_operator #=> String, one of "EQUALS"
     #   resp.runs[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].job_name #=> String
-    #   resp.runs[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.runs[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.runs[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawler_name #=> String
-    #   resp.runs[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.runs[0].graph.nodes[0].trigger_details.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
+    #   resp.runs[0].graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_size #=> Integer
+    #   resp.runs[0].graph.nodes[0].trigger_details.trigger.event_batching_condition.batch_window #=> Integer
     #   resp.runs[0].graph.nodes[0].job_details.job_runs #=> Array
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].id #=> String
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].attempt #=> Integer
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].previous_run_id #=> String
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].trigger_name #=> String
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].job_name #=> String
+    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].job_mode #=> String, one of "SCRIPT", "VISUAL", "NOTEBOOK"
+    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].job_run_queuing_enabled #=> Boolean
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].started_on #=> Time
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].last_modified_on #=> Time
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].completed_on #=> Time
-    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].job_run_state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].arguments #=> Hash
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].arguments["GenericString"] #=> String
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].error_message #=> String
@@ -7450,14 +13263,19 @@ module Aws::Glue
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].execution_time #=> Integer
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].timeout #=> Integer
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].max_capacity #=> Float
-    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X"
+    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].number_of_workers #=> Integer
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].security_configuration #=> String
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].log_group_name #=> String
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].notification_property.notify_delay_after #=> Integer
     #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].glue_version #=> String
+    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].dpu_seconds #=> Float
+    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].execution_class #=> String, one of "FLEX", "STANDARD"
+    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].maintenance_window #=> String
+    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].profile_name #=> String
+    #   resp.runs[0].graph.nodes[0].job_details.job_runs[0].state_detail #=> String
     #   resp.runs[0].graph.nodes[0].crawler_details.crawls #=> Array
-    #   resp.runs[0].graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.runs[0].graph.nodes[0].crawler_details.crawls[0].state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
     #   resp.runs[0].graph.nodes[0].crawler_details.crawls[0].started_on #=> Time
     #   resp.runs[0].graph.nodes[0].crawler_details.crawls[0].completed_on #=> Time
     #   resp.runs[0].graph.nodes[0].crawler_details.crawls[0].error_message #=> String
@@ -7466,6 +13284,8 @@ module Aws::Glue
     #   resp.runs[0].graph.edges #=> Array
     #   resp.runs[0].graph.edges[0].source_id #=> String
     #   resp.runs[0].graph.edges[0].destination_id #=> String
+    #   resp.runs[0].starting_event_batch_condition.batch_size #=> Integer
+    #   resp.runs[0].starting_event_batch_condition.batch_window #=> Integer
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/GetWorkflowRuns AWS API Documentation
@@ -7477,11 +13297,11 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Imports an existing Amazon Athena Data Catalog to AWS Glue
+    # Imports an existing Amazon Athena Data Catalog to Glue.
     #
     # @option params [String] :catalog_id
-    #   The ID of the catalog to import. Currently, this should be the AWS
-    #   account ID.
+    #   The ID of the catalog to import. Currently, this should be the Amazon
+    #   Web Services account ID.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -7500,9 +13320,90 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Retrieves the names of all crawler resources in this AWS account, or
-    # the resources with the specified tag. This operation allows you to see
-    # which resources are available in your account, and their names.
+    # Lists all the blueprint names in an account.
+    #
+    # @option params [String] :next_token
+    #   A continuation token, if this is a continuation request.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of a list to return.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Filters the list by an Amazon Web Services resource tag.
+    #
+    # @return [Types::ListBlueprintsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListBlueprintsResponse#blueprints #blueprints} => Array&lt;String&gt;
+    #   * {Types::ListBlueprintsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_blueprints({
+    #     next_token: "GenericString",
+    #     max_results: 1,
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.blueprints #=> Array
+    #   resp.blueprints[0] #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListBlueprints AWS API Documentation
+    #
+    # @overload list_blueprints(params = {})
+    # @param [Hash] params ({})
+    def list_blueprints(params = {}, options = {})
+      req = build_request(:list_blueprints, params)
+      req.send_request(options)
+    end
+
+    # List all task runs for a particular account.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of the response.
+    #
+    # @option params [String] :next_token
+    #   A continuation token, if this is a continuation call.
+    #
+    # @return [Types::ListColumnStatisticsTaskRunsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListColumnStatisticsTaskRunsResponse#column_statistics_task_run_ids #column_statistics_task_run_ids} => Array&lt;String&gt;
+    #   * {Types::ListColumnStatisticsTaskRunsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_column_statistics_task_runs({
+    #     max_results: 1,
+    #     next_token: "Token",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.column_statistics_task_run_ids #=> Array
+    #   resp.column_statistics_task_run_ids[0] #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListColumnStatisticsTaskRuns AWS API Documentation
+    #
+    # @overload list_column_statistics_task_runs(params = {})
+    # @param [Hash] params ({})
+    def list_column_statistics_task_runs(params = {}, options = {})
+      req = build_request(:list_column_statistics_task_runs, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the names of all crawler resources in this Amazon Web
+    # Services account, or the resources with the specified tag. This
+    # operation allows you to see which resources are available in your
+    # account, and their names.
     #
     # This operation takes the optional `Tags` field, which you can use as a
     # filter on the response so that tagged resources can be retrieved as a
@@ -7550,10 +13451,512 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Retrieves the names of all `DevEndpoint` resources in this AWS
-    # account, or the resources with the specified tag. This operation
-    # allows you to see which resources are available in your account, and
-    # their names.
+    # Returns all the crawls of a specified crawler. Returns only the crawls
+    # that have occurred since the launch date of the crawler history
+    # feature, and only retains up to 12 months of crawls. Older crawls will
+    # not be returned.
+    #
+    # You may use this API to:
+    #
+    # * Retrive all the crawls of a specified crawler.
+    #
+    # * Retrieve all the crawls of a specified crawler within a limited
+    #   count.
+    #
+    # * Retrieve all the crawls of a specified crawler in a specific time
+    #   range.
+    #
+    # * Retrieve all the crawls of a specified crawler with a particular
+    #   state, crawl ID, or DPU hour value.
+    #
+    # @option params [required, String] :crawler_name
+    #   The name of the crawler whose runs you want to retrieve.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return. The default is 20, and
+    #   maximum is 100.
+    #
+    # @option params [Array<Types::CrawlsFilter>] :filters
+    #   Filters the crawls by the criteria you specify in a list of
+    #   `CrawlsFilter` objects.
+    #
+    # @option params [String] :next_token
+    #   A continuation token, if this is a continuation call.
+    #
+    # @return [Types::ListCrawlsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListCrawlsResponse#crawls #crawls} => Array&lt;Types::CrawlerHistory&gt;
+    #   * {Types::ListCrawlsResponse#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_crawls({
+    #     crawler_name: "NameString", # required
+    #     max_results: 1,
+    #     filters: [
+    #       {
+    #         field_name: "CRAWL_ID", # accepts CRAWL_ID, STATE, START_TIME, END_TIME, DPU_HOUR
+    #         filter_operator: "GT", # accepts GT, GE, LT, LE, EQ, NE
+    #         field_value: "GenericString",
+    #       },
+    #     ],
+    #     next_token: "Token",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.crawls #=> Array
+    #   resp.crawls[0].crawl_id #=> String
+    #   resp.crawls[0].state #=> String, one of "RUNNING", "COMPLETED", "FAILED", "STOPPED"
+    #   resp.crawls[0].start_time #=> Time
+    #   resp.crawls[0].end_time #=> Time
+    #   resp.crawls[0].summary #=> String
+    #   resp.crawls[0].error_message #=> String
+    #   resp.crawls[0].log_group #=> String
+    #   resp.crawls[0].log_stream #=> String
+    #   resp.crawls[0].message_prefix #=> String
+    #   resp.crawls[0].dpu_hour #=> Float
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListCrawls AWS API Documentation
+    #
+    # @overload list_crawls(params = {})
+    # @param [Hash] params ({})
+    def list_crawls(params = {}, options = {})
+      req = build_request(:list_crawls, params)
+      req.send_request(options)
+    end
+
+    # Lists all the custom patterns that have been created.
+    #
+    # @option params [String] :next_token
+    #   A paginated token to offset the results.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   A list of key-value pair tags.
+    #
+    # @return [Types::ListCustomEntityTypesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListCustomEntityTypesResponse#custom_entity_types #custom_entity_types} => Array&lt;Types::CustomEntityType&gt;
+    #   * {Types::ListCustomEntityTypesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_custom_entity_types({
+    #     next_token: "PaginationToken",
+    #     max_results: 1,
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.custom_entity_types #=> Array
+    #   resp.custom_entity_types[0].name #=> String
+    #   resp.custom_entity_types[0].regex_string #=> String
+    #   resp.custom_entity_types[0].context_words #=> Array
+    #   resp.custom_entity_types[0].context_words[0] #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListCustomEntityTypes AWS API Documentation
+    #
+    # @overload list_custom_entity_types(params = {})
+    # @param [Hash] params ({})
+    def list_custom_entity_types(params = {}, options = {})
+      req = build_request(:list_custom_entity_types, params)
+      req.send_request(options)
+    end
+
+    # Returns all data quality execution results for your account.
+    #
+    # @option params [Types::DataQualityResultFilterCriteria] :filter
+    #   The filter criteria.
+    #
+    # @option params [String] :next_token
+    #   A paginated token to offset the results.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return.
+    #
+    # @return [Types::ListDataQualityResultsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListDataQualityResultsResponse#results #results} => Array&lt;Types::DataQualityResultDescription&gt;
+    #   * {Types::ListDataQualityResultsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_data_quality_results({
+    #     filter: {
+    #       data_source: {
+    #         glue_table: { # required
+    #           database_name: "NameString", # required
+    #           table_name: "NameString", # required
+    #           catalog_id: "NameString",
+    #           connection_name: "NameString",
+    #           additional_options: {
+    #             "NameString" => "DescriptionString",
+    #           },
+    #         },
+    #       },
+    #       job_name: "NameString",
+    #       job_run_id: "HashString",
+    #       started_after: Time.now,
+    #       started_before: Time.now,
+    #     },
+    #     next_token: "PaginationToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.results #=> Array
+    #   resp.results[0].result_id #=> String
+    #   resp.results[0].data_source.glue_table.database_name #=> String
+    #   resp.results[0].data_source.glue_table.table_name #=> String
+    #   resp.results[0].data_source.glue_table.catalog_id #=> String
+    #   resp.results[0].data_source.glue_table.connection_name #=> String
+    #   resp.results[0].data_source.glue_table.additional_options #=> Hash
+    #   resp.results[0].data_source.glue_table.additional_options["NameString"] #=> String
+    #   resp.results[0].job_name #=> String
+    #   resp.results[0].job_run_id #=> String
+    #   resp.results[0].started_on #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListDataQualityResults AWS API Documentation
+    #
+    # @overload list_data_quality_results(params = {})
+    # @param [Hash] params ({})
+    def list_data_quality_results(params = {}, options = {})
+      req = build_request(:list_data_quality_results, params)
+      req.send_request(options)
+    end
+
+    # Lists the recommendation runs meeting the filter criteria.
+    #
+    # @option params [Types::DataQualityRuleRecommendationRunFilter] :filter
+    #   The filter criteria.
+    #
+    # @option params [String] :next_token
+    #   A paginated token to offset the results.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return.
+    #
+    # @return [Types::ListDataQualityRuleRecommendationRunsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListDataQualityRuleRecommendationRunsResponse#runs #runs} => Array&lt;Types::DataQualityRuleRecommendationRunDescription&gt;
+    #   * {Types::ListDataQualityRuleRecommendationRunsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_data_quality_rule_recommendation_runs({
+    #     filter: {
+    #       data_source: { # required
+    #         glue_table: { # required
+    #           database_name: "NameString", # required
+    #           table_name: "NameString", # required
+    #           catalog_id: "NameString",
+    #           connection_name: "NameString",
+    #           additional_options: {
+    #             "NameString" => "DescriptionString",
+    #           },
+    #         },
+    #       },
+    #       started_before: Time.now,
+    #       started_after: Time.now,
+    #     },
+    #     next_token: "PaginationToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.runs #=> Array
+    #   resp.runs[0].run_id #=> String
+    #   resp.runs[0].status #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.runs[0].started_on #=> Time
+    #   resp.runs[0].data_source.glue_table.database_name #=> String
+    #   resp.runs[0].data_source.glue_table.table_name #=> String
+    #   resp.runs[0].data_source.glue_table.catalog_id #=> String
+    #   resp.runs[0].data_source.glue_table.connection_name #=> String
+    #   resp.runs[0].data_source.glue_table.additional_options #=> Hash
+    #   resp.runs[0].data_source.glue_table.additional_options["NameString"] #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListDataQualityRuleRecommendationRuns AWS API Documentation
+    #
+    # @overload list_data_quality_rule_recommendation_runs(params = {})
+    # @param [Hash] params ({})
+    def list_data_quality_rule_recommendation_runs(params = {}, options = {})
+      req = build_request(:list_data_quality_rule_recommendation_runs, params)
+      req.send_request(options)
+    end
+
+    # Lists all the runs meeting the filter criteria, where a ruleset is
+    # evaluated against a data source.
+    #
+    # @option params [Types::DataQualityRulesetEvaluationRunFilter] :filter
+    #   The filter criteria.
+    #
+    # @option params [String] :next_token
+    #   A paginated token to offset the results.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return.
+    #
+    # @return [Types::ListDataQualityRulesetEvaluationRunsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListDataQualityRulesetEvaluationRunsResponse#runs #runs} => Array&lt;Types::DataQualityRulesetEvaluationRunDescription&gt;
+    #   * {Types::ListDataQualityRulesetEvaluationRunsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_data_quality_ruleset_evaluation_runs({
+    #     filter: {
+    #       data_source: { # required
+    #         glue_table: { # required
+    #           database_name: "NameString", # required
+    #           table_name: "NameString", # required
+    #           catalog_id: "NameString",
+    #           connection_name: "NameString",
+    #           additional_options: {
+    #             "NameString" => "DescriptionString",
+    #           },
+    #         },
+    #       },
+    #       started_before: Time.now,
+    #       started_after: Time.now,
+    #     },
+    #     next_token: "PaginationToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.runs #=> Array
+    #   resp.runs[0].run_id #=> String
+    #   resp.runs[0].status #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.runs[0].started_on #=> Time
+    #   resp.runs[0].data_source.glue_table.database_name #=> String
+    #   resp.runs[0].data_source.glue_table.table_name #=> String
+    #   resp.runs[0].data_source.glue_table.catalog_id #=> String
+    #   resp.runs[0].data_source.glue_table.connection_name #=> String
+    #   resp.runs[0].data_source.glue_table.additional_options #=> Hash
+    #   resp.runs[0].data_source.glue_table.additional_options["NameString"] #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListDataQualityRulesetEvaluationRuns AWS API Documentation
+    #
+    # @overload list_data_quality_ruleset_evaluation_runs(params = {})
+    # @param [Hash] params ({})
+    def list_data_quality_ruleset_evaluation_runs(params = {}, options = {})
+      req = build_request(:list_data_quality_ruleset_evaluation_runs, params)
+      req.send_request(options)
+    end
+
+    # Returns a paginated list of rulesets for the specified list of Glue
+    # tables.
+    #
+    # @option params [String] :next_token
+    #   A paginated token to offset the results.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return.
+    #
+    # @option params [Types::DataQualityRulesetFilterCriteria] :filter
+    #   The filter criteria.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   A list of key-value pair tags.
+    #
+    # @return [Types::ListDataQualityRulesetsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListDataQualityRulesetsResponse#rulesets #rulesets} => Array&lt;Types::DataQualityRulesetListDetails&gt;
+    #   * {Types::ListDataQualityRulesetsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_data_quality_rulesets({
+    #     next_token: "PaginationToken",
+    #     max_results: 1,
+    #     filter: {
+    #       name: "NameString",
+    #       description: "DescriptionString",
+    #       created_before: Time.now,
+    #       created_after: Time.now,
+    #       last_modified_before: Time.now,
+    #       last_modified_after: Time.now,
+    #       target_table: {
+    #         table_name: "NameString", # required
+    #         database_name: "NameString", # required
+    #         catalog_id: "NameString",
+    #       },
+    #     },
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.rulesets #=> Array
+    #   resp.rulesets[0].name #=> String
+    #   resp.rulesets[0].description #=> String
+    #   resp.rulesets[0].created_on #=> Time
+    #   resp.rulesets[0].last_modified_on #=> Time
+    #   resp.rulesets[0].target_table.table_name #=> String
+    #   resp.rulesets[0].target_table.database_name #=> String
+    #   resp.rulesets[0].target_table.catalog_id #=> String
+    #   resp.rulesets[0].recommendation_run_id #=> String
+    #   resp.rulesets[0].rule_count #=> Integer
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListDataQualityRulesets AWS API Documentation
+    #
+    # @overload list_data_quality_rulesets(params = {})
+    # @param [Hash] params ({})
+    def list_data_quality_rulesets(params = {}, options = {})
+      req = build_request(:list_data_quality_rulesets, params)
+      req.send_request(options)
+    end
+
+    # Retrieve annotations for a data quality statistic.
+    #
+    # @option params [String] :statistic_id
+    #   The Statistic ID.
+    #
+    # @option params [String] :profile_id
+    #   The Profile ID.
+    #
+    # @option params [Types::TimestampFilter] :timestamp_filter
+    #   A timestamp filter.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return in this request.
+    #
+    # @option params [String] :next_token
+    #   A pagination token to retrieve the next set of results.
+    #
+    # @return [Types::ListDataQualityStatisticAnnotationsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListDataQualityStatisticAnnotationsResponse#annotations #annotations} => Array&lt;Types::StatisticAnnotation&gt;
+    #   * {Types::ListDataQualityStatisticAnnotationsResponse#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_data_quality_statistic_annotations({
+    #     statistic_id: "HashString",
+    #     profile_id: "HashString",
+    #     timestamp_filter: {
+    #       recorded_before: Time.now,
+    #       recorded_after: Time.now,
+    #     },
+    #     max_results: 1,
+    #     next_token: "PaginationToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.annotations #=> Array
+    #   resp.annotations[0].profile_id #=> String
+    #   resp.annotations[0].statistic_id #=> String
+    #   resp.annotations[0].statistic_recorded_on #=> Time
+    #   resp.annotations[0].inclusion_annotation.value #=> String, one of "INCLUDE", "EXCLUDE"
+    #   resp.annotations[0].inclusion_annotation.last_modified_on #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListDataQualityStatisticAnnotations AWS API Documentation
+    #
+    # @overload list_data_quality_statistic_annotations(params = {})
+    # @param [Hash] params ({})
+    def list_data_quality_statistic_annotations(params = {}, options = {})
+      req = build_request(:list_data_quality_statistic_annotations, params)
+      req.send_request(options)
+    end
+
+    # Retrieves a list of data quality statistics.
+    #
+    # @option params [String] :statistic_id
+    #   The Statistic ID.
+    #
+    # @option params [String] :profile_id
+    #   The Profile ID.
+    #
+    # @option params [Types::TimestampFilter] :timestamp_filter
+    #   A timestamp filter.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return in this request.
+    #
+    # @option params [String] :next_token
+    #   A pagination token to request the next page of results.
+    #
+    # @return [Types::ListDataQualityStatisticsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListDataQualityStatisticsResponse#statistics #statistics} => Array&lt;Types::StatisticSummary&gt;
+    #   * {Types::ListDataQualityStatisticsResponse#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_data_quality_statistics({
+    #     statistic_id: "HashString",
+    #     profile_id: "HashString",
+    #     timestamp_filter: {
+    #       recorded_before: Time.now,
+    #       recorded_after: Time.now,
+    #     },
+    #     max_results: 1,
+    #     next_token: "PaginationToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.statistics #=> Array
+    #   resp.statistics[0].statistic_id #=> String
+    #   resp.statistics[0].profile_id #=> String
+    #   resp.statistics[0].run_identifier.run_id #=> String
+    #   resp.statistics[0].run_identifier.job_run_id #=> String
+    #   resp.statistics[0].statistic_name #=> String
+    #   resp.statistics[0].double_value #=> Float
+    #   resp.statistics[0].evaluation_level #=> String, one of "Dataset", "Column", "Multicolumn"
+    #   resp.statistics[0].columns_referenced #=> Array
+    #   resp.statistics[0].columns_referenced[0] #=> String
+    #   resp.statistics[0].referenced_datasets #=> Array
+    #   resp.statistics[0].referenced_datasets[0] #=> String
+    #   resp.statistics[0].statistic_properties #=> Hash
+    #   resp.statistics[0].statistic_properties["NameString"] #=> String
+    #   resp.statistics[0].recorded_on #=> Time
+    #   resp.statistics[0].inclusion_annotation.value #=> String, one of "INCLUDE", "EXCLUDE"
+    #   resp.statistics[0].inclusion_annotation.last_modified_on #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListDataQualityStatistics AWS API Documentation
+    #
+    # @overload list_data_quality_statistics(params = {})
+    # @param [Hash] params ({})
+    def list_data_quality_statistics(params = {}, options = {})
+      req = build_request(:list_data_quality_statistics, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the names of all `DevEndpoint` resources in this Amazon Web
+    # Services account, or the resources with the specified tag. This
+    # operation allows you to see which resources are available in your
+    # account, and their names.
     #
     # This operation takes the optional `Tags` field, which you can use as a
     # filter on the response so that tagged resources can be retrieved as a
@@ -7601,9 +14004,10 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Retrieves the names of all job resources in this AWS account, or the
-    # resources with the specified tag. This operation allows you to see
-    # which resources are available in your account, and their names.
+    # Retrieves the names of all job resources in this Amazon Web Services
+    # account, or the resources with the specified tag. This operation
+    # allows you to see which resources are available in your account, and
+    # their names.
     #
     # This operation takes the optional `Tags` field, which you can use as a
     # filter on the response so that tagged resources can be retrieved as a
@@ -7651,12 +14055,12 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Retrieves a sortable, filterable list of existing AWS Glue machine
-    # learning transforms in this AWS account, or the resources with the
-    # specified tag. This operation takes the optional `Tags` field, which
-    # you can use as a filter of the responses so that tagged resources can
-    # be retrieved as a group. If you choose to use tag filtering, only
-    # resources with the tags are retrieved.
+    # Retrieves a sortable, filterable list of existing Glue machine
+    # learning transforms in this Amazon Web Services account, or the
+    # resources with the specified tag. This operation takes the optional
+    # `Tags` field, which you can use as a filter of the responses so that
+    # tagged resources can be retrieved as a group. If you choose to use tag
+    # filtering, only resources with the tags are retrieved.
     #
     # @option params [String] :next_token
     #   A continuation token, if this is a continuation request.
@@ -7891,9 +14295,213 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Retrieves the names of all trigger resources in this AWS account, or
-    # the resources with the specified tag. This operation allows you to see
-    # which resources are available in your account, and their names.
+    # Retrieve a list of sessions.
+    #
+    # @option params [String] :next_token
+    #   The token for the next set of results, or null if there are no more
+    #   result.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Tags belonging to the session.
+    #
+    # @option params [String] :request_origin
+    #   The origin of the request.
+    #
+    # @return [Types::ListSessionsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListSessionsResponse#ids #ids} => Array&lt;String&gt;
+    #   * {Types::ListSessionsResponse#sessions #sessions} => Array&lt;Types::Session&gt;
+    #   * {Types::ListSessionsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_sessions({
+    #     next_token: "OrchestrationToken",
+    #     max_results: 1,
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #     request_origin: "OrchestrationNameString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.ids #=> Array
+    #   resp.ids[0] #=> String
+    #   resp.sessions #=> Array
+    #   resp.sessions[0].id #=> String
+    #   resp.sessions[0].created_on #=> Time
+    #   resp.sessions[0].status #=> String, one of "PROVISIONING", "READY", "FAILED", "TIMEOUT", "STOPPING", "STOPPED"
+    #   resp.sessions[0].error_message #=> String
+    #   resp.sessions[0].description #=> String
+    #   resp.sessions[0].role #=> String
+    #   resp.sessions[0].command.name #=> String
+    #   resp.sessions[0].command.python_version #=> String
+    #   resp.sessions[0].default_arguments #=> Hash
+    #   resp.sessions[0].default_arguments["OrchestrationNameString"] #=> String
+    #   resp.sessions[0].connections.connections #=> Array
+    #   resp.sessions[0].connections.connections[0] #=> String
+    #   resp.sessions[0].progress #=> Float
+    #   resp.sessions[0].max_capacity #=> Float
+    #   resp.sessions[0].security_configuration #=> String
+    #   resp.sessions[0].glue_version #=> String
+    #   resp.sessions[0].number_of_workers #=> Integer
+    #   resp.sessions[0].worker_type #=> String, one of "Standard", "G.1X", "G.2X", "G.025X", "G.4X", "G.8X", "Z.2X"
+    #   resp.sessions[0].completed_on #=> Time
+    #   resp.sessions[0].execution_time #=> Float
+    #   resp.sessions[0].dpu_seconds #=> Float
+    #   resp.sessions[0].idle_timeout #=> Integer
+    #   resp.sessions[0].profile_name #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListSessions AWS API Documentation
+    #
+    # @overload list_sessions(params = {})
+    # @param [Hash] params ({})
+    def list_sessions(params = {}, options = {})
+      req = build_request(:list_sessions, params)
+      req.send_request(options)
+    end
+
+    # Lists statements for the session.
+    #
+    # @option params [required, String] :session_id
+    #   The Session ID of the statements.
+    #
+    # @option params [String] :request_origin
+    #   The origin of the request to list statements.
+    #
+    # @option params [String] :next_token
+    #   A continuation token, if this is a continuation call.
+    #
+    # @return [Types::ListStatementsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListStatementsResponse#statements #statements} => Array&lt;Types::Statement&gt;
+    #   * {Types::ListStatementsResponse#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_statements({
+    #     session_id: "NameString", # required
+    #     request_origin: "OrchestrationNameString",
+    #     next_token: "OrchestrationToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.statements #=> Array
+    #   resp.statements[0].id #=> Integer
+    #   resp.statements[0].code #=> String
+    #   resp.statements[0].state #=> String, one of "WAITING", "RUNNING", "AVAILABLE", "CANCELLING", "CANCELLED", "ERROR"
+    #   resp.statements[0].output.data.text_plain #=> String
+    #   resp.statements[0].output.execution_count #=> Integer
+    #   resp.statements[0].output.status #=> String, one of "WAITING", "RUNNING", "AVAILABLE", "CANCELLING", "CANCELLED", "ERROR"
+    #   resp.statements[0].output.error_name #=> String
+    #   resp.statements[0].output.error_value #=> String
+    #   resp.statements[0].output.traceback #=> Array
+    #   resp.statements[0].output.traceback[0] #=> String
+    #   resp.statements[0].progress #=> Float
+    #   resp.statements[0].started_on #=> Integer
+    #   resp.statements[0].completed_on #=> Integer
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListStatements AWS API Documentation
+    #
+    # @overload list_statements(params = {})
+    # @param [Hash] params ({})
+    def list_statements(params = {}, options = {})
+      req = build_request(:list_statements, params)
+      req.send_request(options)
+    end
+
+    # Lists the history of previous optimizer runs for a specific table.
+    #
+    # @option params [required, String] :catalog_id
+    #   The Catalog ID of the table.
+    #
+    # @option params [required, String] :database_name
+    #   The name of the database in the catalog in which the table resides.
+    #
+    # @option params [required, String] :table_name
+    #   The name of the table.
+    #
+    # @option params [required, String] :type
+    #   The type of table optimizer. Currently, the only valid value is
+    #   `compaction`.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of optimizer runs to return on each call.
+    #
+    # @option params [String] :next_token
+    #   A continuation token, if this is a continuation call.
+    #
+    # @return [Types::ListTableOptimizerRunsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListTableOptimizerRunsResponse#catalog_id #catalog_id} => String
+    #   * {Types::ListTableOptimizerRunsResponse#database_name #database_name} => String
+    #   * {Types::ListTableOptimizerRunsResponse#table_name #table_name} => String
+    #   * {Types::ListTableOptimizerRunsResponse#next_token #next_token} => String
+    #   * {Types::ListTableOptimizerRunsResponse#table_optimizer_runs #table_optimizer_runs} => Array&lt;Types::TableOptimizerRun&gt;
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_table_optimizer_runs({
+    #     catalog_id: "CatalogIdString", # required
+    #     database_name: "NameString", # required
+    #     table_name: "NameString", # required
+    #     type: "compaction", # required, accepts compaction, retention, orphan_file_deletion
+    #     max_results: 1,
+    #     next_token: "ListTableOptimizerRunsToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.catalog_id #=> String
+    #   resp.database_name #=> String
+    #   resp.table_name #=> String
+    #   resp.next_token #=> String
+    #   resp.table_optimizer_runs #=> Array
+    #   resp.table_optimizer_runs[0].event_type #=> String, one of "starting", "completed", "failed", "in_progress"
+    #   resp.table_optimizer_runs[0].start_timestamp #=> Time
+    #   resp.table_optimizer_runs[0].end_timestamp #=> Time
+    #   resp.table_optimizer_runs[0].metrics.number_of_bytes_compacted #=> String
+    #   resp.table_optimizer_runs[0].metrics.number_of_files_compacted #=> String
+    #   resp.table_optimizer_runs[0].metrics.number_of_dpus #=> String
+    #   resp.table_optimizer_runs[0].metrics.job_duration_in_hour #=> String
+    #   resp.table_optimizer_runs[0].error #=> String
+    #   resp.table_optimizer_runs[0].compaction_metrics.iceberg_metrics.number_of_bytes_compacted #=> Integer
+    #   resp.table_optimizer_runs[0].compaction_metrics.iceberg_metrics.number_of_files_compacted #=> Integer
+    #   resp.table_optimizer_runs[0].compaction_metrics.iceberg_metrics.number_of_dpus #=> Integer
+    #   resp.table_optimizer_runs[0].compaction_metrics.iceberg_metrics.job_duration_in_hour #=> Float
+    #   resp.table_optimizer_runs[0].retention_metrics.iceberg_metrics.number_of_data_files_deleted #=> Integer
+    #   resp.table_optimizer_runs[0].retention_metrics.iceberg_metrics.number_of_manifest_files_deleted #=> Integer
+    #   resp.table_optimizer_runs[0].retention_metrics.iceberg_metrics.number_of_manifest_lists_deleted #=> Integer
+    #   resp.table_optimizer_runs[0].retention_metrics.iceberg_metrics.number_of_dpus #=> Integer
+    #   resp.table_optimizer_runs[0].retention_metrics.iceberg_metrics.job_duration_in_hour #=> Float
+    #   resp.table_optimizer_runs[0].orphan_file_deletion_metrics.iceberg_metrics.number_of_orphan_files_deleted #=> Integer
+    #   resp.table_optimizer_runs[0].orphan_file_deletion_metrics.iceberg_metrics.number_of_dpus #=> Integer
+    #   resp.table_optimizer_runs[0].orphan_file_deletion_metrics.iceberg_metrics.job_duration_in_hour #=> Float
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListTableOptimizerRuns AWS API Documentation
+    #
+    # @overload list_table_optimizer_runs(params = {})
+    # @param [Hash] params ({})
+    def list_table_optimizer_runs(params = {}, options = {})
+      req = build_request(:list_table_optimizer_runs, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the names of all trigger resources in this Amazon Web
+    # Services account, or the resources with the specified tag. This
+    # operation allows you to see which resources are available in your
+    # account, and their names.
     #
     # This operation takes the optional `Tags` field, which you can use as a
     # filter on the response so that tagged resources can be retrieved as a
@@ -7947,6 +14555,46 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # List all the Glue usage profiles.
+    #
+    # @option params [String] :next_token
+    #   A continuation token, included if this is a continuation call.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of usage profiles to return in a single response.
+    #
+    # @return [Types::ListUsageProfilesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListUsageProfilesResponse#profiles #profiles} => Array&lt;Types::UsageProfileDefinition&gt;
+    #   * {Types::ListUsageProfilesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_usage_profiles({
+    #     next_token: "OrchestrationToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.profiles #=> Array
+    #   resp.profiles[0].name #=> String
+    #   resp.profiles[0].description #=> String
+    #   resp.profiles[0].created_on #=> Time
+    #   resp.profiles[0].last_modified_on #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/ListUsageProfiles AWS API Documentation
+    #
+    # @overload list_usage_profiles(params = {})
+    # @param [Hash] params ({})
+    def list_usage_profiles(params = {}, options = {})
+      req = build_request(:list_usage_profiles, params)
+      req.send_request(options)
+    end
+
     # Lists names of workflows created in the account.
     #
     # @option params [String] :next_token
@@ -7990,7 +14638,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog to set the security configuration for. If
-    #   none is provided, the AWS account ID is used by default.
+    #   none is provided, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, Types::DataCatalogEncryptionSettings] :data_catalog_encryption_settings
     #   The security configuration to set.
@@ -8003,8 +14652,9 @@ module Aws::Glue
     #     catalog_id: "CatalogIdString",
     #     data_catalog_encryption_settings: { # required
     #       encryption_at_rest: {
-    #         catalog_encryption_mode: "DISABLED", # required, accepts DISABLED, SSE-KMS
+    #         catalog_encryption_mode: "DISABLED", # required, accepts DISABLED, SSE-KMS, SSE-KMS-WITH-SERVICE-ROLE
     #         sse_aws_kms_key_id: "NameString",
+    #         catalog_encryption_service_role: "IAMRoleArn",
     #       },
     #       connection_password_encryption: {
     #         return_connection_password_encrypted: false, # required
@@ -8022,19 +14672,39 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Annotate all datapoints for a Profile.
+    #
+    # @option params [required, String] :profile_id
+    #   The ID of the data quality monitoring profile to annotate.
+    #
+    # @option params [required, String] :inclusion_annotation
+    #   The inclusion annotation value to apply to the profile.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.put_data_quality_profile_annotation({
+    #     profile_id: "HashString", # required
+    #     inclusion_annotation: "INCLUDE", # required, accepts INCLUDE, EXCLUDE
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/PutDataQualityProfileAnnotation AWS API Documentation
+    #
+    # @overload put_data_quality_profile_annotation(params = {})
+    # @param [Hash] params ({})
+    def put_data_quality_profile_annotation(params = {}, options = {})
+      req = build_request(:put_data_quality_profile_annotation, params)
+      req.send_request(options)
+    end
+
     # Sets the Data Catalog resource policy for access control.
     #
     # @option params [required, String] :policy_in_json
     #   Contains the policy document to set, in JSON format.
     #
     # @option params [String] :resource_arn
-    #   The ARN of the AWS Glue resource for the resource policy to be set.
-    #   For more information about AWS Glue resource ARNs, see the [AWS Glue
-    #   ARN string pattern][1]
-    #
-    #
-    #
-    #   [1]: https://docs.aws.amazon.com/glue/latest/dg/aws-glue-api-common.html#aws-glue-api-regex-aws-glue-arn-id
+    #   Do not use. For internal use only.
     #
     # @option params [String] :policy_hash_condition
     #   The hash value returned when the previous policy was set using
@@ -8045,19 +14715,21 @@ module Aws::Glue
     # @option params [String] :policy_exists_condition
     #   A value of `MUST_EXIST` is used to update a policy. A value of
     #   `NOT_EXIST` is used to create a new policy. If a value of `NONE` or a
-    #   null value is used, the call will not depend on the existence of a
+    #   null value is used, the call does not depend on the existence of a
     #   policy.
     #
     # @option params [String] :enable_hybrid
-    #   Allows you to specify if you want to use both resource-level and
-    #   account/catalog-level resource policies. A resource-level policy is a
-    #   policy attached to an individual resource such as a database or a
-    #   table.
+    #   If `'TRUE'`, indicates that you are using both methods to grant
+    #   cross-account access to Data Catalog resources:
     #
-    #   The default value of `NO` indicates that resource-level policies
-    #   cannot co-exist with an account-level policy. A value of `YES` means
-    #   the use of both resource-level and account/catalog-level resource
-    #   policies is allowed.
+    #   * By directly updating the resource policy with `PutResourePolicy`
+    #
+    #   * By using the **Grant permissions** command on the Amazon Web
+    #     Services Management Console.
+    #
+    #   Must be set to `'TRUE'` if you have already used the Management
+    #   Console to grant cross-account access, otherwise the call fails.
+    #   Default is 'FALSE'.
     #
     # @return [Types::PutResourcePolicyResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -8244,6 +14916,9 @@ module Aws::Glue
     #   resp.metadata_info_map #=> Hash
     #   resp.metadata_info_map["MetadataKeyString"].metadata_value #=> String
     #   resp.metadata_info_map["MetadataKeyString"].created_time #=> String
+    #   resp.metadata_info_map["MetadataKeyString"].other_metadata_value_list #=> Array
+    #   resp.metadata_info_map["MetadataKeyString"].other_metadata_value_list[0].metadata_value #=> String
+    #   resp.metadata_info_map["MetadataKeyString"].other_metadata_value_list[0].created_time #=> String
     #   resp.schema_version_id #=> String
     #   resp.next_token #=> String
     #
@@ -8388,6 +15063,20 @@ module Aws::Glue
 
     # Resets a bookmark entry.
     #
+    # For more information about enabling and using job bookmarks, see:
+    #
+    # * [Tracking processed data using job bookmarks][1]
+    #
+    # * [Job parameters used by Glue][2]
+    #
+    # * [Job structure][3]
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/glue/latest/dg/monitor-continuations.html
+    # [2]: https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-glue-arguments.html
+    # [3]: https://docs.aws.amazon.com/glue/latest/dg/aws-glue-api-jobs-job.html#aws-glue-api-jobs-job-Job
+    #
     # @option params [required, String] :job_name
     #   The name of the job in question.
     #
@@ -8466,6 +15155,42 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Executes the statement.
+    #
+    # @option params [required, String] :session_id
+    #   The Session Id of the statement to be run.
+    #
+    # @option params [required, String] :code
+    #   The statement code to be run.
+    #
+    # @option params [String] :request_origin
+    #   The origin of the request.
+    #
+    # @return [Types::RunStatementResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::RunStatementResponse#id #id} => Integer
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.run_statement({
+    #     session_id: "NameString", # required
+    #     code: "OrchestrationStatementCodeString", # required
+    #     request_origin: "OrchestrationNameString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/RunStatement AWS API Documentation
+    #
+    # @overload run_statement(params = {})
+    # @param [Hash] params ({})
+    def run_statement(params = {}, options = {})
+      req = build_request(:run_statement, params)
+      req.send_request(options)
+    end
+
     # Searches a set of tables based on properties in the table metadata as
     # well as on the parent database. You can search against text or filter
     # conditions.
@@ -8522,6 +15247,10 @@ module Aws::Glue
     #   * If set to `ALL`, will search the tables shared with your account, as
     #     well as the tables in yor local account.
     #
+    # @option params [Boolean] :include_status_details
+    #   Specifies whether to include status details related to a request to
+    #   create or update an Glue Data Catalog view.
+    #
     # @return [Types::SearchTablesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::SearchTablesResponse#next_token #next_token} => String
@@ -8549,7 +15278,8 @@ module Aws::Glue
     #       },
     #     ],
     #     max_results: 1,
-    #     resource_share_type: "FOREIGN", # accepts FOREIGN, ALL
+    #     resource_share_type: "FOREIGN", # accepts FOREIGN, ALL, FEDERATED
+    #     include_status_details: false,
     #   })
     #
     # @example Response structure
@@ -8572,6 +15302,8 @@ module Aws::Glue
     #   resp.table_list[0].storage_descriptor.columns[0].parameters #=> Hash
     #   resp.table_list[0].storage_descriptor.columns[0].parameters["KeyString"] #=> String
     #   resp.table_list[0].storage_descriptor.location #=> String
+    #   resp.table_list[0].storage_descriptor.additional_locations #=> Array
+    #   resp.table_list[0].storage_descriptor.additional_locations[0] #=> String
     #   resp.table_list[0].storage_descriptor.input_format #=> String
     #   resp.table_list[0].storage_descriptor.output_format #=> String
     #   resp.table_list[0].storage_descriptor.compressed #=> Boolean
@@ -8615,7 +15347,41 @@ module Aws::Glue
     #   resp.table_list[0].target_table.catalog_id #=> String
     #   resp.table_list[0].target_table.database_name #=> String
     #   resp.table_list[0].target_table.name #=> String
+    #   resp.table_list[0].target_table.region #=> String
     #   resp.table_list[0].catalog_id #=> String
+    #   resp.table_list[0].version_id #=> String
+    #   resp.table_list[0].federated_table.identifier #=> String
+    #   resp.table_list[0].federated_table.database_identifier #=> String
+    #   resp.table_list[0].federated_table.connection_name #=> String
+    #   resp.table_list[0].view_definition.is_protected #=> Boolean
+    #   resp.table_list[0].view_definition.definer #=> String
+    #   resp.table_list[0].view_definition.sub_objects #=> Array
+    #   resp.table_list[0].view_definition.sub_objects[0] #=> String
+    #   resp.table_list[0].view_definition.representations #=> Array
+    #   resp.table_list[0].view_definition.representations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table_list[0].view_definition.representations[0].dialect_version #=> String
+    #   resp.table_list[0].view_definition.representations[0].view_original_text #=> String
+    #   resp.table_list[0].view_definition.representations[0].view_expanded_text #=> String
+    #   resp.table_list[0].view_definition.representations[0].validation_connection #=> String
+    #   resp.table_list[0].view_definition.representations[0].is_stale #=> Boolean
+    #   resp.table_list[0].is_multi_dialect_view #=> Boolean
+    #   resp.table_list[0].status.requested_by #=> String
+    #   resp.table_list[0].status.updated_by #=> String
+    #   resp.table_list[0].status.request_time #=> Time
+    #   resp.table_list[0].status.update_time #=> Time
+    #   resp.table_list[0].status.action #=> String, one of "UPDATE", "CREATE"
+    #   resp.table_list[0].status.state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table_list[0].status.error.error_code #=> String
+    #   resp.table_list[0].status.error.error_message #=> String
+    #   resp.table_list[0].status.details.requested_change #=> Types::Table
+    #   resp.table_list[0].status.details.view_validations #=> Array
+    #   resp.table_list[0].status.details.view_validations[0].dialect #=> String, one of "REDSHIFT", "ATHENA", "SPARK"
+    #   resp.table_list[0].status.details.view_validations[0].dialect_version #=> String
+    #   resp.table_list[0].status.details.view_validations[0].view_validation_text #=> String
+    #   resp.table_list[0].status.details.view_validations[0].update_time #=> Time
+    #   resp.table_list[0].status.details.view_validations[0].state #=> String, one of "QUEUED", "IN_PROGRESS", "SUCCESS", "STOPPED", "FAILED"
+    #   resp.table_list[0].status.details.view_validations[0].error.error_code #=> String
+    #   resp.table_list[0].status.details.view_validations[0].error.error_message #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/SearchTables AWS API Documentation
     #
@@ -8623,6 +15389,99 @@ module Aws::Glue
     # @param [Hash] params ({})
     def search_tables(params = {}, options = {})
       req = build_request(:search_tables, params)
+      req.send_request(options)
+    end
+
+    # Starts a new run of the specified blueprint.
+    #
+    # @option params [required, String] :blueprint_name
+    #   The name of the blueprint.
+    #
+    # @option params [String] :parameters
+    #   Specifies the parameters as a `BlueprintParameters` object.
+    #
+    # @option params [required, String] :role_arn
+    #   Specifies the IAM role used to create the workflow.
+    #
+    # @return [Types::StartBlueprintRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StartBlueprintRunResponse#run_id #run_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_blueprint_run({
+    #     blueprint_name: "OrchestrationNameString", # required
+    #     parameters: "BlueprintParameters",
+    #     role_arn: "OrchestrationIAMRoleArn", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.run_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/StartBlueprintRun AWS API Documentation
+    #
+    # @overload start_blueprint_run(params = {})
+    # @param [Hash] params ({})
+    def start_blueprint_run(params = {}, options = {})
+      req = build_request(:start_blueprint_run, params)
+      req.send_request(options)
+    end
+
+    # Starts a column statistics task run, for a specified table and
+    # columns.
+    #
+    # @option params [required, String] :database_name
+    #   The name of the database where the table resides.
+    #
+    # @option params [required, String] :table_name
+    #   The name of the table to generate statistics.
+    #
+    # @option params [Array<String>] :column_name_list
+    #   A list of the column names to generate statistics. If none is
+    #   supplied, all column names for the table will be used by default.
+    #
+    # @option params [required, String] :role
+    #   The IAM role that the service assumes to generate statistics.
+    #
+    # @option params [Float] :sample_size
+    #   The percentage of rows used to generate statistics. If none is
+    #   supplied, the entire table will be used to generate stats.
+    #
+    # @option params [String] :catalog_id
+    #   The ID of the Data Catalog where the table reside. If none is
+    #   supplied, the Amazon Web Services account ID is used by default.
+    #
+    # @option params [String] :security_configuration
+    #   Name of the security configuration that is used to encrypt CloudWatch
+    #   logs for the column stats task run.
+    #
+    # @return [Types::StartColumnStatisticsTaskRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StartColumnStatisticsTaskRunResponse#column_statistics_task_run_id #column_statistics_task_run_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_column_statistics_task_run({
+    #     database_name: "NameString", # required
+    #     table_name: "NameString", # required
+    #     column_name_list: ["NameString"],
+    #     role: "NameString", # required
+    #     sample_size: 1.0,
+    #     catalog_id: "NameString",
+    #     security_configuration: "NameString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.column_statistics_task_run_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/StartColumnStatisticsTaskRun AWS API Documentation
+    #
+    # @overload start_column_statistics_task_run(params = {})
+    # @param [Hash] params ({})
+    def start_column_statistics_task_run(params = {}, options = {})
+      req = build_request(:start_column_statistics_task_run, params)
       req.send_request(options)
     end
 
@@ -8678,6 +15537,169 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Starts a recommendation run that is used to generate rules when you
+    # don't know what rules to write. Glue Data Quality analyzes the data
+    # and comes up with recommendations for a potential ruleset. You can
+    # then triage the ruleset and modify the generated ruleset to your
+    # liking.
+    #
+    # Recommendation runs are automatically deleted after 90 days.
+    #
+    # @option params [required, Types::DataSource] :data_source
+    #   The data source (Glue table) associated with this run.
+    #
+    # @option params [required, String] :role
+    #   An IAM role supplied to encrypt the results of the run.
+    #
+    # @option params [Integer] :number_of_workers
+    #   The number of `G.1X` workers to be used in the run. The default is 5.
+    #
+    # @option params [Integer] :timeout
+    #   The timeout for a run in minutes. This is the maximum time that a run
+    #   can consume resources before it is terminated and enters `TIMEOUT`
+    #   status. The default is 2,880 minutes (48 hours).
+    #
+    # @option params [String] :created_ruleset_name
+    #   A name for the ruleset.
+    #
+    # @option params [String] :data_quality_security_configuration
+    #   The name of the security configuration created with the data quality
+    #   encryption option.
+    #
+    # @option params [String] :client_token
+    #   Used for idempotency and is recommended to be set to a random ID (such
+    #   as a UUID) to avoid creating or starting multiple instances of the
+    #   same resource.
+    #
+    # @return [Types::StartDataQualityRuleRecommendationRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StartDataQualityRuleRecommendationRunResponse#run_id #run_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_data_quality_rule_recommendation_run({
+    #     data_source: { # required
+    #       glue_table: { # required
+    #         database_name: "NameString", # required
+    #         table_name: "NameString", # required
+    #         catalog_id: "NameString",
+    #         connection_name: "NameString",
+    #         additional_options: {
+    #           "NameString" => "DescriptionString",
+    #         },
+    #       },
+    #     },
+    #     role: "RoleString", # required
+    #     number_of_workers: 1,
+    #     timeout: 1,
+    #     created_ruleset_name: "NameString",
+    #     data_quality_security_configuration: "NameString",
+    #     client_token: "HashString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.run_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/StartDataQualityRuleRecommendationRun AWS API Documentation
+    #
+    # @overload start_data_quality_rule_recommendation_run(params = {})
+    # @param [Hash] params ({})
+    def start_data_quality_rule_recommendation_run(params = {}, options = {})
+      req = build_request(:start_data_quality_rule_recommendation_run, params)
+      req.send_request(options)
+    end
+
+    # Once you have a ruleset definition (either recommended or your own),
+    # you call this operation to evaluate the ruleset against a data source
+    # (Glue table). The evaluation computes results which you can retrieve
+    # with the `GetDataQualityResult` API.
+    #
+    # @option params [required, Types::DataSource] :data_source
+    #   The data source (Glue table) associated with this run.
+    #
+    # @option params [required, String] :role
+    #   An IAM role supplied to encrypt the results of the run.
+    #
+    # @option params [Integer] :number_of_workers
+    #   The number of `G.1X` workers to be used in the run. The default is 5.
+    #
+    # @option params [Integer] :timeout
+    #   The timeout for a run in minutes. This is the maximum time that a run
+    #   can consume resources before it is terminated and enters `TIMEOUT`
+    #   status. The default is 2,880 minutes (48 hours).
+    #
+    # @option params [String] :client_token
+    #   Used for idempotency and is recommended to be set to a random ID (such
+    #   as a UUID) to avoid creating or starting multiple instances of the
+    #   same resource.
+    #
+    # @option params [Types::DataQualityEvaluationRunAdditionalRunOptions] :additional_run_options
+    #   Additional run options you can specify for an evaluation run.
+    #
+    # @option params [required, Array<String>] :ruleset_names
+    #   A list of ruleset names.
+    #
+    # @option params [Hash<String,Types::DataSource>] :additional_data_sources
+    #   A map of reference strings to additional data sources you can specify
+    #   for an evaluation run.
+    #
+    # @return [Types::StartDataQualityRulesetEvaluationRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StartDataQualityRulesetEvaluationRunResponse#run_id #run_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_data_quality_ruleset_evaluation_run({
+    #     data_source: { # required
+    #       glue_table: { # required
+    #         database_name: "NameString", # required
+    #         table_name: "NameString", # required
+    #         catalog_id: "NameString",
+    #         connection_name: "NameString",
+    #         additional_options: {
+    #           "NameString" => "DescriptionString",
+    #         },
+    #       },
+    #     },
+    #     role: "RoleString", # required
+    #     number_of_workers: 1,
+    #     timeout: 1,
+    #     client_token: "HashString",
+    #     additional_run_options: {
+    #       cloud_watch_metrics_enabled: false,
+    #       results_s3_prefix: "UriString",
+    #       composite_rule_evaluation_method: "COLUMN", # accepts COLUMN, ROW
+    #     },
+    #     ruleset_names: ["NameString"], # required
+    #     additional_data_sources: {
+    #       "NameString" => {
+    #         glue_table: { # required
+    #           database_name: "NameString", # required
+    #           table_name: "NameString", # required
+    #           catalog_id: "NameString",
+    #           connection_name: "NameString",
+    #           additional_options: {
+    #             "NameString" => "DescriptionString",
+    #           },
+    #         },
+    #       },
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.run_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/StartDataQualityRulesetEvaluationRun AWS API Documentation
+    #
+    # @overload start_data_quality_ruleset_evaluation_run(params = {})
+    # @param [Hash] params ({})
+    def start_data_quality_ruleset_evaluation_run(params = {}, options = {})
+      req = build_request(:start_data_quality_ruleset_evaluation_run, params)
+      req.send_request(options)
+    end
+
     # Begins an asynchronous task to export all labeled data for a
     # particular transform. This task is the only label-related API call
     # that is not part of the typical active learning workflow. You
@@ -8726,10 +15748,10 @@ module Aws::Glue
     # call and that ultimately results in improving the quality of your
     # machine learning transform.
     #
-    # After the `StartMLLabelingSetGenerationTaskRun` finishes, AWS Glue
-    # machine learning will have generated a series of questions for humans
-    # to answer. (Answering these questions is often called 'labeling' in
-    # the machine learning workflows). In the case of the `FindMatches`
+    # After the `StartMLLabelingSetGenerationTaskRun` finishes, Glue machine
+    # learning will have generated a series of questions for humans to
+    # answer. (Answering these questions is often called 'labeling' in the
+    # machine learning workflows). In the case of the `FindMatches`
     # transform, these questions are of the form, “What is the correct way
     # to group these rows together into groups composed entirely of matching
     # records?” After the labeling process is finished, users upload their
@@ -8790,72 +15812,100 @@ module Aws::Glue
     # @option params [required, String] :job_name
     #   The name of the job definition to use.
     #
+    # @option params [Boolean] :job_run_queuing_enabled
+    #   Specifies whether job run queuing is enabled for the job run.
+    #
+    #   A value of true means job run queuing is enabled for the job run. If
+    #   false or not populated, the job run will not be considered for
+    #   queueing.
+    #
     # @option params [String] :job_run_id
     #   The ID of a previous `JobRun` to retry.
     #
     # @option params [Hash<String,String>] :arguments
-    #   The job arguments specifically for this run. For this job run, they
+    #   The job arguments associated with this run. For this job run, they
     #   replace the default arguments set in the job definition itself.
     #
     #   You can specify arguments here that your own job-execution script
-    #   consumes, as well as arguments that AWS Glue itself consumes.
+    #   consumes, as well as arguments that Glue itself consumes.
+    #
+    #   Job arguments may be logged. Do not pass plaintext secrets as
+    #   arguments. Retrieve secrets from a Glue Connection, Secrets Manager or
+    #   other secret management mechanism if you intend to keep them within
+    #   the Job.
     #
     #   For information about how to specify and consume your own Job
-    #   arguments, see the [Calling AWS Glue APIs in Python][1] topic in the
+    #   arguments, see the [Calling Glue APIs in Python][1] topic in the
     #   developer guide.
     #
-    #   For information about the key-value pairs that AWS Glue consumes to
-    #   set up your job, see the [Special Parameters Used by AWS Glue][2]
+    #   For information about the arguments you can provide to this field when
+    #   configuring Spark jobs, see the [Special Parameters Used by Glue][2]
     #   topic in the developer guide.
+    #
+    #   For information about the arguments you can provide to this field when
+    #   configuring Ray jobs, see [Using job parameters in Ray jobs][3] in the
+    #   developer guide.
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-python-calling.html
     #   [2]: https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-glue-arguments.html
+    #   [3]: https://docs.aws.amazon.com/glue/latest/dg/author-job-ray-job-parameters.html
     #
     # @option params [Integer] :allocated_capacity
     #   This field is deprecated. Use `MaxCapacity` instead.
     #
-    #   The number of AWS Glue data processing units (DPUs) to allocate to
-    #   this JobRun. From 2 to 100 DPUs can be allocated; the default is 10. A
-    #   DPU is a relative measure of processing power that consists of 4 vCPUs
-    #   of compute capacity and 16 GB of memory. For more information, see the
-    #   [AWS Glue pricing page][1].
+    #   The number of Glue data processing units (DPUs) to allocate to this
+    #   JobRun. You can allocate a minimum of 2 DPUs; the default is 10. A DPU
+    #   is a relative measure of processing power that consists of 4 vCPUs of
+    #   compute capacity and 16 GB of memory. For more information, see the
+    #   [Glue pricing page][1].
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/https:/aws.amazon.com/glue/pricing/
+    #   [1]: https://aws.amazon.com/glue/pricing/
     #
     # @option params [Integer] :timeout
     #   The `JobRun` timeout in minutes. This is the maximum time that a job
     #   run can consume resources before it is terminated and enters `TIMEOUT`
-    #   status. The default is 2,880 minutes (48 hours). This overrides the
-    #   timeout value set in the parent job.
+    #   status. This value overrides the timeout value set in the parent job.
+    #
+    #   Streaming jobs must have timeout values less than 7 days or 10080
+    #   minutes. When the value is left blank, the job will be restarted after
+    #   7 days based if you have not setup a maintenance window. If you have
+    #   setup maintenance window, it will be restarted during the maintenance
+    #   window after 7 days.
     #
     # @option params [Float] :max_capacity
-    #   The number of AWS Glue data processing units (DPUs) that can be
-    #   allocated when this job runs. A DPU is a relative measure of
-    #   processing power that consists of 4 vCPUs of compute capacity and 16
-    #   GB of memory. For more information, see the [AWS Glue pricing
-    #   page][1].
+    #   For Glue version 1.0 or earlier jobs, using the standard worker type,
+    #   the number of Glue data processing units (DPUs) that can be allocated
+    #   when this job runs. A DPU is a relative measure of processing power
+    #   that consists of 4 vCPUs of compute capacity and 16 GB of memory. For
+    #   more information, see the [ Glue pricing page][1].
     #
-    #   Do not set `Max Capacity` if using `WorkerType` and `NumberOfWorkers`.
+    #   For Glue version 2.0+ jobs, you cannot specify a `Maximum capacity`.
+    #   Instead, you should specify a `Worker type` and the `Number of
+    #   workers`.
+    #
+    #   Do not set `MaxCapacity` if using `WorkerType` and `NumberOfWorkers`.
     #
     #   The value that can be allocated for `MaxCapacity` depends on whether
-    #   you are running a Python shell job, or an Apache Spark ETL job:
+    #   you are running a Python shell job, an Apache Spark ETL job, or an
+    #   Apache Spark streaming ETL job:
     #
     #   * When you specify a Python shell job
     #     (`JobCommand.Name`="pythonshell"), you can allocate either 0.0625
     #     or 1 DPU. The default is 0.0625 DPU.
     #
     #   * When you specify an Apache Spark ETL job
-    #     (`JobCommand.Name`="glueetl"), you can allocate from 2 to 100
-    #     DPUs. The default is 10 DPUs. This job type cannot have a fractional
-    #     DPU allocation.
+    #     (`JobCommand.Name`="glueetl") or Apache Spark streaming ETL job
+    #     (`JobCommand.Name`="gluestreaming"), you can allocate from 2 to
+    #     100 DPUs. The default is 10 DPUs. This job type cannot have a
+    #     fractional DPU allocation.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/https:/aws.amazon.com/glue/pricing/
+    #   [1]: https://aws.amazon.com/glue/pricing/
     #
     # @option params [String] :security_configuration
     #   The name of the `SecurityConfiguration` structure to be used with this
@@ -8866,23 +15916,65 @@ module Aws::Glue
     #
     # @option params [String] :worker_type
     #   The type of predefined worker that is allocated when a job runs.
-    #   Accepts a value of Standard, G.1X, or G.2X.
+    #   Accepts a value of G.1X, G.2X, G.4X, G.8X or G.025X for Spark jobs.
+    #   Accepts the value Z.2X for Ray jobs.
     #
-    #   * For the `Standard` worker type, each worker provides 4 vCPU, 16 GB
-    #     of memory and a 50GB disk, and 2 executors per worker.
+    #   * For the `G.1X` worker type, each worker maps to 1 DPU (4 vCPUs, 16
+    #     GB of memory) with 84GB disk (approximately 34GB free), and provides
+    #     1 executor per worker. We recommend this worker type for workloads
+    #     such as data transforms, joins, and queries, to offers a scalable
+    #     and cost effective way to run most jobs.
     #
-    #   * For the `G.1X` worker type, each worker provides 4 vCPU, 16 GB of
-    #     memory and a 64GB disk, and 1 executor per worker.
+    #   * For the `G.2X` worker type, each worker maps to 2 DPU (8 vCPUs, 32
+    #     GB of memory) with 128GB disk (approximately 77GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     workloads such as data transforms, joins, and queries, to offers a
+    #     scalable and cost effective way to run most jobs.
     #
-    #   * For the `G.2X` worker type, each worker provides 8 vCPU, 32 GB of
-    #     memory and a 128GB disk, and 1 executor per worker.
+    #   * For the `G.4X` worker type, each worker maps to 4 DPU (16 vCPUs, 64
+    #     GB of memory) with 256GB disk (approximately 235GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     jobs whose workloads contain your most demanding transforms,
+    #     aggregations, joins, and queries. This worker type is available only
+    #     for Glue version 3.0 or later Spark ETL jobs in the following Amazon
+    #     Web Services Regions: US East (Ohio), US East (N. Virginia), US West
+    #     (Oregon), Asia Pacific (Singapore), Asia Pacific (Sydney), Asia
+    #     Pacific (Tokyo), Canada (Central), Europe (Frankfurt), Europe
+    #     (Ireland), and Europe (Stockholm).
+    #
+    #   * For the `G.8X` worker type, each worker maps to 8 DPU (32 vCPUs, 128
+    #     GB of memory) with 512GB disk (approximately 487GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     jobs whose workloads contain your most demanding transforms,
+    #     aggregations, joins, and queries. This worker type is available only
+    #     for Glue version 3.0 or later Spark ETL jobs, in the same Amazon Web
+    #     Services Regions as supported for the `G.4X` worker type.
+    #
+    #   * For the `G.025X` worker type, each worker maps to 0.25 DPU (2 vCPUs,
+    #     4 GB of memory) with 84GB disk (approximately 34GB free), and
+    #     provides 1 executor per worker. We recommend this worker type for
+    #     low volume streaming jobs. This worker type is only available for
+    #     Glue version 3.0 streaming jobs.
+    #
+    #   * For the `Z.2X` worker type, each worker maps to 2 M-DPU (8vCPUs, 64
+    #     GB of memory) with 128 GB disk (approximately 120GB free), and
+    #     provides up to 8 Ray workers based on the autoscaler.
     #
     # @option params [Integer] :number_of_workers
     #   The number of workers of a defined `workerType` that are allocated
     #   when a job runs.
     #
-    #   The maximum number of workers you can define are 299 for `G.1X`, and
-    #   149 for `G.2X`.
+    # @option params [String] :execution_class
+    #   Indicates whether the job is run with a standard or flexible execution
+    #   class. The standard execution-class is ideal for time-sensitive
+    #   workloads that require fast job startup and dedicated resources.
+    #
+    #   The flexible execution class is appropriate for time-insensitive jobs
+    #   whose start and completion times may vary.
+    #
+    #   Only jobs with Glue version 3.0 and above and command type `glueetl`
+    #   will be allowed to set `ExecutionClass` to `FLEX`. The flexible
+    #   execution class is available for Spark jobs.
     #
     # @return [Types::StartJobRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -8892,6 +15984,7 @@ module Aws::Glue
     #
     #   resp = client.start_job_run({
     #     job_name: "NameString", # required
+    #     job_run_queuing_enabled: false,
     #     job_run_id: "IdString",
     #     arguments: {
     #       "GenericString" => "GenericString",
@@ -8903,8 +15996,9 @@ module Aws::Glue
     #     notification_property: {
     #       notify_delay_after: 1,
     #     },
-    #     worker_type: "Standard", # accepts Standard, G.1X, G.2X
+    #     worker_type: "Standard", # accepts Standard, G.1X, G.2X, G.025X, G.4X, G.8X, Z.2X
     #     number_of_workers: 1,
+    #     execution_class: "FLEX", # accepts FLEX, STANDARD
     #   })
     #
     # @example Response structure
@@ -8922,7 +16016,7 @@ module Aws::Glue
 
     # Starts a task to estimate the quality of the transform.
     #
-    # When you provide label sets as examples of truth, AWS Glue machine
+    # When you provide label sets as examples of truth, Glue machine
     # learning uses some of those examples to learn from them. The rest of
     # the labels are used as a test to estimate quality.
     #
@@ -8959,7 +16053,7 @@ module Aws::Glue
     # transform to improve the transform's quality by generating label sets
     # and adding labels.
     #
-    # When the `StartMLLabelingSetGenerationTaskRun` finishes, AWS Glue will
+    # When the `StartMLLabelingSetGenerationTaskRun` finishes, Glue will
     # have generated a "labeling set" or a set of questions for humans to
     # answer.
     #
@@ -9042,6 +16136,9 @@ module Aws::Glue
     # @option params [required, String] :name
     #   The name of the workflow to start.
     #
+    # @option params [Hash<String,String>] :run_properties
+    #   The workflow run properties for the new workflow run.
+    #
     # @return [Types::StartWorkflowRunResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::StartWorkflowRunResponse#run_id #run_id} => String
@@ -9050,6 +16147,9 @@ module Aws::Glue
     #
     #   resp = client.start_workflow_run({
     #     name: "NameString", # required
+    #     run_properties: {
+    #       "IdString" => "GenericString",
+    #     },
     #   })
     #
     # @example Response structure
@@ -9062,6 +16162,32 @@ module Aws::Glue
     # @param [Hash] params ({})
     def start_workflow_run(params = {}, options = {})
       req = build_request(:start_workflow_run, params)
+      req.send_request(options)
+    end
+
+    # Stops a task run for the specified table.
+    #
+    # @option params [required, String] :database_name
+    #   The name of the database where the table resides.
+    #
+    # @option params [required, String] :table_name
+    #   The name of the table.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.stop_column_statistics_task_run({
+    #     database_name: "DatabaseName", # required
+    #     table_name: "NameString", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/StopColumnStatisticsTaskRun AWS API Documentation
+    #
+    # @overload stop_column_statistics_task_run(params = {})
+    # @param [Hash] params ({})
+    def stop_column_statistics_task_run(params = {}, options = {})
+      req = build_request(:stop_column_statistics_task_run, params)
       req.send_request(options)
     end
 
@@ -9107,6 +16233,38 @@ module Aws::Glue
     # @param [Hash] params ({})
     def stop_crawler_schedule(params = {}, options = {})
       req = build_request(:stop_crawler_schedule, params)
+      req.send_request(options)
+    end
+
+    # Stops the session.
+    #
+    # @option params [required, String] :id
+    #   The ID of the session to be stopped.
+    #
+    # @option params [String] :request_origin
+    #   The origin of the request.
+    #
+    # @return [Types::StopSessionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StopSessionResponse#id #id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.stop_session({
+    #     id: "NameString", # required
+    #     request_origin: "OrchestrationNameString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/StopSession AWS API Documentation
+    #
+    # @overload stop_session(params = {})
+    # @param [Hash] params ({})
+    def stop_session(params = {}, options = {})
+      req = build_request(:stop_session, params)
       req.send_request(options)
     end
 
@@ -9164,18 +16322,18 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Adds tags to a resource. A tag is a label you can assign to an AWS
-    # resource. In AWS Glue, you can tag only certain resources. For
-    # information about what resources you can tag, see [AWS Tags in AWS
-    # Glue][1].
+    # Adds tags to a resource. A tag is a label you can assign to an Amazon
+    # Web Services resource. In Glue, you can tag only certain resources.
+    # For information about what resources you can tag, see [Amazon Web
+    # Services Tags in Glue][1].
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/glue/latest/dg/monitor-tags.html
     #
     # @option params [required, String] :resource_arn
-    #   The ARN of the AWS Glue resource to which to add the tags. For more
-    #   information about AWS Glue resource ARNs, see the [AWS Glue ARN string
+    #   The ARN of the Glue resource to which to add the tags. For more
+    #   information about Glue resource ARNs, see the [Glue ARN string
     #   pattern][1].
     #
     #
@@ -9205,6 +16363,66 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Tests a connection to a service to validate the service credentials
+    # that you provide.
+    #
+    # You can either provide an existing connection name or a
+    # `TestConnectionInput` for testing a non-existing connection input.
+    # Providing both at the same time will cause an error.
+    #
+    # If the action is successful, the service sends back an HTTP 200
+    # response.
+    #
+    # @option params [String] :connection_name
+    #   Optional. The name of the connection to test. If only name is
+    #   provided, the operation will get the connection and use that for
+    #   testing.
+    #
+    # @option params [Types::TestConnectionInput] :test_connection_input
+    #   A structure that is used to specify testing a connection to a service.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.test_connection({
+    #     connection_name: "NameString",
+    #     test_connection_input: {
+    #       connection_type: "JDBC", # required, accepts JDBC, SFTP, MONGODB, KAFKA, NETWORK, MARKETPLACE, CUSTOM, SALESFORCE, VIEW_VALIDATION_REDSHIFT, VIEW_VALIDATION_ATHENA
+    #       connection_properties: { # required
+    #         "HOST" => "ValueString",
+    #       },
+    #       authentication_configuration: {
+    #         authentication_type: "BASIC", # accepts BASIC, OAUTH2, CUSTOM
+    #         o_auth_2_properties: {
+    #           o_auth_2_grant_type: "AUTHORIZATION_CODE", # accepts AUTHORIZATION_CODE, CLIENT_CREDENTIALS, JWT_BEARER
+    #           o_auth_2_client_application: {
+    #             user_managed_client_application_client_id: "UserManagedClientApplicationClientId",
+    #             aws_managed_client_application_reference: "AWSManagedClientApplicationReference",
+    #           },
+    #           token_url: "TokenUrl",
+    #           token_url_parameters_map: {
+    #             "TokenUrlParameterKey" => "TokenUrlParameterValue",
+    #           },
+    #           authorization_code_properties: {
+    #             authorization_code: "AuthorizationCode",
+    #             redirect_uri: "RedirectUri",
+    #           },
+    #         },
+    #         secret_arn: "SecretArn",
+    #       },
+    #     },
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/TestConnection AWS API Documentation
+    #
+    # @overload test_connection(params = {})
+    # @param [Hash] params ({})
+    def test_connection(params = {}, options = {})
+      req = build_request(:test_connection, params)
+      req.send_request(options)
+    end
+
     # Removes tags from a resource.
     #
     # @option params [required, String] :resource_arn
@@ -9229,6 +16447,42 @@ module Aws::Glue
     # @param [Hash] params ({})
     def untag_resource(params = {}, options = {})
       req = build_request(:untag_resource, params)
+      req.send_request(options)
+    end
+
+    # Updates a registered blueprint.
+    #
+    # @option params [required, String] :name
+    #   The name of the blueprint.
+    #
+    # @option params [String] :description
+    #   A description of the blueprint.
+    #
+    # @option params [required, String] :blueprint_location
+    #   Specifies a path in Amazon S3 where the blueprint is published.
+    #
+    # @return [Types::UpdateBlueprintResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateBlueprintResponse#name #name} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_blueprint({
+    #     name: "OrchestrationNameString", # required
+    #     description: "Generic512CharString",
+    #     blueprint_location: "OrchestrationS3Location", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/UpdateBlueprint AWS API Documentation
+    #
+    # @overload update_blueprint(params = {})
+    # @param [Hash] params ({})
+    def update_blueprint(params = {}, options = {})
+      req = build_request(:update_blueprint, params)
       req.send_request(options)
     end
 
@@ -9276,6 +16530,9 @@ module Aws::Glue
     #       header: ["NameString"],
     #       disable_value_trimming: false,
     #       allow_single_column: false,
+    #       custom_datatype_configured: false,
+    #       custom_datatypes: ["NameString"],
+    #       serde: "OpenCSVSerDe", # accepts OpenCSVSerDe, LazySimpleSerDe, None
     #     },
     #   })
     #
@@ -9295,7 +16552,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partitions in question reside. If
-    #   none is supplied, the AWS account ID is used by default.
+    #   none is supplied, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the partitions reside.
@@ -9432,7 +16690,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partitions in question reside. If
-    #   none is supplied, the AWS account ID is used by default.
+    #   none is supplied, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the partitions reside.
@@ -9562,7 +16821,7 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which the connection resides. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :name
     #   The name of the connection definition to update.
@@ -9580,16 +16839,39 @@ module Aws::Glue
     #     connection_input: { # required
     #       name: "NameString", # required
     #       description: "DescriptionString",
-    #       connection_type: "JDBC", # required, accepts JDBC, SFTP, MONGODB, KAFKA, NETWORK, MARKETPLACE, CUSTOM
+    #       connection_type: "JDBC", # required, accepts JDBC, SFTP, MONGODB, KAFKA, NETWORK, MARKETPLACE, CUSTOM, SALESFORCE, VIEW_VALIDATION_REDSHIFT, VIEW_VALIDATION_ATHENA
     #       match_criteria: ["NameString"],
     #       connection_properties: { # required
     #         "HOST" => "ValueString",
+    #       },
+    #       athena_properties: {
+    #         "PropertyKey" => "PropertyValue",
     #       },
     #       physical_connection_requirements: {
     #         subnet_id: "NameString",
     #         security_group_id_list: ["NameString"],
     #         availability_zone: "NameString",
     #       },
+    #       authentication_configuration: {
+    #         authentication_type: "BASIC", # accepts BASIC, OAUTH2, CUSTOM
+    #         o_auth_2_properties: {
+    #           o_auth_2_grant_type: "AUTHORIZATION_CODE", # accepts AUTHORIZATION_CODE, CLIENT_CREDENTIALS, JWT_BEARER
+    #           o_auth_2_client_application: {
+    #             user_managed_client_application_client_id: "UserManagedClientApplicationClientId",
+    #             aws_managed_client_application_reference: "AWSManagedClientApplicationReference",
+    #           },
+    #           token_url: "TokenUrl",
+    #           token_url_parameters_map: {
+    #             "TokenUrlParameterKey" => "TokenUrlParameterValue",
+    #           },
+    #           authorization_code_properties: {
+    #             authorization_code: "AuthorizationCode",
+    #             redirect_uri: "RedirectUri",
+    #           },
+    #         },
+    #         secret_arn: "SecretArn",
+    #       },
+    #       validate_credentials: false,
     #     },
     #   })
     #
@@ -9613,7 +16895,7 @@ module Aws::Glue
     #   by the new crawler to access customer resources.
     #
     # @option params [String] :database_name
-    #   The AWS Glue database where results are stored, such as:
+    #   The Glue database where results are stored, such as:
     #   `arn:aws:daylight:us-east-1::database/sometable/*`.
     #
     # @option params [String] :description
@@ -9650,10 +16932,13 @@ module Aws::Glue
     # @option params [Types::LineageConfiguration] :lineage_configuration
     #   Specifies data lineage configuration settings for the crawler.
     #
+    # @option params [Types::LakeFormationConfiguration] :lake_formation_configuration
+    #   Specifies Lake Formation configuration settings for the crawler.
+    #
     # @option params [String] :configuration
     #   Crawler configuration information. This versioned JSON string allows
     #   users to specify aspects of a crawler's behavior. For more
-    #   information, see [Configuring a Crawler][1].
+    #   information, see [Setting crawler configuration options][1].
     #
     #
     #
@@ -9678,6 +16963,9 @@ module Aws::Glue
     #           path: "Path",
     #           exclusions: ["Path"],
     #           connection_name: "ConnectionName",
+    #           sample_size: 1,
+    #           event_queue_arn: "EventQueueArn",
+    #           dlq_event_queue_arn: "EventQueueArn",
     #         },
     #       ],
     #       jdbc_targets: [
@@ -9685,6 +16973,7 @@ module Aws::Glue
     #           connection_name: "ConnectionName",
     #           path: "Path",
     #           exclusions: ["Path"],
+    #           enable_additional_metadata: ["COMMENTS"], # accepts COMMENTS, RAWTYPES
     #         },
     #       ],
     #       mongo_db_targets: [
@@ -9705,6 +16994,33 @@ module Aws::Glue
     #         {
     #           database_name: "NameString", # required
     #           tables: ["NameString"], # required
+    #           connection_name: "ConnectionName",
+    #           event_queue_arn: "EventQueueArn",
+    #           dlq_event_queue_arn: "EventQueueArn",
+    #         },
+    #       ],
+    #       delta_targets: [
+    #         {
+    #           delta_tables: ["Path"],
+    #           connection_name: "ConnectionName",
+    #           write_manifest: false,
+    #           create_native_delta_table: false,
+    #         },
+    #       ],
+    #       iceberg_targets: [
+    #         {
+    #           paths: ["Path"],
+    #           connection_name: "ConnectionName",
+    #           exclusions: ["Path"],
+    #           maximum_traversal_depth: 1,
+    #         },
+    #       ],
+    #       hudi_targets: [
+    #         {
+    #           paths: ["Path"],
+    #           connection_name: "ConnectionName",
+    #           exclusions: ["Path"],
+    #           maximum_traversal_depth: 1,
     #         },
     #       ],
     #     },
@@ -9716,10 +17032,14 @@ module Aws::Glue
     #       delete_behavior: "LOG", # accepts LOG, DELETE_FROM_DATABASE, DEPRECATE_IN_DATABASE
     #     },
     #     recrawl_policy: {
-    #       recrawl_behavior: "CRAWL_EVERYTHING", # accepts CRAWL_EVERYTHING, CRAWL_NEW_FOLDERS_ONLY
+    #       recrawl_behavior: "CRAWL_EVERYTHING", # accepts CRAWL_EVERYTHING, CRAWL_NEW_FOLDERS_ONLY, CRAWL_EVENT_MODE
     #     },
     #     lineage_configuration: {
     #       crawler_lineage_settings: "ENABLE", # accepts ENABLE, DISABLE
+    #     },
+    #     lake_formation_configuration: {
+    #       use_lake_formation_credentials: false,
+    #       account_id: "AccountId",
     #     },
     #     configuration: "CrawlerConfiguration",
     #     crawler_security_configuration: "CrawlerSecurityConfiguration",
@@ -9767,11 +17087,53 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Updates the specified data quality ruleset.
+    #
+    # @option params [required, String] :name
+    #   The name of the data quality ruleset.
+    #
+    # @option params [String] :description
+    #   A description of the ruleset.
+    #
+    # @option params [String] :ruleset
+    #   A Data Quality Definition Language (DQDL) ruleset. For more
+    #   information, see the Glue developer guide.
+    #
+    # @return [Types::UpdateDataQualityRulesetResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateDataQualityRulesetResponse#name #name} => String
+    #   * {Types::UpdateDataQualityRulesetResponse#description #description} => String
+    #   * {Types::UpdateDataQualityRulesetResponse#ruleset #ruleset} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_data_quality_ruleset({
+    #     name: "NameString", # required
+    #     description: "DescriptionString",
+    #     ruleset: "DataQualityRulesetString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #   resp.description #=> String
+    #   resp.ruleset #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/UpdateDataQualityRuleset AWS API Documentation
+    #
+    # @overload update_data_quality_ruleset(params = {})
+    # @param [Hash] params ({})
+    def update_data_quality_ruleset(params = {}, options = {})
+      req = build_request(:update_data_quality_ruleset, params)
+      req.send_request(options)
+    end
+
     # Updates an existing database definition in a Data Catalog.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog in which the metadata database resides. If
-    #   none is provided, the AWS account ID is used by default.
+    #   none is provided, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :name
     #   The name of the database to update in the catalog. For Hive
@@ -9806,6 +17168,11 @@ module Aws::Glue
     #       target_database: {
     #         catalog_id: "CatalogIdString",
     #         database_name: "NameString",
+    #         region: "NameString",
+    #       },
+    #       federated_database: {
+    #         identifier: "FederationIdentifier",
+    #         connection_name: "NameString",
     #       },
     #     },
     #   })
@@ -9852,9 +17219,7 @@ module Aws::Glue
     #
     #   * `"--enable-glue-datacatalog": ""`
     #
-    #   * `"GLUE_PYTHON_VERSION": "3"`
-    #
-    #   * `"GLUE_PYTHON_VERSION": "2"`
+    #   ^
     #
     #   You can specify a version of Python support for development endpoints
     #   by using the `Arguments` parameter in the `CreateDevEndpoint` or
@@ -9890,56 +17255,19 @@ module Aws::Glue
       req.send_request(options)
     end
 
-    # Updates an existing job definition.
+    # Updates an existing job definition. The previous job definition is
+    # completely overwritten by this information.
     #
     # @option params [required, String] :job_name
     #   The name of the job definition to update.
     #
     # @option params [required, Types::JobUpdate] :job_update
     #   Specifies the values with which to update the job definition.
+    #   Unspecified configuration is removed or reset to default values.
     #
     # @return [Types::UpdateJobResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateJobResponse#job_name #job_name} => String
-    #
-    # @example Request syntax with placeholder values
-    #
-    #   resp = client.update_job({
-    #     job_name: "NameString", # required
-    #     job_update: { # required
-    #       description: "DescriptionString",
-    #       log_uri: "UriString",
-    #       role: "RoleString",
-    #       execution_property: {
-    #         max_concurrent_runs: 1,
-    #       },
-    #       command: {
-    #         name: "GenericString",
-    #         script_location: "ScriptLocationString",
-    #         python_version: "PythonVersionString",
-    #       },
-    #       default_arguments: {
-    #         "GenericString" => "GenericString",
-    #       },
-    #       non_overridable_arguments: {
-    #         "GenericString" => "GenericString",
-    #       },
-    #       connections: {
-    #         connections: ["GenericString"],
-    #       },
-    #       max_retries: 1,
-    #       allocated_capacity: 1,
-    #       timeout: 1,
-    #       max_capacity: 1.0,
-    #       worker_type: "Standard", # accepts Standard, G.1X, G.2X
-    #       number_of_workers: 1,
-    #       security_configuration: "NameString",
-    #       notification_property: {
-    #         notify_delay_after: 1,
-    #       },
-    #       glue_version: "GlueVersionString",
-    #     },
-    #   })
     #
     # @example Response structure
     #
@@ -9951,6 +17279,77 @@ module Aws::Glue
     # @param [Hash] params ({})
     def update_job(params = {}, options = {})
       req = build_request(:update_job, params)
+      req.send_request(options)
+    end
+
+    # Synchronizes a job from the source control repository. This operation
+    # takes the job artifacts that are located in the remote repository and
+    # updates the Glue internal stores with these artifacts.
+    #
+    # This API supports optional parameters which take in the repository
+    # information.
+    #
+    # @option params [String] :job_name
+    #   The name of the Glue job to be synchronized to or from the remote
+    #   repository.
+    #
+    # @option params [String] :provider
+    #   The provider for the remote repository. Possible values: GITHUB,
+    #   AWS\_CODE\_COMMIT, GITLAB, BITBUCKET.
+    #
+    # @option params [String] :repository_name
+    #   The name of the remote repository that contains the job artifacts. For
+    #   BitBucket providers, `RepositoryName` should include `WorkspaceName`.
+    #   Use the format `<WorkspaceName>/<RepositoryName>`.
+    #
+    # @option params [String] :repository_owner
+    #   The owner of the remote repository that contains the job artifacts.
+    #
+    # @option params [String] :branch_name
+    #   An optional branch in the remote repository.
+    #
+    # @option params [String] :folder
+    #   An optional folder in the remote repository.
+    #
+    # @option params [String] :commit_id
+    #   A commit ID for a commit in the remote repository.
+    #
+    # @option params [String] :auth_strategy
+    #   The type of authentication, which can be an authentication token
+    #   stored in Amazon Web Services Secrets Manager, or a personal access
+    #   token.
+    #
+    # @option params [String] :auth_token
+    #   The value of the authorization token.
+    #
+    # @return [Types::UpdateJobFromSourceControlResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateJobFromSourceControlResponse#job_name #job_name} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_job_from_source_control({
+    #     job_name: "NameString",
+    #     provider: "GITHUB", # accepts GITHUB, GITLAB, BITBUCKET, AWS_CODE_COMMIT
+    #     repository_name: "NameString",
+    #     repository_owner: "NameString",
+    #     branch_name: "NameString",
+    #     folder: "NameString",
+    #     commit_id: "CommitIdString",
+    #     auth_strategy: "PERSONAL_ACCESS_TOKEN", # accepts PERSONAL_ACCESS_TOKEN, AWS_SECRETS_MANAGER
+    #     auth_token: "AuthTokenString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.job_name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/UpdateJobFromSourceControl AWS API Documentation
+    #
+    # @overload update_job_from_source_control(params = {})
+    # @param [Hash] params ({})
+    def update_job_from_source_control(params = {}, options = {})
+      req = build_request(:update_job_from_source_control, params)
       req.send_request(options)
     end
 
@@ -9980,10 +17379,10 @@ module Aws::Glue
     #   required permissions.
     #
     # @option params [String] :glue_version
-    #   This value determines which version of AWS Glue this machine learning
+    #   This value determines which version of Glue this machine learning
     #   transform is compatible with. Glue 1.0 is recommended for most
     #   customers. If the value is not set, the Glue compatibility defaults to
-    #   Glue 0.9. For more information, see [AWS Glue Versions][1] in the
+    #   Glue 0.9. For more information, see [Glue Versions][1] in the
     #   developer guide.
     #
     #
@@ -9991,11 +17390,11 @@ module Aws::Glue
     #   [1]: https://docs.aws.amazon.com/glue/latest/dg/release-notes.html#release-notes-versions
     #
     # @option params [Float] :max_capacity
-    #   The number of AWS Glue data processing units (DPUs) that are allocated
-    #   to task runs for this transform. You can allocate from 2 to 100 DPUs;
-    #   the default is 10. A DPU is a relative measure of processing power
-    #   that consists of 4 vCPUs of compute capacity and 16 GB of memory. For
-    #   more information, see the [AWS Glue pricing page][1].
+    #   The number of Glue data processing units (DPUs) that are allocated to
+    #   task runs for this transform. You can allocate from 2 to 100 DPUs; the
+    #   default is 10. A DPU is a relative measure of processing power that
+    #   consists of 4 vCPUs of compute capacity and 16 GB of memory. For more
+    #   information, see the [Glue pricing page][1].
     #
     #   When the `WorkerType` field is set to a value other than `Standard`,
     #   the `MaxCapacity` field is set automatically and becomes read-only.
@@ -10053,7 +17452,7 @@ module Aws::Glue
     #     role: "RoleString",
     #     glue_version: "GlueVersionString",
     #     max_capacity: 1.0,
-    #     worker_type: "Standard", # accepts Standard, G.1X, G.2X
+    #     worker_type: "Standard", # accepts Standard, G.1X, G.2X, G.025X, G.4X, G.8X, Z.2X
     #     number_of_workers: 1,
     #     timeout: 1,
     #     max_retries: 1,
@@ -10076,7 +17475,8 @@ module Aws::Glue
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the partition to be updated resides.
-    #   If none is provided, the AWS account ID is used by default.
+    #   If none is provided, the Amazon Web Services account ID is used by
+    #   default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database in which the table in question
@@ -10119,6 +17519,7 @@ module Aws::Glue
     #           },
     #         ],
     #         location: "LocationString",
+    #         additional_locations: ["LocationString"],
     #         input_format: "FormatString",
     #         output_format: "FormatString",
     #         compressed: false,
@@ -10287,11 +17688,82 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Synchronizes a job to the source control repository. This operation
+    # takes the job artifacts from the Glue internal stores and makes a
+    # commit to the remote repository that is configured on the job.
+    #
+    # This API supports optional parameters which take in the repository
+    # information.
+    #
+    # @option params [String] :job_name
+    #   The name of the Glue job to be synchronized to or from the remote
+    #   repository.
+    #
+    # @option params [String] :provider
+    #   The provider for the remote repository. Possible values: GITHUB,
+    #   AWS\_CODE\_COMMIT, GITLAB, BITBUCKET.
+    #
+    # @option params [String] :repository_name
+    #   The name of the remote repository that contains the job artifacts. For
+    #   BitBucket providers, `RepositoryName` should include `WorkspaceName`.
+    #   Use the format `<WorkspaceName>/<RepositoryName>`.
+    #
+    # @option params [String] :repository_owner
+    #   The owner of the remote repository that contains the job artifacts.
+    #
+    # @option params [String] :branch_name
+    #   An optional branch in the remote repository.
+    #
+    # @option params [String] :folder
+    #   An optional folder in the remote repository.
+    #
+    # @option params [String] :commit_id
+    #   A commit ID for a commit in the remote repository.
+    #
+    # @option params [String] :auth_strategy
+    #   The type of authentication, which can be an authentication token
+    #   stored in Amazon Web Services Secrets Manager, or a personal access
+    #   token.
+    #
+    # @option params [String] :auth_token
+    #   The value of the authorization token.
+    #
+    # @return [Types::UpdateSourceControlFromJobResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateSourceControlFromJobResponse#job_name #job_name} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_source_control_from_job({
+    #     job_name: "NameString",
+    #     provider: "GITHUB", # accepts GITHUB, GITLAB, BITBUCKET, AWS_CODE_COMMIT
+    #     repository_name: "NameString",
+    #     repository_owner: "NameString",
+    #     branch_name: "NameString",
+    #     folder: "NameString",
+    #     commit_id: "CommitIdString",
+    #     auth_strategy: "PERSONAL_ACCESS_TOKEN", # accepts PERSONAL_ACCESS_TOKEN, AWS_SECRETS_MANAGER
+    #     auth_token: "AuthTokenString",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.job_name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/UpdateSourceControlFromJob AWS API Documentation
+    #
+    # @overload update_source_control_from_job(params = {})
+    # @param [Hash] params ({})
+    def update_source_control_from_job(params = {}, options = {})
+      req = build_request(:update_source_control_from_job, params)
+      req.send_request(options)
+    end
+
     # Updates a metadata table in the Data Catalog.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the table resides. If none is
-    #   provided, the AWS account ID is used by default.
+    #   provided, the Amazon Web Services account ID is used by default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database in which the table resides. For Hive
@@ -10305,6 +17777,19 @@ module Aws::Glue
     #   By default, `UpdateTable` always creates an archived version of the
     #   table before updating it. However, if `skipArchive` is set to true,
     #   `UpdateTable` does not create the archived version.
+    #
+    # @option params [String] :transaction_id
+    #   The transaction ID at which to update the table contents.
+    #
+    # @option params [String] :version_id
+    #   The version ID at which to update the table contents.
+    #
+    # @option params [String] :view_update_action
+    #   The operation to be performed when updating the view.
+    #
+    # @option params [Boolean] :force
+    #   A flag that can be set to true to ignore matching storage descriptor
+    #   and subobject matching requirements.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -10332,6 +17817,7 @@ module Aws::Glue
     #           },
     #         ],
     #         location: "LocationString",
+    #         additional_locations: ["LocationString"],
     #         input_format: "FormatString",
     #         output_format: "FormatString",
     #         compressed: false,
@@ -10391,9 +17877,28 @@ module Aws::Glue
     #         catalog_id: "CatalogIdString",
     #         database_name: "NameString",
     #         name: "NameString",
+    #         region: "NameString",
+    #       },
+    #       view_definition: {
+    #         is_protected: false,
+    #         definer: "ArnString",
+    #         representations: [
+    #           {
+    #             dialect: "REDSHIFT", # accepts REDSHIFT, ATHENA, SPARK
+    #             dialect_version: "ViewDialectVersionString",
+    #             view_original_text: "ViewTextString",
+    #             validation_connection: "NameString",
+    #             view_expanded_text: "ViewTextString",
+    #           },
+    #         ],
+    #         sub_objects: ["ArnString"],
     #       },
     #     },
     #     skip_archive: false,
+    #     transaction_id: "TransactionIdString",
+    #     version_id: "VersionString",
+    #     view_update_action: "ADD", # accepts ADD, REPLACE, ADD_OR_REPLACE, DROP
+    #     force: false,
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/UpdateTable AWS API Documentation
@@ -10402,6 +17907,62 @@ module Aws::Glue
     # @param [Hash] params ({})
     def update_table(params = {}, options = {})
       req = build_request(:update_table, params)
+      req.send_request(options)
+    end
+
+    # Updates the configuration for an existing table optimizer.
+    #
+    # @option params [required, String] :catalog_id
+    #   The Catalog ID of the table.
+    #
+    # @option params [required, String] :database_name
+    #   The name of the database in the catalog in which the table resides.
+    #
+    # @option params [required, String] :table_name
+    #   The name of the table.
+    #
+    # @option params [required, String] :type
+    #   The type of table optimizer. Currently, the only valid value is
+    #   `compaction`.
+    #
+    # @option params [required, Types::TableOptimizerConfiguration] :table_optimizer_configuration
+    #   A `TableOptimizerConfiguration` object representing the configuration
+    #   of a table optimizer.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_table_optimizer({
+    #     catalog_id: "CatalogIdString", # required
+    #     database_name: "NameString", # required
+    #     table_name: "NameString", # required
+    #     type: "compaction", # required, accepts compaction, retention, orphan_file_deletion
+    #     table_optimizer_configuration: { # required
+    #       role_arn: "ArnString",
+    #       enabled: false,
+    #       retention_configuration: {
+    #         iceberg_configuration: {
+    #           snapshot_retention_period_in_days: 1,
+    #           number_of_snapshots_to_retain: 1,
+    #           clean_expired_files: false,
+    #         },
+    #       },
+    #       orphan_file_deletion_configuration: {
+    #         iceberg_configuration: {
+    #           orphan_file_retention_period_in_days: 1,
+    #           location: "MessageString",
+    #         },
+    #       },
+    #     },
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/UpdateTableOptimizer AWS API Documentation
+    #
+    # @overload update_table_optimizer(params = {})
+    # @param [Hash] params ({})
+    def update_table_optimizer(params = {}, options = {})
+      req = build_request(:update_table_optimizer, params)
       req.send_request(options)
     end
 
@@ -10445,11 +18006,15 @@ module Aws::Glue
     #           {
     #             logical_operator: "EQUALS", # accepts EQUALS
     #             job_name: "NameString",
-    #             state: "STARTING", # accepts STARTING, RUNNING, STOPPING, STOPPED, SUCCEEDED, FAILED, TIMEOUT
+    #             state: "STARTING", # accepts STARTING, RUNNING, STOPPING, STOPPED, SUCCEEDED, FAILED, TIMEOUT, ERROR, WAITING, EXPIRED
     #             crawler_name: "NameString",
-    #             crawl_state: "RUNNING", # accepts RUNNING, CANCELLING, CANCELLED, SUCCEEDED, FAILED
+    #             crawl_state: "RUNNING", # accepts RUNNING, CANCELLING, CANCELLED, SUCCEEDED, FAILED, ERROR
     #           },
     #         ],
+    #       },
+    #       event_batching_condition: {
+    #         batch_size: 1, # required
+    #         batch_window: 1,
     #       },
     #     },
     #   })
@@ -10459,7 +18024,7 @@ module Aws::Glue
     #   resp.trigger.name #=> String
     #   resp.trigger.workflow_name #=> String
     #   resp.trigger.id #=> String
-    #   resp.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND"
+    #   resp.trigger.type #=> String, one of "SCHEDULED", "CONDITIONAL", "ON_DEMAND", "EVENT"
     #   resp.trigger.state #=> String, one of "CREATING", "CREATED", "ACTIVATING", "ACTIVATED", "DEACTIVATING", "DEACTIVATED", "DELETING", "UPDATING"
     #   resp.trigger.description #=> String
     #   resp.trigger.schedule #=> String
@@ -10475,9 +18040,11 @@ module Aws::Glue
     #   resp.trigger.predicate.conditions #=> Array
     #   resp.trigger.predicate.conditions[0].logical_operator #=> String, one of "EQUALS"
     #   resp.trigger.predicate.conditions[0].job_name #=> String
-    #   resp.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT"
+    #   resp.trigger.predicate.conditions[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED", "SUCCEEDED", "FAILED", "TIMEOUT", "ERROR", "WAITING", "EXPIRED"
     #   resp.trigger.predicate.conditions[0].crawler_name #=> String
-    #   resp.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED"
+    #   resp.trigger.predicate.conditions[0].crawl_state #=> String, one of "RUNNING", "CANCELLING", "CANCELLED", "SUCCEEDED", "FAILED", "ERROR"
+    #   resp.trigger.event_batching_condition.batch_size #=> Integer
+    #   resp.trigger.event_batching_condition.batch_window #=> Integer
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/UpdateTrigger AWS API Documentation
     #
@@ -10488,11 +18055,66 @@ module Aws::Glue
       req.send_request(options)
     end
 
+    # Update an Glue usage profile.
+    #
+    # @option params [required, String] :name
+    #   The name of the usage profile.
+    #
+    # @option params [String] :description
+    #   A description of the usage profile.
+    #
+    # @option params [required, Types::ProfileConfiguration] :configuration
+    #   A `ProfileConfiguration` object specifying the job and session values
+    #   for the profile.
+    #
+    # @return [Types::UpdateUsageProfileResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateUsageProfileResponse#name #name} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_usage_profile({
+    #     name: "NameString", # required
+    #     description: "DescriptionString",
+    #     configuration: { # required
+    #       session_configuration: {
+    #         "NameString" => {
+    #           default_value: "ConfigValueString",
+    #           allowed_values: ["ConfigValueString"],
+    #           min_value: "ConfigValueString",
+    #           max_value: "ConfigValueString",
+    #         },
+    #       },
+    #       job_configuration: {
+    #         "NameString" => {
+    #           default_value: "ConfigValueString",
+    #           allowed_values: ["ConfigValueString"],
+    #           min_value: "ConfigValueString",
+    #           max_value: "ConfigValueString",
+    #         },
+    #       },
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/glue-2017-03-31/UpdateUsageProfile AWS API Documentation
+    #
+    # @overload update_usage_profile(params = {})
+    # @param [Hash] params ({})
+    def update_usage_profile(params = {}, options = {})
+      req = build_request(:update_usage_profile, params)
+      req.send_request(options)
+    end
+
     # Updates an existing function definition in the Data Catalog.
     #
     # @option params [String] :catalog_id
     #   The ID of the Data Catalog where the function to be updated is
-    #   located. If none is provided, the AWS account ID is used by default.
+    #   located. If none is provided, the Amazon Web Services account ID is
+    #   used by default.
     #
     # @option params [required, String] :database_name
     #   The name of the catalog database where the function to be updated is
@@ -10589,14 +18211,19 @@ module Aws::Glue
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::Glue')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-glue'
-      context[:gem_version] = '1.82.0'
+      context[:gem_version] = '1.198.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

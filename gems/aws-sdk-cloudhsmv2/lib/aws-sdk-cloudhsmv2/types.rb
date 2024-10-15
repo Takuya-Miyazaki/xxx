@@ -3,15 +3,15 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::CloudHSMV2
   module Types
 
-    # Contains information about a backup of an AWS CloudHSM cluster. All
-    # backup objects contain the `BackupId`, `BackupState`, `ClusterId`, and
+    # Contains information about a backup of an CloudHSM cluster. All backup
+    # objects contain the `BackupId`, `BackupState`, `ClusterId`, and
     # `CreateTimestamp` parameters. Backups that were copied into a
     # destination region additionally contain the `CopyTimestamp`,
     # `SourceBackup`, `SourceCluster`, and `SourceRegion` parameters. A
@@ -20,6 +20,10 @@ module Aws::CloudHSMV2
     #
     # @!attribute [rw] backup_id
     #   The identifier (ID) of the backup.
+    #   @return [String]
+    #
+    # @!attribute [rw] backup_arn
+    #   The Amazon Resource Name (ARN) of the backup.
     #   @return [String]
     #
     # @!attribute [rw] backup_state
@@ -68,10 +72,19 @@ module Aws::CloudHSMV2
     #   The list of tags for the backup.
     #   @return [Array<Types::Tag>]
     #
+    # @!attribute [rw] hsm_type
+    #   The HSM type used to create the backup.
+    #   @return [String]
+    #
+    # @!attribute [rw] mode
+    #   The mode of the cluster that was backed up.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloudhsmv2-2017-04-28/Backup AWS API Documentation
     #
     class Backup < Struct.new(
       :backup_id,
+      :backup_arn,
       :backup_state,
       :cluster_id,
       :create_timestamp,
@@ -81,20 +94,14 @@ module Aws::CloudHSMV2
       :source_backup,
       :source_cluster,
       :delete_timestamp,
-      :tag_list)
+      :tag_list,
+      :hsm_type,
+      :mode)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # A policy that defines the number of days to retain backups.
-    #
-    # @note When making an API call, you may pass BackupRetentionPolicy
-    #   data as a hash:
-    #
-    #       {
-    #         type: "DAYS", # accepts DAYS
-    #         value: "BackupRetentionValue",
-    #       }
     #
     # @!attribute [rw] type
     #   The type of backup retention policy. For the `DAYS` type, the value
@@ -127,7 +134,7 @@ module Aws::CloudHSMV2
     #   @return [String]
     #
     # @!attribute [rw] aws_hardware_certificate
-    #   The HSM hardware certificate issued (signed) by AWS CloudHSM.
+    #   The HSM hardware certificate issued (signed) by CloudHSM.
     #   @return [String]
     #
     # @!attribute [rw] manufacturer_hardware_certificate
@@ -166,8 +173,8 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # The request was rejected because of an AWS CloudHSM internal failure.
-    # The request can be retried.
+    # The request was rejected because of an CloudHSM internal failure. The
+    # request can be retried.
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -234,7 +241,7 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # Contains information about an AWS CloudHSM cluster.
+    # Contains information about an CloudHSM cluster.
     #
     # @!attribute [rw] backup_policy
     #   The cluster's backup policy.
@@ -301,6 +308,10 @@ module Aws::CloudHSMV2
     #   The list of tags for the cluster.
     #   @return [Array<Types::Tag>]
     #
+    # @!attribute [rw] mode
+    #   The mode of the cluster.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloudhsmv2-2017-04-28/Cluster AWS API Documentation
     #
     class Cluster < Struct.new(
@@ -318,25 +329,12 @@ module Aws::CloudHSMV2
       :subnet_mapping,
       :vpc_id,
       :certificates,
-      :tag_list)
+      :tag_list,
+      :mode)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CopyBackupToRegionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         destination_region: "Region", # required
-    #         backup_id: "BackupId", # required
-    #         tag_list: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] destination_region
     #   The AWS region that will contain your copied CloudHSM cluster
     #   backup.
@@ -382,38 +380,21 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateClusterRequest
-    #   data as a hash:
-    #
-    #       {
-    #         backup_retention_policy: {
-    #           type: "DAYS", # accepts DAYS
-    #           value: "BackupRetentionValue",
-    #         },
-    #         hsm_type: "HsmType", # required
-    #         source_backup_id: "BackupId",
-    #         subnet_ids: ["SubnetId"], # required
-    #         tag_list: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] backup_retention_policy
     #   A policy that defines how the service retains backups.
     #   @return [Types::BackupRetentionPolicy]
     #
     # @!attribute [rw] hsm_type
-    #   The type of HSM to use in the cluster. Currently the only allowed
-    #   value is `hsm1.medium`.
+    #   The type of HSM to use in the cluster. The allowed values are
+    #   `hsm1.medium` and `hsm2m.medium`.
     #   @return [String]
     #
     # @!attribute [rw] source_backup_id
-    #   The identifier (ID) of the cluster backup to restore. Use this value
-    #   to restore the cluster from a backup instead of creating a new
-    #   cluster. To find the backup ID, use DescribeBackups.
+    #   The identifier (ID) or the Amazon Resource Name (ARN) of the cluster
+    #   backup to restore. Use this value to restore the cluster from a
+    #   backup instead of creating a new cluster. To find the backup ID or
+    #   ARN, use DescribeBackups. *If using a backup in another account, the
+    #   full ARN must be supplied.*
     #   @return [String]
     #
     # @!attribute [rw] subnet_ids
@@ -430,6 +411,11 @@ module Aws::CloudHSMV2
     #   Tags to apply to the CloudHSM cluster during creation.
     #   @return [Array<Types::Tag>]
     #
+    # @!attribute [rw] mode
+    #   The mode to use in the cluster. The allowed values are `FIPS` and
+    #   `NON_FIPS`.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloudhsmv2-2017-04-28/CreateClusterRequest AWS API Documentation
     #
     class CreateClusterRequest < Struct.new(
@@ -437,7 +423,8 @@ module Aws::CloudHSMV2
       :hsm_type,
       :source_backup_id,
       :subnet_ids,
-      :tag_list)
+      :tag_list,
+      :mode)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -454,15 +441,6 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateHsmRequest
-    #   data as a hash:
-    #
-    #       {
-    #         cluster_id: "ClusterId", # required
-    #         availability_zone: "ExternalAz", # required
-    #         ip_address: "IpAddress",
-    #       }
-    #
     # @!attribute [rw] cluster_id
     #   The identifier (ID) of the HSM's cluster. To find the cluster ID,
     #   use DescribeClusters.
@@ -502,13 +480,6 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteBackupRequest
-    #   data as a hash:
-    #
-    #       {
-    #         backup_id: "BackupId", # required
-    #       }
-    #
     # @!attribute [rw] backup_id
     #   The ID of the backup to be deleted. To find the ID of a backup, use
     #   the DescribeBackups operation.
@@ -534,13 +505,6 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteClusterRequest
-    #   data as a hash:
-    #
-    #       {
-    #         cluster_id: "ClusterId", # required
-    #       }
-    #
     # @!attribute [rw] cluster_id
     #   The identifier (ID) of the cluster that you are deleting. To find
     #   the cluster ID, use DescribeClusters.
@@ -566,16 +530,6 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteHsmRequest
-    #   data as a hash:
-    #
-    #       {
-    #         cluster_id: "ClusterId", # required
-    #         hsm_id: "HsmId",
-    #         eni_id: "EniId",
-    #         eni_ip: "IpAddress",
-    #       }
-    #
     # @!attribute [rw] cluster_id
     #   The identifier (ID) of the cluster that contains the HSM that you
     #   are deleting.
@@ -618,18 +572,37 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeBackupsRequest
-    #   data as a hash:
+    # @!attribute [rw] resource_arn
+    #   Amazon Resource Name (ARN) of the resource from which the policy
+    #   will be removed.
+    #   @return [String]
     #
-    #       {
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #         filters: {
-    #           "Field" => ["String"],
-    #         },
-    #         sort_ascending: false,
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cloudhsmv2-2017-04-28/DeleteResourcePolicyRequest AWS API Documentation
     #
+    class DeleteResourcePolicyRequest < Struct.new(
+      :resource_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] resource_arn
+    #   Amazon Resource Name (ARN) of the resource from which the policy was
+    #   deleted.
+    #   @return [String]
+    #
+    # @!attribute [rw] policy
+    #   The policy previously attached to the resource.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cloudhsmv2-2017-04-28/DeleteResourcePolicyResponse AWS API Documentation
+    #
+    class DeleteResourcePolicyResponse < Struct.new(
+      :resource_arn,
+      :policy)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] next_token
     #   The `NextToken` value that you received in the previous response.
     #   Use this value to get more backups.
@@ -664,6 +637,26 @@ module Aws::CloudHSMV2
     #   with a backup retention policy defined at the cluster.
     #   @return [Hash<String,Array<String>>]
     #
+    # @!attribute [rw] shared
+    #   Describe backups that are shared with you.
+    #
+    #   <note markdown="1"> By default when using this option, the command returns backups that
+    #   have been shared using a standard Resource Access Manager resource
+    #   share. In order for a backup that was shared using the
+    #   PutResourcePolicy command to be returned, the share must be promoted
+    #   to a standard resource share using the RAM
+    #   [PromoteResourceShareCreatedFromPolicy][1] API operation. For more
+    #   information about sharing backups, see [ Working with shared
+    #   backups][2] in the CloudHSM User Guide.
+    #
+    #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/cli/latest/reference/ram/promote-resource-share-created-from-policy.html
+    #   [2]: https://docs.aws.amazon.com/cloudhsm/latest/userguide/sharing.html
+    #   @return [Boolean]
+    #
     # @!attribute [rw] sort_ascending
     #   Designates whether or not to sort the return backups by ascending
     #   chronological order of generation.
@@ -675,6 +668,7 @@ module Aws::CloudHSMV2
       :next_token,
       :max_results,
       :filters,
+      :shared,
       :sort_ascending)
       SENSITIVE = []
       include Aws::Structure
@@ -699,17 +693,6 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeClustersRequest
-    #   data as a hash:
-    #
-    #       {
-    #         filters: {
-    #           "Field" => ["String"],
-    #         },
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] filters
     #   One or more filters to limit the items returned in the response.
     #
@@ -797,7 +780,32 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # Contains information about a hardware security module (HSM) in an AWS
+    # @!attribute [rw] resource_arn
+    #   Amazon Resource Name (ARN) of the resource to which a policy is
+    #   attached.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cloudhsmv2-2017-04-28/GetResourcePolicyRequest AWS API Documentation
+    #
+    class GetResourcePolicyRequest < Struct.new(
+      :resource_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] policy
+    #   The policy attached to a resource.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cloudhsmv2-2017-04-28/GetResourcePolicyResponse AWS API Documentation
+    #
+    class GetResourcePolicyResponse < Struct.new(
+      :policy)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains information about a hardware security module (HSM) in an
     # CloudHSM cluster.
     #
     # @!attribute [rw] availability_zone
@@ -847,15 +855,6 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass InitializeClusterRequest
-    #   data as a hash:
-    #
-    #       {
-    #         cluster_id: "ClusterId", # required
-    #         signed_cert: "Cert", # required
-    #         trust_anchor: "Cert", # required
-    #       }
-    #
     # @!attribute [rw] cluster_id
     #   The identifier (ID) of the cluster that you are claiming. To find
     #   the cluster ID, use DescribeClusters.
@@ -903,15 +902,6 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_id: "ResourceId", # required
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] resource_id
     #   The cluster identifier (ID) for the cluster whose tags you are
     #   getting. To find the cluster ID, use DescribeClusters.
@@ -957,14 +947,6 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ModifyBackupAttributesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         backup_id: "BackupId", # required
-    #         never_expires: false, # required
-    #       }
-    #
     # @!attribute [rw] backup_id
     #   The identifier (ID) of the backup to modify. To find the ID of a
     #   backup, use the DescribeBackups operation.
@@ -987,7 +969,7 @@ module Aws::CloudHSMV2
     end
 
     # @!attribute [rw] backup
-    #   Contains information about a backup of an AWS CloudHSM cluster. All
+    #   Contains information about a backup of an CloudHSM cluster. All
     #   backup objects contain the `BackupId`, `BackupState`, `ClusterId`,
     #   and `CreateTimestamp` parameters. Backups that were copied into a
     #   destination region additionally contain the `CopyTimestamp`,
@@ -1004,17 +986,6 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ModifyClusterRequest
-    #   data as a hash:
-    #
-    #       {
-    #         backup_retention_policy: { # required
-    #           type: "DAYS", # accepts DAYS
-    #           value: "BackupRetentionValue",
-    #         },
-    #         cluster_id: "ClusterId", # required
-    #       }
-    #
     # @!attribute [rw] backup_retention_policy
     #   A policy that defines how the service retains backups.
     #   @return [Types::BackupRetentionPolicy]
@@ -1034,7 +1005,7 @@ module Aws::CloudHSMV2
     end
 
     # @!attribute [rw] cluster
-    #   Contains information about an AWS CloudHSM cluster.
+    #   Contains information about an CloudHSM cluster.
     #   @return [Types::Cluster]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cloudhsmv2-2017-04-28/ModifyClusterResponse AWS API Documentation
@@ -1045,13 +1016,49 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RestoreBackupRequest
-    #   data as a hash:
+    # @!attribute [rw] resource_arn
+    #   Amazon Resource Name (ARN) of the resource to which you want to
+    #   attach a policy.
+    #   @return [String]
     #
-    #       {
-    #         backup_id: "BackupId", # required
-    #       }
+    # @!attribute [rw] policy
+    #   The policy you want to associate with a resource.
     #
+    #   For an example policy, see [ Working with shared backups][1] in the
+    #   CloudHSM User Guide
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/cloudhsm/latest/userguide/sharing.html
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cloudhsmv2-2017-04-28/PutResourcePolicyRequest AWS API Documentation
+    #
+    class PutResourcePolicyRequest < Struct.new(
+      :resource_arn,
+      :policy)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] resource_arn
+    #   Amazon Resource Name (ARN) of the resource to which a policy is
+    #   attached.
+    #   @return [String]
+    #
+    # @!attribute [rw] policy
+    #   The policy attached to a resource.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cloudhsmv2-2017-04-28/PutResourcePolicyResponse AWS API Documentation
+    #
+    class PutResourcePolicyResponse < Struct.new(
+      :resource_arn,
+      :policy)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] backup_id
     #   The ID of the backup to be restored. To find the ID of a backup, use
     #   the DescribeBackups operation.
@@ -1079,14 +1086,6 @@ module Aws::CloudHSMV2
 
     # Contains a tag. A tag is a key-value pair.
     #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey", # required
-    #         value: "TagValue", # required
-    #       }
-    #
     # @!attribute [rw] key
     #   The key of the tag.
     #   @return [String]
@@ -1104,19 +1103,6 @@ module Aws::CloudHSMV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_id: "ResourceId", # required
-    #         tag_list: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] resource_id
     #   The cluster identifier (ID) for the cluster that you are tagging. To
     #   find the cluster ID, use DescribeClusters.
@@ -1139,14 +1125,6 @@ module Aws::CloudHSMV2
     #
     class TagResourceResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_id: "ResourceId", # required
-    #         tag_key_list: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_id
     #   The cluster identifier (ID) for the cluster whose tags you are
     #   removing. To find the cluster ID, use DescribeClusters.
@@ -1172,3 +1150,4 @@ module Aws::CloudHSMV2
 
   end
 end
+

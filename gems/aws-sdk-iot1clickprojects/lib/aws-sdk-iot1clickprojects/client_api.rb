@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::IoT1ClickProjects
   # @api private
@@ -284,9 +285,11 @@ module Aws::IoT1ClickProjects
 
       api.metadata = {
         "apiVersion" => "2018-05-14",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "projects.iot1click",
         "jsonVersion" => "1.1",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceAbbreviation" => "AWS IoT 1-Click Projects",
         "serviceFullName" => "AWS IoT 1-Click Projects Service",
         "serviceId" => "IoT 1Click Projects",

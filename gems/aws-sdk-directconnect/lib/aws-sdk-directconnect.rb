@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-directconnect/types'
-require_relative 'aws-sdk-directconnect/client_api'
-require_relative 'aws-sdk-directconnect/client'
-require_relative 'aws-sdk-directconnect/errors'
-require_relative 'aws-sdk-directconnect/resource'
-require_relative 'aws-sdk-directconnect/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:directconnect)
 
 # This module provides support for AWS Direct Connect. This module is available in the
 # `aws-sdk-directconnect` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-directconnect/customizations'
 #
 # @!group service
 module Aws::DirectConnect
+  autoload :Types, 'aws-sdk-directconnect/types'
+  autoload :ClientApi, 'aws-sdk-directconnect/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-directconnect/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-directconnect/client'
+  autoload :Errors, 'aws-sdk-directconnect/errors'
+  autoload :Resource, 'aws-sdk-directconnect/resource'
+  autoload :EndpointParameters, 'aws-sdk-directconnect/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-directconnect/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-directconnect/endpoints'
 
-  GEM_VERSION = '1.37.0'
+  GEM_VERSION = '1.83.0'
 
 end
+
+require_relative 'aws-sdk-directconnect/customizations'

@@ -3,20 +3,13 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::ApiGatewayManagementApi
   module Types
 
-    # @note When making an API call, you may pass DeleteConnectionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         connection_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] connection_id
     #   @return [String]
     #
@@ -30,13 +23,6 @@ module Aws::ApiGatewayManagementApi
     #
     class ForbiddenException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass GetConnectionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         connection_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] connection_id
     #   @return [String]
     #
@@ -94,14 +80,6 @@ module Aws::ApiGatewayManagementApi
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PostToConnectionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         data: "data", # required
-    #         connection_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] data
     #   The data to be sent to the client specified by its connection id.
     #   @return [String]
@@ -123,3 +101,4 @@ module Aws::ApiGatewayManagementApi
 
   end
 end
+

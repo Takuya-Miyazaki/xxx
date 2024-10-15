@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-wellarchitected/types'
-require_relative 'aws-sdk-wellarchitected/client_api'
-require_relative 'aws-sdk-wellarchitected/client'
-require_relative 'aws-sdk-wellarchitected/errors'
-require_relative 'aws-sdk-wellarchitected/resource'
-require_relative 'aws-sdk-wellarchitected/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:wellarchitected)
 
 # This module provides support for AWS Well-Architected Tool. This module is available in the
 # `aws-sdk-wellarchitected` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-wellarchitected/customizations'
 #
 # @!group service
 module Aws::WellArchitected
+  autoload :Types, 'aws-sdk-wellarchitected/types'
+  autoload :ClientApi, 'aws-sdk-wellarchitected/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-wellarchitected/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-wellarchitected/client'
+  autoload :Errors, 'aws-sdk-wellarchitected/errors'
+  autoload :Resource, 'aws-sdk-wellarchitected/resource'
+  autoload :EndpointParameters, 'aws-sdk-wellarchitected/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-wellarchitected/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-wellarchitected/endpoints'
 
-  GEM_VERSION = '1.0.0'
+  GEM_VERSION = '1.47.0'
 
 end
+
+require_relative 'aws-sdk-wellarchitected/customizations'

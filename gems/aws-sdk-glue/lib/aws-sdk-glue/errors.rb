@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -29,6 +29,9 @@ module Aws::Glue
   # ## Error Classes
   # * {AccessDeniedException}
   # * {AlreadyExistsException}
+  # * {ColumnStatisticsTaskNotRunningException}
+  # * {ColumnStatisticsTaskRunningException}
+  # * {ColumnStatisticsTaskStoppingException}
   # * {ConcurrentModificationException}
   # * {ConcurrentRunsExceededException}
   # * {ConditionCheckFailureException}
@@ -37,18 +40,28 @@ module Aws::Glue
   # * {CrawlerRunningException}
   # * {CrawlerStoppingException}
   # * {EntityNotFoundException}
+  # * {FederatedResourceAlreadyExistsException}
+  # * {FederationSourceException}
+  # * {FederationSourceRetryableException}
   # * {GlueEncryptionException}
   # * {IdempotentParameterMismatchException}
+  # * {IllegalBlueprintStateException}
+  # * {IllegalSessionStateException}
   # * {IllegalWorkflowStateException}
   # * {InternalServiceException}
   # * {InvalidInputException}
+  # * {InvalidStateException}
   # * {MLTransformNotReadyException}
   # * {NoScheduleException}
+  # * {OperationNotSupportedException}
   # * {OperationTimeoutException}
+  # * {PermissionTypeMismatchException}
+  # * {ResourceNotReadyException}
   # * {ResourceNumberLimitExceededException}
   # * {SchedulerNotRunningException}
   # * {SchedulerRunningException}
   # * {SchedulerTransitioningException}
+  # * {ThrottlingException}
   # * {ValidationException}
   # * {VersionMismatchException}
   #
@@ -78,6 +91,51 @@ module Aws::Glue
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::Glue::Types::AlreadyExistsException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ColumnStatisticsTaskNotRunningException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::ColumnStatisticsTaskNotRunningException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ColumnStatisticsTaskRunningException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::ColumnStatisticsTaskRunningException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ColumnStatisticsTaskStoppingException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::ColumnStatisticsTaskStoppingException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -206,6 +264,66 @@ module Aws::Glue
       def message
         @message || @data[:message]
       end
+
+      # @return [String]
+      def from_federation_source
+        @data[:from_federation_source]
+      end
+    end
+
+    class FederatedResourceAlreadyExistsException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::FederatedResourceAlreadyExistsException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+
+      # @return [String]
+      def associated_glue_resource
+        @data[:associated_glue_resource]
+      end
+    end
+
+    class FederationSourceException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::FederationSourceException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def federation_source_error_code
+        @data[:federation_source_error_code]
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class FederationSourceRetryableException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::FederationSourceRetryableException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
     end
 
     class GlueEncryptionException < ServiceError
@@ -228,6 +346,36 @@ module Aws::Glue
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::Glue::Types::IdempotentParameterMismatchException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class IllegalBlueprintStateException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::IllegalBlueprintStateException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class IllegalSessionStateException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::IllegalSessionStateException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -281,6 +429,26 @@ module Aws::Glue
       def message
         @message || @data[:message]
       end
+
+      # @return [String]
+      def from_federation_source
+        @data[:from_federation_source]
+      end
+    end
+
+    class InvalidStateException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::InvalidStateException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
     end
 
     class MLTransformNotReadyException < ServiceError
@@ -313,11 +481,56 @@ module Aws::Glue
       end
     end
 
+    class OperationNotSupportedException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::OperationNotSupportedException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class OperationTimeoutException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::Glue::Types::OperationTimeoutException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class PermissionTypeMismatchException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::PermissionTypeMismatchException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ResourceNotReadyException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::ResourceNotReadyException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -378,6 +591,21 @@ module Aws::Glue
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::Glue::Types::SchedulerTransitioningException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ThrottlingException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Glue::Types::ThrottlingException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

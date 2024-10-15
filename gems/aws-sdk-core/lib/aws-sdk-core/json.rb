@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'json'
 require_relative 'json/builder'
 require_relative 'json/error_handler'
 require_relative 'json/handler'
@@ -19,49 +18,61 @@ module Aws
     end
 
     class << self
-      def load(json)
-        ENGINE.load(json, *ENGINE_LOAD_OPTIONS)
-      rescue *ENGINE_ERRORS => e
-        raise ParseError, e
+      # @param [Symbol,Class] engine
+      #   Must be one of the following values:
+      #
+      #   * :oj
+      #   * :json
+      #
+      def engine=(engine)
+        @engine = Class === engine ? engine : load_engine(engine)
       end
 
-      def load_file(path)
-        load(File.open(path, 'r', encoding: 'UTF-8', &:read))
+      # @return [Class] Returns the default engine.
+      #   One of:
+      #
+      #   * {OjEngine}
+      #   * {JsonEngine}
+      #
+      def engine
+        set_default_engine unless @engine
+        @engine
+      end
+
+      def load(json)
+        @engine.load(json)
       end
 
       def dump(value)
-        ENGINE.dump(value, *ENGINE_DUMP_OPTIONS)
+        @engine.dump(value)
+      end
+
+      def set_default_engine
+        [:oj, :json].each do |name|
+          @engine ||= try_load_engine(name)
+        end
+        unless @engine
+          raise 'Unable to find a compatible json library. ' \
+          'Ensure that you have installed or added to your Gemfile one of ' \
+          'oj or json'
+        end
       end
 
       private
 
-      def oj_engine
-        require 'oj'
-        [
-          Oj,
-          [{ mode: :compat, symbol_keys: false, empty_string: false }],
-          [{ mode: :compat }],
-          oj_parse_error
-        ]
+      def load_engine(name)
+        require "aws-sdk-core/json/#{name}_engine"
+        const_name = name[0].upcase + name[1..-1] + 'Engine'
+        const_get(const_name)
+      end
+
+      def try_load_engine(name)
+        load_engine(name)
       rescue LoadError
         false
       end
-
-      def json_engine
-        [JSON, [], [], [JSON::ParserError]]
-      end
-
-      def oj_parse_error
-        if Oj.const_defined?('ParseError')
-          [Oj::ParseError, EncodingError, JSON::ParserError]
-        else
-          [SyntaxError]
-        end
-      end
     end
 
-    # @api private
-    ENGINE, ENGINE_LOAD_OPTIONS, ENGINE_DUMP_OPTIONS, ENGINE_ERRORS =
-      oj_engine || json_engine
+    set_default_engine
   end
 end

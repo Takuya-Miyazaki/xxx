@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:emr)
 
 module Aws::EMR
   # An API client for EMR.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::EMR
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::EMR::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::EMR
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::EMR
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::EMR
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::EMR
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::EMR
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::EMR
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +341,112 @@ module Aws::EMR
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::EMR::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::EMR::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -340,7 +457,7 @@ module Aws::EMR
     # Adds an instance fleet to a running cluster.
     #
     # <note markdown="1"> The instance fleet configuration is available only in Amazon EMR
-    # versions 4.8.0 and later, excluding 5.0.x.
+    # releases 4.8.0 and later, excluding 5.0.x.
     #
     #  </note>
     #
@@ -378,6 +495,7 @@ module Aws::EMR
     #                   volume_type: "String", # required
     #                   iops: 1,
     #                   size_in_gb: 1, # required
+    #                   throughput: 1,
     #                 },
     #                 volumes_per_instance: 1,
     #               },
@@ -395,6 +513,8 @@ module Aws::EMR
     #               },
     #             },
     #           ],
+    #           custom_ami_id: "XmlStringMaxLen256",
+    #           priority: 1.0,
     #         },
     #       ],
     #       launch_specifications: {
@@ -402,12 +522,33 @@ module Aws::EMR
     #           timeout_duration_minutes: 1, # required
     #           timeout_action: "SWITCH_TO_ON_DEMAND", # required, accepts SWITCH_TO_ON_DEMAND, TERMINATE_CLUSTER
     #           block_duration_minutes: 1,
-    #           allocation_strategy: "capacity-optimized", # accepts capacity-optimized
+    #           allocation_strategy: "capacity-optimized", # accepts capacity-optimized, price-capacity-optimized, lowest-price, diversified, capacity-optimized-prioritized
     #         },
     #         on_demand_specification: {
-    #           allocation_strategy: "lowest-price", # required, accepts lowest-price
+    #           allocation_strategy: "lowest-price", # required, accepts lowest-price, prioritized
+    #           capacity_reservation_options: {
+    #             usage_strategy: "use-capacity-reservations-first", # accepts use-capacity-reservations-first
+    #             capacity_reservation_preference: "open", # accepts open, none
+    #             capacity_reservation_resource_group_arn: "XmlStringMaxLen256",
+    #           },
     #         },
     #       },
+    #       resize_specifications: {
+    #         spot_resize_specification: {
+    #           timeout_duration_minutes: 1,
+    #           allocation_strategy: "capacity-optimized", # accepts capacity-optimized, price-capacity-optimized, lowest-price, diversified, capacity-optimized-prioritized
+    #         },
+    #         on_demand_resize_specification: {
+    #           timeout_duration_minutes: 1,
+    #           allocation_strategy: "lowest-price", # accepts lowest-price, prioritized
+    #           capacity_reservation_options: {
+    #             usage_strategy: "use-capacity-reservations-first", # accepts use-capacity-reservations-first
+    #             capacity_reservation_preference: "open", # accepts open, none
+    #             capacity_reservation_resource_group_arn: "XmlStringMaxLen256",
+    #           },
+    #         },
+    #       },
+    #       context: "XmlStringMaxLen256",
     #     },
     #   })
     #
@@ -469,6 +610,7 @@ module Aws::EMR
     #                 volume_type: "String", # required
     #                 iops: 1,
     #                 size_in_gb: 1, # required
+    #                 throughput: 1,
     #               },
     #               volumes_per_instance: 1,
     #             },
@@ -513,6 +655,7 @@ module Aws::EMR
     #             },
     #           ],
     #         },
+    #         custom_ami_id: "XmlStringMaxLen256",
     #       },
     #     ],
     #     job_flow_id: "XmlStringMaxLen256", # required
@@ -541,9 +684,7 @@ module Aws::EMR
     # complex, you may require more than 256 steps to process your data. You
     # can bypass the 256-step limitation in various ways, including using
     # SSH to connect to the master node and submitting queries directly to
-    # the software running on the master node, such as Hive and Hadoop. For
-    # more information on how to do this, see [Add More than 256 Steps to a
-    # Cluster][1] in the *Amazon EMR Management Guide*.
+    # the software running on the master node, such as Hive and Hadoop.
     #
     # A step specifies the location of a JAR file stored either on the
     # master node of the cluster or in Amazon S3. Each step is performed by
@@ -559,9 +700,10 @@ module Aws::EMR
     # You can only add steps to a cluster that is in one of the following
     # states: STARTING, BOOTSTRAPPING, RUNNING, or WAITING.
     #
+    # <note markdown="1"> The string values passed into `HadoopJarStep` object cannot exceed a
+    # total of 10240 characters.
     #
-    #
-    # [1]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/AddMoreThan256Steps.html
+    #  </note>
     #
     # @option params [required, String] :job_flow_id
     #   A string that uniquely identifies the job flow. This identifier is
@@ -569,6 +711,16 @@ module Aws::EMR
     #
     # @option params [required, Array<Types::StepConfig>] :steps
     #   A list of StepConfig to be executed by the job flow.
+    #
+    # @option params [String] :execution_role_arn
+    #   The Amazon Resource Name (ARN) of the runtime role for a step on the
+    #   cluster. The runtime role can be a cross-account IAM role. The runtime
+    #   role ARN is a combination of account ID, role name, and role type
+    #   using the following format:
+    #   `arn:partition:service:region:account:resource`.
+    #
+    #   For example, `arn:aws:IAM::1234567890:role/ReadOnly` is a correctly
+    #   formatted runtime role ARN.
     #
     # @return [Types::AddJobFlowStepsOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -595,6 +747,7 @@ module Aws::EMR
     #         },
     #       },
     #     ],
+    #     execution_role_arn: "ArnType",
     #   })
     #
     # @example Response structure
@@ -611,24 +764,24 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # Adds tags to an Amazon EMR resource. Tags make it easier to associate
-    # clusters in various ways, such as grouping clusters to track your
-    # Amazon EMR resource allocation costs. For more information, see [Tag
-    # Clusters][1].
+    # Adds tags to an Amazon EMR resource, such as a cluster or an Amazon
+    # EMR Studio. Tags make it easier to associate resources in various
+    # ways, such as grouping clusters to track your Amazon EMR resource
+    # allocation costs. For more information, see [Tag Clusters][1].
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-tags.html
     #
     # @option params [required, String] :resource_id
-    #   The Amazon EMR resource identifier to which tags will be added. This
-    #   value must be a cluster identifier.
+    #   The Amazon EMR resource identifier to which tags will be added. For
+    #   example, a cluster identifier or an Amazon EMR Studio ID.
     #
     # @option params [required, Array<Types::Tag>] :tags
-    #   A list of tags to associate with a cluster and propagate to EC2
-    #   instances. Tags are user-defined key-value pairs that consist of a
-    #   required key string with a maximum of 128 characters, and an optional
-    #   value string with a maximum of 256 characters.
+    #   A list of tags to associate with a resource. Tags are user-defined
+    #   key-value pairs that consist of a required key string with a maximum
+    #   of 128 characters, and an optional value string with a maximum of 256
+    #   characters.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -658,7 +811,10 @@ module Aws::EMR
     # maximum of 256 steps are allowed in each CancelSteps request.
     # CancelSteps is idempotent but asynchronous; it does not guarantee that
     # a step will be canceled, even if the request is successfully
-    # submitted. You can only cancel steps that are in a `PENDING` state.
+    # submitted. When you use Amazon EMR releases 5.28.0 and later, you can
+    # cancel steps that are in a `PENDING` or `RUNNING` state. In earlier
+    # versions of Amazon EMR, you can only cancel steps that are in a
+    # `PENDING` state.
     #
     # @option params [required, String] :cluster_id
     #   The `ClusterID` for the specified steps that will be canceled. Use
@@ -741,42 +897,38 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # <note markdown="1"> The Amazon EMR Studio APIs are in preview release for Amazon EMR and
-    # are subject to change.
-    #
-    #  </note>
-    #
     # Creates a new Amazon EMR Studio.
     #
     # @option params [required, String] :name
     #   A descriptive name for the Amazon EMR Studio.
     #
     # @option params [String] :description
-    #   A detailed description of the Studio.
+    #   A detailed description of the Amazon EMR Studio.
     #
     # @option params [required, String] :auth_mode
-    #   Specifies whether the Studio authenticates users using single sign-on
-    #   (SSO) or IAM. Amazon EMR Studio currently only supports SSO
-    #   authentication.
+    #   Specifies whether the Studio authenticates users using IAM or IAM
+    #   Identity Center.
     #
     # @option params [required, String] :vpc_id
     #   The ID of the Amazon Virtual Private Cloud (Amazon VPC) to associate
     #   with the Studio.
     #
     # @option params [required, Array<String>] :subnet_ids
-    #   A list of subnet IDs to associate with the Studio. The subnets must
-    #   belong to the VPC specified by `VpcId`. Studio users can create a
-    #   Workspace in any of the specified subnets.
+    #   A list of subnet IDs to associate with the Amazon EMR Studio. A Studio
+    #   can have a maximum of 5 subnets. The subnets must belong to the VPC
+    #   specified by `VpcId`. Studio users can create a Workspace in any of
+    #   the specified subnets.
     #
     # @option params [required, String] :service_role
-    #   The IAM role that will be assumed by the Amazon EMR Studio. The
-    #   service role provides a way for Amazon EMR Studio to interoperate with
-    #   other AWS services.
+    #   The IAM role that the Amazon EMR Studio assumes. The service role
+    #   provides a way for Amazon EMR Studio to interoperate with other Amazon
+    #   Web Services services.
     #
-    # @option params [required, String] :user_role
-    #   The IAM user role that will be assumed by users and groups logged in
-    #   to a Studio. The permissions attached to this IAM role can be scoped
-    #   down for each user or group using session policies.
+    # @option params [String] :user_role
+    #   The IAM user role that users and groups assume when logged in to an
+    #   Amazon EMR Studio. Only specify a `UserRole` when you use IAM Identity
+    #   Center authentication. The permissions attached to the `UserRole` can
+    #   be scoped down for each user or group using session policies.
     #
     # @option params [required, String] :workspace_security_group_id
     #   The ID of the Amazon EMR Studio Workspace security group. The
@@ -789,16 +941,46 @@ module Aws::EMR
     #   security group allows inbound network traffic from the Workspace
     #   security group, and it must be in the same VPC specified by `VpcId`.
     #
-    # @option params [String] :default_s3_location
-    #   The default Amazon S3 location to back up EMR Studio Workspaces and
-    #   notebook files. A Studio user can select an alternative Amazon S3
-    #   location when creating a Workspace.
+    # @option params [required, String] :default_s3_location
+    #   The Amazon S3 location to back up Amazon EMR Studio Workspaces and
+    #   notebook files.
+    #
+    # @option params [String] :idp_auth_url
+    #   The authentication endpoint of your identity provider (IdP). Specify
+    #   this value when you use IAM authentication and want to let federated
+    #   users log in to a Studio with the Studio URL and credentials from your
+    #   IdP. Amazon EMR Studio redirects users to this endpoint to enter
+    #   credentials.
+    #
+    # @option params [String] :idp_relay_state_parameter_name
+    #   The name that your identity provider (IdP) uses for its `RelayState`
+    #   parameter. For example, `RelayState` or `TargetSource`. Specify this
+    #   value when you use IAM authentication and want to let federated users
+    #   log in to a Studio using the Studio URL. The `RelayState` parameter
+    #   differs by IdP.
     #
     # @option params [Array<Types::Tag>] :tags
-    #   A list of tags to associate with the Studio. Tags are user-defined
-    #   key-value pairs that consist of a required key string with a maximum
-    #   of 128 characters, and an optional value string with a maximum of 256
-    #   characters.
+    #   A list of tags to associate with the Amazon EMR Studio. Tags are
+    #   user-defined key-value pairs that consist of a required key string
+    #   with a maximum of 128 characters, and an optional value string with a
+    #   maximum of 256 characters.
+    #
+    # @option params [Boolean] :trusted_identity_propagation_enabled
+    #   A Boolean indicating whether to enable Trusted identity propagation
+    #   for the Studio. The default value is `false`.
+    #
+    # @option params [String] :idc_user_assignment
+    #   Specifies whether IAM Identity Center user assignment is `REQUIRED` or
+    #   `OPTIONAL`. If the value is set to `REQUIRED`, users must be
+    #   explicitly assigned to the Studio application to access the Studio.
+    #
+    # @option params [String] :idc_instance_arn
+    #   The ARN of the IAM Identity Center instance to create the Studio
+    #   application.
+    #
+    # @option params [String] :encryption_key_arn
+    #   The KMS key identifier (ARN) used to encrypt Amazon EMR Studio
+    #   workspace and notebook files when backed up to Amazon S3.
     #
     # @return [Types::CreateStudioOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -814,16 +996,22 @@ module Aws::EMR
     #     vpc_id: "XmlStringMaxLen256", # required
     #     subnet_ids: ["String"], # required
     #     service_role: "XmlString", # required
-    #     user_role: "XmlString", # required
+    #     user_role: "XmlString",
     #     workspace_security_group_id: "XmlStringMaxLen256", # required
     #     engine_security_group_id: "XmlStringMaxLen256", # required
-    #     default_s3_location: "XmlString",
+    #     default_s3_location: "XmlString", # required
+    #     idp_auth_url: "XmlString",
+    #     idp_relay_state_parameter_name: "XmlStringMaxLen256",
     #     tags: [
     #       {
     #         key: "String",
     #         value: "String",
     #       },
     #     ],
+    #     trusted_identity_propagation_enabled: false,
+    #     idc_user_assignment: "REQUIRED", # accepts REQUIRED, OPTIONAL
+    #     idc_instance_arn: "ArnType",
+    #     encryption_key_arn: "XmlString",
     #   })
     #
     # @example Response structure
@@ -840,14 +1028,16 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # <note markdown="1"> The Amazon EMR Studio APIs are in preview release for Amazon EMR and
-    # are subject to change.
-    #
-    #  </note>
-    #
     # Maps a user or group to the Amazon EMR Studio specified by `StudioId`,
     # and applies a session policy to refine Studio permissions for that
-    # user or group.
+    # user or group. Use `CreateStudioSessionMapping` to assign users to a
+    # Studio when you use IAM Identity Center authentication. For
+    # instructions on how to assign users to a Studio when you use IAM
+    # authentication, see [Assign a user or group to your EMR Studio][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio-manage-users.html#emr-studio-assign-users-groups
     #
     # @option params [required, String] :studio_id
     #   The ID of the Amazon EMR Studio to which the user or group will be
@@ -855,9 +1045,10 @@ module Aws::EMR
     #
     # @option params [String] :identity_id
     #   The globally unique identifier (GUID) of the user or group from the
-    #   AWS SSO Identity Store. For more information, see [UserId][1] and
-    #   [GroupId][2] in the *AWS SSO Identity Store API Reference*. Either
-    #   `IdentityName` or `IdentityId` must be specified.
+    #   IAM Identity Center Identity Store. For more information, see
+    #   [UserId][1] and [GroupId][2] in the *IAM Identity Center Identity
+    #   Store API Reference*. Either `IdentityName` or `IdentityId` must be
+    #   specified, but not both.
     #
     #
     #
@@ -866,22 +1057,29 @@ module Aws::EMR
     #
     # @option params [String] :identity_name
     #   The name of the user or group. For more information, see [UserName][1]
-    #   and [DisplayName][2] in the *AWS SSO Identity Store API Reference*.
-    #   Either `IdentityName` or `IdentityId` must be specified.
+    #   and [DisplayName][2] in the *IAM Identity Center Identity Store API
+    #   Reference*. Either `IdentityName` or `IdentityId` must be specified,
+    #   but not both.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_User.html#singlesignon-Type-User-UserId
+    #   [1]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_User.html#singlesignon-Type-User-UserName
     #   [2]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_Group.html#singlesignon-Type-Group-DisplayName
     #
     # @option params [required, String] :identity_type
-    #   Specifies whether the identity to map to the Studio is a user or a
-    #   group.
+    #   Specifies whether the identity to map to the Amazon EMR Studio is a
+    #   user or a group.
     #
     # @option params [required, String] :session_policy_arn
     #   The Amazon Resource Name (ARN) for the session policy that will be
-    #   applied to the user or group. Session policies refine Studio user
-    #   permissions without the need to use multiple IAM user roles.
+    #   applied to the user or group. You should specify the ARN for the
+    #   session policy that you want to apply, not the ARN of your user role.
+    #   For more information, see [Create an Amazon EMR Studio User Role with
+    #   Session Policies][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio-user-role.html
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -926,11 +1124,6 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # <note markdown="1"> The Amazon EMR Studio APIs are in preview release for Amazon EMR and
-    # are subject to change.
-    #
-    #  </note>
-    #
     # Removes an Amazon EMR Studio from the Studio metadata store.
     #
     # @option params [required, String] :studio_id
@@ -953,11 +1146,6 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # <note markdown="1"> The Amazon EMR Studio APIs are in preview release for Amazon EMR and
-    # are subject to change.
-    #
-    #  </note>
-    #
     # Removes a user or group from an Amazon EMR Studio.
     #
     # @option params [required, String] :studio_id
@@ -966,8 +1154,8 @@ module Aws::EMR
     # @option params [String] :identity_id
     #   The globally unique identifier (GUID) of the user or group to remove
     #   from the Amazon EMR Studio. For more information, see [UserId][1] and
-    #   [GroupId][2] in the *AWS SSO Identity Store API Reference*. Either
-    #   `IdentityName` or `IdentityId` must be specified.
+    #   [GroupId][2] in the *IAM Identity Center Identity Store API
+    #   Reference*. Either `IdentityName` or `IdentityId` must be specified.
     #
     #
     #
@@ -975,19 +1163,19 @@ module Aws::EMR
     #   [2]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_Group.html#singlesignon-Type-Group-GroupId
     #
     # @option params [String] :identity_name
-    #   The name of the user name or group to remove from the Studio. For more
-    #   information, see [UserName][1] and [DisplayName][2] in the *AWS SSO
-    #   Identity Store API Reference*. Either `IdentityName` or `IdentityId`
-    #   must be specified.
+    #   The name of the user name or group to remove from the Amazon EMR
+    #   Studio. For more information, see [UserName][1] and [DisplayName][2]
+    #   in the *IAM Identity Center Store API Reference*. Either
+    #   `IdentityName` or `IdentityId` must be specified.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_User.html#singlesignon-Type-User-UserId
+    #   [1]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_User.html#singlesignon-Type-User-UserName
     #   [2]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_Group.html#singlesignon-Type-Group-DisplayName
     #
     # @option params [required, String] :identity_type
-    #   Specifies whether the identity to delete from the Studio is a user or
-    #   a group.
+    #   Specifies whether the identity to delete from the Amazon EMR Studio is
+    #   a user or a group.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -1035,6 +1223,12 @@ module Aws::EMR
     #   resp.cluster.status.timeline.creation_date_time #=> Time
     #   resp.cluster.status.timeline.ready_date_time #=> Time
     #   resp.cluster.status.timeline.end_date_time #=> Time
+    #   resp.cluster.status.error_details #=> Array
+    #   resp.cluster.status.error_details[0].error_code #=> String
+    #   resp.cluster.status.error_details[0].error_data #=> Array
+    #   resp.cluster.status.error_details[0].error_data[0] #=> Hash
+    #   resp.cluster.status.error_details[0].error_data[0]["String"] #=> String
+    #   resp.cluster.status.error_details[0].error_message #=> String
     #   resp.cluster.ec2_instance_attributes.ec2_key_name #=> String
     #   resp.cluster.ec2_instance_attributes.ec2_subnet_id #=> String
     #   resp.cluster.ec2_instance_attributes.requested_ec2_subnet_ids #=> Array
@@ -1058,6 +1252,7 @@ module Aws::EMR
     #   resp.cluster.release_label #=> String
     #   resp.cluster.auto_terminate #=> Boolean
     #   resp.cluster.termination_protected #=> Boolean
+    #   resp.cluster.unhealthy_node_replacement #=> Boolean
     #   resp.cluster.visible_to_all_users #=> Boolean
     #   resp.cluster.applications #=> Array
     #   resp.cluster.applications[0].name #=> String
@@ -1094,6 +1289,9 @@ module Aws::EMR
     #   resp.cluster.placement_groups #=> Array
     #   resp.cluster.placement_groups[0].instance_role #=> String, one of "MASTER", "CORE", "TASK"
     #   resp.cluster.placement_groups[0].placement_strategy #=> String, one of "SPREAD", "PARTITION", "CLUSTER", "NONE"
+    #   resp.cluster.os_release_label #=> String
+    #   resp.cluster.ebs_root_volume_iops #=> Integer
+    #   resp.cluster.ebs_root_volume_throughput #=> Integer
     #
     #
     # The following waiters are defined for this operation (see {Client#wait_until} for detailed usage):
@@ -1191,6 +1389,7 @@ module Aws::EMR
     #   resp.job_flows[0].instances.instance_groups[0].start_date_time #=> Time
     #   resp.job_flows[0].instances.instance_groups[0].ready_date_time #=> Time
     #   resp.job_flows[0].instances.instance_groups[0].end_date_time #=> Time
+    #   resp.job_flows[0].instances.instance_groups[0].custom_ami_id #=> String
     #   resp.job_flows[0].instances.normalized_instance_hours #=> Integer
     #   resp.job_flows[0].instances.ec2_key_name #=> String
     #   resp.job_flows[0].instances.ec2_subnet_id #=> String
@@ -1199,6 +1398,7 @@ module Aws::EMR
     #   resp.job_flows[0].instances.placement.availability_zones[0] #=> String
     #   resp.job_flows[0].instances.keep_job_flow_alive_when_no_steps #=> Boolean
     #   resp.job_flows[0].instances.termination_protected #=> Boolean
+    #   resp.job_flows[0].instances.unhealthy_node_replacement #=> Boolean
     #   resp.job_flows[0].instances.hadoop_version #=> String
     #   resp.job_flows[0].steps #=> Array
     #   resp.job_flows[0].steps[0].step_config.name #=> String
@@ -1259,6 +1459,7 @@ module Aws::EMR
     #   resp.notebook_execution.execution_engine.id #=> String
     #   resp.notebook_execution.execution_engine.type #=> String, one of "EMR"
     #   resp.notebook_execution.execution_engine.master_instance_security_group_id #=> String
+    #   resp.notebook_execution.execution_engine.execution_role_arn #=> String
     #   resp.notebook_execution.notebook_execution_name #=> String
     #   resp.notebook_execution.notebook_params #=> String
     #   resp.notebook_execution.status #=> String, one of "START_PENDING", "STARTING", "RUNNING", "FINISHING", "FINISHED", "FAILING", "FAILED", "STOP_PENDING", "STOPPING", "STOPPED"
@@ -1271,6 +1472,13 @@ module Aws::EMR
     #   resp.notebook_execution.tags #=> Array
     #   resp.notebook_execution.tags[0].key #=> String
     #   resp.notebook_execution.tags[0].value #=> String
+    #   resp.notebook_execution.notebook_s3_location.bucket #=> String
+    #   resp.notebook_execution.notebook_s3_location.key #=> String
+    #   resp.notebook_execution.output_notebook_s3_location.bucket #=> String
+    #   resp.notebook_execution.output_notebook_s3_location.key #=> String
+    #   resp.notebook_execution.output_notebook_format #=> String, one of "HTML"
+    #   resp.notebook_execution.environment_variables #=> Hash
+    #   resp.notebook_execution.environment_variables["XmlStringMaxLen256"] #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/DescribeNotebookExecution AWS API Documentation
     #
@@ -1278,6 +1486,54 @@ module Aws::EMR
     # @param [Hash] params ({})
     def describe_notebook_execution(params = {}, options = {})
       req = build_request(:describe_notebook_execution, params)
+      req.send_request(options)
+    end
+
+    # Provides Amazon EMR release label details, such as the releases
+    # available the Region where the API request is run, and the available
+    # applications for a specific Amazon EMR release label. Can also list
+    # Amazon EMR releases that support a specified version of Spark.
+    #
+    # @option params [String] :release_label
+    #   The target release label to be described.
+    #
+    # @option params [String] :next_token
+    #   The pagination token. Reserved for future use. Currently set to null.
+    #
+    # @option params [Integer] :max_results
+    #   Reserved for future use. Currently set to null.
+    #
+    # @return [Types::DescribeReleaseLabelOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeReleaseLabelOutput#release_label #release_label} => String
+    #   * {Types::DescribeReleaseLabelOutput#applications #applications} => Array&lt;Types::SimplifiedApplication&gt;
+    #   * {Types::DescribeReleaseLabelOutput#next_token #next_token} => String
+    #   * {Types::DescribeReleaseLabelOutput#available_os_releases #available_os_releases} => Array&lt;Types::OSRelease&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_release_label({
+    #     release_label: "String",
+    #     next_token: "String",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.release_label #=> String
+    #   resp.applications #=> Array
+    #   resp.applications[0].name #=> String
+    #   resp.applications[0].version #=> String
+    #   resp.next_token #=> String
+    #   resp.available_os_releases #=> Array
+    #   resp.available_os_releases[0].label #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/DescribeReleaseLabel AWS API Documentation
+    #
+    # @overload describe_release_label(params = {})
+    # @param [Hash] params ({})
+    def describe_release_label(params = {}, options = {})
+      req = build_request(:describe_release_label, params)
       req.send_request(options)
     end
 
@@ -1353,6 +1609,7 @@ module Aws::EMR
     #   resp.step.status.timeline.creation_date_time #=> Time
     #   resp.step.status.timeline.start_date_time #=> Time
     #   resp.step.status.timeline.end_date_time #=> Time
+    #   resp.step.execution_role_arn #=> String
     #
     #
     # The following waiters are defined for this operation (see {Client#wait_until} for detailed usage):
@@ -1368,11 +1625,6 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # <note markdown="1"> The Amazon EMR Studio APIs are in preview release for Amazon EMR and
-    # are subject to change.
-    #
-    #  </note>
-    #
     # Returns details for the specified Amazon EMR Studio including ID,
     # Name, VPC, Studio access URL, and so on.
     #
@@ -1406,9 +1658,15 @@ module Aws::EMR
     #   resp.studio.url #=> String
     #   resp.studio.creation_time #=> Time
     #   resp.studio.default_s3_location #=> String
+    #   resp.studio.idp_auth_url #=> String
+    #   resp.studio.idp_relay_state_parameter_name #=> String
     #   resp.studio.tags #=> Array
     #   resp.studio.tags[0].key #=> String
     #   resp.studio.tags[0].value #=> String
+    #   resp.studio.idc_instance_arn #=> String
+    #   resp.studio.trusted_identity_propagation_enabled #=> Boolean
+    #   resp.studio.idc_user_assignment #=> String, one of "REQUIRED", "OPTIONAL"
+    #   resp.studio.encryption_key_arn #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/DescribeStudio AWS API Documentation
     #
@@ -1419,10 +1677,39 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # Returns the Amazon EMR block public access configuration for your AWS
-    # account in the current Region. For more information see [Configure
-    # Block Public Access for Amazon EMR][1] in the *Amazon EMR Management
-    # Guide*.
+    # Returns the auto-termination policy for an Amazon EMR cluster.
+    #
+    # @option params [required, String] :cluster_id
+    #   Specifies the ID of the Amazon EMR cluster for which the
+    #   auto-termination policy will be fetched.
+    #
+    # @return [Types::GetAutoTerminationPolicyOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetAutoTerminationPolicyOutput#auto_termination_policy #auto_termination_policy} => Types::AutoTerminationPolicy
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_auto_termination_policy({
+    #     cluster_id: "ClusterId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.auto_termination_policy.idle_timeout #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/GetAutoTerminationPolicy AWS API Documentation
+    #
+    # @overload get_auto_termination_policy(params = {})
+    # @param [Hash] params ({})
+    def get_auto_termination_policy(params = {}, options = {})
+      req = build_request(:get_auto_termination_policy, params)
+      req.send_request(options)
+    end
+
+    # Returns the Amazon EMR block public access configuration for your
+    # Amazon Web Services account in the current Region. For more
+    # information see [Configure Block Public Access for Amazon EMR][1] in
+    # the *Amazon EMR Management Guide*.
     #
     #
     #
@@ -1448,6 +1735,48 @@ module Aws::EMR
     # @param [Hash] params ({})
     def get_block_public_access_configuration(params = {}, options = {})
       req = build_request(:get_block_public_access_configuration, params)
+      req.send_request(options)
+    end
+
+    # Provides temporary, HTTP basic credentials that are associated with a
+    # given runtime IAM role and used by a cluster with fine-grained access
+    # control activated. You can use these credentials to connect to cluster
+    # endpoints that support username and password authentication.
+    #
+    # @option params [required, String] :cluster_id
+    #   The unique identifier of the cluster.
+    #
+    # @option params [String] :execution_role_arn
+    #   The Amazon Resource Name (ARN) of the runtime role for interactive
+    #   workload submission on the cluster. The runtime role can be a
+    #   cross-account IAM role. The runtime role ARN is a combination of
+    #   account ID, role name, and role type using the following format:
+    #   `arn:partition:service:region:account:resource`.
+    #
+    # @return [Types::GetClusterSessionCredentialsOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetClusterSessionCredentialsOutput#credentials #credentials} => Types::Credentials
+    #   * {Types::GetClusterSessionCredentialsOutput#expires_at #expires_at} => Time
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_cluster_session_credentials({
+    #     cluster_id: "XmlStringMaxLen256", # required
+    #     execution_role_arn: "ArnType",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.credentials.username_password.username #=> String
+    #   resp.credentials.username_password.password #=> String
+    #   resp.expires_at #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/GetClusterSessionCredentials AWS API Documentation
+    #
+    # @overload get_cluster_session_credentials(params = {})
+    # @param [Hash] params ({})
+    def get_cluster_session_credentials(params = {}, options = {})
+      req = build_request(:get_cluster_session_credentials, params)
       req.send_request(options)
     end
 
@@ -1484,11 +1813,6 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # <note markdown="1"> The Amazon EMR Studio APIs are in preview release for Amazon EMR and
-    # are subject to change.
-    #
-    #  </note>
-    #
     # Fetches mapping details for the specified Amazon EMR Studio and
     # identity (user or group).
     #
@@ -1497,9 +1821,9 @@ module Aws::EMR
     #
     # @option params [String] :identity_id
     #   The globally unique identifier (GUID) of the user or group. For more
-    #   information, see [UserId][1] and [GroupId][2] in the *AWS SSO Identity
-    #   Store API Reference*. Either `IdentityName` or `IdentityId` must be
-    #   specified.
+    #   information, see [UserId][1] and [GroupId][2] in the *IAM Identity
+    #   Center Identity Store API Reference*. Either `IdentityName` or
+    #   `IdentityId` must be specified.
     #
     #
     #
@@ -1508,12 +1832,13 @@ module Aws::EMR
     #
     # @option params [String] :identity_name
     #   The name of the user or group to fetch. For more information, see
-    #   [UserName][1] and [DisplayName][2] in the *AWS SSO Identity Store API
-    #   Reference*. Either `IdentityName` or `IdentityId` must be specified.
+    #   [UserName][1] and [DisplayName][2] in the *IAM Identity Center
+    #   Identity Store API Reference*. Either `IdentityName` or `IdentityId`
+    #   must be specified.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_User.html#singlesignon-Type-User-UserId
+    #   [1]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_User.html#singlesignon-Type-User-UserName
     #   [2]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_Group.html#singlesignon-Type-Group-DisplayName
     #
     # @option params [required, String] :identity_type
@@ -1593,12 +1918,12 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # Provides the status of all clusters visible to this AWS account.
-    # Allows you to filter the list of clusters based on certain criteria;
-    # for example, filtering by cluster creation date and time or by status.
-    # This call returns a maximum of 50 clusters per call, but returns a
-    # marker to track the paging of the cluster list across multiple
-    # ListClusters calls.
+    # Provides the status of all clusters visible to this Amazon Web
+    # Services account. Allows you to filter the list of clusters based on
+    # certain criteria; for example, filtering by cluster creation date and
+    # time or by status. This call returns a maximum of 50 clusters in
+    # unsorted order per call, but returns a marker to track the paging of
+    # the cluster list across multiple ListClusters calls.
     #
     # @option params [Time,DateTime,Date,Integer,String] :created_after
     #   The creation date and time beginning value filter for listing
@@ -1608,7 +1933,9 @@ module Aws::EMR
     #   The creation date and time end value filter for listing clusters.
     #
     # @option params [Array<String>] :cluster_states
-    #   The cluster state filters to apply when listing clusters.
+    #   The cluster state filters to apply when listing clusters. Clusters
+    #   that change state while this action runs may be not be returned as
+    #   expected in the list of clusters.
     #
     # @option params [String] :marker
     #   The pagination token that indicates the next set of results to
@@ -1641,6 +1968,12 @@ module Aws::EMR
     #   resp.clusters[0].status.timeline.creation_date_time #=> Time
     #   resp.clusters[0].status.timeline.ready_date_time #=> Time
     #   resp.clusters[0].status.timeline.end_date_time #=> Time
+    #   resp.clusters[0].status.error_details #=> Array
+    #   resp.clusters[0].status.error_details[0].error_code #=> String
+    #   resp.clusters[0].status.error_details[0].error_data #=> Array
+    #   resp.clusters[0].status.error_details[0].error_data[0] #=> Hash
+    #   resp.clusters[0].status.error_details[0].error_data[0]["String"] #=> String
+    #   resp.clusters[0].status.error_details[0].error_message #=> String
     #   resp.clusters[0].normalized_instance_hours #=> Integer
     #   resp.clusters[0].cluster_arn #=> String
     #   resp.clusters[0].outpost_arn #=> String
@@ -1658,7 +1991,7 @@ module Aws::EMR
     # Lists all available details about the instance fleets in a cluster.
     #
     # <note markdown="1"> The instance fleet configuration is available only in Amazon EMR
-    # versions 4.8.0 and later, excluding 5.0.x versions.
+    # releases 4.8.0 and later, excluding 5.0.x versions.
     #
     #  </note>
     #
@@ -1713,13 +2046,27 @@ module Aws::EMR
     #   resp.instance_fleets[0].instance_type_specifications[0].ebs_block_devices[0].volume_specification.volume_type #=> String
     #   resp.instance_fleets[0].instance_type_specifications[0].ebs_block_devices[0].volume_specification.iops #=> Integer
     #   resp.instance_fleets[0].instance_type_specifications[0].ebs_block_devices[0].volume_specification.size_in_gb #=> Integer
+    #   resp.instance_fleets[0].instance_type_specifications[0].ebs_block_devices[0].volume_specification.throughput #=> Integer
     #   resp.instance_fleets[0].instance_type_specifications[0].ebs_block_devices[0].device #=> String
     #   resp.instance_fleets[0].instance_type_specifications[0].ebs_optimized #=> Boolean
+    #   resp.instance_fleets[0].instance_type_specifications[0].custom_ami_id #=> String
+    #   resp.instance_fleets[0].instance_type_specifications[0].priority #=> Float
     #   resp.instance_fleets[0].launch_specifications.spot_specification.timeout_duration_minutes #=> Integer
     #   resp.instance_fleets[0].launch_specifications.spot_specification.timeout_action #=> String, one of "SWITCH_TO_ON_DEMAND", "TERMINATE_CLUSTER"
     #   resp.instance_fleets[0].launch_specifications.spot_specification.block_duration_minutes #=> Integer
-    #   resp.instance_fleets[0].launch_specifications.spot_specification.allocation_strategy #=> String, one of "capacity-optimized"
-    #   resp.instance_fleets[0].launch_specifications.on_demand_specification.allocation_strategy #=> String, one of "lowest-price"
+    #   resp.instance_fleets[0].launch_specifications.spot_specification.allocation_strategy #=> String, one of "capacity-optimized", "price-capacity-optimized", "lowest-price", "diversified", "capacity-optimized-prioritized"
+    #   resp.instance_fleets[0].launch_specifications.on_demand_specification.allocation_strategy #=> String, one of "lowest-price", "prioritized"
+    #   resp.instance_fleets[0].launch_specifications.on_demand_specification.capacity_reservation_options.usage_strategy #=> String, one of "use-capacity-reservations-first"
+    #   resp.instance_fleets[0].launch_specifications.on_demand_specification.capacity_reservation_options.capacity_reservation_preference #=> String, one of "open", "none"
+    #   resp.instance_fleets[0].launch_specifications.on_demand_specification.capacity_reservation_options.capacity_reservation_resource_group_arn #=> String
+    #   resp.instance_fleets[0].resize_specifications.spot_resize_specification.timeout_duration_minutes #=> Integer
+    #   resp.instance_fleets[0].resize_specifications.spot_resize_specification.allocation_strategy #=> String, one of "capacity-optimized", "price-capacity-optimized", "lowest-price", "diversified", "capacity-optimized-prioritized"
+    #   resp.instance_fleets[0].resize_specifications.on_demand_resize_specification.timeout_duration_minutes #=> Integer
+    #   resp.instance_fleets[0].resize_specifications.on_demand_resize_specification.allocation_strategy #=> String, one of "lowest-price", "prioritized"
+    #   resp.instance_fleets[0].resize_specifications.on_demand_resize_specification.capacity_reservation_options.usage_strategy #=> String, one of "use-capacity-reservations-first"
+    #   resp.instance_fleets[0].resize_specifications.on_demand_resize_specification.capacity_reservation_options.capacity_reservation_preference #=> String, one of "open", "none"
+    #   resp.instance_fleets[0].resize_specifications.on_demand_resize_specification.capacity_reservation_options.capacity_reservation_resource_group_arn #=> String
+    #   resp.instance_fleets[0].context #=> String
     #   resp.marker #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/ListInstanceFleets AWS API Documentation
@@ -1787,6 +2134,7 @@ module Aws::EMR
     #   resp.instance_groups[0].ebs_block_devices[0].volume_specification.volume_type #=> String
     #   resp.instance_groups[0].ebs_block_devices[0].volume_specification.iops #=> Integer
     #   resp.instance_groups[0].ebs_block_devices[0].volume_specification.size_in_gb #=> Integer
+    #   resp.instance_groups[0].ebs_block_devices[0].volume_specification.throughput #=> Integer
     #   resp.instance_groups[0].ebs_block_devices[0].device #=> String
     #   resp.instance_groups[0].ebs_optimized #=> Boolean
     #   resp.instance_groups[0].shrink_policy.decommission_timeout #=> Integer
@@ -1818,6 +2166,7 @@ module Aws::EMR
     #   resp.instance_groups[0].auto_scaling_policy.rules[0].trigger.cloud_watch_alarm_definition.dimensions #=> Array
     #   resp.instance_groups[0].auto_scaling_policy.rules[0].trigger.cloud_watch_alarm_definition.dimensions[0].key #=> String
     #   resp.instance_groups[0].auto_scaling_policy.rules[0].trigger.cloud_watch_alarm_definition.dimensions[0].value #=> String
+    #   resp.instance_groups[0].custom_ami_id #=> String
     #   resp.marker #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/ListInstanceGroups AWS API Documentation
@@ -1829,10 +2178,11 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # Provides information for all active EC2 instances and EC2 instances
-    # terminated in the last 30 days, up to a maximum of 2,000. EC2
-    # instances in any of the following states are considered active:
-    # AWAITING\_FULFILLMENT, PROVISIONING, BOOTSTRAPPING, RUNNING.
+    # Provides information for all active Amazon EC2 instances and Amazon
+    # EC2 instances terminated in the last 30 days, up to a maximum of
+    # 2,000. Amazon EC2 instances in any of the following states are
+    # considered active: AWAITING\_FULFILLMENT, PROVISIONING, BOOTSTRAPPING,
+    # RUNNING.
     #
     # @option params [required, String] :cluster_id
     #   The identifier of the cluster for which to list the instances.
@@ -1914,7 +2264,7 @@ module Aws::EMR
     # based on multiple criteria such as status, time range, and editor id.
     # Returns a maximum of 50 notebook executions and a marker to track the
     # paging of a longer notebook execution list across multiple
-    # `ListNotebookExecution` calls.
+    # `ListNotebookExecutions` calls.
     #
     # @option params [String] :editor_id
     #   The unique ID of the editor associated with the notebook execution.
@@ -1962,6 +2312,9 @@ module Aws::EMR
     #   call, that indicates the start of the list for this
     #   `ListNotebookExecutions` call.
     #
+    # @option params [String] :execution_engine_id
+    #   The unique ID of the execution engine.
+    #
     # @return [Types::ListNotebookExecutionsOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ListNotebookExecutionsOutput#notebook_executions #notebook_executions} => Array&lt;Types::NotebookExecutionSummary&gt;
@@ -1977,6 +2330,7 @@ module Aws::EMR
     #     from: Time.now,
     #     to: Time.now,
     #     marker: "Marker",
+    #     execution_engine_id: "XmlString",
     #   })
     #
     # @example Response structure
@@ -1988,6 +2342,9 @@ module Aws::EMR
     #   resp.notebook_executions[0].status #=> String, one of "START_PENDING", "STARTING", "RUNNING", "FINISHING", "FINISHED", "FAILING", "FAILED", "STOP_PENDING", "STOPPING", "STOPPED"
     #   resp.notebook_executions[0].start_time #=> Time
     #   resp.notebook_executions[0].end_time #=> Time
+    #   resp.notebook_executions[0].notebook_s3_location.bucket #=> String
+    #   resp.notebook_executions[0].notebook_s3_location.key #=> String
+    #   resp.notebook_executions[0].execution_engine_id #=> String
     #   resp.marker #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/ListNotebookExecutions AWS API Documentation
@@ -1996,6 +2353,60 @@ module Aws::EMR
     # @param [Hash] params ({})
     def list_notebook_executions(params = {}, options = {})
       req = build_request(:list_notebook_executions, params)
+      req.send_request(options)
+    end
+
+    # Retrieves release labels of Amazon EMR services in the Region where
+    # the API is called.
+    #
+    # @option params [Types::ReleaseLabelFilter] :filters
+    #   Filters the results of the request. `Prefix` specifies the prefix of
+    #   release labels to return. `Application` specifies the application
+    #   (with/without version) of release labels to return.
+    #
+    # @option params [String] :next_token
+    #   Specifies the next page of results. If `NextToken` is not specified,
+    #   which is usually the case for the first request of ListReleaseLabels,
+    #   the first page of results are determined by other filtering parameters
+    #   or by the latest version. The `ListReleaseLabels` request fails if the
+    #   identity (Amazon Web Services account ID) and all filtering parameters
+    #   are different from the original request, or if the `NextToken` is
+    #   expired or tampered with.
+    #
+    # @option params [Integer] :max_results
+    #   Defines the maximum number of release labels to return in a single
+    #   response. The default is `100`.
+    #
+    # @return [Types::ListReleaseLabelsOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListReleaseLabelsOutput#release_labels #release_labels} => Array&lt;String&gt;
+    #   * {Types::ListReleaseLabelsOutput#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_release_labels({
+    #     filters: {
+    #       prefix: "String",
+    #       application: "String",
+    #     },
+    #     next_token: "String",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.release_labels #=> Array
+    #   resp.release_labels[0] #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/ListReleaseLabels AWS API Documentation
+    #
+    # @overload list_release_labels(params = {})
+    # @param [Hash] params ({})
+    def list_release_labels(params = {}, options = {})
+      req = build_request(:list_release_labels, params)
       req.send_request(options)
     end
 
@@ -2038,8 +2449,11 @@ module Aws::EMR
     end
 
     # Provides a list of steps for the cluster in reverse order unless you
-    # specify `stepIds` with the request of filter by `StepStates`. You can
-    # specify a maximum of ten `stepIDs`.
+    # specify `stepIds` with the request or filter by `StepStates`. You can
+    # specify a maximum of 10 `stepIDs`. The CLI automatically paginates
+    # results to return a list greater than 50 steps. To return more than 50
+    # steps using the CLI, specify a `Marker`, which is a pagination token
+    # that indicates the next set of steps to retrieve.
     #
     # @option params [required, String] :cluster_id
     #   The identifier of the cluster for which to list the steps.
@@ -2053,8 +2467,10 @@ module Aws::EMR
     #   constraint applies to the overall length of the array.
     #
     # @option params [String] :marker
-    #   The pagination token that indicates the next set of results to
-    #   retrieve.
+    #   The maximum number of steps that a single `ListSteps` action returns
+    #   is 50. To return a longer list of steps, use multiple `ListSteps`
+    #   actions along with the `Marker` parameter, which is a pagination token
+    #   that indicates the next set of results to retrieve.
     #
     # @return [Types::ListStepsOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2104,13 +2520,8 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # <note markdown="1"> The Amazon EMR Studio APIs are in preview release for Amazon EMR and
-    # are subject to change.
-    #
-    #  </note>
-    #
-    # Returns a list of all user or group session mappings for the EMR
-    # Studio specified by `StudioId`.
+    # Returns a list of all user or group session mappings for the Amazon
+    # EMR Studio specified by `StudioId`.
     #
     # @option params [String] :studio_id
     #   The ID of the Amazon EMR Studio.
@@ -2158,14 +2569,9 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # <note markdown="1"> The Amazon EMR Studio APIs are in preview release for Amazon EMR and
-    # are subject to change.
-    #
-    #  </note>
-    #
-    # Returns a list of all Amazon EMR Studios associated with the AWS
-    # account. The list includes details such as ID, Studio Access URL, and
-    # creation time for each Studio.
+    # Returns a list of all Amazon EMR Studios associated with the Amazon
+    # Web Services account. The list includes details such as ID, Studio
+    # Access URL, and creation time for each Studio.
     #
     # @option params [String] :marker
     #   The pagination token that indicates the set of results to retrieve.
@@ -2191,6 +2597,7 @@ module Aws::EMR
     #   resp.studios[0].vpc_id #=> String
     #   resp.studios[0].description #=> String
     #   resp.studios[0].url #=> String
+    #   resp.studios[0].auth_mode #=> String, one of "SSO", "IAM"
     #   resp.studios[0].creation_time #=> Time
     #   resp.marker #=> String
     #
@@ -2203,6 +2610,65 @@ module Aws::EMR
       req.send_request(options)
     end
 
+    # A list of the instance types that Amazon EMR supports. You can filter
+    # the list by Amazon Web Services Region and Amazon EMR release.
+    #
+    # @option params [required, String] :release_label
+    #   The Amazon EMR release label determines the [versions of open-source
+    #   application packages][1] that Amazon EMR has installed on the cluster.
+    #   Release labels are in the format `emr-x.x.x`, where x.x.x is an Amazon
+    #   EMR release number such as `emr-6.10.0`. For more information about
+    #   Amazon EMR releases and their included application versions and
+    #   features, see the <i> <a
+    #   href="https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-release-components.html">Amazon
+    #   EMR Release Guide</a> </i>.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-release-app-versions-6.x.html
+    #
+    # @option params [String] :marker
+    #   The pagination token that marks the next set of results to retrieve.
+    #
+    # @return [Types::ListSupportedInstanceTypesOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListSupportedInstanceTypesOutput#supported_instance_types #supported_instance_types} => Array&lt;Types::SupportedInstanceType&gt;
+    #   * {Types::ListSupportedInstanceTypesOutput#marker #marker} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_supported_instance_types({
+    #     release_label: "String", # required
+    #     marker: "String",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.supported_instance_types #=> Array
+    #   resp.supported_instance_types[0].type #=> String
+    #   resp.supported_instance_types[0].memory_gb #=> Float
+    #   resp.supported_instance_types[0].storage_gb #=> Integer
+    #   resp.supported_instance_types[0].vcpu #=> Integer
+    #   resp.supported_instance_types[0].is_64_bits_only #=> Boolean
+    #   resp.supported_instance_types[0].instance_family_id #=> String
+    #   resp.supported_instance_types[0].ebs_optimized_available #=> Boolean
+    #   resp.supported_instance_types[0].ebs_optimized_by_default #=> Boolean
+    #   resp.supported_instance_types[0].number_of_disks #=> Integer
+    #   resp.supported_instance_types[0].ebs_storage_only #=> Boolean
+    #   resp.supported_instance_types[0].architecture #=> String
+    #   resp.marker #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/ListSupportedInstanceTypes AWS API Documentation
+    #
+    # @overload list_supported_instance_types(params = {})
+    # @param [Hash] params ({})
+    def list_supported_instance_types(params = {}, options = {})
+      req = build_request(:list_supported_instance_types, params)
+      req.send_request(options)
+    end
+
     # Modifies the number of steps that can be executed concurrently for the
     # cluster specified using ClusterID.
     #
@@ -2211,7 +2677,10 @@ module Aws::EMR
     #
     # @option params [Integer] :step_concurrency_level
     #   The number of steps that can be executed concurrently. You can specify
-    #   a maximum of 256 steps.
+    #   a minimum of 1 step and a maximum of 256 steps. We recommend that you
+    #   do not change this parameter while steps are running or the
+    #   `ActionOnFailure` setting may not behave as expected. For more
+    #   information see Step$ActionOnFailure.
     #
     # @return [Types::ModifyClusterOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2243,7 +2712,7 @@ module Aws::EMR
     # atomically.
     #
     # <note markdown="1"> The instance fleet configuration is available only in Amazon EMR
-    # versions 4.8.0 and later, excluding 5.0.x versions.
+    # releases 4.8.0 and later, excluding 5.0.x versions.
     #
     #  </note>
     #
@@ -2251,7 +2720,7 @@ module Aws::EMR
     #   The unique identifier of the cluster.
     #
     # @option params [required, Types::InstanceFleetModifyConfig] :instance_fleet
-    #   The unique identifier of the instance fleet.
+    #   The configuration parameters of the instance fleet.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -2263,6 +2732,57 @@ module Aws::EMR
     #       instance_fleet_id: "InstanceFleetId", # required
     #       target_on_demand_capacity: 1,
     #       target_spot_capacity: 1,
+    #       resize_specifications: {
+    #         spot_resize_specification: {
+    #           timeout_duration_minutes: 1,
+    #           allocation_strategy: "capacity-optimized", # accepts capacity-optimized, price-capacity-optimized, lowest-price, diversified, capacity-optimized-prioritized
+    #         },
+    #         on_demand_resize_specification: {
+    #           timeout_duration_minutes: 1,
+    #           allocation_strategy: "lowest-price", # accepts lowest-price, prioritized
+    #           capacity_reservation_options: {
+    #             usage_strategy: "use-capacity-reservations-first", # accepts use-capacity-reservations-first
+    #             capacity_reservation_preference: "open", # accepts open, none
+    #             capacity_reservation_resource_group_arn: "XmlStringMaxLen256",
+    #           },
+    #         },
+    #       },
+    #       instance_type_configs: [
+    #         {
+    #           instance_type: "InstanceType", # required
+    #           weighted_capacity: 1,
+    #           bid_price: "XmlStringMaxLen256",
+    #           bid_price_as_percentage_of_on_demand_price: 1.0,
+    #           ebs_configuration: {
+    #             ebs_block_device_configs: [
+    #               {
+    #                 volume_specification: { # required
+    #                   volume_type: "String", # required
+    #                   iops: 1,
+    #                   size_in_gb: 1, # required
+    #                   throughput: 1,
+    #                 },
+    #                 volumes_per_instance: 1,
+    #               },
+    #             ],
+    #             ebs_optimized: false,
+    #           },
+    #           configurations: [
+    #             {
+    #               classification: "String",
+    #               configurations: {
+    #                 # recursive ConfigurationList
+    #               },
+    #               properties: {
+    #                 "String" => "String",
+    #               },
+    #             },
+    #           ],
+    #           custom_ami_id: "XmlStringMaxLen256",
+    #           priority: 1.0,
+    #         },
+    #       ],
+    #       context: "XmlStringMaxLen256",
     #     },
     #   })
     #
@@ -2305,6 +2825,7 @@ module Aws::EMR
     #             instance_termination_timeout: 1,
     #           },
     #         },
+    #         reconfiguration_type: "OVERWRITE", # accepts OVERWRITE, MERGE
     #         configurations: [
     #           {
     #             classification: "String",
@@ -2332,8 +2853,8 @@ module Aws::EMR
     # Creates or updates an automatic scaling policy for a core instance
     # group or task instance group in an Amazon EMR cluster. The automatic
     # scaling policy defines how an instance group dynamically adds and
-    # terminates EC2 instances in response to the value of a CloudWatch
-    # metric.
+    # terminates Amazon EC2 instances in response to the value of a
+    # CloudWatch metric.
     #
     # @option params [required, String] :cluster_id
     #   Specifies the ID of a cluster. The instance group to which the
@@ -2436,10 +2957,54 @@ module Aws::EMR
       req.send_request(options)
     end
 
+    # <note markdown="1"> Auto-termination is supported in Amazon EMR releases 5.30.0 and 6.1.0
+    # and later. For more information, see [Using an auto-termination
+    # policy][1].
+    #
+    #  </note>
+    #
+    # Creates or updates an auto-termination policy for an Amazon EMR
+    # cluster. An auto-termination policy defines the amount of idle time in
+    # seconds after which a cluster automatically terminates. For
+    # alternative cluster termination options, see [Control cluster
+    # termination][2].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-auto-termination-policy.html
+    # [2]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-termination.html
+    #
+    # @option params [required, String] :cluster_id
+    #   Specifies the ID of the Amazon EMR cluster to which the
+    #   auto-termination policy will be attached.
+    #
+    # @option params [Types::AutoTerminationPolicy] :auto_termination_policy
+    #   Specifies the auto-termination policy to attach to the cluster.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.put_auto_termination_policy({
+    #     cluster_id: "ClusterId", # required
+    #     auto_termination_policy: {
+    #       idle_timeout: 1,
+    #     },
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/PutAutoTerminationPolicy AWS API Documentation
+    #
+    # @overload put_auto_termination_policy(params = {})
+    # @param [Hash] params ({})
+    def put_auto_termination_policy(params = {}, options = {})
+      req = build_request(:put_auto_termination_policy, params)
+      req.send_request(options)
+    end
+
     # Creates or updates an Amazon EMR block public access configuration for
-    # your AWS account in the current Region. For more information see
-    # [Configure Block Public Access for Amazon EMR][1] in the *Amazon EMR
-    # Management Guide*.
+    # your Amazon Web Services account in the current Region. For more
+    # information see [Configure Block Public Access for Amazon EMR][1] in
+    # the *Amazon EMR Management Guide*.
     #
     #
     #
@@ -2461,8 +3026,8 @@ module Aws::EMR
     #   <note markdown="1"> For accounts that created clusters in a Region before November 25,
     #   2019, block public access is disabled by default in that Region. To
     #   use this feature, you must manually enable and configure it. For
-    #   accounts that did not create an EMR cluster in a Region before this
-    #   date, block public access is enabled by default in that Region.
+    #   accounts that did not create an Amazon EMR cluster in a Region before
+    #   this date, block public access is enabled by default in that Region.
     #
     #    </note>
     #
@@ -2493,13 +3058,13 @@ module Aws::EMR
 
     # Creates or updates a managed scaling policy for an Amazon EMR cluster.
     # The managed scaling policy defines the limits for resources, such as
-    # EC2 instances that can be added or terminated from a cluster. The
-    # policy only applies to the core and task nodes. The master node cannot
-    # be scaled after initial configuration.
+    # Amazon EC2 instances that can be added or terminated from a cluster.
+    # The policy only applies to the core and task nodes. The master node
+    # cannot be scaled after initial configuration.
     #
     # @option params [required, String] :cluster_id
-    #   Specifies the ID of an EMR cluster where the managed scaling policy is
-    #   attached.
+    #   Specifies the ID of an Amazon EMR cluster where the managed scaling
+    #   policy is attached.
     #
     # @option params [required, Types::ManagedScalingPolicy] :managed_scaling_policy
     #   Specifies the constraints for the managed scaling policy.
@@ -2531,7 +3096,7 @@ module Aws::EMR
     end
 
     # Removes an automatic scaling policy from a specified instance group
-    # within an EMR cluster.
+    # within an Amazon EMR cluster.
     #
     # @option params [required, String] :cluster_id
     #   Specifies the ID of a cluster. The instance group to which the
@@ -2559,7 +3124,30 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # Removes a managed scaling policy from a specified EMR cluster.
+    # Removes an auto-termination policy from an Amazon EMR cluster.
+    #
+    # @option params [required, String] :cluster_id
+    #   Specifies the ID of the Amazon EMR cluster from which the
+    #   auto-termination policy will be removed.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.remove_auto_termination_policy({
+    #     cluster_id: "ClusterId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/RemoveAutoTerminationPolicy AWS API Documentation
+    #
+    # @overload remove_auto_termination_policy(params = {})
+    # @param [Hash] params ({})
+    def remove_auto_termination_policy(params = {}, options = {})
+      req = build_request(:remove_auto_termination_policy, params)
+      req.send_request(options)
+    end
+
+    # Removes a managed scaling policy from a specified Amazon EMR cluster.
     #
     # @option params [required, String] :cluster_id
     #   Specifies the ID of the cluster from which the managed scaling policy
@@ -2582,10 +3170,10 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # Removes tags from an Amazon EMR resource. Tags make it easier to
-    # associate clusters in various ways, such as grouping clusters to track
-    # your Amazon EMR resource allocation costs. For more information, see
-    # [Tag Clusters][1].
+    # Removes tags from an Amazon EMR resource, such as a cluster or Amazon
+    # EMR Studio. Tags make it easier to associate resources in various
+    # ways, such as grouping clusters to track your Amazon EMR resource
+    # allocation costs. For more information, see [Tag Clusters][1].
     #
     # The following example removes the stack tag with value Prod from a
     # cluster:
@@ -2596,10 +3184,10 @@ module Aws::EMR
     #
     # @option params [required, String] :resource_id
     #   The Amazon EMR resource identifier from which tags will be removed.
-    #   This value must be a cluster identifier.
+    #   For example, a cluster identifier or an Amazon EMR Studio ID.
     #
     # @option params [required, Array<String>] :tag_keys
-    #   A list of tag keys to remove from a resource.
+    #   A list of tag keys to remove from the resource.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -2639,22 +3227,17 @@ module Aws::EMR
     # can bypass the 256-step limitation in various ways, including using
     # the SSH shell to connect to the master node and submitting queries
     # directly to the software running on the master node, such as Hive and
-    # Hadoop. For more information on how to do this, see [Add More than 256
-    # Steps to a Cluster][1] in the *Amazon EMR Management Guide*.
+    # Hadoop.
     #
-    # For long running clusters, we recommend that you periodically store
+    # For long-running clusters, we recommend that you periodically store
     # your results.
     #
     # <note markdown="1"> The instance fleets configuration is available only in Amazon EMR
-    # versions 4.8.0 and later, excluding 5.0.x versions. The RunJobFlow
+    # releases 4.8.0 and later, excluding 5.0.x versions. The RunJobFlow
     # request can contain InstanceFleets parameters or InstanceGroups
     # parameters, but not both.
     #
     #  </note>
-    #
-    #
-    #
-    # [1]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/AddMoreThan256Steps.html
     #
     # @option params [required, String] :name
     #   The name of the job flow.
@@ -2664,10 +3247,9 @@ module Aws::EMR
     #   value is not provided, logs are not created.
     #
     # @option params [String] :log_encryption_kms_key_id
-    #   The AWS KMS customer master key (CMK) used for encrypting log files.
-    #   If a value is not provided, the logs remain encrypted by AES-256. This
-    #   attribute is only available with Amazon EMR version 5.30.0 and later,
-    #   excluding Amazon EMR 6.0.0.
+    #   The KMS key used for encrypting log files. If a value is not provided,
+    #   the logs remain encrypted by AES-256. This attribute is only available
+    #   with Amazon EMR releases 5.30.0 and later, excluding Amazon EMR 6.0.0.
     #
     # @option params [String] :additional_info
     #   A JSON string for selecting additional features.
@@ -2727,8 +3309,8 @@ module Aws::EMR
     #    </note>
     #
     #   A list of strings that indicates third-party software to use with the
-    #   job flow that accepts a user argument list. EMR accepts and forwards
-    #   the argument list to the corresponding installation script as
+    #   job flow that accepts a user argument list. Amazon EMR accepts and
+    #   forwards the argument list to the corresponding installation script as
     #   bootstrap action arguments. For more information, see "Launch a Job
     #   Flow on the MapR Distribution for Hadoop" in the [Amazon EMR
     #   Developer Guide][1]. Supported values are:
@@ -2743,7 +3325,7 @@ module Aws::EMR
     #
     #   * "mapr-m7" - launch the cluster using MapR M7 Edition.
     #
-    #   * "hunk" - launch the cluster with the Hunk Big Data Analtics
+    #   * "hunk" - launch the cluster with the Hunk Big Data Analytics
     #     Platform.
     #
     #   * "hue"- launch the cluster with Hue installed.
@@ -2761,7 +3343,7 @@ module Aws::EMR
     #   Applies to Amazon EMR releases 4.0 and later. A case-insensitive list
     #   of applications for Amazon EMR to install and configure when launching
     #   the cluster. For a list of applications available for each Amazon EMR
-    #   release version, see the [Amazon EMR Release Guide][1].
+    #   release version, see the [Amazon EMRRelease Guide][1].
     #
     #
     #
@@ -2769,23 +3351,42 @@ module Aws::EMR
     #
     # @option params [Array<Types::Configuration>] :configurations
     #   For Amazon EMR releases 4.0 and later. The list of configurations
-    #   supplied for the EMR cluster you are creating.
+    #   supplied for the Amazon EMR cluster that you are creating.
     #
     # @option params [Boolean] :visible_to_all_users
-    #   A value of `true` indicates that all IAM users in the AWS account can
-    #   perform cluster actions if they have the proper IAM policy
-    #   permissions. This is the default. A value of `false` indicates that
-    #   only the IAM user who created the cluster can perform actions.
+    #   The VisibleToAllUsers parameter is no longer supported. By default,
+    #   the value is set to `true`. Setting it to `false` now has no effect.
+    #
+    #   Set this value to `true` so that IAM principals in the Amazon Web
+    #   Services account associated with the cluster can perform Amazon EMR
+    #   actions on the cluster that their IAM policies allow. This value
+    #   defaults to `true` for clusters created using the Amazon EMR API or
+    #   the CLI [create-cluster][1] command.
+    #
+    #   When set to `false`, only the IAM principal that created the cluster
+    #   and the Amazon Web Services account root user can perform Amazon EMR
+    #   actions for the cluster, regardless of the IAM permissions policies
+    #   attached to other IAM principals. For more information, see
+    #   [Understanding the Amazon EMR cluster VisibleToAllUsers setting][2] in
+    #   the *Amazon EMR Management Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/cli/latest/reference/emr/create-cluster.html
+    #   [2]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/security_IAM_emr-with-IAM.html#security_set_visible_to_all_users
     #
     # @option params [String] :job_flow_role
-    #   Also called instance profile and EC2 role. An IAM role for an EMR
-    #   cluster. The EC2 instances of the cluster assume this role. The
-    #   default role is `EMR_EC2_DefaultRole`. In order to use the default
-    #   role, you must have already created it using the CLI or console.
+    #   Also called instance profile and Amazon EC2 role. An IAM role for an
+    #   Amazon EMR cluster. The Amazon EC2 instances of the cluster assume
+    #   this role. The default role is `EMR_EC2_DefaultRole`. In order to use
+    #   the default role, you must have already created it using the CLI or
+    #   console.
     #
     # @option params [String] :service_role
-    #   The IAM role that will be assumed by the Amazon EMR service to access
-    #   AWS resources on your behalf.
+    #   The IAM role that Amazon EMR assumes in order to access Amazon Web
+    #   Services resources on your behalf. If you've created a custom service
+    #   role path, you must specify it for the service role when you launch
+    #   your cluster.
     #
     # @option params [Array<Types::Tag>] :tags
     #   A list of tags to associate with a cluster and propagate to Amazon EC2
@@ -2797,8 +3398,8 @@ module Aws::EMR
     # @option params [String] :auto_scaling_role
     #   An IAM role for automatic scaling policies. The default role is
     #   `EMR_AutoScaling_DefaultRole`. The IAM role provides permissions that
-    #   the automatic scaling feature requires to launch and terminate EC2
-    #   instances in an instance group.
+    #   the automatic scaling feature requires to launch and terminate Amazon
+    #   EC2 instances in an instance group.
     #
     # @option params [String] :scale_down_behavior
     #   Specifies the way that individual Amazon EC2 instances terminate when
@@ -2813,17 +3414,17 @@ module Aws::EMR
     #   instance-hour boundary. With either behavior, Amazon EMR removes the
     #   least active nodes first and blocks instance termination if it could
     #   lead to HDFS corruption. `TERMINATE_AT_TASK_COMPLETION` available only
-    #   in Amazon EMR version 4.1.0 and later, and is the default for versions
-    #   of Amazon EMR earlier than 5.1.0.
+    #   in Amazon EMR releases 4.1.0 and later, and is the default for
+    #   releases of Amazon EMR earlier than 5.1.0.
     #
     # @option params [String] :custom_ami_id
-    #   Available only in Amazon EMR version 5.7.0 and later. The ID of a
+    #   Available only in Amazon EMR releases 5.7.0 and later. The ID of a
     #   custom Amazon EBS-backed Linux AMI. If specified, Amazon EMR uses this
-    #   AMI when it launches cluster EC2 instances. For more information about
-    #   custom AMIs in Amazon EMR, see [Using a Custom AMI][1] in the *Amazon
-    #   EMR Management Guide*. If omitted, the cluster uses the base Linux AMI
-    #   for the `ReleaseLabel` specified. For Amazon EMR versions 2.x and 3.x,
-    #   use `AmiVersion` instead.
+    #   AMI when it launches cluster Amazon EC2 instances. For more
+    #   information about custom AMIs in Amazon EMR, see [Using a Custom
+    #   AMI][1] in the *Amazon EMR Management Guide*. If omitted, the cluster
+    #   uses the base Linux AMI for the `ReleaseLabel` specified. For Amazon
+    #   EMR releases 2.x and 3.x, use `AmiVersion` instead.
     #
     #   For information about creating a custom AMI, see [Creating an Amazon
     #   EBS-Backed Linux AMI][2] in the *Amazon Elastic Compute Cloud User
@@ -2838,8 +3439,8 @@ module Aws::EMR
     #
     # @option params [Integer] :ebs_root_volume_size
     #   The size, in GiB, of the Amazon EBS root device volume of the Linux
-    #   AMI that is used for each EC2 instance. Available in Amazon EMR
-    #   version 4.x and later.
+    #   AMI that is used for each Amazon EC2 instance. Available in Amazon EMR
+    #   releases 4.x and later.
     #
     # @option params [String] :repo_upgrade_on_boot
     #   Applies only when `CustomAmiID` is used. Specifies which updates from
@@ -2867,6 +3468,31 @@ module Aws::EMR
     #
     # @option params [Array<Types::PlacementGroupConfig>] :placement_group_configs
     #   The specified placement group configuration for an Amazon EMR cluster.
+    #
+    # @option params [Types::AutoTerminationPolicy] :auto_termination_policy
+    #   An auto-termination policy for an Amazon EMR cluster. An
+    #   auto-termination policy defines the amount of idle time in seconds
+    #   after which a cluster automatically terminates. For alternative
+    #   cluster termination options, see [Control cluster termination][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-termination.html
+    #
+    # @option params [String] :os_release_label
+    #   Specifies a particular Amazon Linux release for all nodes in a cluster
+    #   launch RunJobFlow request. If a release is not specified, Amazon EMR
+    #   uses the latest validated Amazon Linux release for cluster launch.
+    #
+    # @option params [Integer] :ebs_root_volume_iops
+    #   The IOPS, of the Amazon EBS root device volume of the Linux AMI that
+    #   is used for each Amazon EC2 instance. Available in Amazon EMR releases
+    #   6.15.0 and later.
+    #
+    # @option params [Integer] :ebs_root_volume_throughput
+    #   The throughput, in MiB/s, of the Amazon EBS root device volume of the
+    #   Linux AMI that is used for each Amazon EC2 instance. Available in
+    #   Amazon EMR releases 6.15.0 and later.
     #
     # @return [Types::RunJobFlowOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2912,6 +3538,7 @@ module Aws::EMR
     #                   volume_type: "String", # required
     #                   iops: 1,
     #                   size_in_gb: 1, # required
+    #                   throughput: 1,
     #                 },
     #                 volumes_per_instance: 1,
     #               },
@@ -2956,6 +3583,7 @@ module Aws::EMR
     #               },
     #             ],
     #           },
+    #           custom_ami_id: "XmlStringMaxLen256",
     #         },
     #       ],
     #       instance_fleets: [
@@ -2977,6 +3605,7 @@ module Aws::EMR
     #                       volume_type: "String", # required
     #                       iops: 1,
     #                       size_in_gb: 1, # required
+    #                       throughput: 1,
     #                     },
     #                     volumes_per_instance: 1,
     #                   },
@@ -2994,6 +3623,8 @@ module Aws::EMR
     #                   },
     #                 },
     #               ],
+    #               custom_ami_id: "XmlStringMaxLen256",
+    #               priority: 1.0,
     #             },
     #           ],
     #           launch_specifications: {
@@ -3001,12 +3632,33 @@ module Aws::EMR
     #               timeout_duration_minutes: 1, # required
     #               timeout_action: "SWITCH_TO_ON_DEMAND", # required, accepts SWITCH_TO_ON_DEMAND, TERMINATE_CLUSTER
     #               block_duration_minutes: 1,
-    #               allocation_strategy: "capacity-optimized", # accepts capacity-optimized
+    #               allocation_strategy: "capacity-optimized", # accepts capacity-optimized, price-capacity-optimized, lowest-price, diversified, capacity-optimized-prioritized
     #             },
     #             on_demand_specification: {
-    #               allocation_strategy: "lowest-price", # required, accepts lowest-price
+    #               allocation_strategy: "lowest-price", # required, accepts lowest-price, prioritized
+    #               capacity_reservation_options: {
+    #                 usage_strategy: "use-capacity-reservations-first", # accepts use-capacity-reservations-first
+    #                 capacity_reservation_preference: "open", # accepts open, none
+    #                 capacity_reservation_resource_group_arn: "XmlStringMaxLen256",
+    #               },
     #             },
     #           },
+    #           resize_specifications: {
+    #             spot_resize_specification: {
+    #               timeout_duration_minutes: 1,
+    #               allocation_strategy: "capacity-optimized", # accepts capacity-optimized, price-capacity-optimized, lowest-price, diversified, capacity-optimized-prioritized
+    #             },
+    #             on_demand_resize_specification: {
+    #               timeout_duration_minutes: 1,
+    #               allocation_strategy: "lowest-price", # accepts lowest-price, prioritized
+    #               capacity_reservation_options: {
+    #                 usage_strategy: "use-capacity-reservations-first", # accepts use-capacity-reservations-first
+    #                 capacity_reservation_preference: "open", # accepts open, none
+    #                 capacity_reservation_resource_group_arn: "XmlStringMaxLen256",
+    #               },
+    #             },
+    #           },
+    #           context: "XmlStringMaxLen256",
     #         },
     #       ],
     #       ec2_key_name: "XmlStringMaxLen256",
@@ -3016,6 +3668,7 @@ module Aws::EMR
     #       },
     #       keep_job_flow_alive_when_no_steps: false,
     #       termination_protected: false,
+    #       unhealthy_node_replacement: false,
     #       hadoop_version: "XmlStringMaxLen256",
     #       ec2_subnet_id: "XmlStringMaxLen256",
     #       ec2_subnet_ids: ["XmlStringMaxLen256"],
@@ -3117,6 +3770,12 @@ module Aws::EMR
     #         placement_strategy: "SPREAD", # accepts SPREAD, PARTITION, CLUSTER, NONE
     #       },
     #     ],
+    #     auto_termination_policy: {
+    #       idle_timeout: 1,
+    #     },
+    #     os_release_label: "XmlStringMaxLen256",
+    #     ebs_root_volume_iops: 1,
+    #     ebs_root_volume_throughput: 1,
     #   })
     #
     # @example Response structure
@@ -3133,13 +3792,60 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # SetTerminationProtection locks a cluster (job flow) so the EC2
+    # You can use the `SetKeepJobFlowAliveWhenNoSteps` to configure a
+    # cluster (job flow) to terminate after the step execution, i.e., all
+    # your steps are executed. If you want a transient cluster that shuts
+    # down after the last of the current executing steps are completed, you
+    # can configure `SetKeepJobFlowAliveWhenNoSteps` to false. If you want a
+    # long running cluster, configure `SetKeepJobFlowAliveWhenNoSteps` to
+    # true.
+    #
+    # For more information, see [Managing Cluster Termination][1] in the
+    # *Amazon EMR Management Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/UsingEMR_TerminationProtection.html
+    #
+    # @option params [required, Array<String>] :job_flow_ids
+    #   A list of strings that uniquely identify the clusters to protect. This
+    #   identifier is returned by [RunJobFlow][1] and can also be obtained
+    #   from [DescribeJobFlows][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html
+    #   [2]: https://docs.aws.amazon.com/emr/latest/APIReference/API_DescribeJobFlows.html
+    #
+    # @option params [required, Boolean] :keep_job_flow_alive_when_no_steps
+    #   A Boolean that indicates whether to terminate the cluster after all
+    #   steps are executed.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.set_keep_job_flow_alive_when_no_steps({
+    #     job_flow_ids: ["XmlString"], # required
+    #     keep_job_flow_alive_when_no_steps: false, # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/SetKeepJobFlowAliveWhenNoSteps AWS API Documentation
+    #
+    # @overload set_keep_job_flow_alive_when_no_steps(params = {})
+    # @param [Hash] params ({})
+    def set_keep_job_flow_alive_when_no_steps(params = {}, options = {})
+      req = build_request(:set_keep_job_flow_alive_when_no_steps, params)
+      req.send_request(options)
+    end
+
+    # SetTerminationProtection locks a cluster (job flow) so the Amazon EC2
     # instances in the cluster cannot be terminated by user intervention, an
     # API call, or in the event of a job-flow error. The cluster still
     # terminates upon successful completion of the job flow. Calling
     # `SetTerminationProtection` on a cluster is similar to calling the
-    # Amazon EC2 `DisableAPITermination` API on all EC2 instances in a
-    # cluster.
+    # Amazon EC2 `DisableAPITermination` API on all Amazon EC2 instances in
+    # a cluster.
     #
     # `SetTerminationProtection` is used to prevent accidental termination
     # of a cluster and to ensure that in the event of an error, the
@@ -3151,7 +3857,7 @@ module Aws::EMR
     # flow by a subsequent call to `SetTerminationProtection` in which you
     # set the value to `false`.
     #
-    # For more information, see[Managing Cluster Termination][1] in the
+    # For more information, see [Managing Cluster Termination][1] in the
     # *Amazon EMR Management Guide*.
     #
     #
@@ -3186,25 +3892,88 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # Sets the Cluster$VisibleToAllUsers value, which determines whether the
-    # cluster is visible to all IAM users of the AWS account associated with
-    # the cluster. Only the IAM user who created the cluster or the AWS
-    # account root user can call this action. The default value, `true`,
-    # indicates that all IAM users in the AWS account can perform cluster
-    # actions if they have the proper IAM policy permissions. If set to
-    # `false`, only the IAM user that created the cluster can perform
-    # actions. This action works on running clusters. You can override the
-    # default `true` setting when you create a cluster by using the
-    # `VisibleToAllUsers` parameter with `RunJobFlow`.
+    # Specify whether to enable unhealthy node replacement, which lets
+    # Amazon EMR gracefully replace core nodes on a cluster if any nodes
+    # become unhealthy. For example, a node becomes unhealthy if disk usage
+    # is above 90%. If unhealthy node replacement is on and
+    # `TerminationProtected` are off, Amazon EMR immediately terminates the
+    # unhealthy core nodes. To use unhealthy node replacement and retain
+    # unhealthy core nodes, use to turn on termination protection. In such
+    # cases, Amazon EMR adds the unhealthy nodes to a denylist, reducing job
+    # interruptions and failures.
+    #
+    # If unhealthy node replacement is on, Amazon EMR notifies YARN and
+    # other applications on the cluster to stop scheduling tasks with these
+    # nodes, moves the data, and then terminates the nodes.
+    #
+    # For more information, see [graceful node replacement][1] in the
+    # *Amazon EMR Management Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-node-replacement.html
+    #
+    # @option params [required, Array<String>] :job_flow_ids
+    #   The list of strings that uniquely identify the clusters for which to
+    #   turn on unhealthy node replacement. You can get these identifiers by
+    #   running the RunJobFlow or the DescribeJobFlows operations.
+    #
+    # @option params [required, Boolean] :unhealthy_node_replacement
+    #   Indicates whether to turn on or turn off graceful unhealthy node
+    #   replacement.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.set_unhealthy_node_replacement({
+    #     job_flow_ids: ["XmlString"], # required
+    #     unhealthy_node_replacement: false, # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/SetUnhealthyNodeReplacement AWS API Documentation
+    #
+    # @overload set_unhealthy_node_replacement(params = {})
+    # @param [Hash] params ({})
+    def set_unhealthy_node_replacement(params = {}, options = {})
+      req = build_request(:set_unhealthy_node_replacement, params)
+      req.send_request(options)
+    end
+
+    # The SetVisibleToAllUsers parameter is no longer supported. Your
+    # cluster may be visible to all users in your account. To restrict
+    # cluster access using an IAM policy, see [Identity and Access
+    # Management for Amazon EMR][1].
+    #
+    # Sets the Cluster$VisibleToAllUsers value for an Amazon EMR cluster.
+    # When `true`, IAM principals in the Amazon Web Services account can
+    # perform Amazon EMR cluster actions that their IAM policies allow. When
+    # `false`, only the IAM principal that created the cluster and the
+    # Amazon Web Services account root user can perform Amazon EMR actions
+    # on the cluster, regardless of IAM permissions policies attached to
+    # other IAM principals.
+    #
+    # This action works on running clusters. When you create a cluster, use
+    # the RunJobFlowInput$VisibleToAllUsers parameter.
+    #
+    # For more information, see [Understanding the Amazon EMR Cluster
+    # VisibleToAllUsers Setting][2] in the *Amazon EMR Management Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-access-IAM.html
+    # [2]: https://docs.aws.amazon.com/emr/latest/ManagementGuide/security_IAM_emr-with-IAM.html#security_set_visible_to_all_users
     #
     # @option params [required, Array<String>] :job_flow_ids
     #   The unique identifier of the job flow (cluster).
     #
     # @option params [required, Boolean] :visible_to_all_users
-    #   A value of `true` indicates that all IAM users in the AWS account can
-    #   perform cluster actions if they have the proper IAM policy
-    #   permissions. This is the default. A value of `false` indicates that
-    #   only the IAM user who created the cluster can perform actions.
+    #   A value of `true` indicates that an IAM principal in the Amazon Web
+    #   Services account can perform Amazon EMR actions on the cluster that
+    #   the IAM policies attached to the principal allow. A value of `false`
+    #   indicates that only the IAM principal that created the cluster and the
+    #   Amazon Web Services root user can perform Amazon EMR actions on the
+    #   cluster.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -3226,15 +3995,15 @@ module Aws::EMR
 
     # Starts a notebook execution.
     #
-    # @option params [required, String] :editor_id
-    #   The unique identifier of the EMR Notebook to use for notebook
+    # @option params [String] :editor_id
+    #   The unique identifier of the Amazon EMR Notebook to use for notebook
     #   execution.
     #
-    # @option params [required, String] :relative_path
+    # @option params [String] :relative_path
     #   The path and file name of the notebook file for this execution,
-    #   relative to the path specified for the EMR Notebook. For example, if
-    #   you specify a path of `s3://MyBucket/MyNotebooks` when you create an
-    #   EMR Notebook for a notebook with an ID of
+    #   relative to the path specified for the Amazon EMR Notebook. For
+    #   example, if you specify a path of `s3://MyBucket/MyNotebooks` when you
+    #   create an Amazon EMR Notebook for a notebook with an ID of
     #   `e-ABCDEFGHIJK1234567890ABCD` (the `EditorID` of this request), and
     #   you specify a `RelativePath` of
     #   `my_notebook_executions/notebook_execution.ipynb`, the location of the
@@ -3245,8 +4014,8 @@ module Aws::EMR
     #   An optional name for the notebook execution.
     #
     # @option params [String] :notebook_params
-    #   Input parameters in JSON format passed to the EMR Notebook at runtime
-    #   for execution.
+    #   Input parameters in JSON format passed to the Amazon EMR Notebook at
+    #   runtime for execution.
     #
     # @option params [required, Types::ExecutionEngineConfig] :execution_engine
     #   Specifies the execution engine (cluster) that runs the notebook
@@ -3254,17 +4023,29 @@ module Aws::EMR
     #
     # @option params [required, String] :service_role
     #   The name or ARN of the IAM role that is used as the service role for
-    #   Amazon EMR (the EMR role) for the notebook execution.
+    #   Amazon EMR (the Amazon EMR role) for the notebook execution.
     #
     # @option params [String] :notebook_instance_security_group_id
     #   The unique identifier of the Amazon EC2 security group to associate
-    #   with the EMR Notebook for this notebook execution.
+    #   with the Amazon EMR Notebook for this notebook execution.
     #
     # @option params [Array<Types::Tag>] :tags
     #   A list of tags associated with a notebook execution. Tags are
     #   user-defined key-value pairs that consist of a required key string
     #   with a maximum of 128 characters and an optional value string with a
     #   maximum of 256 characters.
+    #
+    # @option params [Types::NotebookS3LocationFromInput] :notebook_s3_location
+    #   The Amazon S3 location for the notebook execution input.
+    #
+    # @option params [Types::OutputNotebookS3LocationFromInput] :output_notebook_s3_location
+    #   The Amazon S3 location for the notebook execution output.
+    #
+    # @option params [String] :output_notebook_format
+    #   The output format for the notebook execution.
+    #
+    # @option params [Hash<String,String>] :environment_variables
+    #   The environment variables associated with the notebook execution.
     #
     # @return [Types::StartNotebookExecutionOutput] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -3273,14 +4054,15 @@ module Aws::EMR
     # @example Request syntax with placeholder values
     #
     #   resp = client.start_notebook_execution({
-    #     editor_id: "XmlStringMaxLen256", # required
-    #     relative_path: "XmlString", # required
+    #     editor_id: "XmlStringMaxLen256",
+    #     relative_path: "XmlString",
     #     notebook_execution_name: "XmlStringMaxLen256",
     #     notebook_params: "XmlString",
     #     execution_engine: { # required
     #       id: "XmlStringMaxLen256", # required
     #       type: "EMR", # accepts EMR
     #       master_instance_security_group_id: "XmlStringMaxLen256",
+    #       execution_role_arn: "IAMRoleArn",
     #     },
     #     service_role: "XmlString", # required
     #     notebook_instance_security_group_id: "XmlStringMaxLen256",
@@ -3290,6 +4072,18 @@ module Aws::EMR
     #         value: "String",
     #       },
     #     ],
+    #     notebook_s3_location: {
+    #       bucket: "XmlStringMaxLen256",
+    #       key: "UriString",
+    #     },
+    #     output_notebook_s3_location: {
+    #       bucket: "XmlStringMaxLen256",
+    #       key: "UriString",
+    #     },
+    #     output_notebook_format: "HTML", # accepts HTML
+    #     environment_variables: {
+    #       "XmlStringMaxLen256" => "XmlString",
+    #     },
     #   })
     #
     # @example Response structure
@@ -3329,8 +4123,8 @@ module Aws::EMR
 
     # TerminateJobFlows shuts a list of clusters (job flows) down. When a
     # job flow is shut down, any step not yet completed is canceled and the
-    # EC2 instances on which the cluster is running are stopped. Any log
-    # files not already saved are uploaded to Amazon S3 if a LogUri was
+    # Amazon EC2 instances on which the cluster is running are stopped. Any
+    # log files not already saved are uploaded to Amazon S3 if a LogUri was
     # specified when the cluster was created.
     #
     # The maximum number of clusters allowed is 10. The call to
@@ -3359,22 +4153,66 @@ module Aws::EMR
       req.send_request(options)
     end
 
-    # <note markdown="1"> The Amazon EMR Studio APIs are in preview release for Amazon EMR and
-    # are subject to change.
+    # Updates an Amazon EMR Studio configuration, including attributes such
+    # as name, description, and subnets.
     #
-    #  </note>
+    # @option params [required, String] :studio_id
+    #   The ID of the Amazon EMR Studio to update.
     #
+    # @option params [String] :name
+    #   A descriptive name for the Amazon EMR Studio.
+    #
+    # @option params [String] :description
+    #   A detailed description to assign to the Amazon EMR Studio.
+    #
+    # @option params [Array<String>] :subnet_ids
+    #   A list of subnet IDs to associate with the Amazon EMR Studio. The list
+    #   can include new subnet IDs, but must also include all of the subnet
+    #   IDs previously associated with the Studio. The list order does not
+    #   matter. A Studio can have a maximum of 5 subnets. The subnets must
+    #   belong to the same VPC as the Studio.
+    #
+    # @option params [String] :default_s3_location
+    #   The Amazon S3 location to back up Workspaces and notebook files for
+    #   the Amazon EMR Studio.
+    #
+    # @option params [String] :encryption_key_arn
+    #   The KMS key identifier (ARN) used to encrypt Amazon EMR Studio
+    #   workspace and notebook files when backed up to Amazon S3.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_studio({
+    #     studio_id: "XmlStringMaxLen256", # required
+    #     name: "XmlStringMaxLen256",
+    #     description: "XmlStringMaxLen256",
+    #     subnet_ids: ["String"],
+    #     default_s3_location: "XmlString",
+    #     encryption_key_arn: "XmlString",
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticmapreduce-2009-03-31/UpdateStudio AWS API Documentation
+    #
+    # @overload update_studio(params = {})
+    # @param [Hash] params ({})
+    def update_studio(params = {}, options = {})
+      req = build_request(:update_studio, params)
+      req.send_request(options)
+    end
+
     # Updates the session policy attached to the user or group for the
     # specified Amazon EMR Studio.
     #
     # @option params [required, String] :studio_id
-    #   The ID of the EMR Studio.
+    #   The ID of the Amazon EMR Studio.
     #
     # @option params [String] :identity_id
     #   The globally unique identifier (GUID) of the user or group. For more
-    #   information, see [UserId][1] and [GroupId][2] in the *AWS SSO Identity
-    #   Store API Reference*. Either `IdentityName` or `IdentityId` must be
-    #   specified.
+    #   information, see [UserId][1] and [GroupId][2] in the *IAM Identity
+    #   Center Identity Store API Reference*. Either `IdentityName` or
+    #   `IdentityId` must be specified.
     #
     #
     #
@@ -3383,12 +4221,13 @@ module Aws::EMR
     #
     # @option params [String] :identity_name
     #   The name of the user or group to update. For more information, see
-    #   [UserName][1] and [DisplayName][2] in the *AWS SSO Identity Store API
-    #   Reference*. Either `IdentityName` or `IdentityId` must be specified.
+    #   [UserName][1] and [DisplayName][2] in the *IAM Identity Center
+    #   Identity Store API Reference*. Either `IdentityName` or `IdentityId`
+    #   must be specified.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_User.html#singlesignon-Type-User-UserId
+    #   [1]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_User.html#singlesignon-Type-User-UserName
     #   [2]: https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_Group.html#singlesignon-Type-Group-DisplayName
     #
     # @option params [required, String] :identity_type
@@ -3425,14 +4264,19 @@ module Aws::EMR
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::EMR')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-emr'
-      context[:gem_version] = '1.40.0'
+      context[:gem_version] = '1.100.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

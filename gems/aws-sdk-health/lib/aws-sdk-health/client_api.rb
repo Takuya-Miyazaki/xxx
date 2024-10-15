@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::Health
   # @api private
@@ -13,6 +14,8 @@ module Aws::Health
 
     include Seahorse::Model
 
+    AccountEntityAggregate = Shapes::StructureShape.new(name: 'AccountEntityAggregate')
+    AccountEntityAggregatesList = Shapes::ListShape.new(name: 'AccountEntityAggregatesList')
     AffectedEntity = Shapes::StructureShape.new(name: 'AffectedEntity')
     ConcurrentModificationException = Shapes::StructureShape.new(name: 'ConcurrentModificationException')
     DateTimeRange = Shapes::StructureShape.new(name: 'DateTimeRange')
@@ -23,6 +26,8 @@ module Aws::Health
     DescribeAffectedEntitiesForOrganizationResponse = Shapes::StructureShape.new(name: 'DescribeAffectedEntitiesForOrganizationResponse')
     DescribeAffectedEntitiesRequest = Shapes::StructureShape.new(name: 'DescribeAffectedEntitiesRequest')
     DescribeAffectedEntitiesResponse = Shapes::StructureShape.new(name: 'DescribeAffectedEntitiesResponse')
+    DescribeEntityAggregatesForOrganizationRequest = Shapes::StructureShape.new(name: 'DescribeEntityAggregatesForOrganizationRequest')
+    DescribeEntityAggregatesForOrganizationResponse = Shapes::StructureShape.new(name: 'DescribeEntityAggregatesForOrganizationResponse')
     DescribeEntityAggregatesRequest = Shapes::StructureShape.new(name: 'DescribeEntityAggregatesRequest')
     DescribeEntityAggregatesResponse = Shapes::StructureShape.new(name: 'DescribeEntityAggregatesResponse')
     DescribeEventAggregatesRequest = Shapes::StructureShape.new(name: 'DescribeEventAggregatesRequest')
@@ -42,6 +47,7 @@ module Aws::Health
     DescribeEventsRequest = Shapes::StructureShape.new(name: 'DescribeEventsRequest')
     DescribeEventsResponse = Shapes::StructureShape.new(name: 'DescribeEventsResponse')
     DescribeHealthServiceStatusForOrganizationResponse = Shapes::StructureShape.new(name: 'DescribeHealthServiceStatusForOrganizationResponse')
+    EntityAccountFilter = Shapes::StructureShape.new(name: 'EntityAccountFilter')
     EntityAggregate = Shapes::StructureShape.new(name: 'EntityAggregate')
     EntityAggregateList = Shapes::ListShape.new(name: 'EntityAggregateList')
     EntityFilter = Shapes::StructureShape.new(name: 'EntityFilter')
@@ -62,9 +68,14 @@ module Aws::Health
     EventTypeFilter = Shapes::StructureShape.new(name: 'EventTypeFilter')
     EventTypeList = Shapes::ListShape.new(name: 'EventTypeList')
     InvalidPaginationToken = Shapes::StructureShape.new(name: 'InvalidPaginationToken')
+    OrganizationAccountIdsList = Shapes::ListShape.new(name: 'OrganizationAccountIdsList')
     OrganizationAffectedEntitiesErrorItem = Shapes::StructureShape.new(name: 'OrganizationAffectedEntitiesErrorItem')
+    OrganizationEntityAccountFiltersList = Shapes::ListShape.new(name: 'OrganizationEntityAccountFiltersList')
+    OrganizationEntityAggregate = Shapes::StructureShape.new(name: 'OrganizationEntityAggregate')
+    OrganizationEntityAggregatesList = Shapes::ListShape.new(name: 'OrganizationEntityAggregatesList')
     OrganizationEntityFiltersList = Shapes::ListShape.new(name: 'OrganizationEntityFiltersList')
     OrganizationEvent = Shapes::StructureShape.new(name: 'OrganizationEvent')
+    OrganizationEventArnsList = Shapes::ListShape.new(name: 'OrganizationEventArnsList')
     OrganizationEventDetailFiltersList = Shapes::ListShape.new(name: 'OrganizationEventDetailFiltersList')
     OrganizationEventDetails = Shapes::StructureShape.new(name: 'OrganizationEventDetails')
     OrganizationEventDetailsErrorItem = Shapes::StructureShape.new(name: 'OrganizationEventDetailsErrorItem')
@@ -83,6 +94,7 @@ module Aws::Health
     entityArnList = Shapes::ListShape.new(name: 'entityArnList')
     entityStatusCode = Shapes::StringShape.new(name: 'entityStatusCode')
     entityStatusCodeList = Shapes::ListShape.new(name: 'entityStatusCodeList')
+    entityStatuses = Shapes::MapShape.new(name: 'entityStatuses')
     entityUrl = Shapes::StringShape.new(name: 'entityUrl')
     entityValue = Shapes::StringShape.new(name: 'entityValue')
     entityValueList = Shapes::ListShape.new(name: 'entityValueList')
@@ -102,6 +114,7 @@ module Aws::Health
     healthServiceAccessStatusForOrganization = Shapes::StringShape.new(name: 'healthServiceAccessStatusForOrganization')
     locale = Shapes::StringShape.new(name: 'locale')
     maxResults = Shapes::IntegerShape.new(name: 'maxResults')
+    maxResultsLowerRange = Shapes::IntegerShape.new(name: 'maxResultsLowerRange')
     metadataKey = Shapes::StringShape.new(name: 'metadataKey')
     metadataValue = Shapes::StringShape.new(name: 'metadataValue')
     nextToken = Shapes::StringShape.new(name: 'nextToken')
@@ -115,6 +128,13 @@ module Aws::Health
     tagSet = Shapes::MapShape.new(name: 'tagSet')
     tagValue = Shapes::StringShape.new(name: 'tagValue')
     timestamp = Shapes::TimestampShape.new(name: 'timestamp')
+
+    AccountEntityAggregate.add_member(:account_id, Shapes::ShapeRef.new(shape: eventArn, location_name: "accountId"))
+    AccountEntityAggregate.add_member(:count, Shapes::ShapeRef.new(shape: count, location_name: "count"))
+    AccountEntityAggregate.add_member(:statuses, Shapes::ShapeRef.new(shape: entityStatuses, location_name: "statuses"))
+    AccountEntityAggregate.struct_class = Types::AccountEntityAggregate
+
+    AccountEntityAggregatesList.member = Shapes::ShapeRef.new(shape: AccountEntityAggregate)
 
     AffectedEntity.add_member(:entity_arn, Shapes::ShapeRef.new(shape: entityArn, location_name: "entityArn"))
     AffectedEntity.add_member(:event_arn, Shapes::ShapeRef.new(shape: eventArn, location_name: "eventArn"))
@@ -145,10 +165,11 @@ module Aws::Health
 
     DescribeAffectedEntitiesForOrganizationFailedSet.member = Shapes::ShapeRef.new(shape: OrganizationAffectedEntitiesErrorItem)
 
-    DescribeAffectedEntitiesForOrganizationRequest.add_member(:organization_entity_filters, Shapes::ShapeRef.new(shape: OrganizationEntityFiltersList, required: true, location_name: "organizationEntityFilters"))
+    DescribeAffectedEntitiesForOrganizationRequest.add_member(:organization_entity_filters, Shapes::ShapeRef.new(shape: OrganizationEntityFiltersList, deprecated: true, location_name: "organizationEntityFilters", metadata: {"deprecatedMessage"=>"This property is deprecated, use organizationEntityAccountFilters instead."}))
     DescribeAffectedEntitiesForOrganizationRequest.add_member(:locale, Shapes::ShapeRef.new(shape: locale, location_name: "locale"))
     DescribeAffectedEntitiesForOrganizationRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: nextToken, location_name: "nextToken"))
-    DescribeAffectedEntitiesForOrganizationRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: maxResults, location_name: "maxResults"))
+    DescribeAffectedEntitiesForOrganizationRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: maxResultsLowerRange, location_name: "maxResults"))
+    DescribeAffectedEntitiesForOrganizationRequest.add_member(:organization_entity_account_filters, Shapes::ShapeRef.new(shape: OrganizationEntityAccountFiltersList, location_name: "organizationEntityAccountFilters"))
     DescribeAffectedEntitiesForOrganizationRequest.struct_class = Types::DescribeAffectedEntitiesForOrganizationRequest
 
     DescribeAffectedEntitiesForOrganizationResponse.add_member(:entities, Shapes::ShapeRef.new(shape: EntityList, location_name: "entities"))
@@ -165,6 +186,13 @@ module Aws::Health
     DescribeAffectedEntitiesResponse.add_member(:entities, Shapes::ShapeRef.new(shape: EntityList, location_name: "entities"))
     DescribeAffectedEntitiesResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: nextToken, location_name: "nextToken"))
     DescribeAffectedEntitiesResponse.struct_class = Types::DescribeAffectedEntitiesResponse
+
+    DescribeEntityAggregatesForOrganizationRequest.add_member(:event_arns, Shapes::ShapeRef.new(shape: OrganizationEventArnsList, required: true, location_name: "eventArns"))
+    DescribeEntityAggregatesForOrganizationRequest.add_member(:aws_account_ids, Shapes::ShapeRef.new(shape: OrganizationAccountIdsList, location_name: "awsAccountIds"))
+    DescribeEntityAggregatesForOrganizationRequest.struct_class = Types::DescribeEntityAggregatesForOrganizationRequest
+
+    DescribeEntityAggregatesForOrganizationResponse.add_member(:organization_entity_aggregates, Shapes::ShapeRef.new(shape: OrganizationEntityAggregatesList, location_name: "organizationEntityAggregates"))
+    DescribeEntityAggregatesForOrganizationResponse.struct_class = Types::DescribeEntityAggregatesForOrganizationResponse
 
     DescribeEntityAggregatesRequest.add_member(:event_arns, Shapes::ShapeRef.new(shape: EventArnsList, location_name: "eventArns"))
     DescribeEntityAggregatesRequest.struct_class = Types::DescribeEntityAggregatesRequest
@@ -218,7 +246,7 @@ module Aws::Health
 
     DescribeEventsForOrganizationRequest.add_member(:filter, Shapes::ShapeRef.new(shape: OrganizationEventFilter, location_name: "filter"))
     DescribeEventsForOrganizationRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: nextToken, location_name: "nextToken"))
-    DescribeEventsForOrganizationRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: maxResults, location_name: "maxResults"))
+    DescribeEventsForOrganizationRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: maxResultsLowerRange, location_name: "maxResults"))
     DescribeEventsForOrganizationRequest.add_member(:locale, Shapes::ShapeRef.new(shape: locale, location_name: "locale"))
     DescribeEventsForOrganizationRequest.struct_class = Types::DescribeEventsForOrganizationRequest
 
@@ -239,8 +267,14 @@ module Aws::Health
     DescribeHealthServiceStatusForOrganizationResponse.add_member(:health_service_access_status_for_organization, Shapes::ShapeRef.new(shape: healthServiceAccessStatusForOrganization, location_name: "healthServiceAccessStatusForOrganization"))
     DescribeHealthServiceStatusForOrganizationResponse.struct_class = Types::DescribeHealthServiceStatusForOrganizationResponse
 
+    EntityAccountFilter.add_member(:event_arn, Shapes::ShapeRef.new(shape: eventArn, required: true, location_name: "eventArn"))
+    EntityAccountFilter.add_member(:aws_account_id, Shapes::ShapeRef.new(shape: accountId, location_name: "awsAccountId"))
+    EntityAccountFilter.add_member(:status_codes, Shapes::ShapeRef.new(shape: entityStatusCodeList, location_name: "statusCodes"))
+    EntityAccountFilter.struct_class = Types::EntityAccountFilter
+
     EntityAggregate.add_member(:event_arn, Shapes::ShapeRef.new(shape: eventArn, location_name: "eventArn"))
     EntityAggregate.add_member(:count, Shapes::ShapeRef.new(shape: count, location_name: "count"))
+    EntityAggregate.add_member(:statuses, Shapes::ShapeRef.new(shape: entityStatuses, location_name: "statuses"))
     EntityAggregate.struct_class = Types::EntityAggregate
 
     EntityAggregateList.member = Shapes::ShapeRef.new(shape: EntityAggregate)
@@ -329,11 +363,23 @@ module Aws::Health
     InvalidPaginationToken.add_member(:message, Shapes::ShapeRef.new(shape: string, location_name: "message"))
     InvalidPaginationToken.struct_class = Types::InvalidPaginationToken
 
+    OrganizationAccountIdsList.member = Shapes::ShapeRef.new(shape: accountId)
+
     OrganizationAffectedEntitiesErrorItem.add_member(:aws_account_id, Shapes::ShapeRef.new(shape: accountId, location_name: "awsAccountId"))
     OrganizationAffectedEntitiesErrorItem.add_member(:event_arn, Shapes::ShapeRef.new(shape: eventArn, location_name: "eventArn"))
     OrganizationAffectedEntitiesErrorItem.add_member(:error_name, Shapes::ShapeRef.new(shape: string, location_name: "errorName"))
     OrganizationAffectedEntitiesErrorItem.add_member(:error_message, Shapes::ShapeRef.new(shape: string, location_name: "errorMessage"))
     OrganizationAffectedEntitiesErrorItem.struct_class = Types::OrganizationAffectedEntitiesErrorItem
+
+    OrganizationEntityAccountFiltersList.member = Shapes::ShapeRef.new(shape: EntityAccountFilter)
+
+    OrganizationEntityAggregate.add_member(:event_arn, Shapes::ShapeRef.new(shape: eventArn, location_name: "eventArn"))
+    OrganizationEntityAggregate.add_member(:count, Shapes::ShapeRef.new(shape: count, location_name: "count"))
+    OrganizationEntityAggregate.add_member(:statuses, Shapes::ShapeRef.new(shape: entityStatuses, location_name: "statuses"))
+    OrganizationEntityAggregate.add_member(:accounts, Shapes::ShapeRef.new(shape: AccountEntityAggregatesList, location_name: "accounts"))
+    OrganizationEntityAggregate.struct_class = Types::OrganizationEntityAggregate
+
+    OrganizationEntityAggregatesList.member = Shapes::ShapeRef.new(shape: OrganizationEntityAggregate)
 
     OrganizationEntityFiltersList.member = Shapes::ShapeRef.new(shape: EventAccountFilter)
 
@@ -348,6 +394,8 @@ module Aws::Health
     OrganizationEvent.add_member(:last_updated_time, Shapes::ShapeRef.new(shape: timestamp, location_name: "lastUpdatedTime"))
     OrganizationEvent.add_member(:status_code, Shapes::ShapeRef.new(shape: eventStatusCode, location_name: "statusCode"))
     OrganizationEvent.struct_class = Types::OrganizationEvent
+
+    OrganizationEventArnsList.member = Shapes::ShapeRef.new(shape: eventArn)
 
     OrganizationEventDetailFiltersList.member = Shapes::ShapeRef.new(shape: EventAccountFilter)
 
@@ -393,6 +441,9 @@ module Aws::Health
 
     entityStatusCodeList.member = Shapes::ShapeRef.new(shape: entityStatusCode)
 
+    entityStatuses.key = Shapes::ShapeRef.new(shape: entityStatusCode)
+    entityStatuses.value = Shapes::ShapeRef.new(shape: count)
+
     entityValueList.member = Shapes::ShapeRef.new(shape: entityValue)
 
     eventArnList.member = Shapes::ShapeRef.new(shape: eventArn)
@@ -423,9 +474,11 @@ module Aws::Health
 
       api.metadata = {
         "apiVersion" => "2016-08-04",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "health",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceAbbreviation" => "AWSHealth",
         "serviceFullName" => "AWS Health APIs and Notifications",
         "serviceId" => "Health",
@@ -487,6 +540,14 @@ module Aws::Health
         o.http_request_uri = "/"
         o.input = Shapes::ShapeRef.new(shape: DescribeEntityAggregatesRequest)
         o.output = Shapes::ShapeRef.new(shape: DescribeEntityAggregatesResponse)
+      end)
+
+      api.add_operation(:describe_entity_aggregates_for_organization, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeEntityAggregatesForOrganization"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeEntityAggregatesForOrganizationRequest)
+        o.output = Shapes::ShapeRef.new(shape: DescribeEntityAggregatesForOrganizationResponse)
       end)
 
       api.add_operation(:describe_event_aggregates, Seahorse::Model::Operation.new.tap do |o|

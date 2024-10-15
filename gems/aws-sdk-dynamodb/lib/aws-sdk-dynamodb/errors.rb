@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -37,6 +37,8 @@ module Aws::DynamoDB
   # * {GlobalTableAlreadyExistsException}
   # * {GlobalTableNotFoundException}
   # * {IdempotentParameterMismatchException}
+  # * {ImportConflictException}
+  # * {ImportNotFoundException}
   # * {IndexNotFoundException}
   # * {InternalServerError}
   # * {InvalidExportTimeException}
@@ -44,6 +46,7 @@ module Aws::DynamoDB
   # * {ItemCollectionSizeLimitExceededException}
   # * {LimitExceededException}
   # * {PointInTimeRecoveryUnavailableException}
+  # * {PolicyNotFoundException}
   # * {ProvisionedThroughputExceededException}
   # * {ReplicaAlreadyExistsException}
   # * {ReplicaNotFoundException}
@@ -105,6 +108,11 @@ module Aws::DynamoDB
       # @return [String]
       def message
         @message || @data[:message]
+      end
+
+      # @return [String]
+      def item
+        @data[:item]
       end
     end
 
@@ -213,6 +221,36 @@ module Aws::DynamoDB
       end
     end
 
+    class ImportConflictException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::DynamoDB::Types::ImportConflictException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ImportNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::DynamoDB::Types::ImportNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class IndexNotFoundException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -308,6 +346,21 @@ module Aws::DynamoDB
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::DynamoDB::Types::PointInTimeRecoveryUnavailableException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class PolicyNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::DynamoDB::Types::PolicyNotFoundException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

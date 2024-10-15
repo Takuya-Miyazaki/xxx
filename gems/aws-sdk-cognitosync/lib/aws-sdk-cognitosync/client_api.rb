@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::CognitoSync
   # @api private
@@ -358,10 +359,13 @@ module Aws::CognitoSync
 
       api.metadata = {
         "apiVersion" => "2014-06-30",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "cognito-sync",
         "jsonVersion" => "1.1",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceFullName" => "Amazon Cognito Sync",
+        "serviceId" => "Cognito Sync",
         "signatureVersion" => "v4",
         "uid" => "cognito-sync-2014-06-30",
       }

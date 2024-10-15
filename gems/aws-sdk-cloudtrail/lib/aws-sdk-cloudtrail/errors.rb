@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -27,10 +27,34 @@ module Aws::CloudTrail
   # See {Seahorse::Client::RequestContext} for more information.
   #
   # ## Error Classes
+  # * {AccessDeniedException}
+  # * {AccountHasOngoingImportException}
+  # * {AccountNotFoundException}
+  # * {AccountNotRegisteredException}
+  # * {AccountRegisteredException}
+  # * {CannotDelegateManagementAccountException}
+  # * {ChannelARNInvalidException}
+  # * {ChannelAlreadyExistsException}
+  # * {ChannelExistsForEDSException}
+  # * {ChannelMaxLimitExceededException}
+  # * {ChannelNotFoundException}
   # * {CloudTrailARNInvalidException}
   # * {CloudTrailAccessNotEnabledException}
   # * {CloudTrailInvalidClientTokenIdException}
   # * {CloudWatchLogsDeliveryUnavailableException}
+  # * {ConcurrentModificationException}
+  # * {ConflictException}
+  # * {DelegatedAdminAccountLimitExceededException}
+  # * {EventDataStoreARNInvalidException}
+  # * {EventDataStoreAlreadyExistsException}
+  # * {EventDataStoreFederationEnabledException}
+  # * {EventDataStoreHasOngoingImportException}
+  # * {EventDataStoreMaxLimitExceededException}
+  # * {EventDataStoreNotFoundException}
+  # * {EventDataStoreTerminationProtectedException}
+  # * {ImportNotFoundException}
+  # * {InactiveEventDataStoreException}
+  # * {InactiveQueryException}
   # * {InsightNotEnabledException}
   # * {InsufficientDependencyServiceAccessPermissionException}
   # * {InsufficientEncryptionPolicyException}
@@ -38,18 +62,26 @@ module Aws::CloudTrail
   # * {InsufficientSnsTopicPolicyException}
   # * {InvalidCloudWatchLogsLogGroupArnException}
   # * {InvalidCloudWatchLogsRoleArnException}
+  # * {InvalidDateRangeException}
   # * {InvalidEventCategoryException}
+  # * {InvalidEventDataStoreCategoryException}
+  # * {InvalidEventDataStoreStatusException}
   # * {InvalidEventSelectorsException}
   # * {InvalidHomeRegionException}
+  # * {InvalidImportSourceException}
   # * {InvalidInsightSelectorsException}
   # * {InvalidKmsKeyIdException}
   # * {InvalidLookupAttributesException}
   # * {InvalidMaxResultsException}
   # * {InvalidNextTokenException}
   # * {InvalidParameterCombinationException}
+  # * {InvalidParameterException}
+  # * {InvalidQueryStatementException}
+  # * {InvalidQueryStatusException}
   # * {InvalidS3BucketNameException}
   # * {InvalidS3PrefixException}
   # * {InvalidSnsTopicNameException}
+  # * {InvalidSourceException}
   # * {InvalidTagParameterException}
   # * {InvalidTimeRangeException}
   # * {InvalidTokenException}
@@ -57,15 +89,23 @@ module Aws::CloudTrail
   # * {KmsException}
   # * {KmsKeyDisabledException}
   # * {KmsKeyNotFoundException}
+  # * {MaxConcurrentQueriesException}
   # * {MaximumNumberOfTrailsExceededException}
+  # * {NoManagementAccountSLRExistsException}
+  # * {NotOrganizationManagementAccountException}
   # * {NotOrganizationMasterAccountException}
   # * {OperationNotPermittedException}
   # * {OrganizationNotInAllFeaturesModeException}
   # * {OrganizationsNotInUseException}
+  # * {QueryIdNotFoundException}
+  # * {ResourceARNNotValidException}
   # * {ResourceNotFoundException}
+  # * {ResourcePolicyNotFoundException}
+  # * {ResourcePolicyNotValidException}
   # * {ResourceTypeNotSupportedException}
   # * {S3BucketDoesNotExistException}
   # * {TagsLimitExceededException}
+  # * {ThrottlingException}
   # * {TrailAlreadyExistsException}
   # * {TrailNotFoundException}
   # * {TrailNotProvidedException}
@@ -76,6 +116,116 @@ module Aws::CloudTrail
   module Errors
 
     extend Aws::Errors::DynamicErrors
+
+    class AccessDeniedException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::AccessDeniedException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class AccountHasOngoingImportException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::AccountHasOngoingImportException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class AccountNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::AccountNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class AccountNotRegisteredException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::AccountNotRegisteredException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class AccountRegisteredException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::AccountRegisteredException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class CannotDelegateManagementAccountException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::CannotDelegateManagementAccountException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ChannelARNInvalidException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ChannelARNInvalidException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ChannelAlreadyExistsException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ChannelAlreadyExistsException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ChannelExistsForEDSException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ChannelExistsForEDSException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ChannelMaxLimitExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ChannelMaxLimitExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ChannelNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ChannelNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
 
     class CloudTrailARNInvalidException < ServiceError
 
@@ -112,6 +262,136 @@ module Aws::CloudTrail
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CloudTrail::Types::CloudWatchLogsDeliveryUnavailableException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ConcurrentModificationException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ConcurrentModificationException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ConflictException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ConflictException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class DelegatedAdminAccountLimitExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::DelegatedAdminAccountLimitExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class EventDataStoreARNInvalidException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::EventDataStoreARNInvalidException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class EventDataStoreAlreadyExistsException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::EventDataStoreAlreadyExistsException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class EventDataStoreFederationEnabledException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::EventDataStoreFederationEnabledException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class EventDataStoreHasOngoingImportException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::EventDataStoreHasOngoingImportException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class EventDataStoreMaxLimitExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::EventDataStoreMaxLimitExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class EventDataStoreNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::EventDataStoreNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class EventDataStoreTerminationProtectedException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::EventDataStoreTerminationProtectedException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ImportNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ImportNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class InactiveEventDataStoreException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::InactiveEventDataStoreException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class InactiveQueryException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::InactiveQueryException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -187,11 +467,41 @@ module Aws::CloudTrail
       end
     end
 
+    class InvalidDateRangeException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::InvalidDateRangeException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
     class InvalidEventCategoryException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CloudTrail::Types::InvalidEventCategoryException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class InvalidEventDataStoreCategoryException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::InvalidEventDataStoreCategoryException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class InvalidEventDataStoreStatusException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::InvalidEventDataStoreStatusException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -212,6 +522,16 @@ module Aws::CloudTrail
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CloudTrail::Types::InvalidHomeRegionException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class InvalidImportSourceException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::InvalidImportSourceException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -277,6 +597,36 @@ module Aws::CloudTrail
       end
     end
 
+    class InvalidParameterException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::InvalidParameterException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class InvalidQueryStatementException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::InvalidQueryStatementException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class InvalidQueryStatusException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::InvalidQueryStatusException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
     class InvalidS3BucketNameException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -302,6 +652,16 @@ module Aws::CloudTrail
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CloudTrail::Types::InvalidSnsTopicNameException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class InvalidSourceException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::InvalidSourceException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -377,11 +737,41 @@ module Aws::CloudTrail
       end
     end
 
+    class MaxConcurrentQueriesException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::MaxConcurrentQueriesException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
     class MaximumNumberOfTrailsExceededException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CloudTrail::Types::MaximumNumberOfTrailsExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class NoManagementAccountSLRExistsException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::NoManagementAccountSLRExistsException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class NotOrganizationManagementAccountException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::NotOrganizationManagementAccountException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -427,11 +817,51 @@ module Aws::CloudTrail
       end
     end
 
+    class QueryIdNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::QueryIdNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ResourceARNNotValidException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ResourceARNNotValidException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
     class ResourceNotFoundException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CloudTrail::Types::ResourceNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ResourcePolicyNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ResourcePolicyNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ResourcePolicyNotValidException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ResourcePolicyNotValidException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -462,6 +892,16 @@ module Aws::CloudTrail
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CloudTrail::Types::TagsLimitExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ThrottlingException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudTrail::Types::ThrottlingException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

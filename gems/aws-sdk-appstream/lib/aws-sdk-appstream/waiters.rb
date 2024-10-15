@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -94,19 +94,19 @@ module Aws::AppStream
                 "state" => "success",
                 "matcher" => "pathAll",
                 "argument" => "fleets[].state",
-                "expected" => "ACTIVE"
+                "expected" => "RUNNING"
               },
               {
                 "state" => "failure",
                 "matcher" => "pathAny",
                 "argument" => "fleets[].state",
-                "expected" => "PENDING_DEACTIVATE"
+                "expected" => "STOPPING"
               },
               {
                 "state" => "failure",
                 "matcher" => "pathAny",
                 "argument" => "fleets[].state",
-                "expected" => "INACTIVE"
+                "expected" => "STOPPED"
               }
             ]
           )
@@ -144,19 +144,19 @@ module Aws::AppStream
                 "state" => "success",
                 "matcher" => "pathAll",
                 "argument" => "fleets[].state",
-                "expected" => "INACTIVE"
+                "expected" => "STOPPED"
               },
               {
                 "state" => "failure",
                 "matcher" => "pathAny",
                 "argument" => "fleets[].state",
-                "expected" => "PENDING_ACTIVATE"
+                "expected" => "STARTING"
               },
               {
                 "state" => "failure",
                 "matcher" => "pathAny",
                 "argument" => "fleets[].state",
-                "expected" => "ACTIVE"
+                "expected" => "RUNNING"
               }
             ]
           )

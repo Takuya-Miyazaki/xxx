@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -50,15 +50,21 @@ module Aws::QLDBSession
       include Aws::Structure
     end
 
+    # Returned when the request exceeds the processing capacity of the
+    # ledger.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/qldb-session-2019-07-11/CapacityExceededException AWS API Documentation
+    #
+    class CapacityExceededException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Contains the details of the transaction to commit.
-    #
-    # @note When making an API call, you may pass CommitTransactionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         transaction_id: "TransactionId", # required
-    #         commit_digest: "data", # required
-    #       }
     #
     # @!attribute [rw] transaction_id
     #   Specifies the transaction ID of the transaction to commit.
@@ -139,20 +145,6 @@ module Aws::QLDBSession
 
     # Specifies a request to execute a statement.
     #
-    # @note When making an API call, you may pass ExecuteStatementRequest
-    #   data as a hash:
-    #
-    #       {
-    #         transaction_id: "TransactionId", # required
-    #         statement: "Statement", # required
-    #         parameters: [
-    #           {
-    #             ion_binary: "data",
-    #             ion_text: "IonText",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] transaction_id
     #   Specifies the transaction ID of the request.
     #   @return [String]
@@ -203,14 +195,6 @@ module Aws::QLDBSession
 
     # Specifies the details of the page to be fetched.
     #
-    # @note When making an API call, you may pass FetchPageRequest
-    #   data as a hash:
-    #
-    #       {
-    #         transaction_id: "TransactionId", # required
-    #         next_page_token: "PageToken", # required
-    #       }
-    #
     # @!attribute [rw] transaction_id
     #   Specifies the transaction ID of the page to be fetched.
     #   @return [String]
@@ -256,11 +240,11 @@ module Aws::QLDBSession
     # Contains I/O usage metrics for a command that was invoked.
     #
     # @!attribute [rw] read_i_os
-    #   The number of read I/O requests that the command performed.
+    #   The number of read I/O requests that the command made.
     #   @return [Integer]
     #
     # @!attribute [rw] write_i_os
-    #   The number of write I/O requests that the command performed.
+    #   The number of write I/O requests that the command made.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/qldb-session-2019-07-11/IOUsage AWS API Documentation
@@ -351,40 +335,6 @@ module Aws::QLDBSession
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SendCommandRequest
-    #   data as a hash:
-    #
-    #       {
-    #         session_token: "SessionToken",
-    #         start_session: {
-    #           ledger_name: "LedgerName", # required
-    #         },
-    #         start_transaction: {
-    #         },
-    #         end_session: {
-    #         },
-    #         commit_transaction: {
-    #           transaction_id: "TransactionId", # required
-    #           commit_digest: "data", # required
-    #         },
-    #         abort_transaction: {
-    #         },
-    #         execute_statement: {
-    #           transaction_id: "TransactionId", # required
-    #           statement: "Statement", # required
-    #           parameters: [
-    #             {
-    #               ion_binary: "data",
-    #               ion_text: "IonText",
-    #             },
-    #           ],
-    #         },
-    #         fetch_page: {
-    #           transaction_id: "TransactionId", # required
-    #           next_page_token: "PageToken", # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] session_token
     #   Specifies the session token for the current command. A session token
     #   is constant throughout the life of the session.
@@ -484,13 +434,6 @@ module Aws::QLDBSession
 
     # Specifies a request to start a new session.
     #
-    # @note When making an API call, you may pass StartSessionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         ledger_name: "LedgerName", # required
-    #       }
-    #
     # @!attribute [rw] ledger_name
     #   The name of the ledger to start a new session against.
     #   @return [String]
@@ -556,8 +499,8 @@ module Aws::QLDBSession
     # the request and when it sends the corresponding response.
     #
     # @!attribute [rw] processing_time_milliseconds
-    #   The amount of time that was taken for the command to finish
-    #   processing, measured in milliseconds.
+    #   The amount of time that QLDB spent on processing the command,
+    #   measured in milliseconds.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/qldb-session-2019-07-11/TimingInformation AWS API Documentation
@@ -569,14 +512,6 @@ module Aws::QLDBSession
     end
 
     # A structure that can contain a value in multiple encoding formats.
-    #
-    # @note When making an API call, you may pass ValueHolder
-    #   data as a hash:
-    #
-    #       {
-    #         ion_binary: "data",
-    #         ion_text: "IonText",
-    #       }
     #
     # @!attribute [rw] ion_binary
     #   An Amazon Ion binary value contained in a `ValueHolder` structure.
@@ -598,3 +533,4 @@ module Aws::QLDBSession
 
   end
 end
+

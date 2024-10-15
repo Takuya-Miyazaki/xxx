@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -21,68 +21,6 @@ module Aws::ElasticLoadBalancingV2
     # Each rule must include exactly one of the following types of actions:
     # `forward`, `fixed-response`, or `redirect`, and it must be the last
     # action to be performed.
-    #
-    # @note When making an API call, you may pass Action
-    #   data as a hash:
-    #
-    #       {
-    #         type: "forward", # required, accepts forward, authenticate-oidc, authenticate-cognito, redirect, fixed-response
-    #         target_group_arn: "TargetGroupArn",
-    #         authenticate_oidc_config: {
-    #           issuer: "AuthenticateOidcActionIssuer", # required
-    #           authorization_endpoint: "AuthenticateOidcActionAuthorizationEndpoint", # required
-    #           token_endpoint: "AuthenticateOidcActionTokenEndpoint", # required
-    #           user_info_endpoint: "AuthenticateOidcActionUserInfoEndpoint", # required
-    #           client_id: "AuthenticateOidcActionClientId", # required
-    #           client_secret: "AuthenticateOidcActionClientSecret",
-    #           session_cookie_name: "AuthenticateOidcActionSessionCookieName",
-    #           scope: "AuthenticateOidcActionScope",
-    #           session_timeout: 1,
-    #           authentication_request_extra_params: {
-    #             "AuthenticateOidcActionAuthenticationRequestParamName" => "AuthenticateOidcActionAuthenticationRequestParamValue",
-    #           },
-    #           on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #           use_existing_client_secret: false,
-    #         },
-    #         authenticate_cognito_config: {
-    #           user_pool_arn: "AuthenticateCognitoActionUserPoolArn", # required
-    #           user_pool_client_id: "AuthenticateCognitoActionUserPoolClientId", # required
-    #           user_pool_domain: "AuthenticateCognitoActionUserPoolDomain", # required
-    #           session_cookie_name: "AuthenticateCognitoActionSessionCookieName",
-    #           scope: "AuthenticateCognitoActionScope",
-    #           session_timeout: 1,
-    #           authentication_request_extra_params: {
-    #             "AuthenticateCognitoActionAuthenticationRequestParamName" => "AuthenticateCognitoActionAuthenticationRequestParamValue",
-    #           },
-    #           on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #         },
-    #         order: 1,
-    #         redirect_config: {
-    #           protocol: "RedirectActionProtocol",
-    #           port: "RedirectActionPort",
-    #           host: "RedirectActionHost",
-    #           path: "RedirectActionPath",
-    #           query: "RedirectActionQuery",
-    #           status_code: "HTTP_301", # required, accepts HTTP_301, HTTP_302
-    #         },
-    #         fixed_response_config: {
-    #           message_body: "FixedResponseActionMessage",
-    #           status_code: "FixedResponseActionStatusCode", # required
-    #           content_type: "FixedResponseActionContentType",
-    #         },
-    #         forward_config: {
-    #           target_groups: [
-    #             {
-    #               target_group_arn: "TargetGroupArn",
-    #               weight: 1,
-    #             },
-    #           ],
-    #           target_group_stickiness_config: {
-    #             enabled: false,
-    #             duration_seconds: 1,
-    #           },
-    #         },
-    #       }
     #
     # @!attribute [rw] type
     #   The type of action.
@@ -148,19 +86,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AddListenerCertificatesInput
-    #   data as a hash:
-    #
-    #       {
-    #         listener_arn: "ListenerArn", # required
-    #         certificates: [ # required
-    #           {
-    #             certificate_arn: "CertificateArn",
-    #             is_default: false,
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] listener_arn
     #   The Amazon Resource Name (ARN) of the listener.
     #   @return [String]
@@ -192,19 +117,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AddTagsInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arns: ["ResourceArn"], # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] resource_arns
     #   The Amazon Resource Name (ARN) of the resource.
     #   @return [Array<String>]
@@ -226,30 +138,87 @@ module Aws::ElasticLoadBalancingV2
     #
     class AddTagsOutput < Aws::EmptyStructure; end
 
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] revocation_contents
+    #   The revocation file to add.
+    #   @return [Array<Types::RevocationContent>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/AddTrustStoreRevocationsInput AWS API Documentation
+    #
+    class AddTrustStoreRevocationsInput < Struct.new(
+      :trust_store_arn,
+      :revocation_contents)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_store_revocations
+    #   Information about the revocation file added to the trust store.
+    #   @return [Array<Types::TrustStoreRevocation>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/AddTrustStoreRevocationsOutput AWS API Documentation
+    #
+    class AddTrustStoreRevocationsOutput < Struct.new(
+      :trust_store_revocations)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about the override status applied to a target.
+    #
+    # @!attribute [rw] state
+    #   The state of the override.
+    #   @return [String]
+    #
+    # @!attribute [rw] reason
+    #   The reason code for the state.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   A description of the override state that provides additional
+    #   details.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/AdministrativeOverride AWS API Documentation
+    #
+    class AdministrativeOverride < Struct.new(
+      :state,
+      :reason,
+      :description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The specified allocation ID does not exist.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/AllocationIdNotFoundException AWS API Documentation
     #
     class AllocationIdNotFoundException < Aws::EmptyStructure; end
 
+    # Information about anomaly detection and mitigation.
+    #
+    # @!attribute [rw] result
+    #   The latest anomaly detection result.
+    #   @return [String]
+    #
+    # @!attribute [rw] mitigation_in_effect
+    #   Indicates whether anomaly mitigation is in progress.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/AnomalyDetection AWS API Documentation
+    #
+    class AnomalyDetection < Struct.new(
+      :result,
+      :mitigation_in_effect)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Request parameters to use when integrating with Amazon Cognito to
     # authenticate users.
-    #
-    # @note When making an API call, you may pass AuthenticateCognitoActionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         user_pool_arn: "AuthenticateCognitoActionUserPoolArn", # required
-    #         user_pool_client_id: "AuthenticateCognitoActionUserPoolClientId", # required
-    #         user_pool_domain: "AuthenticateCognitoActionUserPoolDomain", # required
-    #         session_cookie_name: "AuthenticateCognitoActionSessionCookieName",
-    #         scope: "AuthenticateCognitoActionScope",
-    #         session_timeout: 1,
-    #         authentication_request_extra_params: {
-    #           "AuthenticateCognitoActionAuthenticationRequestParamName" => "AuthenticateCognitoActionAuthenticationRequestParamValue",
-    #         },
-    #         on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #       }
     #
     # @!attribute [rw] user_pool_arn
     #   The Amazon Resource Name (ARN) of the Amazon Cognito user pool.
@@ -316,26 +285,6 @@ module Aws::ElasticLoadBalancingV2
 
     # Request parameters when using an identity provider (IdP) that is
     # compliant with OpenID Connect (OIDC) to authenticate users.
-    #
-    # @note When making an API call, you may pass AuthenticateOidcActionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         issuer: "AuthenticateOidcActionIssuer", # required
-    #         authorization_endpoint: "AuthenticateOidcActionAuthorizationEndpoint", # required
-    #         token_endpoint: "AuthenticateOidcActionTokenEndpoint", # required
-    #         user_info_endpoint: "AuthenticateOidcActionUserInfoEndpoint", # required
-    #         client_id: "AuthenticateOidcActionClientId", # required
-    #         client_secret: "AuthenticateOidcActionClientSecret",
-    #         session_cookie_name: "AuthenticateOidcActionSessionCookieName",
-    #         scope: "AuthenticateOidcActionScope",
-    #         session_timeout: 1,
-    #         authentication_request_extra_params: {
-    #           "AuthenticateOidcActionAuthenticationRequestParamName" => "AuthenticateOidcActionAuthenticationRequestParamValue",
-    #         },
-    #         on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #         use_existing_client_secret: false,
-    #       }
     #
     # @!attribute [rw] issuer
     #   The OIDC issuer identifier of the IdP. This must be a full URL,
@@ -467,15 +416,13 @@ module Aws::ElasticLoadBalancingV2
     #
     class AvailabilityZoneNotSupportedException < Aws::EmptyStructure; end
 
+    # The specified ca certificate bundle does not exist.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/CaCertificatesBundleNotFoundException AWS API Documentation
+    #
+    class CaCertificatesBundleNotFoundException < Aws::EmptyStructure; end
+
     # Information about an SSL server certificate.
-    #
-    # @note When making an API call, you may pass Certificate
-    #   data as a hash:
-    #
-    #       {
-    #         certificate_arn: "CertificateArn",
-    #         is_default: false,
-    #       }
     #
     # @!attribute [rw] certificate_arn
     #   The Amazon Resource Name (ARN) of the certificate.
@@ -522,89 +469,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateListenerInput
-    #   data as a hash:
-    #
-    #       {
-    #         load_balancer_arn: "LoadBalancerArn", # required
-    #         protocol: "HTTP", # accepts HTTP, HTTPS, TCP, TLS, UDP, TCP_UDP, GENEVE
-    #         port: 1,
-    #         ssl_policy: "SslPolicyName",
-    #         certificates: [
-    #           {
-    #             certificate_arn: "CertificateArn",
-    #             is_default: false,
-    #           },
-    #         ],
-    #         default_actions: [ # required
-    #           {
-    #             type: "forward", # required, accepts forward, authenticate-oidc, authenticate-cognito, redirect, fixed-response
-    #             target_group_arn: "TargetGroupArn",
-    #             authenticate_oidc_config: {
-    #               issuer: "AuthenticateOidcActionIssuer", # required
-    #               authorization_endpoint: "AuthenticateOidcActionAuthorizationEndpoint", # required
-    #               token_endpoint: "AuthenticateOidcActionTokenEndpoint", # required
-    #               user_info_endpoint: "AuthenticateOidcActionUserInfoEndpoint", # required
-    #               client_id: "AuthenticateOidcActionClientId", # required
-    #               client_secret: "AuthenticateOidcActionClientSecret",
-    #               session_cookie_name: "AuthenticateOidcActionSessionCookieName",
-    #               scope: "AuthenticateOidcActionScope",
-    #               session_timeout: 1,
-    #               authentication_request_extra_params: {
-    #                 "AuthenticateOidcActionAuthenticationRequestParamName" => "AuthenticateOidcActionAuthenticationRequestParamValue",
-    #               },
-    #               on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #               use_existing_client_secret: false,
-    #             },
-    #             authenticate_cognito_config: {
-    #               user_pool_arn: "AuthenticateCognitoActionUserPoolArn", # required
-    #               user_pool_client_id: "AuthenticateCognitoActionUserPoolClientId", # required
-    #               user_pool_domain: "AuthenticateCognitoActionUserPoolDomain", # required
-    #               session_cookie_name: "AuthenticateCognitoActionSessionCookieName",
-    #               scope: "AuthenticateCognitoActionScope",
-    #               session_timeout: 1,
-    #               authentication_request_extra_params: {
-    #                 "AuthenticateCognitoActionAuthenticationRequestParamName" => "AuthenticateCognitoActionAuthenticationRequestParamValue",
-    #               },
-    #               on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #             },
-    #             order: 1,
-    #             redirect_config: {
-    #               protocol: "RedirectActionProtocol",
-    #               port: "RedirectActionPort",
-    #               host: "RedirectActionHost",
-    #               path: "RedirectActionPath",
-    #               query: "RedirectActionQuery",
-    #               status_code: "HTTP_301", # required, accepts HTTP_301, HTTP_302
-    #             },
-    #             fixed_response_config: {
-    #               message_body: "FixedResponseActionMessage",
-    #               status_code: "FixedResponseActionStatusCode", # required
-    #               content_type: "FixedResponseActionContentType",
-    #             },
-    #             forward_config: {
-    #               target_groups: [
-    #                 {
-    #                   target_group_arn: "TargetGroupArn",
-    #                   weight: 1,
-    #                 },
-    #               ],
-    #               target_group_stickiness_config: {
-    #                 enabled: false,
-    #                 duration_seconds: 1,
-    #               },
-    #             },
-    #           },
-    #         ],
-    #         alpn_policy: ["AlpnPolicyValue"],
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] load_balancer_arn
     #   The Amazon Resource Name (ARN) of the load balancer.
     #   @return [String]
@@ -674,6 +538,10 @@ module Aws::ElasticLoadBalancingV2
     #   The tags to assign to the listener.
     #   @return [Array<Types::Tag>]
     #
+    # @!attribute [rw] mutual_authentication
+    #   The mutual authentication configuration information.
+    #   @return [Types::MutualAuthenticationAttributes]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/CreateListenerInput AWS API Documentation
     #
     class CreateListenerInput < Struct.new(
@@ -684,7 +552,8 @@ module Aws::ElasticLoadBalancingV2
       :certificates,
       :default_actions,
       :alpn_policy,
-      :tags)
+      :tags,
+      :mutual_authentication)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -701,33 +570,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateLoadBalancerInput
-    #   data as a hash:
-    #
-    #       {
-    #         name: "LoadBalancerName", # required
-    #         subnets: ["SubnetId"],
-    #         subnet_mappings: [
-    #           {
-    #             subnet_id: "SubnetId",
-    #             allocation_id: "AllocationId",
-    #             private_i_pv_4_address: "PrivateIPv4Address",
-    #             i_pv_6_address: "IPv6Address",
-    #           },
-    #         ],
-    #         security_groups: ["SecurityGroupId"],
-    #         scheme: "internet-facing", # accepts internet-facing, internal
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #         type: "application", # accepts application, network, gateway
-    #         ip_address_type: "ipv4", # accepts ipv4, dualstack
-    #         customer_owned_ipv_4_pool: "CustomerOwnedIpv4Pool",
-    #       }
-    #
     # @!attribute [rw] name
     #   The name of the load balancer.
     #
@@ -738,9 +580,10 @@ module Aws::ElasticLoadBalancingV2
     #   @return [String]
     #
     # @!attribute [rw] subnets
-    #   The IDs of the public subnets. You can specify only one subnet per
+    #   The IDs of the subnets. You can specify only one subnet per
     #   Availability Zone. You must specify either subnets or subnet
-    #   mappings.
+    #   mappings, but not both. To specify an Elastic IP address, specify
+    #   subnet mappings instead of subnets.
     #
     #   \[Application Load Balancers\] You must specify subnets from at
     #   least two Availability Zones.
@@ -759,9 +602,9 @@ module Aws::ElasticLoadBalancingV2
     #   @return [Array<String>]
     #
     # @!attribute [rw] subnet_mappings
-    #   The IDs of the public subnets. You can specify only one subnet per
+    #   The IDs of the subnets. You can specify only one subnet per
     #   Availability Zone. You must specify either subnets or subnet
-    #   mappings.
+    #   mappings, but not both.
     #
     #   \[Application Load Balancers\] You must specify subnets from at
     #   least two Availability Zones. You cannot specify Elastic IP
@@ -787,8 +630,8 @@ module Aws::ElasticLoadBalancingV2
     #   @return [Array<Types::SubnetMapping>]
     #
     # @!attribute [rw] security_groups
-    #   \[Application Load Balancers\] The IDs of the security groups for
-    #   the load balancer.
+    #   \[Application Load Balancers and Network Load Balancers\] The IDs of
+    #   the security groups for the load balancer.
     #   @return [Array<String>]
     #
     # @!attribute [rw] scheme
@@ -818,10 +661,21 @@ module Aws::ElasticLoadBalancingV2
     #   @return [String]
     #
     # @!attribute [rw] ip_address_type
-    #   The type of IP addresses used by the subnets for your load balancer.
-    #   The possible values are `ipv4` (for IPv4 addresses) and `dualstack`
-    #   (for IPv4 and IPv6 addresses). Internal load balancers must use
-    #   `ipv4`.
+    #   Note: Internal load balancers must use the `ipv4` IP address type.
+    #
+    #   \[Application Load Balancers\] The IP address type. The possible
+    #   values are `ipv4` (for only IPv4 addresses), `dualstack` (for IPv4
+    #   and IPv6 addresses), and `dualstack-without-public-ipv4` (for IPv6
+    #   only public addresses, with private IPv4 and IPv6 addresses).
+    #
+    #   \[Network Load Balancers\] The IP address type. The possible values
+    #   are `ipv4` (for only IPv4 addresses) and `dualstack` (for IPv4 and
+    #   IPv6 addresses). You can’t specify `dualstack` for a load balancer
+    #   with a UDP or TCP\_UDP listener.
+    #
+    #   \[Gateway Load Balancers\] The IP address type. The possible values
+    #   are `ipv4` (for only IPv4 addresses) and `dualstack` (for IPv4 and
+    #   IPv6 addresses).
     #   @return [String]
     #
     # @!attribute [rw] customer_owned_ipv_4_pool
@@ -857,110 +711,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateRuleInput
-    #   data as a hash:
-    #
-    #       {
-    #         listener_arn: "ListenerArn", # required
-    #         conditions: [ # required
-    #           {
-    #             field: "ConditionFieldName",
-    #             values: ["StringValue"],
-    #             host_header_config: {
-    #               values: ["StringValue"],
-    #             },
-    #             path_pattern_config: {
-    #               values: ["StringValue"],
-    #             },
-    #             http_header_config: {
-    #               http_header_name: "HttpHeaderConditionName",
-    #               values: ["StringValue"],
-    #             },
-    #             query_string_config: {
-    #               values: [
-    #                 {
-    #                   key: "StringValue",
-    #                   value: "StringValue",
-    #                 },
-    #               ],
-    #             },
-    #             http_request_method_config: {
-    #               values: ["StringValue"],
-    #             },
-    #             source_ip_config: {
-    #               values: ["StringValue"],
-    #             },
-    #           },
-    #         ],
-    #         priority: 1, # required
-    #         actions: [ # required
-    #           {
-    #             type: "forward", # required, accepts forward, authenticate-oidc, authenticate-cognito, redirect, fixed-response
-    #             target_group_arn: "TargetGroupArn",
-    #             authenticate_oidc_config: {
-    #               issuer: "AuthenticateOidcActionIssuer", # required
-    #               authorization_endpoint: "AuthenticateOidcActionAuthorizationEndpoint", # required
-    #               token_endpoint: "AuthenticateOidcActionTokenEndpoint", # required
-    #               user_info_endpoint: "AuthenticateOidcActionUserInfoEndpoint", # required
-    #               client_id: "AuthenticateOidcActionClientId", # required
-    #               client_secret: "AuthenticateOidcActionClientSecret",
-    #               session_cookie_name: "AuthenticateOidcActionSessionCookieName",
-    #               scope: "AuthenticateOidcActionScope",
-    #               session_timeout: 1,
-    #               authentication_request_extra_params: {
-    #                 "AuthenticateOidcActionAuthenticationRequestParamName" => "AuthenticateOidcActionAuthenticationRequestParamValue",
-    #               },
-    #               on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #               use_existing_client_secret: false,
-    #             },
-    #             authenticate_cognito_config: {
-    #               user_pool_arn: "AuthenticateCognitoActionUserPoolArn", # required
-    #               user_pool_client_id: "AuthenticateCognitoActionUserPoolClientId", # required
-    #               user_pool_domain: "AuthenticateCognitoActionUserPoolDomain", # required
-    #               session_cookie_name: "AuthenticateCognitoActionSessionCookieName",
-    #               scope: "AuthenticateCognitoActionScope",
-    #               session_timeout: 1,
-    #               authentication_request_extra_params: {
-    #                 "AuthenticateCognitoActionAuthenticationRequestParamName" => "AuthenticateCognitoActionAuthenticationRequestParamValue",
-    #               },
-    #               on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #             },
-    #             order: 1,
-    #             redirect_config: {
-    #               protocol: "RedirectActionProtocol",
-    #               port: "RedirectActionPort",
-    #               host: "RedirectActionHost",
-    #               path: "RedirectActionPath",
-    #               query: "RedirectActionQuery",
-    #               status_code: "HTTP_301", # required, accepts HTTP_301, HTTP_302
-    #             },
-    #             fixed_response_config: {
-    #               message_body: "FixedResponseActionMessage",
-    #               status_code: "FixedResponseActionStatusCode", # required
-    #               content_type: "FixedResponseActionContentType",
-    #             },
-    #             forward_config: {
-    #               target_groups: [
-    #                 {
-    #                   target_group_arn: "TargetGroupArn",
-    #                   weight: 1,
-    #                 },
-    #               ],
-    #               target_group_stickiness_config: {
-    #                 enabled: false,
-    #                 duration_seconds: 1,
-    #               },
-    #             },
-    #           },
-    #         ],
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] listener_arn
     #   The Amazon Resource Name (ARN) of the listener.
     #   @return [String]
@@ -1006,36 +756,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateTargetGroupInput
-    #   data as a hash:
-    #
-    #       {
-    #         name: "TargetGroupName", # required
-    #         protocol: "HTTP", # accepts HTTP, HTTPS, TCP, TLS, UDP, TCP_UDP, GENEVE
-    #         protocol_version: "ProtocolVersion",
-    #         port: 1,
-    #         vpc_id: "VpcId",
-    #         health_check_protocol: "HTTP", # accepts HTTP, HTTPS, TCP, TLS, UDP, TCP_UDP, GENEVE
-    #         health_check_port: "HealthCheckPort",
-    #         health_check_enabled: false,
-    #         health_check_path: "Path",
-    #         health_check_interval_seconds: 1,
-    #         health_check_timeout_seconds: 1,
-    #         healthy_threshold_count: 1,
-    #         unhealthy_threshold_count: 1,
-    #         matcher: {
-    #           http_code: "HttpCode",
-    #           grpc_code: "GrpcCode",
-    #         },
-    #         target_type: "instance", # accepts instance, ip, lambda
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] name
     #   The name of the target group.
     #
@@ -1094,8 +814,8 @@ module Aws::ElasticLoadBalancingV2
     # @!attribute [rw] health_check_enabled
     #   Indicates whether health checks are enabled. If the target type is
     #   `lambda`, health checks are disabled by default but can be enabled.
-    #   If the target type is `instance` or `ip`, health checks are always
-    #   enabled and cannot be disabled.
+    #   If the target type is `instance`, `ip`, or `alb`, health checks are
+    #   always enabled and cannot be disabled.
     #   @return [Boolean]
     #
     # @!attribute [rw] health_check_path
@@ -1105,49 +825,52 @@ module Aws::ElasticLoadBalancingV2
     #   \[HTTP1 or HTTP2 protocol version\] The ping path. The default is /.
     #
     #   \[GRPC protocol version\] The path of a custom health check method
-    #   with the format /package.service/method. The default is
-    #   /AWS.ALB/healthcheck.
+    #   with the format /package.service/method. The default is /Amazon Web
+    #   Services.ALB/healthcheck.
     #   @return [String]
     #
     # @!attribute [rw] health_check_interval_seconds
     #   The approximate amount of time, in seconds, between health checks of
-    #   an individual target. For TCP health checks, the supported values
-    #   are 10 and 30 seconds. If the target type is `instance` or `ip`, the
-    #   default is 30 seconds. If the target group protocol is GENEVE, the
-    #   default is 10 seconds. If the target type is `lambda`, the default
-    #   is 35 seconds.
+    #   an individual target. The range is 5-300. If the target group
+    #   protocol is TCP, TLS, UDP, TCP\_UDP, HTTP or HTTPS, the default is
+    #   30 seconds. If the target group protocol is GENEVE, the default is
+    #   10 seconds. If the target type is `lambda`, the default is 35
+    #   seconds.
     #   @return [Integer]
     #
     # @!attribute [rw] health_check_timeout_seconds
     #   The amount of time, in seconds, during which no response from a
-    #   target means a failed health check. For target groups with a
-    #   protocol of HTTP, HTTPS, or GENEVE, the default is 5 seconds. For
-    #   target groups with a protocol of TCP or TLS, this value must be 6
-    #   seconds for HTTP health checks and 10 seconds for TCP and HTTPS
-    #   health checks. If the target type is `lambda`, the default is 30
+    #   target means a failed health check. The range is 2–120 seconds. For
+    #   target groups with a protocol of HTTP, the default is 6 seconds. For
+    #   target groups with a protocol of TCP, TLS or HTTPS, the default is
+    #   10 seconds. For target groups with a protocol of GENEVE, the default
+    #   is 5 seconds. If the target type is `lambda`, the default is 30
     #   seconds.
     #   @return [Integer]
     #
     # @!attribute [rw] healthy_threshold_count
-    #   The number of consecutive health checks successes required before
-    #   considering an unhealthy target healthy. For target groups with a
-    #   protocol of HTTP or HTTPS, the default is 5. For target groups with
-    #   a protocol of TCP, TLS, or GENEVE, the default is 3. If the target
-    #   type is `lambda`, the default is 5.
+    #   The number of consecutive health check successes required before
+    #   considering a target healthy. The range is 2-10. If the target group
+    #   protocol is TCP, TCP\_UDP, UDP, TLS, HTTP or HTTPS, the default is
+    #   5. For target groups with a protocol of GENEVE, the default is 5. If
+    #   the target type is `lambda`, the default is 5.
     #   @return [Integer]
     #
     # @!attribute [rw] unhealthy_threshold_count
     #   The number of consecutive health check failures required before
-    #   considering a target unhealthy. If the target group protocol is HTTP
-    #   or HTTPS, the default is 2. If the target group protocol is TCP or
-    #   TLS, this value must be the same as the healthy threshold count. If
-    #   the target group protocol is GENEVE, the default is 3. If the target
-    #   type is `lambda`, the default is 2.
+    #   considering a target unhealthy. The range is 2-10. If the target
+    #   group protocol is TCP, TCP\_UDP, UDP, TLS, HTTP or HTTPS, the
+    #   default is 2. For target groups with a protocol of GENEVE, the
+    #   default is 2. If the target type is `lambda`, the default is 5.
     #   @return [Integer]
     #
     # @!attribute [rw] matcher
     #   \[HTTP/HTTPS health checks\] The HTTP or gRPC codes to use when
-    #   checking for a successful response from a target.
+    #   checking for a successful response from a target. For target groups
+    #   with a protocol of TCP, TCP\_UDP, UDP or TLS the range is 200-599.
+    #   For target groups with a protocol of HTTP or HTTPS, the range is
+    #   200-499. For target groups with a protocol of GENEVE, the range is
+    #   200-399.
     #   @return [Types::Matcher]
     #
     # @!attribute [rw] target_type
@@ -1165,11 +888,19 @@ module Aws::ElasticLoadBalancingV2
     #     can't specify publicly routable IP addresses.
     #
     #   * `lambda` - Register a single Lambda function as a target.
+    #
+    #   * `alb` - Register a single Application Load Balancer as a target.
     #   @return [String]
     #
     # @!attribute [rw] tags
     #   The tags to assign to the target group.
     #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] ip_address_type
+    #   The type of IP address used for this target group. The possible
+    #   values are `ipv4` and `ipv6`. This is an optional parameter. If not
+    #   specified, the IP address type defaults to `ipv4`.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/CreateTargetGroupInput AWS API Documentation
     #
@@ -1189,7 +920,8 @@ module Aws::ElasticLoadBalancingV2
       :unhealthy_threshold_count,
       :matcher,
       :target_type,
-      :tags)
+      :tags,
+      :ip_address_type)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1206,13 +938,60 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteListenerInput
-    #   data as a hash:
+    # @!attribute [rw] name
+    #   The name of the trust store.
     #
-    #       {
-    #         listener_arn: "ListenerArn", # required
-    #       }
+    #   This name must be unique per region and cannot be changed after
+    #   creation.
+    #   @return [String]
     #
+    # @!attribute [rw] ca_certificates_bundle_s3_bucket
+    #   The Amazon S3 bucket for the ca certificates bundle.
+    #   @return [String]
+    #
+    # @!attribute [rw] ca_certificates_bundle_s3_key
+    #   The Amazon S3 path for the ca certificates bundle.
+    #   @return [String]
+    #
+    # @!attribute [rw] ca_certificates_bundle_s3_object_version
+    #   The Amazon S3 object version for the ca certificates bundle. If
+    #   undefined the current version is used.
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   The tags to assign to the trust store.
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/CreateTrustStoreInput AWS API Documentation
+    #
+    class CreateTrustStoreInput < Struct.new(
+      :name,
+      :ca_certificates_bundle_s3_bucket,
+      :ca_certificates_bundle_s3_key,
+      :ca_certificates_bundle_s3_object_version,
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_stores
+    #   Information about the trust store created.
+    #   @return [Array<Types::TrustStore>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/CreateTrustStoreOutput AWS API Documentation
+    #
+    class CreateTrustStoreOutput < Struct.new(
+      :trust_stores)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The specified association cannot be within the same account.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DeleteAssociationSameAccountException AWS API Documentation
+    #
+    class DeleteAssociationSameAccountException < Aws::EmptyStructure; end
+
     # @!attribute [rw] listener_arn
     #   The Amazon Resource Name (ARN) of the listener.
     #   @return [String]
@@ -1229,13 +1008,6 @@ module Aws::ElasticLoadBalancingV2
     #
     class DeleteListenerOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteLoadBalancerInput
-    #   data as a hash:
-    #
-    #       {
-    #         load_balancer_arn: "LoadBalancerArn", # required
-    #       }
-    #
     # @!attribute [rw] load_balancer_arn
     #   The Amazon Resource Name (ARN) of the load balancer.
     #   @return [String]
@@ -1252,13 +1024,6 @@ module Aws::ElasticLoadBalancingV2
     #
     class DeleteLoadBalancerOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteRuleInput
-    #   data as a hash:
-    #
-    #       {
-    #         rule_arn: "RuleArn", # required
-    #       }
-    #
     # @!attribute [rw] rule_arn
     #   The Amazon Resource Name (ARN) of the rule.
     #   @return [String]
@@ -1275,13 +1040,27 @@ module Aws::ElasticLoadBalancingV2
     #
     class DeleteRuleOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteTargetGroupInput
-    #   data as a hash:
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
     #
-    #       {
-    #         target_group_arn: "TargetGroupArn", # required
-    #       }
+    # @!attribute [rw] resource_arn
+    #   The Amazon Resource Name (ARN) of the resource.
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DeleteSharedTrustStoreAssociationInput AWS API Documentation
+    #
+    class DeleteSharedTrustStoreAssociationInput < Struct.new(
+      :trust_store_arn,
+      :resource_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DeleteSharedTrustStoreAssociationOutput AWS API Documentation
+    #
+    class DeleteSharedTrustStoreAssociationOutput < Aws::EmptyStructure; end
+
     # @!attribute [rw] target_group_arn
     #   The Amazon Resource Name (ARN) of the target group.
     #   @return [String]
@@ -1298,20 +1077,22 @@ module Aws::ElasticLoadBalancingV2
     #
     class DeleteTargetGroupOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeregisterTargetsInput
-    #   data as a hash:
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
     #
-    #       {
-    #         target_group_arn: "TargetGroupArn", # required
-    #         targets: [ # required
-    #           {
-    #             id: "TargetId", # required
-    #             port: 1,
-    #             availability_zone: "ZoneName",
-    #           },
-    #         ],
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DeleteTrustStoreInput AWS API Documentation
     #
+    class DeleteTrustStoreInput < Struct.new(
+      :trust_store_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DeleteTrustStoreOutput AWS API Documentation
+    #
+    class DeleteTrustStoreOutput < Aws::EmptyStructure; end
+
     # @!attribute [rw] target_group_arn
     #   The Amazon Resource Name (ARN) of the target group.
     #   @return [String]
@@ -1335,14 +1116,6 @@ module Aws::ElasticLoadBalancingV2
     #
     class DeregisterTargetsOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DescribeAccountLimitsInput
-    #   data as a hash:
-    #
-    #       {
-    #         marker: "Marker",
-    #         page_size: 1,
-    #       }
-    #
     # @!attribute [rw] marker
     #   The marker for the next set of results. (You received this marker
     #   from a previous call.)
@@ -1379,15 +1152,30 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeListenerCertificatesInput
-    #   data as a hash:
+    # @!attribute [rw] listener_arn
+    #   The Amazon Resource Name (ARN) of the listener.
+    #   @return [String]
     #
-    #       {
-    #         listener_arn: "ListenerArn", # required
-    #         marker: "Marker",
-    #         page_size: 1,
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeListenerAttributesInput AWS API Documentation
     #
+    class DescribeListenerAttributesInput < Struct.new(
+      :listener_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] attributes
+    #   Information about the listener attributes.
+    #   @return [Array<Types::ListenerAttribute>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeListenerAttributesOutput AWS API Documentation
+    #
+    class DescribeListenerAttributesOutput < Struct.new(
+      :attributes)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] listener_arn
     #   The Amazon Resource Names (ARN) of the listener.
     #   @return [String]
@@ -1429,16 +1217,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeListenersInput
-    #   data as a hash:
-    #
-    #       {
-    #         load_balancer_arn: "LoadBalancerArn",
-    #         listener_arns: ["ListenerArn"],
-    #         marker: "Marker",
-    #         page_size: 1,
-    #       }
-    #
     # @!attribute [rw] load_balancer_arn
     #   The Amazon Resource Name (ARN) of the load balancer.
     #   @return [String]
@@ -1485,13 +1263,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeLoadBalancerAttributesInput
-    #   data as a hash:
-    #
-    #       {
-    #         load_balancer_arn: "LoadBalancerArn", # required
-    #       }
-    #
     # @!attribute [rw] load_balancer_arn
     #   The Amazon Resource Name (ARN) of the load balancer.
     #   @return [String]
@@ -1516,16 +1287,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeLoadBalancersInput
-    #   data as a hash:
-    #
-    #       {
-    #         load_balancer_arns: ["LoadBalancerArn"],
-    #         names: ["LoadBalancerName"],
-    #         marker: "Marker",
-    #         page_size: 1,
-    #       }
-    #
     # @!attribute [rw] load_balancer_arns
     #   The Amazon Resource Names (ARN) of the load balancers. You can
     #   specify up to 20 load balancers in a single call.
@@ -1573,16 +1334,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeRulesInput
-    #   data as a hash:
-    #
-    #       {
-    #         listener_arn: "ListenerArn",
-    #         rule_arns: ["RuleArn"],
-    #         marker: "Marker",
-    #         page_size: 1,
-    #       }
-    #
     # @!attribute [rw] listener_arn
     #   The Amazon Resource Name (ARN) of the listener.
     #   @return [String]
@@ -1629,15 +1380,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeSSLPoliciesInput
-    #   data as a hash:
-    #
-    #       {
-    #         names: ["SslPolicyName"],
-    #         marker: "Marker",
-    #         page_size: 1,
-    #       }
-    #
     # @!attribute [rw] names
     #   The names of the policies.
     #   @return [Array<String>]
@@ -1651,12 +1393,18 @@ module Aws::ElasticLoadBalancingV2
     #   The maximum number of results to return with this call.
     #   @return [Integer]
     #
+    # @!attribute [rw] load_balancer_type
+    #   The type of load balancer. The default lists the SSL policies for
+    #   all load balancers.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeSSLPoliciesInput AWS API Documentation
     #
     class DescribeSSLPoliciesInput < Struct.new(
       :names,
       :marker,
-      :page_size)
+      :page_size,
+      :load_balancer_type)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1679,13 +1427,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeTagsInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arns: ["ResourceArn"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arns
     #   The Amazon Resource Names (ARN) of the resources. You can specify up
     #   to 20 resources in a single call.
@@ -1711,13 +1452,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeTargetGroupAttributesInput
-    #   data as a hash:
-    #
-    #       {
-    #         target_group_arn: "TargetGroupArn", # required
-    #       }
-    #
     # @!attribute [rw] target_group_arn
     #   The Amazon Resource Name (ARN) of the target group.
     #   @return [String]
@@ -1742,17 +1476,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeTargetGroupsInput
-    #   data as a hash:
-    #
-    #       {
-    #         load_balancer_arn: "LoadBalancerArn",
-    #         target_group_arns: ["TargetGroupArn"],
-    #         names: ["TargetGroupName"],
-    #         marker: "Marker",
-    #         page_size: 1,
-    #       }
-    #
     # @!attribute [rw] load_balancer_arn
     #   The Amazon Resource Name (ARN) of the load balancer.
     #   @return [String]
@@ -1804,20 +1527,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeTargetHealthInput
-    #   data as a hash:
-    #
-    #       {
-    #         target_group_arn: "TargetGroupArn", # required
-    #         targets: [
-    #           {
-    #             id: "TargetId", # required
-    #             port: 1,
-    #             availability_zone: "ZoneName",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] target_group_arn
     #   The Amazon Resource Name (ARN) of the target group.
     #   @return [String]
@@ -1826,11 +1535,16 @@ module Aws::ElasticLoadBalancingV2
     #   The targets.
     #   @return [Array<Types::TargetDescription>]
     #
+    # @!attribute [rw] include
+    #   Used to include anomaly detection information.
+    #   @return [Array<String>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeTargetHealthInput AWS API Documentation
     #
     class DescribeTargetHealthInput < Struct.new(
       :target_group_arn,
-      :targets)
+      :targets,
+      :include)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1843,6 +1557,168 @@ module Aws::ElasticLoadBalancingV2
     #
     class DescribeTargetHealthOutput < Struct.new(
       :target_health_descriptions)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] marker
+    #   The marker for the next set of results. (You received this marker
+    #   from a previous call.)
+    #   @return [String]
+    #
+    # @!attribute [rw] page_size
+    #   The maximum number of results to return with this call.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeTrustStoreAssociationsInput AWS API Documentation
+    #
+    class DescribeTrustStoreAssociationsInput < Struct.new(
+      :trust_store_arn,
+      :marker,
+      :page_size)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_store_associations
+    #   Information about the resources the trust store is associated to.
+    #   @return [Array<Types::TrustStoreAssociation>]
+    #
+    # @!attribute [rw] next_marker
+    #   If there are additional results, this is the marker for the next set
+    #   of results. Otherwise, this is null.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeTrustStoreAssociationsOutput AWS API Documentation
+    #
+    class DescribeTrustStoreAssociationsOutput < Struct.new(
+      :trust_store_associations,
+      :next_marker)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about the revocations used by a trust store.
+    #
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] revocation_id
+    #   The revocation ID of a revocation file in use.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] revocation_type
+    #   The type of revocation file.
+    #   @return [String]
+    #
+    # @!attribute [rw] number_of_revoked_entries
+    #   The number of revoked certificates.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeTrustStoreRevocation AWS API Documentation
+    #
+    class DescribeTrustStoreRevocation < Struct.new(
+      :trust_store_arn,
+      :revocation_id,
+      :revocation_type,
+      :number_of_revoked_entries)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] revocation_ids
+    #   The revocation IDs of the revocation files you want to describe.
+    #   @return [Array<Integer>]
+    #
+    # @!attribute [rw] marker
+    #   The marker for the next set of results. (You received this marker
+    #   from a previous call.)
+    #   @return [String]
+    #
+    # @!attribute [rw] page_size
+    #   The maximum number of results to return with this call.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeTrustStoreRevocationsInput AWS API Documentation
+    #
+    class DescribeTrustStoreRevocationsInput < Struct.new(
+      :trust_store_arn,
+      :revocation_ids,
+      :marker,
+      :page_size)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_store_revocations
+    #   Information about the revocation file in the trust store.
+    #   @return [Array<Types::DescribeTrustStoreRevocation>]
+    #
+    # @!attribute [rw] next_marker
+    #   If there are additional results, this is the marker for the next set
+    #   of results. Otherwise, this is null.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeTrustStoreRevocationsOutput AWS API Documentation
+    #
+    class DescribeTrustStoreRevocationsOutput < Struct.new(
+      :trust_store_revocations,
+      :next_marker)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_store_arns
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] names
+    #   The names of the trust stores.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] marker
+    #   The marker for the next set of results. (You received this marker
+    #   from a previous call.)
+    #   @return [String]
+    #
+    # @!attribute [rw] page_size
+    #   The maximum number of results to return with this call.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeTrustStoresInput AWS API Documentation
+    #
+    class DescribeTrustStoresInput < Struct.new(
+      :trust_store_arns,
+      :names,
+      :marker,
+      :page_size)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_stores
+    #   Information about the trust stores.
+    #   @return [Array<Types::TrustStore>]
+    #
+    # @!attribute [rw] next_marker
+    #   If there are additional results, this is the marker for the next set
+    #   of results. Otherwise, this is null.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DescribeTrustStoresOutput AWS API Documentation
+    #
+    class DescribeTrustStoresOutput < Struct.new(
+      :trust_stores,
+      :next_marker)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1871,16 +1747,13 @@ module Aws::ElasticLoadBalancingV2
     #
     class DuplicateTargetGroupNameException < Aws::EmptyStructure; end
 
+    # A trust store with the specified name already exists.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/DuplicateTrustStoreNameException AWS API Documentation
+    #
+    class DuplicateTrustStoreNameException < Aws::EmptyStructure; end
+
     # Information about an action that returns a custom HTTP response.
-    #
-    # @note When making an API call, you may pass FixedResponseActionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         message_body: "FixedResponseActionMessage",
-    #         status_code: "FixedResponseActionStatusCode", # required
-    #         content_type: "FixedResponseActionContentType",
-    #       }
     #
     # @!attribute [rw] message_body
     #   The message.
@@ -1909,25 +1782,9 @@ module Aws::ElasticLoadBalancingV2
 
     # Information about a forward action.
     #
-    # @note When making an API call, you may pass ForwardActionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         target_groups: [
-    #           {
-    #             target_group_arn: "TargetGroupArn",
-    #             weight: 1,
-    #           },
-    #         ],
-    #         target_group_stickiness_config: {
-    #           enabled: false,
-    #           duration_seconds: 1,
-    #         },
-    #       }
-    #
     # @!attribute [rw] target_groups
-    #   One or more target groups. For Network Load Balancers, you can
-    #   specify a single target group.
+    #   The target groups. For Network Load Balancers, you can specify a
+    #   single target group.
     #   @return [Array<Types::TargetGroupTuple>]
     #
     # @!attribute [rw] target_group_stickiness_config
@@ -1943,6 +1800,83 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
+    # @!attribute [rw] resource_arn
+    #   The Amazon Resource Name (ARN) of the resource.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/GetResourcePolicyInput AWS API Documentation
+    #
+    class GetResourcePolicyInput < Struct.new(
+      :resource_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] policy
+    #   The content of the resource policy.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/GetResourcePolicyOutput AWS API Documentation
+    #
+    class GetResourcePolicyOutput < Struct.new(
+      :policy)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/GetTrustStoreCaCertificatesBundleInput AWS API Documentation
+    #
+    class GetTrustStoreCaCertificatesBundleInput < Struct.new(
+      :trust_store_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] location
+    #   The ca certificate bundles Amazon S3 URI.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/GetTrustStoreCaCertificatesBundleOutput AWS API Documentation
+    #
+    class GetTrustStoreCaCertificatesBundleOutput < Struct.new(
+      :location)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] revocation_id
+    #   The revocation ID of the revocation file.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/GetTrustStoreRevocationContentInput AWS API Documentation
+    #
+    class GetTrustStoreRevocationContentInput < Struct.new(
+      :trust_store_arn,
+      :revocation_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] location
+    #   The revocation files Amazon S3 URI.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/GetTrustStoreRevocationContentOutput AWS API Documentation
+    #
+    class GetTrustStoreRevocationContentOutput < Struct.new(
+      :location)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The health of the specified targets could not be retrieved due to an
     # internal error.
     #
@@ -1952,18 +1886,11 @@ module Aws::ElasticLoadBalancingV2
 
     # Information about a host header condition.
     #
-    # @note When making an API call, you may pass HostHeaderConditionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         values: ["StringValue"],
-    #       }
-    #
     # @!attribute [rw] values
-    #   One or more host names. The maximum size of each name is 128
-    #   characters. The comparison is case insensitive. The following
-    #   wildcard characters are supported: * (matches 0 or more characters)
-    #   and ? (matches exactly 1 character).
+    #   The host names. The maximum size of each name is 128 characters. The
+    #   comparison is case insensitive. The following wildcard characters
+    #   are supported: * (matches 0 or more characters) and ? (matches
+    #   exactly 1 character).
     #
     #   If you specify multiple strings, the condition is satisfied if one
     #   of the strings matches the host name.
@@ -1982,14 +1909,6 @@ module Aws::ElasticLoadBalancingV2
     # There is a set of standard HTTP header fields. You can also define
     # custom HTTP header fields.
     #
-    # @note When making an API call, you may pass HttpHeaderConditionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         http_header_name: "HttpHeaderConditionName",
-    #         values: ["StringValue"],
-    #       }
-    #
     # @!attribute [rw] http_header_name
     #   The name of the HTTP header field. The maximum size is 40
     #   characters. The header name is case insensitive. The allowed
@@ -2000,8 +1919,8 @@ module Aws::ElasticLoadBalancingV2
     #   @return [String]
     #
     # @!attribute [rw] values
-    #   One or more strings to compare against the value of the HTTP header.
-    #   The maximum size of each string is 128 characters. The comparison
+    #   The strings to compare against the value of the HTTP header. The
+    #   maximum size of each string is 128 characters. The comparison
     #   strings are case insensitive. The following wildcard characters are
     #   supported: * (matches 0 or more characters) and ? (matches exactly
     #   1 character).
@@ -2033,13 +1952,6 @@ module Aws::ElasticLoadBalancingV2
     #
     # [1]: https://www.iana.org/assignments/http-methods/http-methods.xhtml
     #
-    # @note When making an API call, you may pass HttpRequestMethodConditionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         values: ["StringValue"],
-    #       }
-    #
     # @!attribute [rw] values
     #   The name of the request method. The maximum size is 40 characters.
     #   The allowed characters are A-Z, hyphen (-), and underscore (\_). The
@@ -2066,6 +1978,13 @@ module Aws::ElasticLoadBalancingV2
     #
     class IncompatibleProtocolsException < Aws::EmptyStructure; end
 
+    # The specified ca certificate bundle is in an invalid format, or
+    # corrupt.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/InvalidCaCertificatesBundleException AWS API Documentation
+    #
+    class InvalidCaCertificatesBundleException < Aws::EmptyStructure; end
+
     # The requested configuration is not valid.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/InvalidConfigurationRequestException AWS API Documentation
@@ -2077,6 +1996,13 @@ module Aws::ElasticLoadBalancingV2
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/InvalidLoadBalancerActionException AWS API Documentation
     #
     class InvalidLoadBalancerActionException < Aws::EmptyStructure; end
+
+    # The provided revocation file is an invalid format, or uses an
+    # incorrect algorithm.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/InvalidRevocationContentException AWS API Documentation
+    #
+    class InvalidRevocationContentException < Aws::EmptyStructure; end
 
     # The requested scheme is not valid.
     #
@@ -2104,7 +2030,21 @@ module Aws::ElasticLoadBalancingV2
     class InvalidTargetException < Aws::EmptyStructure; end
 
     # Information about an Elastic Load Balancing resource limit for your
-    # AWS account.
+    # Amazon Web Services account.
+    #
+    # For more information, see the following:
+    #
+    # * [Quotas for your Application Load Balancers][1]
+    #
+    # * [Quotas for your Network Load Balancers][2]
+    #
+    # * [Quotas for your Gateway Load Balancers][3]
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-limits.html
+    # [2]: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-limits.html
+    # [3]: https://docs.aws.amazon.com/elasticloadbalancing/latest/gateway/quotas-limits.html
     #
     # @!attribute [rw] name
     #   The name of the limit. The possible values are:
@@ -2195,6 +2135,10 @@ module Aws::ElasticLoadBalancingV2
     #   Negotiation (ALPN) policy.
     #   @return [Array<String>]
     #
+    # @!attribute [rw] mutual_authentication
+    #   The mutual authentication configuration information.
+    #   @return [Types::MutualAuthenticationAttributes]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/Listener AWS API Documentation
     #
     class Listener < Struct.new(
@@ -2205,7 +2149,36 @@ module Aws::ElasticLoadBalancingV2
       :certificates,
       :ssl_policy,
       :default_actions,
-      :alpn_policy)
+      :alpn_policy,
+      :mutual_authentication)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about a listener attribute.
+    #
+    # @!attribute [rw] key
+    #   The name of the attribute.
+    #
+    #   The following attribute is supported by Network Load Balancers, and
+    #   Gateway Load Balancers.
+    #
+    #   * `tcp.idle_timeout.seconds` - The tcp idle timeout value, in
+    #     seconds. The valid range is 60-6000 seconds. The default is 350
+    #     seconds.
+    #
+    #   ^
+    #   @return [String]
+    #
+    # @!attribute [rw] value
+    #   The value of the attribute.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ListenerAttribute AWS API Documentation
+    #
+    class ListenerAttribute < Struct.new(
+      :key,
+      :value)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2274,14 +2247,28 @@ module Aws::ElasticLoadBalancingV2
     #   @return [Array<String>]
     #
     # @!attribute [rw] ip_address_type
-    #   The type of IP addresses used by the subnets for your load balancer.
-    #   The possible values are `ipv4` (for IPv4 addresses) and `dualstack`
-    #   (for IPv4 and IPv6 addresses).
+    #   \[Application Load Balancers\] The type of IP addresses used for
+    #   public or private connections by the subnets attached to your load
+    #   balancer. The possible values are `ipv4` (for only IPv4 addresses),
+    #   `dualstack` (for IPv4 and IPv6 addresses), and
+    #   `dualstack-without-public-ipv4` (for IPv6 only public addresses,
+    #   with private IPv4 and IPv6 addresses).
+    #
+    #   \[Network Load Balancers and Gateway Load Balancers\] The type of IP
+    #   addresses used for public or private connections by the subnets
+    #   attached to your load balancer. The possible values are `ipv4` (for
+    #   only IPv4 addresses) and `dualstack` (for IPv4 and IPv6 addresses).
     #   @return [String]
     #
     # @!attribute [rw] customer_owned_ipv_4_pool
     #   \[Application Load Balancers on Outposts\] The ID of the
     #   customer-owned address pool.
+    #   @return [String]
+    #
+    # @!attribute [rw] enforce_security_group_inbound_rules_on_private_link_traffic
+    #   Indicates whether to evaluate inbound security group rules for
+    #   traffic sent to a Network Load Balancer through Amazon Web Services
+    #   PrivateLink.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/LoadBalancer AWS API Documentation
@@ -2299,7 +2286,8 @@ module Aws::ElasticLoadBalancingV2
       :availability_zones,
       :security_groups,
       :ip_address_type,
-      :customer_owned_ipv_4_pool)
+      :customer_owned_ipv_4_pool,
+      :enforce_security_group_inbound_rules_on_private_link_traffic)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2337,24 +2325,20 @@ module Aws::ElasticLoadBalancingV2
 
     # Information about a load balancer attribute.
     #
-    # @note When making an API call, you may pass LoadBalancerAttribute
-    #   data as a hash:
-    #
-    #       {
-    #         key: "LoadBalancerAttributeKey",
-    #         value: "LoadBalancerAttributeValue",
-    #       }
-    #
     # @!attribute [rw] key
     #   The name of the attribute.
     #
-    #   The following attribute is supported by all load balancers:
+    #   The following attributes are supported by all load balancers:
     #
     #   * `deletion_protection.enabled` - Indicates whether deletion
     #     protection is enabled. The value is `true` or `false`. The default
     #     is `false`.
     #
-    #   ^
+    #   * `load_balancing.cross_zone.enabled` - Indicates whether cross-zone
+    #     load balancing is enabled. The possible values are `true` and
+    #     `false`. The default for Network Load Balancers and Gateway Load
+    #     Balancers is `false`. The default for Application Load Balancers
+    #     is `true`, and cannot be changed.
     #
     #   The following attributes are supported by both Application Load
     #   Balancers and Network Load Balancers:
@@ -2371,12 +2355,35 @@ module Aws::ElasticLoadBalancingV2
     #   * `access_logs.s3.prefix` - The prefix for the location in the S3
     #     bucket for the access logs.
     #
+    #   * `ipv6.deny_all_igw_traffic` - Blocks internet gateway (IGW) access
+    #     to the load balancer. It is set to `false` for internet-facing
+    #     load balancers and `true` for internal load balancers, preventing
+    #     unintended access to your internal load balancer through an
+    #     internet gateway.
+    #
     #   The following attributes are supported by only Application Load
     #   Balancers:
     #
     #   * `idle_timeout.timeout_seconds` - The idle timeout value, in
     #     seconds. The valid range is 1-4000 seconds. The default is 60
     #     seconds.
+    #
+    #   * `client_keep_alive.seconds` - The client keep alive value, in
+    #     seconds. The valid range is 60-604800 seconds. The default is 3600
+    #     seconds.
+    #
+    #   * `connection_logs.s3.enabled` - Indicates whether connection logs
+    #     are enabled. The value is `true` or `false`. The default is
+    #     `false`.
+    #
+    #   * `connection_logs.s3.bucket` - The name of the S3 bucket for the
+    #     connection logs. This attribute is required if connection logs are
+    #     enabled. The bucket must exist in the same region as the load
+    #     balancer and have a bucket policy that grants Elastic Load
+    #     Balancing permissions to write to the bucket.
+    #
+    #   * `connection_logs.s3.prefix` - The prefix for the location in the
+    #     S3 bucket for the connection logs.
     #
     #   * `routing.http.desync_mitigation_mode` - Determines how the load
     #     balancer handles requests that might pose a security risk to your
@@ -2388,24 +2395,68 @@ module Aws::ElasticLoadBalancingV2
     #     load balancer (`true`) or routed to targets (`false`). The default
     #     is `false`.
     #
+    #   * `routing.http.preserve_host_header.enabled` - Indicates whether
+    #     the Application Load Balancer should preserve the `Host` header in
+    #     the HTTP request and send it to the target without any change. The
+    #     possible values are `true` and `false`. The default is `false`.
+    #
+    #   * `routing.http.x_amzn_tls_version_and_cipher_suite.enabled` -
+    #     Indicates whether the two headers (`x-amzn-tls-version` and
+    #     `x-amzn-tls-cipher-suite`), which contain information about the
+    #     negotiated TLS version and cipher suite, are added to the client
+    #     request before sending it to the target. The `x-amzn-tls-version`
+    #     header has information about the TLS protocol version negotiated
+    #     with the client, and the `x-amzn-tls-cipher-suite` header has
+    #     information about the cipher suite negotiated with the client.
+    #     Both headers are in OpenSSL format. The possible values for the
+    #     attribute are `true` and `false`. The default is `false`.
+    #
+    #   * `routing.http.xff_client_port.enabled` - Indicates whether the
+    #     `X-Forwarded-For` header should preserve the source port that the
+    #     client used to connect to the load balancer. The possible values
+    #     are `true` and `false`. The default is `false`.
+    #
+    #   * `routing.http.xff_header_processing.mode` - Enables you to modify,
+    #     preserve, or remove the `X-Forwarded-For` header in the HTTP
+    #     request before the Application Load Balancer sends the request to
+    #     the target. The possible values are `append`, `preserve`, and
+    #     `remove`. The default is `append`.
+    #
+    #     * If the value is `append`, the Application Load Balancer adds the
+    #       client IP address (of the last hop) to the `X-Forwarded-For`
+    #       header in the HTTP request before it sends it to targets.
+    #
+    #     * If the value is `preserve` the Application Load Balancer
+    #       preserves the `X-Forwarded-For` header in the HTTP request, and
+    #       sends it to targets without any change.
+    #
+    #     * If the value is `remove`, the Application Load Balancer removes
+    #       the `X-Forwarded-For` header in the HTTP request before it sends
+    #       it to targets.
+    #
     #   * `routing.http2.enabled` - Indicates whether HTTP/2 is enabled. The
-    #     value is `true` or `false`. The default is `true`. Elastic Load
-    #     Balancing requires that message header names contain only
-    #     alphanumeric characters and hyphens.
+    #     possible values are `true` and `false`. The default is `true`.
+    #     Elastic Load Balancing requires that message header names contain
+    #     only alphanumeric characters and hyphens.
     #
     #   * `waf.fail_open.enabled` - Indicates whether to allow a WAF-enabled
     #     load balancer to route requests to targets if it is unable to
-    #     forward the request to AWS WAF. The value is `true` or `false`.
-    #     The default is `false`.
+    #     forward the request to Amazon Web Services WAF. The possible
+    #     values are `true` and `false`. The default is `false`.
     #
-    #   The following attribute is supported by Network Load Balancers and
-    #   Gateway Load Balancers:
+    #   The following attributes are supported by only Network Load
+    #   Balancers:
     #
-    #   * `load_balancing.cross_zone.enabled` - Indicates whether cross-zone
-    #     load balancing is enabled. The value is `true` or `false`. The
-    #     default is `false`.
+    #   * `dns_record.client_routing_policy` - Indicates how traffic is
+    #     distributed among the load balancer Availability Zones. The
+    #     possible values are `availability_zone_affinity` with 100 percent
+    #     zonal affinity, `partial_availability_zone_affinity` with 85
+    #     percent zonal affinity, and `any_availability_zone` with 0 percent
+    #     zonal affinity.
     #
-    #   ^
+    #   * `zonal_shift.config.enabled` - Indicates whether zonal shift is
+    #     enabled. The possible values are `true` and `false`. The default
+    #     is `false`.
     #   @return [String]
     #
     # @!attribute [rw] value
@@ -2432,8 +2483,10 @@ module Aws::ElasticLoadBalancingV2
     # @!attribute [rw] code
     #   The state code. The initial state of the load balancer is
     #   `provisioning`. After the load balancer is fully set up and ready to
-    #   route traffic, its state is `active`. If the load balancer could not
-    #   be set up, its state is `failed`.
+    #   route traffic, its state is `active`. If load balancer is routing
+    #   traffic but does not have the resources it needs to scale, its state
+    #   is`active_impaired`. If the load balancer could not be set up, its
+    #   state is `failed`.
     #   @return [String]
     #
     # @!attribute [rw] reason
@@ -2453,22 +2506,21 @@ module Aws::ElasticLoadBalancingV2
     # target. If the protocol version is gRPC, these are gRPC codes.
     # Otherwise, these are HTTP codes.
     #
-    # @note When making an API call, you may pass Matcher
-    #   data as a hash:
-    #
-    #       {
-    #         http_code: "HttpCode",
-    #         grpc_code: "GrpcCode",
-    #       }
-    #
     # @!attribute [rw] http_code
     #   For Application Load Balancers, you can specify values between 200
-    #   and 499, and the default value is 200. You can specify multiple
+    #   and 499, with the default value being 200. You can specify multiple
     #   values (for example, "200,202") or a range of values (for example,
     #   "200-299").
     #
-    #   For Network Load Balancers and Gateway Load Balancers, this must be
-    #   "200–399".
+    #   For Network Load Balancers, you can specify values between 200 and
+    #   599, with the default value being 200-399. You can specify multiple
+    #   values (for example, "200,202") or a range of values (for example,
+    #   "200-299").
+    #
+    #   For Gateway Load Balancers, this must be "200–399".
+    #
+    #   Note that when using shorthand syntax, some values such as commas
+    #   need to be escaped.
     #   @return [String]
     #
     # @!attribute [rw] grpc_code
@@ -2486,83 +2538,35 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ModifyListenerInput
-    #   data as a hash:
+    # @!attribute [rw] listener_arn
+    #   The Amazon Resource Name (ARN) of the listener.
+    #   @return [String]
     #
-    #       {
-    #         listener_arn: "ListenerArn", # required
-    #         port: 1,
-    #         protocol: "HTTP", # accepts HTTP, HTTPS, TCP, TLS, UDP, TCP_UDP, GENEVE
-    #         ssl_policy: "SslPolicyName",
-    #         certificates: [
-    #           {
-    #             certificate_arn: "CertificateArn",
-    #             is_default: false,
-    #           },
-    #         ],
-    #         default_actions: [
-    #           {
-    #             type: "forward", # required, accepts forward, authenticate-oidc, authenticate-cognito, redirect, fixed-response
-    #             target_group_arn: "TargetGroupArn",
-    #             authenticate_oidc_config: {
-    #               issuer: "AuthenticateOidcActionIssuer", # required
-    #               authorization_endpoint: "AuthenticateOidcActionAuthorizationEndpoint", # required
-    #               token_endpoint: "AuthenticateOidcActionTokenEndpoint", # required
-    #               user_info_endpoint: "AuthenticateOidcActionUserInfoEndpoint", # required
-    #               client_id: "AuthenticateOidcActionClientId", # required
-    #               client_secret: "AuthenticateOidcActionClientSecret",
-    #               session_cookie_name: "AuthenticateOidcActionSessionCookieName",
-    #               scope: "AuthenticateOidcActionScope",
-    #               session_timeout: 1,
-    #               authentication_request_extra_params: {
-    #                 "AuthenticateOidcActionAuthenticationRequestParamName" => "AuthenticateOidcActionAuthenticationRequestParamValue",
-    #               },
-    #               on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #               use_existing_client_secret: false,
-    #             },
-    #             authenticate_cognito_config: {
-    #               user_pool_arn: "AuthenticateCognitoActionUserPoolArn", # required
-    #               user_pool_client_id: "AuthenticateCognitoActionUserPoolClientId", # required
-    #               user_pool_domain: "AuthenticateCognitoActionUserPoolDomain", # required
-    #               session_cookie_name: "AuthenticateCognitoActionSessionCookieName",
-    #               scope: "AuthenticateCognitoActionScope",
-    #               session_timeout: 1,
-    #               authentication_request_extra_params: {
-    #                 "AuthenticateCognitoActionAuthenticationRequestParamName" => "AuthenticateCognitoActionAuthenticationRequestParamValue",
-    #               },
-    #               on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #             },
-    #             order: 1,
-    #             redirect_config: {
-    #               protocol: "RedirectActionProtocol",
-    #               port: "RedirectActionPort",
-    #               host: "RedirectActionHost",
-    #               path: "RedirectActionPath",
-    #               query: "RedirectActionQuery",
-    #               status_code: "HTTP_301", # required, accepts HTTP_301, HTTP_302
-    #             },
-    #             fixed_response_config: {
-    #               message_body: "FixedResponseActionMessage",
-    #               status_code: "FixedResponseActionStatusCode", # required
-    #               content_type: "FixedResponseActionContentType",
-    #             },
-    #             forward_config: {
-    #               target_groups: [
-    #                 {
-    #                   target_group_arn: "TargetGroupArn",
-    #                   weight: 1,
-    #                 },
-    #               ],
-    #               target_group_stickiness_config: {
-    #                 enabled: false,
-    #                 duration_seconds: 1,
-    #               },
-    #             },
-    #           },
-    #         ],
-    #         alpn_policy: ["AlpnPolicyValue"],
-    #       }
+    # @!attribute [rw] attributes
+    #   The listener attributes.
+    #   @return [Array<Types::ListenerAttribute>]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ModifyListenerAttributesInput AWS API Documentation
+    #
+    class ModifyListenerAttributesInput < Struct.new(
+      :listener_arn,
+      :attributes)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] attributes
+    #   Information about the listener attributes.
+    #   @return [Array<Types::ListenerAttribute>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ModifyListenerAttributesOutput AWS API Documentation
+    #
+    class ModifyListenerAttributesOutput < Struct.new(
+      :attributes)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] listener_arn
     #   The Amazon Resource Name (ARN) of the listener.
     #   @return [String]
@@ -2628,6 +2632,10 @@ module Aws::ElasticLoadBalancingV2
     #   [1]: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/create-tls-listener.html#alpn-policies
     #   @return [Array<String>]
     #
+    # @!attribute [rw] mutual_authentication
+    #   The mutual authentication configuration information.
+    #   @return [Types::MutualAuthenticationAttributes]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ModifyListenerInput AWS API Documentation
     #
     class ModifyListenerInput < Struct.new(
@@ -2637,7 +2645,8 @@ module Aws::ElasticLoadBalancingV2
       :ssl_policy,
       :certificates,
       :default_actions,
-      :alpn_policy)
+      :alpn_policy,
+      :mutual_authentication)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2654,19 +2663,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ModifyLoadBalancerAttributesInput
-    #   data as a hash:
-    #
-    #       {
-    #         load_balancer_arn: "LoadBalancerArn", # required
-    #         attributes: [ # required
-    #           {
-    #             key: "LoadBalancerAttributeKey",
-    #             value: "LoadBalancerAttributeValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] load_balancer_arn
     #   The Amazon Resource Name (ARN) of the load balancer.
     #   @return [String]
@@ -2696,103 +2692,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ModifyRuleInput
-    #   data as a hash:
-    #
-    #       {
-    #         rule_arn: "RuleArn", # required
-    #         conditions: [
-    #           {
-    #             field: "ConditionFieldName",
-    #             values: ["StringValue"],
-    #             host_header_config: {
-    #               values: ["StringValue"],
-    #             },
-    #             path_pattern_config: {
-    #               values: ["StringValue"],
-    #             },
-    #             http_header_config: {
-    #               http_header_name: "HttpHeaderConditionName",
-    #               values: ["StringValue"],
-    #             },
-    #             query_string_config: {
-    #               values: [
-    #                 {
-    #                   key: "StringValue",
-    #                   value: "StringValue",
-    #                 },
-    #               ],
-    #             },
-    #             http_request_method_config: {
-    #               values: ["StringValue"],
-    #             },
-    #             source_ip_config: {
-    #               values: ["StringValue"],
-    #             },
-    #           },
-    #         ],
-    #         actions: [
-    #           {
-    #             type: "forward", # required, accepts forward, authenticate-oidc, authenticate-cognito, redirect, fixed-response
-    #             target_group_arn: "TargetGroupArn",
-    #             authenticate_oidc_config: {
-    #               issuer: "AuthenticateOidcActionIssuer", # required
-    #               authorization_endpoint: "AuthenticateOidcActionAuthorizationEndpoint", # required
-    #               token_endpoint: "AuthenticateOidcActionTokenEndpoint", # required
-    #               user_info_endpoint: "AuthenticateOidcActionUserInfoEndpoint", # required
-    #               client_id: "AuthenticateOidcActionClientId", # required
-    #               client_secret: "AuthenticateOidcActionClientSecret",
-    #               session_cookie_name: "AuthenticateOidcActionSessionCookieName",
-    #               scope: "AuthenticateOidcActionScope",
-    #               session_timeout: 1,
-    #               authentication_request_extra_params: {
-    #                 "AuthenticateOidcActionAuthenticationRequestParamName" => "AuthenticateOidcActionAuthenticationRequestParamValue",
-    #               },
-    #               on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #               use_existing_client_secret: false,
-    #             },
-    #             authenticate_cognito_config: {
-    #               user_pool_arn: "AuthenticateCognitoActionUserPoolArn", # required
-    #               user_pool_client_id: "AuthenticateCognitoActionUserPoolClientId", # required
-    #               user_pool_domain: "AuthenticateCognitoActionUserPoolDomain", # required
-    #               session_cookie_name: "AuthenticateCognitoActionSessionCookieName",
-    #               scope: "AuthenticateCognitoActionScope",
-    #               session_timeout: 1,
-    #               authentication_request_extra_params: {
-    #                 "AuthenticateCognitoActionAuthenticationRequestParamName" => "AuthenticateCognitoActionAuthenticationRequestParamValue",
-    #               },
-    #               on_unauthenticated_request: "deny", # accepts deny, allow, authenticate
-    #             },
-    #             order: 1,
-    #             redirect_config: {
-    #               protocol: "RedirectActionProtocol",
-    #               port: "RedirectActionPort",
-    #               host: "RedirectActionHost",
-    #               path: "RedirectActionPath",
-    #               query: "RedirectActionQuery",
-    #               status_code: "HTTP_301", # required, accepts HTTP_301, HTTP_302
-    #             },
-    #             fixed_response_config: {
-    #               message_body: "FixedResponseActionMessage",
-    #               status_code: "FixedResponseActionStatusCode", # required
-    #               content_type: "FixedResponseActionContentType",
-    #             },
-    #             forward_config: {
-    #               target_groups: [
-    #                 {
-    #                   target_group_arn: "TargetGroupArn",
-    #                   weight: 1,
-    #                 },
-    #               ],
-    #               target_group_stickiness_config: {
-    #                 enabled: false,
-    #                 duration_seconds: 1,
-    #               },
-    #             },
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] rule_arn
     #   The Amazon Resource Name (ARN) of the rule.
     #   @return [String]
@@ -2827,25 +2726,12 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ModifyTargetGroupAttributesInput
-    #   data as a hash:
-    #
-    #       {
-    #         target_group_arn: "TargetGroupArn", # required
-    #         attributes: [ # required
-    #           {
-    #             key: "TargetGroupAttributeKey",
-    #             value: "TargetGroupAttributeValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] target_group_arn
     #   The Amazon Resource Name (ARN) of the target group.
     #   @return [String]
     #
     # @!attribute [rw] attributes
-    #   The attributes.
+    #   The target group attributes.
     #   @return [Array<Types::TargetGroupAttribute>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ModifyTargetGroupAttributesInput AWS API Documentation
@@ -2858,7 +2744,7 @@ module Aws::ElasticLoadBalancingV2
     end
 
     # @!attribute [rw] attributes
-    #   Information about the attributes.
+    #   Information about the target group attributes.
     #   @return [Array<Types::TargetGroupAttribute>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ModifyTargetGroupAttributesOutput AWS API Documentation
@@ -2869,37 +2755,19 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ModifyTargetGroupInput
-    #   data as a hash:
-    #
-    #       {
-    #         target_group_arn: "TargetGroupArn", # required
-    #         health_check_protocol: "HTTP", # accepts HTTP, HTTPS, TCP, TLS, UDP, TCP_UDP, GENEVE
-    #         health_check_port: "HealthCheckPort",
-    #         health_check_path: "Path",
-    #         health_check_enabled: false,
-    #         health_check_interval_seconds: 1,
-    #         health_check_timeout_seconds: 1,
-    #         healthy_threshold_count: 1,
-    #         unhealthy_threshold_count: 1,
-    #         matcher: {
-    #           http_code: "HttpCode",
-    #           grpc_code: "GrpcCode",
-    #         },
-    #       }
-    #
     # @!attribute [rw] target_group_arn
     #   The Amazon Resource Name (ARN) of the target group.
     #   @return [String]
     #
     # @!attribute [rw] health_check_protocol
     #   The protocol the load balancer uses when performing health checks on
-    #   targets. The TCP protocol is supported for health checks only if the
-    #   protocol of the target group is TCP, TLS, UDP, or TCP\_UDP. The
-    #   GENEVE, TLS, UDP, and TCP\_UDP protocols are not supported for
-    #   health checks.
-    #
-    #   With Network Load Balancers, you can't modify this setting.
+    #   targets. For Application Load Balancers, the default is HTTP. For
+    #   Network Load Balancers and Gateway Load Balancers, the default is
+    #   TCP. The TCP protocol is not supported for health checks if the
+    #   protocol of the target group is HTTP or HTTPS. It is supported for
+    #   health checks only if the protocol of the target group is TCP, TLS,
+    #   UDP, or TCP\_UDP. The GENEVE, TLS, UDP, and TCP\_UDP protocols are
+    #   not supported for health checks.
     #   @return [String]
     #
     # @!attribute [rw] health_check_port
@@ -2914,8 +2782,8 @@ module Aws::ElasticLoadBalancingV2
     #   \[HTTP1 or HTTP2 protocol version\] The ping path. The default is /.
     #
     #   \[GRPC protocol version\] The path of a custom health check method
-    #   with the format /package.service/method. The default is
-    #   /AWS.ALB/healthcheck.
+    #   with the format /package.service/method. The default is /Amazon Web
+    #   Services.ALB/healthcheck.
     #   @return [String]
     #
     # @!attribute [rw] health_check_enabled
@@ -2924,17 +2792,12 @@ module Aws::ElasticLoadBalancingV2
     #
     # @!attribute [rw] health_check_interval_seconds
     #   The approximate amount of time, in seconds, between health checks of
-    #   an individual target. For TCP health checks, the supported values
-    #   are 10 or 30 seconds.
-    #
-    #   With Network Load Balancers, you can't modify this setting.
+    #   an individual target.
     #   @return [Integer]
     #
     # @!attribute [rw] health_check_timeout_seconds
     #   \[HTTP/HTTPS health checks\] The amount of time, in seconds, during
     #   which no response means a failed health check.
-    #
-    #   With Network Load Balancers, you can't modify this setting.
     #   @return [Integer]
     #
     # @!attribute [rw] healthy_threshold_count
@@ -2944,16 +2807,16 @@ module Aws::ElasticLoadBalancingV2
     #
     # @!attribute [rw] unhealthy_threshold_count
     #   The number of consecutive health check failures required before
-    #   considering the target unhealthy. For target groups with a protocol
-    #   of TCP or TLS, this value must be the same as the healthy threshold
-    #   count.
+    #   considering the target unhealthy.
     #   @return [Integer]
     #
     # @!attribute [rw] matcher
     #   \[HTTP/HTTPS health checks\] The HTTP or gRPC codes to use when
-    #   checking for a successful response from a target.
-    #
-    #   With Network Load Balancers, you can't modify this setting.
+    #   checking for a successful response from a target. For target groups
+    #   with a protocol of TCP, TCP\_UDP, UDP or TLS the range is 200-599.
+    #   For target groups with a protocol of HTTP or HTTPS, the range is
+    #   200-499. For target groups with a protocol of GENEVE, the range is
+    #   200-399.
     #   @return [Types::Matcher]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ModifyTargetGroupInput AWS API Documentation
@@ -2985,6 +2848,76 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] ca_certificates_bundle_s3_bucket
+    #   The Amazon S3 bucket for the ca certificates bundle.
+    #   @return [String]
+    #
+    # @!attribute [rw] ca_certificates_bundle_s3_key
+    #   The Amazon S3 path for the ca certificates bundle.
+    #   @return [String]
+    #
+    # @!attribute [rw] ca_certificates_bundle_s3_object_version
+    #   The Amazon S3 object version for the ca certificates bundle. If
+    #   undefined the current version is used.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ModifyTrustStoreInput AWS API Documentation
+    #
+    class ModifyTrustStoreInput < Struct.new(
+      :trust_store_arn,
+      :ca_certificates_bundle_s3_bucket,
+      :ca_certificates_bundle_s3_key,
+      :ca_certificates_bundle_s3_object_version)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] trust_stores
+    #   Information about the modified trust store.
+    #   @return [Array<Types::TrustStore>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ModifyTrustStoreOutput AWS API Documentation
+    #
+    class ModifyTrustStoreOutput < Struct.new(
+      :trust_stores)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about the mutual authentication attributes of a listener.
+    #
+    # @!attribute [rw] mode
+    #   The client certificate handling method. Options are `off`,
+    #   `passthrough` or `verify`. The default value is `off`.
+    #   @return [String]
+    #
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] ignore_client_certificate_expiry
+    #   Indicates whether expired client certificates are ignored.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] trust_store_association_status
+    #   Indicates a shared trust stores association status.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/MutualAuthenticationAttributes AWS API Documentation
+    #
+    class MutualAuthenticationAttributes < Struct.new(
+      :mode,
+      :trust_store_arn,
+      :ignore_client_certificate_expiry,
+      :trust_store_association_status)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # This operation is not allowed.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/OperationNotPermittedException AWS API Documentation
@@ -2993,17 +2926,10 @@ module Aws::ElasticLoadBalancingV2
 
     # Information about a path pattern condition.
     #
-    # @note When making an API call, you may pass PathPatternConditionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         values: ["StringValue"],
-    #       }
-    #
     # @!attribute [rw] values
-    #   One or more path patterns to compare against the request URL. The
-    #   maximum size of each string is 128 characters. The comparison is
-    #   case sensitive. The following wildcard characters are supported: *
+    #   The path patterns to compare against the request URL. The maximum
+    #   size of each string is 128 characters. The comparison is case
+    #   sensitive. The following wildcard characters are supported: *
     #   (matches 0 or more characters) and ? (matches exactly 1 character).
     #
     #   If you specify multiple strings, the condition is satisfied if one
@@ -3034,21 +2960,9 @@ module Aws::ElasticLoadBalancingV2
     # '&amp;' characters. The allowed characters are specified by RFC
     # 3986. Any character can be percentage encoded.
     #
-    # @note When making an API call, you may pass QueryStringConditionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         values: [
-    #           {
-    #             key: "StringValue",
-    #             value: "StringValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] values
-    #   One or more key/value pairs or values to find in the query string.
-    #   The maximum size of each string is 128 characters. The comparison is
+    #   The key/value pairs or values to find in the query string. The
+    #   maximum size of each string is 128 characters. The comparison is
     #   case insensitive. The following wildcard characters are supported:
     #   * (matches 0 or more characters) and ? (matches exactly 1
     #   character). To search for a literal '*' or '?' character in a
@@ -3068,14 +2982,6 @@ module Aws::ElasticLoadBalancingV2
     end
 
     # Information about a key/value pair.
-    #
-    # @note When making an API call, you may pass QueryStringKeyValuePair
-    #   data as a hash:
-    #
-    #       {
-    #         key: "StringValue",
-    #         value: "StringValue",
-    #       }
     #
     # @!attribute [rw] key
     #   The key. You can omit the key.
@@ -3117,18 +3023,6 @@ module Aws::ElasticLoadBalancingV2
     # For example, you can change the path to "/new/#\\\{path\\}", the
     # hostname to "example.#\\\{host\\}", or the query to
     # "#\\\{query\\}&amp;value=xyz".
-    #
-    # @note When making an API call, you may pass RedirectActionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         protocol: "RedirectActionProtocol",
-    #         port: "RedirectActionPort",
-    #         host: "RedirectActionHost",
-    #         path: "RedirectActionPath",
-    #         query: "RedirectActionQuery",
-    #         status_code: "HTTP_301", # required, accepts HTTP_301, HTTP_302
-    #       }
     #
     # @!attribute [rw] protocol
     #   The protocol. You can specify HTTP, HTTPS, or #\\\{protocol\\}. You
@@ -3175,20 +3069,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RegisterTargetsInput
-    #   data as a hash:
-    #
-    #       {
-    #         target_group_arn: "TargetGroupArn", # required
-    #         targets: [ # required
-    #           {
-    #             id: "TargetId", # required
-    #             port: 1,
-    #             availability_zone: "ZoneName",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] target_group_arn
     #   The Amazon Resource Name (ARN) of the target group.
     #   @return [String]
@@ -3210,19 +3090,6 @@ module Aws::ElasticLoadBalancingV2
     #
     class RegisterTargetsOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass RemoveListenerCertificatesInput
-    #   data as a hash:
-    #
-    #       {
-    #         listener_arn: "ListenerArn", # required
-    #         certificates: [ # required
-    #           {
-    #             certificate_arn: "CertificateArn",
-    #             is_default: false,
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] listener_arn
     #   The Amazon Resource Name (ARN) of the listener.
     #   @return [String]
@@ -3246,14 +3113,6 @@ module Aws::ElasticLoadBalancingV2
     #
     class RemoveListenerCertificatesOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass RemoveTagsInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arns: ["ResourceArn"], # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arns
     #   The Amazon Resource Name (ARN) of the resource.
     #   @return [Array<String>]
@@ -3275,11 +3134,79 @@ module Aws::ElasticLoadBalancingV2
     #
     class RemoveTagsOutput < Aws::EmptyStructure; end
 
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] revocation_ids
+    #   The revocation IDs of the revocation files you want to remove.
+    #   @return [Array<Integer>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/RemoveTrustStoreRevocationsInput AWS API Documentation
+    #
+    class RemoveTrustStoreRevocationsInput < Struct.new(
+      :trust_store_arn,
+      :revocation_ids)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/RemoveTrustStoreRevocationsOutput AWS API Documentation
+    #
+    class RemoveTrustStoreRevocationsOutput < Aws::EmptyStructure; end
+
     # A specified resource is in use.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ResourceInUseException AWS API Documentation
     #
     class ResourceInUseException < Aws::EmptyStructure; end
+
+    # The specified resource does not exist.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/ResourceNotFoundException AWS API Documentation
+    #
+    class ResourceNotFoundException < Aws::EmptyStructure; end
+
+    # Information about a revocation file.
+    #
+    # @!attribute [rw] s3_bucket
+    #   The Amazon S3 bucket for the revocation file.
+    #   @return [String]
+    #
+    # @!attribute [rw] s3_key
+    #   The Amazon S3 path for the revocation file.
+    #   @return [String]
+    #
+    # @!attribute [rw] s3_object_version
+    #   The Amazon S3 object version of the revocation file.
+    #   @return [String]
+    #
+    # @!attribute [rw] revocation_type
+    #   The type of revocation file.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/RevocationContent AWS API Documentation
+    #
+    class RevocationContent < Struct.new(
+      :s3_bucket,
+      :s3_key,
+      :s3_object_version,
+      :revocation_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The specified revocation file does not exist.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/RevocationContentNotFoundException AWS API Documentation
+    #
+    class RevocationContentNotFoundException < Aws::EmptyStructure; end
+
+    # The specified revocation ID does not exist.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/RevocationIdNotFoundException AWS API Documentation
+    #
+    class RevocationIdNotFoundException < Aws::EmptyStructure; end
 
     # Information about a rule.
     #
@@ -3325,39 +3252,15 @@ module Aws::ElasticLoadBalancingV2
     # Each rule can optionally include up to one of each of the following
     # conditions: `http-request-method`, `host-header`, `path-pattern`, and
     # `source-ip`. Each rule can also optionally include one or more of each
-    # of the following conditions: `http-header` and `query-string`.
+    # of the following conditions: `http-header` and `query-string`. Note
+    # that the value for a condition cannot be empty.
     #
-    # @note When making an API call, you may pass RuleCondition
-    #   data as a hash:
+    # For more information, see [Quotas for your Application Load
+    # Balancers][1].
     #
-    #       {
-    #         field: "ConditionFieldName",
-    #         values: ["StringValue"],
-    #         host_header_config: {
-    #           values: ["StringValue"],
-    #         },
-    #         path_pattern_config: {
-    #           values: ["StringValue"],
-    #         },
-    #         http_header_config: {
-    #           http_header_name: "HttpHeaderConditionName",
-    #           values: ["StringValue"],
-    #         },
-    #         query_string_config: {
-    #           values: [
-    #             {
-    #               key: "StringValue",
-    #               value: "StringValue",
-    #             },
-    #           ],
-    #         },
-    #         http_request_method_config: {
-    #           values: ["StringValue"],
-    #         },
-    #         source_ip_config: {
-    #           values: ["StringValue"],
-    #         },
-    #       }
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-limits.html
     #
     # @!attribute [rw] field
     #   The field in the HTTP request. The following are the possible
@@ -3466,14 +3369,6 @@ module Aws::ElasticLoadBalancingV2
 
     # Information about the priorities for the rules for a listener.
     #
-    # @note When making an API call, you may pass RulePriorityPair
-    #   data as a hash:
-    #
-    #       {
-    #         rule_arn: "RuleArn",
-    #         priority: 1,
-    #       }
-    #
     # @!attribute [rw] rule_arn
     #   The Amazon Resource Name (ARN) of the rule.
     #   @return [String]
@@ -3497,23 +3392,32 @@ module Aws::ElasticLoadBalancingV2
     #
     class SSLPolicyNotFoundException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass SetIpAddressTypeInput
-    #   data as a hash:
-    #
-    #       {
-    #         load_balancer_arn: "LoadBalancerArn", # required
-    #         ip_address_type: "ipv4", # required, accepts ipv4, dualstack
-    #       }
-    #
     # @!attribute [rw] load_balancer_arn
     #   The Amazon Resource Name (ARN) of the load balancer.
     #   @return [String]
     #
     # @!attribute [rw] ip_address_type
-    #   The IP address type. The possible values are `ipv4` (for IPv4
-    #   addresses) and `dualstack` (for IPv4 and IPv6 addresses). Internal
-    #   load balancers must use `ipv4`. You can’t specify `dualstack` for a
-    #   load balancer with a UDP or TCP\_UDP listener.
+    #   Note: Internal load balancers must use the `ipv4` IP address type.
+    #
+    #   \[Application Load Balancers\] The IP address type. The possible
+    #   values are `ipv4` (for only IPv4 addresses), `dualstack` (for IPv4
+    #   and IPv6 addresses), and `dualstack-without-public-ipv4` (for IPv6
+    #   only public addresses, with private IPv4 and IPv6 addresses).
+    #
+    #   Note: Application Load Balancer authentication only supports IPv4
+    #   addresses when connecting to an Identity Provider (IdP) or Amazon
+    #   Cognito endpoint. Without a public IPv4 address the load balancer
+    #   cannot complete the authentication process, resulting in HTTP 500
+    #   errors.
+    #
+    #   \[Network Load Balancers\] The IP address type. The possible values
+    #   are `ipv4` (for only IPv4 addresses) and `dualstack` (for IPv4 and
+    #   IPv6 addresses). You can’t specify `dualstack` for a load balancer
+    #   with a UDP or TCP\_UDP listener.
+    #
+    #   \[Gateway Load Balancers\] The IP address type. The possible values
+    #   are `ipv4` (for only IPv4 addresses) and `dualstack` (for IPv4 and
+    #   IPv6 addresses).
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/SetIpAddressTypeInput AWS API Documentation
@@ -3537,18 +3441,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SetRulePrioritiesInput
-    #   data as a hash:
-    #
-    #       {
-    #         rule_priorities: [ # required
-    #           {
-    #             rule_arn: "RuleArn",
-    #             priority: 1,
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] rule_priorities
     #   The rule priorities.
     #   @return [Array<Types::RulePriorityPair>]
@@ -3573,14 +3465,6 @@ module Aws::ElasticLoadBalancingV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SetSecurityGroupsInput
-    #   data as a hash:
-    #
-    #       {
-    #         load_balancer_arn: "LoadBalancerArn", # required
-    #         security_groups: ["SecurityGroupId"], # required
-    #       }
-    #
     # @!attribute [rw] load_balancer_arn
     #   The Amazon Resource Name (ARN) of the load balancer.
     #   @return [String]
@@ -3589,11 +3473,18 @@ module Aws::ElasticLoadBalancingV2
     #   The IDs of the security groups.
     #   @return [Array<String>]
     #
+    # @!attribute [rw] enforce_security_group_inbound_rules_on_private_link_traffic
+    #   Indicates whether to evaluate inbound security group rules for
+    #   traffic sent to a Network Load Balancer through Amazon Web Services
+    #   PrivateLink. The default is `on`.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/SetSecurityGroupsInput AWS API Documentation
     #
     class SetSecurityGroupsInput < Struct.new(
       :load_balancer_arn,
-      :security_groups)
+      :security_groups,
+      :enforce_security_group_inbound_rules_on_private_link_traffic)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3602,31 +3493,21 @@ module Aws::ElasticLoadBalancingV2
     #   The IDs of the security groups associated with the load balancer.
     #   @return [Array<String>]
     #
+    # @!attribute [rw] enforce_security_group_inbound_rules_on_private_link_traffic
+    #   Indicates whether to evaluate inbound security group rules for
+    #   traffic sent to a Network Load Balancer through Amazon Web Services
+    #   PrivateLink.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/SetSecurityGroupsOutput AWS API Documentation
     #
     class SetSecurityGroupsOutput < Struct.new(
-      :security_group_ids)
+      :security_group_ids,
+      :enforce_security_group_inbound_rules_on_private_link_traffic)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SetSubnetsInput
-    #   data as a hash:
-    #
-    #       {
-    #         load_balancer_arn: "LoadBalancerArn", # required
-    #         subnets: ["SubnetId"],
-    #         subnet_mappings: [
-    #           {
-    #             subnet_id: "SubnetId",
-    #             allocation_id: "AllocationId",
-    #             private_i_pv_4_address: "PrivateIPv4Address",
-    #             i_pv_6_address: "IPv6Address",
-    #           },
-    #         ],
-    #         ip_address_type: "ipv4", # accepts ipv4, dualstack
-    #       }
-    #
     # @!attribute [rw] load_balancer_arn
     #   The Amazon Resource Name (ARN) of the load balancer.
     #   @return [String]
@@ -3646,6 +3527,9 @@ module Aws::ElasticLoadBalancingV2
     #   subnets from one or more Local Zones.
     #
     #   \[Network Load Balancers\] You can specify subnets from one or more
+    #   Availability Zones.
+    #
+    #   \[Gateway Load Balancers\] You can specify subnets from one or more
     #   Availability Zones.
     #   @return [Array<String>]
     #
@@ -3671,14 +3555,26 @@ module Aws::ElasticLoadBalancingV2
     #   IP address per subnet from the IPv4 range of the subnet. For
     #   internet-facing load balancer, you can specify one IPv6 address per
     #   subnet.
+    #
+    #   \[Gateway Load Balancers\] You can specify subnets from one or more
+    #   Availability Zones.
     #   @return [Array<Types::SubnetMapping>]
     #
     # @!attribute [rw] ip_address_type
+    #   \[Application Load Balancers\] The IP address type. The possible
+    #   values are `ipv4` (for only IPv4 addresses), `dualstack` (for IPv4
+    #   and IPv6 addresses), and `dualstack-without-public-ipv4` (for IPv6
+    #   only public addresses, with private IPv4 and IPv6 addresses).
+    #
     #   \[Network Load Balancers\] The type of IP addresses used by the
     #   subnets for your load balancer. The possible values are `ipv4` (for
     #   IPv4 addresses) and `dualstack` (for IPv4 and IPv6 addresses). You
     #   can’t specify `dualstack` for a load balancer with a UDP or TCP\_UDP
-    #   listener. Internal load balancers must use `ipv4`.
+    #   listener.
+    #
+    #   \[Gateway Load Balancers\] The type of IP addresses used by the
+    #   subnets for your load balancer. The possible values are `ipv4` (for
+    #   IPv4 addresses) and `dualstack` (for IPv4 and IPv6 addresses).
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/SetSubnetsInput AWS API Documentation
@@ -3697,7 +3593,11 @@ module Aws::ElasticLoadBalancingV2
     #   @return [Array<Types::AvailabilityZone>]
     #
     # @!attribute [rw] ip_address_type
+    #   \[Application Load Balancers\] The IP address type.
+    #
     #   \[Network Load Balancers\] The IP address type.
+    #
+    #   \[Gateway Load Balancers\] The IP address type.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/SetSubnetsOutput AWS API Documentation
@@ -3716,22 +3616,17 @@ module Aws::ElasticLoadBalancingV2
     # proxy, this is the IP address of the proxy not the IP address of the
     # client.
     #
-    # @note When making an API call, you may pass SourceIpConditionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         values: ["StringValue"],
-    #       }
-    #
     # @!attribute [rw] values
-    #   One or more source IP addresses, in CIDR format. You can use both
-    #   IPv4 and IPv6 addresses. Wildcards are not supported.
+    #   The source IP addresses, in CIDR format. You can use both IPv4 and
+    #   IPv6 addresses. Wildcards are not supported.
     #
     #   If you specify multiple addresses, the condition is satisfied if the
     #   source IP address of the request matches one of the CIDR blocks.
     #   This condition is not satisfied by the addresses in the
     #   X-Forwarded-For header. To search for addresses in the
     #   X-Forwarded-For header, use HttpHeaderConditionConfig.
+    #
+    #   The total number of values must be less than, or equal to five.
     #   @return [Array<String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/SourceIpConditionConfig AWS API Documentation
@@ -3756,27 +3651,22 @@ module Aws::ElasticLoadBalancingV2
     #   The name of the policy.
     #   @return [String]
     #
+    # @!attribute [rw] supported_load_balancer_types
+    #   The supported load balancers.
+    #   @return [Array<String>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/SslPolicy AWS API Documentation
     #
     class SslPolicy < Struct.new(
       :ssl_protocols,
       :ciphers,
-      :name)
+      :name,
+      :supported_load_balancer_types)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Information about a subnet mapping.
-    #
-    # @note When making an API call, you may pass SubnetMapping
-    #   data as a hash:
-    #
-    #       {
-    #         subnet_id: "SubnetId",
-    #         allocation_id: "AllocationId",
-    #         private_i_pv_4_address: "PrivateIPv4Address",
-    #         i_pv_6_address: "IPv6Address",
-    #       }
     #
     # @!attribute [rw] subnet_id
     #   The ID of the subnet.
@@ -3814,14 +3704,6 @@ module Aws::ElasticLoadBalancingV2
     class SubnetNotFoundException < Aws::EmptyStructure; end
 
     # Information about a tag.
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey", # required
-    #         value: "TagValue",
-    #       }
     #
     # @!attribute [rw] key
     #   The key of the tag.
@@ -3861,26 +3743,20 @@ module Aws::ElasticLoadBalancingV2
 
     # Information about a target.
     #
-    # @note When making an API call, you may pass TargetDescription
-    #   data as a hash:
-    #
-    #       {
-    #         id: "TargetId", # required
-    #         port: 1,
-    #         availability_zone: "ZoneName",
-    #       }
-    #
     # @!attribute [rw] id
     #   The ID of the target. If the target type of the target group is
     #   `instance`, specify an instance ID. If the target type is `ip`,
     #   specify an IP address. If the target type is `lambda`, specify the
-    #   ARN of the Lambda function.
+    #   ARN of the Lambda function. If the target type is `alb`, specify the
+    #   ARN of the Application Load Balancer target.
     #   @return [String]
     #
     # @!attribute [rw] port
     #   The port on which the target is listening. If the target group
-    #   protocol is GENEVE, the supported port is 6081. Not used if the
-    #   target is a Lambda function.
+    #   protocol is GENEVE, the supported port is 6081. If the target type
+    #   is `alb`, the targeted Application Load Balancer must have at least
+    #   one listener whose port matches the target group port. This
+    #   parameter is not used if the target is a Lambda function.
     #   @return [Integer]
     #
     # @!attribute [rw] availability_zone
@@ -3889,17 +3765,23 @@ module Aws::ElasticLoadBalancingV2
     #   Availability Zone or from all enabled Availability Zones for the
     #   load balancer.
     #
+    #   For Application Load Balancer target groups, the specified
+    #   Availability Zone value is only applicable when cross-zone load
+    #   balancing is off. Otherwise the parameter is ignored and treated as
+    #   `all`.
+    #
     #   This parameter is not supported if the target type of the target
-    #   group is `instance`.
+    #   group is `instance` or `alb`.
     #
     #   If the target type is `ip` and the IP address is in a subnet of the
     #   VPC for the target group, the Availability Zone is automatically
     #   detected and this parameter is optional. If the IP address is
     #   outside the VPC, this parameter is required.
     #
-    #   With an Application Load Balancer, if the target type is `ip` and
-    #   the IP address is outside the VPC for the target group, the only
-    #   supported value is `all`.
+    #   For Application Load Balancer target groups with cross-zone load
+    #   balancing off, if the target type is `ip` and the IP address is
+    #   outside of the VPC for the target group, this should be an
+    #   Availability Zone inside the VPC for the target group.
     #
     #   If the target type is `lambda`, this parameter is optional and the
     #   only supported value is `all`.
@@ -3930,8 +3812,8 @@ module Aws::ElasticLoadBalancingV2
     #   @return [String]
     #
     # @!attribute [rw] port
-    #   The port on which the targets are listening. Not used if the target
-    #   is a Lambda function.
+    #   The port on which the targets are listening. This parameter is not
+    #   used if the target is a Lambda function.
     #   @return [Integer]
     #
     # @!attribute [rw] vpc_id
@@ -3981,20 +3863,28 @@ module Aws::ElasticLoadBalancingV2
     #   @return [Types::Matcher]
     #
     # @!attribute [rw] load_balancer_arns
-    #   The Amazon Resource Names (ARN) of the load balancers that route
-    #   traffic to this target group.
+    #   The Amazon Resource Name (ARN) of the load balancer that routes
+    #   traffic to this target group. You can use each target group with
+    #   only one load balancer.
     #   @return [Array<String>]
     #
     # @!attribute [rw] target_type
     #   The type of target that you must specify when registering targets
     #   with this target group. The possible values are `instance` (register
-    #   targets by instance ID), `ip` (register targets by IP address), or
-    #   `lambda` (register a single Lambda function as a target).
+    #   targets by instance ID), `ip` (register targets by IP address),
+    #   `lambda` (register a single Lambda function as a target), or `alb`
+    #   (register a single Application Load Balancer as a target).
     #   @return [String]
     #
     # @!attribute [rw] protocol_version
     #   \[HTTP/HTTPS protocol\] The protocol version. The possible values
     #   are `GRPC`, `HTTP1`, and `HTTP2`.
+    #   @return [String]
+    #
+    # @!attribute [rw] ip_address_type
+    #   The type of IP address used for this target group. The possible
+    #   values are `ipv4` and `ipv6`. This is an optional parameter. If not
+    #   specified, the IP address type defaults to `ipv4`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TargetGroup AWS API Documentation
@@ -4016,7 +3906,8 @@ module Aws::ElasticLoadBalancingV2
       :matcher,
       :load_balancer_arns,
       :target_type,
-      :protocol_version)
+      :protocol_version,
+      :ip_address_type)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -4030,18 +3921,10 @@ module Aws::ElasticLoadBalancingV2
 
     # Information about a target group attribute.
     #
-    # @note When making an API call, you may pass TargetGroupAttribute
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TargetGroupAttributeKey",
-    #         value: "TargetGroupAttributeValue",
-    #       }
-    #
     # @!attribute [rw] key
     #   The name of the attribute.
     #
-    #   The following attribute is supported by all load balancers:
+    #   The following attributes are supported by all load balancers:
     #
     #   * `deregistration_delay.timeout_seconds` - The amount of time, in
     #     seconds, for Elastic Load Balancing to wait before changing the
@@ -4049,17 +3932,52 @@ module Aws::ElasticLoadBalancingV2
     #     range is 0-3600 seconds. The default value is 300 seconds. If the
     #     target is a Lambda function, this attribute is not supported.
     #
-    #   ^
-    #
-    #   The following attributes are supported by both Application Load
-    #   Balancers and Network Load Balancers:
-    #
-    #   * `stickiness.enabled` - Indicates whether sticky sessions are
+    #   * `stickiness.enabled` - Indicates whether target stickiness is
     #     enabled. The value is `true` or `false`. The default is `false`.
     #
-    #   * `stickiness.type` - The type of sticky sessions. The possible
-    #     values are `lb_cookie` for Application Load Balancers or
-    #     `source_ip` for Network Load Balancers.
+    #   * `stickiness.type` - Indicates the type of stickiness. The possible
+    #     values are:
+    #
+    #     * `lb_cookie` and `app_cookie` for Application Load Balancers.
+    #
+    #     * `source_ip` for Network Load Balancers.
+    #
+    #     * `source_ip_dest_ip` and `source_ip_dest_ip_proto` for Gateway
+    #       Load Balancers.
+    #
+    #   The following attributes are supported by Application Load Balancers
+    #   and Network Load Balancers:
+    #
+    #   * `load_balancing.cross_zone.enabled` - Indicates whether cross zone
+    #     load balancing is enabled. The value is `true`, `false` or
+    #     `use_load_balancer_configuration`. The default is
+    #     `use_load_balancer_configuration`.
+    #
+    #   * `target_group_health.dns_failover.minimum_healthy_targets.count` -
+    #     The minimum number of targets that must be healthy. If the number
+    #     of healthy targets is below this value, mark the zone as unhealthy
+    #     in DNS, so that traffic is routed only to healthy zones. The
+    #     possible values are `off` or an integer from 1 to the maximum
+    #     number of targets. The default is `off`.
+    #
+    #   * `target_group_health.dns_failover.minimum_healthy_targets.percentage`
+    #     - The minimum percentage of targets that must be healthy. If the
+    #     percentage of healthy targets is below this value, mark the zone
+    #     as unhealthy in DNS, so that traffic is routed only to healthy
+    #     zones. The possible values are `off` or an integer from 1 to 100.
+    #     The default is `off`.
+    #
+    #   * `target_group_health.unhealthy_state_routing.minimum_healthy_targets.count`
+    #     - The minimum number of targets that must be healthy. If the
+    #     number of healthy targets is below this value, send traffic to all
+    #     targets, including unhealthy targets. The possible values are 1 to
+    #     the maximum number of targets. The default is 1.
+    #
+    #   * `target_group_health.unhealthy_state_routing.minimum_healthy_targets.percentage`
+    #     - The minimum percentage of targets that must be healthy. If the
+    #     percentage of healthy targets is below this value, send traffic to
+    #     all targets, including unhealthy targets. The possible values are
+    #     `off` or an integer from 1 to 100. The default is `off`.
     #
     #   The following attributes are supported only if the load balancer is
     #   an Application Load Balancer and the target is an instance or an IP
@@ -4067,14 +3985,32 @@ module Aws::ElasticLoadBalancingV2
     #
     #   * `load_balancing.algorithm.type` - The load balancing algorithm
     #     determines how the load balancer selects targets when routing
-    #     requests. The value is `round_robin` or
-    #     `least_outstanding_requests`. The default is `round_robin`.
+    #     requests. The value is `round_robin`,
+    #     `least_outstanding_requests`, or `weighted_random`. The default is
+    #     `round_robin`.
+    #
+    #   * `load_balancing.algorithm.anomaly_mitigation` - Only available
+    #     when `load_balancing.algorithm.type` is `weighted_random`.
+    #     Indicates whether anomaly mitigation is enabled. The value is `on`
+    #     or `off`. The default is `off`.
     #
     #   * `slow_start.duration_seconds` - The time period, in seconds,
     #     during which a newly registered target receives an increasing
     #     share of the traffic to the target group. After this time period
     #     ends, the target receives its full share of traffic. The range is
     #     30-900 seconds (15 minutes). The default is 0 seconds (disabled).
+    #
+    #   * `stickiness.app_cookie.cookie_name` - Indicates the name of the
+    #     application-based cookie. Names that start with the following
+    #     prefixes are not allowed: `AWSALB`, `AWSALBAPP`, and `AWSALBTG`;
+    #     they're reserved for use by the load balancer.
+    #
+    #   * `stickiness.app_cookie.duration_seconds` - The time period, in
+    #     seconds, during which requests from a client should be routed to
+    #     the same target. After this time period expires, the
+    #     application-based cookie is considered stale. The range is 1
+    #     second to 1 week (604800 seconds). The default value is 1 day
+    #     (86400 seconds).
     #
     #   * `stickiness.lb_cookie.duration_seconds` - The time period, in
     #     seconds, during which requests from a client should be routed to
@@ -4101,12 +4037,54 @@ module Aws::ElasticLoadBalancingV2
     #
     #   * `deregistration_delay.connection_termination.enabled` - Indicates
     #     whether the load balancer terminates connections at the end of the
-    #     deregistration timeout. The value is `true` or `false`. The
+    #     deregistration timeout. The value is `true` or `false`. For new
+    #     UDP/TCP\_UDP target groups the default is `true`. Otherwise, the
     #     default is `false`.
+    #
+    #   * `preserve_client_ip.enabled` - Indicates whether client IP
+    #     preservation is enabled. The value is `true` or `false`. The
+    #     default is disabled if the target group type is IP address and the
+    #     target group protocol is TCP or TLS. Otherwise, the default is
+    #     enabled. Client IP preservation cannot be disabled for UDP and
+    #     TCP\_UDP target groups.
     #
     #   * `proxy_protocol_v2.enabled` - Indicates whether Proxy Protocol
     #     version 2 is enabled. The value is `true` or `false`. The default
     #     is `false`.
+    #
+    #   * `target_health_state.unhealthy.connection_termination.enabled` -
+    #     Indicates whether the load balancer terminates connections to
+    #     unhealthy targets. The value is `true` or `false`. The default is
+    #     `true`.
+    #
+    #   * `target_health_state.unhealthy.draining_interval_seconds` - The
+    #     amount of time for Elastic Load Balancing to wait before changing
+    #     the state of an unhealthy target from `unhealthy.draining` to
+    #     `unhealthy`. The range is 0-360000 seconds. The default value is 0
+    #     seconds.
+    #
+    #     Note: This attribute can only be configured when
+    #     `target_health_state.unhealthy.connection_termination.enabled` is
+    #     `false`.
+    #
+    #   The following attributes are supported only by Gateway Load
+    #   Balancers:
+    #
+    #   * `target_failover.on_deregistration` - Indicates how the Gateway
+    #     Load Balancer handles existing flows when a target is
+    #     deregistered. The possible values are `rebalance` and
+    #     `no_rebalance`. The default is `no_rebalance`. The two attributes
+    #     (`target_failover.on_deregistration` and
+    #     `target_failover.on_unhealthy`) can't be set independently. The
+    #     value you set for both attributes must be the same.
+    #
+    #   * `target_failover.on_unhealthy` - Indicates how the Gateway Load
+    #     Balancer handles existing flows when a target is unhealthy. The
+    #     possible values are `rebalance` and `no_rebalance`. The default is
+    #     `no_rebalance`. The two attributes
+    #     (`target_failover.on_deregistration` and
+    #     `target_failover.on_unhealthy`) cannot be set independently. The
+    #     value you set for both attributes must be the same.
     #   @return [String]
     #
     # @!attribute [rw] value
@@ -4130,14 +4108,6 @@ module Aws::ElasticLoadBalancingV2
 
     # Information about the target group stickiness for a rule.
     #
-    # @note When making an API call, you may pass TargetGroupStickinessConfig
-    #   data as a hash:
-    #
-    #       {
-    #         enabled: false,
-    #         duration_seconds: 1,
-    #       }
-    #
     # @!attribute [rw] enabled
     #   Indicates whether target group stickiness is enabled.
     #   @return [Boolean]
@@ -4159,14 +4129,6 @@ module Aws::ElasticLoadBalancingV2
 
     # Information about how traffic will be distributed between multiple
     # target groups in a forward rule.
-    #
-    # @note When making an API call, you may pass TargetGroupTuple
-    #   data as a hash:
-    #
-    #       {
-    #         target_group_arn: "TargetGroupArn",
-    #         weight: 1,
-    #       }
     #
     # @!attribute [rw] target_group_arn
     #   The Amazon Resource Name (ARN) of the target group.
@@ -4287,12 +4249,26 @@ module Aws::ElasticLoadBalancingV2
     #   The health information for the target.
     #   @return [Types::TargetHealth]
     #
+    # @!attribute [rw] anomaly_detection
+    #   The anomaly detection result for the target.
+    #
+    #   If no anomalies were detected, the result is `normal`.
+    #
+    #   If anomalies were detected, the result is `anomalous`.
+    #   @return [Types::AnomalyDetection]
+    #
+    # @!attribute [rw] administrative_override
+    #   The administrative override information for the target.
+    #   @return [Types::AdministrativeOverride]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TargetHealthDescription AWS API Documentation
     #
     class TargetHealthDescription < Struct.new(
       :target,
       :health_check_port,
-      :target_health)
+      :target_health,
+      :anomaly_detection,
+      :administrative_override)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -4317,8 +4293,8 @@ module Aws::ElasticLoadBalancingV2
     #
     class TooManyListenersException < Aws::EmptyStructure; end
 
-    # You've reached the limit on the number of load balancers for your AWS
-    # account.
+    # You've reached the limit on the number of load balancers for your
+    # Amazon Web Services account.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TooManyLoadBalancersException AWS API Documentation
     #
@@ -4337,14 +4313,14 @@ module Aws::ElasticLoadBalancingV2
     #
     class TooManyRulesException < Aws::EmptyStructure; end
 
-    # You've reached the limit on the number of tags per load balancer.
+    # You've reached the limit on the number of tags for this resource.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TooManyTagsException AWS API Documentation
     #
     class TooManyTagsException < Aws::EmptyStructure; end
 
-    # You've reached the limit on the number of target groups for your AWS
-    # account.
+    # You've reached the limit on the number of target groups for your
+    # Amazon Web Services account.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TooManyTargetGroupsException AWS API Documentation
     #
@@ -4356,6 +4332,19 @@ module Aws::ElasticLoadBalancingV2
     #
     class TooManyTargetsException < Aws::EmptyStructure; end
 
+    # The specified trust store has too many revocation entries.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TooManyTrustStoreRevocationEntriesException AWS API Documentation
+    #
+    class TooManyTrustStoreRevocationEntriesException < Aws::EmptyStructure; end
+
+    # You've reached the limit on the number of trust stores for your
+    # Amazon Web Services account.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TooManyTrustStoresException AWS API Documentation
+    #
+    class TooManyTrustStoresException < Aws::EmptyStructure; end
+
     # You've reached the limit on the number of unique target groups per
     # load balancer across all listeners. If a target group is used by
     # multiple actions for a load balancer, it is counted as only one use.
@@ -4363,6 +4352,107 @@ module Aws::ElasticLoadBalancingV2
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TooManyUniqueTargetGroupsPerLoadBalancerException AWS API Documentation
     #
     class TooManyUniqueTargetGroupsPerLoadBalancerException < Aws::EmptyStructure; end
+
+    # Information about a trust store.
+    #
+    # @!attribute [rw] name
+    #   The name of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The current status of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] number_of_ca_certificates
+    #   The number of ca certificates in the trust store.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] total_revoked_entries
+    #   The number of revoked certificates in the trust store.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TrustStore AWS API Documentation
+    #
+    class TrustStore < Struct.new(
+      :name,
+      :trust_store_arn,
+      :status,
+      :number_of_ca_certificates,
+      :total_revoked_entries)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about the resources a trust store is associated with.
+    #
+    # @!attribute [rw] resource_arn
+    #   The Amazon Resource Name (ARN) of the resource.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TrustStoreAssociation AWS API Documentation
+    #
+    class TrustStoreAssociation < Struct.new(
+      :resource_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The specified association does not exist.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TrustStoreAssociationNotFoundException AWS API Documentation
+    #
+    class TrustStoreAssociationNotFoundException < Aws::EmptyStructure; end
+
+    # The specified trust store is currently in use.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TrustStoreInUseException AWS API Documentation
+    #
+    class TrustStoreInUseException < Aws::EmptyStructure; end
+
+    # The specified trust store does not exist.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TrustStoreNotFoundException AWS API Documentation
+    #
+    class TrustStoreNotFoundException < Aws::EmptyStructure; end
+
+    # The specified trust store is not active.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TrustStoreNotReadyException AWS API Documentation
+    #
+    class TrustStoreNotReadyException < Aws::EmptyStructure; end
+
+    # Information about a revocation file in use by a trust store.
+    #
+    # @!attribute [rw] trust_store_arn
+    #   The Amazon Resource Name (ARN) of the trust store.
+    #   @return [String]
+    #
+    # @!attribute [rw] revocation_id
+    #   The revocation ID of the revocation file.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] revocation_type
+    #   The type of revocation file.
+    #   @return [String]
+    #
+    # @!attribute [rw] number_of_revoked_entries
+    #   The number of revoked certificates.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticloadbalancingv2-2015-12-01/TrustStoreRevocation AWS API Documentation
+    #
+    class TrustStoreRevocation < Struct.new(
+      :trust_store_arn,
+      :revocation_id,
+      :revocation_type,
+      :number_of_revoked_entries)
+      SENSITIVE = []
+      include Aws::Structure
+    end
 
     # The specified protocol is not supported.
     #
@@ -4372,3 +4462,4 @@ module Aws::ElasticLoadBalancingV2
 
   end
 end
+

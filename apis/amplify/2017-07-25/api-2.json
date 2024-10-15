@@ -5,12 +5,14 @@
     "endpointPrefix":"amplify",
     "jsonVersion":"1.1",
     "protocol":"rest-json",
+    "protocols":["rest-json"],
     "serviceAbbreviation":"Amplify",
     "serviceFullName":"AWS Amplify",
     "serviceId":"Amplify",
     "signatureVersion":"v4",
     "signingName":"amplify",
-    "uid":"amplify-2017-07-25"
+    "uid":"amplify-2017-07-25",
+    "auth":["aws.auth#sigv4"]
   },
   "operations":{
     "CreateApp":{
@@ -590,6 +592,7 @@
       "type":"string",
       "max":255,
       "min":1,
+      "pattern":"(?s).+",
       "sensitive":true
     },
     "ActiveJobId":{
@@ -635,7 +638,9 @@
         "customHeaders":{"shape":"CustomHeaders"},
         "enableAutoBranchCreation":{"shape":"EnableAutoBranchCreation"},
         "autoBranchCreationPatterns":{"shape":"AutoBranchCreationPatterns"},
-        "autoBranchCreationConfig":{"shape":"AutoBranchCreationConfig"}
+        "autoBranchCreationConfig":{"shape":"AutoBranchCreationConfig"},
+        "repositoryCloneMethod":{"shape":"RepositoryCloneMethod"},
+        "cacheConfig":{"shape":"CacheConfig"}
       }
     },
     "AppArn":{
@@ -669,7 +674,8 @@
     },
     "ArtifactId":{
       "type":"string",
-      "max":255
+      "max":255,
+      "pattern":"(?s).*"
     },
     "ArtifactUrl":{
       "type":"string",
@@ -710,7 +716,8 @@
     "AutoBranchCreationPattern":{
       "type":"string",
       "max":2048,
-      "min":1
+      "min":1,
+      "pattern":"(?s).+"
     },
     "AutoBranchCreationPatterns":{
       "type":"list",
@@ -719,7 +726,8 @@
     "AutoSubDomainCreationPattern":{
       "type":"string",
       "max":2048,
-      "min":1
+      "min":1,
+      "pattern":"(?s).+"
     },
     "AutoSubDomainCreationPatterns":{
       "type":"list",
@@ -729,6 +737,12 @@
       "type":"string",
       "max":1000,
       "pattern":"^$|^arn:aws:iam::\\d{12}:role.+"
+    },
+    "Backend":{
+      "type":"structure",
+      "members":{
+        "stackArn":{"shape":"StackArn"}
+      }
     },
     "BackendEnvironment":{
       "type":"structure",
@@ -750,7 +764,8 @@
     "BackendEnvironmentArn":{
       "type":"string",
       "max":1000,
-      "min":1
+      "min":0,
+      "pattern":"(?s).*"
     },
     "BackendEnvironments":{
       "type":"list",
@@ -767,6 +782,7 @@
     "BasicAuthCredentials":{
       "type":"string",
       "max":2000,
+      "pattern":"(?s).*",
       "sensitive":true
     },
     "Branch":{
@@ -817,17 +833,20 @@
         "pullRequestEnvironmentName":{"shape":"PullRequestEnvironmentName"},
         "destinationBranch":{"shape":"BranchName"},
         "sourceBranch":{"shape":"BranchName"},
-        "backendEnvironmentArn":{"shape":"BackendEnvironmentArn"}
+        "backendEnvironmentArn":{"shape":"BackendEnvironmentArn"},
+        "backend":{"shape":"Backend"}
       }
     },
     "BranchArn":{
       "type":"string",
-      "max":1000
+      "max":1000,
+      "pattern":"(?s).*"
     },
     "BranchName":{
       "type":"string",
       "max":255,
-      "min":1
+      "min":1,
+      "pattern":"(?s).+"
     },
     "Branches":{
       "type":"list",
@@ -837,7 +856,53 @@
     "BuildSpec":{
       "type":"string",
       "max":25000,
-      "min":1
+      "min":1,
+      "pattern":"(?s).+",
+      "sensitive":true
+    },
+    "CacheConfig":{
+      "type":"structure",
+      "required":["type"],
+      "members":{
+        "type":{"shape":"CacheConfigType"}
+      }
+    },
+    "CacheConfigType":{
+      "type":"string",
+      "enum":[
+        "AMPLIFY_MANAGED",
+        "AMPLIFY_MANAGED_NO_COOKIES"
+      ]
+    },
+    "Certificate":{
+      "type":"structure",
+      "required":["type"],
+      "members":{
+        "type":{"shape":"CertificateType"},
+        "customCertificateArn":{"shape":"CertificateArn"},
+        "certificateVerificationDNSRecord":{"shape":"CertificateVerificationDNSRecord"}
+      }
+    },
+    "CertificateArn":{
+      "type":"string",
+      "max":1000,
+      "min":0,
+      "pattern":"^arn:aws:acm:[a-z0-9-]+:\\d{12}:certificate\\/.+$"
+    },
+    "CertificateSettings":{
+      "type":"structure",
+      "required":["type"],
+      "members":{
+        "type":{"shape":"CertificateType"},
+        "customCertificateArn":{"shape":"CertificateArn"}
+      }
+    },
+    "CertificateType":{
+      "type":"string",
+      "enum":[
+        "AMPLIFY_MANAGED",
+        "CUSTOM"
+      ]
     },
     "CertificateVerificationDNSRecord":{
       "type":"string",
@@ -846,17 +911,20 @@
     "Code":{"type":"string"},
     "CommitId":{
       "type":"string",
-      "max":255
+      "max":255,
+      "pattern":"(?s).*"
     },
     "CommitMessage":{
       "type":"string",
-      "max":10000
+      "max":10000,
+      "pattern":"(?s).*"
     },
     "CommitTime":{"type":"timestamp"},
     "Condition":{
       "type":"string",
       "max":2048,
-      "min":1
+      "min":0,
+      "pattern":"(?s).*"
     },
     "Context":{"type":"string"},
     "CreateAppRequest":{
@@ -881,7 +949,8 @@
         "customHeaders":{"shape":"CustomHeaders"},
         "enableAutoBranchCreation":{"shape":"EnableAutoBranchCreation"},
         "autoBranchCreationPatterns":{"shape":"AutoBranchCreationPatterns"},
-        "autoBranchCreationConfig":{"shape":"AutoBranchCreationConfig"}
+        "autoBranchCreationConfig":{"shape":"AutoBranchCreationConfig"},
+        "cacheConfig":{"shape":"CacheConfig"}
       }
     },
     "CreateAppResult":{
@@ -943,7 +1012,8 @@
         "displayName":{"shape":"DisplayName"},
         "enablePullRequestPreview":{"shape":"EnablePullRequestPreview"},
         "pullRequestEnvironmentName":{"shape":"PullRequestEnvironmentName"},
-        "backendEnvironmentArn":{"shape":"BackendEnvironmentArn"}
+        "backendEnvironmentArn":{"shape":"BackendEnvironmentArn"},
+        "backend":{"shape":"Backend"}
       }
     },
     "CreateBranchResult":{
@@ -1002,7 +1072,8 @@
         "enableAutoSubDomain":{"shape":"EnableAutoSubDomain"},
         "subDomainSettings":{"shape":"SubDomainSettings"},
         "autoSubDomainCreationPatterns":{"shape":"AutoSubDomainCreationPatterns"},
-        "autoSubDomainIAMRole":{"shape":"AutoSubDomainIAMRole"}
+        "autoSubDomainIAMRole":{"shape":"AutoSubDomainIAMRole"},
+        "certificateSettings":{"shape":"CertificateSettings"}
       }
     },
     "CreateDomainAssociationResult":{
@@ -1048,7 +1119,8 @@
     "CustomHeaders":{
       "type":"string",
       "max":25000,
-      "min":1
+      "min":0,
+      "pattern":"(?s).*"
     },
     "CustomRule":{
       "type":"structure",
@@ -1233,15 +1305,18 @@
     "DeploymentArtifacts":{
       "type":"string",
       "max":1000,
-      "min":1
+      "min":1,
+      "pattern":"(?s).+"
     },
     "Description":{
       "type":"string",
-      "max":1000
+      "max":1000,
+      "pattern":"(?s).*"
     },
     "DisplayName":{
       "type":"string",
-      "max":255
+      "max":255,
+      "pattern":"(?s).*"
     },
     "DomainAssociation":{
       "type":"structure",
@@ -1260,9 +1335,11 @@
         "autoSubDomainCreationPatterns":{"shape":"AutoSubDomainCreationPatterns"},
         "autoSubDomainIAMRole":{"shape":"AutoSubDomainIAMRole"},
         "domainStatus":{"shape":"DomainStatus"},
+        "updateStatus":{"shape":"UpdateStatus"},
         "statusReason":{"shape":"StatusReason"},
         "certificateVerificationDNSRecord":{"shape":"CertificateVerificationDNSRecord"},
-        "subDomains":{"shape":"SubDomains"}
+        "subDomains":{"shape":"SubDomains"},
+        "certificate":{"shape":"Certificate"}
       }
     },
     "DomainAssociationArn":{
@@ -1276,11 +1353,13 @@
     },
     "DomainName":{
       "type":"string",
-      "max":255
+      "max":64,
+      "pattern":"^(((?!-)[A-Za-z0-9-]{0,62}[A-Za-z0-9])\\.)+((?!-)[A-Za-z0-9-]{1,62}[A-Za-z0-9])(\\.)?$"
     },
     "DomainPrefix":{
       "type":"string",
-      "max":255
+      "max":255,
+      "pattern":"(?s).*"
     },
     "DomainStatus":{
       "type":"string",
@@ -1288,7 +1367,9 @@
         "PENDING_VERIFICATION",
         "IN_PROGRESS",
         "AVAILABLE",
+        "IMPORTING_CUSTOM_CERTIFICATE",
         "PENDING_DEPLOYMENT",
+        "AWAITING_APP_CNAME",
         "FAILED",
         "CREATING",
         "REQUESTING_CERTIFICATE",
@@ -1307,16 +1388,19 @@
     "EndTime":{"type":"timestamp"},
     "EnvKey":{
       "type":"string",
-      "max":255
+      "max":255,
+      "pattern":"(?s).*"
     },
     "EnvValue":{
       "type":"string",
-      "max":1000
+      "max":5500,
+      "pattern":"(?s).*"
     },
     "EnvironmentName":{
       "type":"string",
       "max":255,
-      "min":1
+      "min":1,
+      "pattern":"(?s).+"
     },
     "EnvironmentVariables":{
       "type":"map",
@@ -1334,7 +1418,8 @@
     },
     "FileName":{
       "type":"string",
-      "max":255
+      "max":255,
+      "pattern":"(?s).*"
     },
     "FileUploadUrls":{
       "type":"map",
@@ -1343,7 +1428,8 @@
     },
     "Framework":{
       "type":"string",
-      "max":255
+      "max":255,
+      "pattern":"(?s).*"
     },
     "GenerateAccessLogsRequest":{
       "type":"structure",
@@ -1562,11 +1648,13 @@
     },
     "JobId":{
       "type":"string",
-      "max":255
+      "max":255,
+      "pattern":"[0-9]+"
     },
     "JobReason":{
       "type":"string",
-      "max":255
+      "max":255,
+      "pattern":"(?s).*"
     },
     "JobStatus":{
       "type":"string",
@@ -1636,7 +1724,7 @@
           "locationName":"nextToken"
         },
         "maxResults":{
-          "shape":"MaxResults",
+          "shape":"MaxResultsForListApps",
           "location":"querystring",
           "locationName":"maxResults"
         }
@@ -1874,9 +1962,15 @@
     },
     "MD5Hash":{
       "type":"string",
-      "max":32
+      "max":32,
+      "pattern":"(?s).*"
     },
     "MaxResults":{
+      "type":"integer",
+      "max":50,
+      "min":0
+    },
+    "MaxResultsForListApps":{
       "type":"integer",
       "max":100,
       "min":0
@@ -1884,11 +1978,13 @@
     "Name":{
       "type":"string",
       "max":255,
-      "min":1
+      "min":1,
+      "pattern":"(?s).+"
     },
     "NextToken":{
       "type":"string",
-      "max":2000
+      "max":2000,
+      "pattern":"(?s).*"
     },
     "NotFoundException":{
       "type":"structure",
@@ -1901,11 +1997,16 @@
     "OauthToken":{
       "type":"string",
       "max":1000,
+      "pattern":"(?s).*",
       "sensitive":true
     },
     "Platform":{
       "type":"string",
-      "enum":["WEB"]
+      "enum":[
+        "WEB",
+        "WEB_DYNAMIC",
+        "WEB_COMPUTE"
+      ]
     },
     "ProductionBranch":{
       "type":"structure",
@@ -1918,14 +2019,26 @@
     },
     "PullRequestEnvironmentName":{
       "type":"string",
-      "max":20
+      "max":20,
+      "pattern":"(?s).*"
     },
     "Repository":{
       "type":"string",
-      "max":1000
+      "max":1000,
+      "pattern":"(?s).*"
+    },
+    "RepositoryCloneMethod":{
+      "type":"string",
+      "enum":[
+        "SSH",
+        "TOKEN",
+        "SIGV4"
+      ]
     },
     "ResourceArn":{
       "type":"string",
+      "max":2048,
+      "min":0,
       "pattern":"^arn:aws:amplify:.*"
     },
     "ResourceNotFoundException":{
@@ -1949,21 +2062,31 @@
     "ServiceRoleArn":{
       "type":"string",
       "max":1000,
-      "min":1
+      "min":0,
+      "pattern":"(?s).*"
     },
     "Source":{
       "type":"string",
       "max":2048,
-      "min":1
+      "min":1,
+      "pattern":"(?s).+"
     },
     "SourceUrl":{
       "type":"string",
-      "max":1000
+      "max":3000,
+      "pattern":"(?s).*"
+    },
+    "StackArn":{
+      "type":"string",
+      "max":2048,
+      "min":20,
+      "pattern":"^arn:aws:cloudformation:[a-z0-9-]+:\\d{12}:stack/.+/.+$"
     },
     "StackName":{
       "type":"string",
       "max":255,
-      "min":1
+      "min":1,
+      "pattern":"(?s).+"
     },
     "Stage":{
       "type":"string",
@@ -2040,7 +2163,8 @@
     "Status":{
       "type":"string",
       "max":7,
-      "min":3
+      "min":3,
+      "pattern":".{3,7}"
     },
     "StatusReason":{
       "type":"string",
@@ -2135,14 +2259,19 @@
     "SubDomainSettings":{
       "type":"list",
       "member":{"shape":"SubDomainSetting"},
-      "max":255
+      "max":500
     },
     "SubDomains":{
       "type":"list",
       "member":{"shape":"SubDomain"},
-      "max":255
+      "max":500
     },
-    "TTL":{"type":"string"},
+    "TTL":{
+      "type":"string",
+      "max":32,
+      "min":0,
+      "pattern":"\\d*"
+    },
     "TagKey":{
       "type":"string",
       "max":128,
@@ -2160,7 +2289,7 @@
       "key":{"shape":"TagKey"},
       "value":{"shape":"TagValue"},
       "max":50,
-      "min":1
+      "min":0
     },
     "TagResourceRequest":{
       "type":"structure",
@@ -2184,12 +2313,14 @@
     },
     "TagValue":{
       "type":"string",
-      "max":256
+      "max":256,
+      "pattern":"^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$"
     },
     "Target":{
       "type":"string",
       "max":2048,
-      "min":1
+      "min":1,
+      "pattern":"(?s).+"
     },
     "TestArtifactsUrl":{
       "type":"string",
@@ -2270,7 +2401,8 @@
         "autoBranchCreationConfig":{"shape":"AutoBranchCreationConfig"},
         "repository":{"shape":"Repository"},
         "oauthToken":{"shape":"OauthToken"},
-        "accessToken":{"shape":"AccessToken"}
+        "accessToken":{"shape":"AccessToken"},
+        "cacheConfig":{"shape":"CacheConfig"}
       }
     },
     "UpdateAppResult":{
@@ -2311,7 +2443,8 @@
         "displayName":{"shape":"DisplayName"},
         "enablePullRequestPreview":{"shape":"EnablePullRequestPreview"},
         "pullRequestEnvironmentName":{"shape":"PullRequestEnvironmentName"},
-        "backendEnvironmentArn":{"shape":"BackendEnvironmentArn"}
+        "backendEnvironmentArn":{"shape":"BackendEnvironmentArn"},
+        "backend":{"shape":"Backend"}
       }
     },
     "UpdateBranchResult":{
@@ -2325,8 +2458,7 @@
       "type":"structure",
       "required":[
         "appId",
-        "domainName",
-        "subDomainSettings"
+        "domainName"
       ],
       "members":{
         "appId":{
@@ -2342,7 +2474,8 @@
         "enableAutoSubDomain":{"shape":"EnableAutoSubDomain"},
         "subDomainSettings":{"shape":"SubDomainSettings"},
         "autoSubDomainCreationPatterns":{"shape":"AutoSubDomainCreationPatterns"},
-        "autoSubDomainIAMRole":{"shape":"AutoSubDomainIAMRole"}
+        "autoSubDomainIAMRole":{"shape":"AutoSubDomainIAMRole"},
+        "certificateSettings":{"shape":"CertificateSettings"}
       }
     },
     "UpdateDomainAssociationResult":{
@@ -2351,6 +2484,18 @@
       "members":{
         "domainAssociation":{"shape":"DomainAssociation"}
       }
+    },
+    "UpdateStatus":{
+      "type":"string",
+      "enum":[
+        "REQUESTING_CERTIFICATE",
+        "PENDING_VERIFICATION",
+        "IMPORTING_CUSTOM_CERTIFICATE",
+        "PENDING_DEPLOYMENT",
+        "AWAITING_APP_CNAME",
+        "UPDATE_COMPLETE",
+        "UPDATE_FAILED"
+      ]
     },
     "UpdateTime":{"type":"timestamp"},
     "UpdateWebhookRequest":{
@@ -2405,7 +2550,8 @@
     },
     "WebhookId":{
       "type":"string",
-      "max":255
+      "max":255,
+      "pattern":"(?s).*"
     },
     "WebhookUrl":{
       "type":"string",

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -50,8 +50,12 @@ module Aws::CloudWatch
     end
 
     # An anomaly detection model associated with a particular CloudWatch
-    # metric and statistic. You can use the model to display a band of
-    # expected normal values when the metric is graphed.
+    # metric, statistic, or metric math expression. You can use the model to
+    # display a band of expected, normal values when the metric is graphed.
+    #
+    # If you have enabled unified cross-account observability, and this
+    # account is a monitoring account, the metric can be in the same account
+    # or a source account.
     #
     # @!attribute [rw] namespace
     #   The namespace of the metric associated with the anomaly detection
@@ -77,9 +81,23 @@ module Aws::CloudWatch
     #   @return [Types::AnomalyDetectorConfiguration]
     #
     # @!attribute [rw] state_value
-    #   The current status of the anomaly detector's training. The possible
-    #   values are `TRAINED | PENDING_TRAINING | TRAINED_INSUFFICIENT_DATA`
+    #   The current status of the anomaly detector's training.
     #   @return [String]
+    #
+    # @!attribute [rw] metric_characteristics
+    #   This object includes parameters that you can use to provide
+    #   information about your metric to CloudWatch to help it build more
+    #   accurate anomaly detection models. Currently, it includes the
+    #   `PeriodicSpikes` parameter.
+    #   @return [Types::MetricCharacteristics]
+    #
+    # @!attribute [rw] single_metric_anomaly_detector
+    #   The CloudWatch metric and statistic for this anomaly detector.
+    #   @return [Types::SingleMetricAnomalyDetector]
+    #
+    # @!attribute [rw] metric_math_anomaly_detector
+    #   The CloudWatch metric math expression for this anomaly detector.
+    #   @return [Types::MetricMathAnomalyDetector]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/AnomalyDetector AWS API Documentation
     #
@@ -89,7 +107,10 @@ module Aws::CloudWatch
       :dimensions,
       :stat,
       :configuration,
-      :state_value)
+      :state_value,
+      :metric_characteristics,
+      :single_metric_anomaly_detector,
+      :metric_math_anomaly_detector)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -97,19 +118,6 @@ module Aws::CloudWatch
     # The configuration specifies details about how the anomaly detection
     # model is to be trained, including time ranges to exclude from use for
     # training the model and the time zone to use for the metric.
-    #
-    # @note When making an API call, you may pass AnomalyDetectorConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         excluded_time_ranges: [
-    #           {
-    #             start_time: Time.now, # required
-    #             end_time: Time.now, # required
-    #           },
-    #         ],
-    #         metric_timezone: "AnomalyDetectorMetricTimezone",
-    #       }
     #
     # @!attribute [rw] excluded_time_ranges
     #   An array of time ranges to exclude from use when the anomaly
@@ -195,12 +203,59 @@ module Aws::CloudWatch
     #   @return [String]
     #
     # @!attribute [rw] state_updated_timestamp
-    #   The time stamp of the last update to the alarm state.
+    #   Tracks the timestamp of any state update, even if `StateValue`
+    #   doesn't change.
     #   @return [Time]
     #
     # @!attribute [rw] state_value
     #   The state value for the alarm.
     #   @return [String]
+    #
+    # @!attribute [rw] state_transitioned_timestamp
+    #   The timestamp of the last change to the alarm's `StateValue`.
+    #   @return [Time]
+    #
+    # @!attribute [rw] actions_suppressed_by
+    #   When the value is `ALARM`, it means that the actions are suppressed
+    #   because the suppressor alarm is in `ALARM` When the value is
+    #   `WaitPeriod`, it means that the actions are suppressed because the
+    #   composite alarm is waiting for the suppressor alarm to go into into
+    #   the `ALARM` state. The maximum waiting time is as specified in
+    #   `ActionsSuppressorWaitPeriod`. After this time, the composite alarm
+    #   performs its actions. When the value is `ExtensionPeriod`, it means
+    #   that the actions are suppressed because the composite alarm is
+    #   waiting after the suppressor alarm went out of the `ALARM` state.
+    #   The maximum waiting time is as specified in
+    #   `ActionsSuppressorExtensionPeriod`. After this time, the composite
+    #   alarm performs its actions.
+    #   @return [String]
+    #
+    # @!attribute [rw] actions_suppressed_reason
+    #   Captures the reason for action suppression.
+    #   @return [String]
+    #
+    # @!attribute [rw] actions_suppressor
+    #   Actions will be suppressed if the suppressor alarm is in the `ALARM`
+    #   state. `ActionsSuppressor` can be an AlarmName or an Amazon Resource
+    #   Name (ARN) from an existing alarm.
+    #   @return [String]
+    #
+    # @!attribute [rw] actions_suppressor_wait_period
+    #   The maximum time in seconds that the composite alarm waits for the
+    #   suppressor alarm to go into the `ALARM` state. After this time, the
+    #   composite alarm performs its actions.
+    #
+    #   `WaitPeriod` is required only when `ActionsSuppressor` is specified.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] actions_suppressor_extension_period
+    #   The maximum time in seconds that the composite alarm waits after
+    #   suppressor alarm goes out of the `ALARM` state. After this time, the
+    #   composite alarm performs its actions.
+    #
+    #   `ExtensionPeriod` is required only when `ActionsSuppressor` is
+    #   specified.
+    #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/CompositeAlarm AWS API Documentation
     #
@@ -217,7 +272,13 @@ module Aws::CloudWatch
       :state_reason,
       :state_reason_data,
       :state_updated_timestamp,
-      :state_value)
+      :state_value,
+      :state_transitioned_timestamp,
+      :actions_suppressed_by,
+      :actions_suppressed_reason,
+      :actions_suppressor,
+      :actions_suppressor_wait_period,
+      :actions_suppressor_extension_period)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -359,15 +420,9 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteAlarmsInput
-    #   data as a hash:
-    #
-    #       {
-    #         alarm_names: ["AlarmName"], # required
-    #       }
-    #
     # @!attribute [rw] alarm_names
-    #   The alarms to be deleted.
+    #   The alarms to be deleted. Do not enclose the alarm names in quote
+    #   marks.
     #   @return [Array<String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/DeleteAlarmsInput AWS API Documentation
@@ -378,21 +433,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteAnomalyDetectorInput
-    #   data as a hash:
-    #
-    #       {
-    #         namespace: "Namespace", # required
-    #         metric_name: "MetricName", # required
-    #         dimensions: [
-    #           {
-    #             name: "DimensionName", # required
-    #             value: "DimensionValue", # required
-    #           },
-    #         ],
-    #         stat: "AnomalyDetectorMetricStat", # required
-    #       }
-    #
     # @!attribute [rw] namespace
     #   The namespace associated with the anomaly detection model to delete.
     #   @return [String]
@@ -411,13 +451,57 @@ module Aws::CloudWatch
     #   The statistic associated with the anomaly detection model to delete.
     #   @return [String]
     #
+    # @!attribute [rw] single_metric_anomaly_detector
+    #   A single metric anomaly detector to be deleted.
+    #
+    #   When using `SingleMetricAnomalyDetector`, you cannot include the
+    #   following parameters in the same operation:
+    #
+    #   * `Dimensions`,
+    #
+    #   * `MetricName`
+    #
+    #   * `Namespace`
+    #
+    #   * `Stat`
+    #
+    #   * the `MetricMathAnomalyDetector` parameters of
+    #     `DeleteAnomalyDetectorInput`
+    #
+    #   Instead, specify the single metric anomaly detector attributes as
+    #   part of the `SingleMetricAnomalyDetector` property.
+    #   @return [Types::SingleMetricAnomalyDetector]
+    #
+    # @!attribute [rw] metric_math_anomaly_detector
+    #   The metric math anomaly detector to be deleted.
+    #
+    #   When using `MetricMathAnomalyDetector`, you cannot include following
+    #   parameters in the same operation:
+    #
+    #   * `Dimensions`,
+    #
+    #   * `MetricName`
+    #
+    #   * `Namespace`
+    #
+    #   * `Stat`
+    #
+    #   * the `SingleMetricAnomalyDetector` parameters of
+    #     `DeleteAnomalyDetectorInput`
+    #
+    #   Instead, specify the metric math anomaly detector attributes as part
+    #   of the `MetricMathAnomalyDetector` property.
+    #   @return [Types::MetricMathAnomalyDetector]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/DeleteAnomalyDetectorInput AWS API Documentation
     #
     class DeleteAnomalyDetectorInput < Struct.new(
       :namespace,
       :metric_name,
       :dimensions,
-      :stat)
+      :stat,
+      :single_metric_anomaly_detector,
+      :metric_math_anomaly_detector)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -426,13 +510,6 @@ module Aws::CloudWatch
     #
     class DeleteAnomalyDetectorOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteDashboardsInput
-    #   data as a hash:
-    #
-    #       {
-    #         dashboard_names: ["DashboardName"], # required
-    #       }
-    #
     # @!attribute [rw] dashboard_names
     #   The dashboards to be deleted. This parameter is required.
     #   @return [Array<String>]
@@ -449,13 +526,6 @@ module Aws::CloudWatch
     #
     class DeleteDashboardsOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteInsightRulesInput
-    #   data as a hash:
-    #
-    #       {
-    #         rule_names: ["InsightRuleName"], # required
-    #       }
-    #
     # @!attribute [rw] rule_names
     #   An array of the rule names to delete. If you need to find out the
     #   names of your rules, use [DescribeInsightRules][1].
@@ -486,20 +556,22 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeAlarmHistoryInput
-    #   data as a hash:
+    # @!attribute [rw] name
+    #   The name of the metric stream to delete.
+    #   @return [String]
     #
-    #       {
-    #         alarm_name: "AlarmName",
-    #         alarm_types: ["CompositeAlarm"], # accepts CompositeAlarm, MetricAlarm
-    #         history_item_type: "ConfigurationUpdate", # accepts ConfigurationUpdate, StateUpdate, Action
-    #         start_date: Time.now,
-    #         end_date: Time.now,
-    #         max_records: 1,
-    #         next_token: "NextToken",
-    #         scan_by: "TimestampDescending", # accepts TimestampDescending, TimestampAscending
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/DeleteMetricStreamInput AWS API Documentation
     #
+    class DeleteMetricStreamInput < Struct.new(
+      :name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/DeleteMetricStreamOutput AWS API Documentation
+    #
+    class DeleteMetricStreamOutput < Aws::EmptyStructure; end
+
     # @!attribute [rw] alarm_name
     #   The name of the alarm.
     #   @return [String]
@@ -571,24 +643,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeAlarmsForMetricInput
-    #   data as a hash:
-    #
-    #       {
-    #         metric_name: "MetricName", # required
-    #         namespace: "Namespace", # required
-    #         statistic: "SampleCount", # accepts SampleCount, Average, Sum, Minimum, Maximum
-    #         extended_statistic: "ExtendedStatistic",
-    #         dimensions: [
-    #           {
-    #             name: "DimensionName", # required
-    #             value: "DimensionValue", # required
-    #           },
-    #         ],
-    #         period: 1,
-    #         unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #       }
-    #
     # @!attribute [rw] metric_name
     #   The name of the metric.
     #   @return [String]
@@ -647,21 +701,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeAlarmsInput
-    #   data as a hash:
-    #
-    #       {
-    #         alarm_names: ["AlarmName"],
-    #         alarm_name_prefix: "AlarmNamePrefix",
-    #         alarm_types: ["CompositeAlarm"], # accepts CompositeAlarm, MetricAlarm
-    #         children_of_alarm_name: "AlarmName",
-    #         parents_of_alarm_name: "AlarmName",
-    #         state_value: "OK", # accepts OK, ALARM, INSUFFICIENT_DATA
-    #         action_prefix: "ActionPrefix",
-    #         max_records: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] alarm_names
     #   The names of the alarms to retrieve information about.
     #   @return [Array<String>]
@@ -677,7 +716,16 @@ module Aws::CloudWatch
     # @!attribute [rw] alarm_types
     #   Use this parameter to specify whether you want the operation to
     #   return metric alarms or composite alarms. If you omit this
-    #   parameter, only metric alarms are returned.
+    #   parameter, only metric alarms are returned, even if composite alarms
+    #   exist in the account.
+    #
+    #   For example, if you omit this parameter or specify `MetricAlarms`,
+    #   the operation returns only a list of metric alarms. It does not
+    #   return any composite alarms, even if composite alarms exist in the
+    #   account.
+    #
+    #   If you specify `CompositeAlarms`, the operation returns only a list
+    #   of composite alarms, and does not return any metric alarms.
     #   @return [Array<String>]
     #
     # @!attribute [rw] children_of_alarm_name
@@ -784,22 +832,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeAnomalyDetectorsInput
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #         namespace: "Namespace",
-    #         metric_name: "MetricName",
-    #         dimensions: [
-    #           {
-    #             name: "DimensionName", # required
-    #             value: "DimensionValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] next_token
     #   Use the token returned by the previous operation to request the next
     #   page of results.
@@ -832,6 +864,12 @@ module Aws::CloudWatch
     #   detection models associated, they're all returned.
     #   @return [Array<Types::Dimension>]
     #
+    # @!attribute [rw] anomaly_detector_types
+    #   The anomaly detector types to request when using
+    #   `DescribeAnomalyDetectorsInput`. If empty, defaults to
+    #   `SINGLE_METRIC`.
+    #   @return [Array<String>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/DescribeAnomalyDetectorsInput AWS API Documentation
     #
     class DescribeAnomalyDetectorsInput < Struct.new(
@@ -839,7 +877,8 @@ module Aws::CloudWatch
       :max_results,
       :namespace,
       :metric_name,
-      :dimensions)
+      :dimensions,
+      :anomaly_detector_types)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -862,14 +901,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeInsightRulesInput
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   Include this value, if it was returned by the previous operation, to
     #   get the next set of rules.
@@ -908,27 +939,26 @@ module Aws::CloudWatch
     end
 
     # A dimension is a name/value pair that is part of the identity of a
-    # metric. You can assign up to 10 dimensions to a metric. Because
-    # dimensions are part of the unique identifier for a metric, whenever
-    # you add a unique name/value pair to one of your metrics, you are
-    # creating a new variation of that metric.
+    # metric. Because dimensions are part of the unique identifier for a
+    # metric, whenever you add a unique name/value pair to one of your
+    # metrics, you are creating a new variation of that metric. For example,
+    # many Amazon EC2 metrics publish `InstanceId` as a dimension name, and
+    # the actual instance ID as the value for that dimension.
     #
-    # @note When making an API call, you may pass Dimension
-    #   data as a hash:
-    #
-    #       {
-    #         name: "DimensionName", # required
-    #         value: "DimensionValue", # required
-    #       }
+    # You can assign up to 30 dimensions to a metric.
     #
     # @!attribute [rw] name
-    #   The name of the dimension. Dimension names cannot contain blank
-    #   spaces or non-ASCII characters.
+    #   The name of the dimension. Dimension names must contain only ASCII
+    #   characters, must include at least one non-whitespace character, and
+    #   cannot start with a colon (`:`). ASCII control characters are not
+    #   supported as part of dimension names.
     #   @return [String]
     #
     # @!attribute [rw] value
-    #   The value of the dimension. Dimension values cannot contain blank
-    #   spaces or non-ASCII characters.
+    #   The value of the dimension. Dimension values must contain only ASCII
+    #   characters and must include at least one non-whitespace character.
+    #   ASCII control characters are not supported as part of dimension
+    #   values.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/Dimension AWS API Documentation
@@ -941,14 +971,6 @@ module Aws::CloudWatch
     end
 
     # Represents filters for a dimension.
-    #
-    # @note When making an API call, you may pass DimensionFilter
-    #   data as a hash:
-    #
-    #       {
-    #         name: "DimensionName", # required
-    #         value: "DimensionValue",
-    #       }
     #
     # @!attribute [rw] name
     #   The dimension name to be matched.
@@ -967,13 +989,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DisableAlarmActionsInput
-    #   data as a hash:
-    #
-    #       {
-    #         alarm_names: ["AlarmName"], # required
-    #       }
-    #
     # @!attribute [rw] alarm_names
     #   The names of the alarms.
     #   @return [Array<String>]
@@ -986,13 +1001,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DisableInsightRulesInput
-    #   data as a hash:
-    #
-    #       {
-    #         rule_names: ["InsightRuleName"], # required
-    #       }
-    #
     # @!attribute [rw] rule_names
     #   An array of the rule names to disable. If you need to find out the
     #   names of your rules, use [DescribeInsightRules][1].
@@ -1023,13 +1031,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass EnableAlarmActionsInput
-    #   data as a hash:
-    #
-    #       {
-    #         alarm_names: ["AlarmName"], # required
-    #       }
-    #
     # @!attribute [rw] alarm_names
     #   The names of the alarms.
     #   @return [Array<String>]
@@ -1042,13 +1043,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass EnableInsightRulesInput
-    #   data as a hash:
-    #
-    #       {
-    #         rule_names: ["InsightRuleName"], # required
-    #       }
-    #
     # @!attribute [rw] rule_names
     #   An array of the rule names to enable. If you need to find out the
     #   names of your rules, use [DescribeInsightRules][1].
@@ -1079,13 +1073,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetDashboardInput
-    #   data as a hash:
-    #
-    #       {
-    #         dashboard_name: "DashboardName", # required
-    #       }
-    #
     # @!attribute [rw] dashboard_name
     #   The name of the dashboard to be described.
     #   @return [String]
@@ -1127,19 +1114,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetInsightRuleReportInput
-    #   data as a hash:
-    #
-    #       {
-    #         rule_name: "InsightRuleName", # required
-    #         start_time: Time.now, # required
-    #         end_time: Time.now, # required
-    #         period: 1, # required
-    #         max_contributor_count: 1,
-    #         metrics: ["InsightRuleMetricName"],
-    #         order_by: "InsightRuleOrderBy",
-    #       }
-    #
     # @!attribute [rw] rule_name
     #   The name of the rule that you want to see data from.
     #   @return [String]
@@ -1201,7 +1175,7 @@ module Aws::CloudWatch
     #
     # @!attribute [rw] order_by
     #   Determines what statistic to use to rank the contributors. Valid
-    #   values are SUM and MAXIMUM.
+    #   values are `Sum` and `Maximum`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/GetInsightRuleReportInput AWS API Documentation
@@ -1264,46 +1238,11 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetMetricDataInput
-    #   data as a hash:
-    #
-    #       {
-    #         metric_data_queries: [ # required
-    #           {
-    #             id: "MetricId", # required
-    #             metric_stat: {
-    #               metric: { # required
-    #                 namespace: "Namespace",
-    #                 metric_name: "MetricName",
-    #                 dimensions: [
-    #                   {
-    #                     name: "DimensionName", # required
-    #                     value: "DimensionValue", # required
-    #                   },
-    #                 ],
-    #               },
-    #               period: 1, # required
-    #               stat: "Stat", # required
-    #               unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #             },
-    #             expression: "MetricExpression",
-    #             label: "MetricLabel",
-    #             return_data: false,
-    #             period: 1,
-    #           },
-    #         ],
-    #         start_time: Time.now, # required
-    #         end_time: Time.now, # required
-    #         next_token: "NextToken",
-    #         scan_by: "TimestampDescending", # accepts TimestampDescending, TimestampAscending
-    #         max_datapoints: 1,
-    #       }
-    #
     # @!attribute [rw] metric_data_queries
     #   The metric queries to be returned. A single `GetMetricData` call can
     #   include as many as 500 `MetricDataQuery` structures. Each of these
-    #   structures can specify either a metric to retrieve, or a math
-    #   expression to perform on retrieved data.
+    #   structures can specify either a metric to retrieve, a Metrics
+    #   Insights query, or a math expression to perform on retrieved data.
     #   @return [Array<Types::MetricDataQuery>]
     #
     # @!attribute [rw] start_time
@@ -1367,12 +1306,21 @@ module Aws::CloudWatch
     #   when the `MaxDatapoints` limit is reached. `TimestampAscending`
     #   returns the oldest data first and paginates when the `MaxDatapoints`
     #   limit is reached.
+    #
+    #   If you omit this parameter, the default of `TimestampDescending` is
+    #   used.
     #   @return [String]
     #
     # @!attribute [rw] max_datapoints
     #   The maximum number of data points the request should return before
     #   paginating. If you omit this, the default of 100,800 is used.
     #   @return [Integer]
+    #
+    # @!attribute [rw] label_options
+    #   This structure includes the `Timezone` parameter, which you can use
+    #   to specify your time zone so that the labels of returned data
+    #   display the correct time for your time zone.
+    #   @return [Types::LabelOptions]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/GetMetricDataInput AWS API Documentation
     #
@@ -1382,7 +1330,8 @@ module Aws::CloudWatch
       :end_time,
       :next_token,
       :scan_by,
-      :max_datapoints)
+      :max_datapoints,
+      :label_options)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1419,26 +1368,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetMetricStatisticsInput
-    #   data as a hash:
-    #
-    #       {
-    #         namespace: "Namespace", # required
-    #         metric_name: "MetricName", # required
-    #         dimensions: [
-    #           {
-    #             name: "DimensionName", # required
-    #             value: "DimensionValue", # required
-    #           },
-    #         ],
-    #         start_time: Time.now, # required
-    #         end_time: Time.now, # required
-    #         period: 1, # required
-    #         statistics: ["SampleCount"], # accepts SampleCount, Average, Sum, Minimum, Maximum
-    #         extended_statistics: ["ExtendedStatistic"],
-    #         unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #       }
-    #
     # @!attribute [rw] namespace
     #   The namespace of the metric, with or without spaces.
     #   @return [String]
@@ -1586,14 +1515,109 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetMetricWidgetImageInput
-    #   data as a hash:
+    # @!attribute [rw] name
+    #   The name of the metric stream to retrieve information about.
+    #   @return [String]
     #
-    #       {
-    #         metric_widget: "MetricWidget", # required
-    #         output_format: "OutputFormat",
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/GetMetricStreamInput AWS API Documentation
     #
+    class GetMetricStreamInput < Struct.new(
+      :name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] arn
+    #   The ARN of the metric stream.
+    #   @return [String]
+    #
+    # @!attribute [rw] name
+    #   The name of the metric stream.
+    #   @return [String]
+    #
+    # @!attribute [rw] include_filters
+    #   If this array of metric namespaces is present, then these namespaces
+    #   are the only metric namespaces that are streamed by this metric
+    #   stream.
+    #   @return [Array<Types::MetricStreamFilter>]
+    #
+    # @!attribute [rw] exclude_filters
+    #   If this array of metric namespaces is present, then these namespaces
+    #   are the only metric namespaces that are not streamed by this metric
+    #   stream. In this case, all other metric namespaces in the account are
+    #   streamed by this metric stream.
+    #   @return [Array<Types::MetricStreamFilter>]
+    #
+    # @!attribute [rw] firehose_arn
+    #   The ARN of the Amazon Kinesis Data Firehose delivery stream that is
+    #   used by this metric stream.
+    #   @return [String]
+    #
+    # @!attribute [rw] role_arn
+    #   The ARN of the IAM role that is used by this metric stream.
+    #   @return [String]
+    #
+    # @!attribute [rw] state
+    #   The state of the metric stream. The possible values are `running`
+    #   and `stopped`.
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_date
+    #   The date that the metric stream was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_update_date
+    #   The date of the most recent update to the metric stream's
+    #   configuration.
+    #   @return [Time]
+    #
+    # @!attribute [rw] output_format
+    #   The output format for the stream. Valid values are `json`,
+    #   `opentelemetry1.0`, and `opentelemetry0.7`. For more information
+    #   about metric stream output formats, see [Metric streams output
+    #   formats][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-metric-streams-formats.html
+    #   @return [String]
+    #
+    # @!attribute [rw] statistics_configurations
+    #   Each entry in this array displays information about one or more
+    #   metrics that include additional statistics in the metric stream. For
+    #   more information about the additional statistics, see [ CloudWatch
+    #   statistics definitions][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html.html
+    #   @return [Array<Types::MetricStreamStatisticsConfiguration>]
+    #
+    # @!attribute [rw] include_linked_accounts_metrics
+    #   If this is `true` and this metric stream is in a monitoring account,
+    #   then the stream includes metrics from source accounts that the
+    #   monitoring account is linked to.
+    #   @return [Boolean]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/GetMetricStreamOutput AWS API Documentation
+    #
+    class GetMetricStreamOutput < Struct.new(
+      :arn,
+      :name,
+      :include_filters,
+      :exclude_filters,
+      :firehose_arn,
+      :role_arn,
+      :state,
+      :creation_date,
+      :last_update_date,
+      :output_format,
+      :statistics_configurations,
+      :include_linked_accounts_metrics)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] metric_widget
     #   A JSON string that defines the bitmap graph to be retrieved. The
     #   string includes the metrics to include in the graph, statistics,
@@ -1640,10 +1664,10 @@ module Aws::CloudWatch
     #   `</GetMetricWidgetImageResponse>`
     #
     #   The `image/png` setting is intended only for custom HTTP requests.
-    #   For most use cases, and all actions using an AWS SDK, you should use
-    #   `png`. If you specify `image/png`, the HTTP response has a
-    #   content-type set to `image/png`, and the body of the response is a
-    #   PNG image.
+    #   For most use cases, and all actions using an Amazon Web Services
+    #   SDK, you should use `png`. If you specify `image/png`, the HTTP
+    #   response has a content-type set to `image/png`, and the body of the
+    #   response is a PNG image.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/GetMetricWidgetImageInput AWS API Documentation
@@ -1669,7 +1693,13 @@ module Aws::CloudWatch
     end
 
     # This structure contains the definition for a Contributor Insights
-    # rule.
+    # rule. For more information about this rule, see[ Using Constributor
+    # Insights to analyze high-cardinality data][1] in the *Amazon
+    # CloudWatch User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContributorInsights.html
     #
     # @!attribute [rw] name
     #   The name of the rule.
@@ -1681,7 +1711,7 @@ module Aws::CloudWatch
     #
     # @!attribute [rw] schema
     #   For rules that you create, this is always `\{"Name":
-    #   "CloudWatchLogRule", "Version": 1\}`. For built-in rules, this is
+    #   "CloudWatchLogRule", "Version": 1\}`. For managed rules, this is
     #   `\{"Name": "ServiceLogRule", "Version": 1\}`
     #   @return [String]
     #
@@ -1697,13 +1727,18 @@ module Aws::CloudWatch
     #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContributorInsights-RuleSyntax.html
     #   @return [String]
     #
+    # @!attribute [rw] managed_rule
+    #   An optional built-in rule that Amazon Web Services manages.
+    #   @return [Boolean]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/InsightRule AWS API Documentation
     #
     class InsightRule < Struct.new(
       :name,
       :state,
       :schema,
-      :definition)
+      :definition,
+      :managed_rule)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1926,6 +1961,35 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
+    # This structure includes the `Timezone` parameter, which you can use to
+    # specify your time zone so that the labels that are associated with
+    # returned metrics display the correct time for your time zone.
+    #
+    # The `Timezone` value affects a label only if you have a time-based
+    # dynamic expression in the label. For more information about dynamic
+    # expressions in labels, see [Using Dynamic Labels][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/graph-dynamic-labels.html
+    #
+    # @!attribute [rw] timezone
+    #   The time zone to use for metric data return in this operation. The
+    #   format is `+` or `-` followed by four digits. The first two digits
+    #   indicate the number of hours ahead or behind of UTC, and the final
+    #   two digits are the number of minutes. For example, +0130 indicates a
+    #   time zone that is 1 hour and 30 minutes ahead of UTC. The default is
+    #   +0000.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/LabelOptions AWS API Documentation
+    #
+    class LabelOptions < Struct.new(
+      :timezone)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The operation exceeded one or more limits.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/LimitExceededException AWS API Documentation
@@ -1945,14 +2009,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListDashboardsInput
-    #   data as a hash:
-    #
-    #       {
-    #         dashboard_name_prefix: "DashboardNamePrefix",
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] dashboard_name_prefix
     #   If you specify this parameter, only the dashboards with names
     #   starting with the specified string are listed. The maximum length is
@@ -1992,22 +2048,88 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListMetricsInput
-    #   data as a hash:
+    # @!attribute [rw] resource_arn
+    #   The ARN of an Amazon Web Services resource that has managed
+    #   Contributor Insights rules.
+    #   @return [String]
     #
-    #       {
-    #         namespace: "Namespace",
-    #         metric_name: "MetricName",
-    #         dimensions: [
-    #           {
-    #             name: "DimensionName", # required
-    #             value: "DimensionValue",
-    #           },
-    #         ],
-    #         next_token: "NextToken",
-    #         recently_active: "PT3H", # accepts PT3H
-    #       }
+    # @!attribute [rw] next_token
+    #   Include this value to get the next set of rules if the value was
+    #   returned by the previous operation.
+    #   @return [String]
     #
+    # @!attribute [rw] max_results
+    #   The maximum number of results to return in one operation. If you
+    #   omit this parameter, the default number is used. The default number
+    #   is `100`.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/ListManagedInsightRulesInput AWS API Documentation
+    #
+    class ListManagedInsightRulesInput < Struct.new(
+      :resource_arn,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] managed_rules
+    #   The managed rules that are available for the specified Amazon Web
+    #   Services resource.
+    #   @return [Array<Types::ManagedRuleDescription>]
+    #
+    # @!attribute [rw] next_token
+    #   Include this value to get the next set of rules if the value was
+    #   returned by the previous operation.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/ListManagedInsightRulesOutput AWS API Documentation
+    #
+    class ListManagedInsightRulesOutput < Struct.new(
+      :managed_rules,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] next_token
+    #   Include this value, if it was returned by the previous call, to get
+    #   the next set of metric streams.
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of results to return in one operation.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/ListMetricStreamsInput AWS API Documentation
+    #
+    class ListMetricStreamsInput < Struct.new(
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] next_token
+    #   The token that marks the start of the next batch of returned
+    #   results. You can use this token in a subsequent operation to get the
+    #   next batch of results.
+    #   @return [String]
+    #
+    # @!attribute [rw] entries
+    #   The array of metric stream information.
+    #   @return [Array<Types::MetricStreamEntry>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/ListMetricStreamsOutput AWS API Documentation
+    #
+    class ListMetricStreamsOutput < Struct.new(
+      :next_token,
+      :entries)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] namespace
     #   The metric namespace to filter against. Only the namespace that
     #   matches exactly will be returned.
@@ -2039,6 +2161,20 @@ module Aws::CloudWatch
     #   than the specified time interval.
     #   @return [String]
     #
+    # @!attribute [rw] include_linked_accounts
+    #   If you are using this operation in a monitoring account, specify
+    #   `true` to include metrics from source accounts in the returned data.
+    #
+    #   The default is `false`.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] owning_account
+    #   When you use this operation in a monitoring account, use this field
+    #   to return metrics only from one source account. To do so, specify
+    #   that source account ID in this field, and also specify `true` for
+    #   `IncludeLinkedAccounts`.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/ListMetricsInput AWS API Documentation
     #
     class ListMetricsInput < Struct.new(
@@ -2046,7 +2182,9 @@ module Aws::CloudWatch
       :metric_name,
       :dimensions,
       :next_token,
-      :recently_active)
+      :recently_active,
+      :include_linked_accounts,
+      :owning_account)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2060,22 +2198,25 @@ module Aws::CloudWatch
     #   results.
     #   @return [String]
     #
+    # @!attribute [rw] owning_accounts
+    #   If you are using this operation in a monitoring account, this array
+    #   contains the account IDs of the source accounts where the metrics in
+    #   the returned data are from.
+    #
+    #   This field is a 1:1 mapping between each metric that is returned and
+    #   the ID of the owning account.
+    #   @return [Array<String>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/ListMetricsOutput AWS API Documentation
     #
     class ListMetricsOutput < Struct.new(
       :metrics,
-      :next_token)
+      :next_token,
+      :owning_accounts)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "AmazonResourceName", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The ARN of the CloudWatch resource that you want to view tags for.
     #
@@ -2083,7 +2224,7 @@ module Aws::CloudWatch
     #   `arn:aws:cloudwatch:Region:account-id:alarm:alarm-name `
     #
     #   The ARN format of a Contributor Insights rule is
-    #   `arn:aws:cloudwatch:Region:account-id:insight-rule:insight-rule-name
+    #   `arn:aws:cloudwatch:Region:account-id:insight-rule/insight-rule-name
     #   `
     #
     #   For more information about ARN format, see [ Resource Types Defined
@@ -2116,8 +2257,99 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
+    # Contains the information that's required to enable a managed
+    # Contributor Insights rule for an Amazon Web Services resource.
+    #
+    # @!attribute [rw] template_name
+    #   The template name for the managed Contributor Insights rule, as
+    #   returned by `ListManagedInsightRules`.
+    #   @return [String]
+    #
+    # @!attribute [rw] resource_arn
+    #   The ARN of an Amazon Web Services resource that has managed
+    #   Contributor Insights rules.
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   A list of key-value pairs that you can associate with a managed
+    #   Contributor Insights rule. You can associate as many as 50 tags with
+    #   a rule. Tags can help you organize and categorize your resources.
+    #   You also can use them to scope user permissions by granting a user
+    #   permission to access or change only the resources that have certain
+    #   tag values. To associate tags with a rule, you must have the
+    #   `cloudwatch:TagResource` permission in addition to the
+    #   `cloudwatch:PutInsightRule` permission. If you are using this
+    #   operation to update an existing Contributor Insights rule, any tags
+    #   that you specify in this parameter are ignored. To change the tags
+    #   of an existing rule, use `TagResource`.
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/ManagedRule AWS API Documentation
+    #
+    class ManagedRule < Struct.new(
+      :template_name,
+      :resource_arn,
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains information about managed Contributor Insights rules, as
+    # returned by `ListManagedInsightRules`.
+    #
+    # @!attribute [rw] template_name
+    #   The template name for the managed rule. Used to enable managed rules
+    #   using `PutManagedInsightRules`.
+    #   @return [String]
+    #
+    # @!attribute [rw] resource_arn
+    #   If a managed rule is enabled, this is the ARN for the related Amazon
+    #   Web Services resource.
+    #   @return [String]
+    #
+    # @!attribute [rw] rule_state
+    #   Describes the state of a managed rule. If present, it contains
+    #   information about the Contributor Insights rule that contains
+    #   information about the related Amazon Web Services resource.
+    #   @return [Types::ManagedRuleState]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/ManagedRuleDescription AWS API Documentation
+    #
+    class ManagedRuleDescription < Struct.new(
+      :template_name,
+      :resource_arn,
+      :rule_state)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The status of a managed Contributor Insights rule.
+    #
+    # @!attribute [rw] rule_name
+    #   The name of the Contributor Insights rule that contains data for the
+    #   specified Amazon Web Services resource.
+    #   @return [String]
+    #
+    # @!attribute [rw] state
+    #   Indicates whether the rule is enabled or disabled.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/ManagedRuleState AWS API Documentation
+    #
+    class ManagedRuleState < Struct.new(
+      :rule_name,
+      :state)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # A message returned by the `GetMetricData`API, including a code and a
     # description.
+    #
+    # If a cross-Region `GetMetricData` operation fails with a code of
+    # `Forbidden` and a value of `Authentication too complex to retrieve
+    # cross region data`, you can correct the problem by running the
+    # `GetMetricData` operation in the same Region where the metric data is.
     #
     # @!attribute [rw] code
     #   The error code or status code associated with the message.
@@ -2137,20 +2369,6 @@ module Aws::CloudWatch
     end
 
     # Represents a specific metric.
-    #
-    # @note When making an API call, you may pass Metric
-    #   data as a hash:
-    #
-    #       {
-    #         namespace: "Namespace",
-    #         metric_name: "MetricName",
-    #         dimensions: [
-    #           {
-    #             name: "DimensionName", # required
-    #             value: "DimensionValue", # required
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] namespace
     #   The namespace of the metric.
@@ -2228,7 +2446,8 @@ module Aws::CloudWatch
     #   @return [String]
     #
     # @!attribute [rw] state_updated_timestamp
-    #   The time stamp of the last update to the alarm state.
+    #   The time stamp of the last update to the value of either the
+    #   `StateValue` or `EvaluationState` parameters.
     #   @return [Time]
     #
     # @!attribute [rw] metric_name
@@ -2283,8 +2502,17 @@ module Aws::CloudWatch
     #   @return [String]
     #
     # @!attribute [rw] treat_missing_data
-    #   Sets how this alarm is to handle missing data points. If this
-    #   parameter is omitted, the default behavior of `missing` is used.
+    #   Sets how this alarm is to handle missing data points. The valid
+    #   values are `breaching`, `notBreaching`, `ignore`, and `missing`. For
+    #   more information, see [Configuring how CloudWatch alarms treat
+    #   missing data][1].
+    #
+    #   If this parameter is omitted, the default behavior of `missing` is
+    #   used.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data
     #   @return [String]
     #
     # @!attribute [rw] evaluate_low_sample_count_percentile
@@ -2308,6 +2536,22 @@ module Aws::CloudWatch
     #   the `ANOMALY_DETECTION_BAND` function used as the threshold for the
     #   alarm.
     #   @return [String]
+    #
+    # @!attribute [rw] evaluation_state
+    #   If the value of this field is `PARTIAL_DATA`, the alarm is being
+    #   evaluated based on only partial data. This happens if the query used
+    #   for the alarm returns more than 10,000 metrics. For more
+    #   information, see [Create alarms on Metrics Insights queries][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Create_Metrics_Insights_Alarm.html
+    #   @return [String]
+    #
+    # @!attribute [rw] state_transitioned_timestamp
+    #   The date and time that the alarm's `StateValue` most recently
+    #   changed.
+    #   @return [Time]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/MetricAlarm AWS API Documentation
     #
@@ -2338,7 +2582,29 @@ module Aws::CloudWatch
       :treat_missing_data,
       :evaluate_low_sample_count_percentile,
       :metrics,
-      :threshold_metric_id)
+      :threshold_metric_id,
+      :evaluation_state,
+      :state_transitioned_timestamp)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # This object includes parameters that you can use to provide
+    # information to CloudWatch to help it build more accurate anomaly
+    # detection models.
+    #
+    # @!attribute [rw] periodic_spikes
+    #   Set this parameter to `true` if values for this metric consistently
+    #   include spikes that should not be considered to be anomalies. With
+    #   this set to `true`, CloudWatch will expect to see spikes that
+    #   occurred consistently during the model training period, and won't
+    #   flag future similar spikes as anomalies.
+    #   @return [Boolean]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/MetricCharacteristics AWS API Documentation
+    #
+    class MetricCharacteristics < Struct.new(
+      :periodic_spikes)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2349,9 +2615,9 @@ module Aws::CloudWatch
     #
     # When used in `GetMetricData`, it indicates the metric data to return,
     # and whether this call is just retrieving a batch set of data for one
-    # metric, or is performing a math expression on metric data. A single
-    # `GetMetricData` call can include up to 500 `MetricDataQuery`
-    # structures.
+    # metric, or is performing a Metrics Insights query or a math
+    # expression. A single `GetMetricData` call can include up to 500
+    # `MetricDataQuery` structures.
     #
     # When used in `PutMetricAlarm`, it enables you to create an alarm based
     # on a metric math expression. Each `MetricDataQuery` in the array
@@ -2361,7 +2627,7 @@ module Aws::CloudWatch
     # structures can include as many as 10 structures that contain a
     # `MetricStat` parameter to retrieve a metric, and as many as 10
     # structures that contain the `Expression` parameter to perform a math
-    # expression. Of those `Expression` structures, one must have `True` as
+    # expression. Of those `Expression` structures, one must have `true` as
     # the value for `ReturnData`. The result of this expression is the value
     # the alarm watches.
     #
@@ -2377,32 +2643,6 @@ module Aws::CloudWatch
     #
     #
     # [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/using-metric-math.html#metric-math-syntax
-    #
-    # @note When making an API call, you may pass MetricDataQuery
-    #   data as a hash:
-    #
-    #       {
-    #         id: "MetricId", # required
-    #         metric_stat: {
-    #           metric: { # required
-    #             namespace: "Namespace",
-    #             metric_name: "MetricName",
-    #             dimensions: [
-    #               {
-    #                 name: "DimensionName", # required
-    #                 value: "DimensionValue", # required
-    #               },
-    #             ],
-    #           },
-    #           period: 1, # required
-    #           stat: "Stat", # required
-    #           unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #         },
-    #         expression: "MetricExpression",
-    #         label: "MetricLabel",
-    #         return_data: false,
-    #         period: 1,
-    #       }
     #
     # @!attribute [rw] id
     #   A short name used to tie this object to the results in the response.
@@ -2423,20 +2663,25 @@ module Aws::CloudWatch
     #   @return [Types::MetricStat]
     #
     # @!attribute [rw] expression
-    #   The math expression to be performed on the returned data, if this
-    #   object is performing a math expression. This expression can use the
-    #   `Id` of the other metrics to refer to those metrics, and can also
-    #   use the `Id` of other expressions to use the result of those
-    #   expressions. For more information about metric math expressions, see
-    #   [Metric Math Syntax and Functions][1] in the *Amazon CloudWatch User
+    #   This field can contain either a Metrics Insights query, or a metric
+    #   math expression to be performed on the returned data. For more
+    #   information about Metrics Insights queries, see [Metrics Insights
+    #   query components and syntax][1] in the *Amazon CloudWatch User
     #   Guide*.
+    #
+    #   A math expression can use the `Id` of the other metrics or queries
+    #   to refer to those metrics, and can also use the `Id` of other
+    #   expressions to use the result of those expressions. For more
+    #   information about metric math expressions, see [Metric Math Syntax
+    #   and Functions][2] in the *Amazon CloudWatch User Guide*.
     #
     #   Within each MetricDataQuery object, you must specify either
     #   `Expression` or `MetricStat` but not both.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/using-metric-math.html#metric-math-syntax
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-metrics-insights-querylanguage
+    #   [2]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/using-metric-math.html#metric-math-syntax
     #   @return [String]
     #
     # @!attribute [rw] label
@@ -2445,16 +2690,23 @@ module Aws::CloudWatch
     #   the value represents. If the metric or expression is shown in a
     #   CloudWatch dashboard widget, the label is shown. If Label is
     #   omitted, CloudWatch generates a default.
+    #
+    #   You can put dynamic expressions into a label, so that it is more
+    #   descriptive. For more information, see [Using Dynamic Labels][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/graph-dynamic-labels.html
     #   @return [String]
     #
     # @!attribute [rw] return_data
     #   When used in `GetMetricData`, this option indicates whether to
     #   return the timestamps and raw data values of this metric. If you are
     #   performing this call just to do math expressions and do not also
-    #   need the raw data returned, you can specify `False`. If you omit
-    #   this, the default of `True` is used.
+    #   need the raw data returned, you can specify `false`. If you omit
+    #   this, the default of `true` is used.
     #
-    #   When used in `PutMetricAlarm`, specify `True` for the one expression
+    #   When used in `PutMetricAlarm`, specify `true` for the one expression
     #   result to use as the alarm. For all other metrics and expressions in
     #   the same `PutMetricAlarm` operation, specify `ReturnData` as False.
     #   @return [Boolean]
@@ -2470,6 +2722,18 @@ module Aws::CloudWatch
     #   second`.
     #   @return [Integer]
     #
+    # @!attribute [rw] account_id
+    #   The ID of the account where the metrics are located.
+    #
+    #   If you are performing a `GetMetricData` operation in a monitoring
+    #   account, use this to specify which account to retrieve this metric
+    #   from.
+    #
+    #   If you are performing a `PutMetricAlarm` operation, use this to
+    #   specify which account contains the metric that the alarm is
+    #   watching.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/MetricDataQuery AWS API Documentation
     #
     class MetricDataQuery < Struct.new(
@@ -2478,7 +2742,8 @@ module Aws::CloudWatch
       :expression,
       :label,
       :return_data,
-      :period)
+      :period,
+      :account_id)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2538,31 +2803,6 @@ module Aws::CloudWatch
 
     # Encapsulates the information sent to either create a metric or add new
     # values to be aggregated into an existing metric.
-    #
-    # @note When making an API call, you may pass MetricDatum
-    #   data as a hash:
-    #
-    #       {
-    #         metric_name: "MetricName", # required
-    #         dimensions: [
-    #           {
-    #             name: "DimensionName", # required
-    #             value: "DimensionValue", # required
-    #           },
-    #         ],
-    #         timestamp: Time.now,
-    #         value: 1.0,
-    #         statistic_values: {
-    #           sample_count: 1.0, # required
-    #           sum: 1.0, # required
-    #           minimum: 1.0, # required
-    #           maximum: 1.0, # required
-    #         },
-    #         values: [1.0],
-    #         counts: [1.0],
-    #         unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #         storage_resolution: 1,
-    #       }
     #
     # @!attribute [rw] metric_name
     #   The name of the metric.
@@ -2656,27 +2896,32 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
+    # Indicates the CloudWatch math expression that provides the time series
+    # the anomaly detector uses as input. The designated math expression
+    # must return a single time series.
+    #
+    # @!attribute [rw] metric_data_queries
+    #   An array of metric data query structures that enables you to create
+    #   an anomaly detector based on the result of a metric math expression.
+    #   Each item in `MetricDataQueries` gets a metric or performs a math
+    #   expression. One item in `MetricDataQueries` is the expression that
+    #   provides the time series that the anomaly detector uses as input.
+    #   Designate the expression by setting `ReturnData` to `true` for this
+    #   object in the array. For all other expressions and metrics, set
+    #   `ReturnData` to `false`. The designated expression must return a
+    #   single time series.
+    #   @return [Array<Types::MetricDataQuery>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/MetricMathAnomalyDetector AWS API Documentation
+    #
+    class MetricMathAnomalyDetector < Struct.new(
+      :metric_data_queries)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # This structure defines the metric to be returned, along with the
     # statistics, period, and units.
-    #
-    # @note When making an API call, you may pass MetricStat
-    #   data as a hash:
-    #
-    #       {
-    #         metric: { # required
-    #           namespace: "Namespace",
-    #           metric_name: "MetricName",
-    #           dimensions: [
-    #             {
-    #               name: "DimensionName", # required
-    #               value: "DimensionValue", # required
-    #             },
-    #           ],
-    #         },
-    #         period: 1, # required
-    #         stat: "Stat", # required
-    #         unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #       }
     #
     # @!attribute [rw] metric
     #   The metric to return, including the metric name, namespace, and
@@ -2736,6 +2981,164 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
+    # This structure contains the configuration information about one metric
+    # stream.
+    #
+    # @!attribute [rw] arn
+    #   The ARN of the metric stream.
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_date
+    #   The date that the metric stream was originally created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_update_date
+    #   The date that the configuration of this metric stream was most
+    #   recently updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] name
+    #   The name of the metric stream.
+    #   @return [String]
+    #
+    # @!attribute [rw] firehose_arn
+    #   The ARN of the Kinesis Firehose devlivery stream that is used for
+    #   this metric stream.
+    #   @return [String]
+    #
+    # @!attribute [rw] state
+    #   The current state of this stream. Valid values are `running` and
+    #   `stopped`.
+    #   @return [String]
+    #
+    # @!attribute [rw] output_format
+    #   The output format of this metric stream. Valid values are `json`,
+    #   `opentelemetry1.0`, and `opentelemetry0.7`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/MetricStreamEntry AWS API Documentation
+    #
+    class MetricStreamEntry < Struct.new(
+      :arn,
+      :creation_date,
+      :last_update_date,
+      :name,
+      :firehose_arn,
+      :state,
+      :output_format)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # This structure contains a metric namespace and optionally, a list of
+    # metric names, to either include in a metric stream or exclude from a
+    # metric stream.
+    #
+    # A metric stream's filters can include up to 1000 total names. This
+    # limit applies to the sum of namespace names and metric names in the
+    # filters. For example, this could include 10 metric namespace filters
+    # with 99 metrics each, or 20 namespace filters with 49 metrics
+    # specified in each filter.
+    #
+    # @!attribute [rw] namespace
+    #   The name of the metric namespace for this filter.
+    #
+    #   The namespace can contain only ASCII printable characters (ASCII
+    #   range 32 through 126). It must contain at least one non-whitespace
+    #   character.
+    #   @return [String]
+    #
+    # @!attribute [rw] metric_names
+    #   The names of the metrics to either include or exclude from the
+    #   metric stream.
+    #
+    #   If you omit this parameter, all metrics in the namespace are
+    #   included or excluded, depending on whether this filter is specified
+    #   as an exclude filter or an include filter.
+    #
+    #   Each metric name can contain only ASCII printable characters (ASCII
+    #   range 32 through 126). Each metric name must contain at least one
+    #   non-whitespace character.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/MetricStreamFilter AWS API Documentation
+    #
+    class MetricStreamFilter < Struct.new(
+      :namespace,
+      :metric_names)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # By default, a metric stream always sends the `MAX`, `MIN`, `SUM`, and
+    # `SAMPLECOUNT` statistics for each metric that is streamed. This
+    # structure contains information for one metric that includes additional
+    # statistics in the stream. For more information about statistics, see
+    # CloudWatch, listed in [ CloudWatch statistics definitions][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html.html
+    #
+    # @!attribute [rw] include_metrics
+    #   An array of metric name and namespace pairs that stream the
+    #   additional statistics listed in the value of the
+    #   `AdditionalStatistics` parameter. There can be as many as 100 pairs
+    #   in the array.
+    #
+    #   All metrics that match the combination of metric name and namespace
+    #   will be streamed with the additional statistics, no matter their
+    #   dimensions.
+    #   @return [Array<Types::MetricStreamStatisticsMetric>]
+    #
+    # @!attribute [rw] additional_statistics
+    #   The list of additional statistics that are to be streamed for the
+    #   metrics listed in the `IncludeMetrics` array in this structure. This
+    #   list can include as many as 20 statistics.
+    #
+    #   If the `OutputFormat` for the stream is `opentelemetry1.0` or
+    #   `opentelemetry0.7`, the only valid values are `p?? ` percentile
+    #   statistics such as `p90`, `p99` and so on.
+    #
+    #   If the `OutputFormat` for the stream is `json`, the valid values
+    #   include the abbreviations for all of the statistics listed in [
+    #   CloudWatch statistics definitions][1]. For example, this includes
+    #   `tm98, ` `wm90`, `PR(:300)`, and so on.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html.html
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/MetricStreamStatisticsConfiguration AWS API Documentation
+    #
+    class MetricStreamStatisticsConfiguration < Struct.new(
+      :include_metrics,
+      :additional_statistics)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # This object contains the information for one metric that is to be
+    # streamed with additional statistics.
+    #
+    # @!attribute [rw] namespace
+    #   The namespace of the metric.
+    #   @return [String]
+    #
+    # @!attribute [rw] metric_name
+    #   The name of the metric.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/MetricStreamStatisticsMetric AWS API Documentation
+    #
+    class MetricStreamStatisticsMetric < Struct.new(
+      :namespace,
+      :metric_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # An input parameter that is required is missing.
     #
     # @!attribute [rw] message
@@ -2780,30 +3183,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutAnomalyDetectorInput
-    #   data as a hash:
-    #
-    #       {
-    #         namespace: "Namespace", # required
-    #         metric_name: "MetricName", # required
-    #         dimensions: [
-    #           {
-    #             name: "DimensionName", # required
-    #             value: "DimensionValue", # required
-    #           },
-    #         ],
-    #         stat: "AnomalyDetectorMetricStat", # required
-    #         configuration: {
-    #           excluded_time_ranges: [
-    #             {
-    #               start_time: Time.now, # required
-    #               end_time: Time.now, # required
-    #             },
-    #           ],
-    #           metric_timezone: "AnomalyDetectorMetricTimezone",
-    #         },
-    #       }
-    #
     # @!attribute [rw] namespace
     #   The namespace of the metric to create the anomaly detection model
     #   for.
@@ -2831,6 +3210,55 @@ module Aws::CloudWatch
     #   metric.
     #   @return [Types::AnomalyDetectorConfiguration]
     #
+    # @!attribute [rw] metric_characteristics
+    #   Use this object to include parameters to provide information about
+    #   your metric to CloudWatch to help it build more accurate anomaly
+    #   detection models. Currently, it includes the `PeriodicSpikes`
+    #   parameter.
+    #   @return [Types::MetricCharacteristics]
+    #
+    # @!attribute [rw] single_metric_anomaly_detector
+    #   A single metric anomaly detector to be created.
+    #
+    #   When using `SingleMetricAnomalyDetector`, you cannot include the
+    #   following parameters in the same operation:
+    #
+    #   * `Dimensions`
+    #
+    #   * `MetricName`
+    #
+    #   * `Namespace`
+    #
+    #   * `Stat`
+    #
+    #   * the `MetricMathAnomalyDetector` parameters of
+    #     `PutAnomalyDetectorInput`
+    #
+    #   Instead, specify the single metric anomaly detector attributes as
+    #   part of the property `SingleMetricAnomalyDetector`.
+    #   @return [Types::SingleMetricAnomalyDetector]
+    #
+    # @!attribute [rw] metric_math_anomaly_detector
+    #   The metric math anomaly detector to be created.
+    #
+    #   When using `MetricMathAnomalyDetector`, you cannot include the
+    #   following parameters in the same operation:
+    #
+    #   * `Dimensions`
+    #
+    #   * `MetricName`
+    #
+    #   * `Namespace`
+    #
+    #   * `Stat`
+    #
+    #   * the `SingleMetricAnomalyDetector` parameters of
+    #     `PutAnomalyDetectorInput`
+    #
+    #   Instead, specify the metric math anomaly detector attributes as part
+    #   of the property `MetricMathAnomalyDetector`.
+    #   @return [Types::MetricMathAnomalyDetector]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/PutAnomalyDetectorInput AWS API Documentation
     #
     class PutAnomalyDetectorInput < Struct.new(
@@ -2838,7 +3266,10 @@ module Aws::CloudWatch
       :metric_name,
       :dimensions,
       :stat,
-      :configuration)
+      :configuration,
+      :metric_characteristics,
+      :single_metric_anomaly_detector,
+      :metric_math_anomaly_detector)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2847,25 +3278,6 @@ module Aws::CloudWatch
     #
     class PutAnomalyDetectorOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass PutCompositeAlarmInput
-    #   data as a hash:
-    #
-    #       {
-    #         actions_enabled: false,
-    #         alarm_actions: ["ResourceName"],
-    #         alarm_description: "AlarmDescription",
-    #         alarm_name: "AlarmName", # required
-    #         alarm_rule: "AlarmRule", # required
-    #         insufficient_data_actions: ["ResourceName"],
-    #         ok_actions: ["ResourceName"],
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] actions_enabled
     #   Indicates whether actions should be executed during any changes to
     #   the alarm state of the composite alarm. The default is `TRUE`.
@@ -2876,7 +3288,27 @@ module Aws::CloudWatch
     #   state from any other state. Each action is specified as an Amazon
     #   Resource Name (ARN).
     #
-    #   Valid Values: `arn:aws:sns:region:account-id:sns-topic-name ` \|
+    #   Valid Values: \]
+    #
+    #   **Amazon SNS actions:**
+    #
+    #   `arn:aws:sns:region:account-id:sns-topic-name `
+    #
+    #   **Lambda actions:**
+    #
+    #   * Invoke the latest version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name `
+    #
+    #   * Invoke a specific version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:version-number
+    #     `
+    #
+    #   * Invoke a function by using an alias Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:alias-name
+    #     `
+    #
+    #   **Systems Manager actions:**
+    #
     #   `arn:aws:ssm:region:account-id:opsitem:severity `
     #   @return [Array<String>]
     #
@@ -2922,7 +3354,7 @@ module Aws::CloudWatch
     #   Alarm names specified in `AlarmRule` can be surrounded with
     #   double-quotes ("), but do not have to be.
     #
-    #   The following are some examples of `AlarmRule`\:
+    #   The following are some examples of `AlarmRule`:
     #
     #   * `ALARM(CPUUtilizationTooHigh) AND ALARM(DiskReadOpsTooHigh)`
     #     specifies that the composite alarm goes into ALARM state only if
@@ -2953,7 +3385,24 @@ module Aws::CloudWatch
     #   `INSUFFICIENT_DATA` state from any other state. Each action is
     #   specified as an Amazon Resource Name (ARN).
     #
-    #   Valid Values: `arn:aws:sns:region:account-id:sns-topic-name `
+    #   Valid Values: \]
+    #
+    #   **Amazon SNS actions:**
+    #
+    #   `arn:aws:sns:region:account-id:sns-topic-name `
+    #
+    #   **Lambda actions:**
+    #
+    #   * Invoke the latest version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name `
+    #
+    #   * Invoke a specific version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:version-number
+    #     `
+    #
+    #   * Invoke a function by using an alias Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:alias-name
+    #     `
     #   @return [Array<String>]
     #
     # @!attribute [rw] ok_actions
@@ -2961,18 +3410,69 @@ module Aws::CloudWatch
     #   from any other state. Each action is specified as an Amazon Resource
     #   Name (ARN).
     #
-    #   Valid Values: `arn:aws:sns:region:account-id:sns-topic-name `
+    #   Valid Values: \]
+    #
+    #   **Amazon SNS actions:**
+    #
+    #   `arn:aws:sns:region:account-id:sns-topic-name `
+    #
+    #   **Lambda actions:**
+    #
+    #   * Invoke the latest version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name `
+    #
+    #   * Invoke a specific version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:version-number
+    #     `
+    #
+    #   * Invoke a function by using an alias Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:alias-name
+    #     `
     #   @return [Array<String>]
     #
     # @!attribute [rw] tags
-    #   A list of key-value pairs to associate with the composite alarm. You
-    #   can associate as many as 50 tags with an alarm.
+    #   A list of key-value pairs to associate with the alarm. You can
+    #   associate as many as 50 tags with an alarm. To be able to associate
+    #   tags with the alarm when you create the alarm, you must have the
+    #   `cloudwatch:TagResource` permission.
     #
     #   Tags can help you organize and categorize your resources. You can
-    #   also use them to scope user permissions, by granting a user
+    #   also use them to scope user permissions by granting a user
     #   permission to access or change only resources with certain tag
     #   values.
+    #
+    #   If you are using this operation to update an existing alarm, any
+    #   tags you specify in this parameter are ignored. To change the tags
+    #   of an existing alarm, use [TagResource][1] or [UntagResource][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_TagResource.html
+    #   [2]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_UntagResource.html
     #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] actions_suppressor
+    #   Actions will be suppressed if the suppressor alarm is in the `ALARM`
+    #   state. `ActionsSuppressor` can be an AlarmName or an Amazon Resource
+    #   Name (ARN) from an existing alarm.
+    #   @return [String]
+    #
+    # @!attribute [rw] actions_suppressor_wait_period
+    #   The maximum time in seconds that the composite alarm waits for the
+    #   suppressor alarm to go into the `ALARM` state. After this time, the
+    #   composite alarm performs its actions.
+    #
+    #   `WaitPeriod` is required only when `ActionsSuppressor` is specified.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] actions_suppressor_extension_period
+    #   The maximum time in seconds that the composite alarm waits after
+    #   suppressor alarm goes out of the `ALARM` state. After this time, the
+    #   composite alarm performs its actions.
+    #
+    #   `ExtensionPeriod` is required only when `ActionsSuppressor` is
+    #   specified.
+    #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/PutCompositeAlarmInput AWS API Documentation
     #
@@ -2984,19 +3484,14 @@ module Aws::CloudWatch
       :alarm_rule,
       :insufficient_data_actions,
       :ok_actions,
-      :tags)
+      :tags,
+      :actions_suppressor,
+      :actions_suppressor_wait_period,
+      :actions_suppressor_extension_period)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutDashboardInput
-    #   data as a hash:
-    #
-    #       {
-    #         dashboard_name: "DashboardName", # required
-    #         dashboard_body: "DashboardBody", # required
-    #       }
-    #
     # @!attribute [rw] dashboard_name
     #   The name of the dashboard. If a dashboard with this name already
     #   exists, this call modifies that dashboard, replacing its current
@@ -3047,21 +3542,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutInsightRuleInput
-    #   data as a hash:
-    #
-    #       {
-    #         rule_name: "InsightRuleName", # required
-    #         rule_state: "InsightRuleState",
-    #         rule_definition: "InsightRuleDefinition", # required
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] rule_name
     #   A unique name for the rule.
     #   @return [String]
@@ -3116,69 +3596,35 @@ module Aws::CloudWatch
     #
     class PutInsightRuleOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass PutMetricAlarmInput
-    #   data as a hash:
+    # @!attribute [rw] managed_rules
+    #   A list of `ManagedRules` to enable.
+    #   @return [Array<Types::ManagedRule>]
     #
-    #       {
-    #         alarm_name: "AlarmName", # required
-    #         alarm_description: "AlarmDescription",
-    #         actions_enabled: false,
-    #         ok_actions: ["ResourceName"],
-    #         alarm_actions: ["ResourceName"],
-    #         insufficient_data_actions: ["ResourceName"],
-    #         metric_name: "MetricName",
-    #         namespace: "Namespace",
-    #         statistic: "SampleCount", # accepts SampleCount, Average, Sum, Minimum, Maximum
-    #         extended_statistic: "ExtendedStatistic",
-    #         dimensions: [
-    #           {
-    #             name: "DimensionName", # required
-    #             value: "DimensionValue", # required
-    #           },
-    #         ],
-    #         period: 1,
-    #         unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #         evaluation_periods: 1, # required
-    #         datapoints_to_alarm: 1,
-    #         threshold: 1.0,
-    #         comparison_operator: "GreaterThanOrEqualToThreshold", # required, accepts GreaterThanOrEqualToThreshold, GreaterThanThreshold, LessThanThreshold, LessThanOrEqualToThreshold, LessThanLowerOrGreaterThanUpperThreshold, LessThanLowerThreshold, GreaterThanUpperThreshold
-    #         treat_missing_data: "TreatMissingData",
-    #         evaluate_low_sample_count_percentile: "EvaluateLowSampleCountPercentile",
-    #         metrics: [
-    #           {
-    #             id: "MetricId", # required
-    #             metric_stat: {
-    #               metric: { # required
-    #                 namespace: "Namespace",
-    #                 metric_name: "MetricName",
-    #                 dimensions: [
-    #                   {
-    #                     name: "DimensionName", # required
-    #                     value: "DimensionValue", # required
-    #                   },
-    #                 ],
-    #               },
-    #               period: 1, # required
-    #               stat: "Stat", # required
-    #               unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #             },
-    #             expression: "MetricExpression",
-    #             label: "MetricLabel",
-    #             return_data: false,
-    #             period: 1,
-    #           },
-    #         ],
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #         threshold_metric_id: "MetricId",
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/PutManagedInsightRulesInput AWS API Documentation
     #
+    class PutManagedInsightRulesInput < Struct.new(
+      :managed_rules)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] failures
+    #   An array that lists the rules that could not be enabled.
+    #   @return [Array<Types::PartialFailure>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/PutManagedInsightRulesOutput AWS API Documentation
+    #
+    class PutManagedInsightRulesOutput < Struct.new(
+      :failures)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] alarm_name
     #   The name for the alarm. This name must be unique within the Region.
+    #
+    #   The name must contain only UTF-8 characters, and can't contain
+    #   ASCII control characters
     #   @return [String]
     #
     # @!attribute [rw] alarm_description
@@ -3193,64 +3639,175 @@ module Aws::CloudWatch
     # @!attribute [rw] ok_actions
     #   The actions to execute when this alarm transitions to an `OK` state
     #   from any other state. Each action is specified as an Amazon Resource
-    #   Name (ARN).
+    #   Name (ARN). Valid values:
     #
-    #   Valid Values: `arn:aws:automate:region:ec2:stop` \|
-    #   `arn:aws:automate:region:ec2:terminate` \|
-    #   `arn:aws:automate:region:ec2:recover` \|
-    #   `arn:aws:automate:region:ec2:reboot` \|
-    #   `arn:aws:sns:region:account-id:sns-topic-name ` \|
-    #   `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
-    #   `
+    #   **EC2 actions:**
     #
-    #   Valid Values (for use with IAM roles):
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #   * `arn:aws:automate:region:ec2:stop`
+    #
+    #   * `arn:aws:automate:region:ec2:terminate`
+    #
+    #   * `arn:aws:automate:region:ec2:reboot`
+    #
+    #   * `arn:aws:automate:region:ec2:recover`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Recover/1.0`
+    #
+    #   **Autoscaling action:**
+    #
+    #   * `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
+    #     `
+    #
+    #   ^
+    #
+    #   **Lambda actions:**
+    #
+    #   * Invoke the latest version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name `
+    #
+    #   * Invoke a specific version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:version-number
+    #     `
+    #
+    #   * Invoke a function by using an alias Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:alias-name
+    #     `
+    #
+    #   **SNS notification action:**
+    #
+    #   * `arn:aws:sns:region:account-id:sns-topic-name `
+    #
+    #   ^
+    #
+    #   **SSM integration actions:**
+    #
+    #   * `arn:aws:ssm:region:account-id:opsitem:severity#CATEGORY=category-name
+    #     `
+    #
+    #   * `arn:aws:ssm-incidents::account-id:responseplan/response-plan-name
+    #     `
     #   @return [Array<String>]
     #
     # @!attribute [rw] alarm_actions
     #   The actions to execute when this alarm transitions to the `ALARM`
     #   state from any other state. Each action is specified as an Amazon
-    #   Resource Name (ARN).
+    #   Resource Name (ARN). Valid values:
     #
-    #   Valid Values: `arn:aws:automate:region:ec2:stop` \|
-    #   `arn:aws:automate:region:ec2:terminate` \|
-    #   `arn:aws:automate:region:ec2:recover` \|
-    #   `arn:aws:automate:region:ec2:reboot` \|
-    #   `arn:aws:sns:region:account-id:sns-topic-name ` \|
-    #   `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
-    #   ` \| `arn:aws:ssm:region:account-id:opsitem:severity `
+    #   **EC2 actions:**
     #
-    #   Valid Values (for use with IAM roles):
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #   * `arn:aws:automate:region:ec2:stop`
+    #
+    #   * `arn:aws:automate:region:ec2:terminate`
+    #
+    #   * `arn:aws:automate:region:ec2:reboot`
+    #
+    #   * `arn:aws:automate:region:ec2:recover`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Recover/1.0`
+    #
+    #   **Autoscaling action:**
+    #
+    #   * `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
+    #     `
+    #
+    #   ^
+    #
+    #   **Lambda actions:**
+    #
+    #   * Invoke the latest version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name `
+    #
+    #   * Invoke a specific version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:version-number
+    #     `
+    #
+    #   * Invoke a function by using an alias Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:alias-name
+    #     `
+    #
+    #   **SNS notification action:**
+    #
+    #   * `arn:aws:sns:region:account-id:sns-topic-name `
+    #
+    #   ^
+    #
+    #   **SSM integration actions:**
+    #
+    #   * `arn:aws:ssm:region:account-id:opsitem:severity#CATEGORY=category-name
+    #     `
+    #
+    #   * `arn:aws:ssm-incidents::account-id:responseplan/response-plan-name
+    #     `
     #   @return [Array<String>]
     #
     # @!attribute [rw] insufficient_data_actions
     #   The actions to execute when this alarm transitions to the
     #   `INSUFFICIENT_DATA` state from any other state. Each action is
-    #   specified as an Amazon Resource Name (ARN).
+    #   specified as an Amazon Resource Name (ARN). Valid values:
     #
-    #   Valid Values: `arn:aws:automate:region:ec2:stop` \|
-    #   `arn:aws:automate:region:ec2:terminate` \|
-    #   `arn:aws:automate:region:ec2:recover` \|
-    #   `arn:aws:automate:region:ec2:reboot` \|
-    #   `arn:aws:sns:region:account-id:sns-topic-name ` \|
-    #   `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
-    #   `
+    #   **EC2 actions:**
     #
-    #   Valid Values (for use with IAM roles):
-    #   `>arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
-    #   \|
-    #   `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #   * `arn:aws:automate:region:ec2:stop`
+    #
+    #   * `arn:aws:automate:region:ec2:terminate`
+    #
+    #   * `arn:aws:automate:region:ec2:reboot`
+    #
+    #   * `arn:aws:automate:region:ec2:recover`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Stop/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Terminate/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Reboot/1.0`
+    #
+    #   * `arn:aws:swf:region:account-id:action/actions/AWS_EC2.InstanceId.Recover/1.0`
+    #
+    #   **Autoscaling action:**
+    #
+    #   * `arn:aws:autoscaling:region:account-id:scalingPolicy:policy-id:autoScalingGroupName/group-friendly-name:policyName/policy-friendly-name
+    #     `
+    #
+    #   ^
+    #
+    #   **Lambda actions:**
+    #
+    #   * Invoke the latest version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name `
+    #
+    #   * Invoke a specific version of a Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:version-number
+    #     `
+    #
+    #   * Invoke a function by using an alias Lambda function:
+    #     `arn:aws:lambda:region:account-id:function:function-name:alias-name
+    #     `
+    #
+    #   **SNS notification action:**
+    #
+    #   * `arn:aws:sns:region:account-id:sns-topic-name `
+    #
+    #   ^
+    #
+    #   **SSM integration actions:**
+    #
+    #   * `arn:aws:ssm:region:account-id:opsitem:severity#CATEGORY=category-name
+    #     `
+    #
+    #   * `arn:aws:ssm-incidents::account-id:responseplan/response-plan-name
+    #     `
     #   @return [Array<String>]
     #
     # @!attribute [rw] metric_name
@@ -3259,8 +3816,8 @@ module Aws::CloudWatch
     #   a `Metrics` array.
     #
     #   If you are creating an alarm based on a math expression, you cannot
-    #   specify this parameter, or any of the `Dimensions`, `Period`,
-    #   `Namespace`, `Statistic`, or `ExtendedStatistic` parameters.
+    #   specify this parameter, or any of the `Namespace`, `Dimensions`,
+    #   `Period`, `Unit`, `Statistic`, or `ExtendedStatistic` parameters.
     #   Instead, you specify all this information in the `Metrics` array.
     #   @return [String]
     #
@@ -3276,10 +3833,40 @@ module Aws::CloudWatch
     #   @return [String]
     #
     # @!attribute [rw] extended_statistic
-    #   The percentile statistic for the metric specified in `MetricName`.
-    #   Specify a value between p0.0 and p100. When you call
-    #   `PutMetricAlarm` and specify a `MetricName`, you must specify either
-    #   `Statistic` or `ExtendedStatistic,` but not both.
+    #   The extended statistic for the metric specified in `MetricName`.
+    #   When you call `PutMetricAlarm` and specify a `MetricName`, you must
+    #   specify either `Statistic` or `ExtendedStatistic` but not both.
+    #
+    #   If you specify `ExtendedStatistic`, the following are valid values:
+    #
+    #   * `p90`
+    #
+    #   * `tm90`
+    #
+    #   * `tc90`
+    #
+    #   * `ts90`
+    #
+    #   * `wm90`
+    #
+    #   * `IQM`
+    #
+    #   * `PR(n:m)` where n and m are values of the metric
+    #
+    #   * `TC(X%:X%)` where X is between 10 and 90 inclusive.
+    #
+    #   * `TM(X%:X%)` where X is between 10 and 90 inclusive.
+    #
+    #   * `TS(X%:X%)` where X is between 10 and 90 inclusive.
+    #
+    #   * `WM(X%:X%)` where X is between 10 and 90 inclusive.
+    #
+    #   For more information about these extended statistics, see
+    #   [CloudWatch statistics definitions][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html
     #   @return [String]
     #
     # @!attribute [rw] dimensions
@@ -3323,7 +3910,9 @@ module Aws::CloudWatch
     #   interfaces. You can also specify a unit when you create a custom
     #   metric. Units help provide conceptual meaning to your data. Metric
     #   data points that specify a unit of measure, such as Percent, are
-    #   aggregated separately.
+    #   aggregated separately. If you are creating an alarm based on a
+    #   metric math expression, you can specify the unit for each metric (if
+    #   needed) within the objects in the `Metrics` array.
     #
     #   If you don't specify `Unit`, CloudWatch retrieves all unit types
     #   that have been published for the metric and attempts to evaluate the
@@ -3332,7 +3921,7 @@ module Aws::CloudWatch
     #
     #   However, if the metric is published with multiple types of units and
     #   you don't specify a unit, the alarm's behavior is not defined and
-    #   it behaves predictably.
+    #   it behaves unpredictably.
     #
     #   We recommend omitting `Unit` so that you don't inadvertently
     #   specify an incorrect unit that is not published for this metric.
@@ -3388,6 +3977,13 @@ module Aws::CloudWatch
     #
     #   Valid Values: `breaching | notBreaching | ignore | missing`
     #
+    #   <note markdown="1"> Alarms that evaluate metrics in the `AWS/DynamoDB` namespace always
+    #   `ignore` missing data even if you choose a different option for
+    #   `TreatMissingData`. When an `AWS/DynamoDB` metric has missing data,
+    #   alarms that evaluate that metric remain in their current state.
+    #
+    #    </note>
+    #
     #
     #
     #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data
@@ -3424,10 +4020,10 @@ module Aws::CloudWatch
     #   [MetricDataQuery][1].
     #
     #   If you use the `Metrics` parameter, you cannot include the
-    #   `MetricName`, `Dimensions`, `Period`, `Namespace`, `Statistic`, or
-    #   `ExtendedStatistic` parameters of `PutMetricAlarm` in the same
-    #   operation. Instead, you retrieve the metrics you are using in your
-    #   math expression as part of the `Metrics` array.
+    #   `Namespace`, `MetricName`, `Dimensions`, `Period`, `Unit`,
+    #   `Statistic`, or `ExtendedStatistic` parameters of `PutMetricAlarm`
+    #   in the same operation. Instead, you retrieve the metrics you are
+    #   using in your math expression as part of the `Metrics` array.
     #
     #
     #
@@ -3436,7 +4032,9 @@ module Aws::CloudWatch
     #
     # @!attribute [rw] tags
     #   A list of key-value pairs to associate with the alarm. You can
-    #   associate as many as 50 tags with an alarm.
+    #   associate as many as 50 tags with an alarm. To be able to associate
+    #   tags with the alarm when you create the alarm, you must have the
+    #   `cloudwatch:TagResource` permission.
     #
     #   Tags can help you organize and categorize your resources. You can
     #   also use them to scope user permissions by granting a user
@@ -3493,45 +4091,17 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutMetricDataInput
-    #   data as a hash:
-    #
-    #       {
-    #         namespace: "Namespace", # required
-    #         metric_data: [ # required
-    #           {
-    #             metric_name: "MetricName", # required
-    #             dimensions: [
-    #               {
-    #                 name: "DimensionName", # required
-    #                 value: "DimensionValue", # required
-    #               },
-    #             ],
-    #             timestamp: Time.now,
-    #             value: 1.0,
-    #             statistic_values: {
-    #               sample_count: 1.0, # required
-    #               sum: 1.0, # required
-    #               minimum: 1.0, # required
-    #               maximum: 1.0, # required
-    #             },
-    #             values: [1.0],
-    #             counts: [1.0],
-    #             unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
-    #             storage_resolution: 1,
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] namespace
-    #   The namespace for the metric data.
+    #   The namespace for the metric data. You can use ASCII characters for
+    #   the namespace, except for control characters which are not
+    #   supported.
     #
-    #   To avoid conflicts with AWS service namespaces, you should not
-    #   specify a namespace that begins with `AWS/`
+    #   To avoid conflicts with Amazon Web Services service namespaces, you
+    #   should not specify a namespace that begins with `AWS/`
     #   @return [String]
     #
     # @!attribute [rw] metric_data
-    #   The data for the metric. The array can include no more than 20
+    #   The data for the metric. The array can include no more than 1000
     #   metrics per call.
     #   @return [Array<Types::MetricDatum>]
     #
@@ -3544,16 +4114,139 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
+    # @!attribute [rw] name
+    #   If you are creating a new metric stream, this is the name for the
+    #   new stream. The name must be different than the names of other
+    #   metric streams in this account and Region.
+    #
+    #   If you are updating a metric stream, specify the name of that stream
+    #   here.
+    #
+    #   Valid characters are A-Z, a-z, 0-9, "-" and "\_".
+    #   @return [String]
+    #
+    # @!attribute [rw] include_filters
+    #   If you specify this parameter, the stream sends only the metrics
+    #   from the metric namespaces that you specify here.
+    #
+    #   You cannot include `IncludeFilters` and `ExcludeFilters` in the same
+    #   operation.
+    #   @return [Array<Types::MetricStreamFilter>]
+    #
+    # @!attribute [rw] exclude_filters
+    #   If you specify this parameter, the stream sends metrics from all
+    #   metric namespaces except for the namespaces that you specify here.
+    #
+    #   You cannot include `ExcludeFilters` and `IncludeFilters` in the same
+    #   operation.
+    #   @return [Array<Types::MetricStreamFilter>]
+    #
+    # @!attribute [rw] firehose_arn
+    #   The ARN of the Amazon Kinesis Data Firehose delivery stream to use
+    #   for this metric stream. This Amazon Kinesis Data Firehose delivery
+    #   stream must already exist and must be in the same account as the
+    #   metric stream.
+    #   @return [String]
+    #
+    # @!attribute [rw] role_arn
+    #   The ARN of an IAM role that this metric stream will use to access
+    #   Amazon Kinesis Data Firehose resources. This IAM role must already
+    #   exist and must be in the same account as the metric stream. This IAM
+    #   role must include the following permissions:
+    #
+    #   * firehose:PutRecord
+    #
+    #   * firehose:PutRecordBatch
+    #   @return [String]
+    #
+    # @!attribute [rw] output_format
+    #   The output format for the stream. Valid values are `json`,
+    #   `opentelemetry1.0`, and `opentelemetry0.7`. For more information
+    #   about metric stream output formats, see [ Metric streams output
+    #   formats][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-metric-streams-formats.html
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   A list of key-value pairs to associate with the metric stream. You
+    #   can associate as many as 50 tags with a metric stream.
+    #
+    #   Tags can help you organize and categorize your resources. You can
+    #   also use them to scope user permissions by granting a user
+    #   permission to access or change only resources with certain tag
+    #   values.
+    #
+    #   You can use this parameter only when you are creating a new metric
+    #   stream. If you are using this operation to update an existing metric
+    #   stream, any tags you specify in this parameter are ignored. To
+    #   change the tags of an existing metric stream, use [TagResource][1]
+    #   or [UntagResource][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_TagResource.html
+    #   [2]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_UntagResource.html
+    #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] statistics_configurations
+    #   By default, a metric stream always sends the `MAX`, `MIN`, `SUM`,
+    #   and `SAMPLECOUNT` statistics for each metric that is streamed. You
+    #   can use this parameter to have the metric stream also send
+    #   additional statistics in the stream. This array can have up to 100
+    #   members.
+    #
+    #   For each entry in this array, you specify one or more metrics and
+    #   the list of additional statistics to stream for those metrics. The
+    #   additional statistics that you can stream depend on the stream's
+    #   `OutputFormat`. If the `OutputFormat` is `json`, you can stream any
+    #   additional statistic that is supported by CloudWatch, listed in [
+    #   CloudWatch statistics definitions][1]. If the `OutputFormat` is
+    #   `opentelemetry1.0` or `opentelemetry0.7`, you can stream percentile
+    #   statistics such as p95, p99.9, and so on.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html.html
+    #   @return [Array<Types::MetricStreamStatisticsConfiguration>]
+    #
+    # @!attribute [rw] include_linked_accounts_metrics
+    #   If you are creating a metric stream in a monitoring account, specify
+    #   `true` to include metrics from source accounts in the metric stream.
+    #   @return [Boolean]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/PutMetricStreamInput AWS API Documentation
+    #
+    class PutMetricStreamInput < Struct.new(
+      :name,
+      :include_filters,
+      :exclude_filters,
+      :firehose_arn,
+      :role_arn,
+      :output_format,
+      :tags,
+      :statistics_configurations,
+      :include_linked_accounts_metrics)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] arn
+    #   The ARN of the metric stream.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/PutMetricStreamOutput AWS API Documentation
+    #
+    class PutMetricStreamOutput < Struct.new(
+      :arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Specifies one range of days or times to exclude from use for training
     # an anomaly detection model.
-    #
-    # @note When making an API call, you may pass Range
-    #   data as a hash:
-    #
-    #       {
-    #         start_time: Time.now, # required
-    #         end_time: Time.now, # required
-    #       }
     #
     # @!attribute [rw] start_time
     #   The start time of the range to exclude. The format is
@@ -3604,16 +4297,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass SetAlarmStateInput
-    #   data as a hash:
-    #
-    #       {
-    #         alarm_name: "AlarmName", # required
-    #         state_value: "OK", # required, accepts OK, ALARM, INSUFFICIENT_DATA
-    #         state_reason: "StateReason", # required
-    #         state_reason_data: "StateReasonData",
-    #       }
-    #
     # @!attribute [rw] alarm_name
     #   The name of the alarm.
     #   @return [String]
@@ -3648,17 +4331,69 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
+    # Designates the CloudWatch metric and statistic that provides the time
+    # series the anomaly detector uses as input. If you have enabled unified
+    # cross-account observability, and this account is a monitoring account,
+    # the metric can be in the same account or a source account.
+    #
+    # @!attribute [rw] account_id
+    #   If the CloudWatch metric that provides the time series that the
+    #   anomaly detector uses as input is in another account, specify that
+    #   account ID here. If you omit this parameter, the current account is
+    #   used.
+    #   @return [String]
+    #
+    # @!attribute [rw] namespace
+    #   The namespace of the metric to create the anomaly detection model
+    #   for.
+    #   @return [String]
+    #
+    # @!attribute [rw] metric_name
+    #   The name of the metric to create the anomaly detection model for.
+    #   @return [String]
+    #
+    # @!attribute [rw] dimensions
+    #   The metric dimensions to create the anomaly detection model for.
+    #   @return [Array<Types::Dimension>]
+    #
+    # @!attribute [rw] stat
+    #   The statistic to use for the metric and anomaly detection model.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/SingleMetricAnomalyDetector AWS API Documentation
+    #
+    class SingleMetricAnomalyDetector < Struct.new(
+      :account_id,
+      :namespace,
+      :metric_name,
+      :dimensions,
+      :stat)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] names
+    #   The array of the names of metric streams to start streaming.
+    #
+    #   This is an "all or nothing" operation. If you do not have
+    #   permission to access all of the metric streams that you list here,
+    #   then none of the streams that you list in the operation will start
+    #   streaming.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/StartMetricStreamsInput AWS API Documentation
+    #
+    class StartMetricStreamsInput < Struct.new(
+      :names)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/StartMetricStreamsOutput AWS API Documentation
+    #
+    class StartMetricStreamsOutput < Aws::EmptyStructure; end
+
     # Represents a set of statistics that describes a specific metric.
-    #
-    # @note When making an API call, you may pass StatisticSet
-    #   data as a hash:
-    #
-    #       {
-    #         sample_count: 1.0, # required
-    #         sum: 1.0, # required
-    #         minimum: 1.0, # required
-    #         maximum: 1.0, # required
-    #       }
     #
     # @!attribute [rw] sample_count
     #   The number of samples used for the statistic set.
@@ -3687,15 +4422,28 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
+    # @!attribute [rw] names
+    #   The array of the names of metric streams to stop streaming.
+    #
+    #   This is an "all or nothing" operation. If you do not have
+    #   permission to access all of the metric streams that you list here,
+    #   then none of the streams that you list in the operation will stop
+    #   streaming.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/StopMetricStreamsInput AWS API Documentation
+    #
+    class StopMetricStreamsInput < Struct.new(
+      :names)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/monitoring-2010-08-01/StopMetricStreamsOutput AWS API Documentation
+    #
+    class StopMetricStreamsOutput < Aws::EmptyStructure; end
+
     # A key-value pair associated with a CloudWatch resource.
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey", # required
-    #         value: "TagValue", # required
-    #       }
     #
     # @!attribute [rw] key
     #   A string that you can use to assign a value. The combination of tag
@@ -3715,19 +4463,6 @@ module Aws::CloudWatch
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "AmazonResourceName", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The ARN of the CloudWatch resource that you're adding tags to.
     #
@@ -3735,7 +4470,7 @@ module Aws::CloudWatch
     #   `arn:aws:cloudwatch:Region:account-id:alarm:alarm-name `
     #
     #   The ARN format of a Contributor Insights rule is
-    #   `arn:aws:cloudwatch:Region:account-id:insight-rule:insight-rule-name
+    #   `arn:aws:cloudwatch:Region:account-id:insight-rule/insight-rule-name
     #   `
     #
     #   For more information about ARN format, see [ Resource Types Defined
@@ -3764,14 +4499,6 @@ module Aws::CloudWatch
     #
     class TagResourceOutput < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UntagResourceInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "AmazonResourceName", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The ARN of the CloudWatch resource that you're removing tags from.
     #
@@ -3779,7 +4506,7 @@ module Aws::CloudWatch
     #   `arn:aws:cloudwatch:Region:account-id:alarm:alarm-name `
     #
     #   The ARN format of a Contributor Insights rule is
-    #   `arn:aws:cloudwatch:Region:account-id:insight-rule:insight-rule-name
+    #   `arn:aws:cloudwatch:Region:account-id:insight-rule/insight-rule-name
     #   `
     #
     #   For more information about ARN format, see [ Resource Types Defined
@@ -3810,3 +4537,4 @@ module Aws::CloudWatch
 
   end
 end
+

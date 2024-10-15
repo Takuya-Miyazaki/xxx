@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::ApplicationDiscoveryService
   # @api private
@@ -22,11 +23,19 @@ module Aws::ApplicationDiscoveryService
     AgentNetworkInfoList = Shapes::ListShape.new(name: 'AgentNetworkInfoList')
     AgentStatus = Shapes::StringShape.new(name: 'AgentStatus')
     AgentsInfo = Shapes::ListShape.new(name: 'AgentsInfo')
+    ApplicationDescription = Shapes::StringShape.new(name: 'ApplicationDescription')
     ApplicationId = Shapes::StringShape.new(name: 'ApplicationId')
     ApplicationIdsList = Shapes::ListShape.new(name: 'ApplicationIdsList')
+    ApplicationName = Shapes::StringShape.new(name: 'ApplicationName')
     AssociateConfigurationItemsToApplicationRequest = Shapes::StructureShape.new(name: 'AssociateConfigurationItemsToApplicationRequest')
     AssociateConfigurationItemsToApplicationResponse = Shapes::StructureShape.new(name: 'AssociateConfigurationItemsToApplicationResponse')
     AuthorizationErrorException = Shapes::StructureShape.new(name: 'AuthorizationErrorException')
+    BatchDeleteAgentError = Shapes::StructureShape.new(name: 'BatchDeleteAgentError')
+    BatchDeleteAgentErrors = Shapes::ListShape.new(name: 'BatchDeleteAgentErrors')
+    BatchDeleteAgentsRequest = Shapes::StructureShape.new(name: 'BatchDeleteAgentsRequest')
+    BatchDeleteAgentsResponse = Shapes::StructureShape.new(name: 'BatchDeleteAgentsResponse')
+    BatchDeleteConfigurationTask = Shapes::StructureShape.new(name: 'BatchDeleteConfigurationTask')
+    BatchDeleteConfigurationTaskStatus = Shapes::StringShape.new(name: 'BatchDeleteConfigurationTaskStatus')
     BatchDeleteImportDataError = Shapes::StructureShape.new(name: 'BatchDeleteImportDataError')
     BatchDeleteImportDataErrorCode = Shapes::StringShape.new(name: 'BatchDeleteImportDataErrorCode')
     BatchDeleteImportDataErrorDescription = Shapes::StringShape.new(name: 'BatchDeleteImportDataErrorDescription')
@@ -56,15 +65,25 @@ module Aws::ApplicationDiscoveryService
     CreateTagsRequest = Shapes::StructureShape.new(name: 'CreateTagsRequest')
     CreateTagsResponse = Shapes::StructureShape.new(name: 'CreateTagsResponse')
     CustomerAgentInfo = Shapes::StructureShape.new(name: 'CustomerAgentInfo')
+    CustomerAgentlessCollectorInfo = Shapes::StructureShape.new(name: 'CustomerAgentlessCollectorInfo')
     CustomerConnectorInfo = Shapes::StructureShape.new(name: 'CustomerConnectorInfo')
+    CustomerMeCollectorInfo = Shapes::StructureShape.new(name: 'CustomerMeCollectorInfo')
     DataSource = Shapes::StringShape.new(name: 'DataSource')
     DatabaseName = Shapes::StringShape.new(name: 'DatabaseName')
+    DeleteAgent = Shapes::StructureShape.new(name: 'DeleteAgent')
+    DeleteAgentErrorCode = Shapes::StringShape.new(name: 'DeleteAgentErrorCode')
+    DeleteAgents = Shapes::ListShape.new(name: 'DeleteAgents')
     DeleteApplicationsRequest = Shapes::StructureShape.new(name: 'DeleteApplicationsRequest')
     DeleteApplicationsResponse = Shapes::StructureShape.new(name: 'DeleteApplicationsResponse')
     DeleteTagsRequest = Shapes::StructureShape.new(name: 'DeleteTagsRequest')
     DeleteTagsResponse = Shapes::StructureShape.new(name: 'DeleteTagsResponse')
+    DeletionConfigurationItemType = Shapes::StringShape.new(name: 'DeletionConfigurationItemType')
+    DeletionWarning = Shapes::StructureShape.new(name: 'DeletionWarning')
+    DeletionWarningsList = Shapes::ListShape.new(name: 'DeletionWarningsList')
     DescribeAgentsRequest = Shapes::StructureShape.new(name: 'DescribeAgentsRequest')
     DescribeAgentsResponse = Shapes::StructureShape.new(name: 'DescribeAgentsResponse')
+    DescribeBatchDeleteConfigurationTaskRequest = Shapes::StructureShape.new(name: 'DescribeBatchDeleteConfigurationTaskRequest')
+    DescribeBatchDeleteConfigurationTaskResponse = Shapes::StructureShape.new(name: 'DescribeBatchDeleteConfigurationTaskResponse')
     DescribeConfigurationsAttribute = Shapes::MapShape.new(name: 'DescribeConfigurationsAttribute')
     DescribeConfigurationsAttributes = Shapes::ListShape.new(name: 'DescribeConfigurationsAttributes')
     DescribeConfigurationsRequest = Shapes::StructureShape.new(name: 'DescribeConfigurationsRequest')
@@ -84,17 +103,26 @@ module Aws::ApplicationDiscoveryService
     DescribeTagsResponse = Shapes::StructureShape.new(name: 'DescribeTagsResponse')
     DisassociateConfigurationItemsFromApplicationRequest = Shapes::StructureShape.new(name: 'DisassociateConfigurationItemsFromApplicationRequest')
     DisassociateConfigurationItemsFromApplicationResponse = Shapes::StructureShape.new(name: 'DisassociateConfigurationItemsFromApplicationResponse')
+    EC2InstanceType = Shapes::StringShape.new(name: 'EC2InstanceType')
+    Ec2RecommendationsExportPreferences = Shapes::StructureShape.new(name: 'Ec2RecommendationsExportPreferences')
+    ErrorMessage = Shapes::StringShape.new(name: 'ErrorMessage')
+    ErrorStatusCode = Shapes::IntegerShape.new(name: 'ErrorStatusCode')
+    ExcludedInstanceTypes = Shapes::ListShape.new(name: 'ExcludedInstanceTypes')
     ExportConfigurationsResponse = Shapes::StructureShape.new(name: 'ExportConfigurationsResponse')
     ExportDataFormat = Shapes::StringShape.new(name: 'ExportDataFormat')
     ExportDataFormats = Shapes::ListShape.new(name: 'ExportDataFormats')
+    ExportEnabled = Shapes::BooleanShape.new(name: 'ExportEnabled')
     ExportFilter = Shapes::StructureShape.new(name: 'ExportFilter')
     ExportFilters = Shapes::ListShape.new(name: 'ExportFilters')
     ExportIds = Shapes::ListShape.new(name: 'ExportIds')
     ExportInfo = Shapes::StructureShape.new(name: 'ExportInfo')
+    ExportPreferences = Shapes::UnionShape.new(name: 'ExportPreferences')
     ExportRequestTime = Shapes::TimestampShape.new(name: 'ExportRequestTime')
     ExportStatus = Shapes::StringShape.new(name: 'ExportStatus')
     ExportStatusMessage = Shapes::StringShape.new(name: 'ExportStatusMessage')
     ExportsInfo = Shapes::ListShape.new(name: 'ExportsInfo')
+    FailedConfiguration = Shapes::StructureShape.new(name: 'FailedConfiguration')
+    FailedConfigurationList = Shapes::ListShape.new(name: 'FailedConfigurationList')
     Filter = Shapes::StructureShape.new(name: 'Filter')
     FilterName = Shapes::StringShape.new(name: 'FilterName')
     FilterValue = Shapes::StringShape.new(name: 'FilterValue')
@@ -116,6 +144,7 @@ module Aws::ApplicationDiscoveryService
     Integer = Shapes::IntegerShape.new(name: 'Integer')
     InvalidParameterException = Shapes::StructureShape.new(name: 'InvalidParameterException')
     InvalidParameterValueException = Shapes::StructureShape.new(name: 'InvalidParameterValueException')
+    LimitExceededException = Shapes::StructureShape.new(name: 'LimitExceededException')
     ListConfigurationsRequest = Shapes::StructureShape.new(name: 'ListConfigurationsRequest')
     ListConfigurationsResponse = Shapes::StructureShape.new(name: 'ListConfigurationsResponse')
     ListServerNeighborsRequest = Shapes::StructureShape.new(name: 'ListServerNeighborsRequest')
@@ -125,15 +154,21 @@ module Aws::ApplicationDiscoveryService
     NeighborConnectionDetail = Shapes::StructureShape.new(name: 'NeighborConnectionDetail')
     NeighborDetailsList = Shapes::ListShape.new(name: 'NeighborDetailsList')
     NextToken = Shapes::StringShape.new(name: 'NextToken')
+    OfferingClass = Shapes::StringShape.new(name: 'OfferingClass')
     OperationNotPermittedException = Shapes::StructureShape.new(name: 'OperationNotPermittedException')
     OrderByElement = Shapes::StructureShape.new(name: 'OrderByElement')
+    OrderByElementFieldName = Shapes::StringShape.new(name: 'OrderByElementFieldName')
     OrderByList = Shapes::ListShape.new(name: 'OrderByList')
+    PurchasingOption = Shapes::StringShape.new(name: 'PurchasingOption')
+    ReservedInstanceOptions = Shapes::StructureShape.new(name: 'ReservedInstanceOptions')
     ResourceInUseException = Shapes::StructureShape.new(name: 'ResourceInUseException')
     ResourceNotFoundException = Shapes::StructureShape.new(name: 'ResourceNotFoundException')
     S3Bucket = Shapes::StringShape.new(name: 'S3Bucket')
     S3PresignedUrl = Shapes::StringShape.new(name: 'S3PresignedUrl')
     SchemaStorageConfig = Shapes::MapShape.new(name: 'SchemaStorageConfig')
     ServerInternalErrorException = Shapes::StructureShape.new(name: 'ServerInternalErrorException')
+    StartBatchDeleteConfigurationTaskRequest = Shapes::StructureShape.new(name: 'StartBatchDeleteConfigurationTaskRequest')
+    StartBatchDeleteConfigurationTaskResponse = Shapes::StructureShape.new(name: 'StartBatchDeleteConfigurationTaskResponse')
     StartContinuousExportRequest = Shapes::StructureShape.new(name: 'StartContinuousExportRequest')
     StartContinuousExportResponse = Shapes::StructureShape.new(name: 'StartContinuousExportResponse')
     StartDataCollectionByAgentIdsRequest = Shapes::StructureShape.new(name: 'StartDataCollectionByAgentIdsRequest')
@@ -154,10 +189,19 @@ module Aws::ApplicationDiscoveryService
     TagKey = Shapes::StringShape.new(name: 'TagKey')
     TagSet = Shapes::ListShape.new(name: 'TagSet')
     TagValue = Shapes::StringShape.new(name: 'TagValue')
+    Tenancy = Shapes::StringShape.new(name: 'Tenancy')
+    TermLength = Shapes::StringShape.new(name: 'TermLength')
     TimeStamp = Shapes::TimestampShape.new(name: 'TimeStamp')
     ToDeleteIdentifierList = Shapes::ListShape.new(name: 'ToDeleteIdentifierList')
+    UUID = Shapes::StringShape.new(name: 'UUID')
     UpdateApplicationRequest = Shapes::StructureShape.new(name: 'UpdateApplicationRequest')
     UpdateApplicationResponse = Shapes::StructureShape.new(name: 'UpdateApplicationResponse')
+    UsageMetricBasis = Shapes::StructureShape.new(name: 'UsageMetricBasis')
+    UsageMetricBasisName = Shapes::StringShape.new(name: 'UsageMetricBasisName')
+    UsageMetricPercentageAdjust = Shapes::FloatShape.new(name: 'UsageMetricPercentageAdjust')
+    UserPreferredRegion = Shapes::StringShape.new(name: 'UserPreferredRegion')
+    WarningCode = Shapes::IntegerShape.new(name: 'WarningCode')
+    WarningText = Shapes::StringShape.new(name: 'WarningText')
     orderString = Shapes::StringShape.new(name: 'orderString')
 
     AgentConfigurationStatus.add_member(:agent_id, Shapes::ShapeRef.new(shape: String, location_name: "agentId"))
@@ -200,6 +244,30 @@ module Aws::ApplicationDiscoveryService
     AuthorizationErrorException.add_member(:message, Shapes::ShapeRef.new(shape: Message, location_name: "message"))
     AuthorizationErrorException.struct_class = Types::AuthorizationErrorException
 
+    BatchDeleteAgentError.add_member(:agent_id, Shapes::ShapeRef.new(shape: AgentId, required: true, location_name: "agentId"))
+    BatchDeleteAgentError.add_member(:error_message, Shapes::ShapeRef.new(shape: String, required: true, location_name: "errorMessage"))
+    BatchDeleteAgentError.add_member(:error_code, Shapes::ShapeRef.new(shape: DeleteAgentErrorCode, required: true, location_name: "errorCode"))
+    BatchDeleteAgentError.struct_class = Types::BatchDeleteAgentError
+
+    BatchDeleteAgentErrors.member = Shapes::ShapeRef.new(shape: BatchDeleteAgentError)
+
+    BatchDeleteAgentsRequest.add_member(:delete_agents, Shapes::ShapeRef.new(shape: DeleteAgents, required: true, location_name: "deleteAgents"))
+    BatchDeleteAgentsRequest.struct_class = Types::BatchDeleteAgentsRequest
+
+    BatchDeleteAgentsResponse.add_member(:errors, Shapes::ShapeRef.new(shape: BatchDeleteAgentErrors, location_name: "errors"))
+    BatchDeleteAgentsResponse.struct_class = Types::BatchDeleteAgentsResponse
+
+    BatchDeleteConfigurationTask.add_member(:task_id, Shapes::ShapeRef.new(shape: UUID, location_name: "taskId"))
+    BatchDeleteConfigurationTask.add_member(:status, Shapes::ShapeRef.new(shape: BatchDeleteConfigurationTaskStatus, location_name: "status"))
+    BatchDeleteConfigurationTask.add_member(:start_time, Shapes::ShapeRef.new(shape: TimeStamp, location_name: "startTime"))
+    BatchDeleteConfigurationTask.add_member(:end_time, Shapes::ShapeRef.new(shape: TimeStamp, location_name: "endTime"))
+    BatchDeleteConfigurationTask.add_member(:configuration_type, Shapes::ShapeRef.new(shape: DeletionConfigurationItemType, location_name: "configurationType"))
+    BatchDeleteConfigurationTask.add_member(:requested_configurations, Shapes::ShapeRef.new(shape: ConfigurationIdList, location_name: "requestedConfigurations"))
+    BatchDeleteConfigurationTask.add_member(:deleted_configurations, Shapes::ShapeRef.new(shape: ConfigurationIdList, location_name: "deletedConfigurations"))
+    BatchDeleteConfigurationTask.add_member(:failed_configurations, Shapes::ShapeRef.new(shape: FailedConfigurationList, location_name: "failedConfigurations"))
+    BatchDeleteConfigurationTask.add_member(:deletion_warnings, Shapes::ShapeRef.new(shape: DeletionWarningsList, location_name: "deletionWarnings"))
+    BatchDeleteConfigurationTask.struct_class = Types::BatchDeleteConfigurationTask
+
     BatchDeleteImportDataError.add_member(:import_task_id, Shapes::ShapeRef.new(shape: ImportTaskIdentifier, location_name: "importTaskId"))
     BatchDeleteImportDataError.add_member(:error_code, Shapes::ShapeRef.new(shape: BatchDeleteImportDataErrorCode, location_name: "errorCode"))
     BatchDeleteImportDataError.add_member(:error_description, Shapes::ShapeRef.new(shape: BatchDeleteImportDataErrorDescription, location_name: "errorDescription"))
@@ -208,6 +276,7 @@ module Aws::ApplicationDiscoveryService
     BatchDeleteImportDataErrorList.member = Shapes::ShapeRef.new(shape: BatchDeleteImportDataError)
 
     BatchDeleteImportDataRequest.add_member(:import_task_ids, Shapes::ShapeRef.new(shape: ToDeleteIdentifierList, required: true, location_name: "importTaskIds"))
+    BatchDeleteImportDataRequest.add_member(:delete_history, Shapes::ShapeRef.new(shape: Boolean, location_name: "deleteHistory"))
     BatchDeleteImportDataRequest.struct_class = Types::BatchDeleteImportDataRequest
 
     BatchDeleteImportDataResponse.add_member(:errors, Shapes::ShapeRef.new(shape: BatchDeleteImportDataErrorList, location_name: "errors"))
@@ -246,8 +315,8 @@ module Aws::ApplicationDiscoveryService
 
     ContinuousExportIds.member = Shapes::ShapeRef.new(shape: ConfigurationsExportId)
 
-    CreateApplicationRequest.add_member(:name, Shapes::ShapeRef.new(shape: String, required: true, location_name: "name"))
-    CreateApplicationRequest.add_member(:description, Shapes::ShapeRef.new(shape: String, location_name: "description"))
+    CreateApplicationRequest.add_member(:name, Shapes::ShapeRef.new(shape: ApplicationName, required: true, location_name: "name"))
+    CreateApplicationRequest.add_member(:description, Shapes::ShapeRef.new(shape: ApplicationDescription, location_name: "description"))
     CreateApplicationRequest.struct_class = Types::CreateApplicationRequest
 
     CreateApplicationResponse.add_member(:configuration_id, Shapes::ShapeRef.new(shape: String, location_name: "configurationId"))
@@ -268,6 +337,15 @@ module Aws::ApplicationDiscoveryService
     CustomerAgentInfo.add_member(:unknown_agents, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "unknownAgents"))
     CustomerAgentInfo.struct_class = Types::CustomerAgentInfo
 
+    CustomerAgentlessCollectorInfo.add_member(:active_agentless_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "activeAgentlessCollectors"))
+    CustomerAgentlessCollectorInfo.add_member(:healthy_agentless_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "healthyAgentlessCollectors"))
+    CustomerAgentlessCollectorInfo.add_member(:deny_listed_agentless_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "denyListedAgentlessCollectors"))
+    CustomerAgentlessCollectorInfo.add_member(:shutdown_agentless_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "shutdownAgentlessCollectors"))
+    CustomerAgentlessCollectorInfo.add_member(:unhealthy_agentless_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "unhealthyAgentlessCollectors"))
+    CustomerAgentlessCollectorInfo.add_member(:total_agentless_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "totalAgentlessCollectors"))
+    CustomerAgentlessCollectorInfo.add_member(:unknown_agentless_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "unknownAgentlessCollectors"))
+    CustomerAgentlessCollectorInfo.struct_class = Types::CustomerAgentlessCollectorInfo
+
     CustomerConnectorInfo.add_member(:active_connectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "activeConnectors"))
     CustomerConnectorInfo.add_member(:healthy_connectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "healthyConnectors"))
     CustomerConnectorInfo.add_member(:black_listed_connectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "blackListedConnectors"))
@@ -276,6 +354,21 @@ module Aws::ApplicationDiscoveryService
     CustomerConnectorInfo.add_member(:total_connectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "totalConnectors"))
     CustomerConnectorInfo.add_member(:unknown_connectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "unknownConnectors"))
     CustomerConnectorInfo.struct_class = Types::CustomerConnectorInfo
+
+    CustomerMeCollectorInfo.add_member(:active_me_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "activeMeCollectors"))
+    CustomerMeCollectorInfo.add_member(:healthy_me_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "healthyMeCollectors"))
+    CustomerMeCollectorInfo.add_member(:deny_listed_me_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "denyListedMeCollectors"))
+    CustomerMeCollectorInfo.add_member(:shutdown_me_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "shutdownMeCollectors"))
+    CustomerMeCollectorInfo.add_member(:unhealthy_me_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "unhealthyMeCollectors"))
+    CustomerMeCollectorInfo.add_member(:total_me_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "totalMeCollectors"))
+    CustomerMeCollectorInfo.add_member(:unknown_me_collectors, Shapes::ShapeRef.new(shape: Integer, required: true, location_name: "unknownMeCollectors"))
+    CustomerMeCollectorInfo.struct_class = Types::CustomerMeCollectorInfo
+
+    DeleteAgent.add_member(:agent_id, Shapes::ShapeRef.new(shape: AgentId, required: true, location_name: "agentId"))
+    DeleteAgent.add_member(:force, Shapes::ShapeRef.new(shape: Boolean, location_name: "force"))
+    DeleteAgent.struct_class = Types::DeleteAgent
+
+    DeleteAgents.member = Shapes::ShapeRef.new(shape: DeleteAgent)
 
     DeleteApplicationsRequest.add_member(:configuration_ids, Shapes::ShapeRef.new(shape: ApplicationIdsList, required: true, location_name: "configurationIds"))
     DeleteApplicationsRequest.struct_class = Types::DeleteApplicationsRequest
@@ -288,6 +381,13 @@ module Aws::ApplicationDiscoveryService
 
     DeleteTagsResponse.struct_class = Types::DeleteTagsResponse
 
+    DeletionWarning.add_member(:configuration_id, Shapes::ShapeRef.new(shape: ConfigurationId, location_name: "configurationId"))
+    DeletionWarning.add_member(:warning_code, Shapes::ShapeRef.new(shape: WarningCode, location_name: "warningCode"))
+    DeletionWarning.add_member(:warning_text, Shapes::ShapeRef.new(shape: WarningText, location_name: "warningText"))
+    DeletionWarning.struct_class = Types::DeletionWarning
+
+    DeletionWarningsList.member = Shapes::ShapeRef.new(shape: DeletionWarning)
+
     DescribeAgentsRequest.add_member(:agent_ids, Shapes::ShapeRef.new(shape: AgentIds, location_name: "agentIds"))
     DescribeAgentsRequest.add_member(:filters, Shapes::ShapeRef.new(shape: Filters, location_name: "filters"))
     DescribeAgentsRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: Integer, location_name: "maxResults"))
@@ -297,6 +397,12 @@ module Aws::ApplicationDiscoveryService
     DescribeAgentsResponse.add_member(:agents_info, Shapes::ShapeRef.new(shape: AgentsInfo, location_name: "agentsInfo"))
     DescribeAgentsResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "nextToken"))
     DescribeAgentsResponse.struct_class = Types::DescribeAgentsResponse
+
+    DescribeBatchDeleteConfigurationTaskRequest.add_member(:task_id, Shapes::ShapeRef.new(shape: UUID, required: true, location_name: "taskId"))
+    DescribeBatchDeleteConfigurationTaskRequest.struct_class = Types::DescribeBatchDeleteConfigurationTaskRequest
+
+    DescribeBatchDeleteConfigurationTaskResponse.add_member(:task, Shapes::ShapeRef.new(shape: BatchDeleteConfigurationTask, location_name: "task"))
+    DescribeBatchDeleteConfigurationTaskResponse.struct_class = Types::DescribeBatchDeleteConfigurationTaskResponse
 
     DescribeConfigurationsAttribute.key = Shapes::ShapeRef.new(shape: String)
     DescribeConfigurationsAttribute.value = Shapes::ShapeRef.new(shape: String)
@@ -363,6 +469,17 @@ module Aws::ApplicationDiscoveryService
 
     DisassociateConfigurationItemsFromApplicationResponse.struct_class = Types::DisassociateConfigurationItemsFromApplicationResponse
 
+    Ec2RecommendationsExportPreferences.add_member(:enabled, Shapes::ShapeRef.new(shape: ExportEnabled, location_name: "enabled"))
+    Ec2RecommendationsExportPreferences.add_member(:cpu_performance_metric_basis, Shapes::ShapeRef.new(shape: UsageMetricBasis, location_name: "cpuPerformanceMetricBasis"))
+    Ec2RecommendationsExportPreferences.add_member(:ram_performance_metric_basis, Shapes::ShapeRef.new(shape: UsageMetricBasis, location_name: "ramPerformanceMetricBasis"))
+    Ec2RecommendationsExportPreferences.add_member(:tenancy, Shapes::ShapeRef.new(shape: Tenancy, location_name: "tenancy"))
+    Ec2RecommendationsExportPreferences.add_member(:excluded_instance_types, Shapes::ShapeRef.new(shape: ExcludedInstanceTypes, location_name: "excludedInstanceTypes"))
+    Ec2RecommendationsExportPreferences.add_member(:preferred_region, Shapes::ShapeRef.new(shape: UserPreferredRegion, location_name: "preferredRegion"))
+    Ec2RecommendationsExportPreferences.add_member(:reserved_instance_options, Shapes::ShapeRef.new(shape: ReservedInstanceOptions, location_name: "reservedInstanceOptions"))
+    Ec2RecommendationsExportPreferences.struct_class = Types::Ec2RecommendationsExportPreferences
+
+    ExcludedInstanceTypes.member = Shapes::ShapeRef.new(shape: EC2InstanceType)
+
     ExportConfigurationsResponse.add_member(:export_id, Shapes::ShapeRef.new(shape: ConfigurationsExportId, location_name: "exportId"))
     ExportConfigurationsResponse.struct_class = Types::ExportConfigurationsResponse
 
@@ -387,7 +504,20 @@ module Aws::ApplicationDiscoveryService
     ExportInfo.add_member(:requested_end_time, Shapes::ShapeRef.new(shape: TimeStamp, location_name: "requestedEndTime"))
     ExportInfo.struct_class = Types::ExportInfo
 
+    ExportPreferences.add_member(:ec2_recommendations_preferences, Shapes::ShapeRef.new(shape: Ec2RecommendationsExportPreferences, location_name: "ec2RecommendationsPreferences"))
+    ExportPreferences.add_member(:unknown, Shapes::ShapeRef.new(shape: nil, location_name: 'unknown'))
+    ExportPreferences.add_member_subclass(:ec2_recommendations_preferences, Types::ExportPreferences::Ec2RecommendationsPreferences)
+    ExportPreferences.add_member_subclass(:unknown, Types::ExportPreferences::Unknown)
+    ExportPreferences.struct_class = Types::ExportPreferences
+
     ExportsInfo.member = Shapes::ShapeRef.new(shape: ExportInfo)
+
+    FailedConfiguration.add_member(:configuration_id, Shapes::ShapeRef.new(shape: ConfigurationId, location_name: "configurationId"))
+    FailedConfiguration.add_member(:error_status_code, Shapes::ShapeRef.new(shape: ErrorStatusCode, location_name: "errorStatusCode"))
+    FailedConfiguration.add_member(:error_message, Shapes::ShapeRef.new(shape: ErrorMessage, location_name: "errorMessage"))
+    FailedConfiguration.struct_class = Types::FailedConfiguration
+
+    FailedConfigurationList.member = Shapes::ShapeRef.new(shape: FailedConfiguration)
 
     Filter.add_member(:name, Shapes::ShapeRef.new(shape: String, required: true, location_name: "name"))
     Filter.add_member(:values, Shapes::ShapeRef.new(shape: FilterValues, required: true, location_name: "values"))
@@ -406,6 +536,8 @@ module Aws::ApplicationDiscoveryService
     GetDiscoverySummaryResponse.add_member(:servers_mappedto_tags, Shapes::ShapeRef.new(shape: Long, location_name: "serversMappedtoTags"))
     GetDiscoverySummaryResponse.add_member(:agent_summary, Shapes::ShapeRef.new(shape: CustomerAgentInfo, location_name: "agentSummary"))
     GetDiscoverySummaryResponse.add_member(:connector_summary, Shapes::ShapeRef.new(shape: CustomerConnectorInfo, location_name: "connectorSummary"))
+    GetDiscoverySummaryResponse.add_member(:me_collector_summary, Shapes::ShapeRef.new(shape: CustomerMeCollectorInfo, location_name: "meCollectorSummary"))
+    GetDiscoverySummaryResponse.add_member(:agentless_collector_summary, Shapes::ShapeRef.new(shape: CustomerAgentlessCollectorInfo, location_name: "agentlessCollectorSummary"))
     GetDiscoverySummaryResponse.struct_class = Types::GetDiscoverySummaryResponse
 
     HomeRegionNotSetException.add_member(:message, Shapes::ShapeRef.new(shape: Message, location_name: "message"))
@@ -439,6 +571,9 @@ module Aws::ApplicationDiscoveryService
 
     InvalidParameterValueException.add_member(:message, Shapes::ShapeRef.new(shape: Message, location_name: "message"))
     InvalidParameterValueException.struct_class = Types::InvalidParameterValueException
+
+    LimitExceededException.add_member(:message, Shapes::ShapeRef.new(shape: Message, location_name: "message"))
+    LimitExceededException.struct_class = Types::LimitExceededException
 
     ListConfigurationsRequest.add_member(:configuration_type, Shapes::ShapeRef.new(shape: ConfigurationItemType, required: true, location_name: "configurationType"))
     ListConfigurationsRequest.add_member(:filters, Shapes::ShapeRef.new(shape: Filters, location_name: "filters"))
@@ -475,11 +610,16 @@ module Aws::ApplicationDiscoveryService
     OperationNotPermittedException.add_member(:message, Shapes::ShapeRef.new(shape: Message, location_name: "message"))
     OperationNotPermittedException.struct_class = Types::OperationNotPermittedException
 
-    OrderByElement.add_member(:field_name, Shapes::ShapeRef.new(shape: String, required: true, location_name: "fieldName"))
+    OrderByElement.add_member(:field_name, Shapes::ShapeRef.new(shape: OrderByElementFieldName, required: true, location_name: "fieldName"))
     OrderByElement.add_member(:sort_order, Shapes::ShapeRef.new(shape: orderString, location_name: "sortOrder"))
     OrderByElement.struct_class = Types::OrderByElement
 
     OrderByList.member = Shapes::ShapeRef.new(shape: OrderByElement)
+
+    ReservedInstanceOptions.add_member(:purchasing_option, Shapes::ShapeRef.new(shape: PurchasingOption, required: true, location_name: "purchasingOption"))
+    ReservedInstanceOptions.add_member(:offering_class, Shapes::ShapeRef.new(shape: OfferingClass, required: true, location_name: "offeringClass"))
+    ReservedInstanceOptions.add_member(:term_length, Shapes::ShapeRef.new(shape: TermLength, required: true, location_name: "termLength"))
+    ReservedInstanceOptions.struct_class = Types::ReservedInstanceOptions
 
     ResourceInUseException.add_member(:message, Shapes::ShapeRef.new(shape: Message, location_name: "message"))
     ResourceInUseException.struct_class = Types::ResourceInUseException
@@ -492,6 +632,13 @@ module Aws::ApplicationDiscoveryService
 
     ServerInternalErrorException.add_member(:message, Shapes::ShapeRef.new(shape: Message, location_name: "message"))
     ServerInternalErrorException.struct_class = Types::ServerInternalErrorException
+
+    StartBatchDeleteConfigurationTaskRequest.add_member(:configuration_type, Shapes::ShapeRef.new(shape: DeletionConfigurationItemType, required: true, location_name: "configurationType"))
+    StartBatchDeleteConfigurationTaskRequest.add_member(:configuration_ids, Shapes::ShapeRef.new(shape: ConfigurationIdList, required: true, location_name: "configurationIds"))
+    StartBatchDeleteConfigurationTaskRequest.struct_class = Types::StartBatchDeleteConfigurationTaskRequest
+
+    StartBatchDeleteConfigurationTaskResponse.add_member(:task_id, Shapes::ShapeRef.new(shape: UUID, location_name: "taskId"))
+    StartBatchDeleteConfigurationTaskResponse.struct_class = Types::StartBatchDeleteConfigurationTaskResponse
 
     StartContinuousExportRequest.struct_class = Types::StartContinuousExportRequest
 
@@ -512,6 +659,7 @@ module Aws::ApplicationDiscoveryService
     StartExportTaskRequest.add_member(:filters, Shapes::ShapeRef.new(shape: ExportFilters, location_name: "filters"))
     StartExportTaskRequest.add_member(:start_time, Shapes::ShapeRef.new(shape: TimeStamp, location_name: "startTime"))
     StartExportTaskRequest.add_member(:end_time, Shapes::ShapeRef.new(shape: TimeStamp, location_name: "endTime"))
+    StartExportTaskRequest.add_member(:preferences, Shapes::ShapeRef.new(shape: ExportPreferences, location_name: "preferences"))
     StartExportTaskRequest.struct_class = Types::StartExportTaskRequest
 
     StartExportTaskResponse.add_member(:export_id, Shapes::ShapeRef.new(shape: ConfigurationsExportId, location_name: "exportId"))
@@ -553,11 +701,15 @@ module Aws::ApplicationDiscoveryService
     ToDeleteIdentifierList.member = Shapes::ShapeRef.new(shape: ImportTaskIdentifier)
 
     UpdateApplicationRequest.add_member(:configuration_id, Shapes::ShapeRef.new(shape: ApplicationId, required: true, location_name: "configurationId"))
-    UpdateApplicationRequest.add_member(:name, Shapes::ShapeRef.new(shape: String, location_name: "name"))
-    UpdateApplicationRequest.add_member(:description, Shapes::ShapeRef.new(shape: String, location_name: "description"))
+    UpdateApplicationRequest.add_member(:name, Shapes::ShapeRef.new(shape: ApplicationName, location_name: "name"))
+    UpdateApplicationRequest.add_member(:description, Shapes::ShapeRef.new(shape: ApplicationDescription, location_name: "description"))
     UpdateApplicationRequest.struct_class = Types::UpdateApplicationRequest
 
     UpdateApplicationResponse.struct_class = Types::UpdateApplicationResponse
+
+    UsageMetricBasis.add_member(:name, Shapes::ShapeRef.new(shape: UsageMetricBasisName, location_name: "name"))
+    UsageMetricBasis.add_member(:percentage_adjust, Shapes::ShapeRef.new(shape: UsageMetricPercentageAdjust, location_name: "percentageAdjust"))
+    UsageMetricBasis.struct_class = Types::UsageMetricBasis
 
 
     # @api private
@@ -567,9 +719,11 @@ module Aws::ApplicationDiscoveryService
 
       api.metadata = {
         "apiVersion" => "2015-11-01",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "discovery",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceFullName" => "AWS Application Discovery Service",
         "serviceId" => "Application Discovery Service",
         "signatureVersion" => "v4",
@@ -588,6 +742,18 @@ module Aws::ApplicationDiscoveryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterValueException)
         o.errors << Shapes::ShapeRef.new(shape: ServerInternalErrorException)
         o.errors << Shapes::ShapeRef.new(shape: HomeRegionNotSetException)
+      end)
+
+      api.add_operation(:batch_delete_agents, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "BatchDeleteAgents"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: BatchDeleteAgentsRequest)
+        o.output = Shapes::ShapeRef.new(shape: BatchDeleteAgentsResponse)
+        o.errors << Shapes::ShapeRef.new(shape: AuthorizationErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidParameterValueException)
+        o.errors << Shapes::ShapeRef.new(shape: ServerInternalErrorException)
       end)
 
       api.add_operation(:batch_delete_import_data, Seahorse::Model::Operation.new.tap do |o|
@@ -668,6 +834,24 @@ module Aws::ApplicationDiscoveryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterValueException)
         o.errors << Shapes::ShapeRef.new(shape: ServerInternalErrorException)
         o.errors << Shapes::ShapeRef.new(shape: HomeRegionNotSetException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_results",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
+      api.add_operation(:describe_batch_delete_configuration_task, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeBatchDeleteConfigurationTask"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeBatchDeleteConfigurationTaskRequest)
+        o.output = Shapes::ShapeRef.new(shape: DescribeBatchDeleteConfigurationTaskResponse)
+        o.errors << Shapes::ShapeRef.new(shape: AuthorizationErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidParameterValueException)
+        o.errors << Shapes::ShapeRef.new(shape: ServerInternalErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: HomeRegionNotSetException)
       end)
 
       api.add_operation(:describe_configurations, Seahorse::Model::Operation.new.tap do |o|
@@ -717,6 +901,12 @@ module Aws::ApplicationDiscoveryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterValueException)
         o.errors << Shapes::ShapeRef.new(shape: ServerInternalErrorException)
         o.errors << Shapes::ShapeRef.new(shape: HomeRegionNotSetException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_results",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:describe_export_tasks, Seahorse::Model::Operation.new.tap do |o|
@@ -730,6 +920,12 @@ module Aws::ApplicationDiscoveryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterValueException)
         o.errors << Shapes::ShapeRef.new(shape: ServerInternalErrorException)
         o.errors << Shapes::ShapeRef.new(shape: HomeRegionNotSetException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_results",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:describe_import_tasks, Seahorse::Model::Operation.new.tap do |o|
@@ -763,6 +959,12 @@ module Aws::ApplicationDiscoveryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterValueException)
         o.errors << Shapes::ShapeRef.new(shape: ServerInternalErrorException)
         o.errors << Shapes::ShapeRef.new(shape: HomeRegionNotSetException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_results",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:disassociate_configuration_items_from_application, Seahorse::Model::Operation.new.tap do |o|
@@ -818,6 +1020,12 @@ module Aws::ApplicationDiscoveryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterValueException)
         o.errors << Shapes::ShapeRef.new(shape: ServerInternalErrorException)
         o.errors << Shapes::ShapeRef.new(shape: HomeRegionNotSetException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_results",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:list_server_neighbors, Seahorse::Model::Operation.new.tap do |o|
@@ -831,6 +1039,20 @@ module Aws::ApplicationDiscoveryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterValueException)
         o.errors << Shapes::ShapeRef.new(shape: ServerInternalErrorException)
         o.errors << Shapes::ShapeRef.new(shape: HomeRegionNotSetException)
+      end)
+
+      api.add_operation(:start_batch_delete_configuration_task, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "StartBatchDeleteConfigurationTask"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: StartBatchDeleteConfigurationTaskRequest)
+        o.output = Shapes::ShapeRef.new(shape: StartBatchDeleteConfigurationTaskResponse)
+        o.errors << Shapes::ShapeRef.new(shape: LimitExceededException)
+        o.errors << Shapes::ShapeRef.new(shape: AuthorizationErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: ServerInternalErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: HomeRegionNotSetException)
+        o.errors << Shapes::ShapeRef.new(shape: OperationNotPermittedException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidParameterValueException)
       end)
 
       api.add_operation(:start_continuous_export, Seahorse::Model::Operation.new.tap do |o|

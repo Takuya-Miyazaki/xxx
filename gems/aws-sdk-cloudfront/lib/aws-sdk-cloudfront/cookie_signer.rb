@@ -12,7 +12,7 @@ module Aws
     #
     #     signer = Aws::CloudFront::CookieSigner.new(
     #       key_pair_id: "cf-keypair-id",
-    #       private_key_path: "./cf_private_key.pem"
+    #       private_key_path: "./unit_test_dummy_key"
     #     )
     #     cookies = signer.signed_cookie(url,
     #       policy: policy.to_json
@@ -38,7 +38,7 @@ module Aws
 
         cookie_parameters = {}
         signature(content).each { |k, v|
-          cookie_parameters["CloudFront-#{k}"] = v.to_s.gsub("\n", '')
+          cookie_parameters["CloudFront-#{k}"] = v.to_s.delete("\n")
         }
         cookie_parameters
       end

@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::OpsWorksCM
   # @api private
@@ -283,6 +284,7 @@ module Aws::OpsWorksCM
     RestoreServerRequest.add_member(:key_pair, Shapes::ShapeRef.new(shape: KeyPair, location_name: "KeyPair"))
     RestoreServerRequest.struct_class = Types::RestoreServerRequest
 
+    RestoreServerResponse.add_member(:server, Shapes::ShapeRef.new(shape: Server, location_name: "Server"))
     RestoreServerResponse.struct_class = Types::RestoreServerResponse
 
     Server.add_member(:associate_public_ip_address, Shapes::ShapeRef.new(shape: Boolean, location_name: "AssociatePublicIpAddress"))
@@ -379,9 +381,11 @@ module Aws::OpsWorksCM
 
       api.metadata = {
         "apiVersion" => "2016-11-01",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "opsworks-cm",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceAbbreviation" => "OpsWorksCM",
         "serviceFullName" => "AWS OpsWorks CM",
         "serviceId" => "OpsWorksCM",

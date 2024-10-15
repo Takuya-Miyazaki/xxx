@@ -13,6 +13,7 @@ module AwsSdkCodeGenerator
         @service = options.fetch(:service)
         @api = @service.api
         @input_shapes = compute_input_shapes(@service.api)
+        @output_shapes = compute_output_shapes(@service.api)
       end
 
       # @return [String|nil]
@@ -27,14 +28,13 @@ module AwsSdkCodeGenerator
 
       # @return [Array<StructClass>]
       def structures
-        unless @service.protocol_settings.empty?
-          if @service.protocol_settings['h2'] == 'eventstream'
-            @service.api['shapes'].each do |_, shape|
-              if shape['eventstream']
-                # add event trait to all members if not exists
-                shape['members'].each do |name, ref|
-                  @service.api['shapes'][ref['shape']]['event'] = true
-                end
+        @service.api['shapes'].each do |_, shape|
+          if shape['eventstream']
+            # add internal exception_event ctrait to all exceptions
+            # exceptions will not have the event trait.
+            shape['members'].each do |name, ref|
+              if !!@service.api['shapes'][ref['shape']]['exception']
+                @service.api['shapes'][ref['shape']]['exceptionEvent'] = true
               end
             end
           end
@@ -47,7 +47,7 @@ module AwsSdkCodeGenerator
           # eventstream shape will be inheriting from enumerator
           if shape['eventstream']
             list
-          elsif shape['type'] == 'structure'
+          elsif shape['type'] == 'structure' && !shape['document']
             struct_members = struct_members(shape)
             sensitive_params = struct_members.select(&:sensitive).map do |m|
               m.member_name.to_sym
@@ -56,7 +56,8 @@ module AwsSdkCodeGenerator
               class_name: shape_name,
               members: struct_members,
               sensitive_params: sensitive_params,
-              documentation: struct_class_docs(shape_name)
+              documentation: struct_class_docs(shape_name, shape),
+              union: shape['union']
             )
           else
             list
@@ -71,7 +72,7 @@ module AwsSdkCodeGenerator
             list << EventStreamClass.new(
               class_name: shape_name,
               types: struct_members(shape),
-              documentation: eventstream_class_docs(shape_name)
+              documentation: eventstream_class_docs(shape_name, shape)
             )
           else
             list
@@ -79,37 +80,62 @@ module AwsSdkCodeGenerator
         end
       end
 
+      # @return [Array<String>]
+      def types_customizations
+        Dir.glob(File.join(Helper.gem_lib_path(gem_name), "#{gem_name}/customizations/types", '*.rb')).map do |file|
+          filename = File.basename(file, '.rb')
+          "#{gem_name}/customizations/types/#{filename}"
+        end
+      end
+
       private
+
+      def gem_name
+        "aws-sdk-#{module_name.split('::').last.downcase}"
+      end
 
       def struct_members(shape)
         return if shape['members'].nil?
         members = shape['members'].map do |member_name, member_ref|
+          member_target = @api['shapes'][member_ref['shape']]
           sensitive = !!(member_ref['sensitive'] ||
-            @api['shapes'][member_ref['shape']]['sensitive'])
+            member_target['sensitive'])
+
+          case member_target["type"]
+          when 'map'
+            key_shape = @api['shapes'][member_target['key']['shape']]
+            value_shape = @api['shapes'][member_target['value']['shape']]
+            sensitive ||= !!(key_shape['sensitive'] || value_shape['sensitive'])
+          when 'list'
+            list_member = @api['shapes'][member_target['member']['shape']]
+            sensitive ||= !!(list_member['sensitive'])
+          end
+
           StructMember.new(
             member_name: underscore(member_name),
             sensitive: sensitive
           )
         end
-        if shape['event']
+        if shape['event'] || shape['exceptionEvent']
           members << StructMember.new(member_name: 'event_type')
         end
         members
       end
 
-      def struct_class_docs(shape_name)
+      def struct_class_docs(shape_name, shape)
         join_docstrings([
           html_to_markdown(Api.docstring(shape_name, @api)),
-          input_example_docs(shape_name),
+          input_example_docs(shape_name, shape),
+          output_example_docs(shape_name, shape),
           attribute_macros_docs(shape_name),
           see_also_tag(shape_name),
         ])
       end
 
-      def eventstream_class_docs(shape_name)
+      def eventstream_class_docs(shape_name, shape)
         join_docstrings([
           html_to_markdown(Api.docstring(shape_name, @api)),
-          input_example_docs(shape_name),
+          input_example_docs(shape_name, shape),
           eventstream_docs(shape_name),
           see_also_tag(shape_name),
         ])
@@ -120,18 +146,32 @@ module AwsSdkCodeGenerator
         " #event_types #=> Array, returns all modeled event types in the stream"
       end
 
-      def input_example_docs(shape_name)
+      def output_example_docs(shape_name, shape)
+        if @output_shapes.include?(shape_name)
+          if shape['union']
+            "@note #{shape_name} is a union - when returned from an API call"\
+            ' exactly one value will be set and the returned type will'\
+            " be a subclass of #{shape_name} corresponding to the set member."
+          end
+        end
+      end
+
+      def input_example_docs(shape_name, shape)
         if @input_shapes.include?(shape_name)
           return if shape(shape_name)['members'].nil?
           if shape(shape_name)['members'].empty?
-            note = '@api private'
-          else
-            note = "@note When making an API call, you may pass #{shape_name}\n"
-            note += "  data as a hash:\n\n"
-            note += '      ' + SyntaxExampleHash.new(
-              shape: shape(shape_name),
-              api: @service.api,
-            ).format('      ')
+            '@api private'
+          elsif shape['union']
+            "@note #{shape_name} is a union - when making an API calls you"\
+            ' must set exactly one of the members.'
+          # This doc block is no longer useful, but keeping for records
+          # else
+          #   note = "@note When making an API call, you may pass #{shape_name}\n"
+          #   note += "  data as a hash:\n\n"
+          #   note += '      ' + SyntaxExampleHash.new(
+          #     shape: shape(shape_name),
+          #     api: @service.api,
+          #   ).format('      ')
           end
         end
       end
@@ -164,7 +204,7 @@ module AwsSdkCodeGenerator
 
       def see_also_tag(shape_name)
         uid = @api['metadata']['uid']
-        if @api['metadata']['protocol'] != 'api-gateway' && Crosslink.taggable?(uid)
+        if @service.protocol != 'api-gateway' && Crosslink.taggable?(uid)
           Crosslink.tag_string(uid, shape_name)
         end
       end
@@ -172,9 +212,17 @@ module AwsSdkCodeGenerator
       def compute_input_shapes(api)
         inputs = Set.new
         (api['operations'] || {}).each do |_, operation|
-          visit_inputs(operation['input'], inputs) if operation['input']
+          visit_shapes(operation['input'], inputs) if operation['input']
         end
         inputs
+      end
+
+      def compute_output_shapes(api)
+        outputs = Set.new
+        (api['operations'] || {}).each do |_, operation|
+          visit_shapes(operation['output'], outputs) if operation['output']
+        end
+        outputs
       end
 
       def idempotency_token?(member_ref)
@@ -185,22 +233,22 @@ module AwsSdkCodeGenerator
         "<p><b>A suitable default value is auto-generated.</b> You should normally not need to pass this option.</p>"
       end
 
-      def visit_inputs(shape_ref, inputs)
-        return if inputs.include?(shape_ref['shape']) # recursion
-        inputs << shape_ref['shape']
+      def visit_shapes(shape_ref, shapes)
+        return if shapes.include?(shape_ref['shape']) # recursion
+        shapes << shape_ref['shape']
         s = shape(shape_ref)
         raise "cannot locate shape #{shape_ref['shape']}" if s.nil?
         case s['type']
         when 'structure'
           return if s['members'].nil?
           s['members'].each_pair do |_, member_ref|
-            visit_inputs(member_ref, inputs)
+            visit_shapes(member_ref, shapes)
           end
         when 'list'
-          visit_inputs(s['member'], inputs)
+          visit_shapes(s['member'], shapes)
         when 'map'
-          visit_inputs(s['key'], inputs)
-          visit_inputs(s['value'], inputs)
+          visit_shapes(s['key'], shapes)
+          visit_shapes(s['value'], shapes)
         end
       end
 
@@ -245,6 +293,8 @@ module AwsSdkCodeGenerator
           @members = options.fetch(:members)
           @documentation = options.fetch(:documentation)
           @sensitive_params = options.fetch(:sensitive_params)
+          @union = options.fetch(:union)
+          @members << StructMember.new(member_name: :unknown, member_class_name: 'Unknown') if @union
           if @members.nil? || @members.empty?
             @empty = true
           else
@@ -266,6 +316,11 @@ module AwsSdkCodeGenerator
         attr_accessor :sensitive_params
 
         # @return [Boolean]
+        def union?
+          @union
+        end
+
+        # @return [Boolean]
         def empty?
           @empty
         end
@@ -275,6 +330,7 @@ module AwsSdkCodeGenerator
 
         def initialize(options)
           @member_name = options.fetch(:member_name)
+          @member_class_name = AwsSdkCodeGenerator::Helper::pascal_case(@member_name)
           @sensitive = options.fetch(:sensitive, false)
           @last = false
         end
@@ -284,6 +340,9 @@ module AwsSdkCodeGenerator
 
         # @return [Boolean]
         attr_accessor :sensitive
+
+        # @return [String]
+        attr_accessor :member_class_name
 
         # @return [Boolean]
         attr_accessor :last

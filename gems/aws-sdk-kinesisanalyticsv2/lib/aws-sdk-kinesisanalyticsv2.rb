@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-kinesisanalyticsv2/types'
-require_relative 'aws-sdk-kinesisanalyticsv2/client_api'
-require_relative 'aws-sdk-kinesisanalyticsv2/client'
-require_relative 'aws-sdk-kinesisanalyticsv2/errors'
-require_relative 'aws-sdk-kinesisanalyticsv2/resource'
-require_relative 'aws-sdk-kinesisanalyticsv2/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:kinesisanalyticsv2)
 
 # This module provides support for Amazon Kinesis Analytics. This module is available in the
 # `aws-sdk-kinesisanalyticsv2` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-kinesisanalyticsv2/customizations'
 #
 # @!group service
 module Aws::KinesisAnalyticsV2
+  autoload :Types, 'aws-sdk-kinesisanalyticsv2/types'
+  autoload :ClientApi, 'aws-sdk-kinesisanalyticsv2/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-kinesisanalyticsv2/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-kinesisanalyticsv2/client'
+  autoload :Errors, 'aws-sdk-kinesisanalyticsv2/errors'
+  autoload :Resource, 'aws-sdk-kinesisanalyticsv2/resource'
+  autoload :EndpointParameters, 'aws-sdk-kinesisanalyticsv2/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-kinesisanalyticsv2/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-kinesisanalyticsv2/endpoints'
 
-  GEM_VERSION = '1.24.0'
+  GEM_VERSION = '1.69.0'
 
 end
+
+require_relative 'aws-sdk-kinesisanalyticsv2/customizations'

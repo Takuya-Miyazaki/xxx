@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -56,6 +56,10 @@ module Aws::S3
 
     # If present, indicates that the requester was successfully charged for
     # the request.
+    #
+    # <note markdown="1"> This functionality is not supported for directory buckets.
+    #
+    #  </note>
     # @return [String]
     def request_charged
       data[:request_charged]
@@ -75,10 +79,12 @@ module Aws::S3
     #
     # @return [self]
     def load
-      resp = @client.get_object_acl(
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_object_acl(
         bucket: @bucket_name,
         key: @object_key
       )
+      end
       @data = resp.data
       self
     end
@@ -193,7 +199,9 @@ module Aws::S3
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -221,6 +229,7 @@ module Aws::S3
     #       },
     #     },
     #     content_md5: "ContentMD5",
+    #     checksum_algorithm: "CRC32", # accepts CRC32, CRC32C, SHA1, SHA256
     #     grant_full_control: "GrantFullControl",
     #     grant_read: "GrantRead",
     #     grant_read_acp: "GrantReadACP",
@@ -247,55 +256,85 @@ module Aws::S3
     #   not corrupted in transit. For more information, go to [RFC
     #   1864.&gt;][1]
     #
-    #   For requests made using the AWS Command Line Interface (CLI) or AWS
-    #   SDKs, this field is calculated automatically.
+    #   For requests made using the Amazon Web Services Command Line Interface
+    #   (CLI) or Amazon Web Services SDKs, this field is calculated
+    #   automatically.
     #
     #
     #
     #   [1]: http://www.ietf.org/rfc/rfc1864.txt
+    # @option options [String] :checksum_algorithm
+    #   Indicates the algorithm used to create the checksum for the object
+    #   when you use the SDK. This header will not provide any additional
+    #   functionality if you don't use the SDK. When you send this header,
+    #   there must be a corresponding `x-amz-checksum` or `x-amz-trailer`
+    #   header sent. Otherwise, Amazon S3 fails the request with the HTTP
+    #   status code `400 Bad Request`. For more information, see [Checking
+    #   object integrity][1] in the *Amazon S3 User Guide*.
+    #
+    #   If you provide an individual checksum, Amazon S3 ignores any provided
+    #   `ChecksumAlgorithm` parameter.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html
     # @option options [String] :grant_full_control
     #   Allows grantee the read, write, read ACP, and write ACP permissions on
     #   the bucket.
     #
-    #   This action is not supported by Amazon S3 on Outposts.
+    #   This functionality is not supported for Amazon S3 on Outposts.
     # @option options [String] :grant_read
     #   Allows grantee to list the objects in the bucket.
     #
-    #   This action is not supported by Amazon S3 on Outposts.
+    #   This functionality is not supported for Amazon S3 on Outposts.
     # @option options [String] :grant_read_acp
     #   Allows grantee to read the bucket ACL.
     #
-    #   This action is not supported by Amazon S3 on Outposts.
+    #   This functionality is not supported for Amazon S3 on Outposts.
     # @option options [String] :grant_write
-    #   Allows grantee to create, overwrite, and delete any object in the
-    #   bucket.
+    #   Allows grantee to create new objects in the bucket.
+    #
+    #   For the bucket and object owners of existing objects, also allows
+    #   deletions and overwrites of those objects.
     # @option options [String] :grant_write_acp
     #   Allows grantee to write the ACL for the applicable bucket.
     #
-    #   This action is not supported by Amazon S3 on Outposts.
+    #   This functionality is not supported for Amazon S3 on Outposts.
     # @option options [String] :request_payer
     #   Confirms that the requester knows that they will be charged for the
     #   request. Bucket owners need not specify this parameter in their
-    #   requests. For information about downloading objects from requester
-    #   pays buckets, see [Downloading Objects in Requestor Pays Buckets][1]
-    #   in the *Amazon S3 Developer Guide*.
+    #   requests. If either the source or destination S3 bucket has Requester
+    #   Pays enabled, the requester will pay for corresponding charges to copy
+    #   the object. For information about downloading objects from Requester
+    #   Pays buckets, see [Downloading Objects in Requester Pays Buckets][1]
+    #   in the *Amazon S3 User Guide*.
+    #
+    #   <note markdown="1"> This functionality is not supported for directory buckets.
+    #
+    #    </note>
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
     # @option options [String] :version_id
-    #   VersionId used to reference a specific version of the object.
+    #   Version ID used to reference a specific version of the object.
+    #
+    #   <note markdown="1"> This functionality is not supported for directory buckets.
+    #
+    #    </note>
     # @option options [String] :expected_bucket_owner
-    #   The account id of the expected bucket owner. If the bucket is owned by
-    #   a different account, the request will fail with an HTTP `403 (Access
-    #   Denied)` error.
+    #   The account ID of the expected bucket owner. If the account ID that
+    #   you provide does not match the actual owner of the bucket, the request
+    #   fails with the HTTP status code `403 Forbidden` (access denied).
     # @return [Types::PutObjectAclOutput]
     def put(options = {})
       options = options.merge(
         bucket: @bucket_name,
         key: @object_key
       )
-      resp = @client.put_object_acl(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.put_object_acl(options)
+      end
       resp.data
     end
 

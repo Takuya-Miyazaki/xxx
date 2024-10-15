@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,13 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-cloudfront/types'
-require_relative 'aws-sdk-cloudfront/client_api'
-require_relative 'aws-sdk-cloudfront/client'
-require_relative 'aws-sdk-cloudfront/errors'
-require_relative 'aws-sdk-cloudfront/waiters'
-require_relative 'aws-sdk-cloudfront/resource'
-require_relative 'aws-sdk-cloudfront/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:cloudfront)
 
 # This module provides support for Amazon CloudFront. This module is available in the
 # `aws-sdk-cloudfront` gem.
@@ -29,7 +23,7 @@ require_relative 'aws-sdk-cloudfront/customizations'
 # structure.
 #
 #     cloud_front = Aws::CloudFront::Client.new
-#     resp = cloud_front.create_cache_policy(params)
+#     resp = cloud_front.associate_alias(params)
 #
 # See {Client} for more information.
 #
@@ -48,7 +42,21 @@ require_relative 'aws-sdk-cloudfront/customizations'
 #
 # @!group service
 module Aws::CloudFront
+  autoload :Types, 'aws-sdk-cloudfront/types'
+  autoload :ClientApi, 'aws-sdk-cloudfront/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-cloudfront/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-cloudfront/client'
+  autoload :Errors, 'aws-sdk-cloudfront/errors'
+  autoload :Waiters, 'aws-sdk-cloudfront/waiters'
+  autoload :Resource, 'aws-sdk-cloudfront/resource'
+  autoload :EndpointParameters, 'aws-sdk-cloudfront/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-cloudfront/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-cloudfront/endpoints'
 
-  GEM_VERSION = '1.47.0'
+  GEM_VERSION = '1.102.0'
 
 end
+
+require_relative 'aws-sdk-cloudfront/customizations'

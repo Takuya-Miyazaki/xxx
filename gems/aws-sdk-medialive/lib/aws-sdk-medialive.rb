@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,13 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-medialive/types'
-require_relative 'aws-sdk-medialive/client_api'
-require_relative 'aws-sdk-medialive/client'
-require_relative 'aws-sdk-medialive/errors'
-require_relative 'aws-sdk-medialive/waiters'
-require_relative 'aws-sdk-medialive/resource'
-require_relative 'aws-sdk-medialive/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:medialive)
 
 # This module provides support for AWS Elemental MediaLive. This module is available in the
 # `aws-sdk-medialive` gem.
@@ -48,7 +42,21 @@ require_relative 'aws-sdk-medialive/customizations'
 #
 # @!group service
 module Aws::MediaLive
+  autoload :Types, 'aws-sdk-medialive/types'
+  autoload :ClientApi, 'aws-sdk-medialive/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-medialive/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-medialive/client'
+  autoload :Errors, 'aws-sdk-medialive/errors'
+  autoload :Waiters, 'aws-sdk-medialive/waiters'
+  autoload :Resource, 'aws-sdk-medialive/resource'
+  autoload :EndpointParameters, 'aws-sdk-medialive/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-medialive/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-medialive/endpoints'
 
-  GEM_VERSION = '1.61.0'
+  GEM_VERSION = '1.136.0'
 
 end
+
+require_relative 'aws-sdk-medialive/customizations'

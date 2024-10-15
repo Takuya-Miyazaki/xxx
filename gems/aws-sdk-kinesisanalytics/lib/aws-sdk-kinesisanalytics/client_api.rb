@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::KinesisAnalytics
   # @api private
@@ -665,9 +666,11 @@ module Aws::KinesisAnalytics
 
       api.metadata = {
         "apiVersion" => "2015-08-14",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "kinesisanalytics",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceAbbreviation" => "Kinesis Analytics",
         "serviceFullName" => "Amazon Kinesis Analytics",
         "serviceId" => "Kinesis Analytics",

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -30,7 +30,9 @@ module Aws::CloudFormation
   # * {AlreadyExistsException}
   # * {CFNRegistryException}
   # * {ChangeSetNotFoundException}
+  # * {ConcurrentResourcesLimitExceededException}
   # * {CreatedButModifiedException}
+  # * {GeneratedTemplateNotFoundException}
   # * {InsufficientCapabilitiesException}
   # * {InvalidChangeSetStatusException}
   # * {InvalidOperationException}
@@ -41,11 +43,16 @@ module Aws::CloudFormation
   # * {OperationInProgressException}
   # * {OperationNotFoundException}
   # * {OperationStatusCheckFailedException}
+  # * {ResourceScanInProgressException}
+  # * {ResourceScanLimitExceededException}
+  # * {ResourceScanNotFoundException}
   # * {StackInstanceNotFoundException}
+  # * {StackNotFoundException}
   # * {StackSetNotEmptyException}
   # * {StackSetNotFoundException}
   # * {StaleRequestException}
   # * {TokenAlreadyExistsException}
+  # * {TypeConfigurationNotFoundException}
   # * {TypeNotFoundException}
   #
   # Additionally, error classes are dynamically generated for service errors based on the error code
@@ -89,11 +96,31 @@ module Aws::CloudFormation
       end
     end
 
+    class ConcurrentResourcesLimitExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudFormation::Types::ConcurrentResourcesLimitExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
     class CreatedButModifiedException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CloudFormation::Types::CreatedButModifiedException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class GeneratedTemplateNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudFormation::Types::GeneratedTemplateNotFoundException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -199,11 +226,51 @@ module Aws::CloudFormation
       end
     end
 
+    class ResourceScanInProgressException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudFormation::Types::ResourceScanInProgressException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ResourceScanLimitExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudFormation::Types::ResourceScanLimitExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class ResourceScanNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudFormation::Types::ResourceScanNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
     class StackInstanceNotFoundException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CloudFormation::Types::StackInstanceNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class StackNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudFormation::Types::StackNotFoundException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -244,6 +311,16 @@ module Aws::CloudFormation
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::CloudFormation::Types::TokenAlreadyExistsException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class TypeConfigurationNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::CloudFormation::Types::TypeConfigurationNotFoundException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

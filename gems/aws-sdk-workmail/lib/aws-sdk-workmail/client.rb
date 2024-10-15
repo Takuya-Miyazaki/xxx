@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:workmail)
 
 module Aws::WorkMail
   # An API client for WorkMail.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::WorkMail
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::WorkMail::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::WorkMail
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::WorkMail
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::WorkMail
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::WorkMail
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::WorkMail
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::WorkMail
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +341,112 @@ module Aws::WorkMail
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::WorkMail::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::WorkMail::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -345,8 +462,27 @@ module Aws::WorkMail
     # @option params [required, String] :resource_id
     #   The resource for which members (users or groups) are associated.
     #
+    #   The identifier can accept *ResourceId*, *Resourcename*, or *email*.
+    #   The following identity formats are available:
+    #
+    #   * Resource ID: r-0123456789a0123456789b0123456789
+    #
+    #   * Email address: resource@domain.tld
+    #
+    #   * Resource name: resource
+    #
     # @option params [required, String] :entity_id
     #   The member (user or group) to associate to the resource.
+    #
+    #   The entity ID can accept *UserId or GroupID*, *Username or Groupname*,
+    #   or *email*.
+    #
+    #   * Entity: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: entity@domain.tld
+    #
+    #   * Entity: entity
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -354,8 +490,8 @@ module Aws::WorkMail
     #
     #   resp = client.associate_delegate_to_resource({
     #     organization_id: "OrganizationId", # required
-    #     resource_id: "ResourceId", # required
-    #     entity_id: "WorkMailIdentifier", # required
+    #     resource_id: "EntityIdentifier", # required
+    #     entity_id: "EntityIdentifier", # required
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/AssociateDelegateToResource AWS API Documentation
@@ -375,8 +511,28 @@ module Aws::WorkMail
     # @option params [required, String] :group_id
     #   The group to which the member (user or group) is associated.
     #
+    #   The identifier can accept *GroupId*, *Groupname*, or *email*. The
+    #   following identity formats are available:
+    #
+    #   * Group ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: group@domain.tld
+    #
+    #   * Group name: group
+    #
     # @option params [required, String] :member_id
     #   The member (user or group) to associate to the group.
+    #
+    #   The member ID can accept *UserID or GroupId*, *Username or Groupname*,
+    #   or *email*.
+    #
+    #   * Member: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: member@domain.tld
+    #
+    #   * Member name: member
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -384,8 +540,8 @@ module Aws::WorkMail
     #
     #   resp = client.associate_member_to_group({
     #     organization_id: "OrganizationId", # required
-    #     group_id: "WorkMailIdentifier", # required
-    #     member_id: "WorkMailIdentifier", # required
+    #     group_id: "EntityIdentifier", # required
+    #     member_id: "EntityIdentifier", # required
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/AssociateMemberToGroup AWS API Documentation
@@ -394,6 +550,43 @@ module Aws::WorkMail
     # @param [Hash] params ({})
     def associate_member_to_group(params = {}, options = {})
       req = build_request(:associate_member_to_group, params)
+      req.send_request(options)
+    end
+
+    # Assumes an impersonation role for the given WorkMail organization.
+    # This method returns an authentication token you can use to make
+    # impersonated calls.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization under which the impersonation role will be
+    #   assumed.
+    #
+    # @option params [required, String] :impersonation_role_id
+    #   The impersonation role ID to assume.
+    #
+    # @return [Types::AssumeImpersonationRoleResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::AssumeImpersonationRoleResponse#token #token} => String
+    #   * {Types::AssumeImpersonationRoleResponse#expires_in #expires_in} => Integer
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.assume_impersonation_role({
+    #     organization_id: "OrganizationId", # required
+    #     impersonation_role_id: "ImpersonationRoleId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.token #=> String
+    #   resp.expires_in #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/AssumeImpersonationRole AWS API Documentation
+    #
+    # @overload assume_impersonation_role(params = {})
+    # @param [Hash] params ({})
+    def assume_impersonation_role(params = {}, options = {})
+      req = build_request(:assume_impersonation_role, params)
       req.send_request(options)
     end
 
@@ -435,7 +628,7 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Adds an alias to the set of a given member (user or group) of Amazon
+    # Adds an alias to the set of a given member (user or group) of
     # WorkMail.
     #
     # @option params [required, String] :organization_id
@@ -466,7 +659,61 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Creates a group that can be used in Amazon WorkMail by calling the
+    # Creates an `AvailabilityConfiguration` for the given WorkMail
+    # organization and domain.
+    #
+    # @option params [String] :client_token
+    #   An idempotent token that ensures that an API request is executed only
+    #   once.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization for which the `AvailabilityConfiguration`
+    #   will be created.
+    #
+    # @option params [required, String] :domain_name
+    #   The domain to which the provider applies.
+    #
+    # @option params [Types::EwsAvailabilityProvider] :ews_provider
+    #   Exchange Web Services (EWS) availability provider definition. The
+    #   request must contain exactly one provider definition, either
+    #   `EwsProvider` or `LambdaProvider`.
+    #
+    # @option params [Types::LambdaAvailabilityProvider] :lambda_provider
+    #   Lambda availability provider definition. The request must contain
+    #   exactly one provider definition, either `EwsProvider` or
+    #   `LambdaProvider`.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_availability_configuration({
+    #     client_token: "IdempotencyClientToken",
+    #     organization_id: "OrganizationId", # required
+    #     domain_name: "DomainName", # required
+    #     ews_provider: {
+    #       ews_endpoint: "Url", # required
+    #       ews_username: "ExternalUserName", # required
+    #       ews_password: "Password", # required
+    #     },
+    #     lambda_provider: {
+    #       lambda_arn: "LambdaArn", # required
+    #     },
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/CreateAvailabilityConfiguration AWS API Documentation
+    #
+    # @overload create_availability_configuration(params = {})
+    # @param [Hash] params ({})
+    def create_availability_configuration(params = {}, options = {})
+      req = build_request(:create_availability_configuration, params)
+      req.send_request(options)
+    end
+
+    # Creates a group that can be used in WorkMail by calling the
     # RegisterToWorkMail operation.
     #
     # @option params [required, String] :organization_id
@@ -474,6 +721,10 @@ module Aws::WorkMail
     #
     # @option params [required, String] :name
     #   The name of the group.
+    #
+    # @option params [Boolean] :hidden_from_global_address_list
+    #   If this parameter is enabled, the group will be hidden from the
+    #   address book.
     #
     # @return [Types::CreateGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -484,6 +735,7 @@ module Aws::WorkMail
     #   resp = client.create_group({
     #     organization_id: "OrganizationId", # required
     #     name: "GroupName", # required
+    #     hidden_from_global_address_list: false,
     #   })
     #
     # @example Response structure
@@ -499,26 +751,176 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Creates a new Amazon WorkMail organization. Optionally, you can choose
-    # to associate an existing AWS Directory Service directory with your
+    # Creates an impersonation role for the given WorkMail organization.
+    #
+    # *Idempotency* ensures that an API request completes no more than one
+    # time. With an idempotent request, if the original request completes
+    # successfully, any subsequent retries also complete successfully
+    # without performing any further actions.
+    #
+    # @option params [String] :client_token
+    #   The idempotency token for the client request.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization to create the new impersonation role within.
+    #
+    # @option params [required, String] :name
+    #   The name of the new impersonation role.
+    #
+    # @option params [required, String] :type
+    #   The impersonation role's type. The available impersonation role types
+    #   are `READ_ONLY` or `FULL_ACCESS`.
+    #
+    # @option params [String] :description
+    #   The description of the new impersonation role.
+    #
+    # @option params [required, Array<Types::ImpersonationRule>] :rules
+    #   The list of rules for the impersonation role.
+    #
+    # @return [Types::CreateImpersonationRoleResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateImpersonationRoleResponse#impersonation_role_id #impersonation_role_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_impersonation_role({
+    #     client_token: "IdempotencyClientToken",
+    #     organization_id: "OrganizationId", # required
+    #     name: "ImpersonationRoleName", # required
+    #     type: "FULL_ACCESS", # required, accepts FULL_ACCESS, READ_ONLY
+    #     description: "ImpersonationRoleDescription",
+    #     rules: [ # required
+    #       {
+    #         impersonation_rule_id: "ImpersonationRuleId", # required
+    #         name: "ImpersonationRuleName",
+    #         description: "ImpersonationRuleDescription",
+    #         effect: "ALLOW", # required, accepts ALLOW, DENY
+    #         target_users: ["EntityIdentifier"],
+    #         not_target_users: ["EntityIdentifier"],
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.impersonation_role_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/CreateImpersonationRole AWS API Documentation
+    #
+    # @overload create_impersonation_role(params = {})
+    # @param [Hash] params ({})
+    def create_impersonation_role(params = {}, options = {})
+      req = build_request(:create_impersonation_role, params)
+      req.send_request(options)
+    end
+
+    # Creates a new mobile device access rule for the specified WorkMail
+    # organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization under which the rule will be created.
+    #
+    # @option params [String] :client_token
+    #   The idempotency token for the client request.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [required, String] :name
+    #   The rule name.
+    #
+    # @option params [String] :description
+    #   The rule description.
+    #
+    # @option params [required, String] :effect
+    #   The effect of the rule when it matches. Allowed values are `ALLOW` or
+    #   `DENY`.
+    #
+    # @option params [Array<String>] :device_types
+    #   Device types that the rule will match.
+    #
+    # @option params [Array<String>] :not_device_types
+    #   Device types that the rule **will not** match. All other device types
+    #   will match.
+    #
+    # @option params [Array<String>] :device_models
+    #   Device models that the rule will match.
+    #
+    # @option params [Array<String>] :not_device_models
+    #   Device models that the rule **will not** match. All other device
+    #   models will match.
+    #
+    # @option params [Array<String>] :device_operating_systems
+    #   Device operating systems that the rule will match.
+    #
+    # @option params [Array<String>] :not_device_operating_systems
+    #   Device operating systems that the rule **will not** match. All other
+    #   device operating systems will match.
+    #
+    # @option params [Array<String>] :device_user_agents
+    #   Device user agents that the rule will match.
+    #
+    # @option params [Array<String>] :not_device_user_agents
+    #   Device user agents that the rule **will not** match. All other device
+    #   user agents will match.
+    #
+    # @return [Types::CreateMobileDeviceAccessRuleResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateMobileDeviceAccessRuleResponse#mobile_device_access_rule_id #mobile_device_access_rule_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_mobile_device_access_rule({
+    #     organization_id: "OrganizationId", # required
+    #     client_token: "IdempotencyClientToken",
+    #     name: "MobileDeviceAccessRuleName", # required
+    #     description: "MobileDeviceAccessRuleDescription",
+    #     effect: "ALLOW", # required, accepts ALLOW, DENY
+    #     device_types: ["DeviceType"],
+    #     not_device_types: ["DeviceType"],
+    #     device_models: ["DeviceModel"],
+    #     not_device_models: ["DeviceModel"],
+    #     device_operating_systems: ["DeviceOperatingSystem"],
+    #     not_device_operating_systems: ["DeviceOperatingSystem"],
+    #     device_user_agents: ["DeviceUserAgent"],
+    #     not_device_user_agents: ["DeviceUserAgent"],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.mobile_device_access_rule_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/CreateMobileDeviceAccessRule AWS API Documentation
+    #
+    # @overload create_mobile_device_access_rule(params = {})
+    # @param [Hash] params ({})
+    def create_mobile_device_access_rule(params = {}, options = {})
+      req = build_request(:create_mobile_device_access_rule, params)
+      req.send_request(options)
+    end
+
+    # Creates a new WorkMail organization. Optionally, you can choose to
+    # associate an existing AWS Directory Service directory with your
     # organization. If an AWS Directory Service directory ID is specified,
     # the organization alias must match the directory alias. If you choose
     # not to associate an existing directory with your organization, then we
-    # create a new Amazon WorkMail directory for you. For more information,
-    # see [Adding an organization][1] in the *Amazon WorkMail Administrator
-    # Guide*.
+    # create a new WorkMail directory for you. For more information, see
+    # [Adding an organization][1] in the *WorkMail Administrator Guide*.
     #
     # You can associate multiple email domains with an organization, then
-    # set your default email domain from the Amazon WorkMail console. You
-    # can also associate a domain that is managed in an Amazon Route 53
-    # public hosted zone. For more information, see [Adding a domain][2] and
-    # [Choosing the default domain][3] in the *Amazon WorkMail Administrator
+    # choose your default email domain from the WorkMail console. You can
+    # also associate a domain that is managed in an Amazon Route 53 public
+    # hosted zone. For more information, see [Adding a domain][2] and
+    # [Choosing the default domain][3] in the *WorkMail Administrator
     # Guide*.
     #
-    # Optionally, you can use a customer managed master key from AWS Key
-    # Management Service (AWS KMS) to encrypt email for your organization.
-    # If you don't associate an AWS KMS key, Amazon WorkMail creates a
-    # default AWS managed master key for you.
+    # Optionally, you can use a customer managed key from AWS Key Management
+    # Service (AWS KMS) to encrypt email for your organization. If you
+    # don't associate an AWS KMS key, WorkMail creates a default, AWS
+    # managed key for you.
     #
     #
     #
@@ -542,13 +944,12 @@ module Aws::WorkMail
     #   The email domains to associate with the organization.
     #
     # @option params [String] :kms_key_arn
-    #   The Amazon Resource Name (ARN) of a customer managed master key from
-    #   AWS KMS.
+    #   The Amazon Resource Name (ARN) of a customer managed key from AWS KMS.
     #
     # @option params [Boolean] :enable_interoperability
-    #   When `true`, allows organization interoperability between Amazon
-    #   WorkMail and Microsoft Exchange. Can only be set to `true` if an AD
-    #   Connector directory ID is included in the request.
+    #   When `true`, allows organization interoperability between WorkMail and
+    #   Microsoft Exchange. If `true`, you must include a AD Connector
+    #   directory ID in the request.
     #
     # @return [Types::CreateOrganizationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -562,7 +963,7 @@ module Aws::WorkMail
     #     client_token: "IdempotencyClientToken",
     #     domains: [
     #       {
-    #         domain_name: "DomainName",
+    #         domain_name: "DomainName", # required
     #         hosted_zone_id: "HostedZoneId",
     #       },
     #     ],
@@ -583,7 +984,7 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Creates a new Amazon WorkMail resource.
+    # Creates a new WorkMail resource.
     #
     # @option params [required, String] :organization_id
     #   The identifier associated with the organization for which the resource
@@ -596,6 +997,13 @@ module Aws::WorkMail
     #   The type of the new resource. The available types are `equipment` and
     #   `room`.
     #
+    # @option params [String] :description
+    #   Resource description.
+    #
+    # @option params [Boolean] :hidden_from_global_address_list
+    #   If this parameter is enabled, the resource will be hidden from the
+    #   address book.
+    #
     # @return [Types::CreateResourceResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateResourceResponse#resource_id #resource_id} => String
@@ -606,6 +1014,8 @@ module Aws::WorkMail
     #     organization_id: "OrganizationId", # required
     #     name: "ResourceName", # required
     #     type: "ROOM", # required, accepts ROOM, EQUIPMENT
+    #     description: "ResourceDescription",
+    #     hidden_from_global_address_list: false,
     #   })
     #
     # @example Response structure
@@ -621,7 +1031,7 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Creates a user who can be used in Amazon WorkMail by calling the
+    # Creates a user who can be used in WorkMail by calling the
     # RegisterToWorkMail operation.
     #
     # @option params [required, String] :organization_id
@@ -634,8 +1044,25 @@ module Aws::WorkMail
     # @option params [required, String] :display_name
     #   The display name for the new user.
     #
-    # @option params [required, String] :password
+    # @option params [String] :password
     #   The password for the new user.
+    #
+    # @option params [String] :role
+    #   The role of the new user.
+    #
+    #   You cannot pass *SYSTEM\_USER* or *RESOURCE* role in a single request.
+    #   When a user role is not selected, the default role of *USER* is
+    #   selected.
+    #
+    # @option params [String] :first_name
+    #   The first name of the new user.
+    #
+    # @option params [String] :last_name
+    #   The last name of the new user.
+    #
+    # @option params [Boolean] :hidden_from_global_address_list
+    #   If this parameter is enabled, the user will be hidden from the address
+    #   book.
     #
     # @return [Types::CreateUserResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -646,8 +1073,12 @@ module Aws::WorkMail
     #   resp = client.create_user({
     #     organization_id: "OrganizationId", # required
     #     name: "UserName", # required
-    #     display_name: "String", # required
-    #     password: "Password", # required
+    #     display_name: "UserAttribute", # required
+    #     password: "Password",
+    #     role: "USER", # accepts USER, RESOURCE, SYSTEM_USER, REMOTE_USER
+    #     first_name: "UserAttribute",
+    #     last_name: "UserAttribute",
+    #     hidden_from_global_address_list: false,
     #   })
     #
     # @example Response structure
@@ -665,6 +1096,12 @@ module Aws::WorkMail
 
     # Deletes an access control rule for the specified WorkMail
     # organization.
+    #
+    # <note markdown="1"> Deleting already deleted and non-existing rules does not produce an
+    # error. In those cases, the service sends back an HTTP 200 response
+    # with an empty HTTP body.
+    #
+    #  </note>
     #
     # @option params [required, String] :organization_id
     #   The identifier for the organization.
@@ -724,7 +1161,59 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Deletes a group from Amazon WorkMail.
+    # Deletes the `AvailabilityConfiguration` for the given WorkMail
+    # organization and domain.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization for which the `AvailabilityConfiguration`
+    #   will be deleted.
+    #
+    # @option params [required, String] :domain_name
+    #   The domain for which the `AvailabilityConfiguration` will be deleted.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_availability_configuration({
+    #     organization_id: "OrganizationId", # required
+    #     domain_name: "DomainName", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeleteAvailabilityConfiguration AWS API Documentation
+    #
+    # @overload delete_availability_configuration(params = {})
+    # @param [Hash] params ({})
+    def delete_availability_configuration(params = {}, options = {})
+      req = build_request(:delete_availability_configuration, params)
+      req.send_request(options)
+    end
+
+    # Deletes the email monitoring configuration for a specified
+    # organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The ID of the organization from which the email monitoring
+    #   configuration is deleted.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_email_monitoring_configuration({
+    #     organization_id: "OrganizationId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeleteEmailMonitoringConfiguration AWS API Documentation
+    #
+    # @overload delete_email_monitoring_configuration(params = {})
+    # @param [Hash] params ({})
+    def delete_email_monitoring_configuration(params = {}, options = {})
+      req = build_request(:delete_email_monitoring_configuration, params)
+      req.send_request(options)
+    end
+
+    # Deletes a group from WorkMail.
     #
     # @option params [required, String] :organization_id
     #   The organization that contains the group.
@@ -732,13 +1221,21 @@ module Aws::WorkMail
     # @option params [required, String] :group_id
     #   The identifier of the group to be deleted.
     #
+    #   The identifier can be the *GroupId*, or *Groupname*. The following
+    #   identity formats are available:
+    #
+    #   * Group ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Group name: group
+    #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.delete_group({
     #     organization_id: "OrganizationId", # required
-    #     group_id: "WorkMailIdentifier", # required
+    #     group_id: "EntityIdentifier", # required
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeleteGroup AWS API Documentation
@@ -750,6 +1247,32 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
+    # Deletes an impersonation role for the given WorkMail organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization from which to delete the impersonation role.
+    #
+    # @option params [required, String] :impersonation_role_id
+    #   The ID of the impersonation role to delete.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_impersonation_role({
+    #     organization_id: "OrganizationId", # required
+    #     impersonation_role_id: "ImpersonationRoleId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeleteImpersonationRole AWS API Documentation
+    #
+    # @overload delete_impersonation_role(params = {})
+    # @param [Hash] params ({})
+    def delete_impersonation_role(params = {}, options = {})
+      req = build_request(:delete_impersonation_role, params)
+      req.send_request(options)
+    end
+
     # Deletes permissions granted to a member (user or group).
     #
     # @option params [required, String] :organization_id
@@ -757,11 +1280,32 @@ module Aws::WorkMail
     #   group) exists.
     #
     # @option params [required, String] :entity_id
-    #   The identifier of the member (user or group) that owns the mailbox.
+    #   The identifier of the entity that owns the mailbox.
+    #
+    #   The identifier can be *UserId or Group Id*, *Username or Groupname*,
+    #   or *email*.
+    #
+    #   * Entity ID: 12345678-1234-1234-1234-123456789012,
+    #     r-0123456789a0123456789b0123456789, or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: entity@domain.tld
+    #
+    #   * Entity name: entity
     #
     # @option params [required, String] :grantee_id
-    #   The identifier of the member (user or group) for which to delete
-    #   granted permissions.
+    #   The identifier of the entity for which to delete granted permissions.
+    #
+    #   The identifier can be *UserId, ResourceID, or Group Id*, *Username or
+    #   Groupname*, or *email*.
+    #
+    #   * Grantee ID:
+    #     12345678-1234-1234-1234-123456789012,r-0123456789a0123456789b0123456789,
+    #     or S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: grantee@domain.tld
+    #
+    #   * Grantee name: grantee
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -769,8 +1313,8 @@ module Aws::WorkMail
     #
     #   resp = client.delete_mailbox_permissions({
     #     organization_id: "OrganizationId", # required
-    #     entity_id: "WorkMailIdentifier", # required
-    #     grantee_id: "WorkMailIdentifier", # required
+    #     entity_id: "EntityIdentifier", # required
+    #     grantee_id: "EntityIdentifier", # required
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeleteMailboxPermissions AWS API Documentation
@@ -782,11 +1326,90 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Deletes an Amazon WorkMail organization and all underlying AWS
-    # resources managed by Amazon WorkMail as part of the organization. You
-    # can choose whether to delete the associated directory. For more
-    # information, see [Removing an organization][1] in the *Amazon WorkMail
-    # Administrator Guide*.
+    # Deletes the mobile device access override for the given WorkMail
+    # organization, user, and device.
+    #
+    # <note markdown="1"> Deleting already deleted and non-existing overrides does not produce
+    # an error. In those cases, the service sends back an HTTP 200 response
+    # with an empty HTTP body.
+    #
+    #  </note>
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization for which the access override will be
+    #   deleted.
+    #
+    # @option params [required, String] :user_id
+    #   The WorkMail user for which you want to delete the override. Accepts
+    #   the following types of user identities:
+    #
+    #   * User ID: `12345678-1234-1234-1234-123456789012` or
+    #     `S-1-1-12-1234567890-123456789-123456789-1234`
+    #
+    #   * Email address: `user@domain.tld`
+    #
+    #   * User name: `user`
+    #
+    # @option params [required, String] :device_id
+    #   The mobile device for which you delete the override. `DeviceId` is
+    #   case insensitive.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_mobile_device_access_override({
+    #     organization_id: "OrganizationId", # required
+    #     user_id: "EntityIdentifier", # required
+    #     device_id: "DeviceId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeleteMobileDeviceAccessOverride AWS API Documentation
+    #
+    # @overload delete_mobile_device_access_override(params = {})
+    # @param [Hash] params ({})
+    def delete_mobile_device_access_override(params = {}, options = {})
+      req = build_request(:delete_mobile_device_access_override, params)
+      req.send_request(options)
+    end
+
+    # Deletes a mobile device access rule for the specified WorkMail
+    # organization.
+    #
+    # <note markdown="1"> Deleting already deleted and non-existing rules does not produce an
+    # error. In those cases, the service sends back an HTTP 200 response
+    # with an empty HTTP body.
+    #
+    #  </note>
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization under which the rule will be deleted.
+    #
+    # @option params [required, String] :mobile_device_access_rule_id
+    #   The identifier of the rule to be deleted.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_mobile_device_access_rule({
+    #     organization_id: "OrganizationId", # required
+    #     mobile_device_access_rule_id: "MobileDeviceAccessRuleId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeleteMobileDeviceAccessRule AWS API Documentation
+    #
+    # @overload delete_mobile_device_access_rule(params = {})
+    # @param [Hash] params ({})
+    def delete_mobile_device_access_rule(params = {}, options = {})
+      req = build_request(:delete_mobile_device_access_rule, params)
+      req.send_request(options)
+    end
+
+    # Deletes an WorkMail organization and all underlying AWS resources
+    # managed by WorkMail as part of the organization. You can choose
+    # whether to delete the associated directory. For more information, see
+    # [Removing an organization][1] in the *WorkMail Administrator Guide*.
     #
     #
     #
@@ -805,6 +1428,10 @@ module Aws::WorkMail
     #   If true, deletes the AWS Directory Service directory associated with
     #   the organization.
     #
+    # @option params [Boolean] :force_delete
+    #   Deletes a WorkMail organization even if the organization has enabled
+    #   users.
+    #
     # @return [Types::DeleteOrganizationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DeleteOrganizationResponse#organization_id #organization_id} => String
@@ -816,6 +1443,7 @@ module Aws::WorkMail
     #     client_token: "IdempotencyClientToken",
     #     organization_id: "OrganizationId", # required
     #     delete_directory: false, # required
+    #     force_delete: false,
     #   })
     #
     # @example Response structure
@@ -841,13 +1469,20 @@ module Aws::WorkMail
     # @option params [required, String] :resource_id
     #   The identifier of the resource to be deleted.
     #
+    #   The identifier can accept *ResourceId*, or *Resourcename*. The
+    #   following identity formats are available:
+    #
+    #   * Resource ID: r-0123456789a0123456789b0123456789
+    #
+    #   * Resource name: resource
+    #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.delete_resource({
     #     organization_id: "OrganizationId", # required
-    #     resource_id: "ResourceId", # required
+    #     resource_id: "EntityIdentifier", # required
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeleteResource AWS API Documentation
@@ -886,8 +1521,8 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Deletes a user from Amazon WorkMail and all subsequent systems. Before
-    # you can delete a user, the user state must be `DISABLED`. Use the
+    # Deletes a user from WorkMail and all subsequent systems. Before you
+    # can delete a user, the user state must be `DISABLED`. Use the
     # DescribeUser action to confirm the user state.
     #
     # Deleting a user is permanent and cannot be undone. WorkMail archives
@@ -899,13 +1534,21 @@ module Aws::WorkMail
     # @option params [required, String] :user_id
     #   The identifier of the user to be deleted.
     #
+    #   The identifier can be the *UserId* or *Username*. The following
+    #   identity formats are available:
+    #
+    #   * User ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * User name: user
+    #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.delete_user({
     #     organization_id: "OrganizationId", # required
-    #     user_id: "WorkMailIdentifier", # required
+    #     user_id: "EntityIdentifier", # required
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeleteUser AWS API Documentation
@@ -917,17 +1560,28 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Mark a user, group, or resource as no longer used in Amazon WorkMail.
-    # This action disassociates the mailbox and schedules it for clean-up.
+    # Mark a user, group, or resource as no longer used in WorkMail. This
+    # action disassociates the mailbox and schedules it for clean-up.
     # WorkMail keeps mailboxes for 30 days before they are permanently
     # removed. The functionality in the console is *Disable*.
     #
     # @option params [required, String] :organization_id
-    #   The identifier for the organization under which the Amazon WorkMail
-    #   entity exists.
+    #   The identifier for the organization under which the WorkMail entity
+    #   exists.
     #
     # @option params [required, String] :entity_id
-    #   The identifier for the member (user or group) to be updated.
+    #   The identifier for the member to be updated.
+    #
+    #   The identifier can be *UserId, ResourceId, or Group Id*, *Username,
+    #   Resourcename, or Groupname*, or *email*.
+    #
+    #   * Entity ID: 12345678-1234-1234-1234-123456789012,
+    #     r-0123456789a0123456789b0123456789, or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: entity@domain.tld
+    #
+    #   * Entity name: entity
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -935,7 +1589,7 @@ module Aws::WorkMail
     #
     #   resp = client.deregister_from_work_mail({
     #     organization_id: "OrganizationId", # required
-    #     entity_id: "WorkMailIdentifier", # required
+    #     entity_id: "EntityIdentifier", # required
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeregisterFromWorkMail AWS API Documentation
@@ -947,6 +1601,103 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
+    # Removes a domain from WorkMail, stops email routing to WorkMail, and
+    # removes the authorization allowing WorkMail use. SES keeps the domain
+    # because other applications may use it. You must first remove any email
+    # address used by WorkMail entities before you remove the domain.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization for which the domain will be deregistered.
+    #
+    # @option params [required, String] :domain_name
+    #   The domain to deregister in WorkMail and SES.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.deregister_mail_domain({
+    #     organization_id: "OrganizationId", # required
+    #     domain_name: "WorkMailDomainName", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DeregisterMailDomain AWS API Documentation
+    #
+    # @overload deregister_mail_domain(params = {})
+    # @param [Hash] params ({})
+    def deregister_mail_domain(params = {}, options = {})
+      req = build_request(:deregister_mail_domain, params)
+      req.send_request(options)
+    end
+
+    # Describes the current email monitoring configuration for a specified
+    # organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The ID of the organization for which the email monitoring
+    #   configuration is described.
+    #
+    # @return [Types::DescribeEmailMonitoringConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeEmailMonitoringConfigurationResponse#role_arn #role_arn} => String
+    #   * {Types::DescribeEmailMonitoringConfigurationResponse#log_group_arn #log_group_arn} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_email_monitoring_configuration({
+    #     organization_id: "OrganizationId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.role_arn #=> String
+    #   resp.log_group_arn #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DescribeEmailMonitoringConfiguration AWS API Documentation
+    #
+    # @overload describe_email_monitoring_configuration(params = {})
+    # @param [Hash] params ({})
+    def describe_email_monitoring_configuration(params = {}, options = {})
+      req = build_request(:describe_email_monitoring_configuration, params)
+      req.send_request(options)
+    end
+
+    # Returns basic details about an entity in WorkMail.
+    #
+    # @option params [required, String] :organization_id
+    #   The identifier for the organization under which the entity exists.
+    #
+    # @option params [required, String] :email
+    #   The email under which the entity exists.
+    #
+    # @return [Types::DescribeEntityResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeEntityResponse#entity_id #entity_id} => String
+    #   * {Types::DescribeEntityResponse#name #name} => String
+    #   * {Types::DescribeEntityResponse#type #type} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_entity({
+    #     organization_id: "OrganizationId", # required
+    #     email: "EmailAddress", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.entity_id #=> String
+    #   resp.name #=> String
+    #   resp.type #=> String, one of "GROUP", "USER", "RESOURCE"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DescribeEntity AWS API Documentation
+    #
+    # @overload describe_entity(params = {})
+    # @param [Hash] params ({})
+    def describe_entity(params = {}, options = {})
+      req = build_request(:describe_entity, params)
+      req.send_request(options)
+    end
+
     # Returns the data available for the group.
     #
     # @option params [required, String] :organization_id
@@ -954,6 +1705,16 @@ module Aws::WorkMail
     #
     # @option params [required, String] :group_id
     #   The identifier for the group to be described.
+    #
+    #   The identifier can accept *GroupId*, *Groupname*, or *email*. The
+    #   following identity formats are available:
+    #
+    #   * Group ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: group@domain.tld
+    #
+    #   * Group name: group
     #
     # @return [Types::DescribeGroupResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -963,12 +1724,13 @@ module Aws::WorkMail
     #   * {Types::DescribeGroupResponse#state #state} => String
     #   * {Types::DescribeGroupResponse#enabled_date #enabled_date} => Time
     #   * {Types::DescribeGroupResponse#disabled_date #disabled_date} => Time
+    #   * {Types::DescribeGroupResponse#hidden_from_global_address_list #hidden_from_global_address_list} => Boolean
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_group({
     #     organization_id: "OrganizationId", # required
-    #     group_id: "WorkMailIdentifier", # required
+    #     group_id: "EntityIdentifier", # required
     #   })
     #
     # @example Response structure
@@ -979,6 +1741,7 @@ module Aws::WorkMail
     #   resp.state #=> String, one of "ENABLED", "DISABLED", "DELETED"
     #   resp.enabled_date #=> Time
     #   resp.disabled_date #=> Time
+    #   resp.hidden_from_global_address_list #=> Boolean
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DescribeGroup AWS API Documentation
     #
@@ -986,6 +1749,34 @@ module Aws::WorkMail
     # @param [Hash] params ({})
     def describe_group(params = {}, options = {})
       req = build_request(:describe_group, params)
+      req.send_request(options)
+    end
+
+    # Lists the settings in a DMARC policy for a specified organization.
+    #
+    # @option params [required, String] :organization_id
+    #   Lists the ID of the given organization.
+    #
+    # @return [Types::DescribeInboundDmarcSettingsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeInboundDmarcSettingsResponse#enforced #enforced} => Boolean
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_inbound_dmarc_settings({
+    #     organization_id: "OrganizationId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.enforced #=> Boolean
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DescribeInboundDmarcSettings AWS API Documentation
+    #
+    # @overload describe_inbound_dmarc_settings(params = {})
+    # @param [Hash] params ({})
+    def describe_inbound_dmarc_settings(params = {}, options = {})
+      req = build_request(:describe_inbound_dmarc_settings, params)
       req.send_request(options)
     end
 
@@ -1060,6 +1851,8 @@ module Aws::WorkMail
     #   * {Types::DescribeOrganizationResponse#completed_date #completed_date} => Time
     #   * {Types::DescribeOrganizationResponse#error_message #error_message} => String
     #   * {Types::DescribeOrganizationResponse#arn #arn} => String
+    #   * {Types::DescribeOrganizationResponse#migration_admin #migration_admin} => String
+    #   * {Types::DescribeOrganizationResponse#interoperability_enabled #interoperability_enabled} => Boolean
     #
     # @example Request syntax with placeholder values
     #
@@ -1078,6 +1871,8 @@ module Aws::WorkMail
     #   resp.completed_date #=> Time
     #   resp.error_message #=> String
     #   resp.arn #=> String
+    #   resp.migration_admin #=> String
+    #   resp.interoperability_enabled #=> Boolean
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DescribeOrganization AWS API Documentation
     #
@@ -1097,6 +1892,15 @@ module Aws::WorkMail
     # @option params [required, String] :resource_id
     #   The identifier of the resource to be described.
     #
+    #   The identifier can accept *ResourceId*, *Resourcename*, or *email*.
+    #   The following identity formats are available:
+    #
+    #   * Resource ID: r-0123456789a0123456789b0123456789
+    #
+    #   * Email address: resource@domain.tld
+    #
+    #   * Resource name: resource
+    #
     # @return [Types::DescribeResourceResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DescribeResourceResponse#resource_id #resource_id} => String
@@ -1107,12 +1911,14 @@ module Aws::WorkMail
     #   * {Types::DescribeResourceResponse#state #state} => String
     #   * {Types::DescribeResourceResponse#enabled_date #enabled_date} => Time
     #   * {Types::DescribeResourceResponse#disabled_date #disabled_date} => Time
+    #   * {Types::DescribeResourceResponse#description #description} => String
+    #   * {Types::DescribeResourceResponse#hidden_from_global_address_list #hidden_from_global_address_list} => Boolean
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_resource({
     #     organization_id: "OrganizationId", # required
-    #     resource_id: "ResourceId", # required
+    #     resource_id: "EntityIdentifier", # required
     #   })
     #
     # @example Response structure
@@ -1127,6 +1933,8 @@ module Aws::WorkMail
     #   resp.state #=> String, one of "ENABLED", "DISABLED", "DELETED"
     #   resp.enabled_date #=> Time
     #   resp.disabled_date #=> Time
+    #   resp.description #=> String
+    #   resp.hidden_from_global_address_list #=> Boolean
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DescribeResource AWS API Documentation
     #
@@ -1145,6 +1953,16 @@ module Aws::WorkMail
     # @option params [required, String] :user_id
     #   The identifier for the user to be described.
     #
+    #   The identifier can be the *UserId*, *Username*, or *email*. The
+    #   following identity formats are available:
+    #
+    #   * User ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: user@domain.tld
+    #
+    #   * User name: user
+    #
     # @return [Types::DescribeUserResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DescribeUserResponse#user_id #user_id} => String
@@ -1155,12 +1973,27 @@ module Aws::WorkMail
     #   * {Types::DescribeUserResponse#user_role #user_role} => String
     #   * {Types::DescribeUserResponse#enabled_date #enabled_date} => Time
     #   * {Types::DescribeUserResponse#disabled_date #disabled_date} => Time
+    #   * {Types::DescribeUserResponse#mailbox_provisioned_date #mailbox_provisioned_date} => Time
+    #   * {Types::DescribeUserResponse#mailbox_deprovisioned_date #mailbox_deprovisioned_date} => Time
+    #   * {Types::DescribeUserResponse#first_name #first_name} => String
+    #   * {Types::DescribeUserResponse#last_name #last_name} => String
+    #   * {Types::DescribeUserResponse#hidden_from_global_address_list #hidden_from_global_address_list} => Boolean
+    #   * {Types::DescribeUserResponse#initials #initials} => String
+    #   * {Types::DescribeUserResponse#telephone #telephone} => String
+    #   * {Types::DescribeUserResponse#street #street} => String
+    #   * {Types::DescribeUserResponse#job_title #job_title} => String
+    #   * {Types::DescribeUserResponse#city #city} => String
+    #   * {Types::DescribeUserResponse#company #company} => String
+    #   * {Types::DescribeUserResponse#zip_code #zip_code} => String
+    #   * {Types::DescribeUserResponse#department #department} => String
+    #   * {Types::DescribeUserResponse#country #country} => String
+    #   * {Types::DescribeUserResponse#office #office} => String
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_user({
     #     organization_id: "OrganizationId", # required
-    #     user_id: "WorkMailIdentifier", # required
+    #     user_id: "EntityIdentifier", # required
     #   })
     #
     # @example Response structure
@@ -1170,9 +2003,24 @@ module Aws::WorkMail
     #   resp.email #=> String
     #   resp.display_name #=> String
     #   resp.state #=> String, one of "ENABLED", "DISABLED", "DELETED"
-    #   resp.user_role #=> String, one of "USER", "RESOURCE", "SYSTEM_USER"
+    #   resp.user_role #=> String, one of "USER", "RESOURCE", "SYSTEM_USER", "REMOTE_USER"
     #   resp.enabled_date #=> Time
     #   resp.disabled_date #=> Time
+    #   resp.mailbox_provisioned_date #=> Time
+    #   resp.mailbox_deprovisioned_date #=> Time
+    #   resp.first_name #=> String
+    #   resp.last_name #=> String
+    #   resp.hidden_from_global_address_list #=> Boolean
+    #   resp.initials #=> String
+    #   resp.telephone #=> String
+    #   resp.street #=> String
+    #   resp.job_title #=> String
+    #   resp.city #=> String
+    #   resp.company #=> String
+    #   resp.zip_code #=> String
+    #   resp.department #=> String
+    #   resp.country #=> String
+    #   resp.office #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DescribeUser AWS API Documentation
     #
@@ -1192,9 +2040,28 @@ module Aws::WorkMail
     #   The identifier of the resource from which delegates' set members are
     #   removed.
     #
+    #   The identifier can accept *ResourceId*, *Resourcename*, or *email*.
+    #   The following identity formats are available:
+    #
+    #   * Resource ID: r-0123456789a0123456789b0123456789
+    #
+    #   * Email address: resource@domain.tld
+    #
+    #   * Resource name: resource
+    #
     # @option params [required, String] :entity_id
     #   The identifier for the member (user, group) to be removed from the
     #   resource's delegates.
+    #
+    #   The entity ID can accept *UserId or GroupID*, *Username or Groupname*,
+    #   or *email*.
+    #
+    #   * Entity: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: entity@domain.tld
+    #
+    #   * Entity: entity
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -1202,8 +2069,8 @@ module Aws::WorkMail
     #
     #   resp = client.disassociate_delegate_from_resource({
     #     organization_id: "OrganizationId", # required
-    #     resource_id: "ResourceId", # required
-    #     entity_id: "WorkMailIdentifier", # required
+    #     resource_id: "EntityIdentifier", # required
+    #     entity_id: "EntityIdentifier", # required
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DisassociateDelegateFromResource AWS API Documentation
@@ -1223,8 +2090,28 @@ module Aws::WorkMail
     # @option params [required, String] :group_id
     #   The identifier for the group from which members are removed.
     #
+    #   The identifier can accept *GroupId*, *Groupname*, or *email*. The
+    #   following identity formats are available:
+    #
+    #   * Group ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: group@domain.tld
+    #
+    #   * Group name: group
+    #
     # @option params [required, String] :member_id
-    #   The identifier for the member to be removed to the group.
+    #   The identifier for the member to be removed from the group.
+    #
+    #   The member ID can accept *UserID or GroupId*, *Username or Groupname*,
+    #   or *email*.
+    #
+    #   * Member ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: member@domain.tld
+    #
+    #   * Member name: member
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -1232,8 +2119,8 @@ module Aws::WorkMail
     #
     #   resp = client.disassociate_member_from_group({
     #     organization_id: "OrganizationId", # required
-    #     group_id: "WorkMailIdentifier", # required
-    #     member_id: "WorkMailIdentifier", # required
+    #     group_id: "EntityIdentifier", # required
+    #     member_id: "EntityIdentifier", # required
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/DisassociateMemberFromGroup AWS API Documentation
@@ -1246,7 +2133,10 @@ module Aws::WorkMail
     end
 
     # Gets the effects of an organization's access control rules as they
-    # apply to a specified IPv4 address, access protocol action, or user ID.
+    # apply to a specified IPv4 address, access protocol action, and user ID
+    # or impersonation role ID. You must provide either the user ID or
+    # impersonation role ID. Impersonation role ID can only be used with
+    # Action EWS.
     #
     # @option params [required, String] :organization_id
     #   The identifier for the organization.
@@ -1259,8 +2149,11 @@ module Aws::WorkMail
     #   `AutoDiscover`, `EWS`, `IMAP`, `SMTP`, `WindowsOutlook`, and
     #   `WebMail`.
     #
-    # @option params [required, String] :user_id
+    # @option params [String] :user_id
     #   The user ID.
+    #
+    # @option params [String] :impersonation_role_id
+    #   The impersonation role ID.
     #
     # @return [Types::GetAccessControlEffectResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1273,7 +2166,8 @@ module Aws::WorkMail
     #     organization_id: "OrganizationId", # required
     #     ip_address: "IpAddress", # required
     #     action: "AccessControlRuleAction", # required
-    #     user_id: "WorkMailIdentifier", # required
+    #     user_id: "WorkMailIdentifier",
+    #     impersonation_role_id: "ImpersonationRoleId",
     #   })
     #
     # @example Response structure
@@ -1329,6 +2223,155 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
+    # Gets the impersonation role details for the given WorkMail
+    # organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization from which to retrieve the impersonation
+    #   role.
+    #
+    # @option params [required, String] :impersonation_role_id
+    #   The impersonation role ID to retrieve.
+    #
+    # @return [Types::GetImpersonationRoleResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetImpersonationRoleResponse#impersonation_role_id #impersonation_role_id} => String
+    #   * {Types::GetImpersonationRoleResponse#name #name} => String
+    #   * {Types::GetImpersonationRoleResponse#type #type} => String
+    #   * {Types::GetImpersonationRoleResponse#description #description} => String
+    #   * {Types::GetImpersonationRoleResponse#rules #rules} => Array&lt;Types::ImpersonationRule&gt;
+    #   * {Types::GetImpersonationRoleResponse#date_created #date_created} => Time
+    #   * {Types::GetImpersonationRoleResponse#date_modified #date_modified} => Time
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_impersonation_role({
+    #     organization_id: "OrganizationId", # required
+    #     impersonation_role_id: "ImpersonationRoleId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.impersonation_role_id #=> String
+    #   resp.name #=> String
+    #   resp.type #=> String, one of "FULL_ACCESS", "READ_ONLY"
+    #   resp.description #=> String
+    #   resp.rules #=> Array
+    #   resp.rules[0].impersonation_rule_id #=> String
+    #   resp.rules[0].name #=> String
+    #   resp.rules[0].description #=> String
+    #   resp.rules[0].effect #=> String, one of "ALLOW", "DENY"
+    #   resp.rules[0].target_users #=> Array
+    #   resp.rules[0].target_users[0] #=> String
+    #   resp.rules[0].not_target_users #=> Array
+    #   resp.rules[0].not_target_users[0] #=> String
+    #   resp.date_created #=> Time
+    #   resp.date_modified #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/GetImpersonationRole AWS API Documentation
+    #
+    # @overload get_impersonation_role(params = {})
+    # @param [Hash] params ({})
+    def get_impersonation_role(params = {}, options = {})
+      req = build_request(:get_impersonation_role, params)
+      req.send_request(options)
+    end
+
+    # Tests whether the given impersonation role can impersonate a target
+    # user.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization where the impersonation role is defined.
+    #
+    # @option params [required, String] :impersonation_role_id
+    #   The impersonation role ID to test.
+    #
+    # @option params [required, String] :target_user
+    #   The WorkMail organization user chosen to test the impersonation role.
+    #   The following identity formats are available:
+    #
+    #   * User ID: `12345678-1234-1234-1234-123456789012` or
+    #     `S-1-1-12-1234567890-123456789-123456789-1234`
+    #
+    #   * Email address: `user@domain.tld`
+    #
+    #   * User name: `user`
+    #
+    # @return [Types::GetImpersonationRoleEffectResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetImpersonationRoleEffectResponse#type #type} => String
+    #   * {Types::GetImpersonationRoleEffectResponse#effect #effect} => String
+    #   * {Types::GetImpersonationRoleEffectResponse#matched_rules #matched_rules} => Array&lt;Types::ImpersonationMatchedRule&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_impersonation_role_effect({
+    #     organization_id: "OrganizationId", # required
+    #     impersonation_role_id: "ImpersonationRoleId", # required
+    #     target_user: "EntityIdentifier", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.type #=> String, one of "FULL_ACCESS", "READ_ONLY"
+    #   resp.effect #=> String, one of "ALLOW", "DENY"
+    #   resp.matched_rules #=> Array
+    #   resp.matched_rules[0].impersonation_rule_id #=> String
+    #   resp.matched_rules[0].name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/GetImpersonationRoleEffect AWS API Documentation
+    #
+    # @overload get_impersonation_role_effect(params = {})
+    # @param [Hash] params ({})
+    def get_impersonation_role_effect(params = {}, options = {})
+      req = build_request(:get_impersonation_role_effect, params)
+      req.send_request(options)
+    end
+
+    # Gets details for a mail domain, including domain records required to
+    # configure your domain with recommended security.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization for which the domain is retrieved.
+    #
+    # @option params [required, String] :domain_name
+    #   The domain from which you want to retrieve details.
+    #
+    # @return [Types::GetMailDomainResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetMailDomainResponse#records #records} => Array&lt;Types::DnsRecord&gt;
+    #   * {Types::GetMailDomainResponse#is_test_domain #is_test_domain} => Boolean
+    #   * {Types::GetMailDomainResponse#is_default #is_default} => Boolean
+    #   * {Types::GetMailDomainResponse#ownership_verification_status #ownership_verification_status} => String
+    #   * {Types::GetMailDomainResponse#dkim_verification_status #dkim_verification_status} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_mail_domain({
+    #     organization_id: "OrganizationId", # required
+    #     domain_name: "WorkMailDomainName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.records #=> Array
+    #   resp.records[0].type #=> String
+    #   resp.records[0].hostname #=> String
+    #   resp.records[0].value #=> String
+    #   resp.is_test_domain #=> Boolean
+    #   resp.is_default #=> Boolean
+    #   resp.ownership_verification_status #=> String, one of "PENDING", "VERIFIED", "FAILED"
+    #   resp.dkim_verification_status #=> String, one of "PENDING", "VERIFIED", "FAILED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/GetMailDomain AWS API Documentation
+    #
+    # @overload get_mail_domain(params = {})
+    # @param [Hash] params ({})
+    def get_mail_domain(params = {}, options = {})
+      req = build_request(:get_mail_domain, params)
+      req.send_request(options)
+    end
+
     # Requests a user's mailbox details for a specified organization and
     # user.
     #
@@ -1339,6 +2382,16 @@ module Aws::WorkMail
     # @option params [required, String] :user_id
     #   The identifier for the user whose mailbox details are being requested.
     #
+    #   The identifier can be the *UserId*, *Username*, or *email*. The
+    #   following identity formats are available:
+    #
+    #   * User ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: user@domain.tld
+    #
+    #   * User name: user
+    #
     # @return [Types::GetMailboxDetailsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::GetMailboxDetailsResponse#mailbox_quota #mailbox_quota} => Integer
@@ -1348,7 +2401,7 @@ module Aws::WorkMail
     #
     #   resp = client.get_mailbox_details({
     #     organization_id: "OrganizationId", # required
-    #     user_id: "WorkMailIdentifier", # required
+    #     user_id: "EntityIdentifier", # required
     #   })
     #
     # @example Response structure
@@ -1362,6 +2415,113 @@ module Aws::WorkMail
     # @param [Hash] params ({})
     def get_mailbox_details(params = {}, options = {})
       req = build_request(:get_mailbox_details, params)
+      req.send_request(options)
+    end
+
+    # Simulates the effect of the mobile device access rules for the given
+    # attributes of a sample access event. Use this method to test the
+    # effects of the current set of mobile device access rules for the
+    # WorkMail organization for a particular user's attributes.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization to simulate the access effect for.
+    #
+    # @option params [String] :device_type
+    #   Device type the simulated user will report.
+    #
+    # @option params [String] :device_model
+    #   Device model the simulated user will report.
+    #
+    # @option params [String] :device_operating_system
+    #   Device operating system the simulated user will report.
+    #
+    # @option params [String] :device_user_agent
+    #   Device user agent the simulated user will report.
+    #
+    # @return [Types::GetMobileDeviceAccessEffectResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetMobileDeviceAccessEffectResponse#effect #effect} => String
+    #   * {Types::GetMobileDeviceAccessEffectResponse#matched_rules #matched_rules} => Array&lt;Types::MobileDeviceAccessMatchedRule&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_mobile_device_access_effect({
+    #     organization_id: "OrganizationId", # required
+    #     device_type: "DeviceType",
+    #     device_model: "DeviceModel",
+    #     device_operating_system: "DeviceOperatingSystem",
+    #     device_user_agent: "DeviceUserAgent",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.effect #=> String, one of "ALLOW", "DENY"
+    #   resp.matched_rules #=> Array
+    #   resp.matched_rules[0].mobile_device_access_rule_id #=> String
+    #   resp.matched_rules[0].name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/GetMobileDeviceAccessEffect AWS API Documentation
+    #
+    # @overload get_mobile_device_access_effect(params = {})
+    # @param [Hash] params ({})
+    def get_mobile_device_access_effect(params = {}, options = {})
+      req = build_request(:get_mobile_device_access_effect, params)
+      req.send_request(options)
+    end
+
+    # Gets the mobile device access override for the given WorkMail
+    # organization, user, and device.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization to which you want to apply the override.
+    #
+    # @option params [required, String] :user_id
+    #   Identifies the WorkMail user for the override. Accepts the following
+    #   types of user identities:
+    #
+    #   * User ID: `12345678-1234-1234-1234-123456789012` or
+    #     `S-1-1-12-1234567890-123456789-123456789-1234`
+    #
+    #   * Email address: `user@domain.tld`
+    #
+    #   * User name: `user`
+    #
+    # @option params [required, String] :device_id
+    #   The mobile device to which the override applies. `DeviceId` is case
+    #   insensitive.
+    #
+    # @return [Types::GetMobileDeviceAccessOverrideResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetMobileDeviceAccessOverrideResponse#user_id #user_id} => String
+    #   * {Types::GetMobileDeviceAccessOverrideResponse#device_id #device_id} => String
+    #   * {Types::GetMobileDeviceAccessOverrideResponse#effect #effect} => String
+    #   * {Types::GetMobileDeviceAccessOverrideResponse#description #description} => String
+    #   * {Types::GetMobileDeviceAccessOverrideResponse#date_created #date_created} => Time
+    #   * {Types::GetMobileDeviceAccessOverrideResponse#date_modified #date_modified} => Time
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_mobile_device_access_override({
+    #     organization_id: "OrganizationId", # required
+    #     user_id: "EntityIdentifier", # required
+    #     device_id: "DeviceId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.user_id #=> String
+    #   resp.device_id #=> String
+    #   resp.effect #=> String, one of "ALLOW", "DENY"
+    #   resp.description #=> String
+    #   resp.date_created #=> Time
+    #   resp.date_modified #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/GetMobileDeviceAccessOverride AWS API Documentation
+    #
+    # @overload get_mobile_device_access_override(params = {})
+    # @param [Hash] params ({})
+    def get_mobile_device_access_override(params = {}, options = {})
+      req = build_request(:get_mobile_device_access_override, params)
       req.send_request(options)
     end
 
@@ -1400,6 +2560,10 @@ module Aws::WorkMail
     #   resp.rules[0].not_user_ids[0] #=> String
     #   resp.rules[0].date_created #=> Time
     #   resp.rules[0].date_modified #=> Time
+    #   resp.rules[0].impersonation_role_ids #=> Array
+    #   resp.rules[0].impersonation_role_ids[0] #=> String
+    #   resp.rules[0].not_impersonation_role_ids #=> Array
+    #   resp.rules[0].not_impersonation_role_ids[0] #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/ListAccessControlRules AWS API Documentation
     #
@@ -1457,6 +2621,56 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
+    # List all the `AvailabilityConfiguration`'s for the given WorkMail
+    # organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization for which the `AvailabilityConfiguration`'s
+    #   will be listed.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return in a single call.
+    #
+    # @option params [String] :next_token
+    #   The token to use to retrieve the next page of results. The first call
+    #   does not require a token.
+    #
+    # @return [Types::ListAvailabilityConfigurationsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListAvailabilityConfigurationsResponse#availability_configurations #availability_configurations} => Array&lt;Types::AvailabilityConfiguration&gt;
+    #   * {Types::ListAvailabilityConfigurationsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_availability_configurations({
+    #     organization_id: "OrganizationId", # required
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.availability_configurations #=> Array
+    #   resp.availability_configurations[0].domain_name #=> String
+    #   resp.availability_configurations[0].provider_type #=> String, one of "EWS", "LAMBDA"
+    #   resp.availability_configurations[0].ews_provider.ews_endpoint #=> String
+    #   resp.availability_configurations[0].ews_provider.ews_username #=> String
+    #   resp.availability_configurations[0].lambda_provider.lambda_arn #=> String
+    #   resp.availability_configurations[0].date_created #=> Time
+    #   resp.availability_configurations[0].date_modified #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/ListAvailabilityConfigurations AWS API Documentation
+    #
+    # @overload list_availability_configurations(params = {})
+    # @param [Hash] params ({})
+    def list_availability_configurations(params = {}, options = {})
+      req = build_request(:list_availability_configurations, params)
+      req.send_request(options)
+    end
+
     # Returns an overview of the members of a group. Users and groups can be
     # members of a group.
     #
@@ -1466,6 +2680,16 @@ module Aws::WorkMail
     # @option params [required, String] :group_id
     #   The identifier for the group to which the members (users or groups)
     #   are associated.
+    #
+    #   The identifier can accept *GroupId*, *Groupname*, or *email*. The
+    #   following identity formats are available:
+    #
+    #   * Group ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: group@domain.tld
+    #
+    #   * Group name: group
     #
     # @option params [String] :next_token
     #   The token to use to retrieve the next page of results. The first call
@@ -1485,7 +2709,7 @@ module Aws::WorkMail
     #
     #   resp = client.list_group_members({
     #     organization_id: "OrganizationId", # required
-    #     group_id: "WorkMailIdentifier", # required
+    #     group_id: "EntityIdentifier", # required
     #     next_token: "NextToken",
     #     max_results: 1,
     #   })
@@ -1522,6 +2746,10 @@ module Aws::WorkMail
     # @option params [Integer] :max_results
     #   The maximum number of results to return in a single call.
     #
+    # @option params [Types::ListGroupsFilters] :filters
+    #   Limit the search results based on the filter criteria. Only one filter
+    #   per request is supported.
+    #
     # @return [Types::ListGroupsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ListGroupsResponse#groups #groups} => Array&lt;Types::Group&gt;
@@ -1535,6 +2763,11 @@ module Aws::WorkMail
     #     organization_id: "OrganizationId", # required
     #     next_token: "NextToken",
     #     max_results: 1,
+    #     filters: {
+    #       name_prefix: "String",
+    #       primary_email_prefix: "String",
+    #       state: "ENABLED", # accepts ENABLED, DISABLED, DELETED
+    #     },
     #   })
     #
     # @example Response structure
@@ -1554,6 +2787,159 @@ module Aws::WorkMail
     # @param [Hash] params ({})
     def list_groups(params = {}, options = {})
       req = build_request(:list_groups, params)
+      req.send_request(options)
+    end
+
+    # Returns all the groups to which an entity belongs.
+    #
+    # @option params [required, String] :organization_id
+    #   The identifier for the organization under which the entity exists.
+    #
+    # @option params [required, String] :entity_id
+    #   The identifier for the entity.
+    #
+    #   The entity ID can accept *UserId or GroupID*, *Username or Groupname*,
+    #   or *email*.
+    #
+    #   * Entity ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: entity@domain.tld
+    #
+    #   * Entity name: entity
+    #
+    # @option params [Types::ListGroupsForEntityFilters] :filters
+    #   Limit the search results based on the filter criteria.
+    #
+    # @option params [String] :next_token
+    #   The token to use to retrieve the next page of results. The first call
+    #   does not contain any tokens.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return in a single call.
+    #
+    # @return [Types::ListGroupsForEntityResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListGroupsForEntityResponse#groups #groups} => Array&lt;Types::GroupIdentifier&gt;
+    #   * {Types::ListGroupsForEntityResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_groups_for_entity({
+    #     organization_id: "OrganizationId", # required
+    #     entity_id: "EntityIdentifier", # required
+    #     filters: {
+    #       group_name_prefix: "String",
+    #     },
+    #     next_token: "NextToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.groups #=> Array
+    #   resp.groups[0].group_id #=> String
+    #   resp.groups[0].group_name #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/ListGroupsForEntity AWS API Documentation
+    #
+    # @overload list_groups_for_entity(params = {})
+    # @param [Hash] params ({})
+    def list_groups_for_entity(params = {}, options = {})
+      req = build_request(:list_groups_for_entity, params)
+      req.send_request(options)
+    end
+
+    # Lists all the impersonation roles for the given WorkMail organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization to which the listed impersonation roles
+    #   belong.
+    #
+    # @option params [String] :next_token
+    #   The token used to retrieve the next page of results. The first call
+    #   doesn't require a token.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results returned in a single call.
+    #
+    # @return [Types::ListImpersonationRolesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListImpersonationRolesResponse#roles #roles} => Array&lt;Types::ImpersonationRole&gt;
+    #   * {Types::ListImpersonationRolesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_impersonation_roles({
+    #     organization_id: "OrganizationId", # required
+    #     next_token: "NextToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.roles #=> Array
+    #   resp.roles[0].impersonation_role_id #=> String
+    #   resp.roles[0].name #=> String
+    #   resp.roles[0].type #=> String, one of "FULL_ACCESS", "READ_ONLY"
+    #   resp.roles[0].date_created #=> Time
+    #   resp.roles[0].date_modified #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/ListImpersonationRoles AWS API Documentation
+    #
+    # @overload list_impersonation_roles(params = {})
+    # @param [Hash] params ({})
+    def list_impersonation_roles(params = {}, options = {})
+      req = build_request(:list_impersonation_roles, params)
+      req.send_request(options)
+    end
+
+    # Lists the mail domains in a given WorkMail organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization for which to list domains.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return in a single call.
+    #
+    # @option params [String] :next_token
+    #   The token to use to retrieve the next page of results. The first call
+    #   does not require a token.
+    #
+    # @return [Types::ListMailDomainsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListMailDomainsResponse#mail_domains #mail_domains} => Array&lt;Types::MailDomainSummary&gt;
+    #   * {Types::ListMailDomainsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_mail_domains({
+    #     organization_id: "OrganizationId", # required
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.mail_domains #=> Array
+    #   resp.mail_domains[0].domain_name #=> String
+    #   resp.mail_domains[0].default_domain #=> Boolean
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/ListMailDomains AWS API Documentation
+    #
+    # @overload list_mail_domains(params = {})
+    # @param [Hash] params ({})
+    def list_mail_domains(params = {}, options = {})
+      req = build_request(:list_mail_domains, params)
       req.send_request(options)
     end
 
@@ -1615,8 +3001,18 @@ module Aws::WorkMail
     #   resource exists.
     #
     # @option params [required, String] :entity_id
-    #   The identifier of the user, group, or resource for which to list
-    #   mailbox permissions.
+    #   The identifier of the user, or resource for which to list mailbox
+    #   permissions.
+    #
+    #   The entity ID can accept *UserId or ResourceId*, *Username or
+    #   Resourcename*, or *email*.
+    #
+    #   * Entity ID: 12345678-1234-1234-1234-123456789012, or
+    #     r-0123456789a0123456789b0123456789
+    #
+    #   * Email address: entity@domain.tld
+    #
+    #   * Entity name: entity
     #
     # @option params [String] :next_token
     #   The token to use to retrieve the next page of results. The first call
@@ -1636,7 +3032,7 @@ module Aws::WorkMail
     #
     #   resp = client.list_mailbox_permissions({
     #     organization_id: "OrganizationId", # required
-    #     entity_id: "WorkMailIdentifier", # required
+    #     entity_id: "EntityIdentifier", # required
     #     next_token: "NextToken",
     #     max_results: 1,
     #   })
@@ -1656,6 +3052,122 @@ module Aws::WorkMail
     # @param [Hash] params ({})
     def list_mailbox_permissions(params = {}, options = {})
       req = build_request(:list_mailbox_permissions, params)
+      req.send_request(options)
+    end
+
+    # Lists all the mobile device access overrides for any given combination
+    # of WorkMail organization, user, or device.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization under which to list mobile device access
+    #   overrides.
+    #
+    # @option params [String] :user_id
+    #   The WorkMail user under which you list the mobile device access
+    #   overrides. Accepts the following types of user identities:
+    #
+    #   * User ID: `12345678-1234-1234-1234-123456789012` or
+    #     `S-1-1-12-1234567890-123456789-123456789-1234`
+    #
+    #   * Email address: `user@domain.tld`
+    #
+    #   * User name: `user`
+    #
+    # @option params [String] :device_id
+    #   The mobile device to which the access override applies.
+    #
+    # @option params [String] :next_token
+    #   The token to use to retrieve the next page of results. The first call
+    #   does not require a token.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return in a single call.
+    #
+    # @return [Types::ListMobileDeviceAccessOverridesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListMobileDeviceAccessOverridesResponse#overrides #overrides} => Array&lt;Types::MobileDeviceAccessOverride&gt;
+    #   * {Types::ListMobileDeviceAccessOverridesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_mobile_device_access_overrides({
+    #     organization_id: "OrganizationId", # required
+    #     user_id: "EntityIdentifier",
+    #     device_id: "DeviceId",
+    #     next_token: "NextToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.overrides #=> Array
+    #   resp.overrides[0].user_id #=> String
+    #   resp.overrides[0].device_id #=> String
+    #   resp.overrides[0].effect #=> String, one of "ALLOW", "DENY"
+    #   resp.overrides[0].description #=> String
+    #   resp.overrides[0].date_created #=> Time
+    #   resp.overrides[0].date_modified #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/ListMobileDeviceAccessOverrides AWS API Documentation
+    #
+    # @overload list_mobile_device_access_overrides(params = {})
+    # @param [Hash] params ({})
+    def list_mobile_device_access_overrides(params = {}, options = {})
+      req = build_request(:list_mobile_device_access_overrides, params)
+      req.send_request(options)
+    end
+
+    # Lists the mobile device access rules for the specified WorkMail
+    # organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization for which to list the rules.
+    #
+    # @return [Types::ListMobileDeviceAccessRulesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListMobileDeviceAccessRulesResponse#rules #rules} => Array&lt;Types::MobileDeviceAccessRule&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_mobile_device_access_rules({
+    #     organization_id: "OrganizationId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.rules #=> Array
+    #   resp.rules[0].mobile_device_access_rule_id #=> String
+    #   resp.rules[0].name #=> String
+    #   resp.rules[0].description #=> String
+    #   resp.rules[0].effect #=> String, one of "ALLOW", "DENY"
+    #   resp.rules[0].device_types #=> Array
+    #   resp.rules[0].device_types[0] #=> String
+    #   resp.rules[0].not_device_types #=> Array
+    #   resp.rules[0].not_device_types[0] #=> String
+    #   resp.rules[0].device_models #=> Array
+    #   resp.rules[0].device_models[0] #=> String
+    #   resp.rules[0].not_device_models #=> Array
+    #   resp.rules[0].not_device_models[0] #=> String
+    #   resp.rules[0].device_operating_systems #=> Array
+    #   resp.rules[0].device_operating_systems[0] #=> String
+    #   resp.rules[0].not_device_operating_systems #=> Array
+    #   resp.rules[0].not_device_operating_systems[0] #=> String
+    #   resp.rules[0].device_user_agents #=> Array
+    #   resp.rules[0].device_user_agents[0] #=> String
+    #   resp.rules[0].not_device_user_agents #=> Array
+    #   resp.rules[0].not_device_user_agents[0] #=> String
+    #   resp.rules[0].date_created #=> Time
+    #   resp.rules[0].date_modified #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/ListMobileDeviceAccessRules AWS API Documentation
+    #
+    # @overload list_mobile_device_access_rules(params = {})
+    # @param [Hash] params ({})
+    def list_mobile_device_access_rules(params = {}, options = {})
+      req = build_request(:list_mobile_device_access_rules, params)
       req.send_request(options)
     end
 
@@ -1711,6 +3223,15 @@ module Aws::WorkMail
     # @option params [required, String] :resource_id
     #   The identifier for the resource whose delegates are listed.
     #
+    #   The identifier can accept *ResourceId*, *Resourcename*, or *email*.
+    #   The following identity formats are available:
+    #
+    #   * Resource ID: r-0123456789a0123456789b0123456789
+    #
+    #   * Email address: resource@domain.tld
+    #
+    #   * Resource name: resource
+    #
     # @option params [String] :next_token
     #   The token used to paginate through the delegates associated with a
     #   resource.
@@ -1729,7 +3250,7 @@ module Aws::WorkMail
     #
     #   resp = client.list_resource_delegates({
     #     organization_id: "OrganizationId", # required
-    #     resource_id: "WorkMailIdentifier", # required
+    #     resource_id: "EntityIdentifier", # required
     #     next_token: "NextToken",
     #     max_results: 1,
     #   })
@@ -1762,6 +3283,10 @@ module Aws::WorkMail
     # @option params [Integer] :max_results
     #   The maximum number of results to return in a single call.
     #
+    # @option params [Types::ListResourcesFilters] :filters
+    #   Limit the resource search results based on the filter criteria. You
+    #   can only use one filter per request.
+    #
     # @return [Types::ListResourcesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ListResourcesResponse#resources #resources} => Array&lt;Types::Resource&gt;
@@ -1775,6 +3300,11 @@ module Aws::WorkMail
     #     organization_id: "OrganizationId", # required
     #     next_token: "NextToken",
     #     max_results: 1,
+    #     filters: {
+    #       name_prefix: "String",
+    #       primary_email_prefix: "String",
+    #       state: "ENABLED", # accepts ENABLED, DISABLED, DELETED
+    #     },
     #   })
     #
     # @example Response structure
@@ -1787,6 +3317,7 @@ module Aws::WorkMail
     #   resp.resources[0].state #=> String, one of "ENABLED", "DISABLED", "DELETED"
     #   resp.resources[0].enabled_date #=> Time
     #   resp.resources[0].disabled_date #=> Time
+    #   resp.resources[0].description #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/ListResources AWS API Documentation
@@ -1798,7 +3329,7 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Lists the tags applied to an Amazon WorkMail organization resource.
+    # Lists the tags applied to an WorkMail organization resource.
     #
     # @option params [required, String] :resource_arn
     #   The resource ARN.
@@ -1840,6 +3371,10 @@ module Aws::WorkMail
     # @option params [Integer] :max_results
     #   The maximum number of results to return in a single call.
     #
+    # @option params [Types::ListUsersFilters] :filters
+    #   Limit the user search results based on the filter criteria. You can
+    #   only use one filter per request.
+    #
     # @return [Types::ListUsersResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ListUsersResponse#users #users} => Array&lt;Types::User&gt;
@@ -1853,6 +3388,12 @@ module Aws::WorkMail
     #     organization_id: "OrganizationId", # required
     #     next_token: "NextToken",
     #     max_results: 1,
+    #     filters: {
+    #       username_prefix: "String",
+    #       display_name_prefix: "UserAttribute",
+    #       primary_email_prefix: "String",
+    #       state: "ENABLED", # accepts ENABLED, DISABLED, DELETED
+    #     },
     #   })
     #
     # @example Response structure
@@ -1863,7 +3404,7 @@ module Aws::WorkMail
     #   resp.users[0].name #=> String
     #   resp.users[0].display_name #=> String
     #   resp.users[0].state #=> String, one of "ENABLED", "DISABLED", "DELETED"
-    #   resp.users[0].user_role #=> String, one of "USER", "RESOURCE", "SYSTEM_USER"
+    #   resp.users[0].user_role #=> String, one of "USER", "RESOURCE", "SYSTEM_USER", "REMOTE_USER"
     #   resp.users[0].enabled_date #=> Time
     #   resp.users[0].disabled_date #=> Time
     #   resp.next_token #=> String
@@ -1879,8 +3420,9 @@ module Aws::WorkMail
 
     # Adds a new access control rule for the specified organization. The
     # rule allows or denies access to the organization for the specified
-    # IPv4 addresses, access protocol actions, and user IDs. Adding a new
-    # rule with the same name as an existing rule replaces the older rule.
+    # IPv4 addresses, access protocol actions, user IDs and impersonation
+    # IDs. Adding a new rule with the same name as an existing rule replaces
+    # the older rule.
     #
     # @option params [required, String] :name
     #   The rule name.
@@ -1916,6 +3458,12 @@ module Aws::WorkMail
     # @option params [required, String] :organization_id
     #   The identifier of the organization.
     #
+    # @option params [Array<String>] :impersonation_role_ids
+    #   Impersonation role IDs to include in the rule.
+    #
+    # @option params [Array<String>] :not_impersonation_role_ids
+    #   Impersonation role IDs to exclude from the rule.
+    #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
     # @example Request syntax with placeholder values
@@ -1931,6 +3479,8 @@ module Aws::WorkMail
     #     user_ids: ["WorkMailIdentifier"],
     #     not_user_ids: ["WorkMailIdentifier"],
     #     organization_id: "OrganizationId", # required
+    #     impersonation_role_ids: ["ImpersonationRoleId"],
+    #     not_impersonation_role_ids: ["ImpersonationRoleId"],
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/PutAccessControlRule AWS API Documentation
@@ -1942,6 +3492,66 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
+    # Creates or updates the email monitoring configuration for a specified
+    # organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The ID of the organization for which the email monitoring
+    #   configuration is set.
+    #
+    # @option params [required, String] :role_arn
+    #   The Amazon Resource Name (ARN) of the IAM Role associated with the
+    #   email monitoring configuration.
+    #
+    # @option params [required, String] :log_group_arn
+    #   The Amazon Resource Name (ARN) of the CloudWatch Log group associated
+    #   with the email monitoring configuration.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.put_email_monitoring_configuration({
+    #     organization_id: "OrganizationId", # required
+    #     role_arn: "RoleArn", # required
+    #     log_group_arn: "LogGroupArn", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/PutEmailMonitoringConfiguration AWS API Documentation
+    #
+    # @overload put_email_monitoring_configuration(params = {})
+    # @param [Hash] params ({})
+    def put_email_monitoring_configuration(params = {}, options = {})
+      req = build_request(:put_email_monitoring_configuration, params)
+      req.send_request(options)
+    end
+
+    # Enables or disables a DMARC policy for a given organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The ID of the organization that you are applying the DMARC policy to.
+    #
+    # @option params [required, Boolean] :enforced
+    #   Enforces or suspends a policy after it's applied.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.put_inbound_dmarc_settings({
+    #     organization_id: "OrganizationId", # required
+    #     enforced: false, # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/PutInboundDmarcSettings AWS API Documentation
+    #
+    # @overload put_inbound_dmarc_settings(params = {})
+    # @param [Hash] params ({})
+    def put_inbound_dmarc_settings(params = {}, options = {})
+      req = build_request(:put_inbound_dmarc_settings, params)
+      req.send_request(options)
+    end
+
     # Sets permissions for a user, group, or resource. This replaces any
     # pre-existing permissions.
     #
@@ -1950,12 +3560,34 @@ module Aws::WorkMail
     #   resource exists.
     #
     # @option params [required, String] :entity_id
-    #   The identifier of the user, group, or resource for which to update
-    #   mailbox permissions.
+    #   The identifier of the user or resource for which to update mailbox
+    #   permissions.
+    #
+    #   The identifier can be *UserId, ResourceID, or Group Id*, *Username,
+    #   Resourcename, or Groupname*, or *email*.
+    #
+    #   * Entity ID: 12345678-1234-1234-1234-123456789012,
+    #     r-0123456789a0123456789b0123456789, or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: entity@domain.tld
+    #
+    #   * Entity name: entity
     #
     # @option params [required, String] :grantee_id
     #   The identifier of the user, group, or resource to which to grant the
     #   permissions.
+    #
+    #   The identifier can be *UserId, ResourceID, or Group Id*, *Username,
+    #   Resourcename, or Groupname*, or *email*.
+    #
+    #   * Grantee ID: 12345678-1234-1234-1234-123456789012,
+    #     r-0123456789a0123456789b0123456789, or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: grantee@domain.tld
+    #
+    #   * Grantee name: grantee
     #
     # @option params [required, Array<String>] :permission_values
     #   The permissions granted to the grantee. SEND\_AS allows the grantee to
@@ -1972,8 +3604,8 @@ module Aws::WorkMail
     #
     #   resp = client.put_mailbox_permissions({
     #     organization_id: "OrganizationId", # required
-    #     entity_id: "WorkMailIdentifier", # required
-    #     grantee_id: "WorkMailIdentifier", # required
+    #     entity_id: "EntityIdentifier", # required
+    #     grantee_id: "EntityIdentifier", # required
     #     permission_values: ["FULL_ACCESS"], # required, accepts FULL_ACCESS, SEND_AS, SEND_ON_BEHALF
     #   })
     #
@@ -1983,6 +3615,55 @@ module Aws::WorkMail
     # @param [Hash] params ({})
     def put_mailbox_permissions(params = {}, options = {})
       req = build_request(:put_mailbox_permissions, params)
+      req.send_request(options)
+    end
+
+    # Creates or updates a mobile device access override for the given
+    # WorkMail organization, user, and device.
+    #
+    # @option params [required, String] :organization_id
+    #   Identifies the WorkMail organization for which you create the
+    #   override.
+    #
+    # @option params [required, String] :user_id
+    #   The WorkMail user for which you create the override. Accepts the
+    #   following types of user identities:
+    #
+    #   * User ID: `12345678-1234-1234-1234-123456789012` or
+    #     `S-1-1-12-1234567890-123456789-123456789-1234`
+    #
+    #   * Email address: `user@domain.tld`
+    #
+    #   * User name: `user`
+    #
+    # @option params [required, String] :device_id
+    #   The mobile device for which you create the override. `DeviceId` is
+    #   case insensitive.
+    #
+    # @option params [required, String] :effect
+    #   The effect of the override, `ALLOW` or `DENY`.
+    #
+    # @option params [String] :description
+    #   A description of the override.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.put_mobile_device_access_override({
+    #     organization_id: "OrganizationId", # required
+    #     user_id: "EntityIdentifier", # required
+    #     device_id: "DeviceId", # required
+    #     effect: "ALLOW", # required, accepts ALLOW, DENY
+    #     description: "MobileDeviceAccessRuleDescription",
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/PutMobileDeviceAccessOverride AWS API Documentation
+    #
+    # @overload put_mobile_device_access_override(params = {})
+    # @param [Hash] params ({})
+    def put_mobile_device_access_override(params = {}, options = {})
+      req = build_request(:put_mobile_device_access_override, params)
       req.send_request(options)
     end
 
@@ -2030,7 +3711,43 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Registers an existing and disabled user, group, or resource for Amazon
+    # Registers a new domain in WorkMail and SES, and configures it for use
+    # by WorkMail. Emails received by SES for this domain are routed to the
+    # specified WorkMail organization, and WorkMail has permanent permission
+    # to use the specified domain for sending your users' emails.
+    #
+    # @option params [String] :client_token
+    #   Idempotency token used when retrying requests.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization under which you're creating the domain.
+    #
+    # @option params [required, String] :domain_name
+    #   The name of the mail domain to create in WorkMail and SES.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.register_mail_domain({
+    #     client_token: "IdempotencyClientToken",
+    #     organization_id: "OrganizationId", # required
+    #     domain_name: "WorkMailDomainName", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/RegisterMailDomain AWS API Documentation
+    #
+    # @overload register_mail_domain(params = {})
+    # @param [Hash] params ({})
+    def register_mail_domain(params = {}, options = {})
+      req = build_request(:register_mail_domain, params)
+      req.send_request(options)
+    end
+
+    # Registers an existing and disabled user, group, or resource for
     # WorkMail use by associating a mailbox and calendaring capabilities. It
     # performs no change if the user, group, or resource is enabled and
     # fails if the user, group, or resource is deleted. This operation
@@ -2053,6 +3770,16 @@ module Aws::WorkMail
     # @option params [required, String] :entity_id
     #   The identifier for the user, group, or resource to be updated.
     #
+    #   The identifier can accept *UserId, ResourceId, or GroupId*, or
+    #   *Username, Resourcename, or Groupname*. The following identity formats
+    #   are available:
+    #
+    #   * Entity ID: 12345678-1234-1234-1234-123456789012,
+    #     r-0123456789a0123456789b0123456789, or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Entity name: entity
+    #
     # @option params [required, String] :email
     #   The email for the user, group, or resource to be updated.
     #
@@ -2062,7 +3789,7 @@ module Aws::WorkMail
     #
     #   resp = client.register_to_work_mail({
     #     organization_id: "OrganizationId", # required
-    #     entity_id: "WorkMailIdentifier", # required
+    #     entity_id: "EntityIdentifier", # required
     #     email: "EmailAddress", # required
     #   })
     #
@@ -2109,8 +3836,7 @@ module Aws::WorkMail
     # Starts a mailbox export job to export MIME-format email messages and
     # calendar items from the specified mailbox to the specified Amazon
     # Simple Storage Service (Amazon S3) bucket. For more information, see
-    # [Exporting mailbox content][1] in the *Amazon WorkMail Administrator
-    # Guide*.
+    # [Exporting mailbox content][1] in the *WorkMail Administrator Guide*.
     #
     #
     #
@@ -2127,6 +3853,18 @@ module Aws::WorkMail
     #
     # @option params [required, String] :entity_id
     #   The identifier of the user or resource associated with the mailbox.
+    #
+    #   The identifier can accept *UserId or ResourceId*, *Username or
+    #   Resourcename*, or *email*. The following identity formats are
+    #   available:
+    #
+    #   * Entity ID: 12345678-1234-1234-1234-123456789012,
+    #     r-0123456789a0123456789b0123456789 , or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: entity@domain.tld
+    #
+    #   * Entity name: entity
     #
     # @option params [String] :description
     #   The mailbox export job description.
@@ -2154,7 +3892,7 @@ module Aws::WorkMail
     #   resp = client.start_mailbox_export_job({
     #     client_token: "IdempotencyClientToken", # required
     #     organization_id: "OrganizationId", # required
-    #     entity_id: "WorkMailIdentifier", # required
+    #     entity_id: "EntityIdentifier", # required
     #     description: "Description",
     #     role_arn: "RoleArn", # required
     #     kms_key_arn: "KmsKeyArn", # required
@@ -2175,8 +3913,8 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Applies the specified tags to the specified Amazon WorkMail
-    # organization resource.
+    # Applies the specified tags to the specified WorkMailorganization
+    # resource.
     #
     # @option params [required, String] :resource_arn
     #   The resource ARN.
@@ -2207,8 +3945,72 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
-    # Untags the specified tags from the specified Amazon WorkMail
-    # organization resource.
+    # Performs a test on an availability provider to ensure that access is
+    # allowed. For EWS, it verifies the provided credentials can be used to
+    # successfully log in. For Lambda, it verifies that the Lambda function
+    # can be invoked and that the resource access policy was configured to
+    # deny anonymous access. An anonymous invocation is one done without
+    # providing either a `SourceArn` or `SourceAccount` header.
+    #
+    # <note markdown="1"> The request must contain either one provider definition (`EwsProvider`
+    # or `LambdaProvider`) or the `DomainName` parameter. If the
+    # `DomainName` parameter is provided, the configuration stored under the
+    # `DomainName` will be tested.
+    #
+    #  </note>
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization where the availability provider will be
+    #   tested.
+    #
+    # @option params [String] :domain_name
+    #   The domain to which the provider applies. If this field is provided, a
+    #   stored availability provider associated to this domain name will be
+    #   tested.
+    #
+    # @option params [Types::EwsAvailabilityProvider] :ews_provider
+    #   Describes an EWS based availability provider. This is only used as
+    #   input to the service.
+    #
+    # @option params [Types::LambdaAvailabilityProvider] :lambda_provider
+    #   Describes a Lambda based availability provider.
+    #
+    # @return [Types::TestAvailabilityConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::TestAvailabilityConfigurationResponse#test_passed #test_passed} => Boolean
+    #   * {Types::TestAvailabilityConfigurationResponse#failure_reason #failure_reason} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.test_availability_configuration({
+    #     organization_id: "OrganizationId", # required
+    #     domain_name: "DomainName",
+    #     ews_provider: {
+    #       ews_endpoint: "Url", # required
+    #       ews_username: "ExternalUserName", # required
+    #       ews_password: "Password", # required
+    #     },
+    #     lambda_provider: {
+    #       lambda_arn: "LambdaArn", # required
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.test_passed #=> Boolean
+    #   resp.failure_reason #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/TestAvailabilityConfiguration AWS API Documentation
+    #
+    # @overload test_availability_configuration(params = {})
+    # @param [Hash] params ({})
+    def test_availability_configuration(params = {}, options = {})
+      req = build_request(:test_availability_configuration, params)
+      req.send_request(options)
+    end
+
+    # Untags the specified tags from the specified WorkMail organization
+    # resource.
     #
     # @option params [required, String] :resource_arn
     #   The resource ARN.
@@ -2234,6 +4036,175 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
+    # Updates an existing `AvailabilityConfiguration` for the given WorkMail
+    # organization and domain.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization for which the `AvailabilityConfiguration`
+    #   will be updated.
+    #
+    # @option params [required, String] :domain_name
+    #   The domain to which the provider applies the availability
+    #   configuration.
+    #
+    # @option params [Types::EwsAvailabilityProvider] :ews_provider
+    #   The EWS availability provider definition. The request must contain
+    #   exactly one provider definition, either `EwsProvider` or
+    #   `LambdaProvider`. The previously stored provider will be overridden by
+    #   the one provided.
+    #
+    # @option params [Types::LambdaAvailabilityProvider] :lambda_provider
+    #   The Lambda availability provider definition. The request must contain
+    #   exactly one provider definition, either `EwsProvider` or
+    #   `LambdaProvider`. The previously stored provider will be overridden by
+    #   the one provided.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_availability_configuration({
+    #     organization_id: "OrganizationId", # required
+    #     domain_name: "DomainName", # required
+    #     ews_provider: {
+    #       ews_endpoint: "Url", # required
+    #       ews_username: "ExternalUserName", # required
+    #       ews_password: "Password", # required
+    #     },
+    #     lambda_provider: {
+    #       lambda_arn: "LambdaArn", # required
+    #     },
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/UpdateAvailabilityConfiguration AWS API Documentation
+    #
+    # @overload update_availability_configuration(params = {})
+    # @param [Hash] params ({})
+    def update_availability_configuration(params = {}, options = {})
+      req = build_request(:update_availability_configuration, params)
+      req.send_request(options)
+    end
+
+    # Updates the default mail domain for an organization. The default mail
+    # domain is used by the WorkMail AWS Console to suggest an email address
+    # when enabling a mail user. You can only have one default domain.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization for which to list domains.
+    #
+    # @option params [required, String] :domain_name
+    #   The domain name that will become the default domain.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_default_mail_domain({
+    #     organization_id: "OrganizationId", # required
+    #     domain_name: "WorkMailDomainName", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/UpdateDefaultMailDomain AWS API Documentation
+    #
+    # @overload update_default_mail_domain(params = {})
+    # @param [Hash] params ({})
+    def update_default_mail_domain(params = {}, options = {})
+      req = build_request(:update_default_mail_domain, params)
+      req.send_request(options)
+    end
+
+    # Updates attibutes in a group.
+    #
+    # @option params [required, String] :organization_id
+    #   The identifier for the organization under which the group exists.
+    #
+    # @option params [required, String] :group_id
+    #   The identifier for the group to be updated.
+    #
+    #   The identifier can accept *GroupId*, *Groupname*, or *email*. The
+    #   following identity formats are available:
+    #
+    #   * Group ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: group@domain.tld
+    #
+    #   * Group name: group
+    #
+    # @option params [Boolean] :hidden_from_global_address_list
+    #   If enabled, the group is hidden from the global address list.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_group({
+    #     organization_id: "OrganizationId", # required
+    #     group_id: "EntityIdentifier", # required
+    #     hidden_from_global_address_list: false,
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/UpdateGroup AWS API Documentation
+    #
+    # @overload update_group(params = {})
+    # @param [Hash] params ({})
+    def update_group(params = {}, options = {})
+      req = build_request(:update_group, params)
+      req.send_request(options)
+    end
+
+    # Updates an impersonation role for the given WorkMail organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization that contains the impersonation role to
+    #   update.
+    #
+    # @option params [required, String] :impersonation_role_id
+    #   The ID of the impersonation role to update.
+    #
+    # @option params [required, String] :name
+    #   The updated impersonation role name.
+    #
+    # @option params [required, String] :type
+    #   The updated impersonation role type.
+    #
+    # @option params [String] :description
+    #   The updated impersonation role description.
+    #
+    # @option params [required, Array<Types::ImpersonationRule>] :rules
+    #   The updated list of rules.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_impersonation_role({
+    #     organization_id: "OrganizationId", # required
+    #     impersonation_role_id: "ImpersonationRoleId", # required
+    #     name: "ImpersonationRoleName", # required
+    #     type: "FULL_ACCESS", # required, accepts FULL_ACCESS, READ_ONLY
+    #     description: "ImpersonationRoleDescription",
+    #     rules: [ # required
+    #       {
+    #         impersonation_rule_id: "ImpersonationRuleId", # required
+    #         name: "ImpersonationRuleName",
+    #         description: "ImpersonationRuleDescription",
+    #         effect: "ALLOW", # required, accepts ALLOW, DENY
+    #         target_users: ["EntityIdentifier"],
+    #         not_target_users: ["EntityIdentifier"],
+    #       },
+    #     ],
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/UpdateImpersonationRole AWS API Documentation
+    #
+    # @overload update_impersonation_role(params = {})
+    # @param [Hash] params ({})
+    def update_impersonation_role(params = {}, options = {})
+      req = build_request(:update_impersonation_role, params)
+      req.send_request(options)
+    end
+
     # Updates a user's current mailbox quota for a specified organization
     # and user.
     #
@@ -2244,6 +4215,16 @@ module Aws::WorkMail
     # @option params [required, String] :user_id
     #   The identifer for the user for whom to update the mailbox quota.
     #
+    #   The identifier can be the *UserId*, *Username*, or *email*. The
+    #   following identity formats are available:
+    #
+    #   * User ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: user@domain.tld
+    #
+    #   * User name: user
+    #
     # @option params [required, Integer] :mailbox_quota
     #   The updated mailbox quota, in MB, for the specified user.
     #
@@ -2253,7 +4234,7 @@ module Aws::WorkMail
     #
     #   resp = client.update_mailbox_quota({
     #     organization_id: "OrganizationId", # required
-    #     user_id: "WorkMailIdentifier", # required
+    #     user_id: "EntityIdentifier", # required
     #     mailbox_quota: 1, # required
     #   })
     #
@@ -2263,6 +4244,82 @@ module Aws::WorkMail
     # @param [Hash] params ({})
     def update_mailbox_quota(params = {}, options = {})
       req = build_request(:update_mailbox_quota, params)
+      req.send_request(options)
+    end
+
+    # Updates a mobile device access rule for the specified WorkMail
+    # organization.
+    #
+    # @option params [required, String] :organization_id
+    #   The WorkMail organization under which the rule will be updated.
+    #
+    # @option params [required, String] :mobile_device_access_rule_id
+    #   The identifier of the rule to be updated.
+    #
+    # @option params [required, String] :name
+    #   The updated rule name.
+    #
+    # @option params [String] :description
+    #   The updated rule description.
+    #
+    # @option params [required, String] :effect
+    #   The effect of the rule when it matches. Allowed values are `ALLOW` or
+    #   `DENY`.
+    #
+    # @option params [Array<String>] :device_types
+    #   Device types that the updated rule will match.
+    #
+    # @option params [Array<String>] :not_device_types
+    #   Device types that the updated rule **will not** match. All other
+    #   device types will match.
+    #
+    # @option params [Array<String>] :device_models
+    #   Device models that the updated rule will match.
+    #
+    # @option params [Array<String>] :not_device_models
+    #   Device models that the updated rule **will not** match. All other
+    #   device models will match.
+    #
+    # @option params [Array<String>] :device_operating_systems
+    #   Device operating systems that the updated rule will match.
+    #
+    # @option params [Array<String>] :not_device_operating_systems
+    #   Device operating systems that the updated rule **will not** match. All
+    #   other device operating systems will match.
+    #
+    # @option params [Array<String>] :device_user_agents
+    #   User agents that the updated rule will match.
+    #
+    # @option params [Array<String>] :not_device_user_agents
+    #   User agents that the updated rule **will not** match. All other user
+    #   agents will match.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_mobile_device_access_rule({
+    #     organization_id: "OrganizationId", # required
+    #     mobile_device_access_rule_id: "MobileDeviceAccessRuleId", # required
+    #     name: "MobileDeviceAccessRuleName", # required
+    #     description: "MobileDeviceAccessRuleDescription",
+    #     effect: "ALLOW", # required, accepts ALLOW, DENY
+    #     device_types: ["DeviceType"],
+    #     not_device_types: ["DeviceType"],
+    #     device_models: ["DeviceModel"],
+    #     not_device_models: ["DeviceModel"],
+    #     device_operating_systems: ["DeviceOperatingSystem"],
+    #     not_device_operating_systems: ["DeviceOperatingSystem"],
+    #     device_user_agents: ["DeviceUserAgent"],
+    #     not_device_user_agents: ["DeviceUserAgent"],
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/UpdateMobileDeviceAccessRule AWS API Documentation
+    #
+    # @overload update_mobile_device_access_rule(params = {})
+    # @param [Hash] params ({})
+    def update_mobile_device_access_rule(params = {}, options = {})
+      req = build_request(:update_mobile_device_access_rule, params)
       req.send_request(options)
     end
 
@@ -2277,6 +4334,18 @@ module Aws::WorkMail
     # @option params [required, String] :entity_id
     #   The user, group, or resource to update.
     #
+    #   The identifier can accept *UseriD, ResourceId, or GroupId*, *Username,
+    #   Resourcename, or Groupname*, or *email*. The following identity
+    #   formats are available:
+    #
+    #   * Entity ID: 12345678-1234-1234-1234-123456789012,
+    #     r-0123456789a0123456789b0123456789, or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: entity@domain.tld
+    #
+    #   * Entity name: entity
+    #
     # @option params [required, String] :email
     #   The value of the email to be updated as primary.
     #
@@ -2286,7 +4355,7 @@ module Aws::WorkMail
     #
     #   resp = client.update_primary_email_address({
     #     organization_id: "OrganizationId", # required
-    #     entity_id: "WorkMailIdentifier", # required
+    #     entity_id: "EntityIdentifier", # required
     #     email: "EmailAddress", # required
     #   })
     #
@@ -2311,11 +4380,29 @@ module Aws::WorkMail
     # @option params [required, String] :resource_id
     #   The identifier of the resource to be updated.
     #
+    #   The identifier can accept *ResourceId*, *Resourcename*, or *email*.
+    #   The following identity formats are available:
+    #
+    #   * Resource ID: r-0123456789a0123456789b0123456789
+    #
+    #   * Email address: resource@domain.tld
+    #
+    #   * Resource name: resource
+    #
     # @option params [String] :name
     #   The name of the resource to be updated.
     #
     # @option params [Types::BookingOptions] :booking_options
     #   The resource's booking options to be updated.
+    #
+    # @option params [String] :description
+    #   Updates the resource description.
+    #
+    # @option params [String] :type
+    #   Updates the resource type.
+    #
+    # @option params [Boolean] :hidden_from_global_address_list
+    #   If enabled, the resource is hidden from the global address list.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -2323,13 +4410,16 @@ module Aws::WorkMail
     #
     #   resp = client.update_resource({
     #     organization_id: "OrganizationId", # required
-    #     resource_id: "ResourceId", # required
+    #     resource_id: "EntityIdentifier", # required
     #     name: "ResourceName",
     #     booking_options: {
     #       auto_accept_requests: false,
     #       auto_decline_recurring_requests: false,
     #       auto_decline_conflicting_requests: false,
     #     },
+    #     description: "NewResourceDescription",
+    #     type: "ROOM", # accepts ROOM, EQUIPMENT
+    #     hidden_from_global_address_list: false,
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/UpdateResource AWS API Documentation
@@ -2341,20 +4431,125 @@ module Aws::WorkMail
       req.send_request(options)
     end
 
+    # Updates data for the user. To have the latest information, it must be
+    # preceded by a DescribeUser call. The dataset in the request should be
+    # the one expected when performing another `DescribeUser` call.
+    #
+    # @option params [required, String] :organization_id
+    #   The identifier for the organization under which the user exists.
+    #
+    # @option params [required, String] :user_id
+    #   The identifier for the user to be updated.
+    #
+    #   The identifier can be the *UserId*, *Username*, or *email*. The
+    #   following identity formats are available:
+    #
+    #   * User ID: 12345678-1234-1234-1234-123456789012 or
+    #     S-1-1-12-1234567890-123456789-123456789-1234
+    #
+    #   * Email address: user@domain.tld
+    #
+    #   * User name: user
+    #
+    # @option params [String] :role
+    #   Updates the user role.
+    #
+    #   You cannot pass *SYSTEM\_USER* or *RESOURCE*.
+    #
+    # @option params [String] :display_name
+    #   Updates the display name of the user.
+    #
+    # @option params [String] :first_name
+    #   Updates the user's first name.
+    #
+    # @option params [String] :last_name
+    #   Updates the user's last name.
+    #
+    # @option params [Boolean] :hidden_from_global_address_list
+    #   If enabled, the user is hidden from the global address list.
+    #
+    # @option params [String] :initials
+    #   Updates the user's initials.
+    #
+    # @option params [String] :telephone
+    #   Updates the user's contact details.
+    #
+    # @option params [String] :street
+    #   Updates the user's street address.
+    #
+    # @option params [String] :job_title
+    #   Updates the user's job title.
+    #
+    # @option params [String] :city
+    #   Updates the user's city.
+    #
+    # @option params [String] :company
+    #   Updates the user's company.
+    #
+    # @option params [String] :zip_code
+    #   Updates the user's zipcode.
+    #
+    # @option params [String] :department
+    #   Updates the user's department.
+    #
+    # @option params [String] :country
+    #   Updates the user's country.
+    #
+    # @option params [String] :office
+    #   Updates the user's office.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_user({
+    #     organization_id: "OrganizationId", # required
+    #     user_id: "EntityIdentifier", # required
+    #     role: "USER", # accepts USER, RESOURCE, SYSTEM_USER, REMOTE_USER
+    #     display_name: "UserAttribute",
+    #     first_name: "UserAttribute",
+    #     last_name: "UserAttribute",
+    #     hidden_from_global_address_list: false,
+    #     initials: "UserAttribute",
+    #     telephone: "UserAttribute",
+    #     street: "UserAttribute",
+    #     job_title: "UserAttribute",
+    #     city: "UserAttribute",
+    #     company: "UserAttribute",
+    #     zip_code: "UserAttribute",
+    #     department: "UserAttribute",
+    #     country: "UserAttribute",
+    #     office: "UserAttribute",
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workmail-2017-10-01/UpdateUser AWS API Documentation
+    #
+    # @overload update_user(params = {})
+    # @param [Hash] params ({})
+    def update_user(params = {}, options = {})
+      req = build_request(:update_user, params)
+      req.send_request(options)
+    end
+
     # @!endgroup
 
     # @param params ({})
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::WorkMail')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-workmail'
-      context[:gem_version] = '1.33.0'
+      context[:gem_version] = '1.76.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -79,7 +79,9 @@ module Aws::OpsWorks
     #
     # @return [self]
     def load
-      resp = @client.describe_stack_summary(stack_id: @stack_id)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.describe_stack_summary(stack_id: @stack_id)
+      end
       @data = resp.stack_summary
       self
     end
@@ -194,7 +196,9 @@ module Aws::OpsWorks
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Associations

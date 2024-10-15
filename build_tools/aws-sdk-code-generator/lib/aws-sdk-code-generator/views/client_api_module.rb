@@ -27,20 +27,26 @@ module AwsSdkCodeGenerator
       SHAPE_KEYS = {
         # keep
         'flattened' => true,
-        'timestampFormat' => true, # glacier api customization
+        'timestampFormat' => true,
         'xmlNamespace' => true,
-        'streaming' => true, # transfer-encoding
-        'requiresLength' => true, # transder-encoding
+        'streaming' => true,
+        'requiresLength' => true,
+        'union' => false, # handled separately - should remain false
+        'document' => true,
+        'jsonvalue' => true,
+        'error' => true,
+        'locationName' => true,
+        # ignore
         # event stream modeling
         'event' => false,
         'eventstream' => false,
         'eventheader' => false,
         'eventpayload' => false,
-        # ignore
+        'exceptionEvent' => false, # internal, exceptions cannot be events
+        # other
         'synthetic' => false,
         'box' => false,
         'fault' => false,
-        'error' => false,
         'deprecated' => false,
         'deprecatedMessage' => false,
         'type' => false,
@@ -48,7 +54,6 @@ module AwsSdkCodeGenerator
         'members' => false,
         'member' => false,
         'key' => false,
-        'locationName' => false,
         'value' => false,
         'required' => false,
         'enum' => false,
@@ -61,28 +66,32 @@ module AwsSdkCodeGenerator
         'wrapper' => false,
         'xmlOrder' => false,
         'retryable' => false,
-        'union' => false
       }
 
       METADATA_KEYS = {
-        # keep all
+        # keep
         'endpointPrefix' => true,
         'signatureVersion' => true,
+        'auth' => true,
         'signingName' => true,
         'serviceFullName' => true,
         'protocol' => true,
+        'protocols' => true,
         'targetPrefix' => true,
         'jsonVersion' => true,
         'errorPrefix' => true,
-        'timestampFormat' => true, # glacier api customization
+        'timestampFormat' => true,
         'xmlNamespace' => true,
-        'protocolSettings' => {}, # current unused unless for h2 exclude
+        'protocolSettings' => {},
         'serviceId' => true,
         'apiVersion' => true,
         'checksumFormat' => true,
         'globalEndpoint' => true,
         'serviceAbbreviation' => true,
-        'uid' => true
+        'uid' => true,
+        'awsQueryCompatible' => true,
+        # ignore
+        'ripServiceName' => false
       }
 
       # @option options [required, Service] :service
@@ -93,6 +102,7 @@ module AwsSdkCodeGenerator
       # @return [String|nil]
       def generated_src_warning
         return if @service.protocol == 'api-gateway'
+
         GENERATED_SRC_WARNING
       end
 
@@ -128,12 +138,21 @@ module AwsSdkCodeGenerator
             shape_name = lstrip_prefix(upcase_first(shape_name))
           end
           lines = []
-          if non_error_struct?(shape)
+          if non_error_struct?(shape) && !document_struct?(shape)
             required = Set.new(shape['required'] || [])
             unless shape['members'].nil?
               shape['members'].each do |member_name, member_ref|
                 lines << "#{shape_name}.add_member(:#{underscore(member_name)}, #{shape_ref(member_ref, member_name, required)})"
               end
+            end
+            if shape['union']
+              lines << "#{shape_name}.add_member(:unknown, Shapes::ShapeRef.new(shape: nil, location_name: 'unknown'))"
+              shape['members'].each do |member_name, member_ref|
+                member_name_underscore = underscore(member_name)
+                member_class_name = pascal_case(member_name_underscore)
+                lines << "#{shape_name}.add_member_subclass(:#{member_name_underscore}, Types::#{shape_name}::#{member_class_name})"
+              end
+              lines << "#{shape_name}.add_member_subclass(:unknown, Types::#{shape_name}::Unknown)"
             end
             lines << "#{shape_name}.struct_class = Types::#{shape_name}"
             if payload = shape['payload']
@@ -173,7 +192,11 @@ module AwsSdkCodeGenerator
               value: @service.api['metadata'][key].inspect
             }
           elsif METADATA_KEYS[key].nil?
-            raise "unhandled metadata key #{key.inspect}"
+            AwsSdkCodeGenerator.warn(
+              @service.service_id,
+              :invalid_key,
+              "unhandled metadata key `#{key}`"
+            )
           end
         end
         metadata
@@ -187,6 +210,21 @@ module AwsSdkCodeGenerator
             o.http_method = operation['http']['method']
             o.http_request_uri = operation['http']['requestUri']
             o.http_checksum_required = true if operation['httpChecksumRequired']
+            if operation.key?('httpChecksum')
+              operation['httpChecksum']['requestAlgorithmMember'] = underscore(operation['httpChecksum']['requestAlgorithmMember']) if operation['httpChecksum']['requestAlgorithmMember']
+              operation['httpChecksum']['requestValidationModeMember'] = underscore(operation['httpChecksum']['requestValidationModeMember']) if operation['httpChecksum']['requestValidationModeMember']
+              o.http_checksum = operation['httpChecksum'].inject([]) do |a, (k, v)|
+                a << { key: k.inspect, value: v.inspect }
+                a
+              end
+            end
+
+            if operation.key?('requestcompression')
+              o.request_compression = operation['requestcompression'].each_with_object([]) do |(k, v), arr|
+                arr << { key: k.inspect, value: v.inspect }
+              end
+            end
+
             %w(input output).each do |key|
               if operation[key]
                 o.shape_references << "o.#{key} = #{operation_ref(operation[key])}"
@@ -217,6 +255,8 @@ module AwsSdkCodeGenerator
             end
             o.authorizer = operation['authorizer'] if operation.key?('authorizer')
             o.authtype = operation['authtype'] if operation.key?('authtype')
+            o.unsigned_payload = operation['unsignedPayload'] if operation.key?('unsignedPayload')
+            o.auth = operation['auth'] if operation.key?('auth')
             o.require_apikey = operation['requiresApiKey'] if operation.key?('requiresApiKey')
             o.pager = pager(operation_name)
             o.async = @service.protocol_settings['h2'] == 'eventstream' &&
@@ -227,6 +267,7 @@ module AwsSdkCodeGenerator
 
       def apig_authorizer
         return nil unless @service.api.key? 'authorizers'
+
         @service.api['authorizers'].map do |name, authorizer|
           Authorizer.new.tap do |a|
             a.name = name
@@ -259,7 +300,11 @@ module AwsSdkCodeGenerator
         if @service.protocol == 'api-gateway' && type == 'timestamp'
           shape['timestampFormat'] = 'iso8601'
         end
-        if SHAPE_CLASSES.key?(type)
+        if document_struct?(shape)
+          ["Shapes::DocumentShape", shape]
+	      elsif shape['union']
+          ["Shapes::UnionShape", shape]
+        elsif SHAPE_CLASSES.key?(type)
           ["Shapes::#{SHAPE_CLASSES[type]}", shape]
         else
           raise ArgumentError, "unsupported shape type `#{type}'"
@@ -271,9 +316,16 @@ module AwsSdkCodeGenerator
         args << "name: '#{shape_name}'"
         shape.each_pair do |key, value|
           if SHAPE_KEYS[key]
+            # only query protocols have custom error code
+            next if @service.protocol != 'query' && key == 'error'
+
             args << "#{key}: #{value.inspect}"
           elsif SHAPE_KEYS[key].nil?
-            raise "unhandled shape key #{key.inspect}"
+            AwsSdkCodeGenerator.warn(
+              @service.service_id,
+              :invalid_key,
+              "unhandled shape key `#{key}` on `#{shape_name}`"
+            )
           end
         end
         args.join(', ')
@@ -314,6 +366,10 @@ module AwsSdkCodeGenerator
       def error_struct?(shape)
         shape['type'] == 'structure' && !!!shape['event'] &&
           (shape['error'] || shape['exception'])
+      end
+
+      def document_struct?(shape)
+        shape['type'] == 'structure' && shape['document']
       end
 
       def structure_shape_enum
@@ -460,8 +516,16 @@ module AwsSdkCodeGenerator
           options = {}
           metadata.each_pair do |key, value|
             next if key == 'resultWrapper'
+
             if key == 'locationName'
-              options[:location_name] = value.inspect
+              options[:location_name] =
+                # use the xmlName on shape if defined
+                if (@service.protocol == 'rest-xml') &&
+                   (shape_location_name = @service.api['shapes'][shape_name]['locationName'])
+                  shape_location_name.inspect
+                else
+                  value.inspect
+                end
             else
               options[:metadata] ||= {}
               options[:metadata][key] = value.inspect
@@ -517,6 +581,12 @@ module AwsSdkCodeGenerator
         # @return [Boolean]
         attr_accessor :http_checksum_required
 
+        # @return [Hash]
+        attr_accessor :http_checksum
+
+        # @return [Hash]
+        attr_accessor :request_compression
+
         # @return [Array<String>]
         attr_accessor :shape_references
 
@@ -537,6 +607,12 @@ module AwsSdkCodeGenerator
 
         # @return [String,nil]
         attr_accessor :authtype
+
+        # @return [Boolean,nil]
+        attr_accessor :unsigned_payload
+
+        # @return [Array<String>]
+        attr_accessor :auth
 
         # @return [Boolean]
         attr_accessor :endpoint_trait

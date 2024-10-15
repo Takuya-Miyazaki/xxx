@@ -3,14 +3,14 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::AppSync
   module Types
 
-    # You do not have access to perform this operation on this resource.
+    # You don't have access to perform this operation on this resource.
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -25,43 +25,68 @@ module Aws::AppSync
 
     # Describes an additional authentication provider.
     #
-    # @note When making an API call, you may pass AdditionalAuthenticationProvider
-    #   data as a hash:
-    #
-    #       {
-    #         authentication_type: "API_KEY", # accepts API_KEY, AWS_IAM, AMAZON_COGNITO_USER_POOLS, OPENID_CONNECT
-    #         open_id_connect_config: {
-    #           issuer: "String", # required
-    #           client_id: "String",
-    #           iat_ttl: 1,
-    #           auth_ttl: 1,
-    #         },
-    #         user_pool_config: {
-    #           user_pool_id: "String", # required
-    #           aws_region: "String", # required
-    #           app_id_client_regex: "String",
-    #         },
-    #       }
-    #
     # @!attribute [rw] authentication_type
-    #   The authentication type: API key, AWS IAM, OIDC, or Amazon Cognito
-    #   user pools.
+    #   The authentication type: API key, Identity and Access Management
+    #   (IAM), OpenID Connect (OIDC), Amazon Cognito user pools, or Lambda.
     #   @return [String]
     #
     # @!attribute [rw] open_id_connect_config
-    #   The OpenID Connect configuration.
+    #   The OIDC configuration.
     #   @return [Types::OpenIDConnectConfig]
     #
     # @!attribute [rw] user_pool_config
     #   The Amazon Cognito user pool configuration.
     #   @return [Types::CognitoUserPoolConfig]
     #
+    # @!attribute [rw] lambda_authorizer_config
+    #   Configuration for Lambda function authorization.
+    #   @return [Types::LambdaAuthorizerConfig]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/AdditionalAuthenticationProvider AWS API Documentation
     #
     class AdditionalAuthenticationProvider < Struct.new(
       :authentication_type,
       :open_id_connect_config,
-      :user_pool_config)
+      :user_pool_config,
+      :lambda_authorizer_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes an `ApiAssociation` object.
+    #
+    # @!attribute [rw] domain_name
+    #   The domain name.
+    #   @return [String]
+    #
+    # @!attribute [rw] api_id
+    #   The API ID.
+    #   @return [String]
+    #
+    # @!attribute [rw] association_status
+    #   Identifies the status of an association.
+    #
+    #   * **PROCESSING**: The API association is being created. You cannot
+    #     modify association requests during processing.
+    #
+    #   * **SUCCESS**: The API association was successful. You can modify
+    #     associations after success.
+    #
+    #   * **FAILED**: The API association has failed. You can modify
+    #     associations after failure.
+    #   @return [String]
+    #
+    # @!attribute [rw] deployment_detail
+    #   Details about the last deployment status.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ApiAssociation AWS API Documentation
+    #
+    class ApiAssociation < Struct.new(
+      :domain_name,
+      :api_id,
+      :association_status,
+      :deployment_detail)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -71,25 +96,25 @@ module Aws::AppSync
     # @!attribute [rw] ttl
     #   TTL in seconds for cache entries.
     #
-    #   Valid values are between 1 and 3600 seconds.
+    #   Valid values are 1–3,600 seconds.
     #   @return [Integer]
     #
     # @!attribute [rw] api_caching_behavior
     #   Caching behavior.
     #
-    #   * **FULL\_REQUEST\_CACHING**\: All requests are fully cached.
+    #   * **FULL\_REQUEST\_CACHING**: All requests are fully cached.
     #
-    #   * **PER\_RESOLVER\_CACHING**\: Individual resolvers that you specify
+    #   * **PER\_RESOLVER\_CACHING**: Individual resolvers that you specify
     #     are cached.
     #   @return [String]
     #
     # @!attribute [rw] transit_encryption_enabled
-    #   Transit encryption flag when connecting to cache. This setting
-    #   cannot be updated after creation.
+    #   Transit encryption flag when connecting to cache. You cannot update
+    #   this setting after creation.
     #   @return [Boolean]
     #
     # @!attribute [rw] at_rest_encryption_enabled
-    #   At rest encryption flag for cache. This setting cannot be updated
+    #   At-rest encryption flag for cache. You cannot update this setting
     #   after creation.
     #   @return [Boolean]
     #
@@ -119,33 +144,50 @@ module Aws::AppSync
     #   The following legacy instance types are available, but their use is
     #   discouraged:
     #
-    #   * **T2\_SMALL**\: A t2.small instance type.
+    #   * **T2\_SMALL**: A t2.small instance type.
     #
-    #   * **T2\_MEDIUM**\: A t2.medium instance type.
+    #   * **T2\_MEDIUM**: A t2.medium instance type.
     #
-    #   * **R4\_LARGE**\: A r4.large instance type.
+    #   * **R4\_LARGE**: A r4.large instance type.
     #
-    #   * **R4\_XLARGE**\: A r4.xlarge instance type.
+    #   * **R4\_XLARGE**: A r4.xlarge instance type.
     #
-    #   * **R4\_2XLARGE**\: A r4.2xlarge instance type.
+    #   * **R4\_2XLARGE**: A r4.2xlarge instance type.
     #
-    #   * **R4\_4XLARGE**\: A r4.4xlarge instance type.
+    #   * **R4\_4XLARGE**: A r4.4xlarge instance type.
     #
-    #   * **R4\_8XLARGE**\: A r4.8xlarge instance type.
+    #   * **R4\_8XLARGE**: A r4.8xlarge instance type.
     #   @return [String]
     #
     # @!attribute [rw] status
     #   The cache instance status.
     #
-    #   * **AVAILABLE**\: The instance is available for use.
+    #   * **AVAILABLE**: The instance is available for use.
     #
-    #   * **CREATING**\: The instance is currently creating.
+    #   * **CREATING**: The instance is currently creating.
     #
-    #   * **DELETING**\: The instance is currently deleting.
+    #   * **DELETING**: The instance is currently deleting.
     #
-    #   * **MODIFYING**\: The instance is currently modifying.
+    #   * **MODIFYING**: The instance is currently modifying.
     #
-    #   * **FAILED**\: The instance has failed creation.
+    #   * **FAILED**: The instance has failed creation.
+    #   @return [String]
+    #
+    # @!attribute [rw] health_metrics_config
+    #   Controls how cache health metrics will be emitted to CloudWatch.
+    #   Cache health metrics include:
+    #
+    #   * NetworkBandwidthOutAllowanceExceeded: The network packets dropped
+    #     because the throughput exceeded the aggregated bandwidth limit.
+    #     This is useful for diagnosing bottlenecks in a cache
+    #     configuration.
+    #
+    #   * EngineCPUUtilization: The CPU utilization (percentage) allocated
+    #     to the Redis process. This is useful for diagnosing bottlenecks in
+    #     a cache configuration.
+    #
+    #   Metrics will be recorded by API ID. You can set the value to
+    #   `ENABLED` or `DISABLED`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ApiCache AWS API Documentation
@@ -156,20 +198,21 @@ module Aws::AppSync
       :transit_encryption_enabled,
       :at_rest_encryption_enabled,
       :type,
-      :status)
+      :status,
+      :health_metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Describes an API key.
     #
-    # Customers invoke AWS AppSync GraphQL API operations with API keys as
-    # an identity mechanism. There are two key versions:
+    # Customers invoke AppSync GraphQL API operations with API keys as an
+    # identity mechanism. There are two key versions:
     #
-    # **da1**\: This version was introduced at launch in November 2017.
-    # These keys always expire after 7 days. Key expiration is managed by
-    # Amazon DynamoDB TTL. The keys ceased to be valid after February 21,
-    # 2018 and should not be used after that date.
+    # **da1**: We introduced this version at launch in November 2017. These
+    # keys always expire after 7 days. Amazon DynamoDB TTL manages key
+    # expiration. These keys ceased to be valid after February 21, 2018, and
+    # they should no longer be used.
     #
     # * `ListApiKeys` returns the expiration time in milliseconds.
     #
@@ -179,13 +222,12 @@ module Aws::AppSync
     #
     # * `DeleteApiKey` deletes the item from the table.
     #
-    # * Expiration is stored in Amazon DynamoDB as milliseconds. This
-    #   results in a bug where keys are not automatically deleted because
-    #   DynamoDB expects the TTL to be stored in seconds. As a one-time
-    #   action, we will delete these keys from the table after February 21,
-    #   2018.
+    # * Expiration is stored in DynamoDB as milliseconds. This results in a
+    #   bug where keys are not automatically deleted because DynamoDB
+    #   expects the TTL to be stored in seconds. As a one-time action, we
+    #   deleted these keys from the table on February 21, 2018.
     #
-    # **da2**\: This version was introduced in February 2018 when AppSync
+    # **da2**: We introduced this version in February 2018 when AppSync
     # added support to extend key expiration.
     #
     # * `ListApiKeys` returns the expiration time and deletion time in
@@ -196,17 +238,18 @@ module Aws::AppSync
     #
     # * `UpdateApiKey` returns the expiration time and and deletion time in
     #   seconds and accepts a user-provided expiration time in seconds.
-    #   Expired API keys are kept for 60 days after the expiration time. Key
-    #   expiration time can be updated while the key is not deleted.
+    #   Expired API keys are kept for 60 days after the expiration time. You
+    #   can update the key expiration time as long as the key isn't
+    #   deleted.
     #
     # * `DeleteApiKey` deletes the item from the table.
     #
-    # * Expiration is stored in Amazon DynamoDB as seconds. After the
-    #   expiration time, using the key to authenticate will fail. But the
-    #   key can be reinstated before deletion.
+    # * Expiration is stored in DynamoDB as seconds. After the expiration
+    #   time, using the key to authenticate will fail. However, you can
+    #   reinstate the key before deletion.
     #
-    # * Deletion is stored in Amazon DynamoDB as seconds. The key will be
-    #   deleted after deletion time.
+    # * Deletion is stored in DynamoDB as seconds. The key is deleted after
+    #   deletion time.
     #
     # @!attribute [rw] id
     #   The API key ID.
@@ -278,30 +321,167 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # The authorization config in case the HTTP endpoint requires
+    # Describes a runtime used by an Amazon Web Services AppSync pipeline
+    # resolver or Amazon Web Services AppSync function. Specifies the name
+    # and version of the runtime to use. Note that if a runtime is
+    # specified, code must also be specified.
+    #
+    # @!attribute [rw] name
+    #   The `name` of the runtime to use. Currently, the only allowed value
+    #   is `APPSYNC_JS`.
+    #   @return [String]
+    #
+    # @!attribute [rw] runtime_version
+    #   The `version` of the runtime to use. Currently, the only allowed
+    #   version is `1.0.0`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/AppSyncRuntime AWS API Documentation
+    #
+    class AppSyncRuntime < Struct.new(
+      :name,
+      :runtime_version)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain_name
+    #   The domain name.
+    #   @return [String]
+    #
+    # @!attribute [rw] api_id
+    #   The API ID. Private APIs can not be associated with custom domains.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/AssociateApiRequest AWS API Documentation
+    #
+    class AssociateApiRequest < Struct.new(
+      :domain_name,
+      :api_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] api_association
+    #   The `ApiAssociation` object.
+    #   @return [Types::ApiAssociation]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/AssociateApiResponse AWS API Documentation
+    #
+    class AssociateApiResponse < Struct.new(
+      :api_association)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] source_api_identifier
+    #   The identifier of the AppSync Source API. This is generated by the
+    #   AppSync service. In most cases, source APIs (especially in your
+    #   account) only require the API ID value or ARN of the source API.
+    #   However, source APIs from other accounts (cross-account use cases)
+    #   strictly require the full resource ARN of the source API.
+    #   @return [String]
+    #
+    # @!attribute [rw] merged_api_identifier
+    #   The identifier of the AppSync Merged API. This is generated by the
+    #   AppSync service. In most cases, Merged APIs (especially in your
+    #   account) only require the API ID value or ARN of the merged API.
+    #   However, Merged APIs in other accounts (cross-account use cases)
+    #   strictly require the full resource ARN of the merged API.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   The description field.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_api_association_config
+    #   The `SourceApiAssociationConfig` object data.
+    #   @return [Types::SourceApiAssociationConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/AssociateMergedGraphqlApiRequest AWS API Documentation
+    #
+    class AssociateMergedGraphqlApiRequest < Struct.new(
+      :source_api_identifier,
+      :merged_api_identifier,
+      :description,
+      :source_api_association_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] source_api_association
+    #   The `SourceApiAssociation` object data.
+    #   @return [Types::SourceApiAssociation]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/AssociateMergedGraphqlApiResponse AWS API Documentation
+    #
+    class AssociateMergedGraphqlApiResponse < Struct.new(
+      :source_api_association)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] merged_api_identifier
+    #   The identifier of the AppSync Merged API. This is generated by the
+    #   AppSync service. In most cases, Merged APIs (especially in your
+    #   account) only require the API ID value or ARN of the merged API.
+    #   However, Merged APIs in other accounts (cross-account use cases)
+    #   strictly require the full resource ARN of the merged API.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_api_identifier
+    #   The identifier of the AppSync Source API. This is generated by the
+    #   AppSync service. In most cases, source APIs (especially in your
+    #   account) only require the API ID value or ARN of the source API.
+    #   However, source APIs from other accounts (cross-account use cases)
+    #   strictly require the full resource ARN of the source API.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   The description field.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_api_association_config
+    #   The `SourceApiAssociationConfig` object data.
+    #   @return [Types::SourceApiAssociationConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/AssociateSourceGraphqlApiRequest AWS API Documentation
+    #
+    class AssociateSourceGraphqlApiRequest < Struct.new(
+      :merged_api_identifier,
+      :source_api_identifier,
+      :description,
+      :source_api_association_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] source_api_association
+    #   The `SourceApiAssociation` object data.
+    #   @return [Types::SourceApiAssociation]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/AssociateSourceGraphqlApiResponse AWS API Documentation
+    #
+    class AssociateSourceGraphqlApiResponse < Struct.new(
+      :source_api_association)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The authorization configuration in case the HTTP endpoint requires
     # authorization.
     #
-    # @note When making an API call, you may pass AuthorizationConfig
-    #   data as a hash:
-    #
-    #       {
-    #         authorization_type: "AWS_IAM", # required, accepts AWS_IAM
-    #         aws_iam_config: {
-    #           signing_region: "String",
-    #           signing_service_name: "String",
-    #         },
-    #       }
-    #
     # @!attribute [rw] authorization_type
-    #   The authorization type required by the HTTP endpoint.
+    #   The authorization type that the HTTP endpoint requires.
     #
-    #   * **AWS\_IAM**\: The authorization type is Sigv4.
+    #   * **AWS\_IAM**: The authorization type is Signature Version 4
+    #     (SigV4).
     #
     #   ^
     #   @return [String]
     #
     # @!attribute [rw] aws_iam_config
-    #   The AWS IAM settings.
+    #   The Identity and Access Management (IAM) settings.
     #   @return [Types::AwsIamConfig]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/AuthorizationConfig AWS API Documentation
@@ -313,22 +493,14 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # The AWS IAM configuration.
-    #
-    # @note When making an API call, you may pass AwsIamConfig
-    #   data as a hash:
-    #
-    #       {
-    #         signing_region: "String",
-    #         signing_service_name: "String",
-    #       }
+    # The Identity and Access Management (IAM) configuration.
     #
     # @!attribute [rw] signing_region
-    #   The signing region for AWS IAM authorization.
+    #   The signing Amazon Web Services Region for IAM authorization.
     #   @return [String]
     #
     # @!attribute [rw] signing_service_name
-    #   The signing service name for AWS IAM authorization.
+    #   The signing service name for IAM authorization.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/AwsIamConfig AWS API Documentation
@@ -340,38 +512,59 @@ module Aws::AppSync
       include Aws::Structure
     end
 
+    # Provides further details for the reason behind the bad request. For
+    # reason type `CODE_ERROR`, the detail will contain a list of code
+    # errors.
+    #
+    # @!attribute [rw] code_errors
+    #   Contains the list of errors in the request.
+    #   @return [Array<Types::CodeError>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/BadRequestDetail AWS API Documentation
+    #
+    class BadRequestDetail < Struct.new(
+      :code_errors)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The request is not well formed. For example, a value is invalid or a
     # required field is missing. Check the field values, and then try again.
     #
     # @!attribute [rw] message
     #   @return [String]
     #
+    # @!attribute [rw] reason
+    #   Provides context for the cause of the bad request. The only
+    #   supported value is `CODE_ERROR`.
+    #   @return [String]
+    #
+    # @!attribute [rw] detail
+    #   Provides further details for the reason behind the bad request. For
+    #   reason type `CODE_ERROR`, the detail will contain a list of code
+    #   errors.
+    #   @return [Types::BadRequestDetail]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/BadRequestException AWS API Documentation
     #
     class BadRequestException < Struct.new(
-      :message)
+      :message,
+      :reason,
+      :detail)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # The caching configuration for a resolver that has caching enabled.
-    #
-    # @note When making an API call, you may pass CachingConfig
-    #   data as a hash:
-    #
-    #       {
-    #         ttl: 1,
-    #         caching_keys: ["String"],
-    #       }
+    # The caching configuration for a resolver that has caching activated.
     #
     # @!attribute [rw] ttl
-    #   The TTL in seconds for a resolver that has caching enabled.
+    #   The TTL in seconds for a resolver that has caching activated.
     #
-    #   Valid values are between 1 and 3600 seconds.
+    #   Valid values are 1–3,600 seconds.
     #   @return [Integer]
     #
     # @!attribute [rw] caching_keys
-    #   The caching keys for a resolver that has caching enabled.
+    #   The caching keys for a resolver that has caching activated.
     #
     #   Valid values are entries from the `$context.arguments`,
     #   `$context.source`, and `$context.identity` maps.
@@ -386,28 +579,74 @@ module Aws::AppSync
       include Aws::Structure
     end
 
+    # Describes an AppSync error.
+    #
+    # @!attribute [rw] error_type
+    #   The type of code error.
+    #
+    #   Examples include, but aren't limited to: `LINT_ERROR`,
+    #   `PARSER_ERROR`.
+    #   @return [String]
+    #
+    # @!attribute [rw] value
+    #   A user presentable error.
+    #
+    #   Examples include, but aren't limited to: `Parsing error:
+    #   Unterminated string literal`.
+    #   @return [String]
+    #
+    # @!attribute [rw] location
+    #   The line, column, and span location of the error in the code.
+    #   @return [Types::CodeErrorLocation]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CodeError AWS API Documentation
+    #
+    class CodeError < Struct.new(
+      :error_type,
+      :value,
+      :location)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the location of the error in a code sample.
+    #
+    # @!attribute [rw] line
+    #   The line number in the code. Defaults to `0` if unknown.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] column
+    #   The column number in the code. Defaults to `0` if unknown.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] span
+    #   The span/length of the error. Defaults to `-1` if unknown.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CodeErrorLocation AWS API Documentation
+    #
+    class CodeErrorLocation < Struct.new(
+      :line,
+      :column,
+      :span)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Describes an Amazon Cognito user pool configuration.
-    #
-    # @note When making an API call, you may pass CognitoUserPoolConfig
-    #   data as a hash:
-    #
-    #       {
-    #         user_pool_id: "String", # required
-    #         aws_region: "String", # required
-    #         app_id_client_regex: "String",
-    #       }
     #
     # @!attribute [rw] user_pool_id
     #   The user pool ID.
     #   @return [String]
     #
     # @!attribute [rw] aws_region
-    #   The AWS Region in which the user pool was created.
+    #   The Amazon Web Services Region in which the user pool was created.
     #   @return [String]
     #
     # @!attribute [rw] app_id_client_regex
     #   A regular expression for validating the incoming Amazon Cognito user
-    #   pool app client ID.
+    #   pool app client ID. If this value isn't set, no filtering is
+    #   applied.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CognitoUserPoolConfig AWS API Documentation
@@ -436,44 +675,32 @@ module Aws::AppSync
 
     # Represents the input of a `CreateApiCache` operation.
     #
-    # @note When making an API call, you may pass CreateApiCacheRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         ttl: 1, # required
-    #         transit_encryption_enabled: false,
-    #         at_rest_encryption_enabled: false,
-    #         api_caching_behavior: "FULL_REQUEST_CACHING", # required, accepts FULL_REQUEST_CACHING, PER_RESOLVER_CACHING
-    #         type: "T2_SMALL", # required, accepts T2_SMALL, T2_MEDIUM, R4_LARGE, R4_XLARGE, R4_2XLARGE, R4_4XLARGE, R4_8XLARGE, SMALL, MEDIUM, LARGE, XLARGE, LARGE_2X, LARGE_4X, LARGE_8X, LARGE_12X
-    #       }
-    #
     # @!attribute [rw] api_id
-    #   The GraphQL API Id.
+    #   The GraphQL API ID.
     #   @return [String]
     #
     # @!attribute [rw] ttl
     #   TTL in seconds for cache entries.
     #
-    #   Valid values are between 1 and 3600 seconds.
+    #   Valid values are 1–3,600 seconds.
     #   @return [Integer]
     #
     # @!attribute [rw] transit_encryption_enabled
-    #   Transit encryption flag when connecting to cache. This setting
-    #   cannot be updated after creation.
+    #   Transit encryption flag when connecting to cache. You cannot update
+    #   this setting after creation.
     #   @return [Boolean]
     #
     # @!attribute [rw] at_rest_encryption_enabled
-    #   At rest encryption flag for cache. This setting cannot be updated
+    #   At-rest encryption flag for cache. You cannot update this setting
     #   after creation.
     #   @return [Boolean]
     #
     # @!attribute [rw] api_caching_behavior
     #   Caching behavior.
     #
-    #   * **FULL\_REQUEST\_CACHING**\: All requests are fully cached.
+    #   * **FULL\_REQUEST\_CACHING**: All requests are fully cached.
     #
-    #   * **PER\_RESOLVER\_CACHING**\: Individual resolvers that you specify
+    #   * **PER\_RESOLVER\_CACHING**: Individual resolvers that you specify
     #     are cached.
     #   @return [String]
     #
@@ -503,19 +730,36 @@ module Aws::AppSync
     #   The following legacy instance types are available, but their use is
     #   discouraged:
     #
-    #   * **T2\_SMALL**\: A t2.small instance type.
+    #   * **T2\_SMALL**: A t2.small instance type.
     #
-    #   * **T2\_MEDIUM**\: A t2.medium instance type.
+    #   * **T2\_MEDIUM**: A t2.medium instance type.
     #
-    #   * **R4\_LARGE**\: A r4.large instance type.
+    #   * **R4\_LARGE**: A r4.large instance type.
     #
-    #   * **R4\_XLARGE**\: A r4.xlarge instance type.
+    #   * **R4\_XLARGE**: A r4.xlarge instance type.
     #
-    #   * **R4\_2XLARGE**\: A r4.2xlarge instance type.
+    #   * **R4\_2XLARGE**: A r4.2xlarge instance type.
     #
-    #   * **R4\_4XLARGE**\: A r4.4xlarge instance type.
+    #   * **R4\_4XLARGE**: A r4.4xlarge instance type.
     #
-    #   * **R4\_8XLARGE**\: A r4.8xlarge instance type.
+    #   * **R4\_8XLARGE**: A r4.8xlarge instance type.
+    #   @return [String]
+    #
+    # @!attribute [rw] health_metrics_config
+    #   Controls how cache health metrics will be emitted to CloudWatch.
+    #   Cache health metrics include:
+    #
+    #   * NetworkBandwidthOutAllowanceExceeded: The network packets dropped
+    #     because the throughput exceeded the aggregated bandwidth limit.
+    #     This is useful for diagnosing bottlenecks in a cache
+    #     configuration.
+    #
+    #   * EngineCPUUtilization: The CPU utilization (percentage) allocated
+    #     to the Redis process. This is useful for diagnosing bottlenecks in
+    #     a cache configuration.
+    #
+    #   Metrics will be recorded by API ID. You can set the value to
+    #   `ENABLED` or `DISABLED`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CreateApiCacheRequest AWS API Documentation
@@ -526,7 +770,8 @@ module Aws::AppSync
       :transit_encryption_enabled,
       :at_rest_encryption_enabled,
       :api_caching_behavior,
-      :type)
+      :type,
+      :health_metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -545,15 +790,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateApiKeyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         description: "String",
-    #         expires: 1,
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The ID for your GraphQL API.
     #   @return [String]
@@ -563,10 +799,10 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] expires
-    #   The time from creation time after which the API key expires. The
-    #   date is represented as seconds since the epoch, rounded down to the
-    #   nearest hour. The default value for this parameter is 7 days from
-    #   creation time. For more information, see .
+    #   From the creation time, the time after which the API key expires.
+    #   The date is represented as seconds since the epoch, rounded down to
+    #   the nearest hour. The default value for this parameter is 7 days
+    #   from creation time. For more information, see .
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CreateApiKeyRequest AWS API Documentation
@@ -591,55 +827,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateDataSourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         name: "ResourceName", # required
-    #         description: "String",
-    #         type: "AWS_LAMBDA", # required, accepts AWS_LAMBDA, AMAZON_DYNAMODB, AMAZON_ELASTICSEARCH, NONE, HTTP, RELATIONAL_DATABASE
-    #         service_role_arn: "String",
-    #         dynamodb_config: {
-    #           table_name: "String", # required
-    #           aws_region: "String", # required
-    #           use_caller_credentials: false,
-    #           delta_sync_config: {
-    #             base_table_ttl: 1,
-    #             delta_sync_table_name: "String",
-    #             delta_sync_table_ttl: 1,
-    #           },
-    #           versioned: false,
-    #         },
-    #         lambda_config: {
-    #           lambda_function_arn: "String", # required
-    #         },
-    #         elasticsearch_config: {
-    #           endpoint: "String", # required
-    #           aws_region: "String", # required
-    #         },
-    #         http_config: {
-    #           endpoint: "String",
-    #           authorization_config: {
-    #             authorization_type: "AWS_IAM", # required, accepts AWS_IAM
-    #             aws_iam_config: {
-    #               signing_region: "String",
-    #               signing_service_name: "String",
-    #             },
-    #           },
-    #         },
-    #         relational_database_config: {
-    #           relational_database_source_type: "RDS_HTTP_ENDPOINT", # accepts RDS_HTTP_ENDPOINT
-    #           rds_http_endpoint_config: {
-    #             aws_region: "String",
-    #             db_cluster_identifier: "String",
-    #             database_name: "String",
-    #             schema: "String",
-    #             aws_secret_store_arn: "String",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID for the GraphQL API for the `DataSource`.
     #   @return [String]
@@ -657,8 +844,9 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] service_role_arn
-    #   The AWS IAM service role ARN for the data source. The system assumes
-    #   this role when accessing the data source.
+    #   The Identity and Access Management (IAM) service role Amazon
+    #   Resource Name (ARN) for the data source. The system assumes this
+    #   role when accessing the data source.
     #   @return [String]
     #
     # @!attribute [rw] dynamodb_config
@@ -666,12 +854,21 @@ module Aws::AppSync
     #   @return [Types::DynamodbDataSourceConfig]
     #
     # @!attribute [rw] lambda_config
-    #   AWS Lambda settings.
+    #   Lambda settings.
     #   @return [Types::LambdaDataSourceConfig]
     #
     # @!attribute [rw] elasticsearch_config
-    #   Amazon Elasticsearch Service settings.
+    #   Amazon OpenSearch Service settings.
+    #
+    #   As of September 2021, Amazon Elasticsearch service is Amazon
+    #   OpenSearch Service. This configuration is deprecated. For new data
+    #   sources, use CreateDataSourceRequest$openSearchServiceConfig to
+    #   create an OpenSearch data source.
     #   @return [Types::ElasticsearchDataSourceConfig]
+    #
+    # @!attribute [rw] open_search_service_config
+    #   Amazon OpenSearch Service settings.
+    #   @return [Types::OpenSearchServiceDataSourceConfig]
     #
     # @!attribute [rw] http_config
     #   HTTP endpoint settings.
@@ -680,6 +877,22 @@ module Aws::AppSync
     # @!attribute [rw] relational_database_config
     #   Relational database settings.
     #   @return [Types::RelationalDatabaseDataSourceConfig]
+    #
+    # @!attribute [rw] event_bridge_config
+    #   Amazon EventBridge settings.
+    #   @return [Types::EventBridgeDataSourceConfig]
+    #
+    # @!attribute [rw] metrics_config
+    #   Enables or disables enhanced data source metrics for specified data
+    #   sources. Note that `metricsConfig` won't be used unless the
+    #   `dataSourceLevelMetricsBehavior` value is set to
+    #   `PER_DATA_SOURCE_METRICS`. If the `dataSourceLevelMetricsBehavior`
+    #   is set to `FULL_REQUEST_DATA_SOURCE_METRICS` instead,
+    #   `metricsConfig` will be ignored. However, you can still set its
+    #   value.
+    #
+    #   `metricsConfig` can be `ENABLED` or `DISABLED`.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CreateDataSourceRequest AWS API Documentation
     #
@@ -692,8 +905,11 @@ module Aws::AppSync
       :dynamodb_config,
       :lambda_config,
       :elasticsearch_config,
+      :open_search_service_config,
       :http_config,
-      :relational_database_config)
+      :relational_database_config,
+      :event_bridge_config,
+      :metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -710,19 +926,42 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateFunctionRequest
-    #   data as a hash:
+    # @!attribute [rw] domain_name
+    #   The domain name.
+    #   @return [String]
     #
-    #       {
-    #         api_id: "String", # required
-    #         name: "ResourceName", # required
-    #         description: "String",
-    #         data_source_name: "ResourceName", # required
-    #         request_mapping_template: "MappingTemplate",
-    #         response_mapping_template: "MappingTemplate",
-    #         function_version: "String", # required
-    #       }
+    # @!attribute [rw] certificate_arn
+    #   The Amazon Resource Name (ARN) of the certificate. This can be an
+    #   Certificate Manager (ACM) certificate or an Identity and Access
+    #   Management (IAM) server certificate.
+    #   @return [String]
     #
+    # @!attribute [rw] description
+    #   A description of the `DomainName`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CreateDomainNameRequest AWS API Documentation
+    #
+    class CreateDomainNameRequest < Struct.new(
+      :domain_name,
+      :certificate_arn,
+      :description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain_name_config
+    #   The configuration for the `DomainName`.
+    #   @return [Types::DomainNameConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CreateDomainNameResponse AWS API Documentation
+    #
+    class CreateDomainNameResponse < Struct.new(
+      :domain_name_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] api_id
     #   The GraphQL API ID.
     #   @return [String]
@@ -749,8 +988,33 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] function_version
-    #   The `version` of the request mapping template. Currently the
-    #   supported value is 2018-05-29.
+    #   The `version` of the request mapping template. Currently, the
+    #   supported value is 2018-05-29. Note that when using VTL and mapping
+    #   templates, the `functionVersion` is required.
+    #   @return [String]
+    #
+    # @!attribute [rw] sync_config
+    #   Describes a Sync configuration for a resolver.
+    #
+    #   Specifies which Conflict Detection strategy and Resolution strategy
+    #   to use when the resolver is invoked.
+    #   @return [Types::SyncConfig]
+    #
+    # @!attribute [rw] max_batch_size
+    #   The maximum batching size for a resolver.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] runtime
+    #   Describes a runtime used by an Amazon Web Services AppSync pipeline
+    #   resolver or Amazon Web Services AppSync function. Specifies the name
+    #   and version of the runtime to use. Note that if a runtime is
+    #   specified, code must also be specified.
+    #   @return [Types::AppSyncRuntime]
+    #
+    # @!attribute [rw] code
+    #   The `function` code that contains the request and response
+    #   functions. When code is used, the `runtime` is required. The
+    #   `runtime` value must be `APPSYNC_JS`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CreateFunctionRequest AWS API Documentation
@@ -762,7 +1026,11 @@ module Aws::AppSync
       :data_source_name,
       :request_mapping_template,
       :response_mapping_template,
-      :function_version)
+      :function_version,
+      :sync_config,
+      :max_batch_size,
+      :runtime,
+      :code)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -779,51 +1047,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateGraphqlApiRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "String", # required
-    #         log_config: {
-    #           field_log_level: "NONE", # required, accepts NONE, ERROR, ALL
-    #           cloud_watch_logs_role_arn: "String", # required
-    #           exclude_verbose_content: false,
-    #         },
-    #         authentication_type: "API_KEY", # required, accepts API_KEY, AWS_IAM, AMAZON_COGNITO_USER_POOLS, OPENID_CONNECT
-    #         user_pool_config: {
-    #           user_pool_id: "String", # required
-    #           aws_region: "String", # required
-    #           default_action: "ALLOW", # required, accepts ALLOW, DENY
-    #           app_id_client_regex: "String",
-    #         },
-    #         open_id_connect_config: {
-    #           issuer: "String", # required
-    #           client_id: "String",
-    #           iat_ttl: 1,
-    #           auth_ttl: 1,
-    #         },
-    #         tags: {
-    #           "TagKey" => "TagValue",
-    #         },
-    #         additional_authentication_providers: [
-    #           {
-    #             authentication_type: "API_KEY", # accepts API_KEY, AWS_IAM, AMAZON_COGNITO_USER_POOLS, OPENID_CONNECT
-    #             open_id_connect_config: {
-    #               issuer: "String", # required
-    #               client_id: "String",
-    #               iat_ttl: 1,
-    #               auth_ttl: 1,
-    #             },
-    #             user_pool_config: {
-    #               user_pool_id: "String", # required
-    #               aws_region: "String", # required
-    #               app_id_client_regex: "String",
-    #             },
-    #           },
-    #         ],
-    #         xray_enabled: false,
-    #       }
-    #
     # @!attribute [rw] name
     #   A user-supplied name for the `GraphqlApi`.
     #   @return [String]
@@ -833,8 +1056,8 @@ module Aws::AppSync
     #   @return [Types::LogConfig]
     #
     # @!attribute [rw] authentication_type
-    #   The authentication type: API key, AWS IAM, OIDC, or Amazon Cognito
-    #   user pools.
+    #   The authentication type: API key, Identity and Access Management
+    #   (IAM), OpenID Connect (OIDC), Amazon Cognito user pools, or Lambda.
     #   @return [String]
     #
     # @!attribute [rw] user_pool_config
@@ -842,7 +1065,7 @@ module Aws::AppSync
     #   @return [Types::UserPoolConfig]
     #
     # @!attribute [rw] open_id_connect_config
-    #   The OpenID Connect configuration.
+    #   The OIDC configuration.
     #   @return [Types::OpenIDConnectConfig]
     #
     # @!attribute [rw] tags
@@ -855,9 +1078,79 @@ module Aws::AppSync
     #   @return [Array<Types::AdditionalAuthenticationProvider>]
     #
     # @!attribute [rw] xray_enabled
-    #   A flag indicating whether to enable X-Ray tracing for the
-    #   `GraphqlApi`.
+    #   A flag indicating whether to use X-Ray tracing for the `GraphqlApi`.
     #   @return [Boolean]
+    #
+    # @!attribute [rw] lambda_authorizer_config
+    #   Configuration for Lambda function authorization.
+    #   @return [Types::LambdaAuthorizerConfig]
+    #
+    # @!attribute [rw] visibility
+    #   Sets the value of the GraphQL API to public (`GLOBAL`) or private
+    #   (`PRIVATE`). If no value is provided, the visibility will be set to
+    #   `GLOBAL` by default. This value cannot be changed once the API has
+    #   been created.
+    #   @return [String]
+    #
+    # @!attribute [rw] api_type
+    #   The value that indicates whether the GraphQL API is a standard API
+    #   (`GRAPHQL`) or merged API (`MERGED`).
+    #   @return [String]
+    #
+    # @!attribute [rw] merged_api_execution_role_arn
+    #   The Identity and Access Management service role ARN for a merged
+    #   API. The AppSync service assumes this role on behalf of the Merged
+    #   API to validate access to source APIs at runtime and to prompt the
+    #   `AUTO_MERGE` to update the merged API endpoint with the source API
+    #   changes automatically.
+    #   @return [String]
+    #
+    # @!attribute [rw] owner_contact
+    #   The owner contact information for an API resource.
+    #
+    #   This field accepts any string input with a length of 0 - 256
+    #   characters.
+    #   @return [String]
+    #
+    # @!attribute [rw] introspection_config
+    #   Sets the value of the GraphQL API to enable (`ENABLED`) or disable
+    #   (`DISABLED`) introspection. If no value is provided, the
+    #   introspection configuration will be set to `ENABLED` by default.
+    #   This field will produce an error if the operation attempts to use
+    #   the introspection feature while this field is disabled.
+    #
+    #   For more information about introspection, see [GraphQL
+    #   introspection][1].
+    #
+    #
+    #
+    #   [1]: https://graphql.org/learn/introspection/
+    #   @return [String]
+    #
+    # @!attribute [rw] query_depth_limit
+    #   The maximum depth a query can have in a single request. Depth refers
+    #   to the amount of nested levels allowed in the body of query. The
+    #   default value is `0` (or unspecified), which indicates there's no
+    #   depth limit. If you set a limit, it can be between `1` and `75`
+    #   nested levels. This field will produce a limit error if the
+    #   operation falls out of bounds.
+    #
+    #   Note that fields can still be set to nullable or non-nullable. If a
+    #   non-nullable field produces an error, the error will be thrown
+    #   upwards to the first nullable field available.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] resolver_count_limit
+    #   The maximum number of resolvers that can be invoked in a single
+    #   request. The default value is `0` (or unspecified), which will set
+    #   the limit to `10000`. When specified, the limit value can be between
+    #   `1` and `10000`. This field will produce a limit error if the
+    #   operation falls out of bounds.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] enhanced_metrics_config
+    #   The `enhancedMetricsConfig` object.
+    #   @return [Types::EnhancedMetricsConfig]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CreateGraphqlApiRequest AWS API Documentation
     #
@@ -869,7 +1162,16 @@ module Aws::AppSync
       :open_id_connect_config,
       :tags,
       :additional_authentication_providers,
-      :xray_enabled)
+      :xray_enabled,
+      :lambda_authorizer_config,
+      :visibility,
+      :api_type,
+      :merged_api_execution_role_arn,
+      :owner_contact,
+      :introspection_config,
+      :query_depth_limit,
+      :resolver_count_limit,
+      :enhanced_metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -886,33 +1188,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateResolverRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         type_name: "ResourceName", # required
-    #         field_name: "ResourceName", # required
-    #         data_source_name: "ResourceName",
-    #         request_mapping_template: "MappingTemplate",
-    #         response_mapping_template: "MappingTemplate",
-    #         kind: "UNIT", # accepts UNIT, PIPELINE
-    #         pipeline_config: {
-    #           functions: ["String"],
-    #         },
-    #         sync_config: {
-    #           conflict_handler: "OPTIMISTIC_CONCURRENCY", # accepts OPTIMISTIC_CONCURRENCY, LAMBDA, AUTOMERGE, NONE
-    #           conflict_detection: "VERSION", # accepts VERSION, NONE
-    #           lambda_conflict_handler_config: {
-    #             lambda_conflict_handler_arn: "String",
-    #           },
-    #         },
-    #         caching_config: {
-    #           ttl: 1,
-    #           caching_keys: ["String"],
-    #         },
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The ID for the GraphQL API for which the resolver is being created.
     #   @return [String]
@@ -930,32 +1205,32 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] request_mapping_template
-    #   The mapping template to be used for requests.
+    #   The mapping template to use for requests.
     #
     #   A resolver uses a request mapping template to convert a GraphQL
     #   expression into a format that a data source can understand. Mapping
     #   templates are written in Apache Velocity Template Language (VTL).
     #
-    #   VTL request mapping templates are optional when using a Lambda data
+    #   VTL request mapping templates are optional when using an Lambda data
     #   source. For all other data sources, VTL request and response mapping
     #   templates are required.
     #   @return [String]
     #
     # @!attribute [rw] response_mapping_template
-    #   The mapping template to be used for responses from the data source.
+    #   The mapping template to use for responses from the data source.
     #   @return [String]
     #
     # @!attribute [rw] kind
     #   The resolver type.
     #
-    #   * **UNIT**\: A UNIT resolver type. A UNIT resolver is the default
-    #     resolver type. A UNIT resolver enables you to execute a GraphQL
-    #     query against a single data source.
+    #   * **UNIT**: A UNIT resolver type. A UNIT resolver is the default
+    #     resolver type. You can use a UNIT resolver to run a GraphQL query
+    #     against a single data source.
     #
-    #   * **PIPELINE**\: A PIPELINE resolver type. A PIPELINE resolver
-    #     enables you to execute a series of `Function` in a serial manner.
-    #     You can use a pipeline resolver to execute a GraphQL query against
-    #     multiple data sources.
+    #   * **PIPELINE**: A PIPELINE resolver type. You can use a PIPELINE
+    #     resolver to invoke a series of `Function` objects in a serial
+    #     manner. You can use a pipeline resolver to run a GraphQL query
+    #     against multiple data sources.
     #   @return [String]
     #
     # @!attribute [rw] pipeline_config
@@ -963,12 +1238,40 @@ module Aws::AppSync
     #   @return [Types::PipelineConfig]
     #
     # @!attribute [rw] sync_config
-    #   The `SyncConfig` for a resolver attached to a versioned datasource.
+    #   The `SyncConfig` for a resolver attached to a versioned data source.
     #   @return [Types::SyncConfig]
     #
     # @!attribute [rw] caching_config
     #   The caching configuration for the resolver.
     #   @return [Types::CachingConfig]
+    #
+    # @!attribute [rw] max_batch_size
+    #   The maximum batching size for a resolver.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] runtime
+    #   Describes a runtime used by an Amazon Web Services AppSync pipeline
+    #   resolver or Amazon Web Services AppSync function. Specifies the name
+    #   and version of the runtime to use. Note that if a runtime is
+    #   specified, code must also be specified.
+    #   @return [Types::AppSyncRuntime]
+    #
+    # @!attribute [rw] code
+    #   The `resolver` code that contains the request and response
+    #   functions. When code is used, the `runtime` is required. The
+    #   `runtime` value must be `APPSYNC_JS`.
+    #   @return [String]
+    #
+    # @!attribute [rw] metrics_config
+    #   Enables or disables enhanced resolver metrics for specified
+    #   resolvers. Note that `metricsConfig` won't be used unless the
+    #   `resolverLevelMetricsBehavior` value is set to
+    #   `PER_RESOLVER_METRICS`. If the `resolverLevelMetricsBehavior` is set
+    #   to `FULL_REQUEST_RESOLVER_METRICS` instead, `metricsConfig` will be
+    #   ignored. However, you can still set its value.
+    #
+    #   `metricsConfig` can be `ENABLED` or `DISABLED`.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/CreateResolverRequest AWS API Documentation
     #
@@ -982,7 +1285,11 @@ module Aws::AppSync
       :kind,
       :pipeline_config,
       :sync_config,
-      :caching_config)
+      :caching_config,
+      :max_batch_size,
+      :runtime,
+      :code,
+      :metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -999,15 +1306,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateTypeRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         definition: "String", # required
-    #         format: "SDL", # required, accepts SDL, JSON
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1052,7 +1350,7 @@ module Aws::AppSync
     # Describes a data source.
     #
     # @!attribute [rw] data_source_arn
-    #   The data source ARN.
+    #   The data source Amazon Resource Name (ARN).
     #   @return [String]
     #
     # @!attribute [rw] name
@@ -1066,41 +1364,51 @@ module Aws::AppSync
     # @!attribute [rw] type
     #   The type of the data source.
     #
-    #   * **AMAZON\_DYNAMODB**\: The data source is an Amazon DynamoDB
-    #     table.
+    #   * **AWS\_LAMBDA**: The data source is an Lambda function.
     #
-    #   * **AMAZON\_ELASTICSEARCH**\: The data source is an Amazon
-    #     Elasticsearch Service domain.
+    #   * **AMAZON\_DYNAMODB**: The data source is an Amazon DynamoDB table.
     #
-    #   * **AWS\_LAMBDA**\: The data source is an AWS Lambda function.
+    #   * **AMAZON\_ELASTICSEARCH**: The data source is an Amazon OpenSearch
+    #     Service domain.
     #
-    #   * **NONE**\: There is no data source. This type is used when you
-    #     wish to invoke a GraphQL operation without connecting to a data
-    #     source, such as performing data transformation with resolvers or
-    #     triggering a subscription to be invoked from a mutation.
+    #   * **AMAZON\_OPENSEARCH\_SERVICE**: The data source is an Amazon
+    #     OpenSearch Service domain.
     #
-    #   * **HTTP**\: The data source is an HTTP endpoint.
+    #   * **AMAZON\_EVENTBRIDGE**: The data source is an Amazon EventBridge
+    #     configuration.
     #
-    #   * **RELATIONAL\_DATABASE**\: The data source is a relational
+    #   * **NONE**: There is no data source. Use this type when you want to
+    #     invoke a GraphQL operation without connecting to a data source,
+    #     such as when you're performing data transformation with resolvers
+    #     or invoking a subscription from a mutation.
+    #
+    #   * **HTTP**: The data source is an HTTP endpoint.
+    #
+    #   * **RELATIONAL\_DATABASE**: The data source is a relational
     #     database.
     #   @return [String]
     #
     # @!attribute [rw] service_role_arn
-    #   The AWS IAM service role ARN for the data source. The system assumes
-    #   this role when accessing the data source.
+    #   The Identity and Access Management (IAM) service role Amazon
+    #   Resource Name (ARN) for the data source. The system assumes this
+    #   role when accessing the data source.
     #   @return [String]
     #
     # @!attribute [rw] dynamodb_config
-    #   Amazon DynamoDB settings.
+    #   DynamoDB settings.
     #   @return [Types::DynamodbDataSourceConfig]
     #
     # @!attribute [rw] lambda_config
-    #   AWS Lambda settings.
+    #   Lambda settings.
     #   @return [Types::LambdaDataSourceConfig]
     #
     # @!attribute [rw] elasticsearch_config
-    #   Amazon Elasticsearch Service settings.
+    #   Amazon OpenSearch Service settings.
     #   @return [Types::ElasticsearchDataSourceConfig]
+    #
+    # @!attribute [rw] open_search_service_config
+    #   Amazon OpenSearch Service settings.
+    #   @return [Types::OpenSearchServiceDataSourceConfig]
     #
     # @!attribute [rw] http_config
     #   HTTP endpoint settings.
@@ -1109,6 +1417,22 @@ module Aws::AppSync
     # @!attribute [rw] relational_database_config
     #   Relational database settings.
     #   @return [Types::RelationalDatabaseDataSourceConfig]
+    #
+    # @!attribute [rw] event_bridge_config
+    #   Amazon EventBridge settings.
+    #   @return [Types::EventBridgeDataSourceConfig]
+    #
+    # @!attribute [rw] metrics_config
+    #   Enables or disables enhanced data source metrics for specified data
+    #   sources. Note that `metricsConfig` won't be used unless the
+    #   `dataSourceLevelMetricsBehavior` value is set to
+    #   `PER_DATA_SOURCE_METRICS`. If the `dataSourceLevelMetricsBehavior`
+    #   is set to `FULL_REQUEST_DATA_SOURCE_METRICS` instead,
+    #   `metricsConfig` will be ignored. However, you can still set its
+    #   value.
+    #
+    #   `metricsConfig` can be `ENABLED` or `DISABLED`.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DataSource AWS API Documentation
     #
@@ -1121,20 +1445,170 @@ module Aws::AppSync
       :dynamodb_config,
       :lambda_config,
       :elasticsearch_config,
+      :open_search_service_config,
       :http_config,
-      :relational_database_config)
+      :relational_database_config,
+      :event_bridge_config,
+      :metrics_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains the introspected data that was retrieved from the data
+    # source.
+    #
+    # @!attribute [rw] name
+    #   The name of the model. For example, this could be the name of a
+    #   single table in a database.
+    #   @return [String]
+    #
+    # @!attribute [rw] fields
+    #   The `DataSourceIntrospectionModelField` object data.
+    #   @return [Array<Types::DataSourceIntrospectionModelField>]
+    #
+    # @!attribute [rw] primary_key
+    #   The primary key stored as a `DataSourceIntrospectionModelIndex`
+    #   object.
+    #   @return [Types::DataSourceIntrospectionModelIndex]
+    #
+    # @!attribute [rw] indexes
+    #   The array of `DataSourceIntrospectionModelIndex` objects.
+    #   @return [Array<Types::DataSourceIntrospectionModelIndex>]
+    #
+    # @!attribute [rw] sdl
+    #   Contains the output of the SDL that was generated from the
+    #   introspected types. This is controlled by the `includeModelsSDL`
+    #   parameter of the `GetDataSourceIntrospection` operation.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DataSourceIntrospectionModel AWS API Documentation
+    #
+    class DataSourceIntrospectionModel < Struct.new(
+      :name,
+      :fields,
+      :primary_key,
+      :indexes,
+      :sdl)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Represents the fields that were retrieved from the introspected data.
+    #
+    # @!attribute [rw] name
+    #   The name of the field that was retrieved from the introspected data.
+    #   @return [String]
+    #
+    # @!attribute [rw] type
+    #   The `DataSourceIntrospectionModelFieldType` object data.
+    #   @return [Types::DataSourceIntrospectionModelFieldType]
+    #
+    # @!attribute [rw] length
+    #   The length value of the introspected field.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DataSourceIntrospectionModelField AWS API Documentation
+    #
+    class DataSourceIntrospectionModelField < Struct.new(
+      :name,
+      :type,
+      :length)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Represents the type data for each field retrieved from the
+    # introspection.
+    #
+    # @!attribute [rw] kind
+    #   Specifies the classification of data. For example, this could be set
+    #   to values like `Scalar` or `NonNull` to indicate a fundamental
+    #   property of the field.
+    #
+    #   Valid values include:
+    #
+    #   * `Scalar`: Indicates the value is a primitive type (scalar).
+    #
+    #   * `NonNull`: Indicates the field cannot be `null`.
+    #
+    #   * `List`: Indicates the field contains a list.
+    #   @return [String]
+    #
+    # @!attribute [rw] name
+    #   The name of the data type that represents the field. For example,
+    #   `String` is a valid `name` value.
+    #   @return [String]
+    #
+    # @!attribute [rw] type
+    #   The `DataSourceIntrospectionModelFieldType` object data. The `type`
+    #   is only present if `DataSourceIntrospectionModelFieldType.kind` is
+    #   set to `NonNull` or `List`.
+    #
+    #   The `type` typically contains its own `kind` and `name` fields to
+    #   represent the actual type data. For instance, `type` could contain a
+    #   `kind` value of `Scalar` with a `name` value of `String`. The values
+    #   `Scalar` and `String` will be collectively stored in the `values`
+    #   field.
+    #   @return [Types::DataSourceIntrospectionModelFieldType]
+    #
+    # @!attribute [rw] values
+    #   The values of the `type` field. This field represents the AppSync
+    #   data type equivalent of the introspected field.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DataSourceIntrospectionModelFieldType AWS API Documentation
+    #
+    class DataSourceIntrospectionModelFieldType < Struct.new(
+      :kind,
+      :name,
+      :type,
+      :values)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The index that was retrieved from the introspected data.
+    #
+    # @!attribute [rw] name
+    #   The name of the index.
+    #   @return [String]
+    #
+    # @!attribute [rw] fields
+    #   The fields of the index.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DataSourceIntrospectionModelIndex AWS API Documentation
+    #
+    class DataSourceIntrospectionModelIndex < Struct.new(
+      :name,
+      :fields)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Represents the output of a `DataSourceIntrospectionResult`. This is
+    # the populated result of a `GetDataSourceIntrospection` operation.
+    #
+    # @!attribute [rw] models
+    #   The array of `DataSourceIntrospectionModel` objects.
+    #   @return [Array<Types::DataSourceIntrospectionModel>]
+    #
+    # @!attribute [rw] next_token
+    #   Determines the number of types to be returned in a single response
+    #   before paginating. This value is typically taken from `nextToken`
+    #   value from the previous response.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DataSourceIntrospectionResult AWS API Documentation
+    #
+    class DataSourceIntrospectionResult < Struct.new(
+      :models,
+      :next_token)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Represents the input of a `DeleteApiCache` operation.
-    #
-    # @note When making an API call, you may pass DeleteApiCacheRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #       }
     #
     # @!attribute [rw] api_id
     #   The API ID.
@@ -1154,14 +1628,6 @@ module Aws::AppSync
     #
     class DeleteApiCacheResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteApiKeyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         id: "String", # required
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1183,14 +1649,6 @@ module Aws::AppSync
     #
     class DeleteApiKeyResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteDataSourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         name: "ResourceName", # required
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1212,14 +1670,22 @@ module Aws::AppSync
     #
     class DeleteDataSourceResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteFunctionRequest
-    #   data as a hash:
+    # @!attribute [rw] domain_name
+    #   The domain name.
+    #   @return [String]
     #
-    #       {
-    #         api_id: "String", # required
-    #         function_id: "ResourceName", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DeleteDomainNameRequest AWS API Documentation
     #
+    class DeleteDomainNameRequest < Struct.new(
+      :domain_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DeleteDomainNameResponse AWS API Documentation
+    #
+    class DeleteDomainNameResponse < Aws::EmptyStructure; end
+
     # @!attribute [rw] api_id
     #   The GraphQL API ID.
     #   @return [String]
@@ -1241,13 +1707,6 @@ module Aws::AppSync
     #
     class DeleteFunctionResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteGraphqlApiRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1264,15 +1723,6 @@ module Aws::AppSync
     #
     class DeleteGraphqlApiResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteResolverRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         type_name: "ResourceName", # required
-    #         field_name: "ResourceName", # required
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1299,14 +1749,6 @@ module Aws::AppSync
     #
     class DeleteResolverResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteTypeRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         type_name: "ResourceName", # required
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1330,17 +1772,8 @@ module Aws::AppSync
 
     # Describes a Delta Sync configuration.
     #
-    # @note When making an API call, you may pass DeltaSyncConfig
-    #   data as a hash:
-    #
-    #       {
-    #         base_table_ttl: 1,
-    #         delta_sync_table_name: "String",
-    #         delta_sync_table_ttl: 1,
-    #       }
-    #
     # @!attribute [rw] base_table_ttl
-    #   The number of minutes an Item is stored in the datasource.
+    #   The number of minutes that an Item is stored in the data source.
     #   @return [Integer]
     #
     # @!attribute [rw] delta_sync_table_name
@@ -1348,8 +1781,8 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] delta_sync_table_ttl
-    #   The number of minutes a Delta Sync log entry is stored in the Delta
-    #   Sync table.
+    #   The number of minutes that a Delta Sync log entry is stored in the
+    #   Delta Sync table.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DeltaSyncConfig AWS API Documentation
@@ -1362,29 +1795,134 @@ module Aws::AppSync
       include Aws::Structure
     end
 
+    # @!attribute [rw] domain_name
+    #   The domain name.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DisassociateApiRequest AWS API Documentation
+    #
+    class DisassociateApiRequest < Struct.new(
+      :domain_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DisassociateApiResponse AWS API Documentation
+    #
+    class DisassociateApiResponse < Aws::EmptyStructure; end
+
+    # @!attribute [rw] source_api_identifier
+    #   The identifier of the AppSync Source API. This is generated by the
+    #   AppSync service. In most cases, source APIs (especially in your
+    #   account) only require the API ID value or ARN of the source API.
+    #   However, source APIs from other accounts (cross-account use cases)
+    #   strictly require the full resource ARN of the source API.
+    #   @return [String]
+    #
+    # @!attribute [rw] association_id
+    #   The ID generated by the AppSync service for the source API
+    #   association.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DisassociateMergedGraphqlApiRequest AWS API Documentation
+    #
+    class DisassociateMergedGraphqlApiRequest < Struct.new(
+      :source_api_identifier,
+      :association_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] source_api_association_status
+    #   The state of the source API association.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DisassociateMergedGraphqlApiResponse AWS API Documentation
+    #
+    class DisassociateMergedGraphqlApiResponse < Struct.new(
+      :source_api_association_status)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] merged_api_identifier
+    #   The identifier of the AppSync Merged API. This is generated by the
+    #   AppSync service. In most cases, Merged APIs (especially in your
+    #   account) only require the API ID value or ARN of the merged API.
+    #   However, Merged APIs in other accounts (cross-account use cases)
+    #   strictly require the full resource ARN of the merged API.
+    #   @return [String]
+    #
+    # @!attribute [rw] association_id
+    #   The ID generated by the AppSync service for the source API
+    #   association.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DisassociateSourceGraphqlApiRequest AWS API Documentation
+    #
+    class DisassociateSourceGraphqlApiRequest < Struct.new(
+      :merged_api_identifier,
+      :association_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] source_api_association_status
+    #   The state of the source API association.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DisassociateSourceGraphqlApiResponse AWS API Documentation
+    #
+    class DisassociateSourceGraphqlApiResponse < Struct.new(
+      :source_api_association_status)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes a configuration for a custom domain.
+    #
+    # @!attribute [rw] domain_name
+    #   The domain name.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   A description of the `DomainName` configuration.
+    #   @return [String]
+    #
+    # @!attribute [rw] certificate_arn
+    #   The Amazon Resource Name (ARN) of the certificate. This can be an
+    #   Certificate Manager (ACM) certificate or an Identity and Access
+    #   Management (IAM) server certificate.
+    #   @return [String]
+    #
+    # @!attribute [rw] appsync_domain_name
+    #   The domain name that AppSync provides.
+    #   @return [String]
+    #
+    # @!attribute [rw] hosted_zone_id
+    #   The ID of your Amazon Route 53 hosted zone.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/DomainNameConfig AWS API Documentation
+    #
+    class DomainNameConfig < Struct.new(
+      :domain_name,
+      :description,
+      :certificate_arn,
+      :appsync_domain_name,
+      :hosted_zone_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Describes an Amazon DynamoDB data source configuration.
-    #
-    # @note When making an API call, you may pass DynamodbDataSourceConfig
-    #   data as a hash:
-    #
-    #       {
-    #         table_name: "String", # required
-    #         aws_region: "String", # required
-    #         use_caller_credentials: false,
-    #         delta_sync_config: {
-    #           base_table_ttl: 1,
-    #           delta_sync_table_name: "String",
-    #           delta_sync_table_ttl: 1,
-    #         },
-    #         versioned: false,
-    #       }
     #
     # @!attribute [rw] table_name
     #   The table name.
     #   @return [String]
     #
     # @!attribute [rw] aws_region
-    #   The AWS Region.
+    #   The Amazon Web Services Region.
     #   @return [String]
     #
     # @!attribute [rw] use_caller_credentials
@@ -1392,7 +1930,7 @@ module Aws::AppSync
     #   @return [Boolean]
     #
     # @!attribute [rw] delta_sync_config
-    #   The `DeltaSyncConfig` for a versioned datasource.
+    #   The `DeltaSyncConfig` for a versioned data source.
     #   @return [Types::DeltaSyncConfig]
     #
     # @!attribute [rw] versioned
@@ -1412,22 +1950,19 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # Describes an Elasticsearch data source configuration.
+    # Describes an OpenSearch data source configuration.
     #
-    # @note When making an API call, you may pass ElasticsearchDataSourceConfig
-    #   data as a hash:
-    #
-    #       {
-    #         endpoint: "String", # required
-    #         aws_region: "String", # required
-    #       }
+    # As of September 2021, Amazon Elasticsearch service is Amazon
+    # OpenSearch Service. This configuration is deprecated. For new data
+    # sources, use OpenSearchServiceDataSourceConfig to specify an
+    # OpenSearch data source.
     #
     # @!attribute [rw] endpoint
     #   The endpoint.
     #   @return [String]
     #
     # @!attribute [rw] aws_region
-    #   The AWS Region.
+    #   The Amazon Web Services Region.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ElasticsearchDataSourceConfig AWS API Documentation
@@ -1439,14 +1974,301 @@ module Aws::AppSync
       include Aws::Structure
     end
 
+    # Enables and controls the enhanced metrics feature. Enhanced metrics
+    # emit granular data on API usage and performance such as AppSync
+    # request and error counts, latency, and cache hits/misses. All enhanced
+    # metric data is sent to your CloudWatch account, and you can configure
+    # the types of data that will be sent.
+    #
+    # Enhanced metrics can be configured at the resolver, data source, and
+    # operation levels. `EnhancedMetricsConfig` contains three required
+    # parameters, each controlling one of these categories:
+    #
+    # 1.  `resolverLevelMetricsBehavior`: Controls how resolver metrics will
+    #     be emitted to CloudWatch. Resolver metrics include:
+    #
+    #     * GraphQL errors: The number of GraphQL errors that occurred.
+    #
+    #     * Requests: The number of invocations that occurred during a
+    #       request.
+    #
+    #     * Latency: The time to complete a resolver invocation.
+    #
+    #     * Cache hits: The number of cache hits during a request.
+    #
+    #     * Cache misses: The number of cache misses during a request.
+    #
+    #     These metrics can be emitted to CloudWatch per resolver or for all
+    #     resolvers in the request. Metrics will be recorded by API ID and
+    #     resolver name. `resolverLevelMetricsBehavior` accepts one of these
+    #     values at a time:
+    #
+    #     * `FULL_REQUEST_RESOLVER_METRICS`: Records and emits metric data
+    #       for all resolvers in the request.
+    #
+    #     * `PER_RESOLVER_METRICS`: Records and emits metric data for
+    #       resolvers that have the `metricsConfig` value set to `ENABLED`.
+    #
+    # 2.  `dataSourceLevelMetricsBehavior`: Controls how data source metrics
+    #     will be emitted to CloudWatch. Data source metrics include:
+    #
+    #     * Requests: The number of invocations that occured during a
+    #       request.
+    #
+    #     * Latency: The time to complete a data source invocation.
+    #
+    #     * Errors: The number of errors that occurred during a data source
+    #       invocation.
+    #
+    #     These metrics can be emitted to CloudWatch per data source or for
+    #     all data sources in the request. Metrics will be recorded by API
+    #     ID and data source name. `dataSourceLevelMetricsBehavior` accepts
+    #     one of these values at a time:
+    #
+    #     * `FULL_REQUEST_DATA_SOURCE_METRICS`: Records and emits metric
+    #       data for all data sources in the request.
+    #
+    #     * `PER_DATA_SOURCE_METRICS`: Records and emits metric data for
+    #       data sources that have the `metricsConfig` value set to
+    #       `ENABLED`.
+    #
+    # 3.  `operationLevelMetricsConfig`: Controls how operation metrics will
+    #     be emitted to CloudWatch. Operation metrics include:
+    #
+    #     * Requests: The number of times a specified GraphQL operation was
+    #       called.
+    #
+    #     * GraphQL errors: The number of GraphQL errors that occurred
+    #       during a specified GraphQL operation.
+    #
+    #     Metrics will be recorded by API ID and operation name. You can set
+    #     the value to `ENABLED` or `DISABLED`.
+    #
+    # @!attribute [rw] resolver_level_metrics_behavior
+    #   Controls how resolver metrics will be emitted to CloudWatch.
+    #   Resolver metrics include:
+    #
+    #   * GraphQL errors: The number of GraphQL errors that occurred.
+    #
+    #   * Requests: The number of invocations that occurred during a
+    #     request.
+    #
+    #   * Latency: The time to complete a resolver invocation.
+    #
+    #   * Cache hits: The number of cache hits during a request.
+    #
+    #   * Cache misses: The number of cache misses during a request.
+    #
+    #   These metrics can be emitted to CloudWatch per resolver or for all
+    #   resolvers in the request. Metrics will be recorded by API ID and
+    #   resolver name. `resolverLevelMetricsBehavior` accepts one of these
+    #   values at a time:
+    #
+    #   * `FULL_REQUEST_RESOLVER_METRICS`: Records and emits metric data for
+    #     all resolvers in the request.
+    #
+    #   * `PER_RESOLVER_METRICS`: Records and emits metric data for
+    #     resolvers that have the `metricsConfig` value set to `ENABLED`.
+    #   @return [String]
+    #
+    # @!attribute [rw] data_source_level_metrics_behavior
+    #   Controls how data source metrics will be emitted to CloudWatch. Data
+    #   source metrics include:
+    #
+    #   * Requests: The number of invocations that occured during a request.
+    #
+    #   * Latency: The time to complete a data source invocation.
+    #
+    #   * Errors: The number of errors that occurred during a data source
+    #     invocation.
+    #
+    #   These metrics can be emitted to CloudWatch per data source or for
+    #   all data sources in the request. Metrics will be recorded by API ID
+    #   and data source name. `dataSourceLevelMetricsBehavior` accepts one
+    #   of these values at a time:
+    #
+    #   * `FULL_REQUEST_DATA_SOURCE_METRICS`: Records and emits metric data
+    #     for all data sources in the request.
+    #
+    #   * `PER_DATA_SOURCE_METRICS`: Records and emits metric data for data
+    #     sources that have the `metricsConfig` value set to `ENABLED`.
+    #   @return [String]
+    #
+    # @!attribute [rw] operation_level_metrics_config
+    #   Controls how operation metrics will be emitted to CloudWatch.
+    #   Operation metrics include:
+    #
+    #   * Requests: The number of times a specified GraphQL operation was
+    #     called.
+    #
+    #   * GraphQL errors: The number of GraphQL errors that occurred during
+    #     a specified GraphQL operation.
+    #
+    #   Metrics will be recorded by API ID and operation name. You can set
+    #   the value to `ENABLED` or `DISABLED`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/EnhancedMetricsConfig AWS API Documentation
+    #
+    class EnhancedMetricsConfig < Struct.new(
+      :resolver_level_metrics_behavior,
+      :data_source_level_metrics_behavior,
+      :operation_level_metrics_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains the list of errors generated. When using JavaScript, this
+    # will apply to the request or response function evaluation.
+    #
+    # @!attribute [rw] message
+    #   The error payload.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ErrorDetail AWS API Documentation
+    #
+    class ErrorDetail < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains the list of errors from a code evaluation response.
+    #
+    # @!attribute [rw] message
+    #   The error payload.
+    #   @return [String]
+    #
+    # @!attribute [rw] code_errors
+    #   Contains the list of `CodeError` objects.
+    #   @return [Array<Types::CodeError>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/EvaluateCodeErrorDetail AWS API Documentation
+    #
+    class EvaluateCodeErrorDetail < Struct.new(
+      :message,
+      :code_errors)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] runtime
+    #   The runtime to be used when evaluating the code. Currently, only the
+    #   `APPSYNC_JS` runtime is supported.
+    #   @return [Types::AppSyncRuntime]
+    #
+    # @!attribute [rw] code
+    #   The code definition to be evaluated. Note that `code` and `runtime`
+    #   are both required for this action. The `runtime` value must be
+    #   `APPSYNC_JS`.
+    #   @return [String]
+    #
+    # @!attribute [rw] context
+    #   The map that holds all of the contextual information for your
+    #   resolver invocation. A `context` is required for this action.
+    #   @return [String]
+    #
+    # @!attribute [rw] function
+    #   The function within the code to be evaluated. If provided, the valid
+    #   values are `request` and `response`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/EvaluateCodeRequest AWS API Documentation
+    #
+    class EvaluateCodeRequest < Struct.new(
+      :runtime,
+      :code,
+      :context,
+      :function)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] evaluation_result
+    #   The result of the evaluation operation.
+    #   @return [String]
+    #
+    # @!attribute [rw] error
+    #   Contains the payload of the response error.
+    #   @return [Types::EvaluateCodeErrorDetail]
+    #
+    # @!attribute [rw] logs
+    #   A list of logs that were generated by calls to `util.log.info` and
+    #   `util.log.error` in the evaluated code.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/EvaluateCodeResponse AWS API Documentation
+    #
+    class EvaluateCodeResponse < Struct.new(
+      :evaluation_result,
+      :error,
+      :logs)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] template
+    #   The mapping template; this can be a request or response template. A
+    #   `template` is required for this action.
+    #   @return [String]
+    #
+    # @!attribute [rw] context
+    #   The map that holds all of the contextual information for your
+    #   resolver invocation. A `context` is required for this action.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/EvaluateMappingTemplateRequest AWS API Documentation
+    #
+    class EvaluateMappingTemplateRequest < Struct.new(
+      :template,
+      :context)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] evaluation_result
+    #   The mapping template; this can be a request or response template.
+    #   @return [String]
+    #
+    # @!attribute [rw] error
+    #   The `ErrorDetail` object.
+    #   @return [Types::ErrorDetail]
+    #
+    # @!attribute [rw] logs
+    #   A list of logs that were generated by calls to `util.log.info` and
+    #   `util.log.error` in the evaluated code.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/EvaluateMappingTemplateResponse AWS API Documentation
+    #
+    class EvaluateMappingTemplateResponse < Struct.new(
+      :evaluation_result,
+      :error,
+      :logs)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes an Amazon EventBridge bus data source configuration.
+    #
+    # @!attribute [rw] event_bus_arn
+    #   The ARN of the event bus. For more information about event buses,
+    #   see [Amazon EventBridge event buses][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/EventBridgeDataSourceConfig AWS API Documentation
+    #
+    class EventBridgeDataSourceConfig < Struct.new(
+      :event_bus_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Represents the input of a `FlushApiCache` operation.
-    #
-    # @note When making an API call, you may pass FlushApiCacheRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #       }
     #
     # @!attribute [rw] api_id
     #   The API ID.
@@ -1466,7 +2288,7 @@ module Aws::AppSync
     #
     class FlushApiCacheResponse < Aws::EmptyStructure; end
 
-    # A function is a reusable entity. Multiple functions can be used to
+    # A function is a reusable entity. You can use multiple functions to
     # compose the resolver logic.
     #
     # @!attribute [rw] function_id
@@ -1474,7 +2296,7 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] function_arn
-    #   The ARN of the `Function` object.
+    #   The Amazon Resource Name (ARN) of the `Function` object.
     #   @return [String]
     #
     # @!attribute [rw] name
@@ -1499,8 +2321,32 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] function_version
-    #   The version of the request mapping template. Currently only the
+    #   The version of the request mapping template. Currently, only the
     #   2018-05-29 version of the template is supported.
+    #   @return [String]
+    #
+    # @!attribute [rw] sync_config
+    #   Describes a Sync configuration for a resolver.
+    #
+    #   Specifies which Conflict Detection strategy and Resolution strategy
+    #   to use when the resolver is invoked.
+    #   @return [Types::SyncConfig]
+    #
+    # @!attribute [rw] max_batch_size
+    #   The maximum batching size for a resolver.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] runtime
+    #   Describes a runtime used by an Amazon Web Services AppSync pipeline
+    #   resolver or Amazon Web Services AppSync function. Specifies the name
+    #   and version of the runtime to use. Note that if a runtime is
+    #   specified, code must also be specified.
+    #   @return [Types::AppSyncRuntime]
+    #
+    # @!attribute [rw] code
+    #   The `function` code that contains the request and response
+    #   functions. When code is used, the `runtime` is required. The
+    #   `runtime` value must be `APPSYNC_JS`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/FunctionConfiguration AWS API Documentation
@@ -1513,19 +2359,40 @@ module Aws::AppSync
       :data_source_name,
       :request_mapping_template,
       :response_mapping_template,
-      :function_version)
+      :function_version,
+      :sync_config,
+      :max_batch_size,
+      :runtime,
+      :code)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain_name
+    #   The domain name.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GetApiAssociationRequest AWS API Documentation
+    #
+    class GetApiAssociationRequest < Struct.new(
+      :domain_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] api_association
+    #   The `ApiAssociation` object.
+    #   @return [Types::ApiAssociation]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GetApiAssociationResponse AWS API Documentation
+    #
+    class GetApiAssociationResponse < Struct.new(
+      :api_association)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Represents the input of a `GetApiCache` operation.
-    #
-    # @note When making an API call, you may pass GetApiCacheRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #       }
     #
     # @!attribute [rw] api_id
     #   The API ID.
@@ -1553,14 +2420,75 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetDataSourceRequest
-    #   data as a hash:
+    # @!attribute [rw] introspection_id
+    #   The introspection ID. Each introspection contains a unique ID that
+    #   can be used to reference the instrospection record.
+    #   @return [String]
     #
-    #       {
-    #         api_id: "String", # required
-    #         name: "ResourceName", # required
-    #       }
+    # @!attribute [rw] include_models_sdl
+    #   A boolean flag that determines whether SDL should be generated for
+    #   introspected types or not. If set to `true`, each model will contain
+    #   an `sdl` property that contains the SDL for that type. The SDL only
+    #   contains the type data and no additional metadata or directives.
+    #   @return [Boolean]
     #
+    # @!attribute [rw] next_token
+    #   Determines the number of types to be returned in a single response
+    #   before paginating. This value is typically taken from `nextToken`
+    #   value from the previous response.
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of introspected types that will be returned in a
+    #   single response.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GetDataSourceIntrospectionRequest AWS API Documentation
+    #
+    class GetDataSourceIntrospectionRequest < Struct.new(
+      :introspection_id,
+      :include_models_sdl,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] introspection_id
+    #   The introspection ID. Each introspection contains a unique ID that
+    #   can be used to reference the instrospection record.
+    #   @return [String]
+    #
+    # @!attribute [rw] introspection_status
+    #   The status of the introspection during retrieval. By default, when a
+    #   new instrospection is being retrieved, the status will be set to
+    #   `PROCESSING`. Once the operation has been completed, the status will
+    #   change to `SUCCESS` or `FAILED` depending on how the data was
+    #   parsed. A `FAILED` operation will return an error and its details as
+    #   an `introspectionStatusDetail`.
+    #   @return [String]
+    #
+    # @!attribute [rw] introspection_status_detail
+    #   The error detail field. When a `FAILED` `introspectionStatus` is
+    #   returned, the `introspectionStatusDetail` will also return the exact
+    #   error that was generated during the operation.
+    #   @return [String]
+    #
+    # @!attribute [rw] introspection_result
+    #   The `DataSourceIntrospectionResult` object data.
+    #   @return [Types::DataSourceIntrospectionResult]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GetDataSourceIntrospectionResponse AWS API Documentation
+    #
+    class GetDataSourceIntrospectionResponse < Struct.new(
+      :introspection_id,
+      :introspection_status,
+      :introspection_status_detail,
+      :introspection_result)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1590,14 +2518,30 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetFunctionRequest
-    #   data as a hash:
+    # @!attribute [rw] domain_name
+    #   The domain name.
+    #   @return [String]
     #
-    #       {
-    #         api_id: "String", # required
-    #         function_id: "ResourceName", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GetDomainNameRequest AWS API Documentation
     #
+    class GetDomainNameRequest < Struct.new(
+      :domain_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain_name_config
+    #   The configuration for the `DomainName`.
+    #   @return [Types::DomainNameConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GetDomainNameResponse AWS API Documentation
+    #
+    class GetDomainNameResponse < Struct.new(
+      :domain_name_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] api_id
     #   The GraphQL API ID.
     #   @return [String]
@@ -1627,13 +2571,32 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetGraphqlApiRequest
-    #   data as a hash:
+    # @!attribute [rw] api_id
+    #   The ID of the API from which the environmental variable list will be
+    #   retrieved.
+    #   @return [String]
     #
-    #       {
-    #         api_id: "String", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GetGraphqlApiEnvironmentVariablesRequest AWS API Documentation
     #
+    class GetGraphqlApiEnvironmentVariablesRequest < Struct.new(
+      :api_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] environment_variables
+    #   The payload containing each environmental variable in the `"key" :
+    #   "value"` format.
+    #   @return [Hash<String,String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GetGraphqlApiEnvironmentVariablesResponse AWS API Documentation
+    #
+    class GetGraphqlApiEnvironmentVariablesResponse < Struct.new(
+      :environment_variables)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] api_id
     #   The API ID for the GraphQL API.
     #   @return [String]
@@ -1658,15 +2621,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetIntrospectionSchemaRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         format: "SDL", # required, accepts SDL, JSON
-    #         include_directives: false,
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1708,15 +2662,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetResolverRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         type_name: "ResourceName", # required
-    #         field_name: "ResourceName", # required
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1751,13 +2696,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSchemaCreationStatusRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1790,15 +2728,40 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetTypeRequest
-    #   data as a hash:
+    # @!attribute [rw] merged_api_identifier
+    #   The identifier of the AppSync Merged API. This is generated by the
+    #   AppSync service. In most cases, Merged APIs (especially in your
+    #   account) only require the API ID value or ARN of the merged API.
+    #   However, Merged APIs in other accounts (cross-account use cases)
+    #   strictly require the full resource ARN of the merged API.
+    #   @return [String]
     #
-    #       {
-    #         api_id: "String", # required
-    #         type_name: "ResourceName", # required
-    #         format: "SDL", # required, accepts SDL, JSON
-    #       }
+    # @!attribute [rw] association_id
+    #   The ID generated by the AppSync service for the source API
+    #   association.
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GetSourceApiAssociationRequest AWS API Documentation
+    #
+    class GetSourceApiAssociationRequest < Struct.new(
+      :merged_api_identifier,
+      :association_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] source_api_association
+    #   The `SourceApiAssociation` object data.
+    #   @return [Types::SourceApiAssociation]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GetSourceApiAssociationResponse AWS API Documentation
+    #
+    class GetSourceApiAssociationResponse < Struct.new(
+      :source_api_association)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -1873,7 +2836,7 @@ module Aws::AppSync
     #   @return [Types::OpenIDConnectConfig]
     #
     # @!attribute [rw] arn
-    #   The ARN.
+    #   The Amazon Resource Name (ARN).
     #   @return [String]
     #
     # @!attribute [rw] uris
@@ -1890,14 +2853,93 @@ module Aws::AppSync
     #   @return [Array<Types::AdditionalAuthenticationProvider>]
     #
     # @!attribute [rw] xray_enabled
-    #   A flag representing whether X-Ray tracing is enabled for this
+    #   A flag indicating whether to use X-Ray tracing for this
     #   `GraphqlApi`.
     #   @return [Boolean]
     #
     # @!attribute [rw] waf_web_acl_arn
-    #   The ARN of the AWS Web Application Firewall (WAF) ACL associated
-    #   with this `GraphqlApi`, if one exists.
+    #   The ARN of the WAF access control list (ACL) associated with this
+    #   `GraphqlApi`, if one exists.
     #   @return [String]
+    #
+    # @!attribute [rw] lambda_authorizer_config
+    #   Configuration for Lambda function authorization.
+    #   @return [Types::LambdaAuthorizerConfig]
+    #
+    # @!attribute [rw] dns
+    #   The DNS records for the API.
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] visibility
+    #   Sets the value of the GraphQL API to public (`GLOBAL`) or private
+    #   (`PRIVATE`). If no value is provided, the visibility will be set to
+    #   `GLOBAL` by default. This value cannot be changed once the API has
+    #   been created.
+    #   @return [String]
+    #
+    # @!attribute [rw] api_type
+    #   The value that indicates whether the GraphQL API is a standard API
+    #   (`GRAPHQL`) or merged API (`MERGED`).
+    #   @return [String]
+    #
+    # @!attribute [rw] merged_api_execution_role_arn
+    #   The Identity and Access Management service role ARN for a merged
+    #   API. The AppSync service assumes this role on behalf of the Merged
+    #   API to validate access to source APIs at runtime and to prompt the
+    #   `AUTO_MERGE` to update the merged API endpoint with the source API
+    #   changes automatically.
+    #   @return [String]
+    #
+    # @!attribute [rw] owner
+    #   The account owner of the GraphQL API.
+    #   @return [String]
+    #
+    # @!attribute [rw] owner_contact
+    #   The owner contact information for an API resource.
+    #
+    #   This field accepts any string input with a length of 0 - 256
+    #   characters.
+    #   @return [String]
+    #
+    # @!attribute [rw] introspection_config
+    #   Sets the value of the GraphQL API to enable (`ENABLED`) or disable
+    #   (`DISABLED`) introspection. If no value is provided, the
+    #   introspection configuration will be set to `ENABLED` by default.
+    #   This field will produce an error if the operation attempts to use
+    #   the introspection feature while this field is disabled.
+    #
+    #   For more information about introspection, see [GraphQL
+    #   introspection][1].
+    #
+    #
+    #
+    #   [1]: https://graphql.org/learn/introspection/
+    #   @return [String]
+    #
+    # @!attribute [rw] query_depth_limit
+    #   The maximum depth a query can have in a single request. Depth refers
+    #   to the amount of nested levels allowed in the body of query. The
+    #   default value is `0` (or unspecified), which indicates there's no
+    #   depth limit. If you set a limit, it can be between `1` and `75`
+    #   nested levels. This field will produce a limit error if the
+    #   operation falls out of bounds.
+    #
+    #   Note that fields can still be set to nullable or non-nullable. If a
+    #   non-nullable field produces an error, the error will be thrown
+    #   upwards to the first nullable field available.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] resolver_count_limit
+    #   The maximum number of resolvers that can be invoked in a single
+    #   request. The default value is `0` (or unspecified), which will set
+    #   the limit to `10000`. When specified, the limit value can be between
+    #   `1` and `10000`. This field will produce a limit error if the
+    #   operation falls out of bounds.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] enhanced_metrics_config
+    #   The `enhancedMetricsConfig` object.
+    #   @return [Types::EnhancedMetricsConfig]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/GraphqlApi AWS API Documentation
     #
@@ -1913,36 +2955,33 @@ module Aws::AppSync
       :tags,
       :additional_authentication_providers,
       :xray_enabled,
-      :waf_web_acl_arn)
+      :waf_web_acl_arn,
+      :lambda_authorizer_config,
+      :dns,
+      :visibility,
+      :api_type,
+      :merged_api_execution_role_arn,
+      :owner,
+      :owner_contact,
+      :introspection_config,
+      :query_depth_limit,
+      :resolver_count_limit,
+      :enhanced_metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Describes an HTTP data source configuration.
     #
-    # @note When making an API call, you may pass HttpDataSourceConfig
-    #   data as a hash:
-    #
-    #       {
-    #         endpoint: "String",
-    #         authorization_config: {
-    #           authorization_type: "AWS_IAM", # required, accepts AWS_IAM
-    #           aws_iam_config: {
-    #             signing_region: "String",
-    #             signing_service_name: "String",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] endpoint
-    #   The HTTP URL endpoint. You can either specify the domain name or IP,
+    #   The HTTP URL endpoint. You can specify either the domain name or IP,
     #   and port combination, and the URL scheme must be HTTP or HTTPS. If
-    #   the port is not specified, AWS AppSync uses the default port 80 for
+    #   you don't specify the port, AppSync uses the default port 80 for
     #   the HTTP endpoint and port 443 for HTTPS endpoints.
     #   @return [String]
     #
     # @!attribute [rw] authorization_config
-    #   The authorization config in case the HTTP endpoint requires
+    #   The authorization configuration in case the HTTP endpoint requires
     #   authorization.
     #   @return [Types::AuthorizationConfig]
     #
@@ -1955,7 +2994,7 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # An internal AWS AppSync error occurred. Try your request again.
+    # An internal AppSync error occurred. Try your request again.
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -1968,18 +3007,55 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # The `LambdaConflictHandlerConfig` object when configuring LAMBDA as
+    # A `LambdaAuthorizerConfig` specifies how to authorize AppSync API
+    # access when using the `AWS_LAMBDA` authorizer mode. Be aware that an
+    # AppSync API can have only one Lambda authorizer configured at a time.
+    #
+    # @!attribute [rw] authorizer_result_ttl_in_seconds
+    #   The number of seconds a response should be cached for. The default
+    #   is 0 seconds, which disables caching. If you don't specify a value
+    #   for `authorizerResultTtlInSeconds`, the default value is used. The
+    #   maximum value is one hour (3600 seconds). The Lambda function can
+    #   override this by returning a `ttlOverride` key in its response.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] authorizer_uri
+    #   The Amazon Resource Name (ARN) of the Lambda function to be called
+    #   for authorization. This can be a standard Lambda ARN, a version ARN
+    #   (`.../v3`), or an alias ARN.
+    #
+    #   **Note**: This Lambda function must have the following
+    #   resource-based policy assigned to it. When configuring Lambda
+    #   authorizers in the console, this is done for you. To use the Command
+    #   Line Interface (CLI), run the following:
+    #
+    #   `aws lambda add-permission --function-name
+    #   "arn:aws:lambda:us-east-2:111122223333:function:my-function"
+    #   --statement-id "appsync" --principal appsync.amazonaws.com --action
+    #   lambda:InvokeFunction`
+    #   @return [String]
+    #
+    # @!attribute [rw] identity_validation_expression
+    #   A regular expression for validation of tokens before the Lambda
+    #   function is called.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/LambdaAuthorizerConfig AWS API Documentation
+    #
+    class LambdaAuthorizerConfig < Struct.new(
+      :authorizer_result_ttl_in_seconds,
+      :authorizer_uri,
+      :identity_validation_expression)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The `LambdaConflictHandlerConfig` object when configuring `LAMBDA` as
     # the Conflict Handler.
     #
-    # @note When making an API call, you may pass LambdaConflictHandlerConfig
-    #   data as a hash:
-    #
-    #       {
-    #         lambda_conflict_handler_arn: "String",
-    #       }
-    #
     # @!attribute [rw] lambda_conflict_handler_arn
-    #   The Arn for the Lambda function to use as the Conflict Handler.
+    #   The Amazon Resource Name (ARN) for the Lambda function to use as the
+    #   Conflict Handler.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/LambdaConflictHandlerConfig AWS API Documentation
@@ -1990,17 +3066,10 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # Describes an AWS Lambda data source configuration.
-    #
-    # @note When making an API call, you may pass LambdaDataSourceConfig
-    #   data as a hash:
-    #
-    #       {
-    #         lambda_function_arn: "String", # required
-    #       }
+    # Describes an Lambda data source configuration.
     #
     # @!attribute [rw] lambda_function_arn
-    #   The ARN for the Lambda function.
+    #   The Amazon Resource Name (ARN) for the Lambda function.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/LambdaDataSourceConfig AWS API Documentation
@@ -2024,27 +3093,18 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListApiKeysRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         next_token: "PaginationToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
     #
     # @!attribute [rw] next_token
     #   An identifier that was returned from the previous call to this
-    #   operation, which can be used to return the next set of items in the
+    #   operation, which you can use to return the next set of items in the
     #   list.
     #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The maximum number of results you want the request to return.
+    #   The maximum number of results that you want the request to return.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListApiKeysRequest AWS API Documentation
@@ -2062,7 +3122,7 @@ module Aws::AppSync
     #   @return [Array<Types::ApiKey>]
     #
     # @!attribute [rw] next_token
-    #   An identifier to be passed in the next request to this operation to
+    #   An identifier to pass in the next request to this operation to
     #   return the next set of items in the list.
     #   @return [String]
     #
@@ -2075,27 +3135,18 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListDataSourcesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         next_token: "PaginationToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
     #
     # @!attribute [rw] next_token
     #   An identifier that was returned from the previous call to this
-    #   operation, which can be used to return the next set of items in the
+    #   operation, which you can use to return the next set of items in the
     #   list.
     #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The maximum number of results you want the request to return.
+    #   The maximum number of results that you want the request to return.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListDataSourcesRequest AWS API Documentation
@@ -2113,7 +3164,7 @@ module Aws::AppSync
     #   @return [Array<Types::DataSource>]
     #
     # @!attribute [rw] next_token
-    #   An identifier to be passed in the next request to this operation to
+    #   An identifier to pass in the next request to this operation to
     #   return the next set of items in the list.
     #   @return [String]
     #
@@ -2126,27 +3177,56 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListFunctionsRequest
-    #   data as a hash:
+    # @!attribute [rw] next_token
+    #   An identifier that was returned from the previous call to this
+    #   operation, which you can use to return the next set of items in the
+    #   list.
+    #   @return [String]
     #
-    #       {
-    #         api_id: "String", # required
-    #         next_token: "PaginationToken",
-    #         max_results: 1,
-    #       }
+    # @!attribute [rw] max_results
+    #   The maximum number of results that you want the request to return.
+    #   @return [Integer]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListDomainNamesRequest AWS API Documentation
+    #
+    class ListDomainNamesRequest < Struct.new(
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain_name_configs
+    #   Lists configurations for multiple domain names.
+    #   @return [Array<Types::DomainNameConfig>]
+    #
+    # @!attribute [rw] next_token
+    #   An identifier that was returned from the previous call to this
+    #   operation, which you can use to return the next set of items in the
+    #   list.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListDomainNamesResponse AWS API Documentation
+    #
+    class ListDomainNamesResponse < Struct.new(
+      :domain_name_configs,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] api_id
     #   The GraphQL API ID.
     #   @return [String]
     #
     # @!attribute [rw] next_token
     #   An identifier that was returned from the previous call to this
-    #   operation, which can be used to return the next set of items in the
+    #   operation, which you can use to return the next set of items in the
     #   list.
     #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The maximum number of results you want the request to return.
+    #   The maximum number of results that you want the request to return.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListFunctionsRequest AWS API Documentation
@@ -2165,7 +3245,7 @@ module Aws::AppSync
     #
     # @!attribute [rw] next_token
     #   An identifier that was returned from the previous call to this
-    #   operation, which can be used to return the next set of items in the
+    #   operation, which you can use to return the next set of items in the
     #   list.
     #   @return [String]
     #
@@ -2178,29 +3258,32 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListGraphqlApisRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "PaginationToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   An identifier that was returned from the previous call to this
-    #   operation, which can be used to return the next set of items in the
+    #   operation, which you can use to return the next set of items in the
     #   list.
     #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The maximum number of results you want the request to return.
+    #   The maximum number of results that you want the request to return.
     #   @return [Integer]
+    #
+    # @!attribute [rw] api_type
+    #   The value that indicates whether the GraphQL API is a standard API
+    #   (`GRAPHQL`) or merged API (`MERGED`).
+    #   @return [String]
+    #
+    # @!attribute [rw] owner
+    #   The account owner of the GraphQL API.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListGraphqlApisRequest AWS API Documentation
     #
     class ListGraphqlApisRequest < Struct.new(
       :next_token,
-      :max_results)
+      :max_results,
+      :api_type,
+      :owner)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2210,7 +3293,7 @@ module Aws::AppSync
     #   @return [Array<Types::GraphqlApi>]
     #
     # @!attribute [rw] next_token
-    #   An identifier to be passed in the next request to this operation to
+    #   An identifier to pass in the next request to this operation to
     #   return the next set of items in the list.
     #   @return [String]
     #
@@ -2223,22 +3306,12 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListResolversByFunctionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         function_id: "String", # required
-    #         next_token: "PaginationToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
     #
     # @!attribute [rw] function_id
-    #   The Function ID.
+    #   The function ID.
     #   @return [String]
     #
     # @!attribute [rw] next_token
@@ -2248,7 +3321,7 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The maximum number of results you want the request to return.
+    #   The maximum number of results that you want the request to return.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListResolversByFunctionRequest AWS API Documentation
@@ -2267,7 +3340,7 @@ module Aws::AppSync
     #   @return [Array<Types::Resolver>]
     #
     # @!attribute [rw] next_token
-    #   An identifier that can be used to return the next set of items in
+    #   An identifier that you can use to return the next set of items in
     #   the list.
     #   @return [String]
     #
@@ -2280,16 +3353,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListResolversRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         type_name: "String", # required
-    #         next_token: "PaginationToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -2300,12 +3363,12 @@ module Aws::AppSync
     #
     # @!attribute [rw] next_token
     #   An identifier that was returned from the previous call to this
-    #   operation, which can be used to return the next set of items in the
+    #   operation, which you can use to return the next set of items in the
     #   list.
     #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The maximum number of results you want the request to return.
+    #   The maximum number of results that you want the request to return.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListResolversRequest AWS API Documentation
@@ -2324,7 +3387,7 @@ module Aws::AppSync
     #   @return [Array<Types::Resolver>]
     #
     # @!attribute [rw] next_token
-    #   An identifier to be passed in the next request to this operation to
+    #   An identifier to pass in the next request to this operation to
     #   return the next set of items in the list.
     #   @return [String]
     #
@@ -2337,15 +3400,51 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
+    # @!attribute [rw] api_id
+    #   The API ID.
+    #   @return [String]
     #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #       }
+    # @!attribute [rw] next_token
+    #   An identifier that was returned from the previous call to this
+    #   operation, which you can use to return the next set of items in the
+    #   list.
+    #   @return [String]
     #
+    # @!attribute [rw] max_results
+    #   The maximum number of results that you want the request to return.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListSourceApiAssociationsRequest AWS API Documentation
+    #
+    class ListSourceApiAssociationsRequest < Struct.new(
+      :api_id,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] source_api_association_summaries
+    #   The `SourceApiAssociationSummary` object data.
+    #   @return [Array<Types::SourceApiAssociationSummary>]
+    #
+    # @!attribute [rw] next_token
+    #   An identifier that was returned from the previous call to this
+    #   operation, which you can use to return the next set of items in the
+    #   list.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListSourceApiAssociationsResponse AWS API Documentation
+    #
+    class ListSourceApiAssociationsResponse < Struct.new(
+      :source_api_association_summaries,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] resource_arn
-    #   The `GraphqlApi` ARN.
+    #   The `GraphqlApi` Amazon Resource Name (ARN).
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListTagsForResourceRequest AWS API Documentation
@@ -2368,16 +3467,64 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTypesRequest
-    #   data as a hash:
+    # @!attribute [rw] merged_api_identifier
+    #   The identifier of the AppSync Merged API. This is generated by the
+    #   AppSync service. In most cases, Merged APIs (especially in your
+    #   account) only require the API ID value or ARN of the merged API.
+    #   However, Merged APIs in other accounts (cross-account use cases)
+    #   strictly require the full resource ARN of the merged API.
+    #   @return [String]
     #
-    #       {
-    #         api_id: "String", # required
-    #         format: "SDL", # required, accepts SDL, JSON
-    #         next_token: "PaginationToken",
-    #         max_results: 1,
-    #       }
+    # @!attribute [rw] association_id
+    #   The ID generated by the AppSync service for the source API
+    #   association.
+    #   @return [String]
     #
+    # @!attribute [rw] format
+    #   The format type.
+    #   @return [String]
+    #
+    # @!attribute [rw] next_token
+    #   An identifier that was returned from the previous call to this
+    #   operation, which you can use to return the next set of items in the
+    #   list.
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of results that you want the request to return.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListTypesByAssociationRequest AWS API Documentation
+    #
+    class ListTypesByAssociationRequest < Struct.new(
+      :merged_api_identifier,
+      :association_id,
+      :format,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] types
+    #   The `Type` objects.
+    #   @return [Array<Types::Type>]
+    #
+    # @!attribute [rw] next_token
+    #   An identifier that was returned from the previous call to this
+    #   operation, which you can use to return the next set of items in the
+    #   list.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListTypesByAssociationResponse AWS API Documentation
+    #
+    class ListTypesByAssociationResponse < Struct.new(
+      :types,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -2388,12 +3535,12 @@ module Aws::AppSync
     #
     # @!attribute [rw] next_token
     #   An identifier that was returned from the previous call to this
-    #   operation, which can be used to return the next set of items in the
+    #   operation, which you can use to return the next set of items in the
     #   list.
     #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The maximum number of results you want the request to return.
+    #   The maximum number of results that you want the request to return.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/ListTypesRequest AWS API Documentation
@@ -2412,7 +3559,7 @@ module Aws::AppSync
     #   @return [Array<Types::Type>]
     #
     # @!attribute [rw] next_token
-    #   An identifier to be passed in the next request to this operation to
+    #   An identifier to pass in the next request to this operation to
     #   return the next set of items in the list.
     #   @return [String]
     #
@@ -2425,24 +3572,16 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # The CloudWatch Logs configuration.
-    #
-    # @note When making an API call, you may pass LogConfig
-    #   data as a hash:
-    #
-    #       {
-    #         field_log_level: "NONE", # required, accepts NONE, ERROR, ALL
-    #         cloud_watch_logs_role_arn: "String", # required
-    #         exclude_verbose_content: false,
-    #       }
+    # The Amazon CloudWatch Logs configuration.
     #
     # @!attribute [rw] field_log_level
-    #   The field logging level. Values can be NONE, ERROR, or ALL.
+    #   The field logging level. Values can be NONE, ERROR, INFO, DEBUG, or
+    #   ALL.
     #
-    #   * **NONE**\: No field-level logs are captured.
+    #   * **NONE**: No field-level logs are captured.
     #
-    #   * **ERROR**\: Logs the following information only for the fields
-    #     that are in error:
+    #   * **ERROR**: Logs the following information **only** for the fields
+    #     that are in the error category:
     #
     #     * The error section in the server response.
     #
@@ -2451,18 +3590,38 @@ module Aws::AppSync
     #     * The generated request/response functions that got resolved for
     #       error fields.
     #
-    #   * **ALL**\: The following information is logged for all fields in
-    #     the query:
+    #   * **INFO**: Logs the following information **only** for the fields
+    #     that are in the info and error categories:
+    #
+    #     * Info-level messages.
+    #
+    #     * The user messages sent through `$util.log.info` and
+    #       `console.log`.
+    #
+    #     * Field-level tracing and mapping logs are not shown.
+    #
+    #   * **DEBUG**: Logs the following information **only** for the fields
+    #     that are in the debug, info, and error categories:
+    #
+    #     * Debug-level messages.
+    #
+    #     * The user messages sent through `$util.log.info`,
+    #       `$util.log.debug`, `console.log`, and `console.debug`.
+    #
+    #     * Field-level tracing and mapping logs are not shown.
+    #
+    #   * **ALL**: The following information is logged for all fields in the
+    #     query:
     #
     #     * Field-level tracing information.
     #
-    #     * The generated request/response functions that got resolved for
+    #     * The generated request/response functions that were resolved for
     #       each field.
     #   @return [String]
     #
     # @!attribute [rw] cloud_watch_logs_role_arn
-    #   The service role that AWS AppSync will assume to publish to Amazon
-    #   CloudWatch logs in your account.
+    #   The service role that AppSync assumes to publish to CloudWatch logs
+    #   in your account.
     #   @return [String]
     #
     # @!attribute [rw] exclude_verbose_content
@@ -2495,38 +3654,28 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # Describes an OpenID Connect configuration.
-    #
-    # @note When making an API call, you may pass OpenIDConnectConfig
-    #   data as a hash:
-    #
-    #       {
-    #         issuer: "String", # required
-    #         client_id: "String",
-    #         iat_ttl: 1,
-    #         auth_ttl: 1,
-    #       }
+    # Describes an OpenID Connect (OIDC) configuration.
     #
     # @!attribute [rw] issuer
-    #   The issuer for the OpenID Connect configuration. The issuer returned
-    #   by discovery must exactly match the value of `iss` in the ID token.
+    #   The issuer for the OIDC configuration. The issuer returned by
+    #   discovery must exactly match the value of `iss` in the ID token.
     #   @return [String]
     #
     # @!attribute [rw] client_id
-    #   The client identifier of the Relying party at the OpenID identity
-    #   provider. This identifier is typically obtained when the Relying
+    #   The client identifier of the relying party at the OpenID identity
+    #   provider. This identifier is typically obtained when the relying
     #   party is registered with the OpenID identity provider. You can
-    #   specify a regular expression so the AWS AppSync can validate against
+    #   specify a regular expression so that AppSync can validate against
     #   multiple client identifiers at a time.
     #   @return [String]
     #
     # @!attribute [rw] iat_ttl
-    #   The number of milliseconds a token is valid after being issued to a
-    #   user.
+    #   The number of milliseconds that a token is valid after it's issued
+    #   to a user.
     #   @return [Integer]
     #
     # @!attribute [rw] auth_ttl
-    #   The number of milliseconds a token is valid after being
+    #   The number of milliseconds that a token is valid after being
     #   authenticated.
     #   @return [Integer]
     #
@@ -2541,14 +3690,26 @@ module Aws::AppSync
       include Aws::Structure
     end
 
+    # Describes an OpenSearch data source configuration.
+    #
+    # @!attribute [rw] endpoint
+    #   The endpoint.
+    #   @return [String]
+    #
+    # @!attribute [rw] aws_region
+    #   The Amazon Web Services Region.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/OpenSearchServiceDataSourceConfig AWS API Documentation
+    #
+    class OpenSearchServiceDataSourceConfig < Struct.new(
+      :endpoint,
+      :aws_region)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The pipeline configuration for a resolver of kind `PIPELINE`.
-    #
-    # @note When making an API call, you may pass PipelineConfig
-    #   data as a hash:
-    #
-    #       {
-    #         functions: ["String"],
-    #       }
     #
     # @!attribute [rw] functions
     #   A list of `Function` objects.
@@ -2562,25 +3723,98 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # The Amazon RDS HTTP endpoint configuration.
+    # @!attribute [rw] api_id
+    #   The ID of the API to which the environmental variable list will be
+    #   written.
+    #   @return [String]
     #
-    # @note When making an API call, you may pass RdsHttpEndpointConfig
-    #   data as a hash:
+    # @!attribute [rw] environment_variables
+    #   The list of environmental variables to add to the API.
     #
-    #       {
-    #         aws_region: "String",
-    #         db_cluster_identifier: "String",
-    #         database_name: "String",
-    #         schema: "String",
-    #         aws_secret_store_arn: "String",
-    #       }
+    #   When creating an environmental variable key-value pair, it must
+    #   follow the additional constraints below:
+    #
+    #   * Keys must begin with a letter.
+    #
+    #   * Keys must be at least two characters long.
+    #
+    #   * Keys can only contain letters, numbers, and the underscore
+    #     character (\_).
+    #
+    #   * Values can be up to 512 characters long.
+    #
+    #   * You can configure up to 50 key-value pairs in a GraphQL API.
+    #
+    #   You can create a list of environmental variables by adding it to the
+    #   `environmentVariables` payload as a list in the format
+    #   `\{"key1":"value1","key2":"value2", …\}`. Note that each call of the
+    #   `PutGraphqlApiEnvironmentVariables` action will result in the
+    #   overwriting of the existing environmental variable list of that API.
+    #   This means the existing environmental variables will be lost. To
+    #   avoid this, you must include all existing and new environmental
+    #   variables in the list each time you call this action.
+    #   @return [Hash<String,String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/PutGraphqlApiEnvironmentVariablesRequest AWS API Documentation
+    #
+    class PutGraphqlApiEnvironmentVariablesRequest < Struct.new(
+      :api_id,
+      :environment_variables)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] environment_variables
+    #   The payload containing each environmental variable in the `"key" :
+    #   "value"` format.
+    #   @return [Hash<String,String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/PutGraphqlApiEnvironmentVariablesResponse AWS API Documentation
+    #
+    class PutGraphqlApiEnvironmentVariablesResponse < Struct.new(
+      :environment_variables)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains the metadata required to introspect the RDS cluster.
+    #
+    # @!attribute [rw] resource_arn
+    #   The resource ARN of the RDS cluster.
+    #   @return [String]
+    #
+    # @!attribute [rw] secret_arn
+    #   The secret's ARN that was obtained from Secrets Manager. A secret
+    #   consists of secret information, the secret value, plus metadata
+    #   about the secret. A secret value can be a string or binary. It
+    #   typically includes the ARN, secret name and description, policies,
+    #   tags, encryption key from the Key Management Service, and key
+    #   rotation data.
+    #   @return [String]
+    #
+    # @!attribute [rw] database_name
+    #   The name of the database in the cluster.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/RdsDataApiConfig AWS API Documentation
+    #
+    class RdsDataApiConfig < Struct.new(
+      :resource_arn,
+      :secret_arn,
+      :database_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The Amazon Relational Database Service (Amazon RDS) HTTP endpoint
+    # configuration.
     #
     # @!attribute [rw] aws_region
-    #   AWS Region for RDS HTTP endpoint.
+    #   Amazon Web Services Region for Amazon RDS HTTP endpoint.
     #   @return [String]
     #
     # @!attribute [rw] db_cluster_identifier
-    #   Amazon RDS cluster ARN.
+    #   Amazon RDS cluster Amazon Resource Name (ARN).
     #   @return [String]
     #
     # @!attribute [rw] database_name
@@ -2592,7 +3826,8 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] aws_secret_store_arn
-    #   AWS secret store ARN for database credentials.
+    #   Amazon Web Services secret store Amazon Resource Name (ARN) for
+    #   database credentials.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/RdsHttpEndpointConfig AWS API Documentation
@@ -2609,25 +3844,11 @@ module Aws::AppSync
 
     # Describes a relational database data source configuration.
     #
-    # @note When making an API call, you may pass RelationalDatabaseDataSourceConfig
-    #   data as a hash:
-    #
-    #       {
-    #         relational_database_source_type: "RDS_HTTP_ENDPOINT", # accepts RDS_HTTP_ENDPOINT
-    #         rds_http_endpoint_config: {
-    #           aws_region: "String",
-    #           db_cluster_identifier: "String",
-    #           database_name: "String",
-    #           schema: "String",
-    #           aws_secret_store_arn: "String",
-    #         },
-    #       }
-    #
     # @!attribute [rw] relational_database_source_type
     #   Source type for the relational database.
     #
-    #   * **RDS\_HTTP\_ENDPOINT**\: The relational database source type is
-    #     an Amazon RDS HTTP endpoint.
+    #   * **RDS\_HTTP\_ENDPOINT**: The relational database source type is an
+    #     Amazon Relational Database Service (Amazon RDS) HTTP endpoint.
     #
     #   ^
     #   @return [String]
@@ -2660,7 +3881,7 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] resolver_arn
-    #   The resolver ARN.
+    #   The resolver Amazon Resource Name (ARN).
     #   @return [String]
     #
     # @!attribute [rw] request_mapping_template
@@ -2674,14 +3895,14 @@ module Aws::AppSync
     # @!attribute [rw] kind
     #   The resolver type.
     #
-    #   * **UNIT**\: A UNIT resolver type. A UNIT resolver is the default
-    #     resolver type. A UNIT resolver enables you to execute a GraphQL
-    #     query against a single data source.
+    #   * **UNIT**: A UNIT resolver type. A UNIT resolver is the default
+    #     resolver type. You can use a UNIT resolver to run a GraphQL query
+    #     against a single data source.
     #
-    #   * **PIPELINE**\: A PIPELINE resolver type. A PIPELINE resolver
-    #     enables you to execute a series of `Function` in a serial manner.
-    #     You can use a pipeline resolver to execute a GraphQL query against
-    #     multiple data sources.
+    #   * **PIPELINE**: A PIPELINE resolver type. You can use a PIPELINE
+    #     resolver to invoke a series of `Function` objects in a serial
+    #     manner. You can use a pipeline resolver to run a GraphQL query
+    #     against multiple data sources.
     #   @return [String]
     #
     # @!attribute [rw] pipeline_config
@@ -2689,12 +3910,40 @@ module Aws::AppSync
     #   @return [Types::PipelineConfig]
     #
     # @!attribute [rw] sync_config
-    #   The `SyncConfig` for a resolver attached to a versioned datasource.
+    #   The `SyncConfig` for a resolver attached to a versioned data source.
     #   @return [Types::SyncConfig]
     #
     # @!attribute [rw] caching_config
     #   The caching configuration for the resolver.
     #   @return [Types::CachingConfig]
+    #
+    # @!attribute [rw] max_batch_size
+    #   The maximum batching size for a resolver.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] runtime
+    #   Describes a runtime used by an Amazon Web Services AppSync pipeline
+    #   resolver or Amazon Web Services AppSync function. Specifies the name
+    #   and version of the runtime to use. Note that if a runtime is
+    #   specified, code must also be specified.
+    #   @return [Types::AppSyncRuntime]
+    #
+    # @!attribute [rw] code
+    #   The `resolver` code that contains the request and response
+    #   functions. When code is used, the `runtime` is required. The
+    #   `runtime` value must be `APPSYNC_JS`.
+    #   @return [String]
+    #
+    # @!attribute [rw] metrics_config
+    #   Enables or disables enhanced resolver metrics for specified
+    #   resolvers. Note that `metricsConfig` won't be used unless the
+    #   `resolverLevelMetricsBehavior` value is set to
+    #   `PER_RESOLVER_METRICS`. If the `resolverLevelMetricsBehavior` is set
+    #   to `FULL_REQUEST_RESOLVER_METRICS` instead, `metricsConfig` will be
+    #   ignored. However, you can still set its value.
+    #
+    #   `metricsConfig` can be `ENABLED` or `DISABLED`.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/Resolver AWS API Documentation
     #
@@ -2708,19 +3957,209 @@ module Aws::AppSync
       :kind,
       :pipeline_config,
       :sync_config,
-      :caching_config)
+      :caching_config,
+      :max_batch_size,
+      :runtime,
+      :code,
+      :metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass StartSchemaCreationRequest
-    #   data as a hash:
+    # Describes the configuration of a source API. A source API is a GraphQL
+    # API that is linked to a merged API. There can be multiple source APIs
+    # attached to each merged API. When linked to a merged API, the source
+    # API's schema, data sources, and resolvers will be combined with other
+    # linked source API data to form a new, singular API.
     #
-    #       {
-    #         api_id: "String", # required
-    #         definition: "data", # required
-    #       }
+    # Source APIs can originate from your account or from other accounts via
+    # Amazon Web Services Resource Access Manager. For more information
+    # about sharing resources from other accounts, see [What is Amazon Web
+    # Services Resource Access Manager?][1] in the *Amazon Web Services
+    # Resource Access Manager* guide.
     #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/ram/latest/userguide/what-is.html
+    #
+    # @!attribute [rw] association_id
+    #   The ID generated by the AppSync service for the source API
+    #   association.
+    #   @return [String]
+    #
+    # @!attribute [rw] association_arn
+    #   The Amazon Resource Name (ARN) of the source API association.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_api_id
+    #   The ID of the AppSync source API.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_api_arn
+    #   The Amazon Resource Name (ARN) of the AppSync source API.
+    #   @return [String]
+    #
+    # @!attribute [rw] merged_api_arn
+    #   The Amazon Resource Name (ARN) of the AppSync Merged API.
+    #   @return [String]
+    #
+    # @!attribute [rw] merged_api_id
+    #   The ID of the AppSync Merged API.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   The description field.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_api_association_config
+    #   The `SourceApiAssociationConfig` object data.
+    #   @return [Types::SourceApiAssociationConfig]
+    #
+    # @!attribute [rw] source_api_association_status
+    #   The state of the source API association.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_api_association_status_detail
+    #   The detailed message related to the current state of the source API
+    #   association.
+    #   @return [String]
+    #
+    # @!attribute [rw] last_successful_merge_date
+    #   The datetime value of the last successful merge of the source API
+    #   association. The result will be in UTC format and your local time
+    #   zone.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/SourceApiAssociation AWS API Documentation
+    #
+    class SourceApiAssociation < Struct.new(
+      :association_id,
+      :association_arn,
+      :source_api_id,
+      :source_api_arn,
+      :merged_api_arn,
+      :merged_api_id,
+      :description,
+      :source_api_association_config,
+      :source_api_association_status,
+      :source_api_association_status_detail,
+      :last_successful_merge_date)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes properties used to specify configurations related to a
+    # source API.
+    #
+    # @!attribute [rw] merge_type
+    #   The property that indicates which merging option is enabled in the
+    #   source API association.
+    #
+    #   Valid merge types are `MANUAL_MERGE` (default) and `AUTO_MERGE`.
+    #   Manual merges are the default behavior and require the user to
+    #   trigger any changes from the source APIs to the merged API manually.
+    #   Auto merges subscribe the merged API to the changes performed on the
+    #   source APIs so that any change in the source APIs are also made to
+    #   the merged API. Auto merges use `MergedApiExecutionRoleArn` to
+    #   perform merge operations.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/SourceApiAssociationConfig AWS API Documentation
+    #
+    class SourceApiAssociationConfig < Struct.new(
+      :merge_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the ARNs and IDs of associations, Merged APIs, and source
+    # APIs.
+    #
+    # @!attribute [rw] association_id
+    #   The ID generated by the AppSync service for the source API
+    #   association.
+    #   @return [String]
+    #
+    # @!attribute [rw] association_arn
+    #   The Amazon Resource Name (ARN) of the source API association.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_api_id
+    #   The ID of the AppSync source API.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_api_arn
+    #   The Amazon Resource Name (ARN) of the AppSync Source API.
+    #   @return [String]
+    #
+    # @!attribute [rw] merged_api_id
+    #   The ID of the AppSync Merged API.
+    #   @return [String]
+    #
+    # @!attribute [rw] merged_api_arn
+    #   The Amazon Resource Name (ARN) of the AppSync Merged API.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   The description field.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/SourceApiAssociationSummary AWS API Documentation
+    #
+    class SourceApiAssociationSummary < Struct.new(
+      :association_id,
+      :association_arn,
+      :source_api_id,
+      :source_api_arn,
+      :merged_api_id,
+      :merged_api_arn,
+      :description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] rds_data_api_config
+    #   The `rdsDataApiConfig` object data.
+    #   @return [Types::RdsDataApiConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/StartDataSourceIntrospectionRequest AWS API Documentation
+    #
+    class StartDataSourceIntrospectionRequest < Struct.new(
+      :rds_data_api_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] introspection_id
+    #   The introspection ID. Each introspection contains a unique ID that
+    #   can be used to reference the instrospection record.
+    #   @return [String]
+    #
+    # @!attribute [rw] introspection_status
+    #   The status of the introspection during creation. By default, when a
+    #   new instrospection has been created, the status will be set to
+    #   `PROCESSING`. Once the operation has been completed, the status will
+    #   change to `SUCCESS` or `FAILED` depending on how the data was
+    #   parsed. A `FAILED` operation will return an error and its details as
+    #   an `introspectionStatusDetail`.
+    #   @return [String]
+    #
+    # @!attribute [rw] introspection_status_detail
+    #   The error detail field. When a `FAILED` `introspectionStatus` is
+    #   returned, the `introspectionStatusDetail` will also return the exact
+    #   error that was generated during the operation.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/StartDataSourceIntrospectionResponse AWS API Documentation
+    #
+    class StartDataSourceIntrospectionResponse < Struct.new(
+      :introspection_id,
+      :introspection_status,
+      :introspection_status_detail)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -2752,48 +4191,71 @@ module Aws::AppSync
       include Aws::Structure
     end
 
+    # @!attribute [rw] association_id
+    #   The ID generated by the AppSync service for the source API
+    #   association.
+    #   @return [String]
+    #
+    # @!attribute [rw] merged_api_identifier
+    #   The identifier of the AppSync Merged API. This is generated by the
+    #   AppSync service. In most cases, Merged APIs (especially in your
+    #   account) only require the API ID value or ARN of the merged API.
+    #   However, Merged APIs in other accounts (cross-account use cases)
+    #   strictly require the full resource ARN of the merged API.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/StartSchemaMergeRequest AWS API Documentation
+    #
+    class StartSchemaMergeRequest < Struct.new(
+      :association_id,
+      :merged_api_identifier)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] source_api_association_status
+    #   The state of the source API association.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/StartSchemaMergeResponse AWS API Documentation
+    #
+    class StartSchemaMergeResponse < Struct.new(
+      :source_api_association_status)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Describes a Sync configuration for a resolver.
     #
-    # Contains information on which Conflict Detection as well as Resolution
-    # strategy should be performed when the resolver is invoked.
-    #
-    # @note When making an API call, you may pass SyncConfig
-    #   data as a hash:
-    #
-    #       {
-    #         conflict_handler: "OPTIMISTIC_CONCURRENCY", # accepts OPTIMISTIC_CONCURRENCY, LAMBDA, AUTOMERGE, NONE
-    #         conflict_detection: "VERSION", # accepts VERSION, NONE
-    #         lambda_conflict_handler_config: {
-    #           lambda_conflict_handler_arn: "String",
-    #         },
-    #       }
+    # Specifies which Conflict Detection strategy and Resolution strategy to
+    # use when the resolver is invoked.
     #
     # @!attribute [rw] conflict_handler
     #   The Conflict Resolution strategy to perform in the event of a
     #   conflict.
     #
-    #   * **OPTIMISTIC\_CONCURRENCY**\: Resolve conflicts by rejecting
-    #     mutations when versions do not match the latest version at the
+    #   * **OPTIMISTIC\_CONCURRENCY**: Resolve conflicts by rejecting
+    #     mutations when versions don't match the latest version at the
     #     server.
     #
-    #   * **AUTOMERGE**\: Resolve conflicts with the Automerge conflict
+    #   * **AUTOMERGE**: Resolve conflicts with the Automerge conflict
     #     resolution strategy.
     #
-    #   * **LAMBDA**\: Resolve conflicts with a Lambda function supplied in
-    #     the LambdaConflictHandlerConfig.
+    #   * **LAMBDA**: Resolve conflicts with an Lambda function supplied in
+    #     the `LambdaConflictHandlerConfig`.
     #   @return [String]
     #
     # @!attribute [rw] conflict_detection
     #   The Conflict Detection strategy to use.
     #
-    #   * **VERSION**\: Detect conflicts based on object versions for this
+    #   * **VERSION**: Detect conflicts based on object versions for this
     #     resolver.
     #
-    #   * **NONE**\: Do not detect conflicts when executing this resolver.
+    #   * **NONE**: Do not detect conflicts when invoking this resolver.
     #   @return [String]
     #
     # @!attribute [rw] lambda_conflict_handler_config
-    #   The `LambdaConflictHandlerConfig` when configuring LAMBDA as the
+    #   The `LambdaConflictHandlerConfig` when configuring `LAMBDA` as the
     #   Conflict Handler.
     #   @return [Types::LambdaConflictHandlerConfig]
     #
@@ -2807,18 +4269,8 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #         tags: { # required
-    #           "TagKey" => "TagValue",
-    #         },
-    #       }
-    #
     # @!attribute [rw] resource_arn
-    #   The `GraphqlApi` ARN.
+    #   The `GraphqlApi` Amazon Resource Name (ARN).
     #   @return [String]
     #
     # @!attribute [rw] tags
@@ -2849,7 +4301,7 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] arn
-    #   The type ARN.
+    #   The type Amazon Resource Name (ARN).
     #   @return [String]
     #
     # @!attribute [rw] definition
@@ -2872,7 +4324,7 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # You are not authorized to perform this operation.
+    # You aren't authorized to perform this operation.
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -2885,16 +4337,8 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
-    #   The `GraphqlApi` ARN.
+    #   The `GraphqlApi` Amazon Resource Name (ARN).
     #   @return [String]
     #
     # @!attribute [rw] tag_keys
@@ -2916,32 +4360,22 @@ module Aws::AppSync
 
     # Represents the input of a `UpdateApiCache` operation.
     #
-    # @note When making an API call, you may pass UpdateApiCacheRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         ttl: 1, # required
-    #         api_caching_behavior: "FULL_REQUEST_CACHING", # required, accepts FULL_REQUEST_CACHING, PER_RESOLVER_CACHING
-    #         type: "T2_SMALL", # required, accepts T2_SMALL, T2_MEDIUM, R4_LARGE, R4_XLARGE, R4_2XLARGE, R4_4XLARGE, R4_8XLARGE, SMALL, MEDIUM, LARGE, XLARGE, LARGE_2X, LARGE_4X, LARGE_8X, LARGE_12X
-    #       }
-    #
     # @!attribute [rw] api_id
-    #   The GraphQL API Id.
+    #   The GraphQL API ID.
     #   @return [String]
     #
     # @!attribute [rw] ttl
     #   TTL in seconds for cache entries.
     #
-    #   Valid values are between 1 and 3600 seconds.
+    #   Valid values are 1–3,600 seconds.
     #   @return [Integer]
     #
     # @!attribute [rw] api_caching_behavior
     #   Caching behavior.
     #
-    #   * **FULL\_REQUEST\_CACHING**\: All requests are fully cached.
+    #   * **FULL\_REQUEST\_CACHING**: All requests are fully cached.
     #
-    #   * **PER\_RESOLVER\_CACHING**\: Individual resolvers that you specify
+    #   * **PER\_RESOLVER\_CACHING**: Individual resolvers that you specify
     #     are cached.
     #   @return [String]
     #
@@ -2971,19 +4405,36 @@ module Aws::AppSync
     #   The following legacy instance types are available, but their use is
     #   discouraged:
     #
-    #   * **T2\_SMALL**\: A t2.small instance type.
+    #   * **T2\_SMALL**: A t2.small instance type.
     #
-    #   * **T2\_MEDIUM**\: A t2.medium instance type.
+    #   * **T2\_MEDIUM**: A t2.medium instance type.
     #
-    #   * **R4\_LARGE**\: A r4.large instance type.
+    #   * **R4\_LARGE**: A r4.large instance type.
     #
-    #   * **R4\_XLARGE**\: A r4.xlarge instance type.
+    #   * **R4\_XLARGE**: A r4.xlarge instance type.
     #
-    #   * **R4\_2XLARGE**\: A r4.2xlarge instance type.
+    #   * **R4\_2XLARGE**: A r4.2xlarge instance type.
     #
-    #   * **R4\_4XLARGE**\: A r4.4xlarge instance type.
+    #   * **R4\_4XLARGE**: A r4.4xlarge instance type.
     #
-    #   * **R4\_8XLARGE**\: A r4.8xlarge instance type.
+    #   * **R4\_8XLARGE**: A r4.8xlarge instance type.
+    #   @return [String]
+    #
+    # @!attribute [rw] health_metrics_config
+    #   Controls how cache health metrics will be emitted to CloudWatch.
+    #   Cache health metrics include:
+    #
+    #   * NetworkBandwidthOutAllowanceExceeded: The network packets dropped
+    #     because the throughput exceeded the aggregated bandwidth limit.
+    #     This is useful for diagnosing bottlenecks in a cache
+    #     configuration.
+    #
+    #   * EngineCPUUtilization: The CPU utilization (percentage) allocated
+    #     to the Redis process. This is useful for diagnosing bottlenecks in
+    #     a cache configuration.
+    #
+    #   Metrics will be recorded by API ID. You can set the value to
+    #   `ENABLED` or `DISABLED`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UpdateApiCacheRequest AWS API Documentation
@@ -2992,7 +4443,8 @@ module Aws::AppSync
       :api_id,
       :ttl,
       :api_caching_behavior,
-      :type)
+      :type,
+      :health_metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3011,16 +4463,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateApiKeyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         id: "String", # required
-    #         description: "String",
-    #         expires: 1,
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The ID for the GraphQL API.
     #   @return [String]
@@ -3034,9 +4476,9 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] expires
-    #   The time from update time after which the API key expires. The date
-    #   is represented as seconds since the epoch. For more information, see
-    #   .
+    #   From the update time, the time after which the API key expires. The
+    #   date is represented as seconds since the epoch. For more
+    #   information, see .
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UpdateApiKeyRequest AWS API Documentation
@@ -3062,55 +4504,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateDataSourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         name: "ResourceName", # required
-    #         description: "String",
-    #         type: "AWS_LAMBDA", # required, accepts AWS_LAMBDA, AMAZON_DYNAMODB, AMAZON_ELASTICSEARCH, NONE, HTTP, RELATIONAL_DATABASE
-    #         service_role_arn: "String",
-    #         dynamodb_config: {
-    #           table_name: "String", # required
-    #           aws_region: "String", # required
-    #           use_caller_credentials: false,
-    #           delta_sync_config: {
-    #             base_table_ttl: 1,
-    #             delta_sync_table_name: "String",
-    #             delta_sync_table_ttl: 1,
-    #           },
-    #           versioned: false,
-    #         },
-    #         lambda_config: {
-    #           lambda_function_arn: "String", # required
-    #         },
-    #         elasticsearch_config: {
-    #           endpoint: "String", # required
-    #           aws_region: "String", # required
-    #         },
-    #         http_config: {
-    #           endpoint: "String",
-    #           authorization_config: {
-    #             authorization_type: "AWS_IAM", # required, accepts AWS_IAM
-    #             aws_iam_config: {
-    #               signing_region: "String",
-    #               signing_service_name: "String",
-    #             },
-    #           },
-    #         },
-    #         relational_database_config: {
-    #           relational_database_source_type: "RDS_HTTP_ENDPOINT", # accepts RDS_HTTP_ENDPOINT
-    #           rds_http_endpoint_config: {
-    #             aws_region: "String",
-    #             db_cluster_identifier: "String",
-    #             database_name: "String",
-    #             schema: "String",
-    #             aws_secret_store_arn: "String",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -3128,7 +4521,7 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] service_role_arn
-    #   The new service role ARN for the data source.
+    #   The new service role Amazon Resource Name (ARN) for the data source.
     #   @return [String]
     #
     # @!attribute [rw] dynamodb_config
@@ -3136,12 +4529,21 @@ module Aws::AppSync
     #   @return [Types::DynamodbDataSourceConfig]
     #
     # @!attribute [rw] lambda_config
-    #   The new AWS Lambda configuration.
+    #   The new Lambda configuration.
     #   @return [Types::LambdaDataSourceConfig]
     #
     # @!attribute [rw] elasticsearch_config
-    #   The new Elasticsearch Service configuration.
+    #   The new OpenSearch configuration.
+    #
+    #   As of September 2021, Amazon Elasticsearch service is Amazon
+    #   OpenSearch Service. This configuration is deprecated. Instead, use
+    #   UpdateDataSourceRequest$openSearchServiceConfig to update an
+    #   OpenSearch data source.
     #   @return [Types::ElasticsearchDataSourceConfig]
+    #
+    # @!attribute [rw] open_search_service_config
+    #   The new OpenSearch configuration.
+    #   @return [Types::OpenSearchServiceDataSourceConfig]
     #
     # @!attribute [rw] http_config
     #   The new HTTP endpoint configuration.
@@ -3150,6 +4552,22 @@ module Aws::AppSync
     # @!attribute [rw] relational_database_config
     #   The new relational database configuration.
     #   @return [Types::RelationalDatabaseDataSourceConfig]
+    #
+    # @!attribute [rw] event_bridge_config
+    #   The new Amazon EventBridge settings.
+    #   @return [Types::EventBridgeDataSourceConfig]
+    #
+    # @!attribute [rw] metrics_config
+    #   Enables or disables enhanced data source metrics for specified data
+    #   sources. Note that `metricsConfig` won't be used unless the
+    #   `dataSourceLevelMetricsBehavior` value is set to
+    #   `PER_DATA_SOURCE_METRICS`. If the `dataSourceLevelMetricsBehavior`
+    #   is set to `FULL_REQUEST_DATA_SOURCE_METRICS` instead,
+    #   `metricsConfig` will be ignored. However, you can still set its
+    #   value.
+    #
+    #   `metricsConfig` can be `ENABLED` or `DISABLED`.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UpdateDataSourceRequest AWS API Documentation
     #
@@ -3162,8 +4580,11 @@ module Aws::AppSync
       :dynamodb_config,
       :lambda_config,
       :elasticsearch_config,
+      :open_search_service_config,
       :http_config,
-      :relational_database_config)
+      :relational_database_config,
+      :event_bridge_config,
+      :metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3180,20 +4601,35 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateFunctionRequest
-    #   data as a hash:
+    # @!attribute [rw] domain_name
+    #   The domain name.
+    #   @return [String]
     #
-    #       {
-    #         api_id: "String", # required
-    #         name: "ResourceName", # required
-    #         description: "String",
-    #         function_id: "ResourceName", # required
-    #         data_source_name: "ResourceName", # required
-    #         request_mapping_template: "MappingTemplate",
-    #         response_mapping_template: "MappingTemplate",
-    #         function_version: "String", # required
-    #       }
+    # @!attribute [rw] description
+    #   A description of the `DomainName`.
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UpdateDomainNameRequest AWS API Documentation
+    #
+    class UpdateDomainNameRequest < Struct.new(
+      :domain_name,
+      :description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain_name_config
+    #   The configuration for the `DomainName`.
+    #   @return [Types::DomainNameConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UpdateDomainNameResponse AWS API Documentation
+    #
+    class UpdateDomainNameResponse < Struct.new(
+      :domain_name_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] api_id
     #   The GraphQL API ID.
     #   @return [String]
@@ -3224,8 +4660,33 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] function_version
-    #   The `version` of the request mapping template. Currently the
-    #   supported value is 2018-05-29.
+    #   The `version` of the request mapping template. Currently, the
+    #   supported value is 2018-05-29. Note that when using VTL and mapping
+    #   templates, the `functionVersion` is required.
+    #   @return [String]
+    #
+    # @!attribute [rw] sync_config
+    #   Describes a Sync configuration for a resolver.
+    #
+    #   Specifies which Conflict Detection strategy and Resolution strategy
+    #   to use when the resolver is invoked.
+    #   @return [Types::SyncConfig]
+    #
+    # @!attribute [rw] max_batch_size
+    #   The maximum batching size for a resolver.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] runtime
+    #   Describes a runtime used by an Amazon Web Services AppSync pipeline
+    #   resolver or Amazon Web Services AppSync function. Specifies the name
+    #   and version of the runtime to use. Note that if a runtime is
+    #   specified, code must also be specified.
+    #   @return [Types::AppSyncRuntime]
+    #
+    # @!attribute [rw] code
+    #   The `function` code that contains the request and response
+    #   functions. When code is used, the `runtime` is required. The
+    #   `runtime` value must be `APPSYNC_JS`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UpdateFunctionRequest AWS API Documentation
@@ -3238,7 +4699,11 @@ module Aws::AppSync
       :data_source_name,
       :request_mapping_template,
       :response_mapping_template,
-      :function_version)
+      :function_version,
+      :sync_config,
+      :max_batch_size,
+      :runtime,
+      :code)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3255,49 +4720,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateGraphqlApiRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         name: "String", # required
-    #         log_config: {
-    #           field_log_level: "NONE", # required, accepts NONE, ERROR, ALL
-    #           cloud_watch_logs_role_arn: "String", # required
-    #           exclude_verbose_content: false,
-    #         },
-    #         authentication_type: "API_KEY", # accepts API_KEY, AWS_IAM, AMAZON_COGNITO_USER_POOLS, OPENID_CONNECT
-    #         user_pool_config: {
-    #           user_pool_id: "String", # required
-    #           aws_region: "String", # required
-    #           default_action: "ALLOW", # required, accepts ALLOW, DENY
-    #           app_id_client_regex: "String",
-    #         },
-    #         open_id_connect_config: {
-    #           issuer: "String", # required
-    #           client_id: "String",
-    #           iat_ttl: 1,
-    #           auth_ttl: 1,
-    #         },
-    #         additional_authentication_providers: [
-    #           {
-    #             authentication_type: "API_KEY", # accepts API_KEY, AWS_IAM, AMAZON_COGNITO_USER_POOLS, OPENID_CONNECT
-    #             open_id_connect_config: {
-    #               issuer: "String", # required
-    #               client_id: "String",
-    #               iat_ttl: 1,
-    #               auth_ttl: 1,
-    #             },
-    #             user_pool_config: {
-    #               user_pool_id: "String", # required
-    #               aws_region: "String", # required
-    #               app_id_client_regex: "String",
-    #             },
-    #           },
-    #         ],
-    #         xray_enabled: false,
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -3316,7 +4738,7 @@ module Aws::AppSync
     #   @return [String]
     #
     # @!attribute [rw] user_pool_config
-    #   The new Amazon Cognito user pool configuration for the `GraphqlApi`
+    #   The new Amazon Cognito user pool configuration for the `~GraphqlApi`
     #   object.
     #   @return [Types::UserPoolConfig]
     #
@@ -3330,9 +4752,67 @@ module Aws::AppSync
     #   @return [Array<Types::AdditionalAuthenticationProvider>]
     #
     # @!attribute [rw] xray_enabled
-    #   A flag indicating whether to enable X-Ray tracing for the
-    #   `GraphqlApi`.
+    #   A flag indicating whether to use X-Ray tracing for the `GraphqlApi`.
     #   @return [Boolean]
+    #
+    # @!attribute [rw] lambda_authorizer_config
+    #   Configuration for Lambda function authorization.
+    #   @return [Types::LambdaAuthorizerConfig]
+    #
+    # @!attribute [rw] merged_api_execution_role_arn
+    #   The Identity and Access Management service role ARN for a merged
+    #   API. The AppSync service assumes this role on behalf of the Merged
+    #   API to validate access to source APIs at runtime and to prompt the
+    #   `AUTO_MERGE` to update the merged API endpoint with the source API
+    #   changes automatically.
+    #   @return [String]
+    #
+    # @!attribute [rw] owner_contact
+    #   The owner contact information for an API resource.
+    #
+    #   This field accepts any string input with a length of 0 - 256
+    #   characters.
+    #   @return [String]
+    #
+    # @!attribute [rw] introspection_config
+    #   Sets the value of the GraphQL API to enable (`ENABLED`) or disable
+    #   (`DISABLED`) introspection. If no value is provided, the
+    #   introspection configuration will be set to `ENABLED` by default.
+    #   This field will produce an error if the operation attempts to use
+    #   the introspection feature while this field is disabled.
+    #
+    #   For more information about introspection, see [GraphQL
+    #   introspection][1].
+    #
+    #
+    #
+    #   [1]: https://graphql.org/learn/introspection/
+    #   @return [String]
+    #
+    # @!attribute [rw] query_depth_limit
+    #   The maximum depth a query can have in a single request. Depth refers
+    #   to the amount of nested levels allowed in the body of query. The
+    #   default value is `0` (or unspecified), which indicates there's no
+    #   depth limit. If you set a limit, it can be between `1` and `75`
+    #   nested levels. This field will produce a limit error if the
+    #   operation falls out of bounds.
+    #
+    #   Note that fields can still be set to nullable or non-nullable. If a
+    #   non-nullable field produces an error, the error will be thrown
+    #   upwards to the first nullable field available.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] resolver_count_limit
+    #   The maximum number of resolvers that can be invoked in a single
+    #   request. The default value is `0` (or unspecified), which will set
+    #   the limit to `10000`. When specified, the limit value can be between
+    #   `1` and `10000`. This field will produce a limit error if the
+    #   operation falls out of bounds.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] enhanced_metrics_config
+    #   The `enhancedMetricsConfig` object.
+    #   @return [Types::EnhancedMetricsConfig]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UpdateGraphqlApiRequest AWS API Documentation
     #
@@ -3344,7 +4824,14 @@ module Aws::AppSync
       :user_pool_config,
       :open_id_connect_config,
       :additional_authentication_providers,
-      :xray_enabled)
+      :xray_enabled,
+      :lambda_authorizer_config,
+      :merged_api_execution_role_arn,
+      :owner_contact,
+      :introspection_config,
+      :query_depth_limit,
+      :resolver_count_limit,
+      :enhanced_metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3361,33 +4848,6 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateResolverRequest
-    #   data as a hash:
-    #
-    #       {
-    #         api_id: "String", # required
-    #         type_name: "ResourceName", # required
-    #         field_name: "ResourceName", # required
-    #         data_source_name: "ResourceName",
-    #         request_mapping_template: "MappingTemplate",
-    #         response_mapping_template: "MappingTemplate",
-    #         kind: "UNIT", # accepts UNIT, PIPELINE
-    #         pipeline_config: {
-    #           functions: ["String"],
-    #         },
-    #         sync_config: {
-    #           conflict_handler: "OPTIMISTIC_CONCURRENCY", # accepts OPTIMISTIC_CONCURRENCY, LAMBDA, AUTOMERGE, NONE
-    #           conflict_detection: "VERSION", # accepts VERSION, NONE
-    #           lambda_conflict_handler_config: {
-    #             lambda_conflict_handler_arn: "String",
-    #           },
-    #         },
-    #         caching_config: {
-    #           ttl: 1,
-    #           caching_keys: ["String"],
-    #         },
-    #       }
-    #
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -3411,7 +4871,7 @@ module Aws::AppSync
     #   expression into a format that a data source can understand. Mapping
     #   templates are written in Apache Velocity Template Language (VTL).
     #
-    #   VTL request mapping templates are optional when using a Lambda data
+    #   VTL request mapping templates are optional when using an Lambda data
     #   source. For all other data sources, VTL request and response mapping
     #   templates are required.
     #   @return [String]
@@ -3423,14 +4883,14 @@ module Aws::AppSync
     # @!attribute [rw] kind
     #   The resolver type.
     #
-    #   * **UNIT**\: A UNIT resolver type. A UNIT resolver is the default
-    #     resolver type. A UNIT resolver enables you to execute a GraphQL
-    #     query against a single data source.
+    #   * **UNIT**: A UNIT resolver type. A UNIT resolver is the default
+    #     resolver type. You can use a UNIT resolver to run a GraphQL query
+    #     against a single data source.
     #
-    #   * **PIPELINE**\: A PIPELINE resolver type. A PIPELINE resolver
-    #     enables you to execute a series of `Function` in a serial manner.
-    #     You can use a pipeline resolver to execute a GraphQL query against
-    #     multiple data sources.
+    #   * **PIPELINE**: A PIPELINE resolver type. You can use a PIPELINE
+    #     resolver to invoke a series of `Function` objects in a serial
+    #     manner. You can use a pipeline resolver to run a GraphQL query
+    #     against multiple data sources.
     #   @return [String]
     #
     # @!attribute [rw] pipeline_config
@@ -3438,12 +4898,40 @@ module Aws::AppSync
     #   @return [Types::PipelineConfig]
     #
     # @!attribute [rw] sync_config
-    #   The `SyncConfig` for a resolver attached to a versioned datasource.
+    #   The `SyncConfig` for a resolver attached to a versioned data source.
     #   @return [Types::SyncConfig]
     #
     # @!attribute [rw] caching_config
     #   The caching configuration for the resolver.
     #   @return [Types::CachingConfig]
+    #
+    # @!attribute [rw] max_batch_size
+    #   The maximum batching size for a resolver.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] runtime
+    #   Describes a runtime used by an Amazon Web Services AppSync pipeline
+    #   resolver or Amazon Web Services AppSync function. Specifies the name
+    #   and version of the runtime to use. Note that if a runtime is
+    #   specified, code must also be specified.
+    #   @return [Types::AppSyncRuntime]
+    #
+    # @!attribute [rw] code
+    #   The `resolver` code that contains the request and response
+    #   functions. When code is used, the `runtime` is required. The
+    #   `runtime` value must be `APPSYNC_JS`.
+    #   @return [String]
+    #
+    # @!attribute [rw] metrics_config
+    #   Enables or disables enhanced resolver metrics for specified
+    #   resolvers. Note that `metricsConfig` won't be used unless the
+    #   `resolverLevelMetricsBehavior` value is set to
+    #   `PER_RESOLVER_METRICS`. If the `resolverLevelMetricsBehavior` is set
+    #   to `FULL_REQUEST_RESOLVER_METRICS` instead, `metricsConfig` will be
+    #   ignored. However, you can still set its value.
+    #
+    #   `metricsConfig` can be `ENABLED` or `DISABLED`.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UpdateResolverRequest AWS API Documentation
     #
@@ -3457,7 +4945,11 @@ module Aws::AppSync
       :kind,
       :pipeline_config,
       :sync_config,
-      :caching_config)
+      :caching_config,
+      :max_batch_size,
+      :runtime,
+      :code,
+      :metrics_config)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3474,16 +4966,50 @@ module Aws::AppSync
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateTypeRequest
-    #   data as a hash:
+    # @!attribute [rw] association_id
+    #   The ID generated by the AppSync service for the source API
+    #   association.
+    #   @return [String]
     #
-    #       {
-    #         api_id: "String", # required
-    #         type_name: "ResourceName", # required
-    #         definition: "String",
-    #         format: "SDL", # required, accepts SDL, JSON
-    #       }
+    # @!attribute [rw] merged_api_identifier
+    #   The identifier of the AppSync Merged API. This is generated by the
+    #   AppSync service. In most cases, Merged APIs (especially in your
+    #   account) only require the API ID value or ARN of the merged API.
+    #   However, Merged APIs in other accounts (cross-account use cases)
+    #   strictly require the full resource ARN of the merged API.
+    #   @return [String]
     #
+    # @!attribute [rw] description
+    #   The description field.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_api_association_config
+    #   The `SourceApiAssociationConfig` object data.
+    #   @return [Types::SourceApiAssociationConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UpdateSourceApiAssociationRequest AWS API Documentation
+    #
+    class UpdateSourceApiAssociationRequest < Struct.new(
+      :association_id,
+      :merged_api_identifier,
+      :description,
+      :source_api_association_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] source_api_association
+    #   The `SourceApiAssociation` object data.
+    #   @return [Types::SourceApiAssociation]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UpdateSourceApiAssociationResponse AWS API Documentation
+    #
+    class UpdateSourceApiAssociationResponse < Struct.new(
+      :source_api_association)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] api_id
     #   The API ID.
     #   @return [String]
@@ -3525,22 +5051,12 @@ module Aws::AppSync
 
     # Describes an Amazon Cognito user pool configuration.
     #
-    # @note When making an API call, you may pass UserPoolConfig
-    #   data as a hash:
-    #
-    #       {
-    #         user_pool_id: "String", # required
-    #         aws_region: "String", # required
-    #         default_action: "ALLOW", # required, accepts ALLOW, DENY
-    #         app_id_client_regex: "String",
-    #       }
-    #
     # @!attribute [rw] user_pool_id
     #   The user pool ID.
     #   @return [String]
     #
     # @!attribute [rw] aws_region
-    #   The AWS Region in which the user pool was created.
+    #   The Amazon Web Services Region in which the user pool was created.
     #   @return [String]
     #
     # @!attribute [rw] default_action
@@ -3551,7 +5067,8 @@ module Aws::AppSync
     #
     # @!attribute [rw] app_id_client_regex
     #   A regular expression for validating the incoming Amazon Cognito user
-    #   pool app client ID.
+    #   pool app client ID. If this value isn't set, no filtering is
+    #   applied.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appsync-2017-07-25/UserPoolConfig AWS API Documentation
@@ -3567,3 +5084,4 @@ module Aws::AppSync
 
   end
 end
+

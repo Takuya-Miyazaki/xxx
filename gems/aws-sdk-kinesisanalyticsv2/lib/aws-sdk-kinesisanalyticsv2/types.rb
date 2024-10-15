@@ -3,31 +3,24 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::KinesisAnalyticsV2
   module Types
 
-    # @note When making an API call, you may pass AddApplicationCloudWatchLoggingOptionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         cloud_watch_logging_option: { # required
-    #           log_stream_arn: "LogStreamARN", # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The Kinesis Data Analytics application name.
     #   @return [String]
     #
     # @!attribute [rw] current_application_version_id
-    #   The version ID of the Kinesis Data Analytics application. You can
-    #   retrieve the application version ID using DescribeApplication.
+    #   The version ID of the SQL-based Kinesis Data Analytics application.
+    #   You must provide the `CurrentApplicationVersionId` or the
+    #   `ConditionalToken`.You can retrieve the application version ID using
+    #   DescribeApplication. For better concurrency support, use the
+    #   `ConditionalToken` parameter instead of
+    #   `CurrentApplicationVersionId`.
     #   @return [Integer]
     #
     # @!attribute [rw] cloud_watch_logging_option
@@ -35,12 +28,22 @@ module Aws::KinesisAnalyticsV2
     #   (ARN).
     #   @return [Types::CloudWatchLoggingOption]
     #
+    # @!attribute [rw] conditional_token
+    #   A value you use to implement strong concurrency for application
+    #   updates. You must provide the `CurrentApplicationVersionId` or the
+    #   `ConditionalToken`. You get the application's current
+    #   `ConditionalToken` using DescribeApplication. For better concurrency
+    #   support, use the `ConditionalToken` parameter instead of
+    #   `CurrentApplicationVersionId`.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/AddApplicationCloudWatchLoggingOptionRequest AWS API Documentation
     #
     class AddApplicationCloudWatchLoggingOptionRequest < Struct.new(
       :application_name,
       :current_application_version_id,
-      :cloud_watch_logging_option)
+      :cloud_watch_logging_option,
+      :conditional_token)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -50,40 +53,33 @@ module Aws::KinesisAnalyticsV2
     #   @return [String]
     #
     # @!attribute [rw] application_version_id
-    #   The new version ID of the Kinesis Data Analytics application.
-    #   Kinesis Data Analytics updates the `ApplicationVersionId` each time
-    #   you change the CloudWatch logging options.
+    #   The new version ID of the SQL-based Kinesis Data Analytics
+    #   application. Kinesis Data Analytics updates the
+    #   `ApplicationVersionId` each time you change the CloudWatch logging
+    #   options.
     #   @return [Integer]
     #
     # @!attribute [rw] cloud_watch_logging_option_descriptions
     #   The descriptions of the current CloudWatch logging options for the
-    #   Kinesis Data Analytics application.
+    #   SQL-based Kinesis Data Analytics application.
     #   @return [Array<Types::CloudWatchLoggingOptionDescription>]
+    #
+    # @!attribute [rw] operation_id
+    #   Operation ID for tracking AddApplicationCloudWatchLoggingOption
+    #   request
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/AddApplicationCloudWatchLoggingOptionResponse AWS API Documentation
     #
     class AddApplicationCloudWatchLoggingOptionResponse < Struct.new(
       :application_arn,
       :application_version_id,
-      :cloud_watch_logging_option_descriptions)
+      :cloud_watch_logging_option_descriptions,
+      :operation_id)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AddApplicationInputProcessingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         input_id: "Id", # required
-    #         input_processing_configuration: { # required
-    #           input_lambda_processor: { # required
-    #             resource_arn: "ResourceARN", # required
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of the application to which you want to add the input
     #   processing configuration.
@@ -148,60 +144,14 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AddApplicationInputRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         input: { # required
-    #           name_prefix: "InAppStreamName", # required
-    #           input_processing_configuration: {
-    #             input_lambda_processor: { # required
-    #               resource_arn: "ResourceARN", # required
-    #             },
-    #           },
-    #           kinesis_streams_input: {
-    #             resource_arn: "ResourceARN", # required
-    #           },
-    #           kinesis_firehose_input: {
-    #             resource_arn: "ResourceARN", # required
-    #           },
-    #           input_parallelism: {
-    #             count: 1,
-    #           },
-    #           input_schema: { # required
-    #             record_format: { # required
-    #               record_format_type: "JSON", # required, accepts JSON, CSV
-    #               mapping_parameters: {
-    #                 json_mapping_parameters: {
-    #                   record_row_path: "RecordRowPath", # required
-    #                 },
-    #                 csv_mapping_parameters: {
-    #                   record_row_delimiter: "RecordRowDelimiter", # required
-    #                   record_column_delimiter: "RecordColumnDelimiter", # required
-    #                 },
-    #               },
-    #             },
-    #             record_encoding: "RecordEncoding",
-    #             record_columns: [ # required
-    #               {
-    #                 name: "RecordColumnName", # required
-    #                 mapping: "RecordColumnMapping",
-    #                 sql_type: "RecordColumnSqlType", # required
-    #               },
-    #             ],
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of your existing application to which you want to add the
     #   streaming source.
     #   @return [String]
     #
     # @!attribute [rw] current_application_version_id
-    #   The current version of your application. You can use the
+    #   The current version of your application. You must provide the
+    #   `ApplicationVersionID` or the `ConditionalToken`.You can use the
     #   DescribeApplication operation to find the current application
     #   version.
     #   @return [Integer]
@@ -242,29 +192,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AddApplicationOutputRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         output: { # required
-    #           name: "InAppStreamName", # required
-    #           kinesis_streams_output: {
-    #             resource_arn: "ResourceARN", # required
-    #           },
-    #           kinesis_firehose_output: {
-    #             resource_arn: "ResourceARN", # required
-    #           },
-    #           lambda_output: {
-    #             resource_arn: "ResourceARN", # required
-    #           },
-    #           destination_schema: { # required
-    #             record_format_type: "JSON", # required, accepts JSON, CSV
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of the application to which you want to add the output
     #   configuration.
@@ -281,7 +208,7 @@ module Aws::KinesisAnalyticsV2
     #   An array of objects, each describing one output configuration. In
     #   the output configuration, you specify the name of an in-application
     #   stream, a destination (that is, a Kinesis data stream, a Kinesis
-    #   Data Firehose delivery stream, or an AWS Lambda function), and
+    #   Data Firehose delivery stream, or an Amazon Lambda function), and
     #   record the formation to use when writing to the destination.
     #   @return [Types::Output]
     #
@@ -323,43 +250,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AddApplicationReferenceDataSourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         reference_data_source: { # required
-    #           table_name: "InAppTableName", # required
-    #           s3_reference_data_source: {
-    #             bucket_arn: "BucketARN",
-    #             file_key: "FileKey",
-    #           },
-    #           reference_schema: { # required
-    #             record_format: { # required
-    #               record_format_type: "JSON", # required, accepts JSON, CSV
-    #               mapping_parameters: {
-    #                 json_mapping_parameters: {
-    #                   record_row_path: "RecordRowPath", # required
-    #                 },
-    #                 csv_mapping_parameters: {
-    #                   record_row_delimiter: "RecordRowDelimiter", # required
-    #                   record_column_delimiter: "RecordColumnDelimiter", # required
-    #                 },
-    #               },
-    #             },
-    #             record_encoding: "RecordEncoding",
-    #             record_columns: [ # required
-    #               {
-    #                 name: "RecordColumnName", # required
-    #                 mapping: "RecordColumnMapping",
-    #                 sql_type: "RecordColumnSqlType", # required
-    #               },
-    #             ],
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of an existing application.
     #   @return [String]
@@ -413,39 +303,41 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AddApplicationVpcConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         vpc_configuration: { # required
-    #           subnet_ids: ["SubnetId"], # required
-    #           security_group_ids: ["SecurityGroupId"], # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of an existing application.
     #   @return [String]
     #
     # @!attribute [rw] current_application_version_id
     #   The version of the application to which you want to add the VPC
-    #   configuration. You can use the DescribeApplication operation to get
-    #   the current application version. If the version specified is not the
-    #   current version, the `ConcurrentModificationException` is returned.
+    #   configuration. You must provide the `CurrentApplicationVersionId` or
+    #   the `ConditionalToken`. You can use the DescribeApplication
+    #   operation to get the current application version. If the version
+    #   specified is not the current version, the
+    #   `ConcurrentModificationException` is returned. For better
+    #   concurrency support, use the `ConditionalToken` parameter instead of
+    #   `CurrentApplicationVersionId`.
     #   @return [Integer]
     #
     # @!attribute [rw] vpc_configuration
     #   Description of the VPC to add to the application.
     #   @return [Types::VpcConfiguration]
     #
+    # @!attribute [rw] conditional_token
+    #   A value you use to implement strong concurrency for application
+    #   updates. You must provide the `ApplicationVersionID` or the
+    #   `ConditionalToken`. You get the application's current
+    #   `ConditionalToken` using DescribeApplication. For better concurrency
+    #   support, use the `ConditionalToken` parameter instead of
+    #   `CurrentApplicationVersionId`.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/AddApplicationVpcConfigurationRequest AWS API Documentation
     #
     class AddApplicationVpcConfigurationRequest < Struct.new(
       :application_name,
       :current_application_version_id,
-      :vpc_configuration)
+      :vpc_configuration,
+      :conditional_token)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -455,8 +347,8 @@ module Aws::KinesisAnalyticsV2
     #   @return [String]
     #
     # @!attribute [rw] application_version_id
-    #   Provides the current application version. Kinesis Data Analytics
-    #   updates the ApplicationVersionId each time you update the
+    #   Provides the current application version. Managed Service for Apache
+    #   Flink updates the ApplicationVersionId each time you update the
     #   application.
     #   @return [Integer]
     #
@@ -464,34 +356,22 @@ module Aws::KinesisAnalyticsV2
     #   The parameters of the new VPC configuration.
     #   @return [Types::VpcConfigurationDescription]
     #
+    # @!attribute [rw] operation_id
+    #   Operation ID for tracking AddApplicationVpcConfiguration request
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/AddApplicationVpcConfigurationResponse AWS API Documentation
     #
     class AddApplicationVpcConfigurationResponse < Struct.new(
       :application_arn,
       :application_version_id,
-      :vpc_configuration_description)
+      :vpc_configuration_description,
+      :operation_id)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # Describes code configuration for a Flink-based Kinesis Data Analytics
-    # application.
-    #
-    # @note When making an API call, you may pass ApplicationCodeConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         code_content: {
-    #           text_content: "TextContent",
-    #           zip_file_content: "data",
-    #           s3_content_location: {
-    #             bucket_arn: "BucketARN", # required
-    #             file_key: "FileKey", # required
-    #             object_version: "ObjectVersion",
-    #           },
-    #         },
-    #         code_content_type: "PLAINTEXT", # required, accepts PLAINTEXT, ZIPFILE
-    #       }
+    # Describes code configuration for an application.
     #
     # @!attribute [rw] code_content
     #   The location and type of the application code.
@@ -510,8 +390,7 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes code configuration for a Flink-based Kinesis Data Analytics
-    # application.
+    # Describes code configuration for an application.
     #
     # @!attribute [rw] code_content_type
     #   Specifies whether the code content is in text or zip format.
@@ -531,24 +410,9 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes code configuration updates to a Flink-based Kinesis Data
-    # Analytics application.
-    #
-    # @note When making an API call, you may pass ApplicationCodeConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         code_content_type_update: "PLAINTEXT", # accepts PLAINTEXT, ZIPFILE
-    #         code_content_update: {
-    #           text_content_update: "TextContent",
-    #           zip_file_content_update: "data",
-    #           s3_content_location_update: {
-    #             bucket_arn_update: "BucketARN",
-    #             file_key_update: "FileKey",
-    #             object_version_update: "ObjectVersion",
-    #           },
-    #         },
-    #       }
+    # Describes code configuration updates for an application. This is
+    # supported for a Managed Service for Apache Flink application or a
+    # SQL-based Kinesis Data Analytics application.
     #
     # @!attribute [rw] code_content_type_update
     #   Describes updates to the code content type.
@@ -567,155 +431,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Specifies the creation parameters for a Kinesis Data Analytics
-    # application.
-    #
-    # @note When making an API call, you may pass ApplicationConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         sql_application_configuration: {
-    #           inputs: [
-    #             {
-    #               name_prefix: "InAppStreamName", # required
-    #               input_processing_configuration: {
-    #                 input_lambda_processor: { # required
-    #                   resource_arn: "ResourceARN", # required
-    #                 },
-    #               },
-    #               kinesis_streams_input: {
-    #                 resource_arn: "ResourceARN", # required
-    #               },
-    #               kinesis_firehose_input: {
-    #                 resource_arn: "ResourceARN", # required
-    #               },
-    #               input_parallelism: {
-    #                 count: 1,
-    #               },
-    #               input_schema: { # required
-    #                 record_format: { # required
-    #                   record_format_type: "JSON", # required, accepts JSON, CSV
-    #                   mapping_parameters: {
-    #                     json_mapping_parameters: {
-    #                       record_row_path: "RecordRowPath", # required
-    #                     },
-    #                     csv_mapping_parameters: {
-    #                       record_row_delimiter: "RecordRowDelimiter", # required
-    #                       record_column_delimiter: "RecordColumnDelimiter", # required
-    #                     },
-    #                   },
-    #                 },
-    #                 record_encoding: "RecordEncoding",
-    #                 record_columns: [ # required
-    #                   {
-    #                     name: "RecordColumnName", # required
-    #                     mapping: "RecordColumnMapping",
-    #                     sql_type: "RecordColumnSqlType", # required
-    #                   },
-    #                 ],
-    #               },
-    #             },
-    #           ],
-    #           outputs: [
-    #             {
-    #               name: "InAppStreamName", # required
-    #               kinesis_streams_output: {
-    #                 resource_arn: "ResourceARN", # required
-    #               },
-    #               kinesis_firehose_output: {
-    #                 resource_arn: "ResourceARN", # required
-    #               },
-    #               lambda_output: {
-    #                 resource_arn: "ResourceARN", # required
-    #               },
-    #               destination_schema: { # required
-    #                 record_format_type: "JSON", # required, accepts JSON, CSV
-    #               },
-    #             },
-    #           ],
-    #           reference_data_sources: [
-    #             {
-    #               table_name: "InAppTableName", # required
-    #               s3_reference_data_source: {
-    #                 bucket_arn: "BucketARN",
-    #                 file_key: "FileKey",
-    #               },
-    #               reference_schema: { # required
-    #                 record_format: { # required
-    #                   record_format_type: "JSON", # required, accepts JSON, CSV
-    #                   mapping_parameters: {
-    #                     json_mapping_parameters: {
-    #                       record_row_path: "RecordRowPath", # required
-    #                     },
-    #                     csv_mapping_parameters: {
-    #                       record_row_delimiter: "RecordRowDelimiter", # required
-    #                       record_column_delimiter: "RecordColumnDelimiter", # required
-    #                     },
-    #                   },
-    #                 },
-    #                 record_encoding: "RecordEncoding",
-    #                 record_columns: [ # required
-    #                   {
-    #                     name: "RecordColumnName", # required
-    #                     mapping: "RecordColumnMapping",
-    #                     sql_type: "RecordColumnSqlType", # required
-    #                   },
-    #                 ],
-    #               },
-    #             },
-    #           ],
-    #         },
-    #         flink_application_configuration: {
-    #           checkpoint_configuration: {
-    #             configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #             checkpointing_enabled: false,
-    #             checkpoint_interval: 1,
-    #             min_pause_between_checkpoints: 1,
-    #           },
-    #           monitoring_configuration: {
-    #             configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #             metrics_level: "APPLICATION", # accepts APPLICATION, TASK, OPERATOR, PARALLELISM
-    #             log_level: "INFO", # accepts INFO, WARN, ERROR, DEBUG
-    #           },
-    #           parallelism_configuration: {
-    #             configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #             parallelism: 1,
-    #             parallelism_per_kpu: 1,
-    #             auto_scaling_enabled: false,
-    #           },
-    #         },
-    #         environment_properties: {
-    #           property_groups: [ # required
-    #             {
-    #               property_group_id: "Id", # required
-    #               property_map: { # required
-    #                 "PropertyKey" => "PropertyValue",
-    #               },
-    #             },
-    #           ],
-    #         },
-    #         application_code_configuration: { # required
-    #           code_content: {
-    #             text_content: "TextContent",
-    #             zip_file_content: "data",
-    #             s3_content_location: {
-    #               bucket_arn: "BucketARN", # required
-    #               file_key: "FileKey", # required
-    #               object_version: "ObjectVersion",
-    #             },
-    #           },
-    #           code_content_type: "PLAINTEXT", # required, accepts PLAINTEXT, ZIPFILE
-    #         },
-    #         application_snapshot_configuration: {
-    #           snapshots_enabled: false, # required
-    #         },
-    #         vpc_configurations: [
-    #           {
-    #             subnet_ids: ["SubnetId"], # required
-    #             security_group_ids: ["SecurityGroupId"], # required
-    #           },
-    #         ],
-    #       }
+    # Specifies the creation parameters for a Managed Service for Apache
+    # Flink application.
     #
     # @!attribute [rw] sql_application_configuration
     #   The creation and update parameters for a SQL-based Kinesis Data
@@ -723,29 +440,39 @@ module Aws::KinesisAnalyticsV2
     #   @return [Types::SqlApplicationConfiguration]
     #
     # @!attribute [rw] flink_application_configuration
-    #   The creation and update parameters for a Flink-based Kinesis Data
-    #   Analytics application.
+    #   The creation and update parameters for a Managed Service for Apache
+    #   Flink application.
     #   @return [Types::FlinkApplicationConfiguration]
     #
     # @!attribute [rw] environment_properties
-    #   Describes execution properties for a Flink-based Kinesis Data
-    #   Analytics application.
+    #   Describes execution properties for a Managed Service for Apache
+    #   Flink application.
     #   @return [Types::EnvironmentProperties]
     #
     # @!attribute [rw] application_code_configuration
-    #   The code location and type parameters for a Flink-based Kinesis Data
-    #   Analytics application.
+    #   The code location and type parameters for a Managed Service for
+    #   Apache Flink application.
     #   @return [Types::ApplicationCodeConfiguration]
     #
     # @!attribute [rw] application_snapshot_configuration
-    #   Describes whether snapshots are enabled for a Flink-based Kinesis
-    #   Data Analytics application.
+    #   Describes whether snapshots are enabled for a Managed Service for
+    #   Apache Flink application.
     #   @return [Types::ApplicationSnapshotConfiguration]
+    #
+    # @!attribute [rw] application_system_rollback_configuration
+    #   Describes system rollback configuration for a Managed Service for
+    #   Apache Flink application
+    #   @return [Types::ApplicationSystemRollbackConfiguration]
     #
     # @!attribute [rw] vpc_configurations
     #   The array of descriptions of VPC configurations available to the
     #   application.
     #   @return [Array<Types::VpcConfiguration>]
+    #
+    # @!attribute [rw] zeppelin_application_configuration
+    #   The configuration parameters for a Managed Service for Apache Flink
+    #   Studio notebook.
+    #   @return [Types::ZeppelinApplicationConfiguration]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationConfiguration AWS API Documentation
     #
@@ -755,13 +482,15 @@ module Aws::KinesisAnalyticsV2
       :environment_properties,
       :application_code_configuration,
       :application_snapshot_configuration,
-      :vpc_configurations)
+      :application_system_rollback_configuration,
+      :vpc_configurations,
+      :zeppelin_application_configuration)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Describes details about the application code and starting parameters
-    # for a Kinesis Data Analytics application.
+    # for a Managed Service for Apache Flink application.
     #
     # @!attribute [rw] sql_application_configuration_description
     #   The details about inputs, outputs, and reference data sources for a
@@ -769,33 +498,43 @@ module Aws::KinesisAnalyticsV2
     #   @return [Types::SqlApplicationConfigurationDescription]
     #
     # @!attribute [rw] application_code_configuration_description
-    #   The details about the application code for a Flink-based Kinesis
-    #   Data Analytics application.
+    #   The details about the application code for a Managed Service for
+    #   Apache Flink application.
     #   @return [Types::ApplicationCodeConfigurationDescription]
     #
     # @!attribute [rw] run_configuration_description
-    #   The details about the starting properties for a Kinesis Data
-    #   Analytics application.
+    #   The details about the starting properties for a Managed Service for
+    #   Apache Flink application.
     #   @return [Types::RunConfigurationDescription]
     #
     # @!attribute [rw] flink_application_configuration_description
-    #   The details about a Flink-based Kinesis Data Analytics application.
+    #   The details about a Managed Service for Apache Flink application.
     #   @return [Types::FlinkApplicationConfigurationDescription]
     #
     # @!attribute [rw] environment_property_descriptions
-    #   Describes execution properties for a Flink-based Kinesis Data
-    #   Analytics application.
+    #   Describes execution properties for a Managed Service for Apache
+    #   Flink application.
     #   @return [Types::EnvironmentPropertyDescriptions]
     #
     # @!attribute [rw] application_snapshot_configuration_description
-    #   Describes whether snapshots are enabled for a Flink-based Kinesis
-    #   Data Analytics application.
+    #   Describes whether snapshots are enabled for a Managed Service for
+    #   Apache Flink application.
     #   @return [Types::ApplicationSnapshotConfigurationDescription]
+    #
+    # @!attribute [rw] application_system_rollback_configuration_description
+    #   Describes system rollback configuration for a Managed Service for
+    #   Apache Flink application
+    #   @return [Types::ApplicationSystemRollbackConfigurationDescription]
     #
     # @!attribute [rw] vpc_configuration_descriptions
     #   The array of descriptions of VPC configurations available to the
     #   application.
     #   @return [Array<Types::VpcConfigurationDescription>]
+    #
+    # @!attribute [rw] zeppelin_application_configuration_description
+    #   The configuration parameters for a Managed Service for Apache Flink
+    #   Studio notebook.
+    #   @return [Types::ZeppelinApplicationConfigurationDescription]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationConfigurationDescription AWS API Documentation
     #
@@ -806,163 +545,14 @@ module Aws::KinesisAnalyticsV2
       :flink_application_configuration_description,
       :environment_property_descriptions,
       :application_snapshot_configuration_description,
-      :vpc_configuration_descriptions)
+      :application_system_rollback_configuration_description,
+      :vpc_configuration_descriptions,
+      :zeppelin_application_configuration_description)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Describes updates to an application's configuration.
-    #
-    # @note When making an API call, you may pass ApplicationConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         sql_application_configuration_update: {
-    #           input_updates: [
-    #             {
-    #               input_id: "Id", # required
-    #               name_prefix_update: "InAppStreamName",
-    #               input_processing_configuration_update: {
-    #                 input_lambda_processor_update: { # required
-    #                   resource_arn_update: "ResourceARN", # required
-    #                 },
-    #               },
-    #               kinesis_streams_input_update: {
-    #                 resource_arn_update: "ResourceARN", # required
-    #               },
-    #               kinesis_firehose_input_update: {
-    #                 resource_arn_update: "ResourceARN", # required
-    #               },
-    #               input_schema_update: {
-    #                 record_format_update: {
-    #                   record_format_type: "JSON", # required, accepts JSON, CSV
-    #                   mapping_parameters: {
-    #                     json_mapping_parameters: {
-    #                       record_row_path: "RecordRowPath", # required
-    #                     },
-    #                     csv_mapping_parameters: {
-    #                       record_row_delimiter: "RecordRowDelimiter", # required
-    #                       record_column_delimiter: "RecordColumnDelimiter", # required
-    #                     },
-    #                   },
-    #                 },
-    #                 record_encoding_update: "RecordEncoding",
-    #                 record_column_updates: [
-    #                   {
-    #                     name: "RecordColumnName", # required
-    #                     mapping: "RecordColumnMapping",
-    #                     sql_type: "RecordColumnSqlType", # required
-    #                   },
-    #                 ],
-    #               },
-    #               input_parallelism_update: {
-    #                 count_update: 1, # required
-    #               },
-    #             },
-    #           ],
-    #           output_updates: [
-    #             {
-    #               output_id: "Id", # required
-    #               name_update: "InAppStreamName",
-    #               kinesis_streams_output_update: {
-    #                 resource_arn_update: "ResourceARN", # required
-    #               },
-    #               kinesis_firehose_output_update: {
-    #                 resource_arn_update: "ResourceARN", # required
-    #               },
-    #               lambda_output_update: {
-    #                 resource_arn_update: "ResourceARN", # required
-    #               },
-    #               destination_schema_update: {
-    #                 record_format_type: "JSON", # required, accepts JSON, CSV
-    #               },
-    #             },
-    #           ],
-    #           reference_data_source_updates: [
-    #             {
-    #               reference_id: "Id", # required
-    #               table_name_update: "InAppTableName",
-    #               s3_reference_data_source_update: {
-    #                 bucket_arn_update: "BucketARN",
-    #                 file_key_update: "FileKey",
-    #               },
-    #               reference_schema_update: {
-    #                 record_format: { # required
-    #                   record_format_type: "JSON", # required, accepts JSON, CSV
-    #                   mapping_parameters: {
-    #                     json_mapping_parameters: {
-    #                       record_row_path: "RecordRowPath", # required
-    #                     },
-    #                     csv_mapping_parameters: {
-    #                       record_row_delimiter: "RecordRowDelimiter", # required
-    #                       record_column_delimiter: "RecordColumnDelimiter", # required
-    #                     },
-    #                   },
-    #                 },
-    #                 record_encoding: "RecordEncoding",
-    #                 record_columns: [ # required
-    #                   {
-    #                     name: "RecordColumnName", # required
-    #                     mapping: "RecordColumnMapping",
-    #                     sql_type: "RecordColumnSqlType", # required
-    #                   },
-    #                 ],
-    #               },
-    #             },
-    #           ],
-    #         },
-    #         application_code_configuration_update: {
-    #           code_content_type_update: "PLAINTEXT", # accepts PLAINTEXT, ZIPFILE
-    #           code_content_update: {
-    #             text_content_update: "TextContent",
-    #             zip_file_content_update: "data",
-    #             s3_content_location_update: {
-    #               bucket_arn_update: "BucketARN",
-    #               file_key_update: "FileKey",
-    #               object_version_update: "ObjectVersion",
-    #             },
-    #           },
-    #         },
-    #         flink_application_configuration_update: {
-    #           checkpoint_configuration_update: {
-    #             configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #             checkpointing_enabled_update: false,
-    #             checkpoint_interval_update: 1,
-    #             min_pause_between_checkpoints_update: 1,
-    #           },
-    #           monitoring_configuration_update: {
-    #             configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #             metrics_level_update: "APPLICATION", # accepts APPLICATION, TASK, OPERATOR, PARALLELISM
-    #             log_level_update: "INFO", # accepts INFO, WARN, ERROR, DEBUG
-    #           },
-    #           parallelism_configuration_update: {
-    #             configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #             parallelism_update: 1,
-    #             parallelism_per_kpu_update: 1,
-    #             auto_scaling_enabled_update: false,
-    #           },
-    #         },
-    #         environment_property_updates: {
-    #           property_groups: [ # required
-    #             {
-    #               property_group_id: "Id", # required
-    #               property_map: { # required
-    #                 "PropertyKey" => "PropertyValue",
-    #               },
-    #             },
-    #           ],
-    #         },
-    #         application_snapshot_configuration_update: {
-    #           snapshots_enabled_update: false, # required
-    #         },
-    #         vpc_configuration_updates: [
-    #           {
-    #             vpc_configuration_id: "Id", # required
-    #             subnet_id_updates: ["SubnetId"],
-    #             security_group_id_updates: ["SecurityGroupId"],
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] sql_application_configuration_update
     #   Describes updates to a SQL-based Kinesis Data Analytics
@@ -970,29 +560,38 @@ module Aws::KinesisAnalyticsV2
     #   @return [Types::SqlApplicationConfigurationUpdate]
     #
     # @!attribute [rw] application_code_configuration_update
-    #   Describes updates to a Flink-based Kinesis Data Analytics
-    #   application's code configuration.
+    #   Describes updates to an application's code configuration.
     #   @return [Types::ApplicationCodeConfigurationUpdate]
     #
     # @!attribute [rw] flink_application_configuration_update
-    #   Describes updates to a Flink-based Kinesis Data Analytics
+    #   Describes updates to a Managed Service for Apache Flink
     #   application's configuration.
     #   @return [Types::FlinkApplicationConfigurationUpdate]
     #
     # @!attribute [rw] environment_property_updates
-    #   Describes updates to the environment properties for a Flink-based
-    #   Kinesis Data Analytics application.
+    #   Describes updates to the environment properties for a Managed
+    #   Service for Apache Flink application.
     #   @return [Types::EnvironmentPropertyUpdates]
     #
     # @!attribute [rw] application_snapshot_configuration_update
-    #   Describes whether snapshots are enabled for a Flink-based Kinesis
-    #   Data Analytics application.
+    #   Describes whether snapshots are enabled for a Managed Service for
+    #   Apache Flink application.
     #   @return [Types::ApplicationSnapshotConfigurationUpdate]
+    #
+    # @!attribute [rw] application_system_rollback_configuration_update
+    #   Describes system rollback configuration for a Managed Service for
+    #   Apache Flink application
+    #   @return [Types::ApplicationSystemRollbackConfigurationUpdate]
     #
     # @!attribute [rw] vpc_configuration_updates
     #   Updates to the array of descriptions of VPC configurations available
     #   to the application.
     #   @return [Array<Types::VpcConfigurationUpdate>]
+    #
+    # @!attribute [rw] zeppelin_application_configuration_update
+    #   Updates to the configuration of a Managed Service for Apache Flink
+    #   Studio notebook.
+    #   @return [Types::ZeppelinApplicationConfigurationUpdate]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationConfigurationUpdate AWS API Documentation
     #
@@ -1002,7 +601,9 @@ module Aws::KinesisAnalyticsV2
       :flink_application_configuration_update,
       :environment_property_updates,
       :application_snapshot_configuration_update,
-      :vpc_configuration_updates)
+      :application_system_rollback_configuration_update,
+      :vpc_configuration_updates,
+      :zeppelin_application_configuration_update)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1024,8 +625,7 @@ module Aws::KinesisAnalyticsV2
     #   @return [String]
     #
     # @!attribute [rw] runtime_environment
-    #   The runtime environment for the application (`SQL-1.0`, `FLINK-1_6`,
-    #   or `FLINK-1_8`).
+    #   The runtime environment for the application.
     #   @return [String]
     #
     # @!attribute [rw] service_execution_role
@@ -1038,8 +638,8 @@ module Aws::KinesisAnalyticsV2
     #   @return [String]
     #
     # @!attribute [rw] application_version_id
-    #   Provides the current application version. Kinesis Data Analytics
-    #   updates the `ApplicationVersionId` each time you update the
+    #   Provides the current application version. Managed Service for Apache
+    #   Flink updates the `ApplicationVersionId` each time you update the
     #   application.
     #   @return [Integer]
     #
@@ -1052,13 +652,46 @@ module Aws::KinesisAnalyticsV2
     #   @return [Time]
     #
     # @!attribute [rw] application_configuration_description
-    #   Provides details about the application's Java, SQL, or Scala code
-    #   and starting parameters.
+    #   Describes details about the application code and starting parameters
+    #   for a Managed Service for Apache Flink application.
     #   @return [Types::ApplicationConfigurationDescription]
     #
     # @!attribute [rw] cloud_watch_logging_option_descriptions
     #   Describes the application Amazon CloudWatch logging options.
     #   @return [Array<Types::CloudWatchLoggingOptionDescription>]
+    #
+    # @!attribute [rw] application_maintenance_configuration_description
+    #   The details of the maintenance configuration for the application.
+    #   @return [Types::ApplicationMaintenanceConfigurationDescription]
+    #
+    # @!attribute [rw] application_version_updated_from
+    #   The previous application version before the latest application
+    #   update. RollbackApplication reverts the application to this version.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] application_version_rolled_back_from
+    #   If you reverted the application using RollbackApplication, the
+    #   application version when `RollbackApplication` was called.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] application_version_create_timestamp
+    #   The current timestamp when the application version was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] conditional_token
+    #   A value you use to implement strong concurrency for application
+    #   updates.
+    #   @return [String]
+    #
+    # @!attribute [rw] application_version_rolled_back_to
+    #   The version to which you want to roll back the application.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] application_mode
+    #   To create a Managed Service for Apache Flink Studio notebook, you
+    #   must set the mode to `INTERACTIVE`. However, for a Managed Service
+    #   for Apache Flink application, the mode is optional.
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationDetail AWS API Documentation
     #
@@ -1073,21 +706,129 @@ module Aws::KinesisAnalyticsV2
       :create_timestamp,
       :last_update_timestamp,
       :application_configuration_description,
-      :cloud_watch_logging_option_descriptions)
+      :cloud_watch_logging_option_descriptions,
+      :application_maintenance_configuration_description,
+      :application_version_updated_from,
+      :application_version_rolled_back_from,
+      :application_version_create_timestamp,
+      :conditional_token,
+      :application_version_rolled_back_to,
+      :application_mode)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The details of the maintenance configuration for the application.
+    #
+    # @!attribute [rw] application_maintenance_window_start_time
+    #   The start time for the maintenance window.
+    #   @return [String]
+    #
+    # @!attribute [rw] application_maintenance_window_end_time
+    #   The end time for the maintenance window.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationMaintenanceConfigurationDescription AWS API Documentation
+    #
+    class ApplicationMaintenanceConfigurationDescription < Struct.new(
+      :application_maintenance_window_start_time,
+      :application_maintenance_window_end_time)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the updated maintenance configuration for the application.
+    #
+    # @!attribute [rw] application_maintenance_window_start_time_update
+    #   The updated start time for the maintenance window.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationMaintenanceConfigurationUpdate AWS API Documentation
+    #
+    class ApplicationMaintenanceConfigurationUpdate < Struct.new(
+      :application_maintenance_window_start_time_update)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides a description of the operation, such as the type and status
+    # of operation
+    #
+    # @!attribute [rw] operation
+    #   Type of operation performed on an application
+    #   @return [String]
+    #
+    # @!attribute [rw] operation_id
+    #   Identifier of the Operation
+    #   @return [String]
+    #
+    # @!attribute [rw] start_time
+    #   The timestamp at which the operation was created
+    #   @return [Time]
+    #
+    # @!attribute [rw] end_time
+    #   The timestamp at which the operation finished for the application
+    #   @return [Time]
+    #
+    # @!attribute [rw] operation_status
+    #   Status of the operation performed on an application
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationOperationInfo AWS API Documentation
+    #
+    class ApplicationOperationInfo < Struct.new(
+      :operation,
+      :operation_id,
+      :start_time,
+      :end_time,
+      :operation_status)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides a description of the operation, such as the operation-type
+    # and status
+    #
+    # @!attribute [rw] operation
+    #   Type of operation performed on an application
+    #   @return [String]
+    #
+    # @!attribute [rw] start_time
+    #   The timestamp at which the operation was created
+    #   @return [Time]
+    #
+    # @!attribute [rw] end_time
+    #   The timestamp at which the operation finished for the application
+    #   @return [Time]
+    #
+    # @!attribute [rw] operation_status
+    #   Status of the operation performed on an application
+    #   @return [String]
+    #
+    # @!attribute [rw] application_version_change_details
+    #   Contains information about the application version changes due to an
+    #   operation
+    #   @return [Types::ApplicationVersionChangeDetails]
+    #
+    # @!attribute [rw] operation_failure_details
+    #   Provides a description of the operation failure
+    #   @return [Types::OperationFailureDetails]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationOperationInfoDetails AWS API Documentation
+    #
+    class ApplicationOperationInfoDetails < Struct.new(
+      :operation,
+      :start_time,
+      :end_time,
+      :operation_status,
+      :application_version_change_details,
+      :operation_failure_details)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Specifies the method and snapshot to use when restarting an
     # application using previously saved application state.
-    #
-    # @note When making an API call, you may pass ApplicationRestoreConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         application_restore_type: "SKIP_RESTORE_FROM_SNAPSHOT", # required, accepts SKIP_RESTORE_FROM_SNAPSHOT, RESTORE_FROM_LATEST_SNAPSHOT, RESTORE_FROM_CUSTOM_SNAPSHOT
-    #         snapshot_name: "SnapshotName",
-    #       }
     #
     # @!attribute [rw] application_restore_type
     #   Specifies how the application should be restored.
@@ -1109,19 +850,12 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes whether snapshots are enabled for a Flink-based Kinesis Data
-    # Analytics application.
-    #
-    # @note When making an API call, you may pass ApplicationSnapshotConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         snapshots_enabled: false, # required
-    #       }
+    # Describes whether snapshots are enabled for a Managed Service for
+    # Apache Flink application.
     #
     # @!attribute [rw] snapshots_enabled
-    #   Describes whether snapshots are enabled for a Flink-based Kinesis
-    #   Data Analytics application.
+    #   Describes whether snapshots are enabled for a Managed Service for
+    #   Apache Flink application.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationSnapshotConfiguration AWS API Documentation
@@ -1132,12 +866,12 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes whether snapshots are enabled for a Flink-based Kinesis Data
-    # Analytics application.
+    # Describes whether snapshots are enabled for a Managed Service for
+    # Apache Flink application.
     #
     # @!attribute [rw] snapshots_enabled
-    #   Describes whether snapshots are enabled for a Flink-based Kinesis
-    #   Data Analytics application.
+    #   Describes whether snapshots are enabled for a Managed Service for
+    #   Apache Flink application.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationSnapshotConfigurationDescription AWS API Documentation
@@ -1148,19 +882,12 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes updates to whether snapshots are enabled for a Flink-based
-    # Kinesis Data Analytics application.
-    #
-    # @note When making an API call, you may pass ApplicationSnapshotConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         snapshots_enabled_update: false, # required
-    #       }
+    # Describes updates to whether snapshots are enabled for a Managed
+    # Service for Apache Flink application.
     #
     # @!attribute [rw] snapshots_enabled_update
-    #   Describes updates to whether snapshots are enabled for a Flink-based
-    #   Kinesis Data Analytics application.
+    #   Describes updates to whether snapshots are enabled for an
+    #   application.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationSnapshotConfigurationUpdate AWS API Documentation
@@ -1191,8 +918,13 @@ module Aws::KinesisAnalyticsV2
     #   @return [Integer]
     #
     # @!attribute [rw] runtime_environment
-    #   The runtime environment for the application (`SQL-1.0`, `FLINK-1_6`,
-    #   or `FLINK-1_8`).
+    #   The runtime environment for the application.
+    #   @return [String]
+    #
+    # @!attribute [rw] application_mode
+    #   For a Managed Service for Apache Flink application, the mode is
+    #   `STREAMING`. For a Managed Service for Apache Flink Studio notebook,
+    #   it is `INTERACTIVE`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationSummary AWS API Documentation
@@ -1202,7 +934,98 @@ module Aws::KinesisAnalyticsV2
       :application_arn,
       :application_status,
       :application_version_id,
-      :runtime_environment)
+      :runtime_environment,
+      :application_mode)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes system rollback configuration for a Managed Service for
+    # Apache Flink application
+    #
+    # @!attribute [rw] rollback_enabled
+    #   Describes whether system rollbacks are enabled for a Managed Service
+    #   for Apache Flink application
+    #   @return [Boolean]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationSystemRollbackConfiguration AWS API Documentation
+    #
+    class ApplicationSystemRollbackConfiguration < Struct.new(
+      :rollback_enabled)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes system rollback configuration for a Managed Service for
+    # Apache Flink application
+    #
+    # @!attribute [rw] rollback_enabled
+    #   Describes whether system rollbacks are enabled for a Managed Service
+    #   for Apache Flink application
+    #   @return [Boolean]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationSystemRollbackConfigurationDescription AWS API Documentation
+    #
+    class ApplicationSystemRollbackConfigurationDescription < Struct.new(
+      :rollback_enabled)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes system rollback configuration for a Managed Service for
+    # Apache Flink application
+    #
+    # @!attribute [rw] rollback_enabled_update
+    #   Describes whether system rollbacks are enabled for a Managed Service
+    #   for Apache Flink application
+    #   @return [Boolean]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationSystemRollbackConfigurationUpdate AWS API Documentation
+    #
+    class ApplicationSystemRollbackConfigurationUpdate < Struct.new(
+      :rollback_enabled_update)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains information about the application version changes due to an
+    # operation
+    #
+    # @!attribute [rw] application_version_updated_from
+    #   The operation was performed on this version of the application
+    #   @return [Integer]
+    #
+    # @!attribute [rw] application_version_updated_to
+    #   The operation execution resulted in the transition to the following
+    #   version of the application
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationVersionChangeDetails AWS API Documentation
+    #
+    class ApplicationVersionChangeDetails < Struct.new(
+      :application_version_updated_from,
+      :application_version_updated_to)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The summary of the application version.
+    #
+    # @!attribute [rw] application_version_id
+    #   The ID of the application version. Managed Service for Apache Flink
+    #   updates the `ApplicationVersionId` each time you update the
+    #   application.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] application_status
+    #   The status of the application.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ApplicationVersionSummary AWS API Documentation
+    #
+    class ApplicationVersionSummary < Struct.new(
+      :application_version_id,
+      :application_status)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1216,14 +1039,6 @@ module Aws::KinesisAnalyticsV2
     # `"name1", "address1"`
     #
     # `"name2", "address2"`
-    #
-    # @note When making an API call, you may pass CSVMappingParameters
-    #   data as a hash:
-    #
-    #       {
-    #         record_row_delimiter: "RecordRowDelimiter", # required
-    #         record_column_delimiter: "RecordColumnDelimiter", # required
-    #       }
     #
     # @!attribute [rw] record_row_delimiter
     #   The row delimiter. For example, in a CSV format, *'\\n'* is the
@@ -1244,6 +1059,62 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
+    # The configuration parameters for the default Amazon Glue database. You
+    # use this database for SQL queries that you write in a Managed Service
+    # for Apache Flink Studio notebook.
+    #
+    # @!attribute [rw] glue_data_catalog_configuration
+    #   The configuration parameters for the default Amazon Glue database.
+    #   You use this database for Apache Flink SQL queries and table API
+    #   transforms that you write in a Managed Service for Apache Flink
+    #   Studio notebook.
+    #   @return [Types::GlueDataCatalogConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/CatalogConfiguration AWS API Documentation
+    #
+    class CatalogConfiguration < Struct.new(
+      :glue_data_catalog_configuration)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The configuration parameters for the default Amazon Glue database. You
+    # use this database for Apache Flink SQL queries and table API
+    # transforms that you write in a Managed Service for Apache Flink Studio
+    # notebook.
+    #
+    # @!attribute [rw] glue_data_catalog_configuration_description
+    #   The configuration parameters for the default Amazon Glue database.
+    #   You use this database for SQL queries that you write in a Managed
+    #   Service for Apache Flink Studio notebook.
+    #   @return [Types::GlueDataCatalogConfigurationDescription]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/CatalogConfigurationDescription AWS API Documentation
+    #
+    class CatalogConfigurationDescription < Struct.new(
+      :glue_data_catalog_configuration_description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Updates to the configuration parameters for the default Amazon Glue
+    # database. You use this database for SQL queries that you write in a
+    # Managed Service for Apache Flink Studio notebook.
+    #
+    # @!attribute [rw] glue_data_catalog_configuration_update
+    #   Updates to the configuration parameters for the default Amazon Glue
+    #   database. You use this database for SQL queries that you write in a
+    #   Managed Service for Apache Flink Studio notebook.
+    #   @return [Types::GlueDataCatalogConfigurationUpdate]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/CatalogConfigurationUpdate AWS API Documentation
+    #
+    class CatalogConfigurationUpdate < Struct.new(
+      :glue_data_catalog_configuration_update)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Describes an application's checkpointing configuration. Checkpointing
     # is the process of persisting application state for fault tolerance.
     # For more information, see [ Checkpoints for Fault Tolerance][1] in the
@@ -1251,23 +1122,13 @@ module Aws::KinesisAnalyticsV2
     #
     #
     #
-    # [1]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/concepts/programming-model.html#checkpoints-for-fault-tolerance
-    # [2]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/
-    #
-    # @note When making an API call, you may pass CheckpointConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #         checkpointing_enabled: false,
-    #         checkpoint_interval: 1,
-    #         min_pause_between_checkpoints: 1,
-    #       }
+    # [1]: https://nightlies.apache.org/flink/flink-docs-release-1.19/docs/dev/datastream/fault-tolerance/checkpointing/#enabling-and-configuring-checkpointing
+    # [2]: https://nightlies.apache.org/flink/flink-docs-release-1.19/
     #
     # @!attribute [rw] configuration_type
-    #   Describes whether the application uses Kinesis Data Analytics'
-    #   default checkpointing behavior. You must set this property to
-    #   `CUSTOM` in order to set the `CheckpointingEnabled`,
+    #   Describes whether the application uses Managed Service for Apache
+    #   Flink' default checkpointing behavior. You must set this property
+    #   to `CUSTOM` in order to set the `CheckpointingEnabled`,
     #   `CheckpointInterval`, or `MinPauseBetweenCheckpoints` parameters.
     #
     #   <note markdown="1"> If this value is set to `DEFAULT`, the application will use the
@@ -1284,8 +1145,8 @@ module Aws::KinesisAnalyticsV2
     #   @return [String]
     #
     # @!attribute [rw] checkpointing_enabled
-    #   Describes whether checkpointing is enabled for a Flink-based Kinesis
-    #   Data Analytics application.
+    #   Describes whether checkpointing is enabled for a Managed Service for
+    #   Apache Flink application.
     #
     #   <note markdown="1"> If `CheckpointConfiguration.ConfigurationType` is `DEFAULT`, the
     #   application will use a `CheckpointingEnabled` value of `true`, even
@@ -1300,7 +1161,7 @@ module Aws::KinesisAnalyticsV2
     #   operations.
     #
     #   <note markdown="1"> If `CheckpointConfiguration.ConfigurationType` is `DEFAULT`, the
-    #   application will use a `CheckpointInterval` vaue of 60000, even if
+    #   application will use a `CheckpointInterval` value of 60000, even if
     #   this value is set to another value using this API or in application
     #   code.
     #
@@ -1323,8 +1184,8 @@ module Aws::KinesisAnalyticsV2
     #
     #
     #
-    #   [1]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/ops/state/large_state_tuning.html#tuning-checkpointing
-    #   [2]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/
+    #   [1]: https://nightlies.apache.org/flink/flink-docs-release-1.19/docs/ops/state/large_state_tuning/#tuning-checkpointing
+    #   [2]: https://nightlies.apache.org/flink/flink-docs-release-1.19/
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/CheckpointConfiguration AWS API Documentation
@@ -1338,12 +1199,12 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes checkpointing parameters for a Flink-based Kinesis Data
-    # Analytics application.
+    # Describes checkpointing parameters for a Managed Service for Apache
+    # Flink application.
     #
     # @!attribute [rw] configuration_type
     #   Describes whether the application uses the default checkpointing
-    #   behavior in Kinesis Data Analytics.
+    #   behavior in Managed Service for Apache Flink.
     #
     #   <note markdown="1"> If this value is set to `DEFAULT`, the application will use the
     #   following values, even if they are set to other values using APIs or
@@ -1359,8 +1220,8 @@ module Aws::KinesisAnalyticsV2
     #   @return [String]
     #
     # @!attribute [rw] checkpointing_enabled
-    #   Describes whether checkpointing is enabled for a Flink-based Kinesis
-    #   Data Analytics application.
+    #   Describes whether checkpointing is enabled for a Managed Service for
+    #   Apache Flink application.
     #
     #   <note markdown="1"> If `CheckpointConfiguration.ConfigurationType` is `DEFAULT`, the
     #   application will use a `CheckpointingEnabled` value of `true`, even
@@ -1375,7 +1236,7 @@ module Aws::KinesisAnalyticsV2
     #   operations.
     #
     #   <note markdown="1"> If `CheckpointConfiguration.ConfigurationType` is `DEFAULT`, the
-    #   application will use a `CheckpointInterval` vaue of 60000, even if
+    #   application will use a `CheckpointInterval` value of 60000, even if
     #   this value is set to another value using this API or in application
     #   code.
     #
@@ -1404,24 +1265,15 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes updates to the checkpointing parameters for a Flink-based
-    # Kinesis Data Analytics application.
-    #
-    # @note When making an API call, you may pass CheckpointConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #         checkpointing_enabled_update: false,
-    #         checkpoint_interval_update: 1,
-    #         min_pause_between_checkpoints_update: 1,
-    #       }
+    # Describes updates to the checkpointing parameters for a Managed
+    # Service for Apache Flink application.
     #
     # @!attribute [rw] configuration_type_update
     #   Describes updates to whether the application uses the default
-    #   checkpointing behavior of Kinesis Data Analytics. You must set this
-    #   property to `CUSTOM` in order to set the `CheckpointingEnabled`,
-    #   `CheckpointInterval`, or `MinPauseBetweenCheckpoints` parameters.
+    #   checkpointing behavior of Managed Service for Apache Flink. You must
+    #   set this property to `CUSTOM` in order to set the
+    #   `CheckpointingEnabled`, `CheckpointInterval`, or
+    #   `MinPauseBetweenCheckpoints` parameters.
     #
     #   <note markdown="1"> If this value is set to `DEFAULT`, the application will use the
     #   following values, even if they are set to other values using APIs or
@@ -1453,7 +1305,7 @@ module Aws::KinesisAnalyticsV2
     #   operations.
     #
     #   <note markdown="1"> If `CheckpointConfiguration.ConfigurationType` is `DEFAULT`, the
-    #   application will use a `CheckpointInterval` vaue of 60000, even if
+    #   application will use a `CheckpointInterval` value of 60000, even if
     #   this value is set to another value using this API or in application
     #   code.
     #
@@ -1485,13 +1337,6 @@ module Aws::KinesisAnalyticsV2
 
     # Provides a description of Amazon CloudWatch logging options, including
     # the log stream Amazon Resource Name (ARN).
-    #
-    # @note When making an API call, you may pass CloudWatchLoggingOption
-    #   data as a hash:
-    #
-    #       {
-    #         log_stream_arn: "LogStreamARN", # required
-    #       }
     #
     # @!attribute [rw] log_stream_arn
     #   The ARN of the CloudWatch log to receive application messages.
@@ -1538,14 +1383,6 @@ module Aws::KinesisAnalyticsV2
 
     # Describes the Amazon CloudWatch logging option updates.
     #
-    # @note When making an API call, you may pass CloudWatchLoggingOptionUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         cloud_watch_logging_option_id: "Id", # required
-    #         log_stream_arn_update: "LogStreamARN",
-    #       }
-    #
     # @!attribute [rw] cloud_watch_logging_option_id
     #   The ID of the CloudWatch logging option to update
     #   @return [String]
@@ -1565,34 +1402,20 @@ module Aws::KinesisAnalyticsV2
     end
 
     # Specifies either the application code, or the location of the
-    # application code, for a Flink-based Kinesis Data Analytics
-    # application.
-    #
-    # @note When making an API call, you may pass CodeContent
-    #   data as a hash:
-    #
-    #       {
-    #         text_content: "TextContent",
-    #         zip_file_content: "data",
-    #         s3_content_location: {
-    #           bucket_arn: "BucketARN", # required
-    #           file_key: "FileKey", # required
-    #           object_version: "ObjectVersion",
-    #         },
-    #       }
+    # application code, for a Managed Service for Apache Flink application.
     #
     # @!attribute [rw] text_content
-    #   The text-format code for a Flink-based Kinesis Data Analytics
+    #   The text-format code for a Managed Service for Apache Flink
     #   application.
     #   @return [String]
     #
     # @!attribute [rw] zip_file_content
-    #   The zip-format code for a Flink-based Kinesis Data Analytics
+    #   The zip-format code for a Managed Service for Apache Flink
     #   application.
     #   @return [String]
     #
     # @!attribute [rw] s3_content_location
-    #   Information about the Amazon S3 bucket containing the application
+    #   Information about the Amazon S3 bucket that contains the application
     #   code.
     #   @return [Types::S3ContentLocation]
     #
@@ -1606,8 +1429,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes details about the application code for a Flink-based Kinesis
-    # Data Analytics application.
+    # Describes details about the code of a Managed Service for Apache Flink
+    # application.
     #
     # @!attribute [rw] text_content
     #   The text-format code
@@ -1638,21 +1461,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes an update to the code of a Flink-based Kinesis Data
-    # Analytics application.
-    #
-    # @note When making an API call, you may pass CodeContentUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         text_content_update: "TextContent",
-    #         zip_file_content_update: "data",
-    #         s3_content_location_update: {
-    #           bucket_arn_update: "BucketARN",
-    #           file_key_update: "FileKey",
-    #           object_version_update: "ObjectVersion",
-    #         },
-    #       }
+    # Describes an update to the code of an application. Not supported for
+    # Apache Zeppelin.
     #
     # @!attribute [rw] text_content_update
     #   Describes an update to the text code for an application.
@@ -1705,15 +1515,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateApplicationPresignedUrlRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         url_type: "FLINK_DASHBOARD_URL", # required, accepts FLINK_DASHBOARD_URL
-    #         session_expiration_duration_in_seconds: 1,
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of the application.
     #   @return [String]
@@ -1750,170 +1551,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         application_description: "ApplicationDescription",
-    #         runtime_environment: "SQL-1_0", # required, accepts SQL-1_0, FLINK-1_6, FLINK-1_8, FLINK-1_11
-    #         service_execution_role: "RoleARN", # required
-    #         application_configuration: {
-    #           sql_application_configuration: {
-    #             inputs: [
-    #               {
-    #                 name_prefix: "InAppStreamName", # required
-    #                 input_processing_configuration: {
-    #                   input_lambda_processor: { # required
-    #                     resource_arn: "ResourceARN", # required
-    #                   },
-    #                 },
-    #                 kinesis_streams_input: {
-    #                   resource_arn: "ResourceARN", # required
-    #                 },
-    #                 kinesis_firehose_input: {
-    #                   resource_arn: "ResourceARN", # required
-    #                 },
-    #                 input_parallelism: {
-    #                   count: 1,
-    #                 },
-    #                 input_schema: { # required
-    #                   record_format: { # required
-    #                     record_format_type: "JSON", # required, accepts JSON, CSV
-    #                     mapping_parameters: {
-    #                       json_mapping_parameters: {
-    #                         record_row_path: "RecordRowPath", # required
-    #                       },
-    #                       csv_mapping_parameters: {
-    #                         record_row_delimiter: "RecordRowDelimiter", # required
-    #                         record_column_delimiter: "RecordColumnDelimiter", # required
-    #                       },
-    #                     },
-    #                   },
-    #                   record_encoding: "RecordEncoding",
-    #                   record_columns: [ # required
-    #                     {
-    #                       name: "RecordColumnName", # required
-    #                       mapping: "RecordColumnMapping",
-    #                       sql_type: "RecordColumnSqlType", # required
-    #                     },
-    #                   ],
-    #                 },
-    #               },
-    #             ],
-    #             outputs: [
-    #               {
-    #                 name: "InAppStreamName", # required
-    #                 kinesis_streams_output: {
-    #                   resource_arn: "ResourceARN", # required
-    #                 },
-    #                 kinesis_firehose_output: {
-    #                   resource_arn: "ResourceARN", # required
-    #                 },
-    #                 lambda_output: {
-    #                   resource_arn: "ResourceARN", # required
-    #                 },
-    #                 destination_schema: { # required
-    #                   record_format_type: "JSON", # required, accepts JSON, CSV
-    #                 },
-    #               },
-    #             ],
-    #             reference_data_sources: [
-    #               {
-    #                 table_name: "InAppTableName", # required
-    #                 s3_reference_data_source: {
-    #                   bucket_arn: "BucketARN",
-    #                   file_key: "FileKey",
-    #                 },
-    #                 reference_schema: { # required
-    #                   record_format: { # required
-    #                     record_format_type: "JSON", # required, accepts JSON, CSV
-    #                     mapping_parameters: {
-    #                       json_mapping_parameters: {
-    #                         record_row_path: "RecordRowPath", # required
-    #                       },
-    #                       csv_mapping_parameters: {
-    #                         record_row_delimiter: "RecordRowDelimiter", # required
-    #                         record_column_delimiter: "RecordColumnDelimiter", # required
-    #                       },
-    #                     },
-    #                   },
-    #                   record_encoding: "RecordEncoding",
-    #                   record_columns: [ # required
-    #                     {
-    #                       name: "RecordColumnName", # required
-    #                       mapping: "RecordColumnMapping",
-    #                       sql_type: "RecordColumnSqlType", # required
-    #                     },
-    #                   ],
-    #                 },
-    #               },
-    #             ],
-    #           },
-    #           flink_application_configuration: {
-    #             checkpoint_configuration: {
-    #               configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #               checkpointing_enabled: false,
-    #               checkpoint_interval: 1,
-    #               min_pause_between_checkpoints: 1,
-    #             },
-    #             monitoring_configuration: {
-    #               configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #               metrics_level: "APPLICATION", # accepts APPLICATION, TASK, OPERATOR, PARALLELISM
-    #               log_level: "INFO", # accepts INFO, WARN, ERROR, DEBUG
-    #             },
-    #             parallelism_configuration: {
-    #               configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #               parallelism: 1,
-    #               parallelism_per_kpu: 1,
-    #               auto_scaling_enabled: false,
-    #             },
-    #           },
-    #           environment_properties: {
-    #             property_groups: [ # required
-    #               {
-    #                 property_group_id: "Id", # required
-    #                 property_map: { # required
-    #                   "PropertyKey" => "PropertyValue",
-    #                 },
-    #               },
-    #             ],
-    #           },
-    #           application_code_configuration: { # required
-    #             code_content: {
-    #               text_content: "TextContent",
-    #               zip_file_content: "data",
-    #               s3_content_location: {
-    #                 bucket_arn: "BucketARN", # required
-    #                 file_key: "FileKey", # required
-    #                 object_version: "ObjectVersion",
-    #               },
-    #             },
-    #             code_content_type: "PLAINTEXT", # required, accepts PLAINTEXT, ZIPFILE
-    #           },
-    #           application_snapshot_configuration: {
-    #             snapshots_enabled: false, # required
-    #           },
-    #           vpc_configurations: [
-    #             {
-    #               subnet_ids: ["SubnetId"], # required
-    #               security_group_ids: ["SecurityGroupId"], # required
-    #             },
-    #           ],
-    #         },
-    #         cloud_watch_logging_options: [
-    #           {
-    #             log_stream_arn: "LogStreamARN", # required
-    #           },
-    #         ],
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of your application (for example, `sample-app`).
     #   @return [String]
@@ -1923,8 +1560,7 @@ module Aws::KinesisAnalyticsV2
     #   @return [String]
     #
     # @!attribute [rw] runtime_environment
-    #   The runtime environment for the application (`SQL-1.0`, `FLINK-1_6`,
-    #   or `FLINK-1_8`).
+    #   The runtime environment for the application.
     #   @return [String]
     #
     # @!attribute [rw] service_execution_role
@@ -1954,6 +1590,12 @@ module Aws::KinesisAnalyticsV2
     #   [1]: https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-tagging.html
     #   @return [Array<Types::Tag>]
     #
+    # @!attribute [rw] application_mode
+    #   Use the `STREAMING` mode to create a Managed Service for Apache
+    #   Flink application. To create a Managed Service for Apache Flink
+    #   Studio notebook, use the `INTERACTIVE` mode.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/CreateApplicationRequest AWS API Documentation
     #
     class CreateApplicationRequest < Struct.new(
@@ -1963,14 +1605,15 @@ module Aws::KinesisAnalyticsV2
       :service_execution_role,
       :application_configuration,
       :cloud_watch_logging_options,
-      :tags)
+      :tags,
+      :application_mode)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # @!attribute [rw] application_detail
-    #   In response to your `CreateApplication` request, Kinesis Data
-    #   Analytics returns a response with details of the application it
+    #   In response to your `CreateApplication` request, Managed Service for
+    #   Apache Flink returns a response with details of the application it
     #   created.
     #   @return [Types::ApplicationDetail]
     #
@@ -1982,14 +1625,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateApplicationSnapshotRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         snapshot_name: "SnapshotName", # required
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of an existing application
     #   @return [String]
@@ -2011,22 +1646,77 @@ module Aws::KinesisAnalyticsV2
     #
     class CreateApplicationSnapshotResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteApplicationCloudWatchLoggingOptionRequest
-    #   data as a hash:
+    # Specifies dependency JARs, as well as JAR files that contain
+    # user-defined functions (UDF).
     #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         cloud_watch_logging_option_id: "Id", # required
-    #       }
+    # @!attribute [rw] artifact_type
+    #   `UDF` stands for user-defined functions. This type of artifact must
+    #   be in an S3 bucket. A `DEPENDENCY_JAR` can be in either Maven or an
+    #   S3 bucket.
+    #   @return [String]
     #
+    # @!attribute [rw] s3_content_location
+    #   For a Managed Service for Apache Flink application provides a
+    #   description of an Amazon S3 object, including the Amazon Resource
+    #   Name (ARN) of the S3 bucket, the name of the Amazon S3 object that
+    #   contains the data, and the version number of the Amazon S3 object
+    #   that contains the data.
+    #   @return [Types::S3ContentLocation]
+    #
+    # @!attribute [rw] maven_reference
+    #   The parameters required to fully specify a Maven reference.
+    #   @return [Types::MavenReference]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/CustomArtifactConfiguration AWS API Documentation
+    #
+    class CustomArtifactConfiguration < Struct.new(
+      :artifact_type,
+      :s3_content_location,
+      :maven_reference)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Specifies a dependency JAR or a JAR of user-defined functions.
+    #
+    # @!attribute [rw] artifact_type
+    #   `UDF` stands for user-defined functions. This type of artifact must
+    #   be in an S3 bucket. A `DEPENDENCY_JAR` can be in either Maven or an
+    #   S3 bucket.
+    #   @return [String]
+    #
+    # @!attribute [rw] s3_content_location_description
+    #   For a Managed Service for Apache Flink application provides a
+    #   description of an Amazon S3 object, including the Amazon Resource
+    #   Name (ARN) of the S3 bucket, the name of the Amazon S3 object that
+    #   contains the data, and the version number of the Amazon S3 object
+    #   that contains the data.
+    #   @return [Types::S3ContentLocation]
+    #
+    # @!attribute [rw] maven_reference_description
+    #   The parameters that are required to specify a Maven dependency.
+    #   @return [Types::MavenReference]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/CustomArtifactConfigurationDescription AWS API Documentation
+    #
+    class CustomArtifactConfigurationDescription < Struct.new(
+      :artifact_type,
+      :s3_content_location_description,
+      :maven_reference_description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] application_name
     #   The application name.
     #   @return [String]
     #
     # @!attribute [rw] current_application_version_id
-    #   The version ID of the application. You can retrieve the application
-    #   version ID using DescribeApplication.
+    #   The version ID of the application. You must provide the
+    #   `CurrentApplicationVersionId` or the `ConditionalToken`. You can
+    #   retrieve the application version ID using DescribeApplication. For
+    #   better concurrency support, use the `ConditionalToken` parameter
+    #   instead of `CurrentApplicationVersionId`.
     #   @return [Integer]
     #
     # @!attribute [rw] cloud_watch_logging_option_id
@@ -2035,12 +1725,22 @@ module Aws::KinesisAnalyticsV2
     #   using the DescribeApplication operation.
     #   @return [String]
     #
+    # @!attribute [rw] conditional_token
+    #   A value you use to implement strong concurrency for application
+    #   updates. You must provide the `CurrentApplicationVersionId` or the
+    #   `ConditionalToken`. You get the application's current
+    #   `ConditionalToken` using DescribeApplication. For better concurrency
+    #   support, use the `ConditionalToken` parameter instead of
+    #   `CurrentApplicationVersionId`.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DeleteApplicationCloudWatchLoggingOptionRequest AWS API Documentation
     #
     class DeleteApplicationCloudWatchLoggingOptionRequest < Struct.new(
       :application_name,
       :current_application_version_id,
-      :cloud_watch_logging_option_id)
+      :cloud_watch_logging_option_id,
+      :conditional_token)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2060,25 +1760,22 @@ module Aws::KinesisAnalyticsV2
     #   application.
     #   @return [Array<Types::CloudWatchLoggingOptionDescription>]
     #
+    # @!attribute [rw] operation_id
+    #   Operation ID for tracking DeleteApplicationCloudWatchLoggingOption
+    #   request
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DeleteApplicationCloudWatchLoggingOptionResponse AWS API Documentation
     #
     class DeleteApplicationCloudWatchLoggingOptionResponse < Struct.new(
       :application_arn,
       :application_version_id,
-      :cloud_watch_logging_option_descriptions)
+      :cloud_watch_logging_option_descriptions,
+      :operation_id)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteApplicationInputProcessingConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         input_id: "Id", # required
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of the application.
     #   @return [String]
@@ -2123,15 +1820,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteApplicationOutputRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         output_id: "Id", # required
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The application name.
     #   @return [String]
@@ -2180,15 +1868,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteApplicationReferenceDataSourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         reference_id: "Id", # required
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of an existing application.
     #   @return [String]
@@ -2235,14 +1914,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         create_timestamp: Time.now, # required
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of the application to delete.
     #   @return [String]
@@ -2264,15 +1935,6 @@ module Aws::KinesisAnalyticsV2
     #
     class DeleteApplicationResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteApplicationSnapshotRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         snapshot_name: "SnapshotName", # required
-    #         snapshot_creation_timestamp: Time.now, # required
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of an existing application.
     #   @return [String]
@@ -2300,26 +1962,29 @@ module Aws::KinesisAnalyticsV2
     #
     class DeleteApplicationSnapshotResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteApplicationVpcConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         vpc_configuration_id: "Id", # required
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of an existing application.
     #   @return [String]
     #
     # @!attribute [rw] current_application_version_id
-    #   The current application version ID. You can retrieve the application
-    #   version ID using DescribeApplication.
+    #   The current application version ID. You must provide the
+    #   `CurrentApplicationVersionId` or the `ConditionalToken`. You can
+    #   retrieve the application version ID using DescribeApplication. For
+    #   better concurrency support, use the `ConditionalToken` parameter
+    #   instead of `CurrentApplicationVersionId`.
     #   @return [Integer]
     #
     # @!attribute [rw] vpc_configuration_id
     #   The ID of the VPC configuration to delete.
+    #   @return [String]
+    #
+    # @!attribute [rw] conditional_token
+    #   A value you use to implement strong concurrency for application
+    #   updates. You must provide the `CurrentApplicationVersionId` or the
+    #   `ConditionalToken`. You get the application's current
+    #   `ConditionalToken` using DescribeApplication. For better concurrency
+    #   support, use the `ConditionalToken` parameter instead of
+    #   `CurrentApplicationVersionId`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DeleteApplicationVpcConfigurationRequest AWS API Documentation
@@ -2327,43 +1992,128 @@ module Aws::KinesisAnalyticsV2
     class DeleteApplicationVpcConfigurationRequest < Struct.new(
       :application_name,
       :current_application_version_id,
-      :vpc_configuration_id)
+      :vpc_configuration_id,
+      :conditional_token)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # @!attribute [rw] application_arn
-    #   The ARN of the Kinesis Data Analytics application.
+    #   The ARN of the Managed Service for Apache Flink application.
     #   @return [String]
     #
     # @!attribute [rw] application_version_id
     #   The updated version ID of the application.
     #   @return [Integer]
     #
+    # @!attribute [rw] operation_id
+    #   Operation ID for tracking DeleteApplicationVpcConfiguration request
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DeleteApplicationVpcConfigurationResponse AWS API Documentation
     #
     class DeleteApplicationVpcConfigurationResponse < Struct.new(
       :application_arn,
-      :application_version_id)
+      :application_version_id,
+      :operation_id)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeApplicationRequest
-    #   data as a hash:
+    # The information required to deploy a Managed Service for Apache Flink
+    # Studio notebook as an application with durable state.
     #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         include_additional_details: false,
-    #       }
+    # @!attribute [rw] s3_content_location
+    #   The description of an Amazon S3 object that contains the Amazon Data
+    #   Analytics application, including the Amazon Resource Name (ARN) of
+    #   the S3 bucket, the name of the Amazon S3 object that contains the
+    #   data, and the version number of the Amazon S3 object that contains
+    #   the data.
+    #   @return [Types::S3ContentBaseLocation]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DeployAsApplicationConfiguration AWS API Documentation
+    #
+    class DeployAsApplicationConfiguration < Struct.new(
+      :s3_content_location)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The configuration information required to deploy an Amazon Data
+    # Analytics Studio notebook as an application with durable state.
+    #
+    # @!attribute [rw] s3_content_location_description
+    #   The location that holds the data required to specify an Amazon Data
+    #   Analytics application.
+    #   @return [Types::S3ContentBaseLocationDescription]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DeployAsApplicationConfigurationDescription AWS API Documentation
+    #
+    class DeployAsApplicationConfigurationDescription < Struct.new(
+      :s3_content_location_description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Updates to the configuration information required to deploy an Amazon
+    # Data Analytics Studio notebook as an application with durable state.
+    #
+    # @!attribute [rw] s3_content_location_update
+    #   Updates to the location that holds the data required to specify an
+    #   Amazon Data Analytics application.
+    #   @return [Types::S3ContentBaseLocationUpdate]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DeployAsApplicationConfigurationUpdate AWS API Documentation
+    #
+    class DeployAsApplicationConfigurationUpdate < Struct.new(
+      :s3_content_location_update)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Request for information about a specific operation performed on a
+    # Managed Service for Apache Flink application
+    #
+    # @!attribute [rw] application_name
+    #   The name of the application
+    #   @return [String]
+    #
+    # @!attribute [rw] operation_id
+    #   Identifier of the Operation
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DescribeApplicationOperationRequest AWS API Documentation
+    #
+    class DescribeApplicationOperationRequest < Struct.new(
+      :application_name,
+      :operation_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides details of the operation corresponding to the operation-ID on
+    # a Managed Service for Apache Flink application
+    #
+    # @!attribute [rw] application_operation_info_details
+    #   Provides a description of the operation, such as the operation-type
+    #   and status
+    #   @return [Types::ApplicationOperationInfoDetails]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DescribeApplicationOperationResponse AWS API Documentation
+    #
+    class DescribeApplicationOperationResponse < Struct.new(
+      :application_operation_info_details)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] application_name
     #   The name of the application.
     #   @return [String]
     #
     # @!attribute [rw] include_additional_details
-    #   Displays verbose information about a Kinesis Data Analytics
-    #   application, including the application's job plan.
+    #   Displays verbose information about a Managed Service for Apache
+    #   Flink application, including the application's job plan.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DescribeApplicationRequest AWS API Documentation
@@ -2389,14 +2139,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeApplicationSnapshotRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         snapshot_name: "SnapshotName", # required
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of an existing application.
     #   @return [String]
@@ -2427,15 +2169,41 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
+    # @!attribute [rw] application_name
+    #   The name of the application for which you want to get the version
+    #   description.
+    #   @return [String]
+    #
+    # @!attribute [rw] application_version_id
+    #   The ID of the application version for which you want to get the
+    #   description.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DescribeApplicationVersionRequest AWS API Documentation
+    #
+    class DescribeApplicationVersionRequest < Struct.new(
+      :application_name,
+      :application_version_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] application_version_detail
+    #   Describes the application, including the application Amazon Resource
+    #   Name (ARN), status, latest version, and input and output
+    #   configurations.
+    #   @return [Types::ApplicationDetail]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/DescribeApplicationVersionResponse AWS API Documentation
+    #
+    class DescribeApplicationVersionResponse < Struct.new(
+      :application_version_detail)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Describes the data format when records are written to the destination
     # in a SQL-based Kinesis Data Analytics application.
-    #
-    # @note When making an API call, you may pass DestinationSchema
-    #   data as a hash:
-    #
-    #       {
-    #         record_format_type: "JSON", # required, accepts JSON, CSV
-    #       }
     #
     # @!attribute [rw] record_format_type
     #   Specifies the format of the records on the output stream.
@@ -2449,26 +2217,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DiscoverInputSchemaRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceARN",
-    #         service_execution_role: "RoleARN", # required
-    #         input_starting_position_configuration: {
-    #           input_starting_position: "NOW", # accepts NOW, TRIM_HORIZON, LAST_STOPPED_POINT
-    #         },
-    #         s3_configuration: {
-    #           bucket_arn: "BucketARN", # required
-    #           file_key: "FileKey", # required
-    #         },
-    #         input_processing_configuration: {
-    #           input_lambda_processor: { # required
-    #             resource_arn: "ResourceARN", # required
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the streaming source.
     #   @return [String]
@@ -2479,7 +2227,7 @@ module Aws::KinesisAnalyticsV2
     #
     # @!attribute [rw] input_starting_position_configuration
     #   The point at which you want Kinesis Data Analytics to start reading
-    #   records from the specified streaming source discovery purposes.
+    #   records from the specified streaming source for discovery purposes.
     #   @return [Types::InputStartingPositionConfiguration]
     #
     # @!attribute [rw] s3_configuration
@@ -2536,22 +2284,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes execution properties for a Flink-based Kinesis Data
-    # Analytics application.
-    #
-    # @note When making an API call, you may pass EnvironmentProperties
-    #   data as a hash:
-    #
-    #       {
-    #         property_groups: [ # required
-    #           {
-    #             property_group_id: "Id", # required
-    #             property_map: { # required
-    #               "PropertyKey" => "PropertyValue",
-    #             },
-    #           },
-    #         ],
-    #       }
+    # Describes execution properties for a Managed Service for Apache Flink
+    # application.
     #
     # @!attribute [rw] property_groups
     #   Describes the execution property groups.
@@ -2565,8 +2299,7 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes the execution properties for a Flink-based Kinesis Data
-    # Analytics application.
+    # Describes the execution properties for an Apache Flink runtime.
     #
     # @!attribute [rw] property_group_descriptions
     #   Describes the execution property groups.
@@ -2580,22 +2313,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes updates to the execution property groups for a Flink-based
-    # Kinesis Data Analytics application.
-    #
-    # @note When making an API call, you may pass EnvironmentPropertyUpdates
-    #   data as a hash:
-    #
-    #       {
-    #         property_groups: [ # required
-    #           {
-    #             property_group_id: "Id", # required
-    #             property_map: { # required
-    #               "PropertyKey" => "PropertyValue",
-    #             },
-    #           },
-    #         ],
-    #       }
+    # Describes updates to the execution property groups for a Managed
+    # Service for Apache Flink application or a Studio notebook.
     #
     # @!attribute [rw] property_groups
     #   Describes updates to the execution property groups.
@@ -2609,31 +2328,22 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes configuration parameters for a Flink-based Kinesis Data
-    # Analytics application.
+    # Provides a description of the operation failure error
     #
-    # @note When making an API call, you may pass FlinkApplicationConfiguration
-    #   data as a hash:
+    # @!attribute [rw] error_string
+    #   Error message resulting in failure of the operation
+    #   @return [String]
     #
-    #       {
-    #         checkpoint_configuration: {
-    #           configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #           checkpointing_enabled: false,
-    #           checkpoint_interval: 1,
-    #           min_pause_between_checkpoints: 1,
-    #         },
-    #         monitoring_configuration: {
-    #           configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #           metrics_level: "APPLICATION", # accepts APPLICATION, TASK, OPERATOR, PARALLELISM
-    #           log_level: "INFO", # accepts INFO, WARN, ERROR, DEBUG
-    #         },
-    #         parallelism_configuration: {
-    #           configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #           parallelism: 1,
-    #           parallelism_per_kpu: 1,
-    #           auto_scaling_enabled: false,
-    #         },
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ErrorInfo AWS API Documentation
+    #
+    class ErrorInfo < Struct.new(
+      :error_string)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes configuration parameters for a Managed Service for Apache
+    # Flink application or a Studio notebook.
     #
     # @!attribute [rw] checkpoint_configuration
     #   Describes an application's checkpointing configuration.
@@ -2643,8 +2353,8 @@ module Aws::KinesisAnalyticsV2
     #
     #
     #
-    #   [1]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/concepts/programming-model.html#checkpoints-for-fault-tolerance
-    #   [2]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/
+    #   [1]: https://nightlies.apache.org/flink/flink-docs-release-1.19/docs/dev/datastream/fault-tolerance/checkpointing/#enabling-and-configuring-checkpointing
+    #   [2]: https://nightlies.apache.org/flink/flink-docs-release-1.19/
     #   @return [Types::CheckpointConfiguration]
     #
     # @!attribute [rw] monitoring_configuration
@@ -2667,8 +2377,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes configuration parameters for a Flink-based Kinesis Data
-    # Analytics application.
+    # Describes configuration parameters for a Managed Service for Apache
+    # Flink application.
     #
     # @!attribute [rw] checkpoint_configuration_description
     #   Describes an application's checkpointing configuration.
@@ -2695,8 +2405,8 @@ module Aws::KinesisAnalyticsV2
     #
     #
     #
-    #   [1]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/internals/job_scheduling.html
-    #   [2]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/
+    #   [1]: https://nightlies.apache.org/flink/flink-docs-release-1.19/internals/job_scheduling.html
+    #   [2]: https://nightlies.apache.org/flink/flink-docs-release-1.19/
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/FlinkApplicationConfigurationDescription AWS API Documentation
@@ -2710,31 +2420,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes updates to the configuration parameters for a Flink-based
-    # Kinesis Data Analytics application.
-    #
-    # @note When making an API call, you may pass FlinkApplicationConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         checkpoint_configuration_update: {
-    #           configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #           checkpointing_enabled_update: false,
-    #           checkpoint_interval_update: 1,
-    #           min_pause_between_checkpoints_update: 1,
-    #         },
-    #         monitoring_configuration_update: {
-    #           configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #           metrics_level_update: "APPLICATION", # accepts APPLICATION, TASK, OPERATOR, PARALLELISM
-    #           log_level_update: "INFO", # accepts INFO, WARN, ERROR, DEBUG
-    #         },
-    #         parallelism_configuration_update: {
-    #           configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #           parallelism_update: 1,
-    #           parallelism_per_kpu_update: 1,
-    #           auto_scaling_enabled_update: false,
-    #         },
-    #       }
+    # Describes updates to the configuration parameters for a Managed
+    # Service for Apache Flink application.
     #
     # @!attribute [rw] checkpoint_configuration_update
     #   Describes updates to an application's checkpointing configuration.
@@ -2762,15 +2449,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes the starting parameters for a Flink-based Kinesis Data
-    # Analytics application.
-    #
-    # @note When making an API call, you may pass FlinkRunConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         allow_non_restored_state: false,
-    #       }
+    # Describes the starting parameters for a Managed Service for Apache
+    # Flink application.
     #
     # @!attribute [rw] allow_non_restored_state
     #   When restoring from a snapshot, specifies whether the runtime is
@@ -2789,8 +2469,8 @@ module Aws::KinesisAnalyticsV2
     #
     #
     #
-    #   [1]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/ops/state/savepoints.html#allowing-non-restored-state
-    #   [2]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/
+    #   [1]: https://nightlies.apache.org/flink/flink-docs-release-1.19/docs/ops/state/savepoints/#allowing-non-restored-state
+    #   [2]: https://nightlies.apache.org/flink/flink-docs-release-1.19/
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/FlinkRunConfiguration AWS API Documentation
@@ -2801,53 +2481,58 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
+    # The configuration of the Glue Data Catalog that you use for Apache
+    # Flink SQL queries and table API transforms that you write in an
+    # application.
+    #
+    # @!attribute [rw] database_arn
+    #   The Amazon Resource Name (ARN) of the database.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/GlueDataCatalogConfiguration AWS API Documentation
+    #
+    class GlueDataCatalogConfiguration < Struct.new(
+      :database_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The configuration of the Glue Data Catalog that you use for Apache
+    # Flink SQL queries and table API transforms that you write in an
+    # application.
+    #
+    # @!attribute [rw] database_arn
+    #   The Amazon Resource Name (ARN) of the database.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/GlueDataCatalogConfigurationDescription AWS API Documentation
+    #
+    class GlueDataCatalogConfigurationDescription < Struct.new(
+      :database_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Updates to the configuration of the Glue Data Catalog that you use for
+    # SQL queries that you write in a Managed Service for Apache Flink
+    # Studio notebook.
+    #
+    # @!attribute [rw] database_arn_update
+    #   The updated Amazon Resource Name (ARN) of the database.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/GlueDataCatalogConfigurationUpdate AWS API Documentation
+    #
+    class GlueDataCatalogConfigurationUpdate < Struct.new(
+      :database_arn_update)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # When you configure the application input for a SQL-based Kinesis Data
     # Analytics application, you specify the streaming source, the
     # in-application stream name that is created, and the mapping between
     # the two.
-    #
-    # @note When making an API call, you may pass Input
-    #   data as a hash:
-    #
-    #       {
-    #         name_prefix: "InAppStreamName", # required
-    #         input_processing_configuration: {
-    #           input_lambda_processor: { # required
-    #             resource_arn: "ResourceARN", # required
-    #           },
-    #         },
-    #         kinesis_streams_input: {
-    #           resource_arn: "ResourceARN", # required
-    #         },
-    #         kinesis_firehose_input: {
-    #           resource_arn: "ResourceARN", # required
-    #         },
-    #         input_parallelism: {
-    #           count: 1,
-    #         },
-    #         input_schema: { # required
-    #           record_format: { # required
-    #             record_format_type: "JSON", # required, accepts JSON, CSV
-    #             mapping_parameters: {
-    #               json_mapping_parameters: {
-    #                 record_row_path: "RecordRowPath", # required
-    #               },
-    #               csv_mapping_parameters: {
-    #                 record_row_delimiter: "RecordRowDelimiter", # required
-    #                 record_column_delimiter: "RecordColumnDelimiter", # required
-    #               },
-    #             },
-    #           },
-    #           record_encoding: "RecordEncoding",
-    #           record_columns: [ # required
-    #             {
-    #               name: "RecordColumnName", # required
-    #               mapping: "RecordColumnMapping",
-    #               sql_type: "RecordColumnSqlType", # required
-    #             },
-    #           ],
-    #         },
-    #       }
     #
     # @!attribute [rw] name_prefix
     #   The name prefix to use when creating an in-application stream.
@@ -2965,25 +2650,18 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # An object that contains the Amazon Resource Name (ARN) of the AWS
+    # An object that contains the Amazon Resource Name (ARN) of the Amazon
     # Lambda function that is used to preprocess records in the stream in a
     # SQL-based Kinesis Data Analytics application.
     #
-    # @note When making an API call, you may pass InputLambdaProcessor
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceARN", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
-    #   The ARN of the AWS Lambda function that operates on records in the
-    #   stream.
+    #   The ARN of the Amazon Lambda function that operates on records in
+    #   the stream.
     #
     #   <note markdown="1"> To specify an earlier version of the Lambda function than the
     #   latest, include the Lambda function version in the Lambda function
-    #   ARN. For more information about Lambda ARNs, see [Example ARNs: AWS
-    #   Lambda][1]
+    #   ARN. For more information about Lambda ARNs, see [Example ARNs:
+    #   Amazon Lambda][1]
     #
     #    </note>
     #
@@ -3001,17 +2679,17 @@ module Aws::KinesisAnalyticsV2
     end
 
     # For a SQL-based Kinesis Data Analytics application, an object that
-    # contains the Amazon Resource Name (ARN) of the AWS Lambda function
+    # contains the Amazon Resource Name (ARN) of the Amazon Lambda function
     # that is used to preprocess records in the stream.
     #
     # @!attribute [rw] resource_arn
-    #   The ARN of the AWS Lambda function that is used to preprocess the
+    #   The ARN of the Amazon Lambda function that is used to preprocess the
     #   records in the stream.
     #
     #   <note markdown="1"> To specify an earlier version of the Lambda function than the
     #   latest, include the Lambda function version in the Lambda function
-    #   ARN. For more information about Lambda ARNs, see [Example ARNs: AWS
-    #   Lambda][1]
+    #   ARN. For more information about Lambda ARNs, see [Example ARNs:
+    #   Amazon Lambda][1]
     #
     #    </note>
     #
@@ -3021,7 +2699,7 @@ module Aws::KinesisAnalyticsV2
     #   @return [String]
     #
     # @!attribute [rw] role_arn
-    #   The ARN of the IAM role that is used to access the AWS Lambda
+    #   The ARN of the IAM role that is used to access the Amazon Lambda
     #   function.
     #
     #   <note markdown="1"> Provided for backward compatibility. Applications that are created
@@ -3044,21 +2722,14 @@ module Aws::KinesisAnalyticsV2
     # update to the InputLambdaProcessor that is used to preprocess the
     # records in the stream.
     #
-    # @note When making an API call, you may pass InputLambdaProcessorUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn_update: "ResourceARN", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn_update
-    #   The Amazon Resource Name (ARN) of the new AWS Lambda function that
-    #   is used to preprocess the records in the stream.
+    #   The Amazon Resource Name (ARN) of the new Amazon Lambda function
+    #   that is used to preprocess the records in the stream.
     #
     #   <note markdown="1"> To specify an earlier version of the Lambda function than the
     #   latest, include the Lambda function version in the Lambda function
-    #   ARN. For more information about Lambda ARNs, see [Example ARNs: AWS
-    #   Lambda][1]
+    #   ARN. For more information about Lambda ARNs, see [Example ARNs:
+    #   Amazon Lambda][1]
     #
     #    </note>
     #
@@ -3079,13 +2750,6 @@ module Aws::KinesisAnalyticsV2
     # number of in-application streams to create for a given streaming
     # source.
     #
-    # @note When making an API call, you may pass InputParallelism
-    #   data as a hash:
-    #
-    #       {
-    #         count: 1,
-    #       }
-    #
     # @!attribute [rw] count
     #   The number of in-application streams to create.
     #   @return [Integer]
@@ -3100,13 +2764,6 @@ module Aws::KinesisAnalyticsV2
 
     # For a SQL-based Kinesis Data Analytics application, provides updates
     # to the parallelism count.
-    #
-    # @note When making an API call, you may pass InputParallelismUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         count_update: 1, # required
-    #       }
     #
     # @!attribute [rw] count_update
     #   The number of in-application streams to create for the specified
@@ -3124,20 +2781,11 @@ module Aws::KinesisAnalyticsV2
     # For a SQL-based Kinesis Data Analytics application, describes a
     # processor that is used to preprocess the records in the stream before
     # being processed by your application code. Currently, the only input
-    # processor available is [AWS Lambda][1].
+    # processor available is [Amazon Lambda][1].
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/lambda/
-    #
-    # @note When making an API call, you may pass InputProcessingConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         input_lambda_processor: { # required
-    #           resource_arn: "ResourceARN", # required
-    #         },
-    #       }
     #
     # @!attribute [rw] input_lambda_processor
     #   The InputLambdaProcessor that is used to preprocess the records in
@@ -3154,7 +2802,7 @@ module Aws::KinesisAnalyticsV2
 
     # For a SQL-based Kinesis Data Analytics application, provides the
     # configuration information about an input processor. Currently, the
-    # only input processor available is [AWS Lambda][1].
+    # only input processor available is [Amazon Lambda][1].
     #
     #
     #
@@ -3176,15 +2824,6 @@ module Aws::KinesisAnalyticsV2
     # For a SQL-based Kinesis Data Analytics application, describes updates
     # to an InputProcessingConfiguration.
     #
-    # @note When making an API call, you may pass InputProcessingConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         input_lambda_processor_update: { # required
-    #           resource_arn_update: "ResourceARN", # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] input_lambda_processor_update
     #   Provides update information for an InputLambdaProcessor.
     #   @return [Types::InputLambdaProcessorUpdate]
@@ -3199,32 +2838,6 @@ module Aws::KinesisAnalyticsV2
 
     # Describes updates for an SQL-based Kinesis Data Analytics
     # application's input schema.
-    #
-    # @note When making an API call, you may pass InputSchemaUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         record_format_update: {
-    #           record_format_type: "JSON", # required, accepts JSON, CSV
-    #           mapping_parameters: {
-    #             json_mapping_parameters: {
-    #               record_row_path: "RecordRowPath", # required
-    #             },
-    #             csv_mapping_parameters: {
-    #               record_row_delimiter: "RecordRowDelimiter", # required
-    #               record_column_delimiter: "RecordColumnDelimiter", # required
-    #             },
-    #           },
-    #         },
-    #         record_encoding_update: "RecordEncoding",
-    #         record_column_updates: [
-    #           {
-    #             name: "RecordColumnName", # required
-    #             mapping: "RecordColumnMapping",
-    #             sql_type: "RecordColumnSqlType", # required
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] record_format_update
     #   Specifies the format of the records on the streaming source.
@@ -3254,13 +2867,6 @@ module Aws::KinesisAnalyticsV2
     # Describes the point at which the application reads from the streaming
     # source.
     #
-    # @note When making an API call, you may pass InputStartingPositionConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         input_starting_position: "NOW", # accepts NOW, TRIM_HORIZON, LAST_STOPPED_POINT
-    #       }
-    #
     # @!attribute [rw] input_starting_position
     #   The starting position on the stream.
     #
@@ -3288,50 +2894,6 @@ module Aws::KinesisAnalyticsV2
     # For a SQL-based Kinesis Data Analytics application, describes updates
     # to a specific input configuration (identified by the `InputId` of an
     # application).
-    #
-    # @note When making an API call, you may pass InputUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         input_id: "Id", # required
-    #         name_prefix_update: "InAppStreamName",
-    #         input_processing_configuration_update: {
-    #           input_lambda_processor_update: { # required
-    #             resource_arn_update: "ResourceARN", # required
-    #           },
-    #         },
-    #         kinesis_streams_input_update: {
-    #           resource_arn_update: "ResourceARN", # required
-    #         },
-    #         kinesis_firehose_input_update: {
-    #           resource_arn_update: "ResourceARN", # required
-    #         },
-    #         input_schema_update: {
-    #           record_format_update: {
-    #             record_format_type: "JSON", # required, accepts JSON, CSV
-    #             mapping_parameters: {
-    #               json_mapping_parameters: {
-    #                 record_row_path: "RecordRowPath", # required
-    #               },
-    #               csv_mapping_parameters: {
-    #                 record_row_delimiter: "RecordRowDelimiter", # required
-    #                 record_column_delimiter: "RecordColumnDelimiter", # required
-    #               },
-    #             },
-    #           },
-    #           record_encoding_update: "RecordEncoding",
-    #           record_column_updates: [
-    #             {
-    #               name: "RecordColumnName", # required
-    #               mapping: "RecordColumnMapping",
-    #               sql_type: "RecordColumnSqlType", # required
-    #             },
-    #           ],
-    #         },
-    #         input_parallelism_update: {
-    #           count_update: 1, # required
-    #         },
-    #       }
     #
     # @!attribute [rw] input_id
     #   The input ID of the application input to be updated.
@@ -3425,13 +2987,6 @@ module Aws::KinesisAnalyticsV2
     # additional mapping information when JSON is the record format on the
     # streaming source.
     #
-    # @note When making an API call, you may pass JSONMappingParameters
-    #   data as a hash:
-    #
-    #       {
-    #         record_row_path: "RecordRowPath", # required
-    #       }
-    #
     # @!attribute [rw] record_row_path
     #   The path to the top-level parent that contains the records.
     #   @return [String]
@@ -3447,13 +3002,6 @@ module Aws::KinesisAnalyticsV2
     # For a SQL-based Kinesis Data Analytics application, identifies a
     # Kinesis Data Firehose delivery stream as the streaming source. You
     # provide the delivery stream's Amazon Resource Name (ARN).
-    #
-    # @note When making an API call, you may pass KinesisFirehoseInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceARN", # required
-    #       }
     #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the delivery stream.
@@ -3499,13 +3047,6 @@ module Aws::KinesisAnalyticsV2
     # application input configuration, provides information about a Kinesis
     # Data Firehose delivery stream as the streaming source.
     #
-    # @note When making an API call, you may pass KinesisFirehoseInputUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn_update: "ResourceARN", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn_update
     #   The Amazon Resource Name (ARN) of the input delivery stream to read.
     #   @return [String]
@@ -3522,13 +3063,6 @@ module Aws::KinesisAnalyticsV2
     # application output, identifies a Kinesis Data Firehose delivery stream
     # as the destination. You provide the stream Amazon Resource Name (ARN)
     # of the delivery stream.
-    #
-    # @note When making an API call, you may pass KinesisFirehoseOutput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceARN", # required
-    #       }
     #
     # @!attribute [rw] resource_arn
     #   The ARN of the destination delivery stream to write to.
@@ -3575,13 +3109,6 @@ module Aws::KinesisAnalyticsV2
     # information about a Kinesis Data Firehose delivery stream that is
     # configured as the destination.
     #
-    # @note When making an API call, you may pass KinesisFirehoseOutputUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn_update: "ResourceARN", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn_update
     #   The Amazon Resource Name (ARN) of the delivery stream to write to.
     #   @return [String]
@@ -3596,13 +3123,6 @@ module Aws::KinesisAnalyticsV2
 
     # Identifies a Kinesis data stream as the streaming source. You provide
     # the stream's Amazon Resource Name (ARN).
-    #
-    # @note When making an API call, you may pass KinesisStreamsInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceARN", # required
-    #       }
     #
     # @!attribute [rw] resource_arn
     #   The ARN of the input Kinesis data stream to read.
@@ -3648,13 +3168,6 @@ module Aws::KinesisAnalyticsV2
     # Analytics application, provides information about a Kinesis stream as
     # the streaming source.
     #
-    # @note When making an API call, you may pass KinesisStreamsInputUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn_update: "ResourceARN", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn_update
     #   The Amazon Resource Name (ARN) of the input Kinesis data stream to
     #   read.
@@ -3671,13 +3184,6 @@ module Aws::KinesisAnalyticsV2
     # When you configure a SQL-based Kinesis Data Analytics application's
     # output, identifies a Kinesis data stream as the destination. You
     # provide the stream Amazon Resource Name (ARN).
-    #
-    # @note When making an API call, you may pass KinesisStreamsOutput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceARN", # required
-    #       }
     #
     # @!attribute [rw] resource_arn
     #   The ARN of the destination Kinesis data stream to write to.
@@ -3724,13 +3230,6 @@ module Aws::KinesisAnalyticsV2
     # information about a Kinesis data stream that is configured as the
     # destination.
     #
-    # @note When making an API call, you may pass KinesisStreamsOutputUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn_update: "ResourceARN", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn_update
     #   The Amazon Resource Name (ARN) of the Kinesis data stream where you
     #   want to write the output.
@@ -3745,16 +3244,9 @@ module Aws::KinesisAnalyticsV2
     end
 
     # When you configure a SQL-based Kinesis Data Analytics application's
-    # output, identifies an AWS Lambda function as the destination. You
+    # output, identifies an Amazon Lambda function as the destination. You
     # provide the function Amazon Resource Name (ARN) of the Lambda
     # function.
-    #
-    # @note When making an API call, you may pass LambdaOutput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceARN", # required
-    #       }
     #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the destination Lambda function to
@@ -3762,8 +3254,8 @@ module Aws::KinesisAnalyticsV2
     #
     #   <note markdown="1"> To specify an earlier version of the Lambda function than the
     #   latest, include the Lambda function version in the Lambda function
-    #   ARN. For more information about Lambda ARNs, see [Example ARNs: AWS
-    #   Lambda][1]
+    #   ARN. For more information about Lambda ARNs, see [Example ARNs:
+    #   Amazon Lambda][1]
     #
     #    </note>
     #
@@ -3781,7 +3273,7 @@ module Aws::KinesisAnalyticsV2
     end
 
     # For a SQL-based Kinesis Data Analytics application's output,
-    # describes the AWS Lambda function that is configured as its
+    # describes the Amazon Lambda function that is configured as its
     # destination.
     #
     # @!attribute [rw] resource_arn
@@ -3810,24 +3302,17 @@ module Aws::KinesisAnalyticsV2
 
     # When you update an SQL-based Kinesis Data Analytics application's
     # output configuration using the UpdateApplication operation, provides
-    # information about an AWS Lambda function that is configured as the
+    # information about an Amazon Lambda function that is configured as the
     # destination.
     #
-    # @note When making an API call, you may pass LambdaOutputUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn_update: "ResourceARN", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn_update
-    #   The Amazon Resource Name (ARN) of the destination AWS Lambda
+    #   The Amazon Resource Name (ARN) of the destination Amazon Lambda
     #   function.
     #
     #   <note markdown="1"> To specify an earlier version of the Lambda function than the
     #   latest, include the Lambda function version in the Lambda function
-    #   ARN. For more information about Lambda ARNs, see [Example ARNs: AWS
-    #   Lambda][1]
+    #   ARN. For more information about Lambda ARNs, see [Example ARNs:
+    #   Amazon Lambda][1]
     #
     #    </note>
     #
@@ -3857,15 +3342,61 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListApplicationSnapshotsRequest
-    #   data as a hash:
+    # Request to list operations performed on an application
     #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         limit: 1,
-    #         next_token: "NextToken",
-    #       }
+    # @!attribute [rw] application_name
+    #   The name of the application
+    #   @return [String]
     #
+    # @!attribute [rw] limit
+    #   Limit on the number of records returned in the response
+    #   @return [Integer]
+    #
+    # @!attribute [rw] next_token
+    #   If a previous command returned a pagination token, pass it into this
+    #   value to retrieve the next set of results
+    #   @return [String]
+    #
+    # @!attribute [rw] operation
+    #   Type of operation performed on an application
+    #   @return [String]
+    #
+    # @!attribute [rw] operation_status
+    #   Status of the operation performed on an application
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ListApplicationOperationsRequest AWS API Documentation
+    #
+    class ListApplicationOperationsRequest < Struct.new(
+      :application_name,
+      :limit,
+      :next_token,
+      :operation,
+      :operation_status)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Response with the list of operations for an application
+    #
+    # @!attribute [rw] application_operation_info_list
+    #   List of ApplicationOperationInfo for an application
+    #   @return [Array<Types::ApplicationOperationInfo>]
+    #
+    # @!attribute [rw] next_token
+    #   If a previous command returned a pagination token, pass it into this
+    #   value to retrieve the next set of results
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ListApplicationOperationsResponse AWS API Documentation
+    #
+    class ListApplicationOperationsResponse < Struct.new(
+      :application_operation_info_list,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] application_name
     #   The name of an existing application.
     #   @return [String]
@@ -3910,14 +3441,66 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListApplicationsRequest
-    #   data as a hash:
+    # @!attribute [rw] application_name
+    #   The name of the application for which you want to list all versions.
+    #   @return [String]
     #
-    #       {
-    #         limit: 1,
-    #         next_token: "ApplicationName",
-    #       }
+    # @!attribute [rw] limit
+    #   The maximum number of versions to list in this invocation of the
+    #   operation.
+    #   @return [Integer]
     #
+    # @!attribute [rw] next_token
+    #   If a previous invocation of this operation returned a pagination
+    #   token, pass it into this value to retrieve the next set of results.
+    #   For more information about pagination, see [Using the Amazon Command
+    #   Line Interface's Pagination Options][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/cli/latest/userguide/pagination.html
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ListApplicationVersionsRequest AWS API Documentation
+    #
+    class ListApplicationVersionsRequest < Struct.new(
+      :application_name,
+      :limit,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] application_version_summaries
+    #   A list of the application versions and the associated configuration
+    #   summaries. The list includes application versions that were rolled
+    #   back.
+    #
+    #   To get the complete description of a specific application version,
+    #   invoke the DescribeApplicationVersion operation.
+    #   @return [Array<Types::ApplicationVersionSummary>]
+    #
+    # @!attribute [rw] next_token
+    #   The pagination token for the next set of results, or `null` if there
+    #   are no additional results. To retrieve the next set of items, pass
+    #   this token into a subsequent invocation of this operation. For more
+    #   information about pagination, see [Using the Amazon Command Line
+    #   Interface's Pagination Options][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/cli/latest/userguide/pagination.html
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ListApplicationVersionsResponse AWS API Documentation
+    #
+    class ListApplicationVersionsResponse < Struct.new(
+      :application_version_summaries,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] limit
     #   The maximum number of applications to list.
     #   @return [Integer]
@@ -3925,7 +3508,7 @@ module Aws::KinesisAnalyticsV2
     # @!attribute [rw] next_token
     #   If a previous command returned a pagination token, pass it into this
     #   value to retrieve the next set of results. For more information
-    #   about pagination, see [Using the AWS Command Line Interface's
+    #   about pagination, see [Using the Amazon Command Line Interface's
     #   Pagination Options][1].
     #
     #
@@ -3950,8 +3533,8 @@ module Aws::KinesisAnalyticsV2
     #   The pagination token for the next set of results, or `null` if there
     #   are no additional results. Pass this token into a subsequent command
     #   to retrieve the next set of items For more information about
-    #   pagination, see [Using the AWS Command Line Interface's Pagination
-    #   Options][1].
+    #   pagination, see [Using the Amazon Command Line Interface's
+    #   Pagination Options][1].
     #
     #
     #
@@ -3967,13 +3550,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "KinesisAnalyticsARN", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The ARN of the application for which to retrieve tags.
     #   @return [String]
@@ -4004,19 +3580,6 @@ module Aws::KinesisAnalyticsV2
     # JSON, CSV, or record fields delimited by some delimiter) on the
     # streaming source.
     #
-    # @note When making an API call, you may pass MappingParameters
-    #   data as a hash:
-    #
-    #       {
-    #         json_mapping_parameters: {
-    #           record_row_path: "RecordRowPath", # required
-    #         },
-    #         csv_mapping_parameters: {
-    #           record_row_delimiter: "RecordRowDelimiter", # required
-    #           record_column_delimiter: "RecordColumnDelimiter", # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] json_mapping_parameters
     #   Provides additional mapping information when JSON is the record
     #   format on the streaming source.
@@ -4036,22 +3599,38 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes configuration parameters for Amazon CloudWatch logging for a
-    # Flink-based Kinesis Data Analytics application. For more information
-    # about CloudWatch logging, see [Monitoring][1].
+    # The information required to specify a Maven reference. You can use
+    # Maven references to specify dependency JAR files.
+    #
+    # @!attribute [rw] group_id
+    #   The group ID of the Maven reference.
+    #   @return [String]
+    #
+    # @!attribute [rw] artifact_id
+    #   The artifact ID of the Maven reference.
+    #   @return [String]
+    #
+    # @!attribute [rw] version
+    #   The version of the Maven reference.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/MavenReference AWS API Documentation
+    #
+    class MavenReference < Struct.new(
+      :group_id,
+      :artifact_id,
+      :version)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes configuration parameters for Amazon CloudWatch logging for
+    # an application. For more information about CloudWatch logging, see
+    # [Monitoring][1].
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/kinesisanalytics/latest/java/monitoring-overview.html
-    #
-    # @note When making an API call, you may pass MonitoringConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #         metrics_level: "APPLICATION", # accepts APPLICATION, TASK, OPERATOR, PARALLELISM
-    #         log_level: "INFO", # accepts INFO, WARN, ERROR, DEBUG
-    #       }
     #
     # @!attribute [rw] configuration_type
     #   Describes whether to use the default CloudWatch logging
@@ -4080,8 +3659,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes configuration parameters for CloudWatch logging for a
-    # Flink-based Kinesis Data Analytics application.
+    # Describes configuration parameters for CloudWatch logging for an
+    # application.
     #
     # @!attribute [rw] configuration_type
     #   Describes whether to use the default CloudWatch logging
@@ -4107,16 +3686,7 @@ module Aws::KinesisAnalyticsV2
     end
 
     # Describes updates to configuration parameters for Amazon CloudWatch
-    # logging for a Flink-based Kinesis Data Analytics application.
-    #
-    # @note When making an API call, you may pass MonitoringConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #         metrics_level_update: "APPLICATION", # accepts APPLICATION, TASK, OPERATOR, PARALLELISM
-    #         log_level_update: "INFO", # accepts INFO, WARN, ERROR, DEBUG
-    #       }
+    # logging for an application.
     #
     # @!attribute [rw] configuration_type_update
     #   Describes updates to whether to use the default CloudWatch logging
@@ -4146,30 +3716,31 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
+    # Provides a description of the operation failure
+    #
+    # @!attribute [rw] rollback_operation_id
+    #   Provides the operation ID of a system-rollback operation executed
+    #   due to failure in the current operation
+    #   @return [String]
+    #
+    # @!attribute [rw] error_info
+    #   Provides a description of the operation failure error
+    #   @return [Types::ErrorInfo]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/OperationFailureDetails AWS API Documentation
+    #
+    class OperationFailureDetails < Struct.new(
+      :rollback_operation_id,
+      :error_info)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Describes a SQL-based Kinesis Data Analytics application's output
     # configuration, in which you identify an in-application stream and a
     # destination where you want the in-application stream data to be
     # written. The destination can be a Kinesis data stream or a Kinesis
     # Data Firehose delivery stream.
-    #
-    # @note When making an API call, you may pass Output
-    #   data as a hash:
-    #
-    #       {
-    #         name: "InAppStreamName", # required
-    #         kinesis_streams_output: {
-    #           resource_arn: "ResourceARN", # required
-    #         },
-    #         kinesis_firehose_output: {
-    #           resource_arn: "ResourceARN", # required
-    #         },
-    #         lambda_output: {
-    #           resource_arn: "ResourceARN", # required
-    #         },
-    #         destination_schema: { # required
-    #           record_format_type: "JSON", # required, accepts JSON, CSV
-    #         },
-    #       }
     #
     # @!attribute [rw] name
     #   The name of the in-application stream.
@@ -4185,7 +3756,7 @@ module Aws::KinesisAnalyticsV2
     #   @return [Types::KinesisFirehoseOutput]
     #
     # @!attribute [rw] lambda_output
-    #   Identifies an AWS Lambda function as the destination.
+    #   Identifies an Amazon Lambda function as the destination.
     #   @return [Types::LambdaOutput]
     #
     # @!attribute [rw] destination_schema
@@ -4254,26 +3825,6 @@ module Aws::KinesisAnalyticsV2
     # For a SQL-based Kinesis Data Analytics application, describes updates
     # to the output configuration identified by the `OutputId`.
     #
-    # @note When making an API call, you may pass OutputUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         output_id: "Id", # required
-    #         name_update: "InAppStreamName",
-    #         kinesis_streams_output_update: {
-    #           resource_arn_update: "ResourceARN", # required
-    #         },
-    #         kinesis_firehose_output_update: {
-    #           resource_arn_update: "ResourceARN", # required
-    #         },
-    #         lambda_output_update: {
-    #           resource_arn_update: "ResourceARN", # required
-    #         },
-    #         destination_schema_update: {
-    #           record_format_type: "JSON", # required, accepts JSON, CSV
-    #         },
-    #       }
-    #
     # @!attribute [rw] output_id
     #   Identifies the specific output configuration that you want to
     #   update.
@@ -4295,7 +3846,8 @@ module Aws::KinesisAnalyticsV2
     #   @return [Types::KinesisFirehoseOutputUpdate]
     #
     # @!attribute [rw] lambda_output_update
-    #   Describes an AWS Lambda function as the destination for the output.
+    #   Describes an Amazon Lambda function as the destination for the
+    #   output.
     #   @return [Types::LambdaOutputUpdate]
     #
     # @!attribute [rw] destination_schema_update
@@ -4316,42 +3868,32 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes parameters for how a Flink-based Kinesis Data Analytics
-    # application application executes multiple tasks simultaneously. For
-    # more information about parallelism, see [Parallel Execution][1] in the
+    # Describes parameters for how a Managed Service for Apache Flink
+    # application executes multiple tasks simultaneously. For more
+    # information about parallelism, see [Parallel Execution][1] in the
     # [Apache Flink Documentation][2].
     #
     #
     #
-    # [1]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/dev/parallel.html
-    # [2]: https://ci.apache.org/projects/flink/flink-docs-release-1.8/
-    #
-    # @note When making an API call, you may pass ParallelismConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_type: "DEFAULT", # required, accepts DEFAULT, CUSTOM
-    #         parallelism: 1,
-    #         parallelism_per_kpu: 1,
-    #         auto_scaling_enabled: false,
-    #       }
+    # [1]: https://nightlies.apache.org/flink/flink-docs-release-1.19/dev/parallel.html
+    # [2]: https://nightlies.apache.org/flink/flink-docs-release-1.19/
     #
     # @!attribute [rw] configuration_type
     #   Describes whether the application uses the default parallelism for
-    #   the Kinesis Data Analytics service. You must set this property to
-    #   `CUSTOM` in order to change your application's
+    #   the Managed Service for Apache Flink service. You must set this
+    #   property to `CUSTOM` in order to change your application's
     #   `AutoScalingEnabled`, `Parallelism`, or `ParallelismPerKPU`
     #   properties.
     #   @return [String]
     #
     # @!attribute [rw] parallelism
-    #   Describes the initial number of parallel tasks that a Flink-based
-    #   Kinesis Data Analytics application can perform. If
-    #   `AutoScalingEnabled` is set to True, Kinesis Data Analytics
-    #   increases the `CurrentParallelism` value in response to application
-    #   load. The service can increase the `CurrentParallelism` value up to
-    #   the maximum parallelism, which is `ParalellismPerKPU` times the
-    #   maximum KPUs for the application. The maximum KPUs for an
+    #   Describes the initial number of parallel tasks that a Managed
+    #   Service for Apache Flink application can perform. If
+    #   `AutoScalingEnabled` is set to True, Managed Service for Apache
+    #   Flink increases the `CurrentParallelism` value in response to
+    #   application load. The service can increase the `CurrentParallelism`
+    #   value up to the maximum parallelism, which is `ParalellismPerKPU`
+    #   times the maximum KPUs for the application. The maximum KPUs for an
     #   application is 32 by default, and can be increased by requesting a
     #   limit increase. If application load is reduced, the service can
     #   reduce the `CurrentParallelism` value down to the `Parallelism`
@@ -4359,10 +3901,10 @@ module Aws::KinesisAnalyticsV2
     #   @return [Integer]
     #
     # @!attribute [rw] parallelism_per_kpu
-    #   Describes the number of parallel tasks that a Flink-based Kinesis
-    #   Data Analytics application can perform per Kinesis Processing Unit
+    #   Describes the number of parallel tasks that a Managed Service for
+    #   Apache Flink application can perform per Kinesis Processing Unit
     #   (KPU) used by the application. For more information about KPUs, see
-    #   [Amazon Kinesis Data Analytics Pricing][1].
+    #   [Amazon Managed Service for Apache Flink Pricing][1].
     #
     #
     #
@@ -4370,8 +3912,8 @@ module Aws::KinesisAnalyticsV2
     #   @return [Integer]
     #
     # @!attribute [rw] auto_scaling_enabled
-    #   Describes whether the Kinesis Data Analytics service can increase
-    #   the parallelism of the application in response to increased
+    #   Describes whether the Managed Service for Apache Flink service can
+    #   increase the parallelism of the application in response to increased
     #   throughput.
     #   @return [Boolean]
     #
@@ -4386,49 +3928,50 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes parameters for how a Flink-based Kinesis Data Analytics
+    # Describes parameters for how a Managed Service for Apache Flink
     # application executes multiple tasks simultaneously.
     #
     # @!attribute [rw] configuration_type
     #   Describes whether the application uses the default parallelism for
-    #   the Kinesis Data Analytics service.
+    #   the Managed Service for Apache Flink service.
     #   @return [String]
     #
     # @!attribute [rw] parallelism
-    #   Describes the initial number of parallel tasks that a Flink-based
-    #   Kinesis Data Analytics application can perform. If
-    #   `AutoScalingEnabled` is set to True, then Kinesis Data Analytics can
-    #   increase the `CurrentParallelism` value in response to application
-    #   load. The service can increase `CurrentParallelism` up to the
-    #   maximum parallelism, which is `ParalellismPerKPU` times the maximum
-    #   KPUs for the application. The maximum KPUs for an application is 32
-    #   by default, and can be increased by requesting a limit increase. If
-    #   application load is reduced, the service can reduce the
-    #   `CurrentParallelism` value down to the `Parallelism` setting.
+    #   Describes the initial number of parallel tasks that a Managed
+    #   Service for Apache Flink application can perform. If
+    #   `AutoScalingEnabled` is set to True, then Managed Service for Apache
+    #   Flink can increase the `CurrentParallelism` value in response to
+    #   application load. The service can increase `CurrentParallelism` up
+    #   to the maximum parallelism, which is `ParalellismPerKPU` times the
+    #   maximum KPUs for the application. The maximum KPUs for an
+    #   application is 32 by default, and can be increased by requesting a
+    #   limit increase. If application load is reduced, the service can
+    #   reduce the `CurrentParallelism` value down to the `Parallelism`
+    #   setting.
     #   @return [Integer]
     #
     # @!attribute [rw] parallelism_per_kpu
-    #   Describes the number of parallel tasks that a Flink-based Kinesis
-    #   Data Analytics application can perform per Kinesis Processing Unit
+    #   Describes the number of parallel tasks that a Managed Service for
+    #   Apache Flink application can perform per Kinesis Processing Unit
     #   (KPU) used by the application.
     #   @return [Integer]
     #
     # @!attribute [rw] current_parallelism
-    #   Describes the current number of parallel tasks that a Flink-based
-    #   Kinesis Data Analytics application can perform. If
-    #   `AutoScalingEnabled` is set to True, Kinesis Data Analytics can
-    #   increase this value in response to application load. The service can
-    #   increase this value up to the maximum parallelism, which is
-    #   `ParalellismPerKPU` times the maximum KPUs for the application. The
-    #   maximum KPUs for an application is 32 by default, and can be
+    #   Describes the current number of parallel tasks that a Managed
+    #   Service for Apache Flink application can perform. If
+    #   `AutoScalingEnabled` is set to True, Managed Service for Apache
+    #   Flink can increase this value in response to application load. The
+    #   service can increase this value up to the maximum parallelism, which
+    #   is `ParalellismPerKPU` times the maximum KPUs for the application.
+    #   The maximum KPUs for an application is 32 by default, and can be
     #   increased by requesting a limit increase. If application load is
     #   reduced, the service can reduce the `CurrentParallelism` value down
     #   to the `Parallelism` setting.
     #   @return [Integer]
     #
     # @!attribute [rw] auto_scaling_enabled
-    #   Describes whether the Kinesis Data Analytics service can increase
-    #   the parallelism of the application in response to increased
+    #   Describes whether the Managed Service for Apache Flink service can
+    #   increase the parallelism of the application in response to increased
     #   throughput.
     #   @return [Boolean]
     #
@@ -4444,38 +3987,28 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes updates to parameters for how a Flink-based Kinesis Data
-    # Analytics application executes multiple tasks simultaneously.
-    #
-    # @note When making an API call, you may pass ParallelismConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #         parallelism_update: 1,
-    #         parallelism_per_kpu_update: 1,
-    #         auto_scaling_enabled_update: false,
-    #       }
+    # Describes updates to parameters for how an application executes
+    # multiple tasks simultaneously.
     #
     # @!attribute [rw] configuration_type_update
     #   Describes updates to whether the application uses the default
-    #   parallelism for the Kinesis Data Analytics service, or if a custom
-    #   parallelism is used. You must set this property to `CUSTOM` in order
-    #   to change your application's `AutoScalingEnabled`, `Parallelism`,
-    #   or `ParallelismPerKPU` properties.
+    #   parallelism for the Managed Service for Apache Flink service, or if
+    #   a custom parallelism is used. You must set this property to `CUSTOM`
+    #   in order to change your application's `AutoScalingEnabled`,
+    #   `Parallelism`, or `ParallelismPerKPU` properties.
     #   @return [String]
     #
     # @!attribute [rw] parallelism_update
     #   Describes updates to the initial number of parallel tasks an
     #   application can perform. If `AutoScalingEnabled` is set to True,
-    #   then Kinesis Data Analytics can increase the `CurrentParallelism`
-    #   value in response to application load. The service can increase
-    #   `CurrentParallelism` up to the maximum parallelism, which is
-    #   `ParalellismPerKPU` times the maximum KPUs for the application. The
-    #   maximum KPUs for an application is 32 by default, and can be
-    #   increased by requesting a limit increase. If application load is
-    #   reduced, the service will reduce `CurrentParallelism` down to the
-    #   `Parallelism` setting.
+    #   then Managed Service for Apache Flink can increase the
+    #   `CurrentParallelism` value in response to application load. The
+    #   service can increase `CurrentParallelism` up to the maximum
+    #   parallelism, which is `ParalellismPerKPU` times the maximum KPUs for
+    #   the application. The maximum KPUs for an application is 32 by
+    #   default, and can be increased by requesting a limit increase. If
+    #   application load is reduced, the service will reduce
+    #   `CurrentParallelism` down to the `Parallelism` setting.
     #   @return [Integer]
     #
     # @!attribute [rw] parallelism_per_kpu_update
@@ -4484,9 +4017,9 @@ module Aws::KinesisAnalyticsV2
     #   @return [Integer]
     #
     # @!attribute [rw] auto_scaling_enabled_update
-    #   Describes updates to whether the Kinesis Data Analytics service can
-    #   increase the parallelism of the application in response to increased
-    #   throughput.
+    #   Describes updates to whether the Managed Service for Apache Flink
+    #   service can increase the parallelism of a Managed Service for Apache
+    #   Flink application in response to increased throughput.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ParallelismConfigurationUpdate AWS API Documentation
@@ -4500,18 +4033,7 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Property key-value pairs passed into a Flink-based Kinesis Data
-    # Analytics application.
-    #
-    # @note When making an API call, you may pass PropertyGroup
-    #   data as a hash:
-    #
-    #       {
-    #         property_group_id: "Id", # required
-    #         property_map: { # required
-    #           "PropertyKey" => "PropertyValue",
-    #         },
-    #       }
+    # Property key-value pairs passed into an application.
     #
     # @!attribute [rw] property_group_id
     #   Describes the key of an application execution property key-value
@@ -4537,15 +4059,6 @@ module Aws::KinesisAnalyticsV2
     # corresponding column in the in-application stream.
     #
     # Also used to describe the format of the reference data source.
-    #
-    # @note When making an API call, you may pass RecordColumn
-    #   data as a hash:
-    #
-    #       {
-    #         name: "RecordColumnName", # required
-    #         mapping: "RecordColumnMapping",
-    #         sql_type: "RecordColumnSqlType", # required
-    #       }
     #
     # @!attribute [rw] name
     #   The name of the column that is created in the in-application input
@@ -4576,22 +4089,6 @@ module Aws::KinesisAnalyticsV2
     # record format and relevant mapping information that should be applied
     # to schematize the records on the stream.
     #
-    # @note When making an API call, you may pass RecordFormat
-    #   data as a hash:
-    #
-    #       {
-    #         record_format_type: "JSON", # required, accepts JSON, CSV
-    #         mapping_parameters: {
-    #           json_mapping_parameters: {
-    #             record_row_path: "RecordRowPath", # required
-    #           },
-    #           csv_mapping_parameters: {
-    #             record_row_delimiter: "RecordRowDelimiter", # required
-    #             record_column_delimiter: "RecordColumnDelimiter", # required
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] record_format_type
     #   The type of record format.
     #   @return [String]
@@ -4618,48 +4115,15 @@ module Aws::KinesisAnalyticsV2
     # name that is created, and the necessary schema to map the data
     # elements in the Amazon S3 object to the in-application table.
     #
-    # @note When making an API call, you may pass ReferenceDataSource
-    #   data as a hash:
-    #
-    #       {
-    #         table_name: "InAppTableName", # required
-    #         s3_reference_data_source: {
-    #           bucket_arn: "BucketARN",
-    #           file_key: "FileKey",
-    #         },
-    #         reference_schema: { # required
-    #           record_format: { # required
-    #             record_format_type: "JSON", # required, accepts JSON, CSV
-    #             mapping_parameters: {
-    #               json_mapping_parameters: {
-    #                 record_row_path: "RecordRowPath", # required
-    #               },
-    #               csv_mapping_parameters: {
-    #                 record_row_delimiter: "RecordRowDelimiter", # required
-    #                 record_column_delimiter: "RecordColumnDelimiter", # required
-    #               },
-    #             },
-    #           },
-    #           record_encoding: "RecordEncoding",
-    #           record_columns: [ # required
-    #             {
-    #               name: "RecordColumnName", # required
-    #               mapping: "RecordColumnMapping",
-    #               sql_type: "RecordColumnSqlType", # required
-    #             },
-    #           ],
-    #         },
-    #       }
-    #
     # @!attribute [rw] table_name
     #   The name of the in-application table to create.
     #   @return [String]
     #
     # @!attribute [rw] s3_reference_data_source
     #   Identifies the S3 bucket and object that contains the reference
-    #   data. A Kinesis Data Analytics application loads reference data only
-    #   once. If the data changes, you call the UpdateApplication operation
-    #   to trigger reloading of data into your application.
+    #   data. A SQL-based Kinesis Data Analytics application loads reference
+    #   data only once. If the data changes, you call the UpdateApplication
+    #   operation to trigger reloading of data into your application.
     #   @return [Types::S3ReferenceDataSource]
     #
     # @!attribute [rw] reference_schema
@@ -4721,40 +4185,6 @@ module Aws::KinesisAnalyticsV2
     # the in-application table name that is created, and updated mapping
     # information that maps the data in the Amazon S3 object to the
     # in-application reference table that is created.
-    #
-    # @note When making an API call, you may pass ReferenceDataSourceUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         reference_id: "Id", # required
-    #         table_name_update: "InAppTableName",
-    #         s3_reference_data_source_update: {
-    #           bucket_arn_update: "BucketARN",
-    #           file_key_update: "FileKey",
-    #         },
-    #         reference_schema_update: {
-    #           record_format: { # required
-    #             record_format_type: "JSON", # required, accepts JSON, CSV
-    #             mapping_parameters: {
-    #               json_mapping_parameters: {
-    #                 record_row_path: "RecordRowPath", # required
-    #               },
-    #               csv_mapping_parameters: {
-    #                 record_row_delimiter: "RecordRowDelimiter", # required
-    #                 record_column_delimiter: "RecordColumnDelimiter", # required
-    #               },
-    #             },
-    #           },
-    #           record_encoding: "RecordEncoding",
-    #           record_columns: [ # required
-    #             {
-    #               name: "RecordColumnName", # required
-    #               mapping: "RecordColumnMapping",
-    #               sql_type: "RecordColumnSqlType", # required
-    #             },
-    #           ],
-    #         },
-    #       }
     #
     # @!attribute [rw] reference_id
     #   The ID of the reference data source that is being updated. You can
@@ -4834,33 +4264,49 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes the starting parameters for an Kinesis Data Analytics
-    # application.
+    # @!attribute [rw] application_name
+    #   The name of the application.
+    #   @return [String]
     #
-    # @note When making an API call, you may pass RunConfiguration
-    #   data as a hash:
+    # @!attribute [rw] current_application_version_id
+    #   The current application version ID. You can retrieve the application
+    #   version ID using DescribeApplication.
+    #   @return [Integer]
     #
-    #       {
-    #         flink_run_configuration: {
-    #           allow_non_restored_state: false,
-    #         },
-    #         sql_run_configurations: [
-    #           {
-    #             input_id: "Id", # required
-    #             input_starting_position_configuration: { # required
-    #               input_starting_position: "NOW", # accepts NOW, TRIM_HORIZON, LAST_STOPPED_POINT
-    #             },
-    #           },
-    #         ],
-    #         application_restore_configuration: {
-    #           application_restore_type: "SKIP_RESTORE_FROM_SNAPSHOT", # required, accepts SKIP_RESTORE_FROM_SNAPSHOT, RESTORE_FROM_LATEST_SNAPSHOT, RESTORE_FROM_CUSTOM_SNAPSHOT
-    #           snapshot_name: "SnapshotName",
-    #         },
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/RollbackApplicationRequest AWS API Documentation
+    #
+    class RollbackApplicationRequest < Struct.new(
+      :application_name,
+      :current_application_version_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] application_detail
+    #   Describes the application, including the application Amazon Resource
+    #   Name (ARN), status, latest version, and input and output
+    #   configurations.
+    #   @return [Types::ApplicationDetail]
+    #
+    # @!attribute [rw] operation_id
+    #   Operation ID for tracking RollbackApplication request
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/RollbackApplicationResponse AWS API Documentation
+    #
+    class RollbackApplicationResponse < Struct.new(
+      :application_detail,
+      :operation_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the starting parameters for an Managed Service for Apache
+    # Flink application.
     #
     # @!attribute [rw] flink_run_configuration
-    #   Describes the starting parameters for a Flink-based Kinesis Data
-    #   Analytics application.
+    #   Describes the starting parameters for a Managed Service for Apache
+    #   Flink application.
     #   @return [Types::FlinkRunConfiguration]
     #
     # @!attribute [rw] sql_run_configurations
@@ -4882,16 +4328,16 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes the starting properties for a Kinesis Data Analytics
-    # application.
+    # Describes the starting properties for a Managed Service for Apache
+    # Flink application.
     #
     # @!attribute [rw] application_restore_configuration_description
     #   Describes the restore behavior of a restarting application.
     #   @return [Types::ApplicationRestoreConfiguration]
     #
     # @!attribute [rw] flink_run_configuration_description
-    #   Describes the starting parameters for a Flink-based Kinesis Data
-    #   Analytics application.
+    #   Describes the starting parameters for a Managed Service for Apache
+    #   Flink application.
     #   @return [Types::FlinkRunConfiguration]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/RunConfigurationDescription AWS API Documentation
@@ -4903,25 +4349,12 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes the updates to the starting parameters for a Kinesis Data
-    # Analytics application.
-    #
-    # @note When making an API call, you may pass RunConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         flink_run_configuration: {
-    #           allow_non_restored_state: false,
-    #         },
-    #         application_restore_configuration: {
-    #           application_restore_type: "SKIP_RESTORE_FROM_SNAPSHOT", # required, accepts SKIP_RESTORE_FROM_SNAPSHOT, RESTORE_FROM_LATEST_SNAPSHOT, RESTORE_FROM_CUSTOM_SNAPSHOT
-    #           snapshot_name: "SnapshotName",
-    #         },
-    #       }
+    # Describes the updates to the starting parameters for a Managed Service
+    # for Apache Flink application.
     #
     # @!attribute [rw] flink_run_configuration
-    #   Describes the starting parameters for a Flink-based Kinesis Data
-    #   Analytics application.
+    #   Describes the starting parameters for a Managed Service for Apache
+    #   Flink application.
     #   @return [Types::FlinkRunConfiguration]
     #
     # @!attribute [rw] application_restore_configuration
@@ -4938,8 +4371,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes the location of a Flink-based Kinesis Data Analytics
-    # application's code stored in an S3 bucket.
+    # Describes the location of an application's code stored in an S3
+    # bucket.
     #
     # @!attribute [rw] bucket_arn
     #   The Amazon Resource Name (ARN) for the S3 bucket containing the
@@ -4969,14 +4402,6 @@ module Aws::KinesisAnalyticsV2
     # Name (ARN) of the S3 bucket and the name of the Amazon S3 object that
     # contains the data.
     #
-    # @note When making an API call, you may pass S3Configuration
-    #   data as a hash:
-    #
-    #       {
-    #         bucket_arn: "BucketARN", # required
-    #         file_key: "FileKey", # required
-    #       }
-    #
     # @!attribute [rw] bucket_arn
     #   The ARN of the S3 bucket that contains the data.
     #   @return [String]
@@ -4994,20 +4419,69 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # For a Flink-based Kinesis Data Analytics application, provides a
+    # The S3 bucket that holds the application information.
+    #
+    # @!attribute [rw] bucket_arn
+    #   The Amazon Resource Name (ARN) of the S3 bucket.
+    #   @return [String]
+    #
+    # @!attribute [rw] base_path
+    #   The base path for the S3 bucket.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/S3ContentBaseLocation AWS API Documentation
+    #
+    class S3ContentBaseLocation < Struct.new(
+      :bucket_arn,
+      :base_path)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The description of the S3 base location that holds the application.
+    #
+    # @!attribute [rw] bucket_arn
+    #   The Amazon Resource Name (ARN) of the S3 bucket.
+    #   @return [String]
+    #
+    # @!attribute [rw] base_path
+    #   The base path for the S3 bucket.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/S3ContentBaseLocationDescription AWS API Documentation
+    #
+    class S3ContentBaseLocationDescription < Struct.new(
+      :bucket_arn,
+      :base_path)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The information required to update the S3 base location that holds the
+    # application.
+    #
+    # @!attribute [rw] bucket_arn_update
+    #   The updated Amazon Resource Name (ARN) of the S3 bucket.
+    #   @return [String]
+    #
+    # @!attribute [rw] base_path_update
+    #   The updated S3 bucket path.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/S3ContentBaseLocationUpdate AWS API Documentation
+    #
+    class S3ContentBaseLocationUpdate < Struct.new(
+      :bucket_arn_update,
+      :base_path_update)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # For a Managed Service for Apache Flink application provides a
     # description of an Amazon S3 object, including the Amazon Resource Name
     # (ARN) of the S3 bucket, the name of the Amazon S3 object that contains
     # the data, and the version number of the Amazon S3 object that contains
     # the data.
-    #
-    # @note When making an API call, you may pass S3ContentLocation
-    #   data as a hash:
-    #
-    #       {
-    #         bucket_arn: "BucketARN", # required
-    #         file_key: "FileKey", # required
-    #         object_version: "ObjectVersion",
-    #       }
     #
     # @!attribute [rw] bucket_arn
     #   The Amazon Resource Name (ARN) for the S3 bucket containing the
@@ -5032,17 +4506,8 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # Describes an update for the Amazon S3 code content location for a
-    # Flink-based Kinesis Data Analytics application.
-    #
-    # @note When making an API call, you may pass S3ContentLocationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         bucket_arn_update: "BucketARN",
-    #         file_key_update: "FileKey",
-    #         object_version_update: "ObjectVersion",
-    #       }
+    # Describes an update for the Amazon S3 code content location for an
+    # application.
     #
     # @!attribute [rw] bucket_arn_update
     #   The new Amazon Resource Name (ARN) for the S3 bucket containing the
@@ -5070,17 +4535,9 @@ module Aws::KinesisAnalyticsV2
     # For a SQL-based Kinesis Data Analytics application, identifies the
     # Amazon S3 bucket and object that contains the reference data.
     #
-    # A Kinesis Data Analytics application loads reference data only once.
-    # If the data changes, you call the UpdateApplication operation to
-    # trigger reloading of data into your application.
-    #
-    # @note When making an API call, you may pass S3ReferenceDataSource
-    #   data as a hash:
-    #
-    #       {
-    #         bucket_arn: "BucketARN",
-    #         file_key: "FileKey",
-    #       }
+    # A SQL-based Kinesis Data Analytics application loads reference data
+    # only once. If the data changes, you call the UpdateApplication
+    # operation to trigger reloading of data into your application.
     #
     # @!attribute [rw] bucket_arn
     #   The Amazon Resource Name (ARN) of the S3 bucket.
@@ -5136,14 +4593,6 @@ module Aws::KinesisAnalyticsV2
     # Amazon S3 bucket name and object key name for an in-application
     # reference table.
     #
-    # @note When making an API call, you may pass S3ReferenceDataSourceUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         bucket_arn_update: "BucketARN",
-    #         file_key_update: "FileKey",
-    #       }
-    #
     # @!attribute [rw] bucket_arn_update
     #   The Amazon Resource Name (ARN) of the S3 bucket.
     #   @return [String]
@@ -5192,13 +4641,18 @@ module Aws::KinesisAnalyticsV2
     #   The timestamp of the application snapshot.
     #   @return [Time]
     #
+    # @!attribute [rw] runtime_environment
+    #   The Flink Runtime for the application snapshot.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/SnapshotDetails AWS API Documentation
     #
     class SnapshotDetails < Struct.new(
       :snapshot_name,
       :snapshot_status,
       :application_version_id,
-      :snapshot_creation_timestamp)
+      :snapshot_creation_timestamp,
+      :runtime_environment)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -5206,32 +4660,6 @@ module Aws::KinesisAnalyticsV2
     # For a SQL-based Kinesis Data Analytics application, describes the
     # format of the data in the streaming source, and how each data element
     # maps to corresponding columns created in the in-application stream.
-    #
-    # @note When making an API call, you may pass SourceSchema
-    #   data as a hash:
-    #
-    #       {
-    #         record_format: { # required
-    #           record_format_type: "JSON", # required, accepts JSON, CSV
-    #           mapping_parameters: {
-    #             json_mapping_parameters: {
-    #               record_row_path: "RecordRowPath", # required
-    #             },
-    #             csv_mapping_parameters: {
-    #               record_row_delimiter: "RecordRowDelimiter", # required
-    #               record_column_delimiter: "RecordColumnDelimiter", # required
-    #             },
-    #           },
-    #         },
-    #         record_encoding: "RecordEncoding",
-    #         record_columns: [ # required
-    #           {
-    #             name: "RecordColumnName", # required
-    #             mapping: "RecordColumnMapping",
-    #             sql_type: "RecordColumnSqlType", # required
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] record_format
     #   Specifies the format of the records on the streaming source.
@@ -5258,101 +4686,6 @@ module Aws::KinesisAnalyticsV2
 
     # Describes the inputs, outputs, and reference data sources for a
     # SQL-based Kinesis Data Analytics application.
-    #
-    # @note When making an API call, you may pass SqlApplicationConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         inputs: [
-    #           {
-    #             name_prefix: "InAppStreamName", # required
-    #             input_processing_configuration: {
-    #               input_lambda_processor: { # required
-    #                 resource_arn: "ResourceARN", # required
-    #               },
-    #             },
-    #             kinesis_streams_input: {
-    #               resource_arn: "ResourceARN", # required
-    #             },
-    #             kinesis_firehose_input: {
-    #               resource_arn: "ResourceARN", # required
-    #             },
-    #             input_parallelism: {
-    #               count: 1,
-    #             },
-    #             input_schema: { # required
-    #               record_format: { # required
-    #                 record_format_type: "JSON", # required, accepts JSON, CSV
-    #                 mapping_parameters: {
-    #                   json_mapping_parameters: {
-    #                     record_row_path: "RecordRowPath", # required
-    #                   },
-    #                   csv_mapping_parameters: {
-    #                     record_row_delimiter: "RecordRowDelimiter", # required
-    #                     record_column_delimiter: "RecordColumnDelimiter", # required
-    #                   },
-    #                 },
-    #               },
-    #               record_encoding: "RecordEncoding",
-    #               record_columns: [ # required
-    #                 {
-    #                   name: "RecordColumnName", # required
-    #                   mapping: "RecordColumnMapping",
-    #                   sql_type: "RecordColumnSqlType", # required
-    #                 },
-    #               ],
-    #             },
-    #           },
-    #         ],
-    #         outputs: [
-    #           {
-    #             name: "InAppStreamName", # required
-    #             kinesis_streams_output: {
-    #               resource_arn: "ResourceARN", # required
-    #             },
-    #             kinesis_firehose_output: {
-    #               resource_arn: "ResourceARN", # required
-    #             },
-    #             lambda_output: {
-    #               resource_arn: "ResourceARN", # required
-    #             },
-    #             destination_schema: { # required
-    #               record_format_type: "JSON", # required, accepts JSON, CSV
-    #             },
-    #           },
-    #         ],
-    #         reference_data_sources: [
-    #           {
-    #             table_name: "InAppTableName", # required
-    #             s3_reference_data_source: {
-    #               bucket_arn: "BucketARN",
-    #               file_key: "FileKey",
-    #             },
-    #             reference_schema: { # required
-    #               record_format: { # required
-    #                 record_format_type: "JSON", # required, accepts JSON, CSV
-    #                 mapping_parameters: {
-    #                   json_mapping_parameters: {
-    #                     record_row_path: "RecordRowPath", # required
-    #                   },
-    #                   csv_mapping_parameters: {
-    #                     record_row_delimiter: "RecordRowDelimiter", # required
-    #                     record_column_delimiter: "RecordColumnDelimiter", # required
-    #                   },
-    #                 },
-    #               },
-    #               record_encoding: "RecordEncoding",
-    #               record_columns: [ # required
-    #                 {
-    #                   name: "RecordColumnName", # required
-    #                   mapping: "RecordColumnMapping",
-    #                   sql_type: "RecordColumnSqlType", # required
-    #                 },
-    #               ],
-    #             },
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] inputs
     #   The array of Input objects describing the input streams used by the
@@ -5411,104 +4744,6 @@ module Aws::KinesisAnalyticsV2
     # reference data sources for a SQL-based Kinesis Data Analytics
     # application.
     #
-    # @note When making an API call, you may pass SqlApplicationConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         input_updates: [
-    #           {
-    #             input_id: "Id", # required
-    #             name_prefix_update: "InAppStreamName",
-    #             input_processing_configuration_update: {
-    #               input_lambda_processor_update: { # required
-    #                 resource_arn_update: "ResourceARN", # required
-    #               },
-    #             },
-    #             kinesis_streams_input_update: {
-    #               resource_arn_update: "ResourceARN", # required
-    #             },
-    #             kinesis_firehose_input_update: {
-    #               resource_arn_update: "ResourceARN", # required
-    #             },
-    #             input_schema_update: {
-    #               record_format_update: {
-    #                 record_format_type: "JSON", # required, accepts JSON, CSV
-    #                 mapping_parameters: {
-    #                   json_mapping_parameters: {
-    #                     record_row_path: "RecordRowPath", # required
-    #                   },
-    #                   csv_mapping_parameters: {
-    #                     record_row_delimiter: "RecordRowDelimiter", # required
-    #                     record_column_delimiter: "RecordColumnDelimiter", # required
-    #                   },
-    #                 },
-    #               },
-    #               record_encoding_update: "RecordEncoding",
-    #               record_column_updates: [
-    #                 {
-    #                   name: "RecordColumnName", # required
-    #                   mapping: "RecordColumnMapping",
-    #                   sql_type: "RecordColumnSqlType", # required
-    #                 },
-    #               ],
-    #             },
-    #             input_parallelism_update: {
-    #               count_update: 1, # required
-    #             },
-    #           },
-    #         ],
-    #         output_updates: [
-    #           {
-    #             output_id: "Id", # required
-    #             name_update: "InAppStreamName",
-    #             kinesis_streams_output_update: {
-    #               resource_arn_update: "ResourceARN", # required
-    #             },
-    #             kinesis_firehose_output_update: {
-    #               resource_arn_update: "ResourceARN", # required
-    #             },
-    #             lambda_output_update: {
-    #               resource_arn_update: "ResourceARN", # required
-    #             },
-    #             destination_schema_update: {
-    #               record_format_type: "JSON", # required, accepts JSON, CSV
-    #             },
-    #           },
-    #         ],
-    #         reference_data_source_updates: [
-    #           {
-    #             reference_id: "Id", # required
-    #             table_name_update: "InAppTableName",
-    #             s3_reference_data_source_update: {
-    #               bucket_arn_update: "BucketARN",
-    #               file_key_update: "FileKey",
-    #             },
-    #             reference_schema_update: {
-    #               record_format: { # required
-    #                 record_format_type: "JSON", # required, accepts JSON, CSV
-    #                 mapping_parameters: {
-    #                   json_mapping_parameters: {
-    #                     record_row_path: "RecordRowPath", # required
-    #                   },
-    #                   csv_mapping_parameters: {
-    #                     record_row_delimiter: "RecordRowDelimiter", # required
-    #                     record_column_delimiter: "RecordColumnDelimiter", # required
-    #                   },
-    #                 },
-    #               },
-    #               record_encoding: "RecordEncoding",
-    #               record_columns: [ # required
-    #                 {
-    #                   name: "RecordColumnName", # required
-    #                   mapping: "RecordColumnMapping",
-    #                   sql_type: "RecordColumnSqlType", # required
-    #                 },
-    #               ],
-    #             },
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] input_updates
     #   The array of InputUpdate objects describing the new input streams
     #   used by the application.
@@ -5537,16 +4772,6 @@ module Aws::KinesisAnalyticsV2
     # Describes the starting parameters for a SQL-based Kinesis Data
     # Analytics application.
     #
-    # @note When making an API call, you may pass SqlRunConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         input_id: "Id", # required
-    #         input_starting_position_configuration: { # required
-    #           input_starting_position: "NOW", # accepts NOW, TRIM_HORIZON, LAST_STOPPED_POINT
-    #         },
-    #       }
-    #
     # @!attribute [rw] input_id
     #   The input source ID. You can get this ID by calling the
     #   DescribeApplication operation.
@@ -5566,37 +4791,13 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass StartApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         run_configuration: { # required
-    #           flink_run_configuration: {
-    #             allow_non_restored_state: false,
-    #           },
-    #           sql_run_configurations: [
-    #             {
-    #               input_id: "Id", # required
-    #               input_starting_position_configuration: { # required
-    #                 input_starting_position: "NOW", # accepts NOW, TRIM_HORIZON, LAST_STOPPED_POINT
-    #               },
-    #             },
-    #           ],
-    #           application_restore_configuration: {
-    #             application_restore_type: "SKIP_RESTORE_FROM_SNAPSHOT", # required, accepts SKIP_RESTORE_FROM_SNAPSHOT, RESTORE_FROM_LATEST_SNAPSHOT, RESTORE_FROM_CUSTOM_SNAPSHOT
-    #             snapshot_name: "SnapshotName",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of the application.
     #   @return [String]
     #
     # @!attribute [rw] run_configuration
-    #   Identifies the run configuration (start parameters) of a Kinesis
-    #   Data Analytics application.
+    #   Identifies the run configuration (start parameters) of a Managed
+    #   Service for Apache Flink application.
     #   @return [Types::RunConfiguration]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/StartApplicationRequest AWS API Documentation
@@ -5608,26 +4809,26 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
+    # @!attribute [rw] operation_id
+    #   Operation ID for tracking StartApplication request
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/StartApplicationResponse AWS API Documentation
     #
-    class StartApplicationResponse < Aws::EmptyStructure; end
+    class StartApplicationResponse < Struct.new(
+      :operation_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
 
-    # @note When making an API call, you may pass StopApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         force: false,
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of the running application to stop.
     #   @return [String]
     #
     # @!attribute [rw] force
     #   Set to `true` to force the application to stop. If you set `Force`
-    #   to `true`, Kinesis Data Analytics stops the application without
-    #   taking a snapshot.
+    #   to `true`, Managed Service for Apache Flink stops the application
+    #   without taking a snapshot.
     #
     #   <note markdown="1"> Force-stopping your application may lead to data loss or
     #   duplication. To prevent data loss or duplicate processing of data
@@ -5636,7 +4837,7 @@ module Aws::KinesisAnalyticsV2
     #
     #    </note>
     #
-    #   You can only force stop a Flink-based Kinesis Data Analytics
+    #   You can only force stop a Managed Service for Apache Flink
     #   application. You can't force stop a SQL-based Kinesis Data
     #   Analytics application.
     #
@@ -5653,28 +4854,28 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
+    # @!attribute [rw] operation_id
+    #   Operation ID for tracking StopApplication request
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/StopApplicationResponse AWS API Documentation
     #
-    class StopApplicationResponse < Aws::EmptyStructure; end
+    class StopApplicationResponse < Struct.new(
+      :operation_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
 
     # A key-value pair (the value is optional) that you can define and
-    # assign to AWS resources. If you specify a tag that already exists, the
-    # tag value is replaced with the value that you specify in the request.
-    # Note that the maximum number of application tags includes system tags.
-    # The maximum number of user-defined application tags is 50. For more
-    # information, see [Using Tagging][1].
+    # assign to Amazon resources. If you specify a tag that already exists,
+    # the tag value is replaced with the value that you specify in the
+    # request. Note that the maximum number of application tags includes
+    # system tags. The maximum number of user-defined application tags is
+    # 50. For more information, see [Using Tagging][1].
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-tagging.html
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey", # required
-    #         value: "TagValue",
-    #       }
     #
     # @!attribute [rw] key
     #   The key of the key-value tag.
@@ -5693,19 +4894,6 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "KinesisAnalyticsARN", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The ARN of the application to assign the tags.
     #   @return [String]
@@ -5782,17 +4970,9 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "KinesisAnalyticsARN", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
-    #   The ARN of the Kinesis Data Analytics application from which to
-    #   remove the tags.
+    #   The ARN of the Managed Service for Apache Flink application from
+    #   which to remove the tags.
     #   @return [String]
     #
     # @!attribute [rw] tag_keys
@@ -5812,184 +4992,52 @@ module Aws::KinesisAnalyticsV2
     #
     class UntagResourceResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UpdateApplicationRequest
-    #   data as a hash:
+    # @!attribute [rw] application_name
+    #   The name of the application for which you want to update the
+    #   maintenance configuration.
+    #   @return [String]
     #
-    #       {
-    #         application_name: "ApplicationName", # required
-    #         current_application_version_id: 1, # required
-    #         application_configuration_update: {
-    #           sql_application_configuration_update: {
-    #             input_updates: [
-    #               {
-    #                 input_id: "Id", # required
-    #                 name_prefix_update: "InAppStreamName",
-    #                 input_processing_configuration_update: {
-    #                   input_lambda_processor_update: { # required
-    #                     resource_arn_update: "ResourceARN", # required
-    #                   },
-    #                 },
-    #                 kinesis_streams_input_update: {
-    #                   resource_arn_update: "ResourceARN", # required
-    #                 },
-    #                 kinesis_firehose_input_update: {
-    #                   resource_arn_update: "ResourceARN", # required
-    #                 },
-    #                 input_schema_update: {
-    #                   record_format_update: {
-    #                     record_format_type: "JSON", # required, accepts JSON, CSV
-    #                     mapping_parameters: {
-    #                       json_mapping_parameters: {
-    #                         record_row_path: "RecordRowPath", # required
-    #                       },
-    #                       csv_mapping_parameters: {
-    #                         record_row_delimiter: "RecordRowDelimiter", # required
-    #                         record_column_delimiter: "RecordColumnDelimiter", # required
-    #                       },
-    #                     },
-    #                   },
-    #                   record_encoding_update: "RecordEncoding",
-    #                   record_column_updates: [
-    #                     {
-    #                       name: "RecordColumnName", # required
-    #                       mapping: "RecordColumnMapping",
-    #                       sql_type: "RecordColumnSqlType", # required
-    #                     },
-    #                   ],
-    #                 },
-    #                 input_parallelism_update: {
-    #                   count_update: 1, # required
-    #                 },
-    #               },
-    #             ],
-    #             output_updates: [
-    #               {
-    #                 output_id: "Id", # required
-    #                 name_update: "InAppStreamName",
-    #                 kinesis_streams_output_update: {
-    #                   resource_arn_update: "ResourceARN", # required
-    #                 },
-    #                 kinesis_firehose_output_update: {
-    #                   resource_arn_update: "ResourceARN", # required
-    #                 },
-    #                 lambda_output_update: {
-    #                   resource_arn_update: "ResourceARN", # required
-    #                 },
-    #                 destination_schema_update: {
-    #                   record_format_type: "JSON", # required, accepts JSON, CSV
-    #                 },
-    #               },
-    #             ],
-    #             reference_data_source_updates: [
-    #               {
-    #                 reference_id: "Id", # required
-    #                 table_name_update: "InAppTableName",
-    #                 s3_reference_data_source_update: {
-    #                   bucket_arn_update: "BucketARN",
-    #                   file_key_update: "FileKey",
-    #                 },
-    #                 reference_schema_update: {
-    #                   record_format: { # required
-    #                     record_format_type: "JSON", # required, accepts JSON, CSV
-    #                     mapping_parameters: {
-    #                       json_mapping_parameters: {
-    #                         record_row_path: "RecordRowPath", # required
-    #                       },
-    #                       csv_mapping_parameters: {
-    #                         record_row_delimiter: "RecordRowDelimiter", # required
-    #                         record_column_delimiter: "RecordColumnDelimiter", # required
-    #                       },
-    #                     },
-    #                   },
-    #                   record_encoding: "RecordEncoding",
-    #                   record_columns: [ # required
-    #                     {
-    #                       name: "RecordColumnName", # required
-    #                       mapping: "RecordColumnMapping",
-    #                       sql_type: "RecordColumnSqlType", # required
-    #                     },
-    #                   ],
-    #                 },
-    #               },
-    #             ],
-    #           },
-    #           application_code_configuration_update: {
-    #             code_content_type_update: "PLAINTEXT", # accepts PLAINTEXT, ZIPFILE
-    #             code_content_update: {
-    #               text_content_update: "TextContent",
-    #               zip_file_content_update: "data",
-    #               s3_content_location_update: {
-    #                 bucket_arn_update: "BucketARN",
-    #                 file_key_update: "FileKey",
-    #                 object_version_update: "ObjectVersion",
-    #               },
-    #             },
-    #           },
-    #           flink_application_configuration_update: {
-    #             checkpoint_configuration_update: {
-    #               configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #               checkpointing_enabled_update: false,
-    #               checkpoint_interval_update: 1,
-    #               min_pause_between_checkpoints_update: 1,
-    #             },
-    #             monitoring_configuration_update: {
-    #               configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #               metrics_level_update: "APPLICATION", # accepts APPLICATION, TASK, OPERATOR, PARALLELISM
-    #               log_level_update: "INFO", # accepts INFO, WARN, ERROR, DEBUG
-    #             },
-    #             parallelism_configuration_update: {
-    #               configuration_type_update: "DEFAULT", # accepts DEFAULT, CUSTOM
-    #               parallelism_update: 1,
-    #               parallelism_per_kpu_update: 1,
-    #               auto_scaling_enabled_update: false,
-    #             },
-    #           },
-    #           environment_property_updates: {
-    #             property_groups: [ # required
-    #               {
-    #                 property_group_id: "Id", # required
-    #                 property_map: { # required
-    #                   "PropertyKey" => "PropertyValue",
-    #                 },
-    #               },
-    #             ],
-    #           },
-    #           application_snapshot_configuration_update: {
-    #             snapshots_enabled_update: false, # required
-    #           },
-    #           vpc_configuration_updates: [
-    #             {
-    #               vpc_configuration_id: "Id", # required
-    #               subnet_id_updates: ["SubnetId"],
-    #               security_group_id_updates: ["SecurityGroupId"],
-    #             },
-    #           ],
-    #         },
-    #         service_execution_role_update: "RoleARN",
-    #         run_configuration_update: {
-    #           flink_run_configuration: {
-    #             allow_non_restored_state: false,
-    #           },
-    #           application_restore_configuration: {
-    #             application_restore_type: "SKIP_RESTORE_FROM_SNAPSHOT", # required, accepts SKIP_RESTORE_FROM_SNAPSHOT, RESTORE_FROM_LATEST_SNAPSHOT, RESTORE_FROM_CUSTOM_SNAPSHOT
-    #             snapshot_name: "SnapshotName",
-    #           },
-    #         },
-    #         cloud_watch_logging_option_updates: [
-    #           {
-    #             cloud_watch_logging_option_id: "Id", # required
-    #             log_stream_arn_update: "LogStreamARN",
-    #           },
-    #         ],
-    #       }
+    # @!attribute [rw] application_maintenance_configuration_update
+    #   Describes the application maintenance configuration update.
+    #   @return [Types::ApplicationMaintenanceConfigurationUpdate]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/UpdateApplicationMaintenanceConfigurationRequest AWS API Documentation
+    #
+    class UpdateApplicationMaintenanceConfigurationRequest < Struct.new(
+      :application_name,
+      :application_maintenance_configuration_update)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] application_arn
+    #   The Amazon Resource Name (ARN) of the application.
+    #   @return [String]
+    #
+    # @!attribute [rw] application_maintenance_configuration_description
+    #   The application maintenance configuration description after the
+    #   update.
+    #   @return [Types::ApplicationMaintenanceConfigurationDescription]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/UpdateApplicationMaintenanceConfigurationResponse AWS API Documentation
+    #
+    class UpdateApplicationMaintenanceConfigurationResponse < Struct.new(
+      :application_arn,
+      :application_maintenance_configuration_description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] application_name
     #   The name of the application to update.
     #   @return [String]
     #
     # @!attribute [rw] current_application_version_id
-    #   The current application version ID. You can retrieve the application
-    #   version ID using DescribeApplication.
+    #   The current application version ID. You must provide the
+    #   `CurrentApplicationVersionId` or the `ConditionalToken`.You can
+    #   retrieve the application version ID using DescribeApplication. For
+    #   better concurrency support, use the `ConditionalToken` parameter
+    #   instead of `CurrentApplicationVersionId`.
     #   @return [Integer]
     #
     # @!attribute [rw] application_configuration_update
@@ -6011,6 +5059,26 @@ module Aws::KinesisAnalyticsV2
     #   AddApplicationCloudWatchLoggingOption.
     #   @return [Array<Types::CloudWatchLoggingOptionUpdate>]
     #
+    # @!attribute [rw] conditional_token
+    #   A value you use to implement strong concurrency for application
+    #   updates. You must provide the `CurrentApplicationVersionId` or the
+    #   `ConditionalToken`. You get the application's current
+    #   `ConditionalToken` using DescribeApplication. For better concurrency
+    #   support, use the `ConditionalToken` parameter instead of
+    #   `CurrentApplicationVersionId`.
+    #   @return [String]
+    #
+    # @!attribute [rw] runtime_environment_update
+    #   Updates the Managed Service for Apache Flink runtime environment
+    #   used to run your code. To avoid issues you must:
+    #
+    #   * Ensure your new jar and dependencies are compatible with the new
+    #     runtime selected.
+    #
+    #   * Ensure your new code's state is compatible with the snapshot from
+    #     which your application will start
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/UpdateApplicationRequest AWS API Documentation
     #
     class UpdateApplicationRequest < Struct.new(
@@ -6019,7 +5087,9 @@ module Aws::KinesisAnalyticsV2
       :application_configuration_update,
       :service_execution_role_update,
       :run_configuration_update,
-      :cloud_watch_logging_option_updates)
+      :cloud_watch_logging_option_updates,
+      :conditional_token,
+      :runtime_environment_update)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -6028,23 +5098,20 @@ module Aws::KinesisAnalyticsV2
     #   Describes application updates.
     #   @return [Types::ApplicationDetail]
     #
+    # @!attribute [rw] operation_id
+    #   Operation ID for tracking UpdateApplication request
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/UpdateApplicationResponse AWS API Documentation
     #
     class UpdateApplicationResponse < Struct.new(
-      :application_detail)
+      :application_detail,
+      :operation_id)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Describes the parameters of a VPC used by the application.
-    #
-    # @note When making an API call, you may pass VpcConfiguration
-    #   data as a hash:
-    #
-    #       {
-    #         subnet_ids: ["SubnetId"], # required
-    #         security_group_ids: ["SecurityGroupId"], # required
-    #       }
     #
     # @!attribute [rw] subnet_ids
     #   The array of [Subnet][1] IDs used by the VPC configuration.
@@ -6110,15 +5177,6 @@ module Aws::KinesisAnalyticsV2
 
     # Describes updates to the VPC configuration used by the application.
     #
-    # @note When making an API call, you may pass VpcConfigurationUpdate
-    #   data as a hash:
-    #
-    #       {
-    #         vpc_configuration_id: "Id", # required
-    #         subnet_id_updates: ["SubnetId"],
-    #         security_group_id_updates: ["SecurityGroupId"],
-    #       }
-    #
     # @!attribute [rw] vpc_configuration_id
     #   Describes an update to the ID of the VPC configuration.
     #   @return [String]
@@ -6151,5 +5209,161 @@ module Aws::KinesisAnalyticsV2
       include Aws::Structure
     end
 
+    # The configuration of a Managed Service for Apache Flink Studio
+    # notebook.
+    #
+    # @!attribute [rw] monitoring_configuration
+    #   The monitoring configuration of a Managed Service for Apache Flink
+    #   Studio notebook.
+    #   @return [Types::ZeppelinMonitoringConfiguration]
+    #
+    # @!attribute [rw] catalog_configuration
+    #   The Amazon Glue Data Catalog that you use in queries in a Managed
+    #   Service for Apache Flink Studio notebook.
+    #   @return [Types::CatalogConfiguration]
+    #
+    # @!attribute [rw] deploy_as_application_configuration
+    #   The information required to deploy a Managed Service for Apache
+    #   Flink Studio notebook as an application with durable state.
+    #   @return [Types::DeployAsApplicationConfiguration]
+    #
+    # @!attribute [rw] custom_artifacts_configuration
+    #   Custom artifacts are dependency JARs and user-defined functions
+    #   (UDF).
+    #   @return [Array<Types::CustomArtifactConfiguration>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ZeppelinApplicationConfiguration AWS API Documentation
+    #
+    class ZeppelinApplicationConfiguration < Struct.new(
+      :monitoring_configuration,
+      :catalog_configuration,
+      :deploy_as_application_configuration,
+      :custom_artifacts_configuration)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The configuration of a Managed Service for Apache Flink Studio
+    # notebook.
+    #
+    # @!attribute [rw] monitoring_configuration_description
+    #   The monitoring configuration of a Managed Service for Apache Flink
+    #   Studio notebook.
+    #   @return [Types::ZeppelinMonitoringConfigurationDescription]
+    #
+    # @!attribute [rw] catalog_configuration_description
+    #   The Amazon Glue Data Catalog that is associated with the Managed
+    #   Service for Apache Flink Studio notebook.
+    #   @return [Types::CatalogConfigurationDescription]
+    #
+    # @!attribute [rw] deploy_as_application_configuration_description
+    #   The parameters required to deploy a Managed Service for Apache Flink
+    #   Studio notebook as an application with durable state.
+    #   @return [Types::DeployAsApplicationConfigurationDescription]
+    #
+    # @!attribute [rw] custom_artifacts_configuration_description
+    #   Custom artifacts are dependency JARs and user-defined functions
+    #   (UDF).
+    #   @return [Array<Types::CustomArtifactConfigurationDescription>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ZeppelinApplicationConfigurationDescription AWS API Documentation
+    #
+    class ZeppelinApplicationConfigurationDescription < Struct.new(
+      :monitoring_configuration_description,
+      :catalog_configuration_description,
+      :deploy_as_application_configuration_description,
+      :custom_artifacts_configuration_description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Updates to the configuration of Managed Service for Apache Flink
+    # Studio notebook.
+    #
+    # @!attribute [rw] monitoring_configuration_update
+    #   Updates to the monitoring configuration of a Managed Service for
+    #   Apache Flink Studio notebook.
+    #   @return [Types::ZeppelinMonitoringConfigurationUpdate]
+    #
+    # @!attribute [rw] catalog_configuration_update
+    #   Updates to the configuration of the Amazon Glue Data Catalog that is
+    #   associated with the Managed Service for Apache Flink Studio
+    #   notebook.
+    #   @return [Types::CatalogConfigurationUpdate]
+    #
+    # @!attribute [rw] deploy_as_application_configuration_update
+    #   Updates to the configuration information required to deploy an
+    #   Amazon Data Analytics Studio notebook as an application with durable
+    #   state.
+    #   @return [Types::DeployAsApplicationConfigurationUpdate]
+    #
+    # @!attribute [rw] custom_artifacts_configuration_update
+    #   Updates to the customer artifacts. Custom artifacts are dependency
+    #   JAR files and user-defined functions (UDF).
+    #   @return [Array<Types::CustomArtifactConfiguration>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ZeppelinApplicationConfigurationUpdate AWS API Documentation
+    #
+    class ZeppelinApplicationConfigurationUpdate < Struct.new(
+      :monitoring_configuration_update,
+      :catalog_configuration_update,
+      :deploy_as_application_configuration_update,
+      :custom_artifacts_configuration_update)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes configuration parameters for Amazon CloudWatch logging for a
+    # Managed Service for Apache Flink Studio notebook. For more information
+    # about CloudWatch logging, see [Monitoring][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/kinesisanalytics/latest/java/monitoring-overview.html
+    #
+    # @!attribute [rw] log_level
+    #   The verbosity of the CloudWatch Logs for an application.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ZeppelinMonitoringConfiguration AWS API Documentation
+    #
+    class ZeppelinMonitoringConfiguration < Struct.new(
+      :log_level)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The monitoring configuration for Apache Zeppelin within a Managed
+    # Service for Apache Flink Studio notebook.
+    #
+    # @!attribute [rw] log_level
+    #   Describes the verbosity of the CloudWatch Logs for an application.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ZeppelinMonitoringConfigurationDescription AWS API Documentation
+    #
+    class ZeppelinMonitoringConfigurationDescription < Struct.new(
+      :log_level)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Updates to the monitoring configuration for Apache Zeppelin within a
+    # Managed Service for Apache Flink Studio notebook.
+    #
+    # @!attribute [rw] log_level_update
+    #   Updates to the logging level for Apache Zeppelin within a Managed
+    #   Service for Apache Flink Studio notebook.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/kinesisanalyticsv2-2018-05-23/ZeppelinMonitoringConfigurationUpdate AWS API Documentation
+    #
+    class ZeppelinMonitoringConfigurationUpdate < Struct.new(
+      :log_level_update)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
   end
 end
+

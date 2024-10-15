@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -23,18 +23,6 @@ module Aws::MigrationHubConfig
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateHomeRegionControlRequest
-    #   data as a hash:
-    #
-    #       {
-    #         home_region: "HomeRegion", # required
-    #         target: { # required
-    #           type: "ACCOUNT", # required, accepts ACCOUNT
-    #           id: "TargetId",
-    #         },
-    #         dry_run: false,
-    #       }
-    #
     # @!attribute [rw] home_region
     #   The name of the home region of the calling account.
     #   @return [String]
@@ -72,20 +60,24 @@ module Aws::MigrationHubConfig
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeHomeRegionControlsRequest
-    #   data as a hash:
+    # @!attribute [rw] control_id
+    #   A unique identifier that's generated for each home region control.
+    #   It's always a string that begins with "hrc-" followed by 12
+    #   lowercase letters and numbers.
+    #   @return [String]
     #
-    #       {
-    #         control_id: "ControlId",
-    #         home_region: "HomeRegion",
-    #         target: {
-    #           type: "ACCOUNT", # required, accepts ACCOUNT
-    #           id: "TargetId",
-    #         },
-    #         max_results: 1,
-    #         next_token: "Token",
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/migrationhub-config-2019-06-30/DeleteHomeRegionControlRequest AWS API Documentation
     #
+    class DeleteHomeRegionControlRequest < Struct.new(
+      :control_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/migrationhub-config-2019-06-30/DeleteHomeRegionControlResult AWS API Documentation
+    #
+    class DeleteHomeRegionControlResult < Aws::EmptyStructure; end
+
     # @!attribute [rw] control_id
     #   The `ControlID` is a unique identifier string of your
     #   `HomeRegionControl` object.
@@ -258,14 +250,6 @@ module Aws::MigrationHubConfig
     # is applied, which is always an `ACCOUNT`. It applies the home region
     # to the current `ACCOUNT`.
     #
-    # @note When making an API call, you may pass Target
-    #   data as a hash:
-    #
-    #       {
-    #         type: "ACCOUNT", # required, accepts ACCOUNT
-    #         id: "TargetId",
-    #       }
-    #
     # @!attribute [rw] type
     #   The target type is always an `ACCOUNT`.
     #   @return [String]
@@ -304,3 +288,4 @@ module Aws::MigrationHubConfig
 
   end
 end
+

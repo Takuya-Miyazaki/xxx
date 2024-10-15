@@ -26,13 +26,21 @@ module Aws
 
       def filter(values, type)
         case values
-        when Struct, Hash then filter_hash(values, type)
+        when Struct then filter_struct(values, type)
+        when Hash then filter_hash(values, type)
         when Array then filter_array(values, type)
         else values
         end
       end
 
       private
+
+      def filter_struct(values, type)
+        if values.class.include? Aws::Structure::Union
+          values = { values.member => values.value }
+        end
+        filter_hash(values, type)
+      end
 
       def filter_hash(values, type)
         if type.const_defined?('SENSITIVE')
@@ -47,14 +55,14 @@ module Aws
           filtered[key] = if @enabled && filters.include?(key)
             '[FILTERED]'
           else
-            filter(value, type)
+            filter(value, value.class)
           end
         end
         filtered
       end
 
       def filter_array(values, type)
-        values.map { |value| filter(value, type) }
+        values.map { |value| filter(value, value.class) }
       end
 
     end

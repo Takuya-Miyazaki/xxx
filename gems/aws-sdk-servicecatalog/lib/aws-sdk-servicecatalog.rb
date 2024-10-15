@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-servicecatalog/types'
-require_relative 'aws-sdk-servicecatalog/client_api'
-require_relative 'aws-sdk-servicecatalog/client'
-require_relative 'aws-sdk-servicecatalog/errors'
-require_relative 'aws-sdk-servicecatalog/resource'
-require_relative 'aws-sdk-servicecatalog/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:servicecatalog)
 
 # This module provides support for AWS Service Catalog. This module is available in the
 # `aws-sdk-servicecatalog` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-servicecatalog/customizations'
 #
 # @!group service
 module Aws::ServiceCatalog
+  autoload :Types, 'aws-sdk-servicecatalog/types'
+  autoload :ClientApi, 'aws-sdk-servicecatalog/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-servicecatalog/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-servicecatalog/client'
+  autoload :Errors, 'aws-sdk-servicecatalog/errors'
+  autoload :Resource, 'aws-sdk-servicecatalog/resource'
+  autoload :EndpointParameters, 'aws-sdk-servicecatalog/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-servicecatalog/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-servicecatalog/endpoints'
 
-  GEM_VERSION = '1.57.0'
+  GEM_VERSION = '1.105.0'
 
 end
+
+require_relative 'aws-sdk-servicecatalog/customizations'

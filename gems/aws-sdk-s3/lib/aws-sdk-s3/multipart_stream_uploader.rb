@@ -26,6 +26,10 @@ module Aws
       UPLOAD_PART_OPTIONS =
         Set.new(Client.api.operation(:upload_part).input.shape.member_names)
 
+      # @api private
+      COMPLETE_UPLOAD_OPTIONS =
+        Set.new(Client.api.operation(:complete_multipart_upload).input.shape.member_names)
+
       # @option options [Client] :client
       def initialize(options = {})
         @client = options[:client] || Client.new
@@ -39,11 +43,14 @@ module Aws
 
       # @option options [required,String] :bucket
       # @option options [required,String] :key
-      # @return [void]
+      # @option options [Integer] :thread_count (THREAD_COUNT)
+      # @return [Seahorse::Client::Response] - the CompleteMultipartUploadResponse
       def upload(options = {}, &block)
-        upload_id = initiate_upload(options)
-        parts = upload_parts(upload_id, options, &block)
-        complete_upload(upload_id, parts, options)
+        Aws::Plugins::UserAgent.metric('S3_TRANSFER') do
+          upload_id = initiate_upload(options)
+          parts = upload_parts(upload_id, options, &block)
+          complete_upload(upload_id, parts, options)
+        end
       end
 
       private
@@ -54,17 +61,22 @@ module Aws
 
       def complete_upload(upload_id, parts, options)
         @client.complete_multipart_upload(
-          bucket: options[:bucket],
-          key: options[:key],
-          upload_id: upload_id,
-          multipart_upload: { parts: parts })
+          **complete_opts(options).merge(
+            upload_id: upload_id,
+            multipart_upload: { parts: parts }
+          )
+        )
       end
 
       def upload_parts(upload_id, options, &block)
         completed = Queue.new
+        thread_errors = []
         errors = begin
           IO.pipe do |read_pipe, write_pipe|
-            threads = upload_in_threads(read_pipe, completed, upload_part_opts(options).merge(upload_id: upload_id))
+            threads = upload_in_threads(
+              read_pipe, completed,
+              upload_part_opts(options).merge(upload_id: upload_id),
+              thread_errors)
             begin
               block.call(write_pipe)
             ensure
@@ -74,7 +86,7 @@ module Aws
             threads.map(&:value).compact
           end
         rescue => e
-          [e]
+          thread_errors + [e]
         end
 
         if errors.empty?
@@ -90,12 +102,13 @@ module Aws
           key: options[:key],
           upload_id: upload_id
         )
-        msg = "multipart upload failed: #{errors.map(&:message).join("; ")}"
+        msg = "multipart upload failed: #{errors.map(&:message).join('; ')}"
         raise MultipartUploadError.new(msg, errors)
       rescue MultipartUploadError => error
         raise error
       rescue => error
-        msg = "failed to abort multipart upload: #{error.message}"
+        msg = "failed to abort multipart upload: #{error.message}. "\
+          "Multipart upload failed: #{errors.map(&:message).join('; ')}"
         raise MultipartUploadError.new(msg, errors + [error])
       end
 
@@ -108,6 +121,13 @@ module Aws
 
       def upload_part_opts(options)
         UPLOAD_PART_OPTIONS.inject({}) do |hash, key|
+          hash[key] = options[key] if options.key?(key)
+          hash
+        end
+      end
+
+      def complete_opts(options)
+        COMPLETE_UPLOAD_OPTIONS.inject({}) do |hash, key|
           hash[key] = options[key] if options.key?(key)
           hash
         end
@@ -130,10 +150,10 @@ module Aws
         end
       end
 
-      def upload_in_threads(read_pipe, completed, options)
+      def upload_in_threads(read_pipe, completed, options, thread_errors)
         mutex = Mutex.new
         part_number = 0
-        @thread_count.times.map do
+        options.fetch(:thread_count, @thread_count).times.map do
           thread = Thread.new do
             begin
               loop do
@@ -147,7 +167,14 @@ module Aws
                     part_number: thread_part_number,
                   )
                   resp = @client.upload_part(part)
-                  completed << {etag: resp.etag, part_number: part[:part_number]}
+                  completed_part = {etag: resp.etag, part_number: part[:part_number]}
+
+                  # get the requested checksum from the response
+                  if part[:checksum_algorithm]
+                    k = "checksum_#{part[:checksum_algorithm].downcase}".to_sym
+                    completed_part[k] = resp[k]
+                  end
+                  completed.push(completed_part)
                 ensure
                   if Tempfile === body
                     body.close
@@ -160,11 +187,13 @@ module Aws
               nil
             rescue => error
               # keep other threads from uploading other parts
-              mutex.synchronize { read_pipe.close_read unless read_pipe.closed? }
+              mutex.synchronize do
+                thread_errors.push(error)
+                read_pipe.close_read unless read_pipe.closed?
+              end
               error
             end
           end
-          thread.abort_on_exception = true
           thread
         end
       end

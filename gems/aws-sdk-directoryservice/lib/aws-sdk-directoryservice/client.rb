@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:directoryservice)
 
 module Aws::DirectoryService
   # An API client for DirectoryService.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::DirectoryService
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::DirectoryService::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::DirectoryService
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::DirectoryService
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::DirectoryService
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::DirectoryService
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::DirectoryService
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::DirectoryService
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +341,112 @@ module Aws::DirectoryService
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::DirectoryService::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::DirectoryService::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -375,18 +492,18 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # If the DNS server for your on-premises domain uses a publicly
+    # If the DNS server for your self-managed domain uses a publicly
     # addressable IP address, you must add a CIDR address block to correctly
     # route traffic to and from your Microsoft AD on Amazon Web Services.
     # *AddIpRoutes* adds this address block. You can also use *AddIpRoutes*
     # to facilitate routing traffic that uses public IP ranges from your
-    # Microsoft AD on AWS to a peer VPC.
+    # Microsoft AD on Amazon Web Services to a peer VPC.
     #
     # Before you call *AddIpRoutes*, ensure that all of the required
     # permissions have been explicitly granted through a policy. For details
     # about what permissions are required to run the *AddIpRoutes*
-    # operation, see [AWS Directory Service API Permissions: Actions,
-    # Resources, and Conditions Reference][1].
+    # operation, see [Directory Service API Permissions: Actions, Resources,
+    # and Conditions Reference][1].
     #
     #
     #
@@ -397,51 +514,67 @@ module Aws::DirectoryService
     #
     # @option params [required, Array<Types::IpRoute>] :ip_routes
     #   IP address blocks, using CIDR format, of the traffic to route. This is
-    #   often the IP address block of the DNS server used for your on-premises
-    #   domain.
+    #   often the IP address block of the DNS server used for your
+    #   self-managed domain.
     #
     # @option params [Boolean] :update_security_group_for_directory_controllers
     #   If set to true, updates the inbound and outbound rules of the security
-    #   group that has the description: "AWS created security group for
-    #   *directory ID* directory controllers." Following are the new rules:
+    #   group that has the description: "Amazon Web Services created security
+    #   group for *directory ID* directory controllers." Following are the
+    #   new rules:
     #
     #   Inbound:
     #
-    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 88, Source: 0.0.0.0/0
+    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 88, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 123, Source: 0.0.0.0/0
+    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 123, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 138, Source: 0.0.0.0/0
+    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 138, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 389, Source: 0.0.0.0/0
+    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 389, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 464, Source: 0.0.0.0/0
+    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 464, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 445, Source: 0.0.0.0/0
+    #   * Type: Custom UDP Rule, Protocol: UDP, Range: 445, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: Custom TCP Rule, Protocol: TCP, Range: 88, Source: 0.0.0.0/0
+    #   * Type: Custom TCP Rule, Protocol: TCP, Range: 88, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: Custom TCP Rule, Protocol: TCP, Range: 135, Source: 0.0.0.0/0
+    #   * Type: Custom TCP Rule, Protocol: TCP, Range: 135, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: Custom TCP Rule, Protocol: TCP, Range: 445, Source: 0.0.0.0/0
+    #   * Type: Custom TCP Rule, Protocol: TCP, Range: 445, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: Custom TCP Rule, Protocol: TCP, Range: 464, Source: 0.0.0.0/0
+    #   * Type: Custom TCP Rule, Protocol: TCP, Range: 464, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: Custom TCP Rule, Protocol: TCP, Range: 636, Source: 0.0.0.0/0
+    #   * Type: Custom TCP Rule, Protocol: TCP, Range: 636, Source: Managed
+    #     Microsoft AD VPC IPv4 CIDR
     #
     #   * Type: Custom TCP Rule, Protocol: TCP, Range: 1024-65535, Source:
-    #     0.0.0.0/0
+    #     Managed Microsoft AD VPC IPv4 CIDR
     #
     #   * Type: Custom TCP Rule, Protocol: TCP, Range: 3268-33269, Source:
-    #     0.0.0.0/0
+    #     Managed Microsoft AD VPC IPv4 CIDR
     #
-    #   * Type: DNS (UDP), Protocol: UDP, Range: 53, Source: 0.0.0.0/0
+    #   * Type: DNS (UDP), Protocol: UDP, Range: 53, Source: Managed Microsoft
+    #     AD VPC IPv4 CIDR
     #
-    #   * Type: DNS (TCP), Protocol: TCP, Range: 53, Source: 0.0.0.0/0
+    #   * Type: DNS (TCP), Protocol: TCP, Range: 53, Source: Managed Microsoft
+    #     AD VPC IPv4 CIDR
     #
-    #   * Type: LDAP, Protocol: TCP, Range: 389, Source: 0.0.0.0/0
+    #   * Type: LDAP, Protocol: TCP, Range: 389, Source: Managed Microsoft AD
+    #     VPC IPv4 CIDR
     #
-    #   * Type: All ICMP, Protocol: All, Range: N/A, Source: 0.0.0.0/0
+    #   * Type: All ICMP, Protocol: All, Range: N/A, Source: Managed Microsoft
+    #     AD VPC IPv4 CIDR
     #
     #
     #
@@ -579,27 +712,27 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Creates an AD Connector to connect to an on-premises directory.
+    # Creates an AD Connector to connect to a self-managed directory.
     #
     # Before you call `ConnectDirectory`, ensure that all of the required
     # permissions have been explicitly granted through a policy. For details
     # about what permissions are required to run the `ConnectDirectory`
-    # operation, see [AWS Directory Service API Permissions: Actions,
-    # Resources, and Conditions Reference][1].
+    # operation, see [Directory Service API Permissions: Actions, Resources,
+    # and Conditions Reference][1].
     #
     #
     #
     # [1]: http://docs.aws.amazon.com/directoryservice/latest/admin-guide/UsingWithDS_IAM_ResourcePermissions.html
     #
     # @option params [required, String] :name
-    #   The fully qualified name of the on-premises directory, such as
+    #   The fully qualified name of your self-managed directory, such as
     #   `corp.example.com`.
     #
     # @option params [String] :short_name
-    #   The NetBIOS name of the on-premises directory, such as `CORP`.
+    #   The NetBIOS name of your self-managed directory, such as `CORP`.
     #
     # @option params [required, String] :password
-    #   The password for the on-premises user account.
+    #   The password for your self-managed user account.
     #
     # @option params [String] :description
     #   A description for the directory.
@@ -666,9 +799,9 @@ module Aws::DirectoryService
     # @option params [required, String] :alias
     #   The requested alias.
     #
-    #   The alias must be unique amongst all aliases in AWS. This operation
-    #   throws an `EntityAlreadyExistsException` error if the alias already
-    #   exists.
+    #   The alias must be unique amongst all aliases in Amazon Web Services.
+    #   This operation throws an `EntityAlreadyExistsException` error if the
+    #   alias already exists.
     #
     # @return [Types::CreateAliasResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -755,14 +888,14 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Creates a conditional forwarder associated with your AWS directory.
-    # Conditional forwarders are required in order to set up a trust
-    # relationship with another domain. The conditional forwarder points to
-    # the trusted domain.
+    # Creates a conditional forwarder associated with your Amazon Web
+    # Services directory. Conditional forwarders are required in order to
+    # set up a trust relationship with another domain. The conditional
+    # forwarder points to the trusted domain.
     #
     # @option params [required, String] :directory_id
-    #   The directory ID of the AWS directory for which you are creating the
-    #   conditional forwarder.
+    #   The directory ID of the Amazon Web Services directory for which you
+    #   are creating the conditional forwarder.
     #
     # @option params [required, String] :remote_domain_name
     #   The fully qualified domain name (FQDN) of the remote domain with which
@@ -792,13 +925,13 @@ module Aws::DirectoryService
     end
 
     # Creates a Simple AD directory. For more information, see [Simple
-    # Active Directory][1] in the *AWS Directory Service Admin Guide*.
+    # Active Directory][1] in the *Directory Service Admin Guide*.
     #
     # Before you call `CreateDirectory`, ensure that all of the required
     # permissions have been explicitly granted through a policy. For details
     # about what permissions are required to run the `CreateDirectory`
-    # operation, see [AWS Directory Service API Permissions: Actions,
-    # Resources, and Conditions Reference][2].
+    # operation, see [Directory Service API Permissions: Actions, Resources,
+    # and Conditions Reference][2].
     #
     #
     #
@@ -902,7 +1035,7 @@ module Aws::DirectoryService
 
     # Creates a subscription to forward real-time Directory Service domain
     # controller security logs to the specified Amazon CloudWatch log group
-    # in your AWS account.
+    # in your Amazon Web Services account.
     #
     # @option params [required, String] :directory_id
     #   Identifier of the directory to which you want to subscribe and receive
@@ -930,15 +1063,15 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Creates a Microsoft AD directory in the AWS Cloud. For more
-    # information, see [AWS Managed Microsoft AD][1] in the *AWS Directory
+    # Creates a Microsoft AD directory in the Amazon Web Services Cloud. For
+    # more information, see [Managed Microsoft AD][1] in the *Directory
     # Service Admin Guide*.
     #
     # Before you call *CreateMicrosoftAD*, ensure that all of the required
     # permissions have been explicitly granted through a policy. For details
     # about what permissions are required to run the *CreateMicrosoftAD*
-    # operation, see [AWS Directory Service API Permissions: Actions,
-    # Resources, and Conditions Reference][2].
+    # operation, see [Directory Service API Permissions: Actions, Resources,
+    # and Conditions Reference][2].
     #
     #
     #
@@ -946,7 +1079,7 @@ module Aws::DirectoryService
     # [2]: http://docs.aws.amazon.com/directoryservice/latest/admin-guide/UsingWithDS_IAM_ResourcePermissions.html
     #
     # @option params [required, String] :name
-    #   The fully qualified domain name for the AWS Managed Microsoft AD
+    #   The fully qualified domain name for the Managed Microsoft AD
     #   directory, such as `corp.example.com`. This name will resolve inside
     #   your VPC only. It does not need to be publicly resolvable.
     #
@@ -963,19 +1096,20 @@ module Aws::DirectoryService
     #   can use the ResetUserPassword API call.
     #
     # @option params [String] :description
-    #   A description for the directory. This label will appear on the AWS
-    #   console `Directory Details` page after the directory is created.
+    #   A description for the directory. This label will appear on the Amazon
+    #   Web Services console `Directory Details` page after the directory is
+    #   created.
     #
     # @option params [required, Types::DirectoryVpcSettings] :vpc_settings
     #   Contains VPC information for the CreateDirectory or CreateMicrosoftAD
     #   operation.
     #
     # @option params [String] :edition
-    #   AWS Managed Microsoft AD is available in two editions: `Standard` and
+    #   Managed Microsoft AD is available in two editions: `Standard` and
     #   `Enterprise`. `Enterprise` is the default.
     #
     # @option params [Array<Types::Tag>] :tags
-    #   The tags to be assigned to the AWS Managed Microsoft AD directory.
+    #   The tags to be assigned to the Managed Microsoft AD directory.
     #
     # @return [Types::CreateMicrosoftADResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1014,8 +1148,8 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Creates a snapshot of a Simple AD or Microsoft AD directory in the AWS
-    # cloud.
+    # Creates a snapshot of a Simple AD or Microsoft AD directory in the
+    # Amazon Web Services cloud.
     #
     # <note markdown="1"> You cannot take snapshots of AD Connector directories.
     #
@@ -1051,29 +1185,29 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # AWS Directory Service for Microsoft Active Directory allows you to
+    # Directory Service for Microsoft Active Directory allows you to
     # configure trust relationships. For example, you can establish a trust
-    # between your AWS Managed Microsoft AD directory, and your existing
-    # on-premises Microsoft Active Directory. This would allow you to
+    # between your Managed Microsoft AD directory, and your existing
+    # self-managed Microsoft Active Directory. This would allow you to
     # provide users and groups access to resources in either domain, with a
     # single set of credentials.
     #
-    # This action initiates the creation of the AWS side of a trust
-    # relationship between an AWS Managed Microsoft AD directory and an
+    # This action initiates the creation of the Amazon Web Services side of
+    # a trust relationship between an Managed Microsoft AD directory and an
     # external domain. You can create either a forest trust or an external
     # trust.
     #
     # @option params [required, String] :directory_id
-    #   The Directory ID of the AWS Managed Microsoft AD directory for which
-    #   to establish the trust relationship.
+    #   The Directory ID of the Managed Microsoft AD directory for which to
+    #   establish the trust relationship.
     #
     # @option params [required, String] :remote_domain_name
     #   The Fully Qualified Domain Name (FQDN) of the external domain for
     #   which to create the trust relationship.
     #
     # @option params [required, String] :trust_password
-    #   The trust password. The must be the same password that was used when
-    #   creating the trust relationship on the external domain.
+    #   The trust password. The trust password must be the same password that
+    #   was used when creating the trust relationship on the external domain.
     #
     # @option params [required, String] :trust_direction
     #   The direction of the trust relationship.
@@ -1117,8 +1251,8 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Deletes a conditional forwarder that has been set up for your AWS
-    # directory.
+    # Deletes a conditional forwarder that has been set up for your Amazon
+    # Web Services directory.
     #
     # @option params [required, String] :directory_id
     #   The directory ID for which you are deleting the conditional forwarder.
@@ -1145,13 +1279,13 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Deletes an AWS Directory Service directory.
+    # Deletes an Directory Service directory.
     #
     # Before you call `DeleteDirectory`, ensure that all of the required
     # permissions have been explicitly granted through a policy. For details
     # about what permissions are required to run the `DeleteDirectory`
-    # operation, see [AWS Directory Service API Permissions: Actions,
-    # Resources, and Conditions Reference][1].
+    # operation, see [Directory Service API Permissions: Actions, Resources,
+    # and Conditions Reference][1].
     #
     #
     #
@@ -1233,8 +1367,8 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Deletes an existing trust relationship between your AWS Managed
-    # Microsoft AD directory and an external domain.
+    # Deletes an existing trust relationship between your Managed Microsoft
+    # AD directory and an external domain.
     #
     # @option params [required, String] :trust_id
     #   The Trust ID of the trust relationship to be deleted.
@@ -1293,16 +1427,16 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Removes the specified directory as a publisher to the specified SNS
-    # topic.
+    # Removes the specified directory as a publisher to the specified Amazon
+    # SNS topic.
     #
     # @option params [required, String] :directory_id
     #   The Directory ID to remove as a publisher. This directory will no
-    #   longer send messages to the specified SNS topic.
+    #   longer send messages to the specified Amazon SNS topic.
     #
     # @option params [required, String] :topic_name
-    #   The name of the SNS topic from which to remove the directory as a
-    #   publisher.
+    #   The name of the Amazon SNS topic from which to remove the directory as
+    #   a publisher.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -1359,6 +1493,63 @@ module Aws::DirectoryService
     # @param [Hash] params ({})
     def describe_certificate(params = {}, options = {})
       req = build_request(:describe_certificate, params)
+      req.send_request(options)
+    end
+
+    # Retrieves information about the type of client authentication for the
+    # specified directory, if the type is specified. If no type is
+    # specified, information about all client authentication types that are
+    # supported for the specified directory is retrieved. Currently, only
+    # `SmartCard` is supported.
+    #
+    # @option params [required, String] :directory_id
+    #   The identifier of the directory for which to retrieve information.
+    #
+    # @option params [String] :type
+    #   The type of client authentication for which to retrieve information.
+    #   If no type is specified, a list of all client authentication types
+    #   that are supported for the specified directory is retrieved.
+    #
+    # @option params [String] :next_token
+    #   The *DescribeClientAuthenticationSettingsResult.NextToken* value from
+    #   a previous call to DescribeClientAuthenticationSettings. Pass null if
+    #   this is the first call.
+    #
+    # @option params [Integer] :limit
+    #   The maximum number of items to return. If this value is zero, the
+    #   maximum number of items is specified by the limitations of the
+    #   operation.
+    #
+    # @return [Types::DescribeClientAuthenticationSettingsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeClientAuthenticationSettingsResult#client_authentication_settings_info #client_authentication_settings_info} => Array&lt;Types::ClientAuthenticationSettingInfo&gt;
+    #   * {Types::DescribeClientAuthenticationSettingsResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_client_authentication_settings({
+    #     directory_id: "DirectoryId", # required
+    #     type: "SmartCard", # accepts SmartCard, SmartCardOrPassword
+    #     next_token: "NextToken",
+    #     limit: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.client_authentication_settings_info #=> Array
+    #   resp.client_authentication_settings_info[0].type #=> String, one of "SmartCard", "SmartCardOrPassword"
+    #   resp.client_authentication_settings_info[0].status #=> String, one of "Enabled", "Disabled"
+    #   resp.client_authentication_settings_info[0].last_updated_date_time #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/DescribeClientAuthenticationSettings AWS API Documentation
+    #
+    # @overload describe_client_authentication_settings(params = {})
+    # @param [Hash] params ({})
+    def describe_client_authentication_settings(params = {}, options = {})
+      req = build_request(:describe_client_authentication_settings, params)
       req.send_request(options)
     end
 
@@ -1441,6 +1632,8 @@ module Aws::DirectoryService
     #   * {Types::DescribeDirectoriesResult#directory_descriptions #directory_descriptions} => Array&lt;Types::DirectoryDescription&gt;
     #   * {Types::DescribeDirectoriesResult#next_token #next_token} => String
     #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_directories({
@@ -1462,7 +1655,7 @@ module Aws::DirectoryService
     #   resp.directory_descriptions[0].description #=> String
     #   resp.directory_descriptions[0].dns_ip_addrs #=> Array
     #   resp.directory_descriptions[0].dns_ip_addrs[0] #=> String
-    #   resp.directory_descriptions[0].stage #=> String, one of "Requested", "Creating", "Created", "Active", "Inoperable", "Impaired", "Restoring", "RestoreFailed", "Deleting", "Deleted", "Failed"
+    #   resp.directory_descriptions[0].stage #=> String, one of "Requested", "Creating", "Created", "Active", "Inoperable", "Impaired", "Restoring", "RestoreFailed", "Deleting", "Deleted", "Failed", "Updating"
     #   resp.directory_descriptions[0].share_status #=> String, one of "Shared", "PendingAcceptance", "Rejected", "Rejecting", "RejectFailed", "Sharing", "ShareFailed", "Deleted", "Deleting"
     #   resp.directory_descriptions[0].share_method #=> String, one of "ORGANIZATIONS", "HANDSHAKE"
     #   resp.directory_descriptions[0].share_notes #=> String
@@ -1520,6 +1713,7 @@ module Aws::DirectoryService
     #   resp.directory_descriptions[0].regions_info.primary_region #=> String
     #   resp.directory_descriptions[0].regions_info.additional_regions #=> Array
     #   resp.directory_descriptions[0].regions_info.additional_regions[0] #=> String
+    #   resp.directory_descriptions[0].os_version #=> String, one of "SERVER_2012", "SERVER_2019"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/DescribeDirectories AWS API Documentation
@@ -1528,6 +1722,35 @@ module Aws::DirectoryService
     # @param [Hash] params ({})
     def describe_directories(params = {}, options = {})
       req = build_request(:describe_directories, params)
+      req.send_request(options)
+    end
+
+    # Obtains status of directory data access enablement through the
+    # Directory Service Data API for the specified directory.
+    #
+    # @option params [required, String] :directory_id
+    #   The directory identifier.
+    #
+    # @return [Types::DescribeDirectoryDataAccessResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeDirectoryDataAccessResult#data_access_status #data_access_status} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_directory_data_access({
+    #     directory_id: "DirectoryId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.data_access_status #=> String, one of "Disabled", "Disabling", "Enabled", "Enabling", "Failed"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/DescribeDirectoryDataAccess AWS API Documentation
+    #
+    # @overload describe_directory_data_access(params = {})
+    # @param [Hash] params ({})
+    def describe_directory_data_access(params = {}, options = {})
+      req = build_request(:describe_directory_data_access, params)
       req.send_request(options)
     end
 
@@ -1573,7 +1796,7 @@ module Aws::DirectoryService
     #   resp.domain_controllers[0].vpc_id #=> String
     #   resp.domain_controllers[0].subnet_id #=> String
     #   resp.domain_controllers[0].availability_zone #=> String
-    #   resp.domain_controllers[0].status #=> String, one of "Creating", "Active", "Impaired", "Restoring", "Deleting", "Deleted", "Failed"
+    #   resp.domain_controllers[0].status #=> String, one of "Creating", "Active", "Impaired", "Restoring", "Deleting", "Deleted", "Failed", "Updating"
     #   resp.domain_controllers[0].status_reason #=> String
     #   resp.domain_controllers[0].launch_time #=> Time
     #   resp.domain_controllers[0].status_last_updated_date_time #=> Time
@@ -1588,21 +1811,21 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Obtains information about which SNS topics receive status messages
-    # from the specified directory.
+    # Obtains information about which Amazon SNS topics receive status
+    # messages from the specified directory.
     #
     # If no input parameters are provided, such as DirectoryId or TopicName,
     # this request describes all of the associations in the account.
     #
     # @option params [String] :directory_id
-    #   The Directory ID for which to get the list of associated SNS topics.
-    #   If this member is null, associations for all Directory IDs are
+    #   The Directory ID for which to get the list of associated Amazon SNS
+    #   topics. If this member is null, associations for all Directory IDs are
     #   returned.
     #
     # @option params [Array<String>] :topic_names
-    #   A list of SNS topic names for which to obtain the information. If this
-    #   member is null, all associations for the specified Directory ID are
-    #   returned.
+    #   A list of Amazon SNS topic names for which to obtain the information.
+    #   If this member is null, all associations for the specified Directory
+    #   ID are returned.
     #
     #   An empty list results in an `InvalidParameterException` being thrown.
     #
@@ -1655,6 +1878,8 @@ module Aws::DirectoryService
     #   * {Types::DescribeLDAPSSettingsResult#ldaps_settings_info #ldaps_settings_info} => Array&lt;Types::LDAPSSettingInfo&gt;
     #   * {Types::DescribeLDAPSSettingsResult#next_token #next_token} => String
     #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_ldaps_settings({
@@ -1699,6 +1924,8 @@ module Aws::DirectoryService
     #   * {Types::DescribeRegionsResult#regions_description #regions_description} => Array&lt;Types::RegionDescription&gt;
     #   * {Types::DescribeRegionsResult#next_token #next_token} => String
     #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_regions({
@@ -1713,7 +1940,7 @@ module Aws::DirectoryService
     #   resp.regions_description[0].directory_id #=> String
     #   resp.regions_description[0].region_name #=> String
     #   resp.regions_description[0].region_type #=> String, one of "Primary", "Additional"
-    #   resp.regions_description[0].status #=> String, one of "Requested", "Creating", "Created", "Active", "Inoperable", "Impaired", "Restoring", "RestoreFailed", "Deleting", "Deleted", "Failed"
+    #   resp.regions_description[0].status #=> String, one of "Requested", "Creating", "Created", "Active", "Inoperable", "Impaired", "Restoring", "RestoreFailed", "Deleting", "Deleted", "Failed", "Updating"
     #   resp.regions_description[0].vpc_settings.vpc_id #=> String
     #   resp.regions_description[0].vpc_settings.subnet_ids #=> Array
     #   resp.regions_description[0].vpc_settings.subnet_ids[0] #=> String
@@ -1729,6 +1956,61 @@ module Aws::DirectoryService
     # @param [Hash] params ({})
     def describe_regions(params = {}, options = {})
       req = build_request(:describe_regions, params)
+      req.send_request(options)
+    end
+
+    # Retrieves information about the configurable settings for the
+    # specified directory.
+    #
+    # @option params [required, String] :directory_id
+    #   The identifier of the directory for which to retrieve information.
+    #
+    # @option params [String] :status
+    #   The status of the directory settings for which to retrieve
+    #   information.
+    #
+    # @option params [String] :next_token
+    #   The `DescribeSettingsResult.NextToken` value from a previous call to
+    #   DescribeSettings. Pass null if this is the first call.
+    #
+    # @return [Types::DescribeSettingsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeSettingsResult#directory_id #directory_id} => String
+    #   * {Types::DescribeSettingsResult#setting_entries #setting_entries} => Array&lt;Types::SettingEntry&gt;
+    #   * {Types::DescribeSettingsResult#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_settings({
+    #     directory_id: "DirectoryId", # required
+    #     status: "Requested", # accepts Requested, Updating, Updated, Failed, Default
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.directory_id #=> String
+    #   resp.setting_entries #=> Array
+    #   resp.setting_entries[0].type #=> String
+    #   resp.setting_entries[0].name #=> String
+    #   resp.setting_entries[0].allowed_values #=> String
+    #   resp.setting_entries[0].applied_value #=> String
+    #   resp.setting_entries[0].requested_value #=> String
+    #   resp.setting_entries[0].request_status #=> String, one of "Requested", "Updating", "Updated", "Failed", "Default"
+    #   resp.setting_entries[0].request_detailed_status #=> Hash
+    #   resp.setting_entries[0].request_detailed_status["RegionName"] #=> String, one of "Requested", "Updating", "Updated", "Failed", "Default"
+    #   resp.setting_entries[0].request_status_message #=> String
+    #   resp.setting_entries[0].last_updated_date_time #=> Time
+    #   resp.setting_entries[0].last_requested_date_time #=> Time
+    #   resp.setting_entries[0].data_type #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/DescribeSettings AWS API Documentation
+    #
+    # @overload describe_settings(params = {})
+    # @param [Hash] params ({})
+    def describe_settings(params = {}, options = {})
+      req = build_request(:describe_settings, params)
       req.send_request(options)
     end
 
@@ -1753,6 +2035,8 @@ module Aws::DirectoryService
     #
     #   * {Types::DescribeSharedDirectoriesResult#shared_directories #shared_directories} => Array&lt;Types::SharedDirectory&gt;
     #   * {Types::DescribeSharedDirectoriesResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
     # @example Request syntax with placeholder values
     #
@@ -1818,6 +2102,8 @@ module Aws::DirectoryService
     #   * {Types::DescribeSnapshotsResult#snapshots #snapshots} => Array&lt;Types::Snapshot&gt;
     #   * {Types::DescribeSnapshotsResult#next_token #next_token} => String
     #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_snapshots({
@@ -1854,8 +2140,8 @@ module Aws::DirectoryService
     # account.
     #
     # @option params [String] :directory_id
-    #   The Directory ID of the AWS directory that is a part of the requested
-    #   trust relationship.
+    #   The Directory ID of the Amazon Web Services directory that is a part
+    #   of the requested trust relationship.
     #
     # @option params [Array<String>] :trust_ids
     #   A list of identifiers of the trust relationships for which to obtain
@@ -1875,6 +2161,8 @@ module Aws::DirectoryService
     #
     #   * {Types::DescribeTrustsResult#trusts #trusts} => Array&lt;Types::Trust&gt;
     #   * {Types::DescribeTrustsResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
     # @example Request syntax with placeholder values
     #
@@ -1910,6 +2198,59 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
+    # Describes the updates of a directory for a particular update type.
+    #
+    # @option params [required, String] :directory_id
+    #   The unique identifier of the directory.
+    #
+    # @option params [required, String] :update_type
+    #   The type of updates you want to describe for the directory.
+    #
+    # @option params [String] :region_name
+    #   The name of the Region.
+    #
+    # @option params [String] :next_token
+    #   The `DescribeUpdateDirectoryResult`. NextToken value from a previous
+    #   call to DescribeUpdateDirectory. Pass null if this is the first call.
+    #
+    # @return [Types::DescribeUpdateDirectoryResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeUpdateDirectoryResult#update_activities #update_activities} => Array&lt;Types::UpdateInfoEntry&gt;
+    #   * {Types::DescribeUpdateDirectoryResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_update_directory({
+    #     directory_id: "DirectoryId", # required
+    #     update_type: "OS", # required, accepts OS
+    #     region_name: "RegionName",
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.update_activities #=> Array
+    #   resp.update_activities[0].region #=> String
+    #   resp.update_activities[0].status #=> String, one of "Updated", "Updating", "UpdateFailed"
+    #   resp.update_activities[0].status_reason #=> String
+    #   resp.update_activities[0].initiated_by #=> String
+    #   resp.update_activities[0].new_value.os_update_settings.os_version #=> String, one of "SERVER_2012", "SERVER_2019"
+    #   resp.update_activities[0].previous_value.os_update_settings.os_version #=> String, one of "SERVER_2012", "SERVER_2019"
+    #   resp.update_activities[0].start_time #=> Time
+    #   resp.update_activities[0].last_updated_date_time #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/DescribeUpdateDirectory AWS API Documentation
+    #
+    # @overload describe_update_directory(params = {})
+    # @param [Hash] params ({})
+    def describe_update_directory(params = {}, options = {})
+      req = build_request(:describe_update_directory, params)
+      req.send_request(options)
+    end
+
     # Disables alternative client authentication methods for the specified
     # directory.
     #
@@ -1917,8 +2258,8 @@ module Aws::DirectoryService
     #   The identifier of the directory
     #
     # @option params [required, String] :type
-    #   The type of client authentication to disable. Currently, only the
-    #   parameter, `SmartCard` is supported.
+    #   The type of client authentication to disable. Currently the only
+    #   parameter `"SmartCard"` is supported.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -1926,7 +2267,7 @@ module Aws::DirectoryService
     #
     #   resp = client.disable_client_authentication({
     #     directory_id: "DirectoryId", # required
-    #     type: "SmartCard", # required, accepts SmartCard
+    #     type: "SmartCard", # required, accepts SmartCard, SmartCardOrPassword
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/DisableClientAuthentication AWS API Documentation
@@ -1935,6 +2276,29 @@ module Aws::DirectoryService
     # @param [Hash] params ({})
     def disable_client_authentication(params = {}, options = {})
       req = build_request(:disable_client_authentication, params)
+      req.send_request(options)
+    end
+
+    # Deactivates access to directory data via the Directory Service Data
+    # API for the specified directory.
+    #
+    # @option params [required, String] :directory_id
+    #   The directory identifier.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.disable_directory_data_access({
+    #     directory_id: "DirectoryId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/DisableDirectoryDataAccess AWS API Documentation
+    #
+    # @overload disable_directory_data_access(params = {})
+    # @param [Hash] params ({})
+    def disable_directory_data_access(params = {}, options = {})
+      req = build_request(:disable_directory_data_access, params)
       req.send_request(options)
     end
 
@@ -2039,7 +2403,7 @@ module Aws::DirectoryService
     #   The type of client authentication to enable. Currently only the value
     #   `SmartCard` is supported. Smart card authentication in AD Connector
     #   requires that you enable Kerberos Constrained Delegation for the
-    #   Service User to the LDAP service in the on-premises AD.
+    #   Service User to the LDAP service in your self-managed AD.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -2047,7 +2411,7 @@ module Aws::DirectoryService
     #
     #   resp = client.enable_client_authentication({
     #     directory_id: "DirectoryId", # required
-    #     type: "SmartCard", # required, accepts SmartCard
+    #     type: "SmartCard", # required, accepts SmartCard, SmartCardOrPassword
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/EnableClientAuthentication AWS API Documentation
@@ -2056,6 +2420,29 @@ module Aws::DirectoryService
     # @param [Hash] params ({})
     def enable_client_authentication(params = {}, options = {})
       req = build_request(:enable_client_authentication, params)
+      req.send_request(options)
+    end
+
+    # Enables access to directory data via the Directory Service Data API
+    # for the specified directory.
+    #
+    # @option params [required, String] :directory_id
+    #   The directory identifier.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.enable_directory_data_access({
+    #     directory_id: "DirectoryId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/EnableDirectoryDataAccess AWS API Documentation
+    #
+    # @overload enable_directory_data_access(params = {})
+    # @param [Hash] params ({})
+    def enable_directory_data_access(params = {}, options = {})
+      req = build_request(:enable_directory_data_access, params)
       req.send_request(options)
     end
 
@@ -2126,8 +2513,9 @@ module Aws::DirectoryService
     end
 
     # Enables single sign-on for a directory. Single sign-on allows users in
-    # your directory to access certain AWS services from a computer joined
-    # to the directory without having to enter their credentials separately.
+    # your directory to access certain Amazon Web Services services from a
+    # computer joined to the directory without having to enter their
+    # credentials separately.
     #
     # @option params [required, String] :directory_id
     #   The identifier of the directory for which to enable single-sign on.
@@ -2244,6 +2632,8 @@ module Aws::DirectoryService
     #   * {Types::ListCertificatesResult#next_token #next_token} => String
     #   * {Types::ListCertificatesResult#certificates_info #certificates_info} => Array&lt;Types::CertificateInfo&gt;
     #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.list_certificates({
@@ -2290,6 +2680,8 @@ module Aws::DirectoryService
     #   * {Types::ListIpRoutesResult#ip_routes_info #ip_routes_info} => Array&lt;Types::IpRouteInfo&gt;
     #   * {Types::ListIpRoutesResult#next_token #next_token} => String
     #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.list_ip_routes({
@@ -2318,14 +2710,15 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Lists the active log subscriptions for the AWS account.
+    # Lists the active log subscriptions for the Amazon Web Services
+    # account.
     #
     # @option params [String] :directory_id
     #   If a *DirectoryID* is provided, lists only the log subscription
     #   associated with that directory. If no *DirectoryId* is provided, lists
-    #   all log subscriptions associated with your AWS account. If there are
-    #   no log subscriptions for the AWS account or the directory, an empty
-    #   list will be returned.
+    #   all log subscriptions associated with your Amazon Web Services
+    #   account. If there are no log subscriptions for the Amazon Web Services
+    #   account or the directory, an empty list will be returned.
     #
     # @option params [String] :next_token
     #   The token for the next set of items to return.
@@ -2337,6 +2730,8 @@ module Aws::DirectoryService
     #
     #   * {Types::ListLogSubscriptionsResult#log_subscriptions #log_subscriptions} => Array&lt;Types::LogSubscription&gt;
     #   * {Types::ListLogSubscriptionsResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
     # @example Request syntax with placeholder values
     #
@@ -2380,6 +2775,8 @@ module Aws::DirectoryService
     #
     #   * {Types::ListSchemaExtensionsResult#schema_extensions_info #schema_extensions_info} => Array&lt;Types::SchemaExtensionInfo&gt;
     #   * {Types::ListSchemaExtensionsResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
     # @example Request syntax with placeholder values
     #
@@ -2425,6 +2822,8 @@ module Aws::DirectoryService
     #
     #   * {Types::ListTagsForResourceResult#tags #tags} => Array&lt;Types::Tag&gt;
     #   * {Types::ListTagsForResourceResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
     # @example Request syntax with placeholder values
     #
@@ -2496,20 +2895,21 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Associates a directory with an SNS topic. This establishes the
-    # directory as a publisher to the specified SNS topic. You can then
-    # receive email or text (SMS) messages when the status of your directory
-    # changes. You get notified if your directory goes from an Active status
-    # to an Impaired or Inoperable status. You also receive a notification
-    # when the directory returns to an Active status.
+    # Associates a directory with an Amazon SNS topic. This establishes the
+    # directory as a publisher to the specified Amazon SNS topic. You can
+    # then receive email or text (SMS) messages when the status of your
+    # directory changes. You get notified if your directory goes from an
+    # Active status to an Impaired or Inoperable status. You also receive a
+    # notification when the directory returns to an Active status.
     #
     # @option params [required, String] :directory_id
-    #   The Directory ID that will publish status messages to the SNS topic.
+    #   The Directory ID that will publish status messages to the Amazon SNS
+    #   topic.
     #
     # @option params [required, String] :topic_name
-    #   The SNS topic name to which the directory will publish status
-    #   messages. This SNS topic must be in the same region as the specified
-    #   Directory ID.
+    #   The Amazon SNS topic name to which the directory will publish status
+    #   messages. This Amazon SNS topic must be in the same region as the
+    #   specified Directory ID.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -2637,8 +3037,9 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Resets the password for any user in your AWS Managed Microsoft AD or
-    # Simple AD directory.
+    # Resets the password for any user in your Managed Microsoft AD or
+    # Simple AD directory. Disabled users will become enabled and can be
+    # authenticated following the API call.
     #
     # You can reset the password for any user in your directory with the
     # following exceptions:
@@ -2647,12 +3048,12 @@ module Aws::DirectoryService
     #   member of either the **Domain Admins** or **Enterprise Admins**
     #   group except for the administrator user.
     #
-    # * For AWS Managed Microsoft AD, you can only reset the password for a
-    #   user that is in an OU based off of the NetBIOS name that you typed
-    #   when you created your directory. For example, you cannot reset the
-    #   password for a user in the **AWS Reserved** OU. For more information
-    #   about the OU structure for an AWS Managed Microsoft AD directory,
-    #   see [What Gets Created][1] in the *AWS Directory Service
+    # * For Managed Microsoft AD, you can only reset the password for a user
+    #   that is in an OU based off of the NetBIOS name that you typed when
+    #   you created your directory. For example, you cannot reset the
+    #   password for a user in the **Amazon Web Services Reserved** OU. For
+    #   more information about the OU structure for an Managed Microsoft AD
+    #   directory, see [What Gets Created][1] in the *Directory Service
     #   Administration Guide*.
     #
     #
@@ -2660,8 +3061,8 @@ module Aws::DirectoryService
     # [1]: https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_getting_started_what_gets_created.html
     #
     # @option params [required, String] :directory_id
-    #   Identifier of the AWS Managed Microsoft AD or Simple AD directory in
-    #   which the user resides.
+    #   Identifier of the Managed Microsoft AD or Simple AD directory in which
+    #   the user resides.
     #
     # @option params [required, String] :user_name
     #   The user name of the user whose password will be reset.
@@ -2719,29 +3120,30 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Shares a specified directory (`DirectoryId`) in your AWS account
-    # (directory owner) with another AWS account (directory consumer). With
-    # this operation you can use your directory from any AWS account and
-    # from any Amazon VPC within an AWS Region.
+    # Shares a specified directory (`DirectoryId`) in your Amazon Web
+    # Services account (directory owner) with another Amazon Web Services
+    # account (directory consumer). With this operation you can use your
+    # directory from any Amazon Web Services account and from any Amazon VPC
+    # within an Amazon Web Services Region.
     #
-    # When you share your AWS Managed Microsoft AD directory, AWS Directory
-    # Service creates a shared directory in the directory consumer account.
-    # This shared directory contains the metadata to provide access to the
+    # When you share your Managed Microsoft AD directory, Directory Service
+    # creates a shared directory in the directory consumer account. This
+    # shared directory contains the metadata to provide access to the
     # directory within the directory owner account. The shared directory is
     # visible in all VPCs in the directory consumer account.
     #
     # The `ShareMethod` parameter determines whether the specified directory
-    # can be shared between AWS accounts inside the same AWS organization
-    # (`ORGANIZATIONS`). It also determines whether you can share the
-    # directory with any other AWS account either inside or outside of the
-    # organization (`HANDSHAKE`).
+    # can be shared between Amazon Web Services accounts inside the same
+    # Amazon Web Services organization (`ORGANIZATIONS`). It also determines
+    # whether you can share the directory with any other Amazon Web Services
+    # account either inside or outside of the organization (`HANDSHAKE`).
     #
     # The `ShareNotes` parameter is only used when `HANDSHAKE` is called,
     # which sends a directory sharing request to the directory consumer.
     #
     # @option params [required, String] :directory_id
-    #   Identifier of the AWS Managed Microsoft AD directory that you want to
-    #   share with other AWS accounts.
+    #   Identifier of the Managed Microsoft AD directory that you want to
+    #   share with other Amazon Web Services accounts.
     #
     # @option params [String] :share_notes
     #   A directory share request that is sent by the directory owner to the
@@ -2755,9 +3157,9 @@ module Aws::DirectoryService
     #
     # @option params [required, String] :share_method
     #   The method used when sharing a directory to determine whether the
-    #   directory should be shared within your AWS organization
-    #   (`ORGANIZATIONS`) or with any AWS account by sending a directory
-    #   sharing request (`HANDSHAKE`).
+    #   directory should be shared within your Amazon Web Services
+    #   organization (`ORGANIZATIONS`) or with any Amazon Web Services account
+    #   by sending a directory sharing request (`HANDSHAKE`).
     #
     # @return [Types::ShareDirectoryResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2837,8 +3239,8 @@ module Aws::DirectoryService
     # accounts.
     #
     # @option params [required, String] :directory_id
-    #   The identifier of the AWS Managed Microsoft AD directory that you want
-    #   to stop sharing.
+    #   The identifier of the Managed Microsoft AD directory that you want to
+    #   stop sharing.
     #
     # @option params [required, Types::UnshareTarget] :unshare_target
     #   Identifier for the directory consumer account with whom the directory
@@ -2871,12 +3273,12 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Updates a conditional forwarder that has been set up for your AWS
-    # directory.
+    # Updates a conditional forwarder that has been set up for your Amazon
+    # Web Services directory.
     #
     # @option params [required, String] :directory_id
-    #   The directory ID of the AWS directory for which to update the
-    #   conditional forwarder.
+    #   The directory ID of the Amazon Web Services directory for which to
+    #   update the conditional forwarder.
     #
     # @option params [required, String] :remote_domain_name
     #   The fully qualified domain name (FQDN) of the remote domain with which
@@ -2902,6 +3304,46 @@ module Aws::DirectoryService
     # @param [Hash] params ({})
     def update_conditional_forwarder(params = {}, options = {})
       req = build_request(:update_conditional_forwarder, params)
+      req.send_request(options)
+    end
+
+    # Updates the directory for a particular update type.
+    #
+    # @option params [required, String] :directory_id
+    #   The identifier of the directory on which you want to perform the
+    #   update.
+    #
+    # @option params [required, String] :update_type
+    #   The type of update that needs to be performed on the directory. For
+    #   example, OS.
+    #
+    # @option params [Types::OSUpdateSettings] :os_update_settings
+    #   The settings for the OS update that needs to be performed on the
+    #   directory.
+    #
+    # @option params [Boolean] :create_snapshot_before_update
+    #   The boolean that specifies if a snapshot for the directory needs to be
+    #   taken before updating the directory.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_directory_setup({
+    #     directory_id: "DirectoryId", # required
+    #     update_type: "OS", # required, accepts OS
+    #     os_update_settings: {
+    #       os_version: "SERVER_2012", # accepts SERVER_2012, SERVER_2019
+    #     },
+    #     create_snapshot_before_update: false,
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/UpdateDirectorySetup AWS API Documentation
+    #
+    # @overload update_directory_setup(params = {})
+    # @param [Hash] params ({})
+    def update_directory_setup(params = {}, options = {})
+      req = build_request(:update_directory_setup, params)
       req.send_request(options)
     end
 
@@ -2975,8 +3417,45 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # Updates the trust that has been set up between your AWS Managed
-    # Microsoft AD directory and an on-premises Active Directory.
+    # Updates the configurable settings for the specified directory.
+    #
+    # @option params [required, String] :directory_id
+    #   The identifier of the directory for which to update settings.
+    #
+    # @option params [required, Array<Types::Setting>] :settings
+    #   The list of Setting objects.
+    #
+    # @return [Types::UpdateSettingsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateSettingsResult#directory_id #directory_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_settings({
+    #     directory_id: "DirectoryId", # required
+    #     settings: [ # required
+    #       {
+    #         name: "DirectoryConfigurationSettingName", # required
+    #         value: "DirectoryConfigurationSettingValue", # required
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.directory_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ds-2015-04-16/UpdateSettings AWS API Documentation
+    #
+    # @overload update_settings(params = {})
+    # @param [Hash] params ({})
+    def update_settings(params = {}, options = {})
+      req = build_request(:update_settings, params)
+      req.send_request(options)
+    end
+
+    # Updates the trust that has been set up between your Managed Microsoft
+    # AD directory and an self-managed Active Directory.
     #
     # @option params [required, String] :trust_id
     #   Identifier of the trust relationship.
@@ -3010,10 +3489,10 @@ module Aws::DirectoryService
       req.send_request(options)
     end
 
-    # AWS Directory Service for Microsoft Active Directory allows you to
+    # Directory Service for Microsoft Active Directory allows you to
     # configure and verify trust relationships.
     #
-    # This action verifies a trust relationship between your AWS Managed
+    # This action verifies a trust relationship between your Managed
     # Microsoft AD directory and an external domain.
     #
     # @option params [required, String] :trust_id
@@ -3048,14 +3527,19 @@ module Aws::DirectoryService
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::DirectoryService')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-directoryservice'
-      context[:gem_version] = '1.37.0'
+      context[:gem_version] = '1.77.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

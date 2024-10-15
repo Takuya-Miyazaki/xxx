@@ -7,19 +7,18 @@ require 'tempfile'
 module Aws
   module S3
     describe Client do
-      let(:client) { Client.new }
+      let(:client) { Client.new(options) }
 
-      before(:each) do
-        Aws.config[:s3] = {
+      let(:options) do
+        {
           region: 'us-east-1',
           credentials: Credentials.new('akid', 'secret'),
           retry_backoff: ->(*args) {}
         }
       end
 
-      after(:each) do
-        Aws.config = {}
-        S3::BUCKET_REGIONS.clear
+      after do
+        Aws::S3.bucket_region_cache.clear
       end
 
       it 'raises an error when region is missing' do
@@ -36,8 +35,8 @@ module Aws
 
       describe 'request ids' do
         it 'populates request id and host id in the response context' do
-          s3 = Client.new(stub_responses: true)
-          s3.handle(step: :send) do |context|
+          options.merge!(stub_responses: true)
+          client.handle(step: :send) do |context|
             context.http_response.signal_done(
               status_code: 200,
               headers: {
@@ -45,11 +44,19 @@ module Aws
                                 'rw0nS41rawnLDzkf+PKXmmt/uEi4bzvNMr72o=',
                 'x-amz-request-id' => 'BE9C18E622969B17'
               },
-              body: ''
-            )
+              body: <<-XML)
+<?xml version="1.0" encoding="UTF-8"?>
+<ListAllMyBucketsResult xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">
+  <Buckets>
+    <Bucket>
+      <Name>aws-sdk-ruby</Name>
+    </Bucket>
+  </Buckets>
+</ListAllMyBucketsResult>
+XML
             Seahorse::Client::Response.new(context: context)
           end
-          resp = s3.list_buckets
+          resp = client.list_buckets
           expect(resp.context[:request_id]).to eq('BE9C18E622969B17')
           expect(resp.context[:s3_host_id]).to eq(
             'H0vUEO2f4PyWtNjgcb3TSdyHaie8j4IgnuKIW2'\
@@ -101,6 +108,52 @@ module Aws
             expect do
               client.head_object(bucket: 'b', key: 'k')
             end.to raise_error(error_class)
+          end
+        end
+      end
+
+      describe 'permanent redirect error' do
+        it 'includes endpoint, bucket, and region in PermanentRedirect' do
+          client = Client.new(stub_responses: true)
+          client.handle(step: :send) do |context|
+            context.http_response.signal_done(
+              status_code: 301,
+              headers: { 'x-amz-bucket-region' => 'us-peccy-1' },
+              body: <<-BODY)
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Error>
+  <Code>PermanentRedirect</Code>
+  <Message>Error message.</Message>
+  <Endpoint>http://foo.com</Endpoint>
+  <Bucket>bucket</Bucket>
+</Error>
+BODY
+            Seahorse::Client::Response.new(context: context)
+          end
+          expect do
+            client.list_objects_v2(bucket: 'bucket')
+          end.to raise_error(Errors::PermanentRedirect) do |error|
+            expect(error.message).to eq('Error message.')
+            expect(error.data.endpoint).to eq('http://foo.com')
+            expect(error.data.bucket).to eq('bucket')
+            expect(error.data.region).to eq('us-peccy-1')
+          end
+        end
+
+        it 'handles PermanentRedirect with no body' do
+          client = Client.new(stub_responses: true)
+          client.handle(step: :send) do |context|
+            context.http_response.signal_done(
+              status_code: 301,
+              headers: { 'x-amz-bucket-region' => 'us-peccy-1' },
+              body: ''
+            )
+            Seahorse::Client::Response.new(context: context)
+          end
+          expect do
+            client.head_bucket(bucket: 'bucket')
+          end.to raise_error(Errors::Http301Error) do |error|
+            expect(error.data.region).to eq('us-peccy-1')
           end
         end
       end
@@ -233,18 +286,18 @@ module Aws
 
       describe 'https required for sse cpk' do
         it 'raises a runtime error when attempting SSE CPK over HTTP' do
-          s3 = Client.new(endpoint: 'http://s3.amazonaws.com')
+          options.merge!(endpoint: 'http://s3.amazonaws.com')
 
           # put_object
           expect do
-            s3.put_object(
+            client.put_object(
               bucket: 'aws-sdk', key: 'key', sse_customer_key: 'secret'
             )
           end.to raise_error(/HTTPS/)
 
           # copy_object_source
           expect do
-            s3.copy_object(
+            client.copy_object(
               bucket: 'aws-sdk',
               key: 'key',
               copy_source: 'bucket#key',
@@ -266,36 +319,35 @@ module Aws
       describe 'invalid Expires header' do
         %w[get_object head_object].each do |method|
           it "correctly handled invalid Expires header for #{method}" do
-            s3 = Client.new
-            s3.handle(step: :send) do |context|
+            client.handle(step: :send) do |context|
               context.http_response.signal_headers(200, 'Expires' => 'abc')
               context.http_response.signal_done
               Seahorse::Client::Response.new(context: context)
             end
-            resp = s3.send(method, bucket: 'b', key: 'k')
+            resp = client.send(method, bucket: 'b', key: 'k')
             expect(resp.expires).to be(nil)
             expect(resp.expires_string).to eq('abc')
           end
 
           it 'accepts a stubbed Expires header as a Time value' do
             now = Time.at(Time.now.to_i)
-            s3 = Client.new(
+            options.merge!(
               stub_responses: {
                 method.to_sym => { expires: now }
               }
             )
-            resp = s3.send(method, bucket: 'b', key: 'k')
+            resp = client.send(method, bucket: 'b', key: 'k')
             expect(resp.expires).to eq(now)
             expect(resp.expires_string).to eq(now.httpdate)
           end
 
           it 'accepts a stubbed Expires header as String value' do
-            s3 = Client.new(
+            options.merge!(
               stub_responses: {
                 method.to_sym => { expires_string: 'abc' }
               }
             )
-            resp = s3.send(method, bucket: 'b', key: 'k')
+            resp = client.send(method, bucket: 'b', key: 'k')
             expect(resp.expires).to be(nil)
             expect(resp.expires_string).to eq('abc')
           end
@@ -303,47 +355,67 @@ module Aws
       end
 
       describe '#create_bucket' do
-        it 'omits location constraint for the classic region' do
-          s3 = Client.new(region: 'us-east-1')
-          s3.handle(step: :send) do |context|
+        it 'omits location constraint for the classic region', rbs_test: :skip do
+          options.merge!(region: 'us-east-1')
+          client.handle(step: :send) do |context|
             context.http_response.status_code = 200
             Seahorse::Client::Response.new(context: context)
           end
-          resp = s3.create_bucket(bucket: 'aws-sdk')
+          resp = client.create_bucket(bucket: 'aws-sdk')
           expect(resp.context.http_request.body_contents).to eq('')
         end
 
-        it 'populates the bucket location constraint for non-classic regions' do
-          s3 = Client.new(region: 'us-west-2')
-          s3.handle(step: :send) do |context|
+        it 'populates the bucket location constraint for non-classic regions', rbs_test: :skip do
+          options.merge!(region: 'us-west-2')
+          client.handle(step: :send) do |context|
             context.http_response.status_code = 200
             Seahorse::Client::Response.new(context: context)
           end
-          resp = s3.create_bucket(bucket: 'aws-sdk')
+          resp = client.create_bucket(bucket: 'aws-sdk')
           expect(resp.context.http_request.body_contents.strip)
-            .to eq(<<-XML.strip)
+            .to eq(<<-XML.gsub(/(^\s+|\n)/, ''))
 <CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
   <LocationConstraint>us-west-2</LocationConstraint>
 </CreateBucketConfiguration>
             XML
         end
 
-        it 'does not overide bucket location constraint params' do
-          s3 = Client.new(region: 'eu-west-1')
-          s3.handle(step: :send) do |context|
+        it 'does not override bucket location constraint params', rbs_test: :skip do
+          options.merge!(region: 'eu-west-1')
+          client.handle(step: :send) do |context|
             context.http_response.status_code = 200
             Seahorse::Client::Response.new(context: context)
           end
-          resp = s3.create_bucket(
+          resp = client.create_bucket(
             bucket: 'aws-sdk',
             create_bucket_configuration: {
               location_constraint: 'EU'
             }
           )
           expect(resp.context.http_request.body_contents.strip)
-            .to eq(<<-XML.strip)
+            .to eq(<<-XML.gsub(/(^\s+|\n)/, ''))
 <CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
   <LocationConstraint>EU</LocationConstraint>
+</CreateBucketConfiguration>
+            XML
+        end
+
+        it 'does not apply location constraint if location is set', rbs_test: :skip do
+          options.merge!(region: 'eu-west-1')
+          client.handle(step: :send) do |context|
+            context.http_response.status_code = 200
+            Seahorse::Client::Response.new(context: context)
+          end
+          resp = client.create_bucket(
+            bucket: 'aws-sdk',
+            create_bucket_configuration: {
+              location: { type: 'AvailabilityZone', name: 'us-west-1a' }
+            }
+          )
+          expect(resp.context.http_request.body_contents.strip)
+            .to eq(<<-XML.gsub(/(^\s+|\n)/, ''))
+<CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+  <Location><Type>AvailabilityZone</Type><Name>us-west-1a</Name></Location>
 </CreateBucketConfiguration>
             XML
         end
@@ -357,14 +429,14 @@ module Aws
               status_code: 409,
               headers: {},
               body: <<-XML.strip
-                <?xml version="1.0" encoding="UTF-8"?>
-                <Error>
-                  <Code>BucketNotEmpty</Code>
-                  <Message>The bucket you tried to delete is not empty</Message>
-                  <BucketName>aws-sdk</BucketName>
-                  <RequestId>740BE6AB575EACED</RequestId>
-                  <HostId>MQVg1RMI+d93Hps1E8qpIuDb9Gd2TzkDhm0wE40981DjxSHP1UfLBB7qOAlwAqJB</HostId>
-                </Error>
+<?xml version="1.0" encoding="UTF-8"?>
+<Error>
+  <Code>BucketNotEmpty</Code>
+  <Message>The bucket you tried to delete is not empty</Message>
+  <BucketName>aws-sdk</BucketName>
+  <RequestId>740BE6AB575EACED</RequestId>
+  <HostId>MQVg1RMI+d93Hps1E8qpIuDb9Gd2TzkDhm0wE40981DjxSHP1UfLBB7qOAlwAqJB</HostId>
+</Error>
               XML
             )
             Seahorse::Client::Response.new(context: context)
@@ -386,8 +458,8 @@ module Aws
               status_code: 200,
               headers: {},
               body: <<-XML.strip
-                <?xml version="1.0" encoding="UTF-8"?>
-                <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">EU</LocationConstraint>
+<?xml version="1.0" encoding="UTF-8"?>
+<LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">EU</LocationConstraint>
               XML
             )
             Seahorse::Client::Response.new(context: context)
@@ -403,8 +475,8 @@ module Aws
               status_code: 200,
               headers: {},
               body: <<-XML.strip
-                <?xml version="1.0" encoding="UTF-8"?>
-                <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>
               XML
             )
             Seahorse::Client::Response.new(context: context)
@@ -438,19 +510,19 @@ module Aws
               status_code: 200,
               headers: {},
               body: <<-XML.strip)
-                <?xml version="1.0" encoding="UTF-8"?>
-                <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-                  <Prefix>a%26</Prefix>
-                  <Delimiter>b%26</Delimiter>
-                  <Marker>c%26</Marker>
-                  <NextMarker>d%26</NextMarker>
-                  <Contents>
-                    <Key>e%26</Key>
-                  </Contents>
-                  <CommonPrefixes>
-                    <Prefix>f%26</Prefix>
-                  </CommonPrefixes>
-                </ListBucketResult>
+<?xml version="1.0" encoding="UTF-8"?>
+<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+  <Prefix>a%26</Prefix>
+  <Delimiter>b%26</Delimiter>
+  <Marker>c%26</Marker>
+  <NextMarker>d%26</NextMarker>
+  <Contents>
+    <Key>e%26</Key>
+  </Contents>
+  <CommonPrefixes>
+    <Prefix>f%26</Prefix>
+  </CommonPrefixes>
+</ListBucketResult>
               XML
             Seahorse::Client::Response.new(context: context)
           end
@@ -475,12 +547,12 @@ module Aws
               status_code: 200,
               headers: {},
               body: <<-XML.strip)
-                <?xml version="1.0" encoding="UTF-8"?>
-                <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-                  <Contents>
-                    <Key>a%26</Key>
-                  </Contents>
-                </ListBucketResult>
+<?xml version="1.0" encoding="UTF-8"?>
+<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+  <Contents>
+    <Key>a%26</Key>
+  </Contents>
+</ListBucketResult>
               XML
             Seahorse::Client::Response.new(context: context)
           end
@@ -496,22 +568,22 @@ module Aws
               status_code: 200,
               headers: {},
               body: <<-XML.strip)
-                <?xml version="1.0" encoding="UTF-8"?>
-                <ListVersionsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01">
-                  <Prefix>a%26</Prefix>
-                  <Delimiter>b%26</Delimiter>
-                  <KeyMarker>c%26</KeyMarker>
-                  <NextKeyMarker>d%26</NextKeyMarker>
-                  <Version>
-                    <Key>e%26</Key>
-                  </Version>
-                  <DeleteMarker>
-                    <Key>f%26</Key>
-                  </DeleteMarker>
-                  <CommonPrefixes>
-                    <Prefix>g%26</Prefix>
-                  </CommonPrefixes>
-                </ListVersionsResult>
+<?xml version="1.0" encoding="UTF-8"?>
+<ListVersionsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01">
+  <Prefix>a%26</Prefix>
+  <Delimiter>b%26</Delimiter>
+  <KeyMarker>c%26</KeyMarker>
+  <NextKeyMarker>d%26</NextKeyMarker>
+  <Version>
+    <Key>e%26</Key>
+  </Version>
+  <DeleteMarker>
+    <Key>f%26</Key>
+  </DeleteMarker>
+  <CommonPrefixes>
+    <Prefix>g%26</Prefix>
+  </CommonPrefixes>
+</ListVersionsResult>
               XML
             Seahorse::Client::Response.new(context: context)
           end
@@ -536,19 +608,19 @@ module Aws
               status_code: 200,
               headers: {},
               body: <<-XML.strip)
-                <?xml version="1.0" encoding="UTF-8"?>
-                <ListVersionsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01">
-                  <Prefix>a%26</Prefix>
-                  <Delimiter>b%26</Delimiter>
-                  <KeyMarker>c%26</KeyMarker>
-                  <NextKeyMarker>d%26</NextKeyMarker>
-                  <Upload>
-                    <Key>e%26</Key>
-                  </Upload>
-                  <CommonPrefixes>
-                    <Prefix>f%26</Prefix>
-                  </CommonPrefixes>
-                </ListVersionsResult>
+<?xml version="1.0" encoding="UTF-8"?>
+<ListVersionsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01">
+  <Prefix>a%26</Prefix>
+  <Delimiter>b%26</Delimiter>
+  <KeyMarker>c%26</KeyMarker>
+  <NextKeyMarker>d%26</NextKeyMarker>
+  <Upload>
+    <Key>e%26</Key>
+  </Upload>
+  <CommonPrefixes>
+    <Prefix>f%26</Prefix>
+  </CommonPrefixes>
+</ListVersionsResult>
               XML
             Seahorse::Client::Response.new(context: context)
           end
@@ -583,7 +655,7 @@ module Aws
               ]
             }
           )
-          expect(resp.context.http_request.body_contents).to eq(<<-XML)
+          expect(resp.context.http_request.body_contents).to eq(<<-XML.gsub(/(^\s+|\n)/, ''))
 <AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
   <AccessControlList>
     <Grant>
@@ -620,18 +692,17 @@ module Aws
               status_code: 200,
               headers: {},
               body: <<-XML)
-                <?xml version="1.0" encoding="UTF-8"?>
-                <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-                  <Contents>
-                    <Key>prefix+suffix</Key>
-                  </Contents>
-                  <Contents>
-                    <Key>prefix%2Bsuffix</Key>
-                  </Contents>
-                  <Contents>
-                    <Key>prefix%20suffix</Key>
-                  </Contents>
-                </ListBucketResult>
+<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+  <Contents>
+    <Key>prefix+suffix</Key>
+  </Contents>
+  <Contents>
+    <Key>prefix%2Bsuffix</Key>
+  </Contents>
+  <Contents>
+    <Key>prefix%20suffix</Key>
+  </Contents>
+</ListBucketResult>
               XML
             Seahorse::Client::Response.new(context: context)
           end
@@ -690,7 +761,7 @@ module Aws
       end
 
       describe '#wait_until' do
-        it 'returns true when the :bucket_exists waiter receives a 301' do
+        it 'returns true when the :bucket_exists waiter receives a 301', rbs_test: :skip do
           stub_request(:head, 'https://bucket.s3.amazonaws.com')
             .to_return(status: 301)
           expect(
@@ -709,20 +780,20 @@ module Aws
         }
       }.each do |operation_name, params|
         describe "#{operation_name} response handling" do
-          it 'handles 200 http response errors' do
+          it 'handles 200 http response errors', rbs_test: :skip do
             client.handlers.remove(
               Seahorse::Client::Plugins::RaiseResponseErrors::Handler
             )
             client.handle(step: :send) do |context|
               context.http_response.signal_headers(200, {})
               context.http_response.signal_data(<<-XML.strip)
-                <?xml version="1.0" encoding="UTF-8"?>
-                <Error>
-                  <Code>InternalError</Code>
-                  <Message>We encountered an internal error. Please try again.</Message>
-                  <RequestId>656c76696e6727732072657175657374</RequestId>
-                  <HostId>Uuag1LuByRx9e6j5Onimru9pO4ZVKnJ2Qz7/C1NPcfTWAtRPfTaOFg==</HostId>
-                </Error>
+<?xml version="1.0" encoding="UTF-8"?>
+<Error>
+  <Code>InternalError</Code>
+  <Message>We encountered an internal error. Please try again.</Message>
+  <RequestId>656c76696e6727732072657175657374</RequestId>
+  <HostId>Uuag1LuByRx9e6j5Onimru9pO4ZVKnJ2Qz7/C1NPcfTWAtRPfTaOFg==</HostId>
+</Error>
               XML
               context.http_response.signal_done
               Seahorse::Client::Response.new(context: context)
@@ -736,7 +807,7 @@ module Aws
             expect(resp.data).to be(nil)
           end
 
-          it 'handles 200 http response with incomplete body as error' do
+          it 'handles 200 http response with incomplete body as error', rbs_test: :skip do
             client.handlers.remove(
               Seahorse::Client::Plugins::RaiseResponseErrors::Handler
             )

@@ -6,7 +6,7 @@ module Aws
 
     include Seahorse::Model::Shapes
 
-    EXPECTED_GOT = "expected %s to be %s, got value %s (class: %s) instead."
+    EXPECTED_GOT = 'expected %s to be %s, got class %s instead.'
 
     # @param [Seahorse::Model::Shapes::ShapeRef] rules
     # @param [Hash] params
@@ -70,6 +70,15 @@ module Aws
           end
         end
 
+        if @validate_required && shape.union
+          set_values = values.to_h.length
+          if set_values > 1
+            errors << "multiple values provided to union at #{context} - must contain exactly one of the supported types: #{shape.member_names.join(', ')}"
+          elsif set_values == 0
+            errors << "No values provided to union at #{context} - must contain exactly one of the supported types: #{shape.member_names.join(', ')}"
+          end
+        end
+
         # validate non-nil members
         values.each_pair do |name, value|
           unless value.nil?
@@ -98,6 +107,8 @@ module Aws
       # validate members
       member_ref = ref.shape.member
       values.each.with_index do |value, index|
+        next unless value
+
         shape(member_ref, value, errors, context + "[#{index}]")
       end
     end
@@ -113,8 +124,30 @@ module Aws
 
       values.each do |key, value|
         shape(key_ref, key, errors, "#{context} #{key.inspect} key")
+        next unless value
+
         shape(value_ref, value, errors, context + "[#{key.inspect}]")
       end
+    end
+
+    def document(ref, value, errors, context)
+      document_types = [Hash, Array, Numeric, String, TrueClass, FalseClass, NilClass]
+      unless document_types.any? { |t| value.is_a?(t) }
+        errors << expected_got(context, "one of #{document_types.join(', ')}", value)
+      end
+
+      # recursively validate types for aggregated types
+      case value
+      when Hash
+        value.each do |k, v|
+          document(ref, v, errors, context + "[#{k}]")
+        end
+      when Array
+        value.each do |v|
+          document(ref, v, errors, context)
+        end
+      end
+
     end
 
     def shape(ref, value, errors, context)
@@ -122,6 +155,7 @@ module Aws
       when StructureShape then structure(ref, value, errors, context)
       when ListShape then list(ref, value, errors, context)
       when MapShape then map(ref, value, errors, context)
+      when DocumentShape then document(ref, value, errors, context)
       when StringShape
         unless value.is_a?(String)
           errors << expected_got(context, "a String", value)
@@ -201,7 +235,7 @@ module Aws
     end
 
     def expected_got(context, expected, got)
-      EXPECTED_GOT % [context, expected, got.inspect, got.class.name]
+      EXPECTED_GOT % [context, expected, got.class.name]
     end
 
   end

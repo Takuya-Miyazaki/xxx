@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,13 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-elasticbeanstalk/types'
-require_relative 'aws-sdk-elasticbeanstalk/client_api'
-require_relative 'aws-sdk-elasticbeanstalk/client'
-require_relative 'aws-sdk-elasticbeanstalk/errors'
-require_relative 'aws-sdk-elasticbeanstalk/waiters'
-require_relative 'aws-sdk-elasticbeanstalk/resource'
-require_relative 'aws-sdk-elasticbeanstalk/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:elasticbeanstalk)
 
 # This module provides support for AWS Elastic Beanstalk. This module is available in the
 # `aws-sdk-elasticbeanstalk` gem.
@@ -48,7 +42,21 @@ require_relative 'aws-sdk-elasticbeanstalk/customizations'
 #
 # @!group service
 module Aws::ElasticBeanstalk
+  autoload :Types, 'aws-sdk-elasticbeanstalk/types'
+  autoload :ClientApi, 'aws-sdk-elasticbeanstalk/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-elasticbeanstalk/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-elasticbeanstalk/client'
+  autoload :Errors, 'aws-sdk-elasticbeanstalk/errors'
+  autoload :Waiters, 'aws-sdk-elasticbeanstalk/waiters'
+  autoload :Resource, 'aws-sdk-elasticbeanstalk/resource'
+  autoload :EndpointParameters, 'aws-sdk-elasticbeanstalk/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-elasticbeanstalk/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-elasticbeanstalk/endpoints'
 
-  GEM_VERSION = '1.40.0'
+  GEM_VERSION = '1.79.0'
 
 end
+
+require_relative 'aws-sdk-elasticbeanstalk/customizations'

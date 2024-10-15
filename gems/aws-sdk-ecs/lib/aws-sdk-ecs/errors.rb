@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -35,9 +35,11 @@ module Aws::ECS
   # * {ClusterContainsServicesException}
   # * {ClusterContainsTasksException}
   # * {ClusterNotFoundException}
+  # * {ConflictException}
   # * {InvalidParameterException}
   # * {LimitExceededException}
   # * {MissingVersionException}
+  # * {NamespaceNotFoundException}
   # * {NoUpdateAvailableException}
   # * {PlatformTaskDefinitionIncompatibilityException}
   # * {PlatformUnknownException}
@@ -46,6 +48,7 @@ module Aws::ECS
   # * {ServerException}
   # * {ServiceNotActiveException}
   # * {ServiceNotFoundException}
+  # * {TargetNotConnectedException}
   # * {TargetNotFoundException}
   # * {TaskSetNotFoundException}
   # * {UnsupportedFeatureException}
@@ -142,6 +145,21 @@ module Aws::ECS
       end
     end
 
+    class ConflictException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::ECS::Types::ConflictException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def resource_ids
+        @data[:resource_ids]
+      end
+    end
+
     class InvalidParameterException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -167,6 +185,16 @@ module Aws::ECS
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::ECS::Types::MissingVersionException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class NamespaceNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::ECS::Types::NamespaceNotFoundException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -252,6 +280,16 @@ module Aws::ECS
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::ECS::Types::ServiceNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+    end
+
+    class TargetNotConnectedException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::ECS::Types::TargetNotConnectedException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

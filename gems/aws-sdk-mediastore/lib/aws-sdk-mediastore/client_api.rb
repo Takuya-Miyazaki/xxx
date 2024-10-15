@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::MediaStore
   # @api private
@@ -289,9 +290,11 @@ module Aws::MediaStore
 
       api.metadata = {
         "apiVersion" => "2017-09-01",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "mediastore",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceAbbreviation" => "MediaStore",
         "serviceFullName" => "AWS Elemental MediaStore",
         "serviceId" => "MediaStore",

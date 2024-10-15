@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -93,17 +93,13 @@ module Aws::Personalize
     end
 
     # When the solution performs AutoML (`performAutoML` is true in
-    # CreateSolution), Amazon Personalize determines which recipe, from the
-    # specified list, optimizes the given metric. Amazon Personalize then
-    # uses that recipe for the solution.
+    # [CreateSolution][1]), Amazon Personalize determines which recipe, from
+    # the specified list, optimizes the given metric. Amazon Personalize
+    # then uses that recipe for the solution.
     #
-    # @note When making an API call, you may pass AutoMLConfig
-    #   data as a hash:
     #
-    #       {
-    #         metric_name: "MetricName",
-    #         recipe_list: ["Arn"],
-    #       }
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_CreateSolution.html
     #
     # @!attribute [rw] metric_name
     #   The metric to optimize.
@@ -123,8 +119,12 @@ module Aws::Personalize
     end
 
     # When the solution performs AutoML (`performAutoML` is true in
-    # CreateSolution), specifies the recipe that best optimized the
+    # [CreateSolution][1]), specifies the recipe that best optimized the
     # specified metric.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_CreateSolution.html
     #
     # @!attribute [rw] best_recipe_arn
     #   The Amazon Resource Name (ARN) of the best recipe.
@@ -134,6 +134,32 @@ module Aws::Personalize
     #
     class AutoMLResult < Struct.new(
       :best_recipe_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The automatic training configuration to use when `performAutoTraining`
+    # is true.
+    #
+    # @!attribute [rw] scheduling_expression
+    #   Specifies how often to automatically train new solution versions.
+    #   Specify a rate expression in rate(*value* *unit*) format. For value,
+    #   specify a number between 1 and 30. For unit, specify `day` or
+    #   `days`. For example, to automatically create a new solution version
+    #   every 5 days, specify `rate(5 days)`. The default is every 7 days.
+    #
+    #   For more information about auto training, see [Creating and
+    #   configuring a solution][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/customizing-solution-config.html
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/AutoTrainingConfig AWS API Documentation
+    #
+    class AutoTrainingConfig < Struct.new(
+      :scheduling_expression)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -187,6 +213,14 @@ module Aws::Personalize
     #   requested the batch inference job.
     #   @return [String]
     #
+    # @!attribute [rw] batch_inference_job_mode
+    #   The job's mode.
+    #   @return [String]
+    #
+    # @!attribute [rw] theme_generation_config
+    #   The job's theme generation settings.
+    #   @return [Types::ThemeGenerationConfig]
+    #
     # @!attribute [rw] status
     #   The status of the batch inference job. The status is one of the
     #   following values:
@@ -221,6 +255,8 @@ module Aws::Personalize
       :job_output,
       :batch_inference_job_config,
       :role_arn,
+      :batch_inference_job_mode,
+      :theme_generation_config,
       :status,
       :creation_date_time,
       :last_updated_date_time)
@@ -230,21 +266,16 @@ module Aws::Personalize
 
     # The configuration details of a batch inference job.
     #
-    # @note When making an API call, you may pass BatchInferenceJobConfig
-    #   data as a hash:
-    #
-    #       {
-    #         item_exploration_config: {
-    #           "ParameterName" => "ParameterValue",
-    #         },
-    #       }
-    #
     # @!attribute [rw] item_exploration_config
     #   A string to string map specifying the exploration configuration
     #   hyperparameters, including `explorationWeight` and
     #   `explorationItemAgeCutOff`, you want to use to configure the amount
     #   of item exploration Amazon Personalize uses when recommending items.
-    #   See native-recipe-new-item-USER\_PERSONALIZATION.
+    #   See [User-Personalization][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/native-recipe-new-item-USER_PERSONALIZATION.html
     #   @return [Hash<String,String>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/BatchInferenceJobConfig AWS API Documentation
@@ -256,16 +287,6 @@ module Aws::Personalize
     end
 
     # The input configuration of a batch inference job.
-    #
-    # @note When making an API call, you may pass BatchInferenceJobInput
-    #   data as a hash:
-    #
-    #       {
-    #         s3_data_source: { # required
-    #           path: "S3Location", # required
-    #           kms_key_arn: "KmsKeyArn",
-    #         },
-    #       }
     #
     # @!attribute [rw] s3_data_source
     #   The URI of the Amazon S3 location that contains your input data. The
@@ -283,16 +304,6 @@ module Aws::Personalize
 
     # The output configuration parameters of a batch inference job.
     #
-    # @note When making an API call, you may pass BatchInferenceJobOutput
-    #   data as a hash:
-    #
-    #       {
-    #         s3_data_destination: { # required
-    #           path: "S3Location", # required
-    #           kms_key_arn: "KmsKeyArn",
-    #         },
-    #       }
-    #
     # @!attribute [rw] s3_data_destination
     #   Information on the Amazon S3 bucket in which the batch inference
     #   job's output is stored.
@@ -306,9 +317,14 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # A truncated version of the BatchInferenceJob datatype. The
-    # ListBatchInferenceJobs operation returns a list of batch inference job
-    # summaries.
+    # A truncated version of the [BatchInferenceJob][1]. The
+    # [ListBatchInferenceJobs][2] operation returns a list of batch
+    # inference job summaries.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_BatchInferenceJob.html
+    # [2]: https://docs.aws.amazon.com/personalize/latest/dg/API_ListBatchInferenceJobs.html
     #
     # @!attribute [rw] batch_inference_job_arn
     #   The Amazon Resource Name (ARN) of the batch inference job.
@@ -347,10 +363,188 @@ module Aws::Personalize
     #   The ARN of the solution version used by the batch inference job.
     #   @return [String]
     #
+    # @!attribute [rw] batch_inference_job_mode
+    #   The job's mode.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/BatchInferenceJobSummary AWS API Documentation
     #
     class BatchInferenceJobSummary < Struct.new(
       :batch_inference_job_arn,
+      :job_name,
+      :status,
+      :creation_date_time,
+      :last_updated_date_time,
+      :failure_reason,
+      :solution_version_arn,
+      :batch_inference_job_mode)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains information on a batch segment job.
+    #
+    # @!attribute [rw] job_name
+    #   The name of the batch segment job.
+    #   @return [String]
+    #
+    # @!attribute [rw] batch_segment_job_arn
+    #   The Amazon Resource Name (ARN) of the batch segment job.
+    #   @return [String]
+    #
+    # @!attribute [rw] filter_arn
+    #   The ARN of the filter used on the batch segment job.
+    #   @return [String]
+    #
+    # @!attribute [rw] failure_reason
+    #   If the batch segment job failed, the reason for the failure.
+    #   @return [String]
+    #
+    # @!attribute [rw] solution_version_arn
+    #   The Amazon Resource Name (ARN) of the solution version used by the
+    #   batch segment job to generate batch segments.
+    #   @return [String]
+    #
+    # @!attribute [rw] num_results
+    #   The number of predicted users generated by the batch segment job for
+    #   each line of input data. The maximum number of users per segment is
+    #   5 million.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] job_input
+    #   The Amazon S3 path that leads to the input data used to generate the
+    #   batch segment job.
+    #   @return [Types::BatchSegmentJobInput]
+    #
+    # @!attribute [rw] job_output
+    #   The Amazon S3 bucket that contains the output data generated by the
+    #   batch segment job.
+    #   @return [Types::BatchSegmentJobOutput]
+    #
+    # @!attribute [rw] role_arn
+    #   The ARN of the Amazon Identity and Access Management (IAM) role that
+    #   requested the batch segment job.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The status of the batch segment job. The status is one of the
+    #   following values:
+    #
+    #   * PENDING
+    #
+    #   * IN PROGRESS
+    #
+    #   * ACTIVE
+    #
+    #   * CREATE FAILED
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The time at which the batch segment job was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The time at which the batch segment job last updated.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/BatchSegmentJob AWS API Documentation
+    #
+    class BatchSegmentJob < Struct.new(
+      :job_name,
+      :batch_segment_job_arn,
+      :filter_arn,
+      :failure_reason,
+      :solution_version_arn,
+      :num_results,
+      :job_input,
+      :job_output,
+      :role_arn,
+      :status,
+      :creation_date_time,
+      :last_updated_date_time)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The input configuration of a batch segment job.
+    #
+    # @!attribute [rw] s3_data_source
+    #   The configuration details of an Amazon S3 input or output bucket.
+    #   @return [Types::S3DataConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/BatchSegmentJobInput AWS API Documentation
+    #
+    class BatchSegmentJobInput < Struct.new(
+      :s3_data_source)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The output configuration parameters of a batch segment job.
+    #
+    # @!attribute [rw] s3_data_destination
+    #   The configuration details of an Amazon S3 input or output bucket.
+    #   @return [Types::S3DataConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/BatchSegmentJobOutput AWS API Documentation
+    #
+    class BatchSegmentJobOutput < Struct.new(
+      :s3_data_destination)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # A truncated version of the [BatchSegmentJob][1] datatype.
+    # [ListBatchSegmentJobs][2] operation returns a list of batch segment
+    # job summaries.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_BatchSegmentJob.html
+    # [2]: https://docs.aws.amazon.com/personalize/latest/dg/API_ListBatchSegmentJobs.html
+    #
+    # @!attribute [rw] batch_segment_job_arn
+    #   The Amazon Resource Name (ARN) of the batch segment job.
+    #   @return [String]
+    #
+    # @!attribute [rw] job_name
+    #   The name of the batch segment job.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The status of the batch segment job. The status is one of the
+    #   following values:
+    #
+    #   * PENDING
+    #
+    #   * IN PROGRESS
+    #
+    #   * ACTIVE
+    #
+    #   * CREATE FAILED
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The time at which the batch segment job was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The time at which the batch segment job was last updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] failure_reason
+    #   If the batch segment job failed, the reason for the failure.
+    #   @return [String]
+    #
+    # @!attribute [rw] solution_version_arn
+    #   The Amazon Resource Name (ARN) of the solution version used by the
+    #   batch segment job to generate batch segments.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/BatchSegmentJobSummary AWS API Documentation
+    #
+    class BatchSegmentJobSummary < Struct.new(
+      :batch_segment_job_arn,
       :job_name,
       :status,
       :creation_date_time,
@@ -361,8 +555,12 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # Describes a deployed solution version, otherwise known as a campaign.
-    # For more information on campaigns, see CreateCampaign.
+    # An object that describes the deployment of a solution version. For
+    # more information on campaigns, see [CreateCampaign][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_CreateCampaign.html
     #
     # @!attribute [rw] name
     #   The name of the campaign.
@@ -373,13 +571,17 @@ module Aws::Personalize
     #   @return [String]
     #
     # @!attribute [rw] solution_version_arn
-    #   The Amazon Resource Name (ARN) of a specific version of the
-    #   solution.
+    #   The Amazon Resource Name (ARN) of the solution version the campaign
+    #   uses.
     #   @return [String]
     #
     # @!attribute [rw] min_provisioned_tps
     #   Specifies the requested minimum provisioned transactions
-    #   (recommendations) per second.
+    #   (recommendations) per second. A high `minProvisionedTPS` will
+    #   increase your bill. We recommend starting with 1 for
+    #   `minProvisionedTPS` (the default). Track your usage using Amazon
+    #   CloudWatch metrics, and increase the `minProvisionedTPS` as
+    #   necessary.
     #   @return [Integer]
     #
     # @!attribute [rw] campaign_config
@@ -412,7 +614,11 @@ module Aws::Personalize
     #
     # @!attribute [rw] latest_campaign_update
     #   Provides a summary of the properties of a campaign update. For a
-    #   complete listing, call the DescribeCampaign API.
+    #   complete listing, call the [DescribeCampaign][1] API.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeCampaign.html
     #   @return [Types::CampaignUpdateSummary]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/Campaign AWS API Documentation
@@ -434,38 +640,67 @@ module Aws::Personalize
 
     # The configuration details of a campaign.
     #
-    # @note When making an API call, you may pass CampaignConfig
-    #   data as a hash:
-    #
-    #       {
-    #         item_exploration_config: {
-    #           "ParameterName" => "ParameterValue",
-    #         },
-    #       }
-    #
     # @!attribute [rw] item_exploration_config
-    #   A string to string map specifying the exploration configuration
-    #   hyperparameters, including `explorationWeight` and
-    #   `explorationItemAgeCutOff`, you want to use to configure the amount
-    #   of item exploration Amazon Personalize uses when recommending items.
-    #   Provide `itemExplorationConfig` data only if your solution uses the
-    #   [User-Personalization][1] recipe.
+    #   Specifies the exploration configuration hyperparameters, including
+    #   `explorationWeight` and `explorationItemAgeCutOff`, you want to use
+    #   to configure the amount of item exploration Amazon Personalize uses
+    #   when recommending items. Provide `itemExplorationConfig` data only
+    #   if your solution uses the [User-Personalization][1] recipe.
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/native-recipe-new-item-USER_PERSONALIZATION.html
     #   @return [Hash<String,String>]
     #
+    # @!attribute [rw] enable_metadata_with_recommendations
+    #   Whether metadata with recommendations is enabled for the campaign.
+    #   If enabled, you can specify the columns from your Items dataset in
+    #   your request for recommendations. Amazon Personalize returns this
+    #   data for each item in the recommendation response. For information
+    #   about enabling metadata for a campaign, see [Enabling metadata in
+    #   recommendations for a campaign][1].
+    #
+    #   If you enable metadata in recommendations, you will incur additional
+    #   costs. For more information, see [Amazon Personalize pricing][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/campaigns.html#create-campaign-return-metadata
+    #   [2]: https://aws.amazon.com/personalize/pricing/
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] sync_with_latest_solution_version
+    #   Whether the campaign automatically updates to use the latest
+    #   solution version (trained model) of a solution. If you specify
+    #   `True`, you must specify the ARN of your *solution* for the
+    #   `SolutionVersionArn` parameter. It must be in `SolutionArn/$LATEST`
+    #   format. The default is `False` and you must manually update the
+    #   campaign to deploy the latest solution version.
+    #
+    #   For more information about automatic campaign updates, see [Enabling
+    #   automatic campaign updates][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/campaigns.html#create-campaign-automatic-latest-sv-update
+    #   @return [Boolean]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CampaignConfig AWS API Documentation
     #
     class CampaignConfig < Struct.new(
-      :item_exploration_config)
+      :item_exploration_config,
+      :enable_metadata_with_recommendations,
+      :sync_with_latest_solution_version)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Provides a summary of the properties of a campaign. For a complete
-    # listing, call the DescribeCampaign API.
+    # listing, call the [DescribeCampaign][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeCampaign.html
     #
     # @!attribute [rw] name
     #   The name of the campaign.
@@ -512,7 +747,11 @@ module Aws::Personalize
     end
 
     # Provides a summary of the properties of a campaign update. For a
-    # complete listing, call the DescribeCampaign API.
+    # complete listing, call the [DescribeCampaign][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeCampaign.html
     #
     # @!attribute [rw] solution_version_arn
     #   The Amazon Resource Name (ARN) of the deployed solution version.
@@ -568,14 +807,6 @@ module Aws::Personalize
 
     # Provides the name and range of a categorical hyperparameter.
     #
-    # @note When making an API call, you may pass CategoricalHyperParameterRange
-    #   data as a hash:
-    #
-    #       {
-    #         name: "ParameterName",
-    #         values: ["CategoricalValue"],
-    #       }
-    #
     # @!attribute [rw] name
     #   The name of the hyperparameter.
     #   @return [String]
@@ -594,15 +825,6 @@ module Aws::Personalize
     end
 
     # Provides the name and range of a continuous hyperparameter.
-    #
-    # @note When making an API call, you may pass ContinuousHyperParameterRange
-    #   data as a hash:
-    #
-    #       {
-    #         name: "ParameterName",
-    #         min_value: 1.0,
-    #         max_value: 1.0,
-    #       }
     #
     # @!attribute [rw] name
     #   The name of the hyperparameter.
@@ -626,34 +848,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateBatchInferenceJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         job_name: "Name", # required
-    #         solution_version_arn: "Arn", # required
-    #         filter_arn: "Arn",
-    #         num_results: 1,
-    #         job_input: { # required
-    #           s3_data_source: { # required
-    #             path: "S3Location", # required
-    #             kms_key_arn: "KmsKeyArn",
-    #           },
-    #         },
-    #         job_output: { # required
-    #           s3_data_destination: { # required
-    #             path: "S3Location", # required
-    #             kms_key_arn: "KmsKeyArn",
-    #           },
-    #         },
-    #         role_arn: "RoleArn", # required
-    #         batch_inference_job_config: {
-    #           item_exploration_config: {
-    #             "ParameterName" => "ParameterValue",
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] job_name
     #   The name of the batch inference job to create.
     #   @return [String]
@@ -665,12 +859,16 @@ module Aws::Personalize
     #
     # @!attribute [rw] filter_arn
     #   The ARN of the filter to apply to the batch inference job. For more
-    #   information on using filters, see Using Filters with Amazon
-    #   Personalize.
+    #   information on using filters, see [Filtering batch
+    #   recommendations][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/filter-batch.html
     #   @return [String]
     #
     # @!attribute [rw] num_results
-    #   The number of recommendations to retreive.
+    #   The number of recommendations to retrieve.
     #   @return [Integer]
     #
     # @!attribute [rw] job_input
@@ -685,13 +883,41 @@ module Aws::Personalize
     #
     # @!attribute [rw] role_arn
     #   The ARN of the Amazon Identity and Access Management role that has
-    #   permissions to read and write to your input and out Amazon S3
+    #   permissions to read and write to your input and output Amazon S3
     #   buckets respectively.
     #   @return [String]
     #
     # @!attribute [rw] batch_inference_job_config
     #   The configuration details of a batch inference job.
     #   @return [Types::BatchInferenceJobConfig]
+    #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the batch inference job.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] batch_inference_job_mode
+    #   The mode of the batch inference job. To generate descriptive themes
+    #   for groups of similar items, set the job mode to `THEME_GENERATION`.
+    #   If you don't want to generate themes, use the default
+    #   `BATCH_INFERENCE`.
+    #
+    #   When you get batch recommendations with themes, you will incur
+    #   additional costs. For more information, see [Amazon Personalize
+    #   pricing][1].
+    #
+    #
+    #
+    #   [1]: https://aws.amazon.com/personalize/pricing/
+    #   @return [String]
+    #
+    # @!attribute [rw] theme_generation_config
+    #   For theme generation jobs, specify the name of the column in your
+    #   Items dataset that contains each item's name.
+    #   @return [Types::ThemeGenerationConfig]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateBatchInferenceJobRequest AWS API Documentation
     #
@@ -703,7 +929,10 @@ module Aws::Personalize
       :job_input,
       :job_output,
       :role_arn,
-      :batch_inference_job_config)
+      :batch_inference_job_config,
+      :tags,
+      :batch_inference_job_mode,
+      :theme_generation_config)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -720,37 +949,127 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateCampaignRequest
-    #   data as a hash:
+    # @!attribute [rw] job_name
+    #   The name of the batch segment job to create.
+    #   @return [String]
     #
-    #       {
-    #         name: "Name", # required
-    #         solution_version_arn: "Arn", # required
-    #         min_provisioned_tps: 1, # required
-    #         campaign_config: {
-    #           item_exploration_config: {
-    #             "ParameterName" => "ParameterValue",
-    #           },
-    #         },
-    #       }
+    # @!attribute [rw] solution_version_arn
+    #   The Amazon Resource Name (ARN) of the solution version you want the
+    #   batch segment job to use to generate batch segments.
+    #   @return [String]
     #
+    # @!attribute [rw] filter_arn
+    #   The ARN of the filter to apply to the batch segment job. For more
+    #   information on using filters, see [Filtering batch
+    #   recommendations][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/filter-batch.html
+    #   @return [String]
+    #
+    # @!attribute [rw] num_results
+    #   The number of predicted users generated by the batch segment job for
+    #   each line of input data. The maximum number of users per segment is
+    #   5 million.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] job_input
+    #   The Amazon S3 path for the input data used to generate the batch
+    #   segment job.
+    #   @return [Types::BatchSegmentJobInput]
+    #
+    # @!attribute [rw] job_output
+    #   The Amazon S3 path for the bucket where the job's output will be
+    #   stored.
+    #   @return [Types::BatchSegmentJobOutput]
+    #
+    # @!attribute [rw] role_arn
+    #   The ARN of the Amazon Identity and Access Management role that has
+    #   permissions to read and write to your input and output Amazon S3
+    #   buckets respectively.
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the batch segment job.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateBatchSegmentJobRequest AWS API Documentation
+    #
+    class CreateBatchSegmentJobRequest < Struct.new(
+      :job_name,
+      :solution_version_arn,
+      :filter_arn,
+      :num_results,
+      :job_input,
+      :job_output,
+      :role_arn,
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] batch_segment_job_arn
+    #   The ARN of the batch segment job.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateBatchSegmentJobResponse AWS API Documentation
+    #
+    class CreateBatchSegmentJobResponse < Struct.new(
+      :batch_segment_job_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] name
     #   A name for the new campaign. The campaign name must be unique within
     #   your account.
     #   @return [String]
     #
     # @!attribute [rw] solution_version_arn
-    #   The Amazon Resource Name (ARN) of the solution version to deploy.
+    #   The Amazon Resource Name (ARN) of the trained model to deploy with
+    #   the campaign. To specify the latest solution version of your
+    #   solution, specify the ARN of your *solution* in
+    #   `SolutionArn/$LATEST` format. You must use this format if you set
+    #   `syncWithLatestSolutionVersion` to `True` in the
+    #   [CampaignConfig][1].
+    #
+    #   To deploy a model that isn't the latest solution version of your
+    #   solution, specify the ARN of the solution version.
+    #
+    #   For more information about automatic campaign updates, see [Enabling
+    #   automatic campaign updates][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_CampaignConfig.html
+    #   [2]: https://docs.aws.amazon.com/personalize/latest/dg/campaigns.html#create-campaign-automatic-latest-sv-update
     #   @return [String]
     #
     # @!attribute [rw] min_provisioned_tps
     #   Specifies the requested minimum provisioned transactions
-    #   (recommendations) per second that Amazon Personalize will support.
+    #   (recommendations) per second that Amazon Personalize will support. A
+    #   high `minProvisionedTPS` will increase your bill. We recommend
+    #   starting with 1 for `minProvisionedTPS` (the default). Track your
+    #   usage using Amazon CloudWatch metrics, and increase the
+    #   `minProvisionedTPS` as necessary.
     #   @return [Integer]
     #
     # @!attribute [rw] campaign_config
     #   The configuration details of a campaign.
     #   @return [Types::CampaignConfig]
+    #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the campaign.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateCampaignRequest AWS API Documentation
     #
@@ -758,7 +1077,8 @@ module Aws::Personalize
       :name,
       :solution_version_arn,
       :min_provisioned_tps,
-      :campaign_config)
+      :campaign_config,
+      :tags)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -775,35 +1095,155 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateDatasetGroupRequest
-    #   data as a hash:
+    # @!attribute [rw] job_name
+    #   The name for the data deletion job.
+    #   @return [String]
     #
-    #       {
-    #         name: "Name", # required
-    #         role_arn: "RoleArn",
-    #         kms_key_arn: "KmsKeyArn",
-    #       }
+    # @!attribute [rw] dataset_group_arn
+    #   The Amazon Resource Name (ARN) of the dataset group that has the
+    #   datasets you want to delete records from.
+    #   @return [String]
     #
+    # @!attribute [rw] data_source
+    #   The Amazon S3 bucket that contains the list of userIds of the users
+    #   to delete.
+    #   @return [Types::DataSource]
+    #
+    # @!attribute [rw] role_arn
+    #   The Amazon Resource Name (ARN) of the IAM role that has permissions
+    #   to read from the Amazon S3 data source.
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the data deletion job.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateDataDeletionJobRequest AWS API Documentation
+    #
+    class CreateDataDeletionJobRequest < Struct.new(
+      :job_name,
+      :dataset_group_arn,
+      :data_source,
+      :role_arn,
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] data_deletion_job_arn
+    #   The Amazon Resource Name (ARN) of the data deletion job.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateDataDeletionJobResponse AWS API Documentation
+    #
+    class CreateDataDeletionJobResponse < Struct.new(
+      :data_deletion_job_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] job_name
+    #   The name for the dataset export job.
+    #   @return [String]
+    #
+    # @!attribute [rw] dataset_arn
+    #   The Amazon Resource Name (ARN) of the dataset that contains the data
+    #   to export.
+    #   @return [String]
+    #
+    # @!attribute [rw] ingestion_mode
+    #   The data to export, based on how you imported the data. You can
+    #   choose to export only `BULK` data that you imported using a dataset
+    #   import job, only `PUT` data that you imported incrementally (using
+    #   the console, PutEvents, PutUsers and PutItems operations), or `ALL`
+    #   for both types. The default value is `PUT`.
+    #   @return [String]
+    #
+    # @!attribute [rw] role_arn
+    #   The Amazon Resource Name (ARN) of the IAM service role that has
+    #   permissions to add data to your output Amazon S3 bucket.
+    #   @return [String]
+    #
+    # @!attribute [rw] job_output
+    #   The path to the Amazon S3 bucket where the job's output is stored.
+    #   @return [Types::DatasetExportJobOutput]
+    #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the dataset export job.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateDatasetExportJobRequest AWS API Documentation
+    #
+    class CreateDatasetExportJobRequest < Struct.new(
+      :job_name,
+      :dataset_arn,
+      :ingestion_mode,
+      :role_arn,
+      :job_output,
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] dataset_export_job_arn
+    #   The Amazon Resource Name (ARN) of the dataset export job.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateDatasetExportJobResponse AWS API Documentation
+    #
+    class CreateDatasetExportJobResponse < Struct.new(
+      :dataset_export_job_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] name
     #   The name for the new dataset group.
     #   @return [String]
     #
     # @!attribute [rw] role_arn
-    #   The ARN of the IAM role that has permissions to access the KMS key.
+    #   The ARN of the Identity and Access Management (IAM) role that has
+    #   permissions to access the Key Management Service (KMS) key.
     #   Supplying an IAM role is only valid when also specifying a KMS key.
     #   @return [String]
     #
     # @!attribute [rw] kms_key_arn
-    #   The Amazon Resource Name (ARN) of a KMS key used to encrypt the
-    #   datasets.
+    #   The Amazon Resource Name (ARN) of a Key Management Service (KMS) key
+    #   used to encrypt the datasets.
     #   @return [String]
+    #
+    # @!attribute [rw] domain
+    #   The domain of the dataset group. Specify a domain to create a Domain
+    #   dataset group. The domain you specify determines the default schemas
+    #   for datasets and the use cases available for recommenders. If you
+    #   don't specify a domain, you create a Custom dataset group with
+    #   solution versions that you deploy with a campaign.
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the dataset group.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateDatasetGroupRequest AWS API Documentation
     #
     class CreateDatasetGroupRequest < Struct.new(
       :name,
       :role_arn,
-      :kms_key_arn)
+      :kms_key_arn,
+      :domain,
+      :tags)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -812,26 +1252,19 @@ module Aws::Personalize
     #   The Amazon Resource Name (ARN) of the new dataset group.
     #   @return [String]
     #
+    # @!attribute [rw] domain
+    #   The domain for the new Domain dataset group.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateDatasetGroupResponse AWS API Documentation
     #
     class CreateDatasetGroupResponse < Struct.new(
-      :dataset_group_arn)
+      :dataset_group_arn,
+      :domain)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateDatasetImportJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         job_name: "Name", # required
-    #         dataset_arn: "Arn", # required
-    #         data_source: { # required
-    #           data_location: "S3Location",
-    #         },
-    #         role_arn: "RoleArn", # required
-    #       }
-    #
     # @!attribute [rw] job_name
     #   The name for the dataset import job.
     #   @return [String]
@@ -849,13 +1282,42 @@ module Aws::Personalize
     #   S3 data source.
     #   @return [String]
     #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the dataset import job.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] import_mode
+    #   Specify how to add the new records to an existing dataset. The
+    #   default import mode is `FULL`. If you haven't imported bulk records
+    #   into the dataset previously, you can only specify `FULL`.
+    #
+    #   * Specify `FULL` to overwrite all existing bulk data in your
+    #     dataset. Data you imported individually is not replaced.
+    #
+    #   * Specify `INCREMENTAL` to append the new records to the existing
+    #     data in your dataset. Amazon Personalize replaces any record with
+    #     the same ID with the new one.
+    #   @return [String]
+    #
+    # @!attribute [rw] publish_attribution_metrics_to_s3
+    #   If you created a metric attribution, specify whether to publish
+    #   metrics for this import job to Amazon S3
+    #   @return [Boolean]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateDatasetImportJobRequest AWS API Documentation
     #
     class CreateDatasetImportJobRequest < Struct.new(
       :job_name,
       :dataset_arn,
       :data_source,
-      :role_arn)
+      :role_arn,
+      :tags,
+      :import_mode,
+      :publish_attribution_metrics_to_s3)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -872,16 +1334,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateDatasetRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "Name", # required
-    #         schema_arn: "Arn", # required
-    #         dataset_group_arn: "Arn", # required
-    #         dataset_type: "DatasetType", # required
-    #       }
-    #
     # @!attribute [rw] name
     #   The name for the dataset.
     #   @return [String]
@@ -906,7 +1358,19 @@ module Aws::Personalize
     #   * Items
     #
     #   * Users
+    #
+    #   * Actions
+    #
+    #   * Action\_Interactions
     #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the dataset.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateDatasetRequest AWS API Documentation
     #
@@ -914,7 +1378,8 @@ module Aws::Personalize
       :name,
       :schema_arn,
       :dataset_group_arn,
-      :dataset_type)
+      :dataset_type,
+      :tags)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -931,14 +1396,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateEventTrackerRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "Name", # required
-    #         dataset_group_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] name
     #   The name for the event tracker.
     #   @return [String]
@@ -948,11 +1405,20 @@ module Aws::Personalize
     #   the event data.
     #   @return [String]
     #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the event tracker.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateEventTrackerRequest AWS API Documentation
     #
     class CreateEventTrackerRequest < Struct.new(
       :name,
-      :dataset_group_arn)
+      :dataset_group_arn,
+      :tags)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -979,15 +1445,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateFilterRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "Name", # required
-    #         dataset_group_arn: "Arn", # required
-    #         filter_expression: "FilterExpression", # required
-    #       }
-    #
     # @!attribute [rw] name
     #   The name of the filter to create.
     #   @return [String]
@@ -1000,15 +1457,28 @@ module Aws::Personalize
     #   The filter expression defines which items are included or excluded
     #   from recommendations. Filter expression must follow specific format
     #   rules. For information about filter expression structure and syntax,
-    #   see filter-expressions.
+    #   see [Filter expressions][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/filter-expressions.html
     #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the filter.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateFilterRequest AWS API Documentation
     #
     class CreateFilterRequest < Struct.new(
       :name,
       :dataset_group_arn,
-      :filter_expression)
+      :filter_expression,
+      :tags)
       SENSITIVE = [:filter_expression]
       include Aws::Structure
     end
@@ -1025,14 +1495,107 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateSchemaRequest
-    #   data as a hash:
+    # @!attribute [rw] name
+    #   A name for the metric attribution.
+    #   @return [String]
     #
-    #       {
-    #         name: "Name", # required
-    #         schema: "AvroSchema", # required
-    #       }
+    # @!attribute [rw] dataset_group_arn
+    #   The Amazon Resource Name (ARN) of the destination dataset group for
+    #   the metric attribution.
+    #   @return [String]
     #
+    # @!attribute [rw] metrics
+    #   A list of metric attributes for the metric attribution. Each metric
+    #   attribute specifies an event type to track and a function. Available
+    #   functions are `SUM()` or `SAMPLECOUNT()`. For SUM() functions,
+    #   provide the dataset type (either Interactions or Items) and column
+    #   to sum as a parameter. For example SUM(Items.PRICE).
+    #   @return [Array<Types::MetricAttribute>]
+    #
+    # @!attribute [rw] metrics_output_config
+    #   The output configuration details for the metric attribution.
+    #   @return [Types::MetricAttributionOutput]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateMetricAttributionRequest AWS API Documentation
+    #
+    class CreateMetricAttributionRequest < Struct.new(
+      :name,
+      :dataset_group_arn,
+      :metrics,
+      :metrics_output_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] metric_attribution_arn
+    #   The Amazon Resource Name (ARN) for the new metric attribution.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateMetricAttributionResponse AWS API Documentation
+    #
+    class CreateMetricAttributionResponse < Struct.new(
+      :metric_attribution_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] name
+    #   The name of the recommender.
+    #   @return [String]
+    #
+    # @!attribute [rw] dataset_group_arn
+    #   The Amazon Resource Name (ARN) of the destination domain dataset
+    #   group for the recommender.
+    #   @return [String]
+    #
+    # @!attribute [rw] recipe_arn
+    #   The Amazon Resource Name (ARN) of the recipe that the recommender
+    #   will use. For a recommender, a recipe is a Domain dataset group use
+    #   case. Only Domain dataset group use cases can be used to create a
+    #   recommender. For information about use cases see [Choosing
+    #   recommender use cases][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/domain-use-cases.html
+    #   @return [String]
+    #
+    # @!attribute [rw] recommender_config
+    #   The configuration details of the recommender.
+    #   @return [Types::RecommenderConfig]
+    #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the recommender.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateRecommenderRequest AWS API Documentation
+    #
+    class CreateRecommenderRequest < Struct.new(
+      :name,
+      :dataset_group_arn,
+      :recipe_arn,
+      :recommender_config,
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] recommender_arn
+    #   The Amazon Resource Name (ARN) of the recommender.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateRecommenderResponse AWS API Documentation
+    #
+    class CreateRecommenderResponse < Struct.new(
+      :recommender_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] name
     #   The name for the schema.
     #   @return [String]
@@ -1041,11 +1604,18 @@ module Aws::Personalize
     #   A schema in Avro JSON format.
     #   @return [String]
     #
+    # @!attribute [rw] domain
+    #   The domain for the schema. If you are creating a schema for a
+    #   dataset in a Domain dataset group, specify the domain you chose when
+    #   you created the Domain dataset group.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateSchemaRequest AWS API Documentation
     #
     class CreateSchemaRequest < Struct.new(
       :name,
-      :schema)
+      :schema,
+      :domain)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1062,64 +1632,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateSolutionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "Name", # required
-    #         perform_hpo: false,
-    #         perform_auto_ml: false,
-    #         recipe_arn: "Arn",
-    #         dataset_group_arn: "Arn", # required
-    #         event_type: "EventType",
-    #         solution_config: {
-    #           event_value_threshold: "EventValueThreshold",
-    #           hpo_config: {
-    #             hpo_objective: {
-    #               type: "HPOObjectiveType",
-    #               metric_name: "MetricName",
-    #               metric_regex: "MetricRegex",
-    #             },
-    #             hpo_resource_config: {
-    #               max_number_of_training_jobs: "HPOResource",
-    #               max_parallel_training_jobs: "HPOResource",
-    #             },
-    #             algorithm_hyper_parameter_ranges: {
-    #               integer_hyper_parameter_ranges: [
-    #                 {
-    #                   name: "ParameterName",
-    #                   min_value: 1,
-    #                   max_value: 1,
-    #                 },
-    #               ],
-    #               continuous_hyper_parameter_ranges: [
-    #                 {
-    #                   name: "ParameterName",
-    #                   min_value: 1.0,
-    #                   max_value: 1.0,
-    #                 },
-    #               ],
-    #               categorical_hyper_parameter_ranges: [
-    #                 {
-    #                   name: "ParameterName",
-    #                   values: ["CategoricalValue"],
-    #                 },
-    #               ],
-    #             },
-    #           },
-    #           algorithm_hyper_parameters: {
-    #             "ParameterName" => "ParameterValue",
-    #           },
-    #           feature_transformation_parameters: {
-    #             "ParameterName" => "ParameterValue",
-    #           },
-    #           auto_ml_config: {
-    #             metric_name: "MetricName",
-    #             recipe_list: ["Arn"],
-    #           },
-    #         },
-    #       }
-    #
     # @!attribute [rw] name
     #   The name for the solution.
     #   @return [String]
@@ -1133,6 +1645,10 @@ module Aws::Personalize
     #   @return [Boolean]
     #
     # @!attribute [rw] perform_auto_ml
+    #   We don't recommend enabling automated machine learning. Instead,
+    #   match your use case to the available Amazon Personalize recipes. For
+    #   more information, see [Choosing a recipe][1].
+    #
     #   Whether to perform automated machine learning (AutoML). The default
     #   is `false`. For this case, you must specify `recipeArn`.
     #
@@ -1142,11 +1658,45 @@ module Aws::Personalize
     #   Personalize determines the optimal recipe by running tests with
     #   different values for the hyperparameters. AutoML lengthens the
     #   training process as compared to selecting a specific recipe.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/working-with-predefined-recipes.html
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] perform_auto_training
+    #   Whether the solution uses automatic training to create new solution
+    #   versions (trained models). The default is `True` and the solution
+    #   automatically creates new solution versions every 7 days. You can
+    #   change the training frequency by specifying a `schedulingExpression`
+    #   in the `AutoTrainingConfig` as part of solution configuration. For
+    #   more information about automatic training, see [Configuring
+    #   automatic training][1].
+    #
+    #   Automatic solution version creation starts within one hour after the
+    #   solution is ACTIVE. If you manually create a solution version within
+    #   the hour, the solution skips the first automatic training.
+    #
+    #   After training starts, you can get the solution version's Amazon
+    #   Resource Name (ARN) with the [ListSolutionVersions][2] API
+    #   operation. To get its status, use the [DescribeSolutionVersion][3].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/solution-config-auto-training.html
+    #   [2]: https://docs.aws.amazon.com/personalize/latest/dg/API_ListSolutionVersions.html
+    #   [3]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeSolutionVersion.html
     #   @return [Boolean]
     #
     # @!attribute [rw] recipe_arn
-    #   The ARN of the recipe to use for model training. Only specified when
-    #   `performAutoML` is false.
+    #   The Amazon Resource Name (ARN) of the recipe to use for model
+    #   training. This is required when `performAutoML` is false. For
+    #   information about different Amazon Personalize recipes and their
+    #   ARNs, see [Choosing a recipe][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/working-with-predefined-recipes.html
     #   @return [String]
     #
     # @!attribute [rw] dataset_group_arn
@@ -1164,8 +1714,8 @@ module Aws::Personalize
     #   @return [String]
     #
     # @!attribute [rw] solution_config
-    #   The configuration to use with the solution. When `performAutoML` is
-    #   set to true, Amazon Personalize only evaluates the `autoMLConfig`
+    #   The configuration properties for the solution. When `performAutoML`
+    #   is set to true, Amazon Personalize only evaluates the `autoMLConfig`
     #   section of the solution configuration.
     #
     #   <note markdown="1"> Amazon Personalize doesn't support configuring the `hpoObjective`
@@ -1174,16 +1724,26 @@ module Aws::Personalize
     #    </note>
     #   @return [Types::SolutionConfig]
     #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the solution.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateSolutionRequest AWS API Documentation
     #
     class CreateSolutionRequest < Struct.new(
       :name,
       :perform_hpo,
       :perform_auto_ml,
+      :perform_auto_training,
       :recipe_arn,
       :dataset_group_arn,
       :event_type,
-      :solution_config)
+      :solution_config,
+      :tags)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1200,13 +1760,9 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateSolutionVersionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         solution_arn: "Arn", # required
-    #         training_mode: "FULL", # accepts FULL, UPDATE
-    #       }
+    # @!attribute [rw] name
+    #   The name of the solution version.
+    #   @return [String]
     #
     # @!attribute [rw] solution_arn
     #   The Amazon Resource Name (ARN) of the solution containing the
@@ -1215,29 +1771,47 @@ module Aws::Personalize
     #
     # @!attribute [rw] training_mode
     #   The scope of training to be performed when creating the solution
-    #   version. The `FULL` option trains the solution version based on the
-    #   entirety of the input solution's training data, while the `UPDATE`
-    #   option processes only the data that has changed in comparison to the
-    #   input solution. Choose `UPDATE` when you want to incrementally
-    #   update your solution version instead of creating an entirely new
-    #   one.
+    #   version. The default is `FULL`. This creates a completely new model
+    #   based on the entirety of the training data from the datasets in your
+    #   dataset group.
+    #
+    #   If you use [User-Personalization][1], you can specify a training
+    #   mode of `UPDATE`. This updates the model to consider new items for
+    #   recommendations. It is not a full retraining. You should still
+    #   complete a full retraining weekly. If you specify `UPDATE`, Amazon
+    #   Personalize will stop automatic updates for the solution version. To
+    #   resume updates, create a new solution with training mode set to
+    #   `FULL` and deploy it in a campaign. For more information about
+    #   automatic updates, see [Automatic updates][2].
     #
     #   The `UPDATE` option can only be used when you already have an active
     #   solution version created from the input solution using the `FULL`
     #   option and the input solution was trained with the
-    #   [User-Personalization][1] recipe or the [HRNN-Coldstart][2] recipe.
+    #   [User-Personalization][1] recipe or the legacy [HRNN-Coldstart][3]
+    #   recipe.
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/native-recipe-new-item-USER_PERSONALIZATION.html
-    #   [2]: https://docs.aws.amazon.com/personalize/latest/dg/native-recipe-hrnn-coldstart.html
+    #   [2]: https://docs.aws.amazon.com/personalize/latest/dg/use-case-recipe-features.html#maintaining-with-automatic-updates
+    #   [3]: https://docs.aws.amazon.com/personalize/latest/dg/native-recipe-hrnn-coldstart.html
     #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   A list of [tags][1] to apply to the solution version.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/CreateSolutionVersionRequest AWS API Documentation
     #
     class CreateSolutionVersionRequest < Struct.new(
+      :name,
       :solution_arn,
-      :training_mode)
+      :training_mode,
+      :tags)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1254,21 +1828,158 @@ module Aws::Personalize
       include Aws::Structure
     end
 
+    # Describes a job that deletes all references to specific users from an
+    # Amazon Personalize dataset group in batches. For information about
+    # creating a data deletion job, see [Deleting users][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/delete-records.html
+    #
+    # @!attribute [rw] job_name
+    #   The name of the data deletion job.
+    #   @return [String]
+    #
+    # @!attribute [rw] data_deletion_job_arn
+    #   The Amazon Resource Name (ARN) of the data deletion job.
+    #   @return [String]
+    #
+    # @!attribute [rw] dataset_group_arn
+    #   The Amazon Resource Name (ARN) of the dataset group the job deletes
+    #   records from.
+    #   @return [String]
+    #
+    # @!attribute [rw] data_source
+    #   Describes the data source that contains the data to upload to a
+    #   dataset, or the list of records to delete from Amazon Personalize.
+    #   @return [Types::DataSource]
+    #
+    # @!attribute [rw] role_arn
+    #   The Amazon Resource Name (ARN) of the IAM role that has permissions
+    #   to read from the Amazon S3 data source.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The status of the data deletion job.
+    #
+    #   A data deletion job can have one of the following statuses:
+    #
+    #   * PENDING &gt; IN\_PROGRESS &gt; COMPLETED -or- FAILED
+    #
+    #   ^
+    #   @return [String]
+    #
+    # @!attribute [rw] num_deleted
+    #   The number of records deleted by a COMPLETED job.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The creation date and time (in Unix time) of the data deletion job.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The date and time (in Unix time) the data deletion job was last
+    #   updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] failure_reason
+    #   If a data deletion job fails, provides the reason why.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DataDeletionJob AWS API Documentation
+    #
+    class DataDeletionJob < Struct.new(
+      :job_name,
+      :data_deletion_job_arn,
+      :dataset_group_arn,
+      :data_source,
+      :role_arn,
+      :status,
+      :num_deleted,
+      :creation_date_time,
+      :last_updated_date_time,
+      :failure_reason)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides a summary of the properties of a data deletion job. For a
+    # complete listing, call the [DescribeDataDeletionJob][1] API operation.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeDataDeletionJob.html
+    #
+    # @!attribute [rw] data_deletion_job_arn
+    #   The Amazon Resource Name (ARN) of the data deletion job.
+    #   @return [String]
+    #
+    # @!attribute [rw] dataset_group_arn
+    #   The Amazon Resource Name (ARN) of the dataset group the job deleted
+    #   records from.
+    #   @return [String]
+    #
+    # @!attribute [rw] job_name
+    #   The name of the data deletion job.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The status of the data deletion job.
+    #
+    #   A data deletion job can have one of the following statuses:
+    #
+    #   * PENDING &gt; IN\_PROGRESS &gt; COMPLETED -or- FAILED
+    #
+    #   ^
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The creation date and time (in Unix time) of the data deletion job.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The date and time (in Unix time) the data deletion job was last
+    #   updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] failure_reason
+    #   If a data deletion job fails, provides the reason why.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DataDeletionJobSummary AWS API Documentation
+    #
+    class DataDeletionJobSummary < Struct.new(
+      :data_deletion_job_arn,
+      :dataset_group_arn,
+      :job_name,
+      :status,
+      :creation_date_time,
+      :last_updated_date_time,
+      :failure_reason)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Describes the data source that contains the data to upload to a
-    # dataset.
-    #
-    # @note When making an API call, you may pass DataSource
-    #   data as a hash:
-    #
-    #       {
-    #         data_location: "S3Location",
-    #       }
+    # dataset, or the list of records to delete from Amazon Personalize.
     #
     # @!attribute [rw] data_location
-    #   The path to the Amazon S3 bucket where the data that you want to
-    #   upload to your dataset is stored. For example:
+    #   For dataset import jobs, the path to the Amazon S3 bucket where the
+    #   data that you want to upload to your dataset is stored. For data
+    #   deletion jobs, the path to the Amazon S3 bucket that stores the list
+    #   of records to delete.
     #
-    #   `s3://bucket-name/training-data.csv`
+    #   For example:
+    #
+    #   `s3://bucket-name/folder-name/fileName.csv`
+    #
+    #   If your CSV files are in a folder in your Amazon S3 bucket and you
+    #   want your import job or data deletion job to consider multiple
+    #   files, you can specify the path to the folder. With a data deletion
+    #   job, Amazon Personalize uses all files in the folder and any sub
+    #   folder. Use the following syntax with a `/` after the folder name:
+    #
+    #   `s3://bucket-name/folder-name/`
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DataSource AWS API Documentation
@@ -1302,6 +2013,10 @@ module Aws::Personalize
     #   * Items
     #
     #   * Users
+    #
+    #   * Actions
+    #
+    #   * Action\_Interactions
     #   @return [String]
     #
     # @!attribute [rw] schema_arn
@@ -1327,6 +2042,17 @@ module Aws::Personalize
     #   A time stamp that shows when the dataset was updated.
     #   @return [Time]
     #
+    # @!attribute [rw] latest_dataset_update
+    #   Describes the latest update to the dataset.
+    #   @return [Types::DatasetUpdateSummary]
+    #
+    # @!attribute [rw] tracking_id
+    #   The ID of the event tracker for an Action interactions dataset. You
+    #   specify the tracker's ID in the `PutActionInteractions` API
+    #   operation. Amazon Personalize uses it to direct new data to the
+    #   Action interactions dataset in your dataset group.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/Dataset AWS API Documentation
     #
     class Dataset < Struct.new(
@@ -1337,20 +2063,183 @@ module Aws::Personalize
       :schema_arn,
       :status,
       :creation_date_time,
-      :last_updated_date_time)
+      :last_updated_date_time,
+      :latest_dataset_update,
+      :tracking_id)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # A dataset group is a collection of related datasets (Interactions,
-    # User, and Item). You create a dataset group by calling
-    # CreateDatasetGroup. You then create a dataset and add it to a dataset
-    # group by calling CreateDataset. The dataset group is used to create
-    # and train a solution by calling CreateSolution. A dataset group can
-    # contain only one of each type of dataset.
+    # Describes a job that exports a dataset to an Amazon S3 bucket. For
+    # more information, see [CreateDatasetExportJob][1].
     #
-    # You can specify an AWS Key Management Service (KMS) key to encrypt the
+    # A dataset export job can be in one of the following states:
+    #
+    # * CREATE PENDING &gt; CREATE IN\_PROGRESS &gt; ACTIVE -or- CREATE
+    #   FAILED
+    #
+    # ^
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_CreateDatasetExportJob.html
+    #
+    # @!attribute [rw] job_name
+    #   The name of the export job.
+    #   @return [String]
+    #
+    # @!attribute [rw] dataset_export_job_arn
+    #   The Amazon Resource Name (ARN) of the dataset export job.
+    #   @return [String]
+    #
+    # @!attribute [rw] dataset_arn
+    #   The Amazon Resource Name (ARN) of the dataset to export.
+    #   @return [String]
+    #
+    # @!attribute [rw] ingestion_mode
+    #   The data to export, based on how you imported the data. You can
+    #   choose to export `BULK` data that you imported using a dataset
+    #   import job, `PUT` data that you imported incrementally (using the
+    #   console, PutEvents, PutUsers and PutItems operations), or `ALL` for
+    #   both types. The default value is `PUT`.
+    #   @return [String]
+    #
+    # @!attribute [rw] role_arn
+    #   The Amazon Resource Name (ARN) of the IAM service role that has
+    #   permissions to add data to your output Amazon S3 bucket.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The status of the dataset export job.
+    #
+    #   A dataset export job can be in one of the following states:
+    #
+    #   * CREATE PENDING &gt; CREATE IN\_PROGRESS &gt; ACTIVE -or- CREATE
+    #     FAILED
+    #
+    #   ^
+    #   @return [String]
+    #
+    # @!attribute [rw] job_output
+    #   The path to the Amazon S3 bucket where the job's output is stored.
+    #   For example:
+    #
+    #   `s3://bucket-name/folder-name/`
+    #   @return [Types::DatasetExportJobOutput]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The creation date and time (in Unix time) of the dataset export job.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The date and time (in Unix time) the status of the dataset export
+    #   job was last updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] failure_reason
+    #   If a dataset export job fails, provides the reason why.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DatasetExportJob AWS API Documentation
+    #
+    class DatasetExportJob < Struct.new(
+      :job_name,
+      :dataset_export_job_arn,
+      :dataset_arn,
+      :ingestion_mode,
+      :role_arn,
+      :status,
+      :job_output,
+      :creation_date_time,
+      :last_updated_date_time,
+      :failure_reason)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The output configuration parameters of a dataset export job.
+    #
+    # @!attribute [rw] s3_data_destination
+    #   The configuration details of an Amazon S3 input or output bucket.
+    #   @return [Types::S3DataConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DatasetExportJobOutput AWS API Documentation
+    #
+    class DatasetExportJobOutput < Struct.new(
+      :s3_data_destination)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides a summary of the properties of a dataset export job. For a
+    # complete listing, call the [DescribeDatasetExportJob][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeDatasetExportJob.html
+    #
+    # @!attribute [rw] dataset_export_job_arn
+    #   The Amazon Resource Name (ARN) of the dataset export job.
+    #   @return [String]
+    #
+    # @!attribute [rw] job_name
+    #   The name of the dataset export job.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The status of the dataset export job.
+    #
+    #   A dataset export job can be in one of the following states:
+    #
+    #   * CREATE PENDING &gt; CREATE IN\_PROGRESS &gt; ACTIVE -or- CREATE
+    #     FAILED
+    #
+    #   ^
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The date and time (in Unix time) that the dataset export job was
+    #   created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The date and time (in Unix time) that the dataset export job status
+    #   was last updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] failure_reason
+    #   If a dataset export job fails, the reason behind the failure.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DatasetExportJobSummary AWS API Documentation
+    #
+    class DatasetExportJobSummary < Struct.new(
+      :dataset_export_job_arn,
+      :job_name,
+      :status,
+      :creation_date_time,
+      :last_updated_date_time,
+      :failure_reason)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # A dataset group is a collection of related datasets (Item
+    # interactions, Users, Items, Actions, Action interactions). You create
+    # a dataset group by calling [CreateDatasetGroup][1]. You then create a
+    # dataset and add it to a dataset group by calling [CreateDataset][2].
+    # The dataset group is used to create and train a solution by calling
+    # [CreateSolution][3]. A dataset group can contain only one of each type
+    # of dataset.
+    #
+    # You can specify an Key Management Service (KMS) key to encrypt the
     # datasets in the group.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_CreateDatasetGroup.html
+    # [2]: https://docs.aws.amazon.com/personalize/latest/dg/API_CreateDataset.html
+    # [3]: https://docs.aws.amazon.com/personalize/latest/dg/API_CreateSolution.html
     #
     # @!attribute [rw] name
     #   The name of the dataset group.
@@ -1372,13 +2261,14 @@ module Aws::Personalize
     #   @return [String]
     #
     # @!attribute [rw] role_arn
-    #   The ARN of the IAM role that has permissions to create the dataset
-    #   group.
+    #   The ARN of the Identity and Access Management (IAM) role that has
+    #   permissions to access the Key Management Service (KMS) key.
+    #   Supplying an IAM role is only valid when also specifying a KMS key.
     #   @return [String]
     #
     # @!attribute [rw] kms_key_arn
-    #   The Amazon Resource Name (ARN) of the KMS key used to encrypt the
-    #   datasets.
+    #   The Amazon Resource Name (ARN) of the Key Management Service (KMS)
+    #   key used to encrypt the datasets.
     #   @return [String]
     #
     # @!attribute [rw] creation_date_time
@@ -1393,6 +2283,10 @@ module Aws::Personalize
     #   If creating a dataset group fails, provides the reason why.
     #   @return [String]
     #
+    # @!attribute [rw] domain
+    #   The domain of a Domain dataset group.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DatasetGroup AWS API Documentation
     #
     class DatasetGroup < Struct.new(
@@ -1403,13 +2297,18 @@ module Aws::Personalize
       :kms_key_arn,
       :creation_date_time,
       :last_updated_date_time,
-      :failure_reason)
+      :failure_reason,
+      :domain)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Provides a summary of the properties of a dataset group. For a
-    # complete listing, call the DescribeDatasetGroup API.
+    # complete listing, call the [DescribeDatasetGroup][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeDatasetGroup.html
     #
     # @!attribute [rw] name
     #   The name of the dataset group.
@@ -1443,6 +2342,10 @@ module Aws::Personalize
     #   If creating a dataset group fails, the reason behind the failure.
     #   @return [String]
     #
+    # @!attribute [rw] domain
+    #   The domain of a Domain dataset group.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DatasetGroupSummary AWS API Documentation
     #
     class DatasetGroupSummary < Struct.new(
@@ -1451,14 +2354,15 @@ module Aws::Personalize
       :status,
       :creation_date_time,
       :last_updated_date_time,
-      :failure_reason)
+      :failure_reason,
+      :domain)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Describes a job that imports training data from a data source (Amazon
     # S3 bucket) to an Amazon Personalize dataset. For more information, see
-    # CreateDatasetImportJob.
+    # [CreateDatasetImportJob][1].
     #
     # A dataset import job can be in one of the following states:
     #
@@ -1466,6 +2370,10 @@ module Aws::Personalize
     #   FAILED
     #
     # ^
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_CreateDatasetImportJob.html
     #
     # @!attribute [rw] job_name
     #   The name of the import job.
@@ -1485,8 +2393,8 @@ module Aws::Personalize
     #   @return [Types::DataSource]
     #
     # @!attribute [rw] role_arn
-    #   The ARN of the AWS Identity and Access Management (IAM) role that
-    #   has permissions to read from the Amazon S3 data source.
+    #   The ARN of the IAM role that has permissions to read from the Amazon
+    #   S3 data source.
     #   @return [String]
     #
     # @!attribute [rw] status
@@ -1512,6 +2420,16 @@ module Aws::Personalize
     #   If a dataset import job fails, provides the reason why.
     #   @return [String]
     #
+    # @!attribute [rw] import_mode
+    #   The import mode used by the dataset import job to import new
+    #   records.
+    #   @return [String]
+    #
+    # @!attribute [rw] publish_attribution_metrics_to_s3
+    #   Whether the job publishes metrics to Amazon S3 for a metric
+    #   attribution.
+    #   @return [Boolean]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DatasetImportJob AWS API Documentation
     #
     class DatasetImportJob < Struct.new(
@@ -1523,13 +2441,19 @@ module Aws::Personalize
       :status,
       :creation_date_time,
       :last_updated_date_time,
-      :failure_reason)
+      :failure_reason,
+      :import_mode,
+      :publish_attribution_metrics_to_s3)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Provides a summary of the properties of a dataset import job. For a
-    # complete listing, call the DescribeDatasetImportJob API.
+    # complete listing, call the [DescribeDatasetImportJob][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeDatasetImportJob.html
     #
     # @!attribute [rw] dataset_import_job_arn
     #   The Amazon Resource Name (ARN) of the dataset import job.
@@ -1556,11 +2480,22 @@ module Aws::Personalize
     #   @return [Time]
     #
     # @!attribute [rw] last_updated_date_time
-    #   The date and time (in Unix time) that the dataset was last updated.
+    #   The date and time (in Unix time) that the dataset import job status
+    #   was last updated.
     #   @return [Time]
     #
     # @!attribute [rw] failure_reason
     #   If a dataset import job fails, the reason behind the failure.
+    #   @return [String]
+    #
+    # @!attribute [rw] import_mode
+    #   The import mode the dataset import job used to update the data in
+    #   the dataset. For more information see [Updating existing bulk
+    #   data][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/updating-existing-bulk-data.html
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DatasetImportJobSummary AWS API Documentation
@@ -1571,13 +2506,18 @@ module Aws::Personalize
       :status,
       :creation_date_time,
       :last_updated_date_time,
-      :failure_reason)
+      :failure_reason,
+      :import_mode)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Describes the schema for a dataset. For more information on schemas,
-    # see CreateSchema.
+    # see [CreateSchema][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_CreateSchema.html
     #
     # @!attribute [rw] name
     #   The name of the schema.
@@ -1599,6 +2539,11 @@ module Aws::Personalize
     #   The date and time (in Unix time) that the schema was last updated.
     #   @return [Time]
     #
+    # @!attribute [rw] domain
+    #   The domain of a schema that you created for a dataset in a Domain
+    #   dataset group.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DatasetSchema AWS API Documentation
     #
     class DatasetSchema < Struct.new(
@@ -1606,13 +2551,18 @@ module Aws::Personalize
       :schema_arn,
       :schema,
       :creation_date_time,
-      :last_updated_date_time)
+      :last_updated_date_time,
+      :domain)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Provides a summary of the properties of a dataset schema. For a
-    # complete listing, call the DescribeSchema API.
+    # complete listing, call the [DescribeSchema][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeSchema.html
     #
     # @!attribute [rw] name
     #   The name of the schema.
@@ -1630,19 +2580,29 @@ module Aws::Personalize
     #   The date and time (in Unix time) that the schema was last updated.
     #   @return [Time]
     #
+    # @!attribute [rw] domain
+    #   The domain of a schema that you created for a dataset in a Domain
+    #   dataset group.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DatasetSchemaSummary AWS API Documentation
     #
     class DatasetSchemaSummary < Struct.new(
       :name,
       :schema_arn,
       :creation_date_time,
-      :last_updated_date_time)
+      :last_updated_date_time,
+      :domain)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Provides a summary of the properties of a dataset. For a complete
-    # listing, call the DescribeDataset API.
+    # listing, call the [DescribeDataset][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeDataset.html
     #
     # @!attribute [rw] name
     #   The name of the dataset.
@@ -1690,6 +2650,41 @@ module Aws::Personalize
       :dataset_arn,
       :dataset_type,
       :status,
+      :creation_date_time,
+      :last_updated_date_time)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes an update to a dataset.
+    #
+    # @!attribute [rw] schema_arn
+    #   The Amazon Resource Name (ARN) of the schema that replaced the
+    #   previous schema of the dataset.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The status of the dataset update.
+    #   @return [String]
+    #
+    # @!attribute [rw] failure_reason
+    #   If updating a dataset fails, provides the reason why.
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The creation date and time (in Unix time) of the dataset update.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The last update date and time (in Unix time) of the dataset.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DatasetUpdateSummary AWS API Documentation
+    #
+    class DatasetUpdateSummary < Struct.new(
+      :schema_arn,
+      :status,
+      :failure_reason,
       :creation_date_time,
       :last_updated_date_time)
       SENSITIVE = []
@@ -1811,13 +2806,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteCampaignRequest
-    #   data as a hash:
-    #
-    #       {
-    #         campaign_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] campaign_arn
     #   The Amazon Resource Name (ARN) of the campaign to delete.
     #   @return [String]
@@ -1830,13 +2818,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteDatasetGroupRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dataset_group_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] dataset_group_arn
     #   The ARN of the dataset group to delete.
     #   @return [String]
@@ -1849,13 +2830,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteDatasetRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dataset_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] dataset_arn
     #   The Amazon Resource Name (ARN) of the dataset to delete.
     #   @return [String]
@@ -1868,13 +2842,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteEventTrackerRequest
-    #   data as a hash:
-    #
-    #       {
-    #         event_tracker_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] event_tracker_arn
     #   The Amazon Resource Name (ARN) of the event tracker to delete.
     #   @return [String]
@@ -1887,13 +2854,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteFilterRequest
-    #   data as a hash:
-    #
-    #       {
-    #         filter_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] filter_arn
     #   The ARN of the filter to delete.
     #   @return [String]
@@ -1906,13 +2866,30 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteSchemaRequest
-    #   data as a hash:
+    # @!attribute [rw] metric_attribution_arn
+    #   The metric attribution's Amazon Resource Name (ARN).
+    #   @return [String]
     #
-    #       {
-    #         schema_arn: "Arn", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DeleteMetricAttributionRequest AWS API Documentation
     #
+    class DeleteMetricAttributionRequest < Struct.new(
+      :metric_attribution_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] recommender_arn
+    #   The Amazon Resource Name (ARN) of the recommender to delete.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DeleteRecommenderRequest AWS API Documentation
+    #
+    class DeleteRecommenderRequest < Struct.new(
+      :recommender_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] schema_arn
     #   The Amazon Resource Name (ARN) of the schema to delete.
     #   @return [String]
@@ -1925,13 +2902,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteSolutionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         solution_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] solution_arn
     #   The ARN of the solution to delete.
     #   @return [String]
@@ -1944,13 +2914,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeAlgorithmRequest
-    #   data as a hash:
-    #
-    #       {
-    #         algorithm_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] algorithm_arn
     #   The Amazon Resource Name (ARN) of the algorithm to describe.
     #   @return [String]
@@ -1975,13 +2938,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeBatchInferenceJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         batch_inference_job_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] batch_inference_job_arn
     #   The ARN of the batch inference job to describe.
     #   @return [String]
@@ -2006,13 +2962,30 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeCampaignRequest
-    #   data as a hash:
+    # @!attribute [rw] batch_segment_job_arn
+    #   The ARN of the batch segment job to describe.
+    #   @return [String]
     #
-    #       {
-    #         campaign_arn: "Arn", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DescribeBatchSegmentJobRequest AWS API Documentation
     #
+    class DescribeBatchSegmentJobRequest < Struct.new(
+      :batch_segment_job_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] batch_segment_job
+    #   Information on the specified batch segment job.
+    #   @return [Types::BatchSegmentJob]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DescribeBatchSegmentJobResponse AWS API Documentation
+    #
+    class DescribeBatchSegmentJobResponse < Struct.new(
+      :batch_segment_job)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] campaign_arn
     #   The Amazon Resource Name (ARN) of the campaign.
     #   @return [String]
@@ -2037,13 +3010,75 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeDatasetGroupRequest
-    #   data as a hash:
+    # @!attribute [rw] data_deletion_job_arn
+    #   The Amazon Resource Name (ARN) of the data deletion job.
+    #   @return [String]
     #
-    #       {
-    #         dataset_group_arn: "Arn", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DescribeDataDeletionJobRequest AWS API Documentation
     #
+    class DescribeDataDeletionJobRequest < Struct.new(
+      :data_deletion_job_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] data_deletion_job
+    #   Information about the data deletion job, including the status.
+    #
+    #   The status is one of the following values:
+    #
+    #   * PENDING
+    #
+    #   * IN\_PROGRESS
+    #
+    #   * COMPLETED
+    #
+    #   * FAILED
+    #   @return [Types::DataDeletionJob]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DescribeDataDeletionJobResponse AWS API Documentation
+    #
+    class DescribeDataDeletionJobResponse < Struct.new(
+      :data_deletion_job)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] dataset_export_job_arn
+    #   The Amazon Resource Name (ARN) of the dataset export job to
+    #   describe.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DescribeDatasetExportJobRequest AWS API Documentation
+    #
+    class DescribeDatasetExportJobRequest < Struct.new(
+      :dataset_export_job_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] dataset_export_job
+    #   Information about the dataset export job, including the status.
+    #
+    #   The status is one of the following values:
+    #
+    #   * CREATE PENDING
+    #
+    #   * CREATE IN\_PROGRESS
+    #
+    #   * ACTIVE
+    #
+    #   * CREATE FAILED
+    #   @return [Types::DatasetExportJob]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DescribeDatasetExportJobResponse AWS API Documentation
+    #
+    class DescribeDatasetExportJobResponse < Struct.new(
+      :dataset_export_job)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] dataset_group_arn
     #   The Amazon Resource Name (ARN) of the dataset group to describe.
     #   @return [String]
@@ -2068,13 +3103,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeDatasetImportJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dataset_import_job_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] dataset_import_job_arn
     #   The Amazon Resource Name (ARN) of the dataset import job to
     #   describe.
@@ -2110,13 +3138,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeDatasetRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dataset_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] dataset_arn
     #   The Amazon Resource Name (ARN) of the dataset to describe.
     #   @return [String]
@@ -2141,13 +3162,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeEventTrackerRequest
-    #   data as a hash:
-    #
-    #       {
-    #         event_tracker_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] event_tracker_arn
     #   The Amazon Resource Name (ARN) of the event tracker to describe.
     #   @return [String]
@@ -2172,13 +3186,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeFeatureTransformationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         feature_transformation_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] feature_transformation_arn
     #   The Amazon Resource Name (ARN) of the feature transformation to
     #   describe.
@@ -2204,13 +3211,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeFilterRequest
-    #   data as a hash:
-    #
-    #       {
-    #         filter_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] filter_arn
     #   The ARN of the filter to describe.
     #   @return [String]
@@ -2235,13 +3235,30 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeRecipeRequest
-    #   data as a hash:
+    # @!attribute [rw] metric_attribution_arn
+    #   The metric attribution's Amazon Resource Name (ARN).
+    #   @return [String]
     #
-    #       {
-    #         recipe_arn: "Arn", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DescribeMetricAttributionRequest AWS API Documentation
     #
+    class DescribeMetricAttributionRequest < Struct.new(
+      :metric_attribution_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] metric_attribution
+    #   The details of the metric attribution.
+    #   @return [Types::MetricAttribution]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DescribeMetricAttributionResponse AWS API Documentation
+    #
+    class DescribeMetricAttributionResponse < Struct.new(
+      :metric_attribution)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] recipe_arn
     #   The Amazon Resource Name (ARN) of the recipe to describe.
     #   @return [String]
@@ -2266,13 +3283,30 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeSchemaRequest
-    #   data as a hash:
+    # @!attribute [rw] recommender_arn
+    #   The Amazon Resource Name (ARN) of the recommender to describe.
+    #   @return [String]
     #
-    #       {
-    #         schema_arn: "Arn", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DescribeRecommenderRequest AWS API Documentation
     #
+    class DescribeRecommenderRequest < Struct.new(
+      :recommender_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] recommender
+    #   The properties of the recommender.
+    #   @return [Types::Recommender]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/DescribeRecommenderResponse AWS API Documentation
+    #
+    class DescribeRecommenderResponse < Struct.new(
+      :recommender)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] schema_arn
     #   The Amazon Resource Name (ARN) of the schema to retrieve.
     #   @return [String]
@@ -2297,13 +3331,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeSolutionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         solution_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] solution_arn
     #   The Amazon Resource Name (ARN) of the solution to describe.
     #   @return [String]
@@ -2328,13 +3355,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeSolutionVersionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         solution_version_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] solution_version_arn
     #   The Amazon Resource Name (ARN) of the solution version.
     #   @return [String]
@@ -2370,7 +3390,7 @@ module Aws::Personalize
     #   @return [String]
     #
     # @!attribute [rw] account_id
-    #   The Amazon AWS account that owns the event tracker.
+    #   The Amazon Web Services account that owns the event tracker.
     #   @return [String]
     #
     # @!attribute [rw] tracking_id
@@ -2424,7 +3444,11 @@ module Aws::Personalize
     end
 
     # Provides a summary of the properties of an event tracker. For a
-    # complete listing, call the DescribeEventTracker API.
+    # complete listing, call the [DescribeEventTracker][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeEventTracker.html
     #
     # @!attribute [rw] name
     #   The name of the event tracker.
@@ -2516,6 +3540,22 @@ module Aws::Personalize
       include Aws::Structure
     end
 
+    # A string to string map of the configuration details for theme
+    # generation.
+    #
+    # @!attribute [rw] item_name
+    #   The name of the Items dataset column that stores the name of each
+    #   item in the dataset.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/FieldsForThemeGeneration AWS API Documentation
+    #
+    class FieldsForThemeGeneration < Struct.new(
+      :item_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Contains information on a recommendation filter, including its ARN,
     # status, and filter expression.
     #
@@ -2547,7 +3587,11 @@ module Aws::Personalize
     #   Specifies the type of item interactions to filter out of
     #   recommendation results. The filter expression must follow specific
     #   format rules. For information about filter expression structure and
-    #   syntax, see filter-expressions.
+    #   syntax, see [Filter expressions][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/filter-expressions.html
     #   @return [String]
     #
     # @!attribute [rw] status
@@ -2613,13 +3657,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSolutionMetricsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         solution_version_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] solution_version_arn
     #   The Amazon Resource Name (ARN) of the solution version for which to
     #   get metrics.
@@ -2638,7 +3675,12 @@ module Aws::Personalize
     #   @return [String]
     #
     # @!attribute [rw] metrics
-    #   The metrics for the solution version.
+    #   The metrics for the solution version. For more information, see [
+    #   Evaluating a solution version with metrics ][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/working-with-training-metrics.html
     #   @return [Hash<String,Float>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/GetSolutionMetricsResponse AWS API Documentation
@@ -2651,43 +3693,6 @@ module Aws::Personalize
     end
 
     # Describes the properties for hyperparameter optimization (HPO).
-    #
-    # @note When making an API call, you may pass HPOConfig
-    #   data as a hash:
-    #
-    #       {
-    #         hpo_objective: {
-    #           type: "HPOObjectiveType",
-    #           metric_name: "MetricName",
-    #           metric_regex: "MetricRegex",
-    #         },
-    #         hpo_resource_config: {
-    #           max_number_of_training_jobs: "HPOResource",
-    #           max_parallel_training_jobs: "HPOResource",
-    #         },
-    #         algorithm_hyper_parameter_ranges: {
-    #           integer_hyper_parameter_ranges: [
-    #             {
-    #               name: "ParameterName",
-    #               min_value: 1,
-    #               max_value: 1,
-    #             },
-    #           ],
-    #           continuous_hyper_parameter_ranges: [
-    #             {
-    #               name: "ParameterName",
-    #               min_value: 1.0,
-    #               max_value: 1.0,
-    #             },
-    #           ],
-    #           categorical_hyper_parameter_ranges: [
-    #             {
-    #               name: "ParameterName",
-    #               values: ["CategoricalValue"],
-    #             },
-    #           ],
-    #         },
-    #       }
     #
     # @!attribute [rw] hpo_objective
     #   The metric to optimize during HPO.
@@ -2723,15 +3728,6 @@ module Aws::Personalize
     #
     #  </note>
     #
-    # @note When making an API call, you may pass HPOObjective
-    #   data as a hash:
-    #
-    #       {
-    #         type: "HPOObjectiveType",
-    #         metric_name: "MetricName",
-    #         metric_regex: "MetricRegex",
-    #       }
-    #
     # @!attribute [rw] type
     #   The type of the metric. Valid values are `Maximize` and `Minimize`.
     #   @return [String]
@@ -2758,14 +3754,6 @@ module Aws::Personalize
     # Describes the resource configuration for hyperparameter optimization
     # (HPO).
     #
-    # @note When making an API call, you may pass HPOResourceConfig
-    #   data as a hash:
-    #
-    #       {
-    #         max_number_of_training_jobs: "HPOResource",
-    #         max_parallel_training_jobs: "HPOResource",
-    #       }
-    #
     # @!attribute [rw] max_number_of_training_jobs
     #   The maximum number of training jobs when you create a solution
     #   version. The maximum value for `maxNumberOfTrainingJobs` is `40`.
@@ -2788,32 +3776,6 @@ module Aws::Personalize
 
     # Specifies the hyperparameters and their ranges. Hyperparameters can be
     # categorical, continuous, or integer-valued.
-    #
-    # @note When making an API call, you may pass HyperParameterRanges
-    #   data as a hash:
-    #
-    #       {
-    #         integer_hyper_parameter_ranges: [
-    #           {
-    #             name: "ParameterName",
-    #             min_value: 1,
-    #             max_value: 1,
-    #           },
-    #         ],
-    #         continuous_hyper_parameter_ranges: [
-    #           {
-    #             name: "ParameterName",
-    #             min_value: 1.0,
-    #             max_value: 1.0,
-    #           },
-    #         ],
-    #         categorical_hyper_parameter_ranges: [
-    #           {
-    #             name: "ParameterName",
-    #             values: ["CategoricalValue"],
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] integer_hyper_parameter_ranges
     #   The integer-valued hyperparameters and their ranges.
@@ -2838,15 +3800,6 @@ module Aws::Personalize
     end
 
     # Provides the name and range of an integer-valued hyperparameter.
-    #
-    # @note When making an API call, you may pass IntegerHyperParameterRange
-    #   data as a hash:
-    #
-    #       {
-    #         name: "ParameterName",
-    #         min_value: 1,
-    #         max_value: 1,
-    #       }
     #
     # @!attribute [rw] name
     #   The name of the hyperparameter.
@@ -2909,15 +3862,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListBatchInferenceJobsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         solution_version_arn: "Arn",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] solution_version_arn
     #   The Amazon Resource Name (ARN) of the solution version from which
     #   the batch inference jobs were created.
@@ -2947,7 +3891,7 @@ module Aws::Personalize
     #   @return [Array<Types::BatchInferenceJobSummary>]
     #
     # @!attribute [rw] next_token
-    #   The token to use to retreive the next page of results. The value is
+    #   The token to use to retrieve the next page of results. The value is
     #   `null` when there are no more results to return.
     #   @return [String]
     #
@@ -2960,15 +3904,48 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListCampaignsRequest
-    #   data as a hash:
+    # @!attribute [rw] solution_version_arn
+    #   The Amazon Resource Name (ARN) of the solution version that the
+    #   batch segment jobs used to generate batch segments.
+    #   @return [String]
     #
-    #       {
-    #         solution_arn: "Arn",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
+    # @!attribute [rw] next_token
+    #   The token to request the next page of results.
+    #   @return [String]
     #
+    # @!attribute [rw] max_results
+    #   The maximum number of batch segment job results to return in each
+    #   page. The default value is 100.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListBatchSegmentJobsRequest AWS API Documentation
+    #
+    class ListBatchSegmentJobsRequest < Struct.new(
+      :solution_version_arn,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] batch_segment_jobs
+    #   A list containing information on each job that is returned.
+    #   @return [Array<Types::BatchSegmentJobSummary>]
+    #
+    # @!attribute [rw] next_token
+    #   The token to use to retrieve the next page of results. The value is
+    #   `null` when there are no more results to return.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListBatchSegmentJobsResponse AWS API Documentation
+    #
+    class ListBatchSegmentJobsResponse < Struct.new(
+      :batch_segment_jobs,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] solution_arn
     #   The Amazon Resource Name (ARN) of the solution to list the campaigns
     #   for. When a solution is not specified, all the campaigns associated
@@ -2976,8 +3953,12 @@ module Aws::Personalize
     #   @return [String]
     #
     # @!attribute [rw] next_token
-    #   A token returned from the previous call to `ListCampaigns` for
+    #   A token returned from the previous call to [ListCampaigns][1] for
     #   getting the next set of campaigns (if they exist).
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_ListCampaigns.html
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -3011,14 +3992,90 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListDatasetGroupsRequest
-    #   data as a hash:
+    # @!attribute [rw] dataset_group_arn
+    #   The Amazon Resource Name (ARN) of the dataset group to list data
+    #   deletion jobs for.
+    #   @return [String]
     #
-    #       {
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
+    # @!attribute [rw] next_token
+    #   A token returned from the previous call to `ListDataDeletionJobs`
+    #   for getting the next set of jobs (if they exist).
+    #   @return [String]
     #
+    # @!attribute [rw] max_results
+    #   The maximum number of data deletion jobs to return.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListDataDeletionJobsRequest AWS API Documentation
+    #
+    class ListDataDeletionJobsRequest < Struct.new(
+      :dataset_group_arn,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] data_deletion_jobs
+    #   The list of data deletion jobs.
+    #   @return [Array<Types::DataDeletionJobSummary>]
+    #
+    # @!attribute [rw] next_token
+    #   A token for getting the next set of data deletion jobs (if they
+    #   exist).
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListDataDeletionJobsResponse AWS API Documentation
+    #
+    class ListDataDeletionJobsResponse < Struct.new(
+      :data_deletion_jobs,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] dataset_arn
+    #   The Amazon Resource Name (ARN) of the dataset to list the dataset
+    #   export jobs for.
+    #   @return [String]
+    #
+    # @!attribute [rw] next_token
+    #   A token returned from the previous call to `ListDatasetExportJobs`
+    #   for getting the next set of dataset export jobs (if they exist).
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of dataset export jobs to return.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListDatasetExportJobsRequest AWS API Documentation
+    #
+    class ListDatasetExportJobsRequest < Struct.new(
+      :dataset_arn,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] dataset_export_jobs
+    #   The list of dataset export jobs.
+    #   @return [Array<Types::DatasetExportJobSummary>]
+    #
+    # @!attribute [rw] next_token
+    #   A token for getting the next set of dataset export jobs (if they
+    #   exist).
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListDatasetExportJobsResponse AWS API Documentation
+    #
+    class ListDatasetExportJobsResponse < Struct.new(
+      :dataset_export_jobs,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] next_token
     #   A token returned from the previous call to `ListDatasetGroups` for
     #   getting the next set of dataset groups (if they exist).
@@ -3054,15 +4111,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListDatasetImportJobsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dataset_arn: "Arn",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] dataset_arn
     #   The Amazon Resource Name (ARN) of the dataset to list the dataset
     #   import jobs for.
@@ -3105,23 +4153,14 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListDatasetsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dataset_group_arn: "Arn",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] dataset_group_arn
     #   The Amazon Resource Name (ARN) of the dataset group that contains
     #   the datasets to list.
     #   @return [String]
     #
     # @!attribute [rw] next_token
-    #   A token returned from the previous call to `ListDatasetImportJobs`
-    #   for getting the next set of dataset import jobs (if they exist).
+    #   A token returned from the previous call to `ListDatasets` for
+    #   getting the next set of dataset import jobs (if they exist).
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -3156,15 +4195,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListEventTrackersRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dataset_group_arn: "Arn",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] dataset_group_arn
     #   The ARN of a dataset group used to filter the response.
     #   @return [String]
@@ -3205,15 +4235,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListFiltersRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dataset_group_arn: "Arn",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] dataset_group_arn
     #   The ARN of the dataset group that contains the filters.
     #   @return [String]
@@ -3254,15 +4275,91 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListRecipesRequest
-    #   data as a hash:
+    # @!attribute [rw] metric_attribution_arn
+    #   The Amazon Resource Name (ARN) of the metric attribution to retrieve
+    #   attributes for.
+    #   @return [String]
     #
-    #       {
-    #         recipe_provider: "SERVICE", # accepts SERVICE
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
+    # @!attribute [rw] next_token
+    #   Specify the pagination token from a previous request to retrieve the
+    #   next page of results.
+    #   @return [String]
     #
+    # @!attribute [rw] max_results
+    #   The maximum number of metrics to return in one page of results.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListMetricAttributionMetricsRequest AWS API Documentation
+    #
+    class ListMetricAttributionMetricsRequest < Struct.new(
+      :metric_attribution_arn,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] metrics
+    #   The metrics for the specified metric attribution.
+    #   @return [Array<Types::MetricAttribute>]
+    #
+    # @!attribute [rw] next_token
+    #   Specify the pagination token from a previous
+    #   `ListMetricAttributionMetricsResponse` request to retrieve the next
+    #   page of results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListMetricAttributionMetricsResponse AWS API Documentation
+    #
+    class ListMetricAttributionMetricsResponse < Struct.new(
+      :metrics,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] dataset_group_arn
+    #   The metric attributions' dataset group Amazon Resource Name (ARN).
+    #   @return [String]
+    #
+    # @!attribute [rw] next_token
+    #   Specify the pagination token from a previous request to retrieve the
+    #   next page of results.
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of metric attributions to return in one page of
+    #   results.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListMetricAttributionsRequest AWS API Documentation
+    #
+    class ListMetricAttributionsRequest < Struct.new(
+      :dataset_group_arn,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] metric_attributions
+    #   The list of metric attributions.
+    #   @return [Array<Types::MetricAttributionSummary>]
+    #
+    # @!attribute [rw] next_token
+    #   Specify the pagination token from a previous request to retrieve the
+    #   next page of results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListMetricAttributionsResponse AWS API Documentation
+    #
+    class ListMetricAttributionsResponse < Struct.new(
+      :metric_attributions,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] recipe_provider
     #   The default is `SERVICE`.
     #   @return [String]
@@ -3276,12 +4373,20 @@ module Aws::Personalize
     #   The maximum number of recipes to return.
     #   @return [Integer]
     #
+    # @!attribute [rw] domain
+    #   Filters returned recipes by domain for a Domain dataset group. Only
+    #   recipes (Domain dataset group use cases) for this domain are
+    #   included in the response. If you don't specify a domain, all
+    #   recipes are returned.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListRecipesRequest AWS API Documentation
     #
     class ListRecipesRequest < Struct.new(
       :recipe_provider,
       :next_token,
-      :max_results)
+      :max_results,
+      :domain)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3303,14 +4408,48 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListSchemasRequest
-    #   data as a hash:
+    # @!attribute [rw] dataset_group_arn
+    #   The Amazon Resource Name (ARN) of the Domain dataset group to list
+    #   the recommenders for. When a Domain dataset group is not specified,
+    #   all the recommenders associated with the account are listed.
+    #   @return [String]
     #
-    #       {
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
+    # @!attribute [rw] next_token
+    #   A token returned from the previous call to `ListRecommenders` for
+    #   getting the next set of recommenders (if they exist).
+    #   @return [String]
     #
+    # @!attribute [rw] max_results
+    #   The maximum number of recommenders to return.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListRecommendersRequest AWS API Documentation
+    #
+    class ListRecommendersRequest < Struct.new(
+      :dataset_group_arn,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] recommenders
+    #   A list of the recommenders.
+    #   @return [Array<Types::RecommenderSummary>]
+    #
+    # @!attribute [rw] next_token
+    #   A token for getting the next set of recommenders (if they exist).
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListRecommendersResponse AWS API Documentation
+    #
+    class ListRecommendersResponse < Struct.new(
+      :recommenders,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] next_token
     #   A token returned from the previous call to `ListSchemas` for getting
     #   the next set of schemas (if they exist).
@@ -3346,15 +4485,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListSolutionVersionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         solution_arn: "Arn",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] solution_arn
     #   The Amazon Resource Name (ARN) of the solution.
     #   @return [String]
@@ -3396,15 +4526,6 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListSolutionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         dataset_group_arn: "Arn",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] dataset_group_arn
     #   The Amazon Resource Name (ARN) of the dataset group.
     #   @return [String]
@@ -3445,9 +4566,225 @@ module Aws::Personalize
       include Aws::Structure
     end
 
+    # @!attribute [rw] resource_arn
+    #   The resource's Amazon Resource Name (ARN).
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListTagsForResourceRequest AWS API Documentation
+    #
+    class ListTagsForResourceRequest < Struct.new(
+      :resource_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] tags
+    #   The resource's tags.
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ListTagsForResourceResponse AWS API Documentation
+    #
+    class ListTagsForResourceResponse < Struct.new(
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains information on a metric that a metric attribution reports on.
+    # For more information, see [Measuring impact of recommendations][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/measuring-recommendation-impact.html
+    #
+    # @!attribute [rw] event_type
+    #   The metric's event type.
+    #   @return [String]
+    #
+    # @!attribute [rw] metric_name
+    #   The metric's name. The name helps you identify the metric in Amazon
+    #   CloudWatch or Amazon S3.
+    #   @return [String]
+    #
+    # @!attribute [rw] expression
+    #   The attribute's expression. Available functions are `SUM()` or
+    #   `SAMPLECOUNT()`. For SUM() functions, provide the dataset type
+    #   (either Interactions or Items) and column to sum as a parameter. For
+    #   example SUM(Items.PRICE).
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/MetricAttribute AWS API Documentation
+    #
+    class MetricAttribute < Struct.new(
+      :event_type,
+      :metric_name,
+      :expression)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains information on a metric attribution. A metric attribution
+    # creates reports on the data that you import into Amazon Personalize.
+    # Depending on how you import the data, you can view reports in Amazon
+    # CloudWatch or Amazon S3. For more information, see [Measuring impact
+    # of recommendations][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/measuring-recommendation-impact.html
+    #
+    # @!attribute [rw] name
+    #   The metric attribution's name.
+    #   @return [String]
+    #
+    # @!attribute [rw] metric_attribution_arn
+    #   The metric attribution's Amazon Resource Name (ARN).
+    #   @return [String]
+    #
+    # @!attribute [rw] dataset_group_arn
+    #   The metric attribution's dataset group Amazon Resource Name (ARN).
+    #   @return [String]
+    #
+    # @!attribute [rw] metrics_output_config
+    #   The metric attribution's output configuration.
+    #   @return [Types::MetricAttributionOutput]
+    #
+    # @!attribute [rw] status
+    #   The metric attribution's status.
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The metric attribution's creation date time.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The metric attribution's last updated date time.
+    #   @return [Time]
+    #
+    # @!attribute [rw] failure_reason
+    #   The metric attribution's failure reason.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/MetricAttribution AWS API Documentation
+    #
+    class MetricAttribution < Struct.new(
+      :name,
+      :metric_attribution_arn,
+      :dataset_group_arn,
+      :metrics_output_config,
+      :status,
+      :creation_date_time,
+      :last_updated_date_time,
+      :failure_reason)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The output configuration details for a metric attribution.
+    #
+    # @!attribute [rw] s3_data_destination
+    #   The configuration details of an Amazon S3 input or output bucket.
+    #   @return [Types::S3DataConfig]
+    #
+    # @!attribute [rw] role_arn
+    #   The Amazon Resource Name (ARN) of the IAM service role that has
+    #   permissions to add data to your output Amazon S3 bucket and add
+    #   metrics to Amazon CloudWatch. For more information, see [Measuring
+    #   impact of recommendations][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/measuring-recommendation-impact.html
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/MetricAttributionOutput AWS API Documentation
+    #
+    class MetricAttributionOutput < Struct.new(
+      :s3_data_destination,
+      :role_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides a summary of the properties of a metric attribution. For a
+    # complete listing, call the [DescribeMetricAttribution][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeMetricAttribution.html
+    #
+    # @!attribute [rw] name
+    #   The name of the metric attribution.
+    #   @return [String]
+    #
+    # @!attribute [rw] metric_attribution_arn
+    #   The metric attribution's Amazon Resource Name (ARN).
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   The metric attribution's status.
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The metric attribution's creation date time.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The metric attribution's last updated date time.
+    #   @return [Time]
+    #
+    # @!attribute [rw] failure_reason
+    #   The metric attribution's failure reason.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/MetricAttributionSummary AWS API Documentation
+    #
+    class MetricAttributionSummary < Struct.new(
+      :name,
+      :metric_attribution_arn,
+      :status,
+      :creation_date_time,
+      :last_updated_date_time,
+      :failure_reason)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the additional objective for the solution, such as
+    # maximizing streaming minutes or increasing revenue. For more
+    # information see [Optimizing a solution][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/optimizing-solution-for-objective.html
+    #
+    # @!attribute [rw] item_attribute
+    #   The numerical metadata column in an Items dataset related to the
+    #   optimization objective. For example, VIDEO\_LENGTH (to maximize
+    #   streaming minutes), or PRICE (to maximize revenue).
+    #   @return [String]
+    #
+    # @!attribute [rw] objective_sensitivity
+    #   Specifies how Amazon Personalize balances the importance of your
+    #   optimization objective versus relevance.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/OptimizationObjective AWS API Documentation
+    #
+    class OptimizationObjective < Struct.new(
+      :item_attribute,
+      :objective_sensitivity)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Provides information about a recipe. Each recipe provides an algorithm
     # that Amazon Personalize uses in model training when you use the
-    # CreateSolution operation.
+    # [CreateSolution][1] operation.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_CreateSolution.html
     #
     # @!attribute [rw] name
     #   The name of the recipe.
@@ -3509,7 +4846,11 @@ module Aws::Personalize
     end
 
     # Provides a summary of the properties of a recipe. For a complete
-    # listing, call the DescribeRecipe API.
+    # listing, call the [DescribeRecipe][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeRecipe.html
     #
     # @!attribute [rw] name
     #   The name of the recipe.
@@ -3531,6 +4872,11 @@ module Aws::Personalize
     #   The date and time (in Unix time) that the recipe was last updated.
     #   @return [Time]
     #
+    # @!attribute [rw] domain
+    #   The domain of the recipe (if the recipe is a Domain dataset group
+    #   use case).
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/RecipeSummary AWS API Documentation
     #
     class RecipeSummary < Struct.new(
@@ -3538,7 +4884,257 @@ module Aws::Personalize
       :recipe_arn,
       :status,
       :creation_date_time,
+      :last_updated_date_time,
+      :domain)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes a recommendation generator for a Domain dataset group. You
+    # create a recommender in a Domain dataset group for a specific domain
+    # use case (domain recipe), and specify the recommender in a
+    # [GetRecommendations][1] request.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_RS_GetRecommendations.html
+    #
+    # @!attribute [rw] recommender_arn
+    #   The Amazon Resource Name (ARN) of the recommender.
+    #   @return [String]
+    #
+    # @!attribute [rw] dataset_group_arn
+    #   The Amazon Resource Name (ARN) of the Domain dataset group that
+    #   contains the recommender.
+    #   @return [String]
+    #
+    # @!attribute [rw] name
+    #   The name of the recommender.
+    #   @return [String]
+    #
+    # @!attribute [rw] recipe_arn
+    #   The Amazon Resource Name (ARN) of the recipe (Domain dataset group
+    #   use case) that the recommender was created for.
+    #   @return [String]
+    #
+    # @!attribute [rw] recommender_config
+    #   The configuration details of the recommender.
+    #   @return [Types::RecommenderConfig]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The date and time (in Unix format) that the recommender was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The date and time (in Unix format) that the recommender was last
+    #   updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] status
+    #   The status of the recommender.
+    #
+    #   A recommender can be in one of the following states:
+    #
+    #   * CREATE PENDING &gt; CREATE IN\_PROGRESS &gt; ACTIVE -or- CREATE
+    #     FAILED
+    #
+    #   * STOP PENDING &gt; STOP IN\_PROGRESS &gt; INACTIVE &gt; START
+    #     PENDING &gt; START IN\_PROGRESS &gt; ACTIVE
+    #
+    #   * DELETE PENDING &gt; DELETE IN\_PROGRESS
+    #   @return [String]
+    #
+    # @!attribute [rw] failure_reason
+    #   If a recommender fails, the reason behind the failure.
+    #   @return [String]
+    #
+    # @!attribute [rw] latest_recommender_update
+    #   Provides a summary of the latest updates to the recommender.
+    #   @return [Types::RecommenderUpdateSummary]
+    #
+    # @!attribute [rw] model_metrics
+    #   Provides evaluation metrics that help you determine the performance
+    #   of a recommender. For more information, see [ Evaluating a
+    #   recommender][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/evaluating-recommenders.html
+    #   @return [Hash<String,Float>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/Recommender AWS API Documentation
+    #
+    class Recommender < Struct.new(
+      :recommender_arn,
+      :dataset_group_arn,
+      :name,
+      :recipe_arn,
+      :recommender_config,
+      :creation_date_time,
+      :last_updated_date_time,
+      :status,
+      :failure_reason,
+      :latest_recommender_update,
+      :model_metrics)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The configuration details of the recommender.
+    #
+    # @!attribute [rw] item_exploration_config
+    #   Specifies the exploration configuration hyperparameters, including
+    #   `explorationWeight` and `explorationItemAgeCutOff`, you want to use
+    #   to configure the amount of item exploration Amazon Personalize uses
+    #   when recommending items. Provide `itemExplorationConfig` data only
+    #   if your recommenders generate personalized recommendations for a
+    #   user (not popular items or similar items).
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] min_recommendation_requests_per_second
+    #   Specifies the requested minimum provisioned recommendation requests
+    #   per second that Amazon Personalize will support. A high
+    #   `minRecommendationRequestsPerSecond` will increase your bill. We
+    #   recommend starting with 1 for `minRecommendationRequestsPerSecond`
+    #   (the default). Track your usage using Amazon CloudWatch metrics, and
+    #   increase the `minRecommendationRequestsPerSecond` as necessary.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] training_data_config
+    #   Specifies the training data configuration to use when creating a
+    #   domain recommender.
+    #   @return [Types::TrainingDataConfig]
+    #
+    # @!attribute [rw] enable_metadata_with_recommendations
+    #   Whether metadata with recommendations is enabled for the
+    #   recommender. If enabled, you can specify the columns from your Items
+    #   dataset in your request for recommendations. Amazon Personalize
+    #   returns this data for each item in the recommendation response. For
+    #   information about enabling metadata for a recommender, see [Enabling
+    #   metadata in recommendations for a recommender][1].
+    #
+    #   If you enable metadata in recommendations, you will incur additional
+    #   costs. For more information, see [Amazon Personalize pricing][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/creating-recommenders.html#create-recommender-return-metadata
+    #   [2]: https://aws.amazon.com/personalize/pricing/
+    #   @return [Boolean]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/RecommenderConfig AWS API Documentation
+    #
+    class RecommenderConfig < Struct.new(
+      :item_exploration_config,
+      :min_recommendation_requests_per_second,
+      :training_data_config,
+      :enable_metadata_with_recommendations)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides a summary of the properties of the recommender.
+    #
+    # @!attribute [rw] name
+    #   The name of the recommender.
+    #   @return [String]
+    #
+    # @!attribute [rw] recommender_arn
+    #   The Amazon Resource Name (ARN) of the recommender.
+    #   @return [String]
+    #
+    # @!attribute [rw] dataset_group_arn
+    #   The Amazon Resource Name (ARN) of the Domain dataset group that
+    #   contains the recommender.
+    #   @return [String]
+    #
+    # @!attribute [rw] recipe_arn
+    #   The Amazon Resource Name (ARN) of the recipe (Domain dataset group
+    #   use case) that the recommender was created for.
+    #   @return [String]
+    #
+    # @!attribute [rw] recommender_config
+    #   The configuration details of the recommender.
+    #   @return [Types::RecommenderConfig]
+    #
+    # @!attribute [rw] status
+    #   The status of the recommender. A recommender can be in one of the
+    #   following states:
+    #
+    #   * CREATE PENDING &gt; CREATE IN\_PROGRESS &gt; ACTIVE -or- CREATE
+    #     FAILED
+    #
+    #   * STOP PENDING &gt; STOP IN\_PROGRESS &gt; INACTIVE &gt; START
+    #     PENDING &gt; START IN\_PROGRESS &gt; ACTIVE
+    #
+    #   * DELETE PENDING &gt; DELETE IN\_PROGRESS
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The date and time (in Unix format) that the recommender was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The date and time (in Unix format) that the recommender was last
+    #   updated.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/RecommenderSummary AWS API Documentation
+    #
+    class RecommenderSummary < Struct.new(
+      :name,
+      :recommender_arn,
+      :dataset_group_arn,
+      :recipe_arn,
+      :recommender_config,
+      :status,
+      :creation_date_time,
       :last_updated_date_time)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides a summary of the properties of a recommender update. For a
+    # complete listing, call the [DescribeRecommender][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeRecommender.html
+    #
+    # @!attribute [rw] recommender_config
+    #   The configuration details of the recommender update.
+    #   @return [Types::RecommenderConfig]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The date and time (in Unix format) that the recommender update was
+    #   created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The date and time (in Unix time) that the recommender update was
+    #   last updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] status
+    #   The status of the recommender update. A recommender update can be in
+    #   one of the following states:
+    #
+    #   CREATE PENDING &gt; CREATE IN\_PROGRESS &gt; ACTIVE -or- CREATE
+    #   FAILED
+    #   @return [String]
+    #
+    # @!attribute [rw] failure_reason
+    #   If a recommender update fails, the reason behind the failure.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/RecommenderUpdateSummary AWS API Documentation
+    #
+    class RecommenderUpdateSummary < Struct.new(
+      :recommender_config,
+      :creation_date_time,
+      :last_updated_date_time,
+      :status,
+      :failure_reason)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3584,22 +5180,14 @@ module Aws::Personalize
 
     # The configuration details of an Amazon S3 input or output bucket.
     #
-    # @note When making an API call, you may pass S3DataConfig
-    #   data as a hash:
-    #
-    #       {
-    #         path: "S3Location", # required
-    #         kms_key_arn: "KmsKeyArn",
-    #       }
-    #
     # @!attribute [rw] path
     #   The file path of the Amazon S3 bucket.
     #   @return [String]
     #
     # @!attribute [rw] kms_key_arn
-    #   The Amazon Resource Name (ARN) of the Amazon Key Management Service
-    #   (KMS) key that Amazon Personalize uses to encrypt or decrypt the
-    #   input and output files of a batch inference job.
+    #   The Amazon Resource Name (ARN) of the Key Management Service (KMS)
+    #   key that Amazon Personalize uses to encrypt or decrypt the input and
+    #   output files.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/S3DataConfig AWS API Documentation
@@ -3611,8 +5199,26 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # An object that provides information about a solution. A solution is a
-    # trained model that can be deployed as a campaign.
+    # By default, all new solutions use automatic training. With automatic
+    # training, you incur training costs while your solution is active. To
+    # avoid unnecessary costs, when you are finished you can [update the
+    # solution][1] to turn off automatic training. For information about
+    # training costs, see [Amazon Personalize pricing][2].
+    #
+    # An object that provides information about a solution. A solution
+    # includes the custom recipe, customized parameters, and trained models
+    # (Solution Versions) that Amazon Personalize uses to generate
+    # recommendations.
+    #
+    # After you create a solution, you can’t change its configuration. If
+    # you need to make changes, you can [clone the solution][3] with the
+    # Amazon Personalize console or create a new one.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_UpdateSolution.html
+    # [2]: https://aws.amazon.com/personalize/pricing/
+    # [3]: https://docs.aws.amazon.com/personalize/latest/dg/cloning-solution.html
     #
     # @!attribute [rw] name
     #   The name of the solution.
@@ -3628,14 +5234,36 @@ module Aws::Personalize
     #   @return [Boolean]
     #
     # @!attribute [rw] perform_auto_ml
+    #   We don't recommend enabling automated machine learning. Instead,
+    #   match your use case to the available Amazon Personalize recipes. For
+    #   more information, see [Determining your use case.][1]
+    #
     #   When true, Amazon Personalize performs a search for the best
     #   USER\_PERSONALIZATION recipe from the list specified in the solution
     #   configuration (`recipeArn` must not be specified). When false (the
     #   default), Amazon Personalize uses `recipeArn` for training.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/determining-use-case.html
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] perform_auto_training
+    #   Specifies whether the solution automatically creates solution
+    #   versions. The default is `True` and the solution automatically
+    #   creates new solution versions every 7 days.
+    #
+    #   For more information about auto training, see [Creating and
+    #   configuring a solution][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/customizing-solution-config.html
     #   @return [Boolean]
     #
     # @!attribute [rw] recipe_arn
-    #   The ARN of the recipe used to create the solution.
+    #   The ARN of the recipe used to create the solution. This is required
+    #   when `performAutoML` is false.
     #   @return [String]
     #
     # @!attribute [rw] dataset_group_arn
@@ -3682,6 +5310,10 @@ module Aws::Personalize
     #   and the ARN.
     #   @return [Types::SolutionVersionSummary]
     #
+    # @!attribute [rw] latest_solution_update
+    #   Provides a summary of the latest updates to the solution.
+    #   @return [Types::SolutionUpdateSummary]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/Solution AWS API Documentation
     #
     class Solution < Struct.new(
@@ -3689,6 +5321,7 @@ module Aws::Personalize
       :solution_arn,
       :perform_hpo,
       :perform_auto_ml,
+      :perform_auto_training,
       :recipe_arn,
       :dataset_group_arn,
       :event_type,
@@ -3697,62 +5330,13 @@ module Aws::Personalize
       :status,
       :creation_date_time,
       :last_updated_date_time,
-      :latest_solution_version)
+      :latest_solution_version,
+      :latest_solution_update)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Describes the configuration properties for the solution.
-    #
-    # @note When making an API call, you may pass SolutionConfig
-    #   data as a hash:
-    #
-    #       {
-    #         event_value_threshold: "EventValueThreshold",
-    #         hpo_config: {
-    #           hpo_objective: {
-    #             type: "HPOObjectiveType",
-    #             metric_name: "MetricName",
-    #             metric_regex: "MetricRegex",
-    #           },
-    #           hpo_resource_config: {
-    #             max_number_of_training_jobs: "HPOResource",
-    #             max_parallel_training_jobs: "HPOResource",
-    #           },
-    #           algorithm_hyper_parameter_ranges: {
-    #             integer_hyper_parameter_ranges: [
-    #               {
-    #                 name: "ParameterName",
-    #                 min_value: 1,
-    #                 max_value: 1,
-    #               },
-    #             ],
-    #             continuous_hyper_parameter_ranges: [
-    #               {
-    #                 name: "ParameterName",
-    #                 min_value: 1.0,
-    #                 max_value: 1.0,
-    #               },
-    #             ],
-    #             categorical_hyper_parameter_ranges: [
-    #               {
-    #                 name: "ParameterName",
-    #                 values: ["CategoricalValue"],
-    #               },
-    #             ],
-    #           },
-    #         },
-    #         algorithm_hyper_parameters: {
-    #           "ParameterName" => "ParameterValue",
-    #         },
-    #         feature_transformation_parameters: {
-    #           "ParameterName" => "ParameterValue",
-    #         },
-    #         auto_ml_config: {
-    #           metric_name: "MetricName",
-    #           recipe_list: ["Arn"],
-    #         },
-    #       }
     #
     # @!attribute [rw] event_value_threshold
     #   Only events with a value greater than or equal to this threshold are
@@ -3764,7 +5348,7 @@ module Aws::Personalize
     #   @return [Types::HPOConfig]
     #
     # @!attribute [rw] algorithm_hyper_parameters
-    #   Lists the hyperparameter names and ranges.
+    #   Lists the algorithm hyperparameters and their values.
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] feature_transformation_parameters
@@ -3772,9 +5356,32 @@ module Aws::Personalize
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] auto_ml_config
-    #   The AutoMLConfig object containing a list of recipes to search when
-    #   AutoML is performed.
+    #   The [AutoMLConfig][1] object containing a list of recipes to search
+    #   when AutoML is performed.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_AutoMLConfig.html
     #   @return [Types::AutoMLConfig]
+    #
+    # @!attribute [rw] optimization_objective
+    #   Describes the additional objective for the solution, such as
+    #   maximizing streaming minutes or increasing revenue. For more
+    #   information see [Optimizing a solution][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/optimizing-solution-for-objective.html
+    #   @return [Types::OptimizationObjective]
+    #
+    # @!attribute [rw] training_data_config
+    #   Specifies the training data configuration to use when creating a
+    #   custom solution version (trained model).
+    #   @return [Types::TrainingDataConfig]
+    #
+    # @!attribute [rw] auto_training_config
+    #   Specifies the automatic training configuration to use.
+    #   @return [Types::AutoTrainingConfig]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/SolutionConfig AWS API Documentation
     #
@@ -3783,13 +5390,20 @@ module Aws::Personalize
       :hpo_config,
       :algorithm_hyper_parameters,
       :feature_transformation_parameters,
-      :auto_ml_config)
+      :auto_ml_config,
+      :optimization_objective,
+      :training_data_config,
+      :auto_training_config)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Provides a summary of the properties of a solution. For a complete
-    # listing, call the DescribeSolution API.
+    # listing, call the [DescribeSolution][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeSolution.html
     #
     # @!attribute [rw] name
     #   The name of the solution.
@@ -3818,6 +5432,10 @@ module Aws::Personalize
     #   The date and time (in Unix time) that the solution was last updated.
     #   @return [Time]
     #
+    # @!attribute [rw] recipe_arn
+    #   The Amazon Resource Name (ARN) of the recipe used by the solution.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/SolutionSummary AWS API Documentation
     #
     class SolutionSummary < Struct.new(
@@ -3825,13 +5443,87 @@ module Aws::Personalize
       :solution_arn,
       :status,
       :creation_date_time,
-      :last_updated_date_time)
+      :last_updated_date_time,
+      :recipe_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The configuration details of the solution update.
+    #
+    # @!attribute [rw] auto_training_config
+    #   The automatic training configuration to use when
+    #   `performAutoTraining` is true.
+    #   @return [Types::AutoTrainingConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/SolutionUpdateConfig AWS API Documentation
+    #
+    class SolutionUpdateConfig < Struct.new(
+      :auto_training_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Provides a summary of the properties of a solution update. For a
+    # complete listing, call the [DescribeSolution][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeSolution.html
+    #
+    # @!attribute [rw] solution_update_config
+    #   The configuration details of the solution.
+    #   @return [Types::SolutionUpdateConfig]
+    #
+    # @!attribute [rw] status
+    #   The status of the solution update. A solution update can be in one
+    #   of the following states:
+    #
+    #   CREATE PENDING &gt; CREATE IN\_PROGRESS &gt; ACTIVE -or- CREATE
+    #   FAILED
+    #   @return [String]
+    #
+    # @!attribute [rw] perform_auto_training
+    #   Whether the solution automatically creates solution versions.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] creation_date_time
+    #   The date and time (in Unix format) that the solution update was
+    #   created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] last_updated_date_time
+    #   The date and time (in Unix time) that the solution update was last
+    #   updated.
+    #   @return [Time]
+    #
+    # @!attribute [rw] failure_reason
+    #   If a solution update fails, the reason behind the failure.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/SolutionUpdateSummary AWS API Documentation
+    #
+    class SolutionUpdateSummary < Struct.new(
+      :solution_update_config,
+      :status,
+      :perform_auto_training,
+      :creation_date_time,
+      :last_updated_date_time,
+      :failure_reason)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # An object that provides information about a specific version of a
-    # Solution.
+    # [Solution][1] in a Custom dataset group.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_Solution.html
+    #
+    # @!attribute [rw] name
+    #   The name of the solution version.
+    #   @return [String]
     #
     # @!attribute [rw] solution_version_arn
     #   The ARN of the solution version.
@@ -3878,22 +5570,10 @@ module Aws::Personalize
     #
     # @!attribute [rw] training_mode
     #   The scope of training to be performed when creating the solution
-    #   version. The `FULL` option trains the solution version based on the
-    #   entirety of the input solution's training data, while the `UPDATE`
-    #   option processes only the data that has changed in comparison to the
-    #   input solution. Choose `UPDATE` when you want to incrementally
-    #   update your solution version instead of creating an entirely new
-    #   one.
-    #
-    #   The `UPDATE` option can only be used when you already have an active
-    #   solution version created from the input solution using the `FULL`
-    #   option and the input solution was trained with the
-    #   [User-Personalization][1] recipe or the [HRNN-Coldstart][2] recipe.
-    #
-    #
-    #
-    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/native-recipe-new-item-USER_PERSONALIZATION.html
-    #   [2]: https://docs.aws.amazon.com/personalize/latest/dg/native-recipe-hrnn-coldstart.html
+    #   version. A `FULL` training considers all of the data in your dataset
+    #   group. An `UPDATE` processes only the data that has changed since
+    #   the latest training. Only solution versions created with the
+    #   User-Personalization recipe can use `UPDATE`.
     #   @return [String]
     #
     # @!attribute [rw] tuned_hpo_params
@@ -3913,6 +5593,10 @@ module Aws::Personalize
     #   * ACTIVE
     #
     #   * CREATE FAILED
+    #
+    #   * CREATE STOPPING
+    #
+    #   * CREATE STOPPED
     #   @return [String]
     #
     # @!attribute [rw] failure_reason
@@ -3928,9 +5612,14 @@ module Aws::Personalize
     #   The date and time (in Unix time) that the solution was last updated.
     #   @return [Time]
     #
+    # @!attribute [rw] training_type
+    #   Whether the solution version was created automatically or manually.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/SolutionVersion AWS API Documentation
     #
     class SolutionVersion < Struct.new(
+      :name,
       :solution_version_arn,
       :solution_arn,
       :perform_hpo,
@@ -3945,13 +5634,18 @@ module Aws::Personalize
       :status,
       :failure_reason,
       :creation_date_time,
-      :last_updated_date_time)
+      :last_updated_date_time,
+      :training_type)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # Provides a summary of the properties of a solution version. For a
-    # complete listing, call the DescribeSolutionVersion API.
+    # complete listing, call the [DescribeSolutionVersion][1] API.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeSolutionVersion.html
     #
     # @!attribute [rw] solution_version_arn
     #   The Amazon Resource Name (ARN) of the solution version.
@@ -3966,6 +5660,18 @@ module Aws::Personalize
     #     FAILED
     #
     #   ^
+    #   @return [String]
+    #
+    # @!attribute [rw] training_mode
+    #   The scope of training to be performed when creating the solution
+    #   version. A `FULL` training considers all of the data in your dataset
+    #   group. An `UPDATE` processes only the data that has changed since
+    #   the latest training. Only solution versions created with the
+    #   User-Personalization recipe can use `UPDATE`.
+    #   @return [String]
+    #
+    # @!attribute [rw] training_type
+    #   Whether the solution version was created automatically or manually.
     #   @return [String]
     #
     # @!attribute [rw] creation_date_time
@@ -3987,9 +5693,192 @@ module Aws::Personalize
     class SolutionVersionSummary < Struct.new(
       :solution_version_arn,
       :status,
+      :training_mode,
+      :training_type,
       :creation_date_time,
       :last_updated_date_time,
       :failure_reason)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] recommender_arn
+    #   The Amazon Resource Name (ARN) of the recommender to start.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/StartRecommenderRequest AWS API Documentation
+    #
+    class StartRecommenderRequest < Struct.new(
+      :recommender_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] recommender_arn
+    #   The Amazon Resource Name (ARN) of the recommender you started.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/StartRecommenderResponse AWS API Documentation
+    #
+    class StartRecommenderResponse < Struct.new(
+      :recommender_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] recommender_arn
+    #   The Amazon Resource Name (ARN) of the recommender to stop.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/StopRecommenderRequest AWS API Documentation
+    #
+    class StopRecommenderRequest < Struct.new(
+      :recommender_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] recommender_arn
+    #   The Amazon Resource Name (ARN) of the recommender you stopped.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/StopRecommenderResponse AWS API Documentation
+    #
+    class StopRecommenderResponse < Struct.new(
+      :recommender_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] solution_version_arn
+    #   The Amazon Resource Name (ARN) of the solution version you want to
+    #   stop creating.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/StopSolutionVersionCreationRequest AWS API Documentation
+    #
+    class StopSolutionVersionCreationRequest < Struct.new(
+      :solution_version_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The optional metadata that you apply to resources to help you
+    # categorize and organize them. Each tag consists of a key and an
+    # optional value, both of which you define. For more information see
+    # [Tagging Amazon Personalize resources][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #
+    # @!attribute [rw] tag_key
+    #   One part of a key-value pair that makes up a tag. A key is a general
+    #   label that acts like a category for more specific tag values.
+    #   @return [String]
+    #
+    # @!attribute [rw] tag_value
+    #   The optional part of a key-value pair that makes up a tag. A value
+    #   acts as a descriptor within a tag category (key).
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/Tag AWS API Documentation
+    #
+    class Tag < Struct.new(
+      :tag_key,
+      :tag_value)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] resource_arn
+    #   The resource's Amazon Resource Name (ARN).
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   Tags to apply to the resource. For more information see [Tagging
+    #   Amazon Personalize resources][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/tagging-resources.html
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/TagResourceRequest AWS API Documentation
+    #
+    class TagResourceRequest < Struct.new(
+      :resource_arn,
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/TagResourceResponse AWS API Documentation
+    #
+    class TagResourceResponse < Aws::EmptyStructure; end
+
+    # The configuration details for generating themes with a batch inference
+    # job.
+    #
+    # @!attribute [rw] fields_for_theme_generation
+    #   Fields used to generate descriptive themes for a batch inference
+    #   job.
+    #   @return [Types::FieldsForThemeGeneration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/ThemeGenerationConfig AWS API Documentation
+    #
+    class ThemeGenerationConfig < Struct.new(
+      :fields_for_theme_generation)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The request contains more tag keys than can be associated with a
+    # resource (50 tag keys per resource).
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/TooManyTagKeysException AWS API Documentation
+    #
+    class TooManyTagKeysException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # You have exceeded the maximum number of tags you can apply to this
+    # resource.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/TooManyTagsException AWS API Documentation
+    #
+    class TooManyTagsException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The training data configuration to use when creating a domain
+    # recommender or custom solution version (trained model).
+    #
+    # @!attribute [rw] excluded_dataset_columns
+    #   Specifies the columns to exclude from training. Each key is a
+    #   dataset type, and each value is a list of columns. Exclude columns
+    #   to control what data Amazon Personalize uses to generate
+    #   recommendations.
+    #
+    #   For example, you might have a column that you want to use only to
+    #   filter recommendations. You can exclude this column from training
+    #   and Amazon Personalize considers it only when filtering.
+    #   @return [Hash<String,Array<String>>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/TrainingDataConfig AWS API Documentation
+    #
+    class TrainingDataConfig < Struct.new(
+      :excluded_dataset_columns)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -4009,31 +5898,57 @@ module Aws::Personalize
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateCampaignRequest
-    #   data as a hash:
+    # @!attribute [rw] resource_arn
+    #   The resource's Amazon Resource Name (ARN).
+    #   @return [String]
     #
-    #       {
-    #         campaign_arn: "Arn", # required
-    #         solution_version_arn: "Arn",
-    #         min_provisioned_tps: 1,
-    #         campaign_config: {
-    #           item_exploration_config: {
-    #             "ParameterName" => "ParameterValue",
-    #           },
-    #         },
-    #       }
+    # @!attribute [rw] tag_keys
+    #   The keys of the tags to be removed.
+    #   @return [Array<String>]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/UntagResourceRequest AWS API Documentation
+    #
+    class UntagResourceRequest < Struct.new(
+      :resource_arn,
+      :tag_keys)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/UntagResourceResponse AWS API Documentation
+    #
+    class UntagResourceResponse < Aws::EmptyStructure; end
+
     # @!attribute [rw] campaign_arn
     #   The Amazon Resource Name (ARN) of the campaign.
     #   @return [String]
     #
     # @!attribute [rw] solution_version_arn
-    #   The ARN of a new solution version to deploy.
+    #   The Amazon Resource Name (ARN) of a new model to deploy. To specify
+    #   the latest solution version of your solution, specify the ARN of
+    #   your *solution* in `SolutionArn/$LATEST` format. You must use this
+    #   format if you set `syncWithLatestSolutionVersion` to `True` in the
+    #   [CampaignConfig][1].
+    #
+    #   To deploy a model that isn't the latest solution version of your
+    #   solution, specify the ARN of the solution version.
+    #
+    #   For more information about automatic campaign updates, see [Enabling
+    #   automatic campaign updates][2].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/API_CampaignConfig.html
+    #   [2]: https://docs.aws.amazon.com/personalize/latest/dg/campaigns.html#create-campaign-automatic-latest-sv-update
     #   @return [String]
     #
     # @!attribute [rw] min_provisioned_tps
     #   Specifies the requested minimum provisioned transactions
-    #   (recommendations) per second that Amazon Personalize will support.
+    #   (recommendations) per second that Amazon Personalize will support. A
+    #   high `minProvisionedTPS` will increase your bill. We recommend
+    #   starting with 1 for `minProvisionedTPS` (the default). Track your
+    #   usage using Amazon CloudWatch metrics, and increase the
+    #   `minProvisionedTPS` as necessary.
     #   @return [Integer]
     #
     # @!attribute [rw] campaign_config
@@ -4063,5 +5978,160 @@ module Aws::Personalize
       include Aws::Structure
     end
 
+    # @!attribute [rw] dataset_arn
+    #   The Amazon Resource Name (ARN) of the dataset that you want to
+    #   update.
+    #   @return [String]
+    #
+    # @!attribute [rw] schema_arn
+    #   The Amazon Resource Name (ARN) of the new schema you want use.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/UpdateDatasetRequest AWS API Documentation
+    #
+    class UpdateDatasetRequest < Struct.new(
+      :dataset_arn,
+      :schema_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] dataset_arn
+    #   The Amazon Resource Name (ARN) of the dataset you updated.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/UpdateDatasetResponse AWS API Documentation
+    #
+    class UpdateDatasetResponse < Struct.new(
+      :dataset_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] add_metrics
+    #   Add new metric attributes to the metric attribution.
+    #   @return [Array<Types::MetricAttribute>]
+    #
+    # @!attribute [rw] remove_metrics
+    #   Remove metric attributes from the metric attribution.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] metrics_output_config
+    #   An output config for the metric attribution.
+    #   @return [Types::MetricAttributionOutput]
+    #
+    # @!attribute [rw] metric_attribution_arn
+    #   The Amazon Resource Name (ARN) for the metric attribution to update.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/UpdateMetricAttributionRequest AWS API Documentation
+    #
+    class UpdateMetricAttributionRequest < Struct.new(
+      :add_metrics,
+      :remove_metrics,
+      :metrics_output_config,
+      :metric_attribution_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] metric_attribution_arn
+    #   The Amazon Resource Name (ARN) for the metric attribution that you
+    #   updated.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/UpdateMetricAttributionResponse AWS API Documentation
+    #
+    class UpdateMetricAttributionResponse < Struct.new(
+      :metric_attribution_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] recommender_arn
+    #   The Amazon Resource Name (ARN) of the recommender to modify.
+    #   @return [String]
+    #
+    # @!attribute [rw] recommender_config
+    #   The configuration details of the recommender.
+    #   @return [Types::RecommenderConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/UpdateRecommenderRequest AWS API Documentation
+    #
+    class UpdateRecommenderRequest < Struct.new(
+      :recommender_arn,
+      :recommender_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] recommender_arn
+    #   The same recommender Amazon Resource Name (ARN) as given in the
+    #   request.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/UpdateRecommenderResponse AWS API Documentation
+    #
+    class UpdateRecommenderResponse < Struct.new(
+      :recommender_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] solution_arn
+    #   The Amazon Resource Name (ARN) of the solution to update.
+    #   @return [String]
+    #
+    # @!attribute [rw] perform_auto_training
+    #   Whether the solution uses automatic training to create new solution
+    #   versions (trained models). You can change the training frequency by
+    #   specifying a `schedulingExpression` in the `AutoTrainingConfig` as
+    #   part of solution configuration.
+    #
+    #   If you turn on automatic training, the first automatic training
+    #   starts within one hour after the solution update completes. If you
+    #   manually create a solution version within the hour, the solution
+    #   skips the first automatic training. For more information about
+    #   automatic training, see [Configuring automatic training][1].
+    #
+    #   After training starts, you can get the solution version's Amazon
+    #   Resource Name (ARN) with the [ListSolutionVersions][2] API
+    #   operation. To get its status, use the [DescribeSolutionVersion][3].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/personalize/latest/dg/solution-config-auto-training.html
+    #   [2]: https://docs.aws.amazon.com/personalize/latest/dg/API_ListSolutionVersions.html
+    #   [3]: https://docs.aws.amazon.com/personalize/latest/dg/API_DescribeSolutionVersion.html
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] solution_update_config
+    #   The new configuration details of the solution.
+    #   @return [Types::SolutionUpdateConfig]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/UpdateSolutionRequest AWS API Documentation
+    #
+    class UpdateSolutionRequest < Struct.new(
+      :solution_arn,
+      :perform_auto_training,
+      :solution_update_config)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] solution_arn
+    #   The same solution Amazon Resource Name (ARN) as given in the
+    #   request.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/personalize-2018-05-22/UpdateSolutionResponse AWS API Documentation
+    #
+    class UpdateSolutionResponse < Struct.new(
+      :solution_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
   end
 end
+

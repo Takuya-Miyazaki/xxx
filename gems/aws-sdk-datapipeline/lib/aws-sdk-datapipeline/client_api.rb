@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::DataPipeline
   # @api private
@@ -373,10 +374,13 @@ module Aws::DataPipeline
 
       api.metadata = {
         "apiVersion" => "2012-10-29",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "datapipeline",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceFullName" => "AWS Data Pipeline",
+        "serviceId" => "Data Pipeline",
         "signatureVersion" => "v4",
         "targetPrefix" => "DataPipeline",
         "uid" => "datapipeline-2012-10-29",

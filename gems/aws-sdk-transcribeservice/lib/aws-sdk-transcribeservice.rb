@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-transcribeservice/types'
-require_relative 'aws-sdk-transcribeservice/client_api'
-require_relative 'aws-sdk-transcribeservice/client'
-require_relative 'aws-sdk-transcribeservice/errors'
-require_relative 'aws-sdk-transcribeservice/resource'
-require_relative 'aws-sdk-transcribeservice/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:transcribeservice)
 
 # This module provides support for Amazon Transcribe Service. This module is available in the
 # `aws-sdk-transcribeservice` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-transcribeservice/customizations'
 # structure.
 #
 #     transcribe_service = Aws::TranscribeService::Client.new
-#     resp = transcribe_service.create_language_model(params)
+#     resp = transcribe_service.create_call_analytics_category(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-transcribeservice/customizations'
 #
 # @!group service
 module Aws::TranscribeService
+  autoload :Types, 'aws-sdk-transcribeservice/types'
+  autoload :ClientApi, 'aws-sdk-transcribeservice/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-transcribeservice/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-transcribeservice/client'
+  autoload :Errors, 'aws-sdk-transcribeservice/errors'
+  autoload :Resource, 'aws-sdk-transcribeservice/resource'
+  autoload :EndpointParameters, 'aws-sdk-transcribeservice/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-transcribeservice/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-transcribeservice/endpoints'
 
-  GEM_VERSION = '1.50.0'
+  GEM_VERSION = '1.109.0'
 
 end
+
+require_relative 'aws-sdk-transcribeservice/customizations'

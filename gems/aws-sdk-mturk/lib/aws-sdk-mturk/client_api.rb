@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::MTurk
   # @api private
@@ -702,9 +703,11 @@ module Aws::MTurk
 
       api.metadata = {
         "apiVersion" => "2017-01-17",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "mturk-requester",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceAbbreviation" => "Amazon MTurk",
         "serviceFullName" => "Amazon Mechanical Turk",
         "serviceId" => "MTurk",

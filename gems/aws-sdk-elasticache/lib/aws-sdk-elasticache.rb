@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,13 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-elasticache/types'
-require_relative 'aws-sdk-elasticache/client_api'
-require_relative 'aws-sdk-elasticache/client'
-require_relative 'aws-sdk-elasticache/errors'
-require_relative 'aws-sdk-elasticache/waiters'
-require_relative 'aws-sdk-elasticache/resource'
-require_relative 'aws-sdk-elasticache/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:elasticache)
 
 # This module provides support for Amazon ElastiCache. This module is available in the
 # `aws-sdk-elasticache` gem.
@@ -48,7 +42,21 @@ require_relative 'aws-sdk-elasticache/customizations'
 #
 # @!group service
 module Aws::ElastiCache
+  autoload :Types, 'aws-sdk-elasticache/types'
+  autoload :ClientApi, 'aws-sdk-elasticache/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-elasticache/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-elasticache/client'
+  autoload :Errors, 'aws-sdk-elasticache/errors'
+  autoload :Waiters, 'aws-sdk-elasticache/waiters'
+  autoload :Resource, 'aws-sdk-elasticache/resource'
+  autoload :EndpointParameters, 'aws-sdk-elasticache/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-elasticache/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-elasticache/endpoints'
 
-  GEM_VERSION = '1.50.0'
+  GEM_VERSION = '1.116.0'
 
 end
+
+require_relative 'aws-sdk-elasticache/customizations'

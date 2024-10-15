@@ -1,6 +1,333 @@
 Unreleased Changes
 ------------------
 
+1.120.0 (2024-09-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.119.0 (2024-09-23)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.118.0 (2024-09-20)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.117.0 (2024-09-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.116.0 (2024-09-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.115.0 (2024-09-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.114.0 (2024-08-12)
+------------------
+
+* Feature - Documentation update for the OrganizationConfigRuleName regex pattern.
+
+1.113.0 (2024-07-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.112.0 (2024-06-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.111.0 (2024-06-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.110.0 (2024-06-18)
+------------------
+
+* Feature - Add v2 smoke tests and smithy smokeTests trait for SDK testing.
+
+1.109.0 (2024-06-05)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.108.0 (2024-05-13)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.107.0 (2024-04-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.106.0 (2024-04-12)
+------------------
+
+* Feature - Updates documentation for AWS Config
+
+1.105.0 (2024-01-26)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.104.0 (2024-01-04)
+------------------
+
+* Feature - Updated ResourceType enum with new resource types onboarded by AWS Config in November and December 2023.
+
+1.103.0 (2023-11-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.102.0 (2023-11-27)
+------------------
+
+* Feature - Support Periodic Recording for Configuration Recorder
+
+1.101.0 (2023-11-22)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.100.0 (2023-11-03)
+------------------
+
+* Feature - Updated ResourceType enum with new resource types onboarded by AWS Config in October 2023.
+
+1.99.0 (2023-10-12)
+------------------
+
+* Feature - Add enums for resource types supported by Config
+
+1.98.0 (2023-09-27)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.97.0 (2023-08-11)
+------------------
+
+* Feature - Updated ResourceType enum with new resource types onboarded by AWS Config in July 2023.
+
+1.96.0 (2023-07-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.95.0 (2023-07-06)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.94.0 (2023-06-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.93.0 (2023-06-20)
+------------------
+
+* Feature - Updated ResourceType enum with new resource types onboarded by AWS Config in May 2023.
+
+1.92.0 (2023-06-15)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.91.0 (2023-05-31)
+------------------
+
+* Feature - Resource Types Exclusion feature launch by AWS Config
+
+1.90.0 (2023-05-04)
+------------------
+
+* Feature - Updated ResourceType enum with new resource types onboarded by AWS Config in April 2023.
+
+1.89.0 (2023-04-05)
+------------------
+
+* Feature - This release adds resourceType enums for types released in March 2023.
+
+1.88.0 (2023-03-17)
+------------------
+
+* Feature - This release adds resourceType enums for types released from October 2022 through February 2023.
+
+1.87.0 (2023-01-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+* Issue - Replace runtime endpoint resolution approach with generated ruby code.
+
+1.86.0 (2022-11-29)
+------------------
+
+* Feature - With this release, you can use AWS Config to evaluate your resources for compliance with Config rules before they are created or updated. Using Config rules in proactive mode enables you to test and build compliant resource templates or check resource configurations at the time they are provisioned.
+
+1.85.0 (2022-10-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.84.0 (2022-10-19)
+------------------
+
+* Feature - This release adds resourceType enums for AppConfig, AppSync, DataSync, EC2, EKS, Glue, GuardDuty, SageMaker, ServiceDiscovery, SES, Route53 types.
+
+1.83.0 (2022-08-24)
+------------------
+
+* Feature - AWS Config now supports ConformancePackTemplate documents in SSM Docs for the deployment and update of conformance packs.
+
+1.82.0 (2022-08-04)
+------------------
+
+* Feature - Add resourceType enums for Athena, GlobalAccelerator, Detective and EC2 types
+
+1.81.0 (2022-08-01)
+------------------
+
+* Feature - Documentation update for PutConfigRule and PutOrganizationConfigRule
+
+1.80.0 (2022-07-27)
+------------------
+
+* Feature - This release adds ListConformancePackComplianceScores API to support the new compliance score feature, which provides a percentage of the number of compliant rule-resource combinations in a conformance pack compared to the number of total possible rule-resource combinations in the conformance pack.
+
+1.79.0 (2022-07-14)
+------------------
+
+* Feature - Update ResourceType enum with values for Route53Resolver, Batch, DMS, Workspaces, Stepfunctions, SageMaker, ElasticLoadBalancingV2, MSK types
+
+1.78.0 (2022-07-05)
+------------------
+
+* Feature - Updating documentation service limits
+
+1.77.0 (2022-04-06)
+------------------
+
+* Feature - Add resourceType enums for AWS::EMR::SecurityConfiguration and AWS::SageMaker::CodeRepository
+
+1.76.0 (2022-03-24)
+------------------
+
+* Feature - Added new APIs GetCustomRulePolicy and GetOrganizationCustomRulePolicy, and updated existing APIs PutConfigRule, DescribeConfigRule, DescribeConfigRuleEvaluationStatus, PutOrganizationConfigRule, DescribeConfigRule to support a new feature for building AWS Config rules with AWS CloudFormation Guard
+
+1.75.0 (2022-03-14)
+------------------
+
+* Feature - Add resourceType enums for AWS::ECR::PublicRepository and AWS::EC2::LaunchTemplate
+
+1.74.0 (2022-02-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.73.0 (2022-02-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.72.0 (2022-01-14)
+------------------
+
+* Feature - Update ResourceType enum with values for CodeDeploy, EC2 and Kinesis resources
+
+1.71.0 (2021-12-21)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.70.0 (2021-11-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.69.0 (2021-11-04)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.68.0 (2021-10-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.67.0 (2021-10-13)
+------------------
+
+* Feature - Adding Config support for AWS::OpenSearch::Domain
+
+1.66.0 (2021-09-01)
+------------------
+
+* Feature - Documentation updates for config
+
+1.65.0 (2021-08-16)
+------------------
+
+* Feature - Update ResourceType enum with values for Backup Plan, Selection, Vault, RecoveryPoint; ECS Cluster, Service, TaskDefinition; EFS AccessPoint, FileSystem; EKS Cluster; ECR Repository resources
+
+1.64.0 (2021-07-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.63.0 (2021-07-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.62.0 (2021-05-10)
+------------------
+
+* Feature - Adds paginator to multiple APIs: By default, the paginator allows user to iterate over the results and allows the CLI to return up to 1000 results.
+
+1.61.0 (2021-04-14)
+------------------
+
+* Feature - Add exception for DeleteRemediationConfiguration and DescribeRemediationExecutionStatus
+
+1.60.0 (2021-03-30)
+------------------
+
+* Feature - Adding new APIs to support ConformancePack Compliance CI in Aggregators
+
+1.59.0 (2021-03-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.58.0 (2021-02-17)
+------------------
+
+* Feature - Added INSUFFICIENT_DATA in ConformancePackComplianceType.
+
+1.57.0 (2021-02-15)
+------------------
+
+* Feature - Added option to provide KMS key to AWS Config DeliveryChannel
+
+1.56.0 (2021-02-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
 1.55.0 (2020-12-21)
 ------------------
 

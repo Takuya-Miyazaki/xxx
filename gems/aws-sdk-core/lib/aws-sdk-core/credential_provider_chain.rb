@@ -45,7 +45,8 @@ module Aws
         Credentials.new(
           options[:config].access_key_id,
           options[:config].secret_access_key,
-          options[:config].session_token
+          options[:config].session_token,
+          account_id: options[:config].account_id
         )
       end
     end
@@ -84,7 +85,7 @@ module Aws
     def static_profile_process_credentials(options)
       if Aws.shared_config.config_enabled? && options[:config] && options[:config].profile
         process_provider = Aws.shared_config.credential_process(profile: options[:config].profile)
-        ProcessCredentials.new(process_provider) if process_provider
+        ProcessCredentials.new([process_provider]) if process_provider
       end
     rescue Errors::NoSuchProfileError
       nil
@@ -94,7 +95,13 @@ module Aws
       key =    %w[AWS_ACCESS_KEY_ID AMAZON_ACCESS_KEY_ID AWS_ACCESS_KEY]
       secret = %w[AWS_SECRET_ACCESS_KEY AMAZON_SECRET_ACCESS_KEY AWS_SECRET_KEY]
       token =  %w[AWS_SESSION_TOKEN AMAZON_SESSION_TOKEN]
-      Credentials.new(envar(key), envar(secret), envar(token))
+      account_id = %w[AWS_ACCOUNT_ID]
+      Credentials.new(
+        envar(key),
+        envar(secret),
+        envar(token),
+        account_id: envar(account_id)
+      )
     end
 
     def envar(keys)
@@ -117,9 +124,9 @@ module Aws
 
     def process_credentials(options)
       profile_name = determine_profile_name(options)
-      if Aws.shared_config.config_enabled? &&
-         (process_provider = Aws.shared_config.credential_process(profile: profile_name))
-        ProcessCredentials.new(process_provider)
+      if Aws.shared_config.config_enabled?
+        process_provider = Aws.shared_config.credential_process(profile: profile_name)
+        ProcessCredentials.new([process_provider]) if process_provider
       end
     rescue Errors::NoSuchProfileError
       nil
@@ -160,20 +167,24 @@ module Aws
     end
 
     def instance_profile_credentials(options)
-      if ENV['AWS_CONTAINER_CREDENTIALS_RELATIVE_URI']
+      profile_name = determine_profile_name(options)
+      if ENV['AWS_CONTAINER_CREDENTIALS_RELATIVE_URI'] ||
+         ENV['AWS_CONTAINER_CREDENTIALS_FULL_URI']
         ECSCredentials.new(options)
       else
-        InstanceProfileCredentials.new(options)
+        InstanceProfileCredentials.new(options.merge(profile: profile_name))
       end
     end
 
     def assume_role_with_profile(options, profile_name)
-      region = (options[:config] && options[:config].region)
-      Aws.shared_config.assume_role_credentials_from_config(
+      assume_opts = {
         profile: profile_name,
-        region: region,
         chain_config: @config
-      )
+      }
+      if options[:config] && options[:config].region
+        assume_opts[:region] = options[:config].region
+      end
+      Aws.shared_config.assume_role_credentials_from_config(assume_opts)
     end
   end
 end

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -28,26 +28,40 @@ module Aws::FSx
   #
   # ## Error Classes
   # * {ActiveDirectoryError}
+  # * {BackupBeingCopied}
   # * {BackupInProgress}
   # * {BackupNotFound}
   # * {BackupRestoring}
   # * {BadRequest}
+  # * {DataRepositoryAssociationNotFound}
   # * {DataRepositoryTaskEnded}
   # * {DataRepositoryTaskExecuting}
   # * {DataRepositoryTaskNotFound}
+  # * {FileCacheNotFound}
   # * {FileSystemNotFound}
   # * {IncompatibleParameterError}
+  # * {IncompatibleRegionForMultiAZ}
   # * {InternalServerError}
+  # * {InvalidDataRepositoryType}
+  # * {InvalidDestinationKmsKey}
   # * {InvalidExportPath}
   # * {InvalidImportPath}
   # * {InvalidNetworkSettings}
   # * {InvalidPerUnitStorageThroughput}
+  # * {InvalidRegion}
+  # * {InvalidSourceKmsKey}
+  # * {MissingFileCacheConfiguration}
   # * {MissingFileSystemConfiguration}
+  # * {MissingVolumeConfiguration}
   # * {NotServiceResourceError}
   # * {ResourceDoesNotSupportTagging}
   # * {ResourceNotFound}
   # * {ServiceLimitExceeded}
+  # * {SnapshotNotFound}
+  # * {SourceBackupUnavailable}
+  # * {StorageVirtualMachineNotFound}
   # * {UnsupportedOperation}
+  # * {VolumeNotFound}
   #
   # Additionally, error classes are dynamically generated for service errors based on the error code
   # if they are not defined above.
@@ -77,6 +91,26 @@ module Aws::FSx
       # @return [String]
       def message
         @message || @data[:message]
+      end
+    end
+
+    class BackupBeingCopied < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::BackupBeingCopied] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+
+      # @return [String]
+      def backup_id
+        @data[:backup_id]
       end
     end
 
@@ -145,6 +179,21 @@ module Aws::FSx
       end
     end
 
+    class DataRepositoryAssociationNotFound < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::DataRepositoryAssociationNotFound] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class DataRepositoryTaskEnded < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -190,6 +239,21 @@ module Aws::FSx
       end
     end
 
+    class FileCacheNotFound < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::FileCacheNotFound] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class FileSystemNotFound < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -225,11 +289,56 @@ module Aws::FSx
       end
     end
 
+    class IncompatibleRegionForMultiAZ < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::IncompatibleRegionForMultiAZ] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class InternalServerError < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::FSx::Types::InternalServerError] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class InvalidDataRepositoryType < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::InvalidDataRepositoryType] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class InvalidDestinationKmsKey < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::InvalidDestinationKmsKey] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -293,6 +402,11 @@ module Aws::FSx
       def invalid_security_group_id
         @data[:invalid_security_group_id]
       end
+
+      # @return [String]
+      def invalid_route_table_id
+        @data[:invalid_route_table_id]
+      end
     end
 
     class InvalidPerUnitStorageThroughput < ServiceError
@@ -310,11 +424,71 @@ module Aws::FSx
       end
     end
 
+    class InvalidRegion < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::InvalidRegion] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class InvalidSourceKmsKey < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::InvalidSourceKmsKey] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class MissingFileCacheConfiguration < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::MissingFileCacheConfiguration] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class MissingFileSystemConfiguration < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::FSx::Types::MissingFileSystemConfiguration] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class MissingVolumeConfiguration < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::MissingVolumeConfiguration] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -405,11 +579,76 @@ module Aws::FSx
       end
     end
 
+    class SnapshotNotFound < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::SnapshotNotFound] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class SourceBackupUnavailable < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::SourceBackupUnavailable] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+
+      # @return [String]
+      def backup_id
+        @data[:backup_id]
+      end
+    end
+
+    class StorageVirtualMachineNotFound < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::StorageVirtualMachineNotFound] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class UnsupportedOperation < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::FSx::Types::UnsupportedOperation] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class VolumeNotFound < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::FSx::Types::VolumeNotFound] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

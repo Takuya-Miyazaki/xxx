@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -156,7 +156,9 @@ module Aws::Glacier
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -172,7 +174,9 @@ module Aws::Glacier
     # @return [Vault]
     def create_vault(options = {})
       options = options.merge(account_id: @id)
-      @client.create_vault(options)
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.create_vault(options)
+      end
       Vault.new(
         account_id: @id,
         name: options[:vault_name],
@@ -200,7 +204,9 @@ module Aws::Glacier
     def vaults(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(account_id: @id)
-        resp = @client.list_vaults(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_vaults(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.vault_list.each do |v|

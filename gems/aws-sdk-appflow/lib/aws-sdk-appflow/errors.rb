@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -27,12 +27,14 @@ module Aws::Appflow
   # See {Seahorse::Client::RequestContext} for more information.
   #
   # ## Error Classes
+  # * {AccessDeniedException}
   # * {ConflictException}
   # * {ConnectorAuthenticationException}
   # * {ConnectorServerException}
   # * {InternalServerException}
   # * {ResourceNotFoundException}
   # * {ServiceQuotaExceededException}
+  # * {ThrottlingException}
   # * {UnsupportedOperationException}
   # * {ValidationException}
   #
@@ -41,6 +43,21 @@ module Aws::Appflow
   module Errors
 
     extend Aws::Errors::DynamicErrors
+
+    class AccessDeniedException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Appflow::Types::AccessDeniedException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
 
     class ConflictException < ServiceError
 
@@ -122,6 +139,21 @@ module Aws::Appflow
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::Appflow::Types::ServiceQuotaExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ThrottlingException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Appflow::Types::ThrottlingException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

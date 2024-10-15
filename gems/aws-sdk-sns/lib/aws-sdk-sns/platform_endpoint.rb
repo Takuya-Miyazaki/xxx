@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -72,7 +72,9 @@ module Aws::SNS
     #
     # @return [self]
     def load
-      resp = @client.get_endpoint_attributes(endpoint_arn: @arn)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_endpoint_attributes(endpoint_arn: @arn)
+      end
       @data = resp.data
       self
     end
@@ -102,7 +104,9 @@ module Aws::SNS
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(endpoint_arn: @arn)
-      resp = @client.delete_endpoint(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_endpoint(options)
+      end
       resp.data
     end
 
@@ -110,7 +114,7 @@ module Aws::SNS
     #
     #   platform_endpoint.publish({
     #     topic_arn: "topicARN",
-    #     phone_number: "String",
+    #     phone_number: "PhoneNumber",
     #     message: "message", # required
     #     subject: "subject",
     #     message_structure: "messageStructure",
@@ -196,9 +200,8 @@ module Aws::SNS
     #   is delivered to email endpoints. This field will also be included, if
     #   present, in the standard JSON messages delivered to other endpoints.
     #
-    #   Constraints: Subjects must be ASCII text that begins with a letter,
-    #   number, or punctuation mark; must not include line breaks or control
-    #   characters; and must be less than 100 characters long.
+    #   Constraints: Subjects must be UTF-8 text with no line breaks or
+    #   control characters, and less than 100 characters long.
     # @option options [String] :message_structure
     #   Set `MessageStructure` to `json` if you want to send a different
     #   message for each protocol. For example, using one publish action, you
@@ -220,7 +223,7 @@ module Aws::SNS
     # @option options [String] :message_deduplication_id
     #   This parameter applies only to FIFO (first-in-first-out) topics. The
     #   `MessageDeduplicationId` can contain up to 128 alphanumeric characters
-    #   (a-z, A-Z, 0-9) and punctuation ``
+    #   `(a-z, A-Z, 0-9)` and punctuation ``
     #   (!"#$%&'()*+,-./:;<=>?@[\]^_`\{|\}~) ``.
     #
     #   Every message must have a unique `MessageDeduplicationId`, which is a
@@ -234,8 +237,8 @@ module Aws::SNS
     #   `MessageDeduplicationId` overrides the generated one.
     # @option options [String] :message_group_id
     #   This parameter applies only to FIFO (first-in-first-out) topics. The
-    #   `MessageGroupId` can contain up to 128 alphanumeric characters (a-z,
-    #   A-Z, 0-9) and punctuation `` (!"#$%&'()*+,-./:;<=>?@[\]^_`\{|\}~) ``.
+    #   `MessageGroupId` can contain up to 128 alphanumeric characters `(a-z,
+    #   A-Z, 0-9)` and punctuation `` (!"#$%&'()*+,-./:;<=>?@[\]^_`\{|\}~) ``.
     #
     #   The `MessageGroupId` is a tag that specifies that a message belongs to
     #   a specific message group. Messages that belong to the same message
@@ -245,7 +248,9 @@ module Aws::SNS
     # @return [Types::PublishResponse]
     def publish(options = {})
       options = options.merge(target_arn: @arn)
-      resp = @client.publish(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.publish(options)
+      end
       resp.data
     end
 
@@ -277,7 +282,9 @@ module Aws::SNS
     # @return [EmptyStructure]
     def set_attributes(options = {})
       options = options.merge(endpoint_arn: @arn)
-      resp = @client.set_endpoint_attributes(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.set_endpoint_attributes(options)
+      end
       resp.data
     end
 

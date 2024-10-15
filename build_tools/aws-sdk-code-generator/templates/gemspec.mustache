@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.license       = 'Apache-2.0'
   spec.email         = ['{{email}}']
   spec.require_paths = ['lib']
-  spec.files         = Dir['lib/**/*.rb']
+  spec.files         = Dir{{{files}}}
 
   {{#metadata}}
   spec.metadata = {
@@ -24,7 +24,11 @@ Gem::Specification.new do |spec|
 
   {{/metadata}}
   {{#dependencies}}
-  spec.add_dependency('{{gem}}', '{{&version}}')
+  spec.add_dependency({{{gem_version}}})
   {{/dependencies}}
 
+  spec.required_ruby_version = '>= 2.5'
+  {{#deprecated?}}
+  spec.post_install_message = '*** {{gem_name}} is deprecated ***'
+  {{/deprecated?}}
 end

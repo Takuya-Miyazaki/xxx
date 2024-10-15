@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-elasticsearchservice/types'
-require_relative 'aws-sdk-elasticsearchservice/client_api'
-require_relative 'aws-sdk-elasticsearchservice/client'
-require_relative 'aws-sdk-elasticsearchservice/errors'
-require_relative 'aws-sdk-elasticsearchservice/resource'
-require_relative 'aws-sdk-elasticsearchservice/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:elasticsearchservice)
 
 # This module provides support for Amazon Elasticsearch Service. This module is available in the
 # `aws-sdk-elasticsearchservice` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-elasticsearchservice/customizations'
 #
 # @!group service
 module Aws::ElasticsearchService
+  autoload :Types, 'aws-sdk-elasticsearchservice/types'
+  autoload :ClientApi, 'aws-sdk-elasticsearchservice/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-elasticsearchservice/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-elasticsearchservice/client'
+  autoload :Errors, 'aws-sdk-elasticsearchservice/errors'
+  autoload :Resource, 'aws-sdk-elasticsearchservice/resource'
+  autoload :EndpointParameters, 'aws-sdk-elasticsearchservice/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-elasticsearchservice/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-elasticsearchservice/endpoints'
 
-  GEM_VERSION = '1.46.0'
+  GEM_VERSION = '1.95.0'
 
 end
+
+require_relative 'aws-sdk-elasticsearchservice/customizations'

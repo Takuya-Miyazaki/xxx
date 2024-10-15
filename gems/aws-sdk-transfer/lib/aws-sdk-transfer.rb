@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-transfer/types'
-require_relative 'aws-sdk-transfer/client_api'
-require_relative 'aws-sdk-transfer/client'
-require_relative 'aws-sdk-transfer/errors'
-require_relative 'aws-sdk-transfer/resource'
-require_relative 'aws-sdk-transfer/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:transfer)
 
 # This module provides support for AWS Transfer Family. This module is available in the
 # `aws-sdk-transfer` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-transfer/customizations'
 # structure.
 #
 #     transfer = Aws::Transfer::Client.new
-#     resp = transfer.create_server(params)
+#     resp = transfer.create_access(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,21 @@ require_relative 'aws-sdk-transfer/customizations'
 #
 # @!group service
 module Aws::Transfer
+  autoload :Types, 'aws-sdk-transfer/types'
+  autoload :ClientApi, 'aws-sdk-transfer/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-transfer/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-transfer/client'
+  autoload :Errors, 'aws-sdk-transfer/errors'
+  autoload :Waiters, 'aws-sdk-transfer/waiters'
+  autoload :Resource, 'aws-sdk-transfer/resource'
+  autoload :EndpointParameters, 'aws-sdk-transfer/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-transfer/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-transfer/endpoints'
 
-  GEM_VERSION = '1.29.0'
+  GEM_VERSION = '1.105.0'
 
 end
+
+require_relative 'aws-sdk-transfer/customizations'

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -28,6 +28,7 @@ module Aws::Route53Resolver
   #
   # ## Error Classes
   # * {AccessDeniedException}
+  # * {ConflictException}
   # * {InternalServiceErrorException}
   # * {InvalidNextTokenException}
   # * {InvalidParameterException}
@@ -39,8 +40,10 @@ module Aws::Route53Resolver
   # * {ResourceInUseException}
   # * {ResourceNotFoundException}
   # * {ResourceUnavailableException}
+  # * {ServiceQuotaExceededException}
   # * {ThrottlingException}
   # * {UnknownResourceException}
+  # * {ValidationException}
   #
   # Additionally, error classes are dynamically generated for service errors based on the error code
   # if they are not defined above.
@@ -53,6 +56,21 @@ module Aws::Route53Resolver
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::Route53Resolver::Types::AccessDeniedException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ConflictException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Route53Resolver::Types::ConflictException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end
@@ -258,6 +276,21 @@ module Aws::Route53Resolver
       end
     end
 
+    class ServiceQuotaExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Route53Resolver::Types::ServiceQuotaExceededException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class ThrottlingException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -278,6 +311,21 @@ module Aws::Route53Resolver
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::Route53Resolver::Types::UnknownResourceException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ValidationException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::Route53Resolver::Types::ValidationException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

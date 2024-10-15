@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-mediaconnect/types'
-require_relative 'aws-sdk-mediaconnect/client_api'
-require_relative 'aws-sdk-mediaconnect/client'
-require_relative 'aws-sdk-mediaconnect/errors'
-require_relative 'aws-sdk-mediaconnect/resource'
-require_relative 'aws-sdk-mediaconnect/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:mediaconnect)
 
 # This module provides support for AWS MediaConnect. This module is available in the
 # `aws-sdk-mediaconnect` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-mediaconnect/customizations'
 # structure.
 #
 #     media_connect = Aws::MediaConnect::Client.new
-#     resp = media_connect.add_flow_outputs(params)
+#     resp = media_connect.add_bridge_outputs(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,21 @@ require_relative 'aws-sdk-mediaconnect/customizations'
 #
 # @!group service
 module Aws::MediaConnect
+  autoload :Types, 'aws-sdk-mediaconnect/types'
+  autoload :ClientApi, 'aws-sdk-mediaconnect/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-mediaconnect/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-mediaconnect/client'
+  autoload :Errors, 'aws-sdk-mediaconnect/errors'
+  autoload :Waiters, 'aws-sdk-mediaconnect/waiters'
+  autoload :Resource, 'aws-sdk-mediaconnect/resource'
+  autoload :EndpointParameters, 'aws-sdk-mediaconnect/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-mediaconnect/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-mediaconnect/endpoints'
 
-  GEM_VERSION = '1.28.0'
+  GEM_VERSION = '1.71.0'
 
 end
+
+require_relative 'aws-sdk-mediaconnect/customizations'

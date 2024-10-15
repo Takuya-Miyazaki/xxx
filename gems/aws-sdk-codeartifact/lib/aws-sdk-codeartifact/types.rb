@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -48,23 +48,13 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass AssociateExternalConnectionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         external_connection: "ExternalConnectionName", # required
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -78,6 +68,8 @@ module Aws::CodeArtifact
     #
     #   * `public:npmjs` - for the npm public repository.
     #
+    #   * `public:nuget-org` - for the NuGet Gallery.
+    #
     #   * `public:pypi` - for the Python Package Index.
     #
     #   * `public:maven-central` - for Maven Central.
@@ -89,7 +81,11 @@ module Aws::CodeArtifact
     #   * `public:maven-commonsware` - for the CommonsWare Android
     #     repository.
     #
-    #   * `public:nuget-org` - for the NuGet Gallery.
+    #   * `public:maven-clojars` - for the Clojars repository.
+    #
+    #   * `public:ruby-gems-org` - for RubyGems.org.
+    #
+    #   * `public:crates-io` - for Crates.io.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/AssociateExternalConnectionRequest AWS API Documentation
@@ -116,6 +112,56 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
+    # A package associated with a package group.
+    #
+    # @!attribute [rw] format
+    #   A format that specifies the type of the associated package.
+    #   @return [String]
+    #
+    # @!attribute [rw] namespace
+    #   The namespace of the associated package. The package component that
+    #   specifies its namespace depends on its type. For example:
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
+    #   @return [String]
+    #
+    # @!attribute [rw] package
+    #   The name of the associated package.
+    #   @return [String]
+    #
+    # @!attribute [rw] association_type
+    #   Describes the strength of the association between the package and
+    #   package group. A strong match can be thought of as an exact match,
+    #   and a weak match can be thought of as a variation match, for
+    #   example, the package name matches a variation of the package group
+    #   pattern. For more information about package group pattern matching,
+    #   including strong and weak matches, see [Package group definition
+    #   syntax and matching behavior][1] in the *CodeArtifact User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/ug/package-group-definition-syntax-matching-behavior.html
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/AssociatedPackage AWS API Documentation
+    #
+    class AssociatedPackage < Struct.new(
+      :format,
+      :namespace,
+      :package,
+      :association_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The operation did not succeed because prerequisites are not met.
     #
     # @!attribute [rw] message
@@ -126,7 +172,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] resource_type
-    #   The type of AWS resource.
+    #   The type of Amazon Web Services resource.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ConflictException AWS API Documentation
@@ -139,38 +185,19 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CopyPackageVersionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         source_repository: "RepositoryName", # required
-    #         destination_repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package: "PackageName", # required
-    #         versions: ["PackageVersion"],
-    #         version_revisions: {
-    #           "PackageVersion" => "PackageVersionRevision",
-    #         },
-    #         allow_overwrite: false,
-    #         include_from_upstream: false,
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the source and destination
     #   repositories.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] source_repository
-    #   The name of the repository that contains the package versions to
-    #   copy.
+    #   The name of the repository that contains the package versions to be
+    #   copied.
     #   @return [String]
     #
     # @!attribute [rw] destination_repository
@@ -178,40 +205,42 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] format
-    #   The format of the package that is copied. The valid package types
-    #   are:
-    #
-    #   * `npm`\: A Node Package Manager (npm) package.
-    #
-    #   * `pypi`\: A Python Package Index (PyPI) package.
-    #
-    #   * `maven`\: A Maven package that contains compiled code in a
-    #     distributable format, such as a JAR file.
-    #
-    #   * `nuget`\: A NuGet package.
+    #   The format of the package versions to be copied.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package versions to be copied. The package
+    #   component that specifies its namespace depends on its type. For
+    #   example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   <note markdown="1"> The namespace is required when copying package versions of the
+    #   following formats:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #    * Maven
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * Swift
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
-    #   The name of the package that is copied.
+    #   The name of the package that contains the versions to be copied.
     #   @return [String]
     #
     # @!attribute [rw] versions
-    #   The versions of the package to copy.
+    #   The versions of the package to be copied.
     #
     #   <note markdown="1"> You must specify `versions` or `versionRevisions`. You cannot
     #   specify both.
@@ -300,25 +329,12 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateDomainRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         encryption_key: "Arn",
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] domain
-    #   The name of the domain to create. All domain names in an AWS Region
-    #   that are in the same AWS account must be unique. The domain name is
-    #   used as the prefix in DNS hostnames. Do not use sensitive
-    #   information in a domain name because it is publicly discoverable.
+    #   The name of the domain to create. All domain names in an Amazon Web
+    #   Services Region that are in the same Amazon Web Services account
+    #   must be unique. The domain name is used as the prefix in DNS
+    #   hostnames. Do not use sensitive information in a domain name because
+    #   it is publicly discoverable.
     #   @return [String]
     #
     # @!attribute [rw] encryption_key
@@ -327,13 +343,13 @@ module Aws::CodeArtifact
     #   Resource Name (ARN), a key alias, or a key alias ARN. To specify an
     #   `encryptionKey`, your IAM role must have `kms:DescribeKey` and
     #   `kms:CreateGrant` permissions on the encryption key that is used.
-    #   For more information, see [DescribeKey][1] in the *AWS Key
-    #   Management Service API Reference* and [AWS KMS API Permissions
-    #   Reference][2] in the *AWS Key Management Service Developer Guide*.
+    #   For more information, see [DescribeKey][1] in the *Key Management
+    #   Service API Reference* and [Key Management Service API Permissions
+    #   Reference][2] in the *Key Management Service Developer Guide*.
     #
     #   CodeArtifact supports only symmetric CMKs. Do not associate an
     #   asymmetric CMK with your domain. For more information, see [Using
-    #   symmetric and asymmetric keys][3] in the *AWS Key Management Service
+    #   symmetric and asymmetric keys][3] in the *Key Management Service
     #   Developer Guide*.
     #
     #
@@ -370,34 +386,65 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateRepositoryRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         description: "Description",
-    #         upstreams: [
-    #           {
-    #             repository_name: "RepositoryName", # required
-    #           },
-    #         ],
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] domain
-    #   The domain that contains the created repository.
+    #   The name of the domain in which you want to create a package group.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
+    #
+    # @!attribute [rw] package_group
+    #   The pattern of the package group to create. The pattern is also the
+    #   identifier of the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] contact_info
+    #   The contact information for the created package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   A description of the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   One or more tag key-value pairs for the package group.
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/CreatePackageGroupRequest AWS API Documentation
+    #
+    class CreatePackageGroupRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :package_group,
+      :contact_info,
+      :description,
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] package_group
+    #   Information about the created package group after processing the
+    #   request.
+    #   @return [Types::PackageGroupDescription]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/CreatePackageGroupResult AWS API Documentation
+    #
+    class CreatePackageGroupResult < Struct.new(
+      :package_group)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain
+    #   The name of the domain that contains the created repository.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -411,7 +458,7 @@ module Aws::CodeArtifact
     # @!attribute [rw] upstreams
     #   A list of upstream repositories to associate with the repository.
     #   The order of the upstream repositories in the list determines their
-    #   priority order when AWS CodeArtifact looks for a requested package
+    #   priority order when CodeArtifact looks for a requested package
     #   version. For more information, see [Working with upstream
     #   repositories][1].
     #
@@ -450,23 +497,14 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteDomainPermissionsPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         policy_revision: "PolicyRevision",
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain associated with the resource policy to be
     #   deleted.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] policy_revision
@@ -498,21 +536,13 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteDomainRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain to delete.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DeleteDomainRequest AWS API Documentation
@@ -537,27 +567,121 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeletePackageVersionsRequest
-    #   data as a hash:
+    # @!attribute [rw] domain
+    #   The domain that contains the package group to be deleted.
+    #   @return [String]
     #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package: "PackageName", # required
-    #         versions: ["PackageVersion"], # required
-    #         expected_status: "Published", # accepts Published, Unfinished, Unlisted, Archived, Disposed, Deleted
-    #       }
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
     #
+    # @!attribute [rw] package_group
+    #   The pattern of the package group to be deleted.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DeletePackageGroupRequest AWS API Documentation
+    #
+    class DeletePackageGroupRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :package_group)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] package_group
+    #   Information about the deleted package group after processing the
+    #   request.
+    #   @return [Types::PackageGroupDescription]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DeletePackageGroupResult AWS API Documentation
+    #
+    class DeletePackageGroupResult < Struct.new(
+      :package_group)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] domain
     #   The name of the domain that contains the package to delete.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository
+    #   The name of the repository that contains the package to delete.
+    #   @return [String]
+    #
+    # @!attribute [rw] format
+    #   The format of the requested package to delete.
+    #   @return [String]
+    #
+    # @!attribute [rw] namespace
+    #   The namespace of the package to delete. The package component that
+    #   specifies its namespace depends on its type. For example:
+    #
+    #   <note markdown="1"> The namespace is required when deleting packages of the following
+    #   formats:
+    #
+    #    * Maven
+    #
+    #   * Swift
+    #
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
+    #   @return [String]
+    #
+    # @!attribute [rw] package
+    #   The name of the package to delete.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DeletePackageRequest AWS API Documentation
+    #
+    class DeletePackageRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :repository,
+      :format,
+      :namespace,
+      :package)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] deleted_package
+    #   Details about a package, including its format, namespace, and name.
+    #   @return [Types::PackageSummary]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DeletePackageResult AWS API Documentation
+    #
+    class DeletePackageResult < Struct.new(
+      :deleted_package)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain
+    #   The name of the domain that contains the package to delete.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -566,30 +690,34 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] format
-    #   The format of the package versions to delete. The valid values are:
-    #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
+    #   The format of the package versions to delete.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package versions to be deleted. The package
+    #   component that specifies its namespace depends on its type. For
+    #   example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   <note markdown="1"> The namespace is required when deleting package versions of the
+    #   following formats:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #    * Maven
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * Swift
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -602,18 +730,7 @@ module Aws::CodeArtifact
     #   @return [Array<String>]
     #
     # @!attribute [rw] expected_status
-    #   The expected status of the package version to delete. Valid values
-    #   are:
-    #
-    #   * `Published`
-    #
-    #   * `Unfinished`
-    #
-    #   * `Unlisted`
-    #
-    #   * `Archived`
-    #
-    #   * `Disposed`
+    #   The expected status of the package version to delete.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DeletePackageVersionsRequest AWS API Documentation
@@ -632,7 +749,8 @@ module Aws::CodeArtifact
     end
 
     # @!attribute [rw] successful_versions
-    #   A list of the package versions that were successfully deleted.
+    #   A list of the package versions that were successfully deleted. The
+    #   status of every successful version will be `Deleted`.
     #   @return [Hash<String,Types::SuccessfulPackageVersionInfo>]
     #
     # @!attribute [rw] failed_versions
@@ -661,24 +779,14 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteRepositoryPermissionsPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         policy_revision: "PolicyRevision",
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository associated with
     #   the resource policy to be deleted.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -716,22 +824,13 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteRepositoryRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository to delete.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -761,21 +860,13 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeDomainRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #       }
-    #
     # @!attribute [rw] domain
     #   A string that specifies the name of the requested domain.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DescribeDomainRequest AWS API Documentation
@@ -801,27 +892,132 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribePackageVersionRequest
-    #   data as a hash:
+    # @!attribute [rw] domain
+    #   The name of the domain that contains the package group.
+    #   @return [String]
     #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package: "PackageName", # required
-    #         package_version: "PackageVersion", # required
-    #       }
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
     #
+    # @!attribute [rw] package_group
+    #   The pattern of the requested package group.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DescribePackageGroupRequest AWS API Documentation
+    #
+    class DescribePackageGroupRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :package_group)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] package_group
+    #   A [PackageGroupDescription][1] object that contains information
+    #   about the requested package group.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageGroupDescription.html
+    #   @return [Types::PackageGroupDescription]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DescribePackageGroupResult AWS API Documentation
+    #
+    class DescribePackageGroupResult < Struct.new(
+      :package_group)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain
+    #   The name of the domain that contains the repository that contains
+    #   the package.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository
+    #   The name of the repository that contains the requested package.
+    #   @return [String]
+    #
+    # @!attribute [rw] format
+    #   A format that specifies the type of the requested package.
+    #   @return [String]
+    #
+    # @!attribute [rw] namespace
+    #   The namespace of the requested package. The package component that
+    #   specifies its namespace depends on its type. For example:
+    #
+    #   <note markdown="1"> The namespace is required when requesting packages of the following
+    #   formats:
+    #
+    #    * Maven
+    #
+    #   * Swift
+    #
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
+    #   @return [String]
+    #
+    # @!attribute [rw] package
+    #   The name of the requested package.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DescribePackageRequest AWS API Documentation
+    #
+    class DescribePackageRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :repository,
+      :format,
+      :namespace,
+      :package)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] package
+    #   A [PackageDescription][1] object that contains information about the
+    #   requested package.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageDescription.html
+    #   @return [Types::PackageDescription]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DescribePackageResult AWS API Documentation
+    #
+    class DescribePackageResult < Struct.new(
+      :package)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository that contains
     #   the package version.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -830,30 +1026,33 @@ module Aws::CodeArtifact
     #
     # @!attribute [rw] format
     #   A format that specifies the type of the requested package version.
-    #   The valid values are:
-    #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the requested package version. The package
+    #   component that specifies its namespace depends on its type. For
+    #   example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   <note markdown="1"> The namespace is required when requesting package versions of the
+    #   following formats:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #    * Maven
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * Swift
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -879,8 +1078,12 @@ module Aws::CodeArtifact
     end
 
     # @!attribute [rw] package_version
-    #   A ` PackageVersionDescription ` object that contains information
+    #   A [PackageVersionDescription][1] object that contains information
     #   about the requested package version.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageVersionDescription.html
     #   @return [Types::PackageVersionDescription]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DescribePackageVersionResult AWS API Documentation
@@ -891,22 +1094,13 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeRepositoryRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository to describe.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -936,24 +1130,14 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DisassociateExternalConnectionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         external_connection: "ExternalConnectionName", # required
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository from which to
     #   remove the external repository.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -989,31 +1173,14 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DisposePackageVersionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package: "PackageName", # required
-    #         versions: ["PackageVersion"], # required
-    #         version_revisions: {
-    #           "PackageVersion" => "PackageVersionRevision",
-    #         },
-    #         expected_status: "Published", # accepts Published, Unfinished, Unlisted, Archived, Disposed, Deleted
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository you want to
     #   dispose.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -1023,30 +1190,34 @@ module Aws::CodeArtifact
     #
     # @!attribute [rw] format
     #   A format that specifies the type of package versions you want to
-    #   dispose. The valid values are:
-    #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
+    #   dispose.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package versions to be disposed. The package
+    #   component that specifies its namespace depends on its type. For
+    #   example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   <note markdown="1"> The namespace is required when disposing package versions of the
+    #   following formats:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #    * Maven
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * Swift
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -1062,18 +1233,7 @@ module Aws::CodeArtifact
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] expected_status
-    #   The expected status of the package version to dispose. Valid values
-    #   are:
-    #
-    #   * `Published`
-    #
-    #   * `Unfinished`
-    #
-    #   * `Unlisted`
-    #
-    #   * `Archived`
-    #
-    #   * `Disposed`
+    #   The expected status of the package version to dispose.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DisposePackageVersionsRequest AWS API Documentation
@@ -1132,7 +1292,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] owner
-    #   The AWS account ID that owns the domain.
+    #   The Amazon Web Services account ID that owns the domain.
     #   @return [String]
     #
     # @!attribute [rw] arn
@@ -1140,11 +1300,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] status
-    #   The current status of a domain. The valid values are
-    #
-    #   * `Active`
-    #
-    #   * `Deleted`
+    #   The current status of a domain.
     #   @return [String]
     #
     # @!attribute [rw] created_time
@@ -1153,8 +1309,8 @@ module Aws::CodeArtifact
     #   @return [Time]
     #
     # @!attribute [rw] encryption_key
-    #   The ARN of an AWS Key Management Service (AWS KMS) key associated
-    #   with a domain.
+    #   The ARN of an Key Management Service (KMS) key associated with a
+    #   domain.
     #   @return [String]
     #
     # @!attribute [rw] repository_count
@@ -1186,9 +1342,43 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
+    # Information about how a package originally entered the CodeArtifact
+    # domain. For packages published directly to CodeArtifact, the entry
+    # point is the repository it was published to. For packages ingested
+    # from an external repository, the entry point is the external
+    # connection that it was ingested from. An external connection is a
+    # CodeArtifact repository that is connected to an external repository
+    # such as the npm registry or NuGet gallery.
+    #
+    # <note markdown="1"> If a package version exists in a repository and is updated, for
+    # example if a package of the same version is added with additional
+    # assets, the package version's `DomainEntryPoint` will not change from
+    # the original package version's value.
+    #
+    #  </note>
+    #
+    # @!attribute [rw] repository_name
+    #   The name of the repository that a package was originally published
+    #   to.
+    #   @return [String]
+    #
+    # @!attribute [rw] external_connection_name
+    #   The name of the external connection that a package was ingested
+    #   from.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/DomainEntryPoint AWS API Documentation
+    #
+    class DomainEntryPoint < Struct.new(
+      :repository_name,
+      :external_connection_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Information about a domain, including its name, Amazon Resource Name
-    # (ARN), and status. The [ `ListDomains` ][1] operation returns a list
-    # of `DomainSummary` objects.
+    # (ARN), and status. The [ListDomains][1] operation returns a list of
+    # `DomainSummary` objects.
     #
     #
     #
@@ -1199,8 +1389,8 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] arn
@@ -1208,12 +1398,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] status
-    #   A string that contains the status of the domain. The valid values
-    #   are:
-    #
-    #   * `Active`
-    #
-    #   * `Deleted`
+    #   A string that contains the status of the domain.
     #   @return [String]
     #
     # @!attribute [rw] created_time
@@ -1237,23 +1422,91 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetAuthorizationTokenRequest
-    #   data as a hash:
+    # @!attribute [rw] domain
+    #   The name of the domain that contains the package from which to get
+    #   the associated package group.
+    #   @return [String]
     #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         duration_seconds: 1,
-    #       }
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
     #
+    # @!attribute [rw] format
+    #   The format of the package from which to get the associated package
+    #   group.
+    #   @return [String]
+    #
+    # @!attribute [rw] namespace
+    #   The namespace of the package from which to get the associated
+    #   package group. The package component that specifies its namespace
+    #   depends on its type. For example:
+    #
+    #   <note markdown="1"> The namespace is required when getting associated package groups
+    #   from packages of the following formats:
+    #
+    #    * Maven
+    #
+    #   * Swift
+    #
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
+    #   @return [String]
+    #
+    # @!attribute [rw] package
+    #   The package from which to get the associated package group.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/GetAssociatedPackageGroupRequest AWS API Documentation
+    #
+    class GetAssociatedPackageGroupRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :format,
+      :namespace,
+      :package)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] package_group
+    #   The package group that is associated with the requested package.
+    #   @return [Types::PackageGroupDescription]
+    #
+    # @!attribute [rw] association_type
+    #   Describes the strength of the association between the package and
+    #   package group. A strong match is also known as an exact match, and a
+    #   weak match is known as a relative match.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/GetAssociatedPackageGroupResult AWS API Documentation
+    #
+    class GetAssociatedPackageGroupResult < Struct.new(
+      :package_group,
+      :association_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] domain
     #   The name of the domain that is in scope for the generated
     #   authorization token.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] duration_seconds
@@ -1292,21 +1545,13 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetDomainPermissionsPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain to which the resource policy is attached.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/GetDomainPermissionsPolicyRequest AWS API Documentation
@@ -1330,29 +1575,14 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetPackageVersionAssetRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package: "PackageName", # required
-    #         package_version: "PackageVersion", # required
-    #         asset: "AssetName", # required
-    #         package_version_revision: "PackageVersionRevision",
-    #       }
-    #
     # @!attribute [rw] domain
-    #   The domain that contains the repository that contains the package
-    #   version with the requested asset.
+    #   The name of the domain that contains the repository that contains
+    #   the package version with the requested asset.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -1362,30 +1592,34 @@ module Aws::CodeArtifact
     #
     # @!attribute [rw] format
     #   A format that specifies the type of the package version with the
-    #   requested asset file. The valid values are:
-    #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
+    #   requested asset file.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package version with the requested asset file.
+    #   The package component that specifies its namespace depends on its
+    #   type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   <note markdown="1"> The namespace is required when requesting assets from package
+    #   versions of the following formats:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #    * Maven
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * Swift
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -1449,27 +1683,14 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetPackageVersionReadmeRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package: "PackageName", # required
-    #         package_version: "PackageVersion", # required
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository that contains
     #   the package version with the requested readme file.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -1479,30 +1700,34 @@ module Aws::CodeArtifact
     #
     # @!attribute [rw] format
     #   A format that specifies the type of the package version with the
-    #   requested readme file. The valid values are:
-    #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
+    #   requested readme file.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package version with the requested readme file.
+    #   The package component that specifies its namespace depends on its
+    #   type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   <note markdown="1"> The namespace is required when requesting the readme from package
+    #   versions of the following formats:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #    * Maven
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * Swift
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -1529,31 +1754,23 @@ module Aws::CodeArtifact
     end
 
     # @!attribute [rw] format
-    #   The format of the package with the requested readme file. Valid
-    #   format types are:
-    #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
+    #   The format of the package with the requested readme file.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package version with the requested readme file.
+    #   The package component that specifies its namespace depends on its
+    #   type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   * The namespace of a Maven package version is its `groupId`.
     #
-    #   * The namespace of an npm package is its `scope`.
+    #   * The namespace of an npm or Swift package version is its `scope`.
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * The namespace of a generic package is its `namespace`.
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -1585,23 +1802,14 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetRepositoryEndpointRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain
-    #   that contains the repository. It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain that contains the repository. It does not include
+    #   dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -1610,15 +1818,11 @@ module Aws::CodeArtifact
     #
     # @!attribute [rw] format
     #   Returns which endpoint of a repository to return. A repository has
-    #   one endpoint for each package format:
+    #   one endpoint for each package format.
+    #   @return [String]
     #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
+    # @!attribute [rw] endpoint_type
+    #   A string that specifies the type of endpoint.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/GetRepositoryEndpointRequest AWS API Documentation
@@ -1627,7 +1831,8 @@ module Aws::CodeArtifact
       :domain,
       :domain_owner,
       :repository,
-      :format)
+      :format,
+      :endpoint_type)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1644,23 +1849,14 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetRepositoryPermissionsPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain containing the repository whose associated
     #   resource policy is to be retrieved.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -1691,7 +1887,7 @@ module Aws::CodeArtifact
     end
 
     # The operation did not succeed because of an error that occurred inside
-    # AWS CodeArtifact.
+    # CodeArtifact.
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -1723,14 +1919,132 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListDomainsRequest
-    #   data as a hash:
+    # @!attribute [rw] domain
+    #   The name of the domain that contains the package group from which to
+    #   list allowed repositories.
+    #   @return [String]
     #
-    #       {
-    #         max_results: 1,
-    #         next_token: "PaginationToken",
-    #       }
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
     #
+    # @!attribute [rw] package_group
+    #   The pattern of the package group from which to list allowed
+    #   repositories.
+    #   @return [String]
+    #
+    # @!attribute [rw] origin_restriction_type
+    #   The origin configuration restriction type of which to list allowed
+    #   repositories.
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of results to return per page.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] next_token
+    #   The token for the next set of results. Use the value returned in the
+    #   previous response in the next request to retrieve the next set of
+    #   results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ListAllowedRepositoriesForGroupRequest AWS API Documentation
+    #
+    class ListAllowedRepositoriesForGroupRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :package_group,
+      :origin_restriction_type,
+      :max_results,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] allowed_repositories
+    #   The list of allowed repositories for the package group and origin
+    #   configuration restriction type.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] next_token
+    #   The token for the next set of results. Use the value returned in the
+    #   previous response in the next request to retrieve the next set of
+    #   results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ListAllowedRepositoriesForGroupResult AWS API Documentation
+    #
+    class ListAllowedRepositoriesForGroupResult < Struct.new(
+      :allowed_repositories,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain
+    #   The name of the domain that contains the package group from which to
+    #   list associated packages.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
+    #
+    # @!attribute [rw] package_group
+    #   The pattern of the package group from which to list associated
+    #   packages.
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of results to return per page.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] next_token
+    #   The token for the next set of results. Use the value returned in the
+    #   previous response in the next request to retrieve the next set of
+    #   results.
+    #   @return [String]
+    #
+    # @!attribute [rw] preview
+    #   When this flag is included, `ListAssociatedPackages` will return a
+    #   list of packages that would be associated with a package group, even
+    #   if it does not exist.
+    #   @return [Boolean]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ListAssociatedPackagesRequest AWS API Documentation
+    #
+    class ListAssociatedPackagesRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :package_group,
+      :max_results,
+      :next_token,
+      :preview)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] packages
+    #   The list of packages associated with the requested package group.
+    #   @return [Array<Types::AssociatedPackage>]
+    #
+    # @!attribute [rw] next_token
+    #   The token for the next set of results. Use the value returned in the
+    #   previous response in the next request to retrieve the next set of
+    #   results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ListAssociatedPackagesResult AWS API Documentation
+    #
+    class ListAssociatedPackagesResult < Struct.new(
+      :packages,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] max_results
     #   The maximum number of results to return per page.
     #   @return [Integer]
@@ -1751,7 +2065,11 @@ module Aws::CodeArtifact
     end
 
     # @!attribute [rw] domains
-    #   The returned list of ` DomainSummary ` objects.
+    #   The returned list of [DomainSummary][1] objects.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_DomainSummary.html
     #   @return [Array<Types::DomainSummary>]
     #
     # @!attribute [rw] next_token
@@ -1769,67 +2087,111 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListPackageVersionAssetsRequest
-    #   data as a hash:
+    # @!attribute [rw] domain
+    #   The domain for which you want to list package groups.
+    #   @return [String]
     #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package: "PackageName", # required
-    #         package_version: "PackageVersion", # required
-    #         max_results: 1,
-    #         next_token: "PaginationToken",
-    #       }
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
     #
+    # @!attribute [rw] max_results
+    #   The maximum number of results to return per page.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] next_token
+    #   The token for the next set of results. Use the value returned in the
+    #   previous response in the next request to retrieve the next set of
+    #   results.
+    #   @return [String]
+    #
+    # @!attribute [rw] prefix
+    #   A prefix for which to search package groups. When included,
+    #   `ListPackageGroups` will return only package groups with patterns
+    #   that match the prefix.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ListPackageGroupsRequest AWS API Documentation
+    #
+    class ListPackageGroupsRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :max_results,
+      :next_token,
+      :prefix)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] package_groups
+    #   The list of package groups in the requested domain.
+    #   @return [Array<Types::PackageGroupSummary>]
+    #
+    # @!attribute [rw] next_token
+    #   The token for the next set of results. Use the value returned in the
+    #   previous response in the next request to retrieve the next set of
+    #   results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ListPackageGroupsResult AWS API Documentation
+    #
+    class ListPackageGroupsResult < Struct.new(
+      :package_groups,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository associated with
     #   the package version assets.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
     #   The name of the repository that contains the package that contains
-    #   the returned package version assets.
+    #   the requested package version assets.
     #   @return [String]
     #
     # @!attribute [rw] format
-    #   The format of the package that contains the returned package version
-    #   assets. The valid package types are:
-    #
-    #   * `npm`\: A Node Package Manager (npm) package.
-    #
-    #   * `pypi`\: A Python Package Index (PyPI) package.
-    #
-    #   * `maven`\: A Maven package that contains compiled code in a
-    #     distributable format, such as a JAR file.
-    #
-    #   * `nuget`\: A NuGet package.
+    #   The format of the package that contains the requested package
+    #   version assets.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package version that contains the requested
+    #   package version assets. The package component that specifies its
+    #   namespace depends on its type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   <note markdown="1"> The namespace is required requesting assets from package versions of
+    #   the following formats:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #    * Maven
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * Swift
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
-    #   The name of the package that contains the returned package version
+    #   The name of the package that contains the requested package version
     #   assets.
     #   @return [String]
     #
@@ -1864,32 +2226,33 @@ module Aws::CodeArtifact
     end
 
     # @!attribute [rw] format
-    #   The format of the package that contains the returned package version
-    #   assets.
+    #   The format of the package that contains the requested package
+    #   version assets.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package version that contains the requested
+    #   package version assets. The package component that specifies its
+    #   namespace depends on its type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   * The namespace of a Maven package version is its `groupId`.
     #
-    #   * The namespace of an npm package is its `scope`.
+    #   * The namespace of an npm or Swift package version is its `scope`.
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * The namespace of a generic package is its `namespace`.
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
-    #   The name of the package that contains the returned package version
+    #   The name of the package that contains the requested package version
     #   assets.
     #   @return [String]
     #
     # @!attribute [rw] version
-    #   The version of the package associated with the returned assets.
+    #   The version of the package associated with the requested assets.
     #   @return [String]
     #
     # @!attribute [rw] version_revision
@@ -1902,7 +2265,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] assets
-    #   The returned list of [ `AssetSummary` ][1] objects.
+    #   The returned list of [AssetSummary][1] objects.
     #
     #
     #
@@ -1923,28 +2286,14 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListPackageVersionDependenciesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package: "PackageName", # required
-    #         package_version: "PackageVersion", # required
-    #         next_token: "PaginationToken",
-    #       }
-    #
     # @!attribute [rw] domain
-    #   The domain that contains the repository that contains the requested
-    #   package version dependencies.
+    #   The name of the domain that contains the repository that contains
+    #   the requested package version dependencies.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -1953,32 +2302,30 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] format
-    #   The format of the package with the requested dependencies. The valid
-    #   package types are:
-    #
-    #   * `npm`\: A Node Package Manager (npm) package.
-    #
-    #   * `pypi`\: A Python Package Index (PyPI) package.
-    #
-    #   * `maven`\: A Maven package that contains compiled code in a
-    #     distributable format, such as a JAR file.
-    #
-    #   * `nuget`\: A NuGet package.
+    #   The format of the package with the requested dependencies.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package version with the requested
+    #   dependencies. The package component that specifies its namespace
+    #   depends on its type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   <note markdown="1"> The namespace is required when listing dependencies from package
+    #   versions of the following formats:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #    * Maven
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   ^
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm package version is its `scope`.
+    #
+    #   * Python and NuGet package versions do not contain a corresponding
+    #     component, package versions of those formats do not have a
+    #     namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -2012,30 +2359,30 @@ module Aws::CodeArtifact
 
     # @!attribute [rw] format
     #   A format that specifies the type of the package that contains the
-    #   returned dependencies. The valid values are:
-    #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
+    #   returned dependencies.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package version that contains the returned
+    #   dependencies. The package component that specifies its namespace
+    #   depends on its type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   <note markdown="1"> The namespace is required when listing dependencies from package
+    #   versions of the following formats:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #    * Maven
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   ^
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm package version is its `scope`.
+    #
+    #   * Python and NuGet package versions do not contain a corresponding
+    #     component, package versions of those formats do not have a
+    #     namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -2058,7 +2405,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] dependencies
-    #   The returned list of [ `PackageDependency` ][1] objects.
+    #   The returned list of [PackageDependency][1] objects.
     #
     #
     #
@@ -2079,86 +2426,63 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListPackageVersionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package: "PackageName", # required
-    #         status: "Published", # accepts Published, Unfinished, Unlisted, Archived, Disposed, Deleted
-    #         sort_by: "PUBLISHED_TIME", # accepts PUBLISHED_TIME
-    #         max_results: 1,
-    #         next_token: "PaginationToken",
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the repository that contains
-    #   the returned package versions.
+    #   the requested package versions.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
-    #   The name of the repository that contains the package.
+    #   The name of the repository that contains the requested package
+    #   versions.
     #   @return [String]
     #
     # @!attribute [rw] format
-    #   The format of the returned packages. The valid package types are:
-    #
-    #   * `npm`\: A Node Package Manager (npm) package.
-    #
-    #   * `pypi`\: A Python Package Index (PyPI) package.
-    #
-    #   * `maven`\: A Maven package that contains compiled code in a
-    #     distributable format, such as a JAR file.
-    #
-    #   * `nuget`\: A NuGet package.
+    #   The format of the package versions you want to list.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package that contains the requested package
+    #   versions. The package component that specifies its namespace depends
+    #   on its type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   <note markdown="1"> The namespace is required when deleting package versions of the
+    #   following formats:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #    * Maven
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * Swift
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * generic
+    #
+    #    </note>
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
-    #   The name of the package for which you want to return a list of
-    #   package versions.
+    #   The name of the package for which you want to request package
+    #   versions.
     #   @return [String]
     #
     # @!attribute [rw] status
-    #   A string that specifies the status of the package versions to
-    #   include in the returned list. It can be one of the following:
-    #
-    #   * `Published`
-    #
-    #   * `Unfinished`
-    #
-    #   * `Unlisted`
-    #
-    #   * `Archived`
-    #
-    #   * `Disposed`
+    #   A string that filters the requested package versions by status.
     #   @return [String]
     #
     # @!attribute [rw] sort_by
-    #   How to sort the returned list of package versions.
+    #   How to sort the requested list of package versions.
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -2169,6 +2493,11 @@ module Aws::CodeArtifact
     #   The token for the next set of results. Use the value returned in the
     #   previous response in the next request to retrieve the next set of
     #   results.
+    #   @return [String]
+    #
+    # @!attribute [rw] origin_type
+    #   The `originType` used to filter package versions. Only package
+    #   versions with the provided `originType` will be returned.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ListPackageVersionsRequest AWS API Documentation
@@ -2183,7 +2512,8 @@ module Aws::CodeArtifact
       :status,
       :sort_by,
       :max_results,
-      :next_token)
+      :next_token,
+      :origin_type)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2201,30 +2531,23 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] format
-    #   A format of the package. Valid package format values are:
-    #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
+    #   A format of the package.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package that contains the requested package
+    #   versions. The package component that specifies its namespace depends
+    #   on its type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   * The namespace of a Maven package version is its `groupId`.
     #
-    #   * The namespace of an npm package is its `scope`.
+    #   * The namespace of an npm or Swift package version is its `scope`.
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * The namespace of a generic package is its `namespace`.
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -2232,7 +2555,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] versions
-    #   The returned list of [ `PackageVersionSummary` ][1] objects.
+    #   The returned list of [PackageVersionSummary][1] objects.
     #
     #
     #
@@ -2257,64 +2580,46 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListPackagesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package_prefix: "PackageName",
-    #         max_results: 1,
-    #         next_token: "PaginationToken",
-    #       }
-    #
     # @!attribute [rw] domain
-    #   The domain that contains the repository that contains the requested
-    #   list of packages.
+    #   The name of the domain that contains the repository that contains
+    #   the requested packages.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
-    #   The name of the repository from which packages are to be listed.
+    #   The name of the repository that contains the requested packages.
     #   @return [String]
     #
     # @!attribute [rw] format
-    #   The format of the packages. The valid package types are:
-    #
-    #   * `npm`\: A Node Package Manager (npm) package.
-    #
-    #   * `pypi`\: A Python Package Index (PyPI) package.
-    #
-    #   * `maven`\: A Maven package that contains compiled code in a
-    #     distributable format, such as a JAR file.
-    #
-    #   * `nuget`\: A NuGet package.
+    #   The format used to filter requested packages. Only packages from the
+    #   provided format will be returned.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace prefix used to filter requested packages. Only
+    #   packages with a namespace that starts with the provided string value
+    #   are returned. Note that although this option is called `--namespace`
+    #   and not `--namespace-prefix`, it has prefix-matching behavior.
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   Each package format uses namespace as follows:
     #
-    #   * The namespace of an npm package is its `scope`.
+    #   * The namespace of a Maven package version is its `groupId`.
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * The namespace of an npm or Swift package version is its `scope`.
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package_prefix
-    #   A prefix used to filter returned packages. Only packages with names
+    #   A prefix used to filter requested packages. Only packages with names
     #   that start with `packagePrefix` are returned.
     #   @return [String]
     #
@@ -2328,6 +2633,28 @@ module Aws::CodeArtifact
     #   results.
     #   @return [String]
     #
+    # @!attribute [rw] publish
+    #   The value of the `Publish` package origin control restriction used
+    #   to filter requested packages. Only packages with the provided
+    #   restriction are returned. For more information, see
+    #   [PackageOriginRestrictions][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageOriginRestrictions.html
+    #   @return [String]
+    #
+    # @!attribute [rw] upstream
+    #   The value of the `Upstream` package origin control restriction used
+    #   to filter requested packages. Only packages with the provided
+    #   restriction are returned. For more information, see
+    #   [PackageOriginRestrictions][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageOriginRestrictions.html
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ListPackagesRequest AWS API Documentation
     #
     class ListPackagesRequest < Struct.new(
@@ -2338,13 +2665,15 @@ module Aws::CodeArtifact
       :namespace,
       :package_prefix,
       :max_results,
-      :next_token)
+      :next_token,
+      :publish,
+      :upstream)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # @!attribute [rw] packages
-    #   The list of returned [ `PackageSummary` ][1] objects.
+    #   The list of returned [PackageSummary][1] objects.
     #
     #
     #
@@ -2365,31 +2694,19 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListRepositoriesInDomainRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         administrator_account: "AccountId",
-    #         repository_prefix: "RepositoryName",
-    #         max_results: 1,
-    #         next_token: "PaginationToken",
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain that contains the returned list of
     #   repositories.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] administrator_account
     #   Filter the list of repositories to only include those that are
-    #   managed by the AWS account ID.
+    #   managed by the Amazon Web Services account ID.
     #   @return [String]
     #
     # @!attribute [rw] repository_prefix
@@ -2438,15 +2755,6 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListRepositoriesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         repository_prefix: "RepositoryName",
-    #         max_results: 1,
-    #         next_token: "PaginationToken",
-    #       }
-    #
     # @!attribute [rw] repository_prefix
     #   A prefix used to filter returned repositories. Only repositories
     #   with names that start with `repositoryPrefix` are returned.
@@ -2473,7 +2781,7 @@ module Aws::CodeArtifact
     end
 
     # @!attribute [rw] repositories
-    #   The returned list of [ `RepositorySummary` ][1] objects.
+    #   The returned list of [RepositorySummary][1] objects.
     #
     #
     #
@@ -2494,13 +2802,61 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
+    # @!attribute [rw] domain
+    #   The name of the domain which contains the package group from which
+    #   to list sub package groups.
+    #   @return [String]
     #
-    #       {
-    #         resource_arn: "Arn", # required
-    #       }
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
     #
+    # @!attribute [rw] package_group
+    #   The pattern of the package group from which to list sub package
+    #   groups.
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   The maximum number of results to return per page.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] next_token
+    #   The token for the next set of results. Use the value returned in the
+    #   previous response in the next request to retrieve the next set of
+    #   results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ListSubPackageGroupsRequest AWS API Documentation
+    #
+    class ListSubPackageGroupsRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :package_group,
+      :max_results,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] package_groups
+    #   A list of sub package groups for the requested package group.
+    #   @return [Array<Types::PackageGroupSummary>]
+    #
+    # @!attribute [rw] next_token
+    #   If there are additional results, this is the token for the next set
+    #   of results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ListSubPackageGroupsResult AWS API Documentation
+    #
+    class ListSubPackageGroupsResult < Struct.new(
+      :package_groups,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the resource to get tags for.
     #   @return [String]
@@ -2529,18 +2885,19 @@ module Aws::CodeArtifact
     # Details about a package dependency.
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package that this package depends on. The
+    #   package component that specifies its namespace depends on its type.
+    #   For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   * The namespace of a Maven package version is its `groupId`.
     #
-    #   * The namespace of an npm package is its `scope`.
+    #   * The namespace of an npm or Swift package version is its `scope`.
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * The namespace of a generic package is its `namespace`.
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -2549,8 +2906,22 @@ module Aws::CodeArtifact
     #
     # @!attribute [rw] dependency_type
     #   The type of a package dependency. The possible values depend on the
-    #   package type. Example types are `compile`, `runtime`, and `test` for
-    #   Maven packages, and `dev`, `prod`, and `optional` for npm packages.
+    #   package type.
+    #
+    #   * npm: `regular`, `dev`, `peer`, `optional`
+    #
+    #   * maven: `optional`, `parent`, `compile`, `runtime`, `test`,
+    #     `system`, `provided`.
+    #
+    #     <note markdown="1"> Note that `parent` is not a regular Maven dependency type; instead
+    #     this is extracted from the `<parent>` element if one is defined in
+    #     the package version's POM file.
+    #
+    #      </note>
+    #
+    #   * nuget: The `dependencyType` field is never set for NuGet packages.
+    #
+    #   * pypi: `Requires-Dist`
     #   @return [String]
     #
     # @!attribute [rw] version_requirement
@@ -2571,51 +2942,341 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # Details about a package, including its format, namespace, and name.
-    # The [ `ListPackages` ][1] operation returns a list of `PackageSummary`
-    # objects.
-    #
-    #
-    #
-    # [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_ListPackages.html
+    # Details about a package.
     #
     # @!attribute [rw] format
-    #   The format of the package. Valid values are:
-    #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
+    #   A format that specifies the type of the package.
     #   @return [String]
     #
     # @!attribute [rw] namespace
     #   The namespace of the package. The package component that specifies
     #   its namespace depends on its type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   * The namespace of a Maven package version is its `groupId`.
     #
-    #   * The namespace of an npm package is its `scope`.
+    #   * The namespace of an npm or Swift package version is its `scope`.
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * The namespace of a generic package is its `namespace`.
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
+    #   @return [String]
+    #
+    # @!attribute [rw] name
+    #   The name of the package.
+    #   @return [String]
+    #
+    # @!attribute [rw] origin_configuration
+    #   The package origin configuration for the package.
+    #   @return [Types::PackageOriginConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageDescription AWS API Documentation
+    #
+    class PackageDescription < Struct.new(
+      :format,
+      :namespace,
+      :name,
+      :origin_configuration)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Details about an allowed repository for a package group, including its
+    # name and origin configuration.
+    #
+    # @!attribute [rw] repository_name
+    #   The name of the allowed repository.
+    #   @return [String]
+    #
+    # @!attribute [rw] origin_restriction_type
+    #   The origin configuration restriction type of the allowed repository.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageGroupAllowedRepository AWS API Documentation
+    #
+    class PackageGroupAllowedRepository < Struct.new(
+      :repository_name,
+      :origin_restriction_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The description of the package group.
+    #
+    # @!attribute [rw] arn
+    #   The ARN of the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] pattern
+    #   The pattern of the package group. The pattern determines which
+    #   packages are associated with the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_name
+    #   The name of the domain that contains the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_time
+    #   A timestamp that represents the date and time the package group was
+    #   created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] contact_info
+    #   The contact information of the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   The description of the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] origin_configuration
+    #   The package group origin configuration that determines how package
+    #   versions can enter repositories.
+    #   @return [Types::PackageGroupOriginConfiguration]
+    #
+    # @!attribute [rw] parent
+    #   The direct parent package group of the package group.
+    #   @return [Types::PackageGroupReference]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageGroupDescription AWS API Documentation
+    #
+    class PackageGroupDescription < Struct.new(
+      :arn,
+      :pattern,
+      :domain_name,
+      :domain_owner,
+      :created_time,
+      :contact_info,
+      :description,
+      :origin_configuration,
+      :parent)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The package group origin configuration that determines how package
+    # versions can enter repositories.
+    #
+    # @!attribute [rw] restrictions
+    #   The origin configuration settings that determine how package
+    #   versions can enter repositories.
+    #   @return [Hash<String,Types::PackageGroupOriginRestriction>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageGroupOriginConfiguration AWS API Documentation
+    #
+    class PackageGroupOriginConfiguration < Struct.new(
+      :restrictions)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Contains information about the configured restrictions of the origin
+    # controls of a package group.
+    #
+    # @!attribute [rw] mode
+    #   The package group origin restriction setting. If the value of `mode`
+    #   is `ALLOW`, `ALLOW_SPECIFIC_REPOSITORIES`, or `BLOCK`, then the
+    #   value of `effectiveMode` is the same. Otherwise, when the value is
+    #   `INHERIT`, then the value of `effectiveMode` is the value of `mode`
+    #   of the first parent group which does not have a value of `INHERIT`.
+    #   @return [String]
+    #
+    # @!attribute [rw] effective_mode
+    #   The effective package group origin restriction setting. If the value
+    #   of `mode` is `ALLOW`, `ALLOW_SPECIFIC_REPOSITORIES`, or `BLOCK`,
+    #   then the value of `effectiveMode` is the same. Otherwise, when the
+    #   value of `mode` is `INHERIT`, then the value of `effectiveMode` is
+    #   the value of `mode` of the first parent group which does not have a
+    #   value of `INHERIT`.
+    #   @return [String]
+    #
+    # @!attribute [rw] inherited_from
+    #   The parent package group that the package group origin restrictions
+    #   are inherited from.
+    #   @return [Types::PackageGroupReference]
+    #
+    # @!attribute [rw] repositories_count
+    #   The number of repositories in the allowed repository list.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageGroupOriginRestriction AWS API Documentation
+    #
+    class PackageGroupOriginRestriction < Struct.new(
+      :mode,
+      :effective_mode,
+      :inherited_from,
+      :repositories_count)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about the identifiers of a package group.
+    #
+    # @!attribute [rw] arn
+    #   The ARN of the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] pattern
+    #   The pattern of the package group. The pattern determines which
+    #   packages are associated with the package group, and is also the
+    #   identifier of the package group.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageGroupReference AWS API Documentation
+    #
+    class PackageGroupReference < Struct.new(
+      :arn,
+      :pattern)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Details about a package group.
+    #
+    # @!attribute [rw] arn
+    #   The ARN of the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] pattern
+    #   The pattern of the package group. The pattern determines which
+    #   packages are associated with the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_name
+    #   The domain that contains the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_time
+    #   A timestamp that represents the date and time the repository was
+    #   created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] contact_info
+    #   The contact information of the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   The description of the package group.
+    #   @return [String]
+    #
+    # @!attribute [rw] origin_configuration
+    #   Details about the package origin configuration of a package group.
+    #   @return [Types::PackageGroupOriginConfiguration]
+    #
+    # @!attribute [rw] parent
+    #   The direct parent package group of the package group.
+    #   @return [Types::PackageGroupReference]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageGroupSummary AWS API Documentation
+    #
+    class PackageGroupSummary < Struct.new(
+      :arn,
+      :pattern,
+      :domain_name,
+      :domain_owner,
+      :created_time,
+      :contact_info,
+      :description,
+      :origin_configuration,
+      :parent)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Details about the package origin configuration of a package.
+    #
+    # @!attribute [rw] restrictions
+    #   A `PackageOriginRestrictions` object that contains information about
+    #   the upstream and publish package origin configuration for the
+    #   package.
+    #   @return [Types::PackageOriginRestrictions]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageOriginConfiguration AWS API Documentation
+    #
+    class PackageOriginConfiguration < Struct.new(
+      :restrictions)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Details about the origin restrictions set on the package. The package
+    # origin restrictions determine how new versions of a package can be
+    # added to a specific repository.
+    #
+    # @!attribute [rw] publish
+    #   The package origin configuration that determines if new versions of
+    #   the package can be published directly to the repository.
+    #   @return [String]
+    #
+    # @!attribute [rw] upstream
+    #   The package origin configuration that determines if new versions of
+    #   the package can be added to the repository from an external
+    #   connection or upstream source.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageOriginRestrictions AWS API Documentation
+    #
+    class PackageOriginRestrictions < Struct.new(
+      :publish,
+      :upstream)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Details about a package, including its format, namespace, and name.
+    #
+    # @!attribute [rw] format
+    #   The format of the package.
+    #   @return [String]
+    #
+    # @!attribute [rw] namespace
+    #   The namespace of the package. The package component that specifies
+    #   its namespace depends on its type. For example:
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
     #   The name of the package.
     #   @return [String]
     #
+    # @!attribute [rw] origin_configuration
+    #   A [PackageOriginConfiguration][1] object that contains a
+    #   [PackageOriginRestrictions][2] object that contains information
+    #   about the upstream and publish package origin restrictions.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageOriginConfiguration.html
+    #   [2]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageOriginRestrictions.html
+    #   @return [Types::PackageOriginConfiguration]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageSummary AWS API Documentation
     #
     class PackageSummary < Struct.new(
       :format,
       :namespace,
-      :package)
+      :package,
+      :origin_configuration)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2623,31 +3284,22 @@ module Aws::CodeArtifact
     # Details about a package version.
     #
     # @!attribute [rw] format
-    #   The format of the package version. The valid package formats are:
-    #
-    #   * `npm`\: A Node Package Manager (npm) package.
-    #
-    #   * `pypi`\: A Python Package Index (PyPI) package.
-    #
-    #   * `maven`\: A Maven package that contains compiled code in a
-    #     distributable format, such as a JAR file.
-    #
-    #   * `nuget`\: A NuGet package.
+    #   The format of the package version.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package version. The package component that
+    #   specifies its namespace depends on its type. For example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   * The namespace of a Maven package version is its `groupId`.
     #
-    #   * The namespace of an npm package is its `scope`.
+    #   * The namespace of an npm or Swift package version is its `scope`.
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * The namespace of a generic package is its `namespace`.
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package_name
@@ -2694,19 +3346,17 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] status
-    #   A string that contains the status of the package version. It can be
-    #   one of the following:
-    #
-    #   * `Published`
-    #
-    #   * `Unfinished`
-    #
-    #   * `Unlisted`
-    #
-    #   * `Archived`
-    #
-    #   * `Disposed`
+    #   A string that contains the status of the package version.
     #   @return [String]
+    #
+    # @!attribute [rw] origin
+    #   A [PackageVersionOrigin][1] object that contains information about
+    #   how the package version was added to the repository.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageVersionOrigin.html
+    #   @return [Types::PackageVersionOrigin]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageVersionDescription AWS API Documentation
     #
@@ -2722,12 +3372,13 @@ module Aws::CodeArtifact
       :published_time,
       :licenses,
       :revision,
-      :status)
+      :status,
+      :origin)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # An error associated with package.
+    # l An error associated with package.
     #
     # @!attribute [rw] error_code
     #   The error code associated with the error. Valid error codes are:
@@ -2758,8 +3409,37 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
+    # Information about how a package version was added to a repository.
+    #
+    # @!attribute [rw] domain_entry_point
+    #   A [DomainEntryPoint][1] object that contains information about from
+    #   which repository or external connection the package version was
+    #   added to the domain.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_DomainEntryPoint.html
+    #   @return [Types::DomainEntryPoint]
+    #
+    # @!attribute [rw] origin_type
+    #   Describes how the package version was originally added to the
+    #   domain. An `INTERNAL` origin type means the package version was
+    #   published directly to a repository in the domain. An `EXTERNAL`
+    #   origin type means the package version was ingested from an external
+    #   connection.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageVersionOrigin AWS API Documentation
+    #
+    class PackageVersionOrigin < Struct.new(
+      :domain_entry_point,
+      :origin_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Details about a package version, including its status, version, and
-    # revision. The [ `ListPackageVersions` ][1] operation returns a list of
+    # revision. The [ListPackageVersions][1] operation returns a list of
     # `PackageVersionSummary` objects.
     #
     #
@@ -2777,45 +3457,175 @@ module Aws::CodeArtifact
     # @!attribute [rw] status
     #   A string that contains the status of the package version. It can be
     #   one of the following:
-    #
-    #   * `Published`
-    #
-    #   * `Unfinished`
-    #
-    #   * `Unlisted`
-    #
-    #   * `Archived`
-    #
-    #   * `Disposed`
     #   @return [String]
+    #
+    # @!attribute [rw] origin
+    #   A [PackageVersionOrigin][1] object that contains information about
+    #   how the package version was added to the repository.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageVersionOrigin.html
+    #   @return [Types::PackageVersionOrigin]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PackageVersionSummary AWS API Documentation
     #
     class PackageVersionSummary < Struct.new(
       :version,
       :revision,
-      :status)
+      :status,
+      :origin)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutDomainPermissionsPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         policy_revision: "PolicyRevision",
-    #         policy_document: "PolicyDocument", # required
-    #       }
-    #
     # @!attribute [rw] domain
-    #   The name of the domain on which to set the resource policy.
+    #   The name of the domain that contains the repository that contains
+    #   the package version to publish.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
     #   The 12-digit account number of the AWS account that owns the domain.
     #   It does not include dashes or spaces.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository
+    #   The name of the repository that the package version will be
+    #   published to.
+    #   @return [String]
+    #
+    # @!attribute [rw] format
+    #   A format that specifies the type of the package version with the
+    #   requested asset file.
+    #
+    #   The only supported value is `generic`.
+    #   @return [String]
+    #
+    # @!attribute [rw] namespace
+    #   The namespace of the package version to publish.
+    #   @return [String]
+    #
+    # @!attribute [rw] package
+    #   The name of the package version to publish.
+    #   @return [String]
+    #
+    # @!attribute [rw] package_version
+    #   The package version to publish (for example, `3.5.2`).
+    #   @return [String]
+    #
+    # @!attribute [rw] asset_content
+    #   The content of the asset to publish.
+    #   @return [IO]
+    #
+    # @!attribute [rw] asset_name
+    #   The name of the asset to publish. Asset names can include Unicode
+    #   letters and numbers, and the following special characters: `` ~ ! @
+    #   ^ & ( ) - ` _ + [ ] \{ \} ; , . ` ``
+    #   @return [String]
+    #
+    # @!attribute [rw] asset_sha256
+    #   The SHA256 hash of the `assetContent` to publish. This value must be
+    #   calculated by the caller and provided with the request (see
+    #   [Publishing a generic package][1] in the *CodeArtifact User Guide*).
+    #
+    #   This value is used as an integrity check to verify that the
+    #   `assetContent` has not changed after it was originally sent.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/ug/using-generic.html#publishing-generic-packages
+    #   @return [String]
+    #
+    # @!attribute [rw] unfinished
+    #   Specifies whether the package version should remain in the
+    #   `unfinished` state. If omitted, the package version status will be
+    #   set to `Published` (see [Package version status][1] in the
+    #   *CodeArtifact User Guide*).
+    #
+    #   Valid values: `unfinished`
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/ug/packages-overview.html#package-version-status
+    #   @return [Boolean]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PublishPackageVersionRequest AWS API Documentation
+    #
+    class PublishPackageVersionRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :repository,
+      :format,
+      :namespace,
+      :package,
+      :package_version,
+      :asset_content,
+      :asset_name,
+      :asset_sha256,
+      :unfinished)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] format
+    #   The format of the package version.
+    #   @return [String]
+    #
+    # @!attribute [rw] namespace
+    #   The namespace of the package version.
+    #   @return [String]
+    #
+    # @!attribute [rw] package
+    #   The name of the package.
+    #   @return [String]
+    #
+    # @!attribute [rw] version
+    #   The version of the package.
+    #   @return [String]
+    #
+    # @!attribute [rw] version_revision
+    #   The revision of the package version.
+    #   @return [String]
+    #
+    # @!attribute [rw] status
+    #   A string that contains the status of the package version. For more
+    #   information, see [Package version status][1] in the *CodeArtifact
+    #   User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/ug/packages-overview.html#package-version-status.html#package-version-status
+    #   @return [String]
+    #
+    # @!attribute [rw] asset
+    #   An [AssetSummary][1] for the published asset.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_AssetSummary.html
+    #   @return [Types::AssetSummary]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PublishPackageVersionResult AWS API Documentation
+    #
+    class PublishPackageVersionResult < Struct.new(
+      :format,
+      :namespace,
+      :package,
+      :version,
+      :version_revision,
+      :status,
+      :asset)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain
+    #   The name of the domain on which to set the resource policy.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] policy_revision
@@ -2852,25 +3662,101 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutRepositoryPermissionsPolicyRequest
-    #   data as a hash:
+    # @!attribute [rw] domain
+    #   The name of the domain that contains the repository that contains
+    #   the package.
+    #   @return [String]
     #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         policy_revision: "PolicyRevision",
-    #         policy_document: "PolicyDocument", # required
-    #       }
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
     #
+    # @!attribute [rw] repository
+    #   The name of the repository that contains the package.
+    #   @return [String]
+    #
+    # @!attribute [rw] format
+    #   A format that specifies the type of the package to be updated.
+    #   @return [String]
+    #
+    # @!attribute [rw] namespace
+    #   The namespace of the package to be updated. The package component
+    #   that specifies its namespace depends on its type. For example:
+    #
+    #   * The namespace of a Maven package version is its `groupId`.
+    #
+    #   * The namespace of an npm or Swift package version is its `scope`.
+    #
+    #   * The namespace of a generic package is its `namespace`.
+    #
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
+    #   @return [String]
+    #
+    # @!attribute [rw] package
+    #   The name of the package to be updated.
+    #   @return [String]
+    #
+    # @!attribute [rw] restrictions
+    #   A [PackageOriginRestrictions][1] object that contains information
+    #   about the `upstream` and `publish` package origin restrictions. The
+    #   `upstream` restriction determines if new package versions can be
+    #   ingested or retained from external connections or upstream
+    #   repositories. The `publish` restriction determines if new package
+    #   versions can be published directly to the repository.
+    #
+    #   You must include both the desired `upstream` and `publish`
+    #   restrictions.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageOriginRestrictions.html
+    #   @return [Types::PackageOriginRestrictions]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PutPackageOriginConfigurationRequest AWS API Documentation
+    #
+    class PutPackageOriginConfigurationRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :repository,
+      :format,
+      :namespace,
+      :package,
+      :restrictions)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] origin_configuration
+    #   A [PackageOriginConfiguration][1] object that describes the origin
+    #   configuration set for the package. It contains a
+    #   [PackageOriginRestrictions][2] object that describes how new
+    #   versions of the package can be introduced to the repository.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageOriginConfiguration.html
+    #   [2]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_PackageOriginRestrictions.html
+    #   @return [Types::PackageOriginConfiguration]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/PutPackageOriginConfigurationResult AWS API Documentation
+    #
+    class PutPackageOriginConfigurationResult < Struct.new(
+      :origin_configuration)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] domain
     #   The name of the domain containing the repository to set the resource
     #   policy on.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -2913,21 +3799,21 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # The details of a repository stored in AWS CodeArtifact. A CodeArtifact
+    # The details of a repository stored in CodeArtifact. A CodeArtifact
     # repository contains a set of package versions, each of which maps to a
     # set of assets. Repositories are polyglot—a single repository can
     # contain packages of any supported type. Each repository exposes
     # endpoints for fetching and publishing packages using tools like the
     # `npm` CLI, the Maven CLI (`mvn`), and `pip`. You can create up to 100
-    # repositories per AWS account.
+    # repositories per Amazon Web Services account.
     #
     # @!attribute [rw] name
     #   The name of the repository.
     #   @return [String]
     #
     # @!attribute [rw] administrator_account
-    #   The 12-digit account number of the AWS account that manages the
-    #   repository.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   manages the repository.
     #   @return [String]
     #
     # @!attribute [rw] domain_name
@@ -2935,8 +3821,9 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain
-    #   that contains the repository. It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain that contains the repository. It does not include
+    #   dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] arn
@@ -2950,7 +3837,7 @@ module Aws::CodeArtifact
     # @!attribute [rw] upstreams
     #   A list of upstream repositories to associate with the repository.
     #   The order of the upstream repositories in the list determines their
-    #   priority order when AWS CodeArtifact looks for a requested package
+    #   priority order when CodeArtifact looks for a requested package
     #   version. For more information, see [Working with upstream
     #   repositories][1].
     #
@@ -2963,6 +3850,11 @@ module Aws::CodeArtifact
     #   An array of external connections associated with the repository.
     #   @return [Array<Types::RepositoryExternalConnectionInfo>]
     #
+    # @!attribute [rw] created_time
+    #   A timestamp that represents the date and time the repository was
+    #   created.
+    #   @return [Time]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/RepositoryDescription AWS API Documentation
     #
     class RepositoryDescription < Struct.new(
@@ -2973,7 +3865,8 @@ module Aws::CodeArtifact
       :arn,
       :description,
       :upstreams,
-      :external_connections)
+      :external_connections,
+      :created_time)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -2988,14 +3881,22 @@ module Aws::CodeArtifact
     #   The package format associated with a repository's external
     #   connection. The valid package formats are:
     #
-    #   * `npm`\: A Node Package Manager (npm) package.
+    #   * `npm`: A Node Package Manager (npm) package.
     #
-    #   * `pypi`\: A Python Package Index (PyPI) package.
+    #   * `pypi`: A Python Package Index (PyPI) package.
     #
-    #   * `maven`\: A Maven package that contains compiled code in a
+    #   * `maven`: A Maven package that contains compiled code in a
     #     distributable format, such as a JAR file.
     #
-    #   * `nuget`\: A NuGet package.
+    #   * `nuget`: A NuGet package.
+    #
+    #   * `generic`: A generic package.
+    #
+    #   * `ruby`: A Ruby package.
+    #
+    #   * `swift`: A Swift package.
+    #
+    #   * `cargo`: A Cargo package.
     #   @return [String]
     #
     # @!attribute [rw] status
@@ -3014,7 +3915,7 @@ module Aws::CodeArtifact
     end
 
     # Details about a repository, including its Amazon Resource Name (ARN),
-    # description, and domain information. The [ `ListRepositories` ][1]
+    # description, and domain information. The [ListRepositories][1]
     # operation returns a list of `RepositorySummary` objects.
     #
     #
@@ -3026,7 +3927,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] administrator_account
-    #   The AWS account ID that manages the repository.
+    #   The Amazon Web Services account ID that manages the repository.
     #   @return [String]
     #
     # @!attribute [rw] domain_name
@@ -3034,8 +3935,8 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] arn
@@ -3046,6 +3947,11 @@ module Aws::CodeArtifact
     #   The description of the repository.
     #   @return [String]
     #
+    # @!attribute [rw] created_time
+    #   A timestamp that represents the date and time the repository was
+    #   created.
+    #   @return [Time]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/RepositorySummary AWS API Documentation
     #
     class RepositorySummary < Struct.new(
@@ -3054,7 +3960,8 @@ module Aws::CodeArtifact
       :domain_name,
       :domain_owner,
       :arn,
-      :description)
+      :description,
+      :created_time)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3070,7 +3977,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] resource_type
-    #   The type of AWS resource.
+    #   The type of Amazon Web Services resource.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ResourceNotFoundException AWS API Documentation
@@ -3083,8 +3990,8 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # An AWS CodeArtifact resource policy that contains a resource ARN,
-    # document details, and a revision.
+    # An CodeArtifact resource policy that contains a resource ARN, document
+    # details, and a revision.
     #
     # @!attribute [rw] resource_arn
     #   The ARN of the resource associated with the resource policy
@@ -3119,7 +4026,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] resource_type
-    #   The type of AWS resource.
+    #   The type of Amazon Web Services resource.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/ServiceQuotaExceededException AWS API Documentation
@@ -3139,17 +4046,7 @@ module Aws::CodeArtifact
     #   @return [String]
     #
     # @!attribute [rw] status
-    #   The status of a package version. Valid statuses are:
-    #
-    #   * `Published`
-    #
-    #   * `Unfinished`
-    #
-    #   * `Unlisted`
-    #
-    #   * `Archived`
-    #
-    #   * `Disposed`
+    #   The status of a package version.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/SuccessfulPackageVersionInfo AWS API Documentation
@@ -3162,15 +4059,7 @@ module Aws::CodeArtifact
     end
 
     # A tag is a key-value pair that can be used to manage, search for, or
-    # filter resources in AWS CodeArtifact.
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey", # required
-    #         value: "TagValue", # required
-    #       }
+    # filter resources in CodeArtifact.
     #
     # @!attribute [rw] key
     #   The tag key.
@@ -3189,19 +4078,6 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "Arn", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the resource that you want to add
     #   or update tags for.
@@ -3243,14 +4119,6 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "Arn", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the resource that you want to
     #   remove tags from.
@@ -3273,32 +4141,124 @@ module Aws::CodeArtifact
     #
     class UntagResourceResult < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UpdatePackageVersionsStatusRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         format: "npm", # required, accepts npm, pypi, maven, nuget
-    #         namespace: "PackageNamespace",
-    #         package: "PackageName", # required
-    #         versions: ["PackageVersion"], # required
-    #         version_revisions: {
-    #           "PackageVersion" => "PackageVersionRevision",
-    #         },
-    #         expected_status: "Published", # accepts Published, Unfinished, Unlisted, Archived, Disposed, Deleted
-    #         target_status: "Published", # required, accepts Published, Unfinished, Unlisted, Archived, Disposed, Deleted
-    #       }
-    #
     # @!attribute [rw] domain
-    #   The domain that contains the repository that contains the package
-    #   versions with a status to be updated.
+    #   The name of the domain which contains the package group for which to
+    #   update the origin configuration.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
+    #
+    # @!attribute [rw] package_group
+    #   The pattern of the package group for which to update the origin
+    #   configuration.
+    #   @return [String]
+    #
+    # @!attribute [rw] restrictions
+    #   The origin configuration settings that determine how package
+    #   versions can enter repositories.
+    #   @return [Hash<String,String>]
+    #
+    # @!attribute [rw] add_allowed_repositories
+    #   The repository name and restrictions to add to the allowed
+    #   repository list of the specified package group.
+    #   @return [Array<Types::PackageGroupAllowedRepository>]
+    #
+    # @!attribute [rw] remove_allowed_repositories
+    #   The repository name and restrictions to remove from the allowed
+    #   repository list of the specified package group.
+    #   @return [Array<Types::PackageGroupAllowedRepository>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/UpdatePackageGroupOriginConfigurationRequest AWS API Documentation
+    #
+    class UpdatePackageGroupOriginConfigurationRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :package_group,
+      :restrictions,
+      :add_allowed_repositories,
+      :remove_allowed_repositories)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] package_group
+    #   The package group and information about it after processing the
+    #   request.
+    #   @return [Types::PackageGroupDescription]
+    #
+    # @!attribute [rw] allowed_repository_updates
+    #   Information about the updated allowed repositories after processing
+    #   the request.
+    #   @return [Hash<String,Hash<String,Array<String>>>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/UpdatePackageGroupOriginConfigurationResult AWS API Documentation
+    #
+    class UpdatePackageGroupOriginConfigurationResult < Struct.new(
+      :package_group,
+      :allowed_repository_updates)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain
+    #   The name of the domain which contains the package group to be
+    #   updated.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
+    #   @return [String]
+    #
+    # @!attribute [rw] package_group
+    #   The pattern of the package group to be updated.
+    #   @return [String]
+    #
+    # @!attribute [rw] contact_info
+    #   Contact information which you want to update the requested package
+    #   group with.
+    #   @return [String]
+    #
+    # @!attribute [rw] description
+    #   The description you want to update the requested package group with.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/UpdatePackageGroupRequest AWS API Documentation
+    #
+    class UpdatePackageGroupRequest < Struct.new(
+      :domain,
+      :domain_owner,
+      :package_group,
+      :contact_info,
+      :description)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] package_group
+    #   The package group and information about it after the request has
+    #   been processed.
+    #   @return [Types::PackageGroupDescription]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codeartifact-2018-09-22/UpdatePackageGroupResult AWS API Documentation
+    #
+    class UpdatePackageGroupResult < Struct.new(
+      :package_group)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] domain
+    #   The name of the domain that contains the repository that contains
+    #   the package versions with a status to be updated.
+    #   @return [String]
+    #
+    # @!attribute [rw] domain_owner
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -3308,30 +4268,23 @@ module Aws::CodeArtifact
     #
     # @!attribute [rw] format
     #   A format that specifies the type of the package with the statuses to
-    #   update. The valid values are:
-    #
-    #   * `npm`
-    #
-    #   * `pypi`
-    #
-    #   * `maven`
-    #
-    #   * `nuget`
+    #   update.
     #   @return [String]
     #
     # @!attribute [rw] namespace
-    #   The namespace of the package. The package component that specifies
-    #   its namespace depends on its type. For example:
+    #   The namespace of the package version to be updated. The package
+    #   component that specifies its namespace depends on its type. For
+    #   example:
     #
-    #   * The namespace of a Maven package is its `groupId`.
+    #   * The namespace of a Maven package version is its `groupId`.
     #
-    #   * The namespace of an npm package is its `scope`.
+    #   * The namespace of an npm or Swift package version is its `scope`.
     #
-    #   * A Python package does not contain a corresponding component, so
-    #     Python packages do not have a namespace.
+    #   * The namespace of a generic package is its `namespace`.
     #
-    #   * A NuGet package does not contain a corresponding component, so
-    #     NuGet packages do not have a namespace.
+    #   * Python, NuGet, Ruby, and Cargo package versions do not contain a
+    #     corresponding component, package versions of those formats do not
+    #     have a namespace.
     #   @return [String]
     #
     # @!attribute [rw] package
@@ -3396,28 +4349,13 @@ module Aws::CodeArtifact
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateRepositoryRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain: "DomainName", # required
-    #         domain_owner: "AccountId",
-    #         repository: "RepositoryName", # required
-    #         description: "Description",
-    #         upstreams: [
-    #           {
-    #             repository_name: "RepositoryName", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] domain
     #   The name of the domain associated with the repository to update.
     #   @return [String]
     #
     # @!attribute [rw] domain_owner
-    #   The 12-digit account number of the AWS account that owns the domain.
-    #   It does not include dashes or spaces.
+    #   The 12-digit account number of the Amazon Web Services account that
+    #   owns the domain. It does not include dashes or spaces.
     #   @return [String]
     #
     # @!attribute [rw] repository
@@ -3431,7 +4369,7 @@ module Aws::CodeArtifact
     # @!attribute [rw] upstreams
     #   A list of upstream repositories to associate with the repository.
     #   The order of the upstream repositories in the list determines their
-    #   priority order when AWS CodeArtifact looks for a requested package
+    #   priority order when CodeArtifact looks for a requested package
     #   version. For more information, see [Working with upstream
     #   repositories][1].
     #
@@ -3465,20 +4403,13 @@ module Aws::CodeArtifact
     end
 
     # Information about an upstream repository. A list of
-    # `UpstreamRepository` objects is an input parameter to [
-    # `CreateRepository` ][1] and [ `UpdateRepository` ][2].
+    # `UpstreamRepository` objects is an input parameter to
+    # [CreateRepository][1] and [UpdateRepository][2].
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_CreateRepository.html
     # [2]: https://docs.aws.amazon.com/codeartifact/latest/APIReference/API_UpdateRepository.html
-    #
-    # @note When making an API call, you may pass UpstreamRepository
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #       }
     #
     # @!attribute [rw] repository_name
     #   The name of an upstream repository.
@@ -3526,3 +4457,4 @@ module Aws::CodeArtifact
 
   end
 end
+

@@ -1,6 +1,686 @@
 Unreleased Changes
 ------------------
 
+3.209.0 (2024-10-10)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-socialmessaging` gem.
+
+3.208.0 (2024-10-03)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-marketplacereporting` gem.
+
+3.207.0 (2024-09-18)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-directoryservicedata` gem.
+
+3.206.0 (2024-09-12)
+------------------
+
+* Feature - Removed a dependency on the deprecated `aws-sdk-worklink` gem.
+
+3.205.0 (2024-09-06)
+------------------
+
+* Feature - Removed a dependency on the deprecated `aws-sdk-lambdapreview` gem.
+
+3.204.0 (2024-08-30)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-core` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-core` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-core` gem.
+
+3.203.0 (2024-08-28)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-pcs` gem.
+
+3.202.0 (2024-08-27)
+------------------
+
+* Feature - Removed a dependency on the deprecated `aws-sdk-core` gem.
+
+* Feature - Removed a dependency on the deprecated `aws-sdk-core` gem.
+
+* Feature - Removed a dependency on the deprecated `aws-sdk-core` gem.
+
+* Issue - Remove autoloads for service gems bundled in `aws-sdk-core` (STS, SSO, SSOOIDC).
+
+------------------
+
+* Feature - Removed a dependency on the deprecated `aws-sdk-codestar` gem.
+
+3.200.0 (2024-08-01)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-ssmquicksetup` gem.
+
+3.199.0 (2024-07-23)
+------------------
+
+* Feature - Removed a dependency on the deprecated `aws-sdk-mobile` gem.
+
+3.198.0 (2024-07-08)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-qapps` gem.
+
+3.197.0 (2024-06-12)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-apptest` gem.
+
+3.196.0 (2024-06-11)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-pcaconnectorscep` gem.
+
+3.195.0 (2024-06-10)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-applicationsignals` gem.
+
+3.194.0 (2024-06-04)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-taxsettings` gem.
+
+3.193.0 (2024-05-21)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-mailmanager` gem.
+
+3.192.0 (2024-04-22)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-route53profiles` gem.
+
+3.191.0 (2024-04-08)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-controlcatalog` gem.
+
+3.190.0 (2024-04-01)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-deadline` gem.
+
+3.189.0 (2024-03-29)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-codeconnections` gem.
+
+3.188.0 (2024-03-14)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-timestreaminfluxdb` gem.
+
+3.187.0 (2024-02-19)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-chatbot` gem.
+
+3.186.0 (2024-02-15)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-artifact` gem.
+
+3.185.0 (2024-01-12)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-supplychain` gem.
+
+3.184.0 (2023-12-22)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-networkmonitor` gem.
+
+3.183.0 (2023-12-14)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-neptunegraph` gem.
+
+3.182.0 (2023-11-30)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-marketplacedeployment` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-marketplaceagreement` gem.
+
+3.181.0 (2023-11-29)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-cleanroomsml` gem.
+
+3.180.0 (2023-11-28)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-qconnect` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-qbusiness` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-bedrockagentruntime` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-bedrockagent` gem.
+
+3.179.0 (2023-11-27)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-b2bi` gem.
+
+3.178.0 (2023-11-27)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-workspacesthinclient` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-repostspace` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-freetier` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-eksauth` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-costoptimizationhub` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-bcmdataexports` gem.
+
+3.177.0 (2023-11-22)
+------------------
+
+* Feature - AWS SDK for Ruby no longer supports Ruby runtime versions 2.3 and 2.4.
+
+3.176.0 (2023-11-21)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-inspectorscan` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-cloudfrontkeyvaluestore` gem.
+
+3.175.0 (2023-11-17)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-trustedadvisor` gem.
+
+* Feature - Removed a dependency on the deprecated `aws-sdk-macie` gem.
+
+3.174.0 (2023-11-03)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-launchwizard` gem.
+
+3.173.0 (2023-10-19)
+------------------
+
+* Feature - Removed a dependency on the deprecated `aws-sdk-gamesparks` gem.
+
+3.172.0 (2023-10-04)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-datazone` gem.
+
+3.171.0 (2023-09-28)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-bedrockruntime` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-bedrock` gem.
+
+3.170.0 (2023-08-30)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-pcaconnectorad` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-neptunedata` gem.
+
+3.169.0 (2023-07-26)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-managedblockchainquery` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-entityresolution` gem.
+
+3.168.0 (2023-07-19)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-medicalimaging` gem.
+
+3.167.0 (2023-06-27)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-appfabric` gem.
+
+3.166.0 (2023-06-13)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-verifiedpermissions` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-codegurusecurity` gem.
+
+3.165.0 (2023-06-08)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-paymentcryptographydata` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-paymentcryptography` gem.
+
+3.164.0 (2023-05-19)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-mediapackagev2` gem.
+
+3.163.0 (2023-04-26)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-osis` gem.
+
+3.162.0 (2023-03-30)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-vpclattice` gem.
+
+3.161.0 (2023-03-23)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-ivsrealtime` gem.
+
+3.160.0 (2023-02-27)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-internetmonitor` gem.
+
+3.159.0 (2023-02-21)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-tnb` gem.
+
+3.158.0 (2023-01-31)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-cloudtraildata` gem.
+
+3.157.0 (2023-01-12)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-cleanrooms` gem.
+
+3.156.0 (2023-01-09)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-kendraranking` gem.
+
+3.155.0 (2022-12-21)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-licensemanagerlinuxsubscriptions` gem.
+
+3.154.0 (2022-12-19)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-kinesisvideowebrtcstorage` gem.
+
+3.153.0 (2022-12-12)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-sagemakermetrics` gem.
+
+3.152.0 (2022-12-01)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-pipes` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-codecatalyst` gem.
+
+3.151.0 (2022-11-30)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-sagemakergeospatial` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-docdbelastic` gem.
+
+3.150.0 (2022-11-29)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-simspaceweaver` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-securitylake` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-opensearchserverless` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-omics` gem.
+
+3.149.0 (2022-11-29)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-arczonalshift` gem.
+
+3.148.0 (2022-11-28)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-oam` gem.
+
+3.147.0 (2022-11-18)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-iotroborunner` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-chimesdkvoice` gem.
+
+3.146.0 (2022-11-15)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-ssmsap` gem.
+
+3.145.0 (2022-11-10)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-scheduler` gem.
+
+3.144.0 (2022-11-08)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-resourceexplorer2` gem.
+
+3.143.0 (2022-10-04)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-connectcases` gem.
+
+3.142.0 (2022-09-29)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-migrationhuborchestrator` gem.
+
+3.141.0 (2022-09-26)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-iotfleetwise` gem.
+
+3.140.0 (2022-09-01)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-controltower` gem.
+
+3.139.0 (2022-08-22)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-supportapp` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-core` gem.
+
+3.138.0 (2022-08-11)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-privatenetworks` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-backupstorage` gem.
+
+3.137.0 (2022-08-02)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-licensemanagerusersubscriptions` gem.
+
+3.136.0 (2022-07-05)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-rolesanywhere` gem.
+
+3.135.0 (2022-06-17)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-connectcampaignservice` gem.
+
+3.134.0 (2022-06-16)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-redshiftserverless` gem.
+
+3.133.1 (2020-06-09)
+------------------
+
+* Issue - Remove dependency on the `aws-sdk-redshiftserverless` gem. This gem will be republished at a later date
+
+3.133.0 (2022-06-08)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-redshiftserverless` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-mainframemodernization` gem.
+
+3.132.0 (2022-05-27)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-emrserverless` gem.
+
+3.131.1 (2022-05-26)
+------------------
+
+* Issue - Remove dependency on the `aws-sdk-emrserverlesswebservice` gem. This gem will be republished under a different name.
+
+3.131.0 (2022-05-26)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-emrserverlesswebservice` gem.
+
+3.130.0 (2022-04-27)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-chimesdkmediapipelines` gem.
+
+3.129.0 (2022-04-26)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-ivschat` gem.
+
+3.128.0 (2022-03-31)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-pinpointsmsvoicev2` gem.
+
+3.127.0 (2022-03-23)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-gamesparks` gem.
+
+3.126.0 (2022-03-16)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-billingconductor` gem.
+
+3.125.0 (2022-03-02)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-keyspaces` gem.
+
+3.124.0 (2021-12-02)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-amplifyuibuilder` gem.
+
+3.123.0 (2021-11-30)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-workspacesweb` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-iottwinmaker` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-backupgateway` gem.
+
+3.122.0 (2021-11-29)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-recyclebin` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-inspector2` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-cloudwatchrum` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-cloudwatchevidently` gem.
+
+3.121.0 (2021-11-29)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-migrationhubrefactorspaces` gem.
+
+3.120.0 (2021-11-17)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-drs` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-appconfigdata` gem.
+
+3.119.0 (2021-11-15)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-migrationhubstrategyrecommendations` gem.
+
+3.118.0 (2021-11-10)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-resiliencehub` gem.
+
+3.117.0 (2021-11-04)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-chimesdkmeetings` gem.
+
+3.116.0 (2021-10-20)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-panorama` gem.
+
+3.115.0 (2021-10-07)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-managedgrafana` gem.
+
+3.114.0 (2021-09-30)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-cloudcontrolapi` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-account` gem.
+
+3.113.0 (2021-09-27)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-voiceid` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-connectwisdomservice` gem.
+
+3.112.0 (2021-09-16)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-kafkaconnect` gem.
+
+3.111.0 (2021-09-08)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-opensearchservice` gem.
+
+3.110.0 (2021-09-01)
+------------------
+
+* Feature - AWS SDK for Ruby no longer supports Ruby runtime versions 1.9, 2.0, 2.1, and 2.2.
+
+3.109.0 (2021-08-19)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-memorydb` gem.
+
+3.108.0 (2021-08-11)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-snowdevicemanagement` gem.
+
+3.107.0 (2021-08-06)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-chimesdkmessaging` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-chimesdkidentity` gem.
+
+3.106.0 (2021-07-27)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-route53recoveryreadiness` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-route53recoverycontrolconfig` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-route53recoverycluster` gem.
+
+3.105.0 (2021-06-09)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-proton` gem.
+
+3.104.0 (2021-05-18)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-apprunner` gem.
+
+3.103.0 (2021-05-17)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-applicationcostprofiler` gem.
+
+3.102.0 (2021-05-11)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-ssmincidents` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-ssmcontacts` gem.
+
+3.101.0 (2021-05-03)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-finspacedata` gem.
+
+3.100.0 (2021-05-03)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-finspace` gem.
+
+3.99.0 (2021-04-28)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-nimblestudio` gem.
+
+3.98.0 (2021-04-08)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-lookoutequipment` gem.
+
+3.97.0 (2021-04-07)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-mgn` gem.
+
+3.96.0 (2021-03-25)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-lookoutmetrics` gem.
+
+3.95.0 (2021-03-15)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-fis` gem.
+
+3.94.1 (2021-03-04)
+------------------
+
+* Issue - Include LICENSE, CHANGELOG, and VERSION files with this gem.
+
+3.94.0 (2021-01-22)
+------------------
+
+* Feature - Added a dependency on the new `aws-sdk-lexruntimev2` gem.
+
+* Feature - Added a dependency on the new `aws-sdk-lexmodelsv2` gem.
+
 3.93.0 (2020-12-16)
 ------------------
 

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -50,8 +50,8 @@ module Aws::CloudFormation
       data[:physical_resource_id]
     end
 
-    # Type of resource. (For more information, go to [ AWS Resource Types
-    # Reference][1] in the AWS CloudFormation User Guide.)
+    # Type of resource. (For more information, go to [Amazon Web Services
+    # Resource Types Reference][1] in the *CloudFormation User Guide*.)
     #
     #
     #
@@ -87,7 +87,7 @@ module Aws::CloudFormation
     #
     #
     #
-    # [1]: http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-stack-drift.html
+    # [1]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-stack-drift.html
     # @return [Types::StackResourceDriftInformationSummary]
     def drift_information
       data[:drift_information]
@@ -225,7 +225,9 @@ module Aws::CloudFormation
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Associations

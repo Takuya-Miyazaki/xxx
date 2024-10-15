@@ -3,25 +3,207 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::RedshiftDataAPIService
   module Types
 
-    # @note When making an API call, you may pass CancelStatementRequest
-    #   data as a hash:
+    # The Amazon Redshift Data API operation failed because the maximum
+    # number of active sessions exceeded.
     #
-    #       {
-    #         id: "UUID", # required
-    #       }
+    # @!attribute [rw] message
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/ActiveSessionsExceededException AWS API Documentation
+    #
+    class ActiveSessionsExceededException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The number of active statements exceeds the limit.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/ActiveStatementsExceededException AWS API Documentation
+    #
+    class ActiveStatementsExceededException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # An SQL statement encountered an environmental error while running.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @!attribute [rw] statement_id
+    #   Statement identifier of the exception.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/BatchExecuteStatementException AWS API Documentation
+    #
+    class BatchExecuteStatementException < Struct.new(
+      :message,
+      :statement_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] client_token
+    #   A unique, case-sensitive identifier that you provide to ensure the
+    #   idempotency of the request.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.
+    #   @return [String]
+    #
+    # @!attribute [rw] cluster_identifier
+    #   The cluster identifier. This parameter is required when connecting
+    #   to a cluster and authenticating using either Secrets Manager or
+    #   temporary credentials.
+    #   @return [String]
+    #
+    # @!attribute [rw] database
+    #   The name of the database. This parameter is required when
+    #   authenticating using either Secrets Manager or temporary
+    #   credentials.
+    #   @return [String]
+    #
+    # @!attribute [rw] db_user
+    #   The database user name. This parameter is required when connecting
+    #   to a cluster as a database user and authenticating using temporary
+    #   credentials.
+    #   @return [String]
+    #
+    # @!attribute [rw] secret_arn
+    #   The name or ARN of the secret that enables access to the database.
+    #   This parameter is required when authenticating using Secrets
+    #   Manager.
+    #   @return [String]
+    #
+    # @!attribute [rw] session_id
+    #   The session identifier of the query.
+    #   @return [String]
+    #
+    # @!attribute [rw] session_keep_alive_seconds
+    #   The number of seconds to keep the session alive after the query
+    #   finishes. The maximum time a session can keep alive is 24 hours.
+    #   After 24 hours, the session is forced closed and the query is
+    #   terminated.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] sqls
+    #   One or more SQL statements to run.      The SQL statements are run
+    #   as a single transaction. They run serially in the order of the
+    #   array. Subsequent SQL statements don't start until the previous
+    #   statement in the array completes. If any SQL statement fails, then
+    #   because they are run as one transaction, all work is rolled
+    #   back.</p>
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] statement_name
+    #   The name of the SQL statements. You can name the SQL statements when
+    #   you create them to identify the query.
+    #   @return [String]
+    #
+    # @!attribute [rw] with_event
+    #   A value that indicates whether to send an event to the Amazon
+    #   EventBridge event bus after the SQL statements run.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] workgroup_name
+    #   The serverless workgroup name or Amazon Resource Name (ARN). This
+    #   parameter is required when connecting to a serverless workgroup and
+    #   authenticating using either Secrets Manager or temporary
+    #   credentials.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/BatchExecuteStatementInput AWS API Documentation
+    #
+    class BatchExecuteStatementInput < Struct.new(
+      :client_token,
+      :cluster_identifier,
+      :database,
+      :db_user,
+      :secret_arn,
+      :session_id,
+      :session_keep_alive_seconds,
+      :sqls,
+      :statement_name,
+      :with_event,
+      :workgroup_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] cluster_identifier
+    #   The cluster identifier. This element is not returned when connecting
+    #   to a serverless workgroup.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
+    #   The date and time (UTC) the statement was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] database
+    #   The name of the database.
+    #   @return [String]
+    #
+    # @!attribute [rw] db_groups
+    #   A list of colon (:) separated names of database groups.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] db_user
+    #   The database user name.
+    #   @return [String]
+    #
+    # @!attribute [rw] id
+    #   The identifier of the SQL statement whose results are to be fetched.
+    #   This value is a universally unique identifier (UUID) generated by
+    #   Amazon Redshift Data API. This identifier is returned by
+    #   `BatchExecuteStatment`.
+    #   @return [String]
+    #
+    # @!attribute [rw] secret_arn
+    #   The name or ARN of the secret that enables access to the database.
+    #   @return [String]
+    #
+    # @!attribute [rw] session_id
+    #   The session identifier of the query.
+    #   @return [String]
+    #
+    # @!attribute [rw] workgroup_name
+    #   The serverless workgroup name or Amazon Resource Name (ARN). This
+    #   element is not returned when connecting to a provisioned cluster.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/BatchExecuteStatementOutput AWS API Documentation
+    #
+    class BatchExecuteStatementOutput < Struct.new(
+      :cluster_identifier,
+      :created_at,
+      :database,
+      :db_groups,
+      :db_user,
+      :id,
+      :secret_arn,
+      :session_id,
+      :workgroup_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] id
     #   The identifier of the SQL statement to cancel. This value is a
     #   universally unique identifier (UUID) generated by Amazon Redshift
-    #   Data API. This identifier is returned by `ExecuteStatment` and
-    #   `ListStatements`.
+    #   Data API. This identifier is returned by `BatchExecuteStatment`,
+    #   `ExecuteStatment`, and `ListStatements`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/CancelStatementRequest AWS API Documentation
@@ -120,18 +302,27 @@ module Aws::RedshiftDataAPIService
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeStatementRequest
-    #   data as a hash:
+    # Connection to a database failed.
     #
-    #       {
-    #         id: "UUID", # required
-    #       }
+    # @!attribute [rw] message
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/DatabaseConnectionException AWS API Documentation
+    #
+    class DatabaseConnectionException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] id
     #   The identifier of the SQL statement to describe. This value is a
     #   universally unique identifier (UUID) generated by Amazon Redshift
-    #   Data API. This identifier is returned by `ExecuteStatment` and
-    #   `ListStatements`.
+    #   Data API. A suffix indicates the number of the SQL statement. For
+    #   example, `d9b6c0c9-0747-4bf4-b142-e8883122f766:2` has a suffix of
+    #   `:2` that indicates the second SQL statement of a batch query. This
+    #   identifier is returned by `BatchExecuteStatment`,
+    #   `ExecuteStatement`, and `ListStatements`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/DescribeStatementRequest AWS API Documentation
@@ -167,11 +358,21 @@ module Aws::RedshiftDataAPIService
     #   an error while running.
     #   @return [String]
     #
+    # @!attribute [rw] has_result_set
+    #   A value that indicates whether the statement has a result set. The
+    #   result set can be empty. The value is true for an empty result set.
+    #   The value is true if any substatement returns a result set.
+    #   @return [Boolean]
+    #
     # @!attribute [rw] id
     #   The identifier of the SQL statement described. This value is a
     #   universally unique identifier (UUID) generated by Amazon Redshift
     #   Data API.
     #   @return [String]
+    #
+    # @!attribute [rw] query_parameters
+    #   The parameters for the SQL statement.
+    #   @return [Array<Types::SqlParameter>]
     #
     # @!attribute [rw] query_string
     #   The SQL statement text.
@@ -191,16 +392,22 @@ module Aws::RedshiftDataAPIService
     #   Either the number of rows returned from the SQL statement or the
     #   number of rows affected. If result size is greater than zero, the
     #   result rows can be the number of rows affected by SQL statements
-    #   such as INSERT, UPDATE, DELETE, COPY, and others.
+    #   such as INSERT, UPDATE, DELETE, COPY, and others. A `-1` indicates
+    #   the value is null.
     #   @return [Integer]
     #
     # @!attribute [rw] result_size
-    #   The size in bytes of the returned results.
+    #   The size in bytes of the returned results. A `-1` indicates the
+    #   value is null.
     #   @return [Integer]
     #
     # @!attribute [rw] secret_arn
     #   The name or Amazon Resource Name (ARN) of the secret that enables
     #   access to the database.
+    #   @return [String]
+    #
+    # @!attribute [rw] session_id
+    #   The session identifier of the query.
     #   @return [String]
     #
     # @!attribute [rw] status
@@ -223,10 +430,18 @@ module Aws::RedshiftDataAPIService
     #   * SUBMITTED - The query was submitted, but not yet processed.
     #   @return [String]
     #
+    # @!attribute [rw] sub_statements
+    #   The SQL statements from a multiple statement run.
+    #   @return [Array<Types::SubStatementData>]
+    #
     # @!attribute [rw] updated_at
     #   The date and time (UTC) that the metadata for the SQL statement was
     #   last updated. An example is the time the status last changed.
     #   @return [Time]
+    #
+    # @!attribute [rw] workgroup_name
+    #   The serverless workgroup name or Amazon Resource Name (ARN).
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/DescribeStatementResponse AWS API Documentation
     #
@@ -237,47 +452,45 @@ module Aws::RedshiftDataAPIService
       :db_user,
       :duration,
       :error,
+      :has_result_set,
       :id,
+      :query_parameters,
       :query_string,
       :redshift_pid,
       :redshift_query_id,
       :result_rows,
       :result_size,
       :secret_arn,
+      :session_id,
       :status,
-      :updated_at)
+      :sub_statements,
+      :updated_at,
+      :workgroup_name)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeTableRequest
-    #   data as a hash:
-    #
-    #       {
-    #         cluster_identifier: "Location", # required
-    #         database: "String",
-    #         db_user: "String",
-    #         max_results: 1,
-    #         next_token: "String",
-    #         schema: "String",
-    #         secret_arn: "SecretArn",
-    #         table: "String",
-    #       }
-    #
     # @!attribute [rw] cluster_identifier
-    #   The cluster identifier. This parameter is required when
-    #   authenticating using either AWS Secrets Manager or temporary
-    #   credentials.
+    #   The cluster identifier. This parameter is required when connecting
+    #   to a cluster and authenticating using either Secrets Manager or
+    #   temporary credentials.
+    #   @return [String]
+    #
+    # @!attribute [rw] connected_database
+    #   A database name. The connected database is specified when you
+    #   connect with your authentication credentials.
     #   @return [String]
     #
     # @!attribute [rw] database
-    #   The name of the database. This parameter is required when
-    #   authenticating using temporary credentials.
+    #   The name of the database that contains the tables to be described.
+    #   If `ConnectedDatabase` is not specified, this is also the database
+    #   to connect to with your authentication credentials.
     #   @return [String]
     #
     # @!attribute [rw] db_user
-    #   The database user name. This parameter is required when
-    #   authenticating using temporary credentials.
+    #   The database user name. This parameter is required when connecting
+    #   to a cluster as a database user and authenticating using temporary
+    #   credentials.
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -302,7 +515,7 @@ module Aws::RedshiftDataAPIService
     #
     # @!attribute [rw] secret_arn
     #   The name or ARN of the secret that enables access to the database.
-    #   This parameter is required when authenticating using AWS Secrets
+    #   This parameter is required when authenticating using Secrets
     #   Manager.
     #   @return [String]
     #
@@ -313,17 +526,26 @@ module Aws::RedshiftDataAPIService
     #   returned
     #   @return [String]
     #
+    # @!attribute [rw] workgroup_name
+    #   The serverless workgroup name or Amazon Resource Name (ARN). This
+    #   parameter is required when connecting to a serverless workgroup and
+    #   authenticating using either Secrets Manager or temporary
+    #   credentials.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/DescribeTableRequest AWS API Documentation
     #
     class DescribeTableRequest < Struct.new(
       :cluster_identifier,
+      :connected_database,
       :database,
       :db_user,
       :max_results,
       :next_token,
       :schema,
       :secret_arn,
-      :table)
+      :table,
+      :workgroup_name)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -374,40 +596,52 @@ module Aws::RedshiftDataAPIService
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ExecuteStatementInput
-    #   data as a hash:
+    # @!attribute [rw] client_token
+    #   A unique, case-sensitive identifier that you provide to ensure the
+    #   idempotency of the request.
     #
-    #       {
-    #         cluster_identifier: "Location", # required
-    #         database: "String",
-    #         db_user: "String",
-    #         secret_arn: "SecretArn",
-    #         sql: "StatementString", # required
-    #         statement_name: "StatementNameString",
-    #         with_event: false,
-    #       }
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.
+    #   @return [String]
     #
     # @!attribute [rw] cluster_identifier
-    #   The cluster identifier. This parameter is required when
-    #   authenticating using either AWS Secrets Manager or temporary
-    #   credentials.
+    #   The cluster identifier. This parameter is required when connecting
+    #   to a cluster and authenticating using either Secrets Manager or
+    #   temporary credentials.
     #   @return [String]
     #
     # @!attribute [rw] database
     #   The name of the database. This parameter is required when
-    #   authenticating using temporary credentials.
+    #   authenticating using either Secrets Manager or temporary
+    #   credentials.
     #   @return [String]
     #
     # @!attribute [rw] db_user
-    #   The database user name. This parameter is required when
-    #   authenticating using temporary credentials.
+    #   The database user name. This parameter is required when connecting
+    #   to a cluster as a database user and authenticating using temporary
+    #   credentials.
     #   @return [String]
+    #
+    # @!attribute [rw] parameters
+    #   The parameters for the SQL statement.
+    #   @return [Array<Types::SqlParameter>]
     #
     # @!attribute [rw] secret_arn
     #   The name or ARN of the secret that enables access to the database.
-    #   This parameter is required when authenticating using AWS Secrets
+    #   This parameter is required when authenticating using Secrets
     #   Manager.
     #   @return [String]
+    #
+    # @!attribute [rw] session_id
+    #   The session identifier of the query.
+    #   @return [String]
+    #
+    # @!attribute [rw] session_keep_alive_seconds
+    #   The number of seconds to keep the session alive after the query
+    #   finishes. The maximum time a session can keep alive is 24 hours.
+    #   After 24 hours, the session is forced closed and the query is
+    #   terminated.
+    #   @return [Integer]
     #
     # @!attribute [rw] sql
     #   The SQL statement text to run.
@@ -423,22 +657,35 @@ module Aws::RedshiftDataAPIService
     #   EventBridge event bus after the SQL statement runs.
     #   @return [Boolean]
     #
+    # @!attribute [rw] workgroup_name
+    #   The serverless workgroup name or Amazon Resource Name (ARN). This
+    #   parameter is required when connecting to a serverless workgroup and
+    #   authenticating using either Secrets Manager or temporary
+    #   credentials.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/ExecuteStatementInput AWS API Documentation
     #
     class ExecuteStatementInput < Struct.new(
+      :client_token,
       :cluster_identifier,
       :database,
       :db_user,
+      :parameters,
       :secret_arn,
+      :session_id,
+      :session_keep_alive_seconds,
       :sql,
       :statement_name,
-      :with_event)
+      :with_event,
+      :workgroup_name)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # @!attribute [rw] cluster_identifier
-    #   The cluster identifier.
+    #   The cluster identifier. This element is not returned when connecting
+    #   to a serverless workgroup.
     #   @return [String]
     #
     # @!attribute [rw] created_at
@@ -449,18 +696,31 @@ module Aws::RedshiftDataAPIService
     #   The name of the database.
     #   @return [String]
     #
+    # @!attribute [rw] db_groups
+    #   A list of colon (:) separated names of database groups.
+    #   @return [Array<String>]
+    #
     # @!attribute [rw] db_user
     #   The database user name.
     #   @return [String]
     #
     # @!attribute [rw] id
-    #   The identifier of the statement to be run. This value is a
-    #   universally unique identifier (UUID) generated by Amazon Redshift
-    #   Data API.
+    #   The identifier of the SQL statement whose results are to be fetched.
+    #   This value is a universally unique identifier (UUID) generated by
+    #   Amazon Redshift Data API.
     #   @return [String]
     #
     # @!attribute [rw] secret_arn
     #   The name or ARN of the secret that enables access to the database.
+    #   @return [String]
+    #
+    # @!attribute [rw] session_id
+    #   The session identifier of the query.
+    #   @return [String]
+    #
+    # @!attribute [rw] workgroup_name
+    #   The serverless workgroup name or Amazon Resource Name (ARN). This
+    #   element is not returned when connecting to a provisioned cluster.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/ExecuteStatementOutput AWS API Documentation
@@ -469,14 +729,19 @@ module Aws::RedshiftDataAPIService
       :cluster_identifier,
       :created_at,
       :database,
+      :db_groups,
       :db_user,
       :id,
-      :secret_arn)
+      :secret_arn,
+      :session_id,
+      :workgroup_name)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # A data value in a column.
+    #
+    # @note Field is a union - when returned from an API call exactly one value will be set and the returned type will be a subclass of Field corresponding to the set member.
     #
     # @!attribute [rw] blob_value
     #   A value of the BLOB data type.
@@ -510,24 +775,29 @@ module Aws::RedshiftDataAPIService
       :double_value,
       :is_null,
       :long_value,
-      :string_value)
+      :string_value,
+      :unknown)
       SENSITIVE = []
       include Aws::Structure
+      include Aws::Structure::Union
+
+      class BlobValue < Field; end
+      class BooleanValue < Field; end
+      class DoubleValue < Field; end
+      class IsNull < Field; end
+      class LongValue < Field; end
+      class StringValue < Field; end
+      class Unknown < Field; end
     end
 
-    # @note When making an API call, you may pass GetStatementResultRequest
-    #   data as a hash:
-    #
-    #       {
-    #         id: "UUID", # required
-    #         next_token: "String",
-    #       }
-    #
     # @!attribute [rw] id
     #   The identifier of the SQL statement whose results are to be fetched.
     #   This value is a universally unique identifier (UUID) generated by
-    #   Amazon Redshift Data API. This identifier is returned by
-    #   `ExecuteStatment` and `ListStatements`.
+    #   Amazon Redshift Data API. A suffix indicates then number of the SQL
+    #   statement. For example, `d9b6c0c9-0747-4bf4-b142-e8883122f766:2` has
+    #   a suffix of `:2` that indicates the second SQL statement of a batch
+    #   query. This identifier is returned by `BatchExecuteStatment`,
+    #   `ExecuteStatment`, and `ListStatements`.
     #   @return [String]
     #
     # @!attribute [rw] next_token
@@ -596,32 +866,22 @@ module Aws::RedshiftDataAPIService
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListDatabasesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         cluster_identifier: "Location", # required
-    #         database: "String",
-    #         db_user: "String",
-    #         max_results: 1,
-    #         next_token: "String",
-    #         secret_arn: "SecretArn",
-    #       }
-    #
     # @!attribute [rw] cluster_identifier
-    #   The cluster identifier. This parameter is required when
-    #   authenticating using either AWS Secrets Manager or temporary
-    #   credentials.
+    #   The cluster identifier. This parameter is required when connecting
+    #   to a cluster and authenticating using either Secrets Manager or
+    #   temporary credentials.
     #   @return [String]
     #
     # @!attribute [rw] database
     #   The name of the database. This parameter is required when
-    #   authenticating using temporary credentials.
+    #   authenticating using either Secrets Manager or temporary
+    #   credentials.
     #   @return [String]
     #
     # @!attribute [rw] db_user
-    #   The database user name. This parameter is required when
-    #   authenticating using temporary credentials.
+    #   The database user name. This parameter is required when connecting
+    #   to a cluster as a database user and authenticating using temporary
+    #   credentials.
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -641,8 +901,15 @@ module Aws::RedshiftDataAPIService
     #
     # @!attribute [rw] secret_arn
     #   The name or ARN of the secret that enables access to the database.
-    #   This parameter is required when authenticating using AWS Secrets
+    #   This parameter is required when authenticating using Secrets
     #   Manager.
+    #   @return [String]
+    #
+    # @!attribute [rw] workgroup_name
+    #   The serverless workgroup name or Amazon Resource Name (ARN). This
+    #   parameter is required when connecting to a serverless workgroup and
+    #   authenticating using either Secrets Manager or temporary
+    #   credentials.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/ListDatabasesRequest AWS API Documentation
@@ -653,7 +920,8 @@ module Aws::RedshiftDataAPIService
       :db_user,
       :max_results,
       :next_token,
-      :secret_arn)
+      :secret_arn,
+      :workgroup_name)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -680,33 +948,27 @@ module Aws::RedshiftDataAPIService
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListSchemasRequest
-    #   data as a hash:
-    #
-    #       {
-    #         cluster_identifier: "Location", # required
-    #         database: "String", # required
-    #         db_user: "String",
-    #         max_results: 1,
-    #         next_token: "String",
-    #         schema_pattern: "String",
-    #         secret_arn: "SecretArn",
-    #       }
-    #
     # @!attribute [rw] cluster_identifier
-    #   The cluster identifier. This parameter is required when
-    #   authenticating using either AWS Secrets Manager or temporary
-    #   credentials.
+    #   The cluster identifier. This parameter is required when connecting
+    #   to a cluster and authenticating using either Secrets Manager or
+    #   temporary credentials.
+    #   @return [String]
+    #
+    # @!attribute [rw] connected_database
+    #   A database name. The connected database is specified when you
+    #   connect with your authentication credentials.
     #   @return [String]
     #
     # @!attribute [rw] database
-    #   The name of the database. This parameter is required when
-    #   authenticating using temporary credentials.
+    #   The name of the database that contains the schemas to list. If
+    #   `ConnectedDatabase` is not specified, this is also the database to
+    #   connect to with your authentication credentials.
     #   @return [String]
     #
     # @!attribute [rw] db_user
-    #   The database user name. This parameter is required when
-    #   authenticating using temporary credentials.
+    #   The database user name. This parameter is required when connecting
+    #   to a cluster as a database user and authenticating using temporary
+    #   credentials.
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -733,20 +995,29 @@ module Aws::RedshiftDataAPIService
     #
     # @!attribute [rw] secret_arn
     #   The name or ARN of the secret that enables access to the database.
-    #   This parameter is required when authenticating using AWS Secrets
+    #   This parameter is required when authenticating using Secrets
     #   Manager.
+    #   @return [String]
+    #
+    # @!attribute [rw] workgroup_name
+    #   The serverless workgroup name or Amazon Resource Name (ARN). This
+    #   parameter is required when connecting to a serverless workgroup and
+    #   authenticating using either Secrets Manager or temporary
+    #   credentials.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/ListSchemasRequest AWS API Documentation
     #
     class ListSchemasRequest < Struct.new(
       :cluster_identifier,
+      :connected_database,
       :database,
       :db_user,
       :max_results,
       :next_token,
       :schema_pattern,
-      :secret_arn)
+      :secret_arn,
+      :workgroup_name)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -773,16 +1044,6 @@ module Aws::RedshiftDataAPIService
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListStatementsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         max_results: 1,
-    #         next_token: "String",
-    #         statement_name: "StatementNameString",
-    #         status: "ABORTED", # accepts ABORTED, ALL, FAILED, FINISHED, PICKED, STARTED, SUBMITTED
-    #       }
-    #
     # @!attribute [rw] max_results
     #   The maximum number of SQL statements to return in the response. If
     #   more SQL statements exist than fit in one response, then `NextToken`
@@ -798,14 +1059,21 @@ module Aws::RedshiftDataAPIService
     #   records have been retrieved for the request.
     #   @return [String]
     #
+    # @!attribute [rw] role_level
+    #   A value that filters which statements to return in the response. If
+    #   true, all statements run by the caller's IAM role are returned. If
+    #   false, only statements run by the caller's IAM role in the current
+    #   IAM session are returned. The default is true.
+    #   @return [Boolean]
+    #
     # @!attribute [rw] statement_name
     #   The name of the SQL statement specified as input to
-    #   `ExecuteStatement` to identify the query. You can list multiple
-    #   statements by providing a prefix that matches the beginning of the
-    #   statement name. For example, to list myStatement1, myStatement2,
-    #   myStatement3, and so on, then provide the a value of `myStatement`.
-    #   Data API does a case-sensitive match of SQL statement names to the
-    #   prefix value you provide.
+    #   `BatchExecuteStatement` or `ExecuteStatement` to identify the query.
+    #   You can list multiple statements by providing a prefix that matches
+    #   the beginning of the statement name. For example, to list
+    #   myStatement1, myStatement2, myStatement3, and so on, then provide
+    #   the a value of `myStatement`. Data API does a case-sensitive match
+    #   of SQL statement names to the prefix value you provide.
     #   @return [String]
     #
     # @!attribute [rw] status
@@ -833,6 +1101,7 @@ module Aws::RedshiftDataAPIService
     class ListStatementsRequest < Struct.new(
       :max_results,
       :next_token,
+      :role_level,
       :statement_name,
       :status)
       SENSITIVE = []
@@ -861,34 +1130,27 @@ module Aws::RedshiftDataAPIService
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTablesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         cluster_identifier: "Location", # required
-    #         database: "String", # required
-    #         db_user: "String",
-    #         max_results: 1,
-    #         next_token: "String",
-    #         schema_pattern: "String",
-    #         secret_arn: "SecretArn",
-    #         table_pattern: "String",
-    #       }
-    #
     # @!attribute [rw] cluster_identifier
-    #   The cluster identifier. This parameter is required when
-    #   authenticating using either AWS Secrets Manager or temporary
-    #   credentials.
+    #   The cluster identifier. This parameter is required when connecting
+    #   to a cluster and authenticating using either Secrets Manager or
+    #   temporary credentials.
+    #   @return [String]
+    #
+    # @!attribute [rw] connected_database
+    #   A database name. The connected database is specified when you
+    #   connect with your authentication credentials.
     #   @return [String]
     #
     # @!attribute [rw] database
-    #   The name of the database. This parameter is required when
-    #   authenticating using temporary credentials.
+    #   The name of the database that contains the tables to list. If
+    #   `ConnectedDatabase` is not specified, this is also the database to
+    #   connect to with your authentication credentials.
     #   @return [String]
     #
     # @!attribute [rw] db_user
-    #   The database user name. This parameter is required when
-    #   authenticating using temporary credentials.
+    #   The database user name. This parameter is required when connecting
+    #   to a cluster as a database user and authenticating using temporary
+    #   credentials.
     #   @return [String]
     #
     # @!attribute [rw] max_results
@@ -918,7 +1180,7 @@ module Aws::RedshiftDataAPIService
     #
     # @!attribute [rw] secret_arn
     #   The name or ARN of the secret that enables access to the database.
-    #   This parameter is required when authenticating using AWS Secrets
+    #   This parameter is required when authenticating using Secrets
     #   Manager.
     #   @return [String]
     #
@@ -932,17 +1194,26 @@ module Aws::RedshiftDataAPIService
     #   returned.
     #   @return [String]
     #
+    # @!attribute [rw] workgroup_name
+    #   The serverless workgroup name or Amazon Resource Name (ARN). This
+    #   parameter is required when connecting to a serverless workgroup and
+    #   authenticating using either Secrets Manager or temporary
+    #   credentials.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/ListTablesRequest AWS API Documentation
     #
     class ListTablesRequest < Struct.new(
       :cluster_identifier,
+      :connected_database,
       :database,
       :db_user,
       :max_results,
       :next_token,
       :schema_pattern,
       :secret_arn,
-      :table_pattern)
+      :table_pattern,
+      :workgroup_name)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -969,6 +1240,19 @@ module Aws::RedshiftDataAPIService
       include Aws::Structure
     end
 
+    # The Amazon Redshift Data API operation failed due to timeout.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/QueryTimeoutException AWS API Documentation
+    #
+    class QueryTimeoutException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The Amazon Redshift Data API operation failed due to a missing
     # resource.
     #
@@ -989,6 +1273,31 @@ module Aws::RedshiftDataAPIService
       include Aws::Structure
     end
 
+    # A parameter used in a SQL statement.
+    #
+    # @!attribute [rw] name
+    #   The name of the parameter.
+    #   @return [String]
+    #
+    # @!attribute [rw] value
+    #   The value of the parameter. Amazon Redshift implicitly converts to
+    #   the proper data type. For more information, see [Data types][1] in
+    #   the *Amazon Redshift Database Developer Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/redshift/latest/dg/c_Supported_data_types.html
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/SqlParameter AWS API Documentation
+    #
+    class SqlParameter < Struct.new(
+      :name,
+      :value)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The SQL statement to run.
     #
     # @!attribute [rw] created_at
@@ -1000,13 +1309,31 @@ module Aws::RedshiftDataAPIService
     #   identifier (UUID) generated by Amazon Redshift Data API.
     #   @return [String]
     #
+    # @!attribute [rw] is_batch_statement
+    #   A value that indicates whether the statement is a batch query
+    #   request.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] query_parameters
+    #   The parameters used in a SQL statement.
+    #   @return [Array<Types::SqlParameter>]
+    #
     # @!attribute [rw] query_string
     #   The SQL statement.
     #   @return [String]
     #
+    # @!attribute [rw] query_strings
+    #   One or more SQL statements. Each query string in the array
+    #   corresponds to one of the queries in a batch query request.
+    #   @return [Array<String>]
+    #
     # @!attribute [rw] secret_arn
     #   The name or Amazon Resource Name (ARN) of the secret that enables
     #   access to the database.
+    #   @return [String]
+    #
+    # @!attribute [rw] session_id
+    #   The session identifier of the query.
     #   @return [String]
     #
     # @!attribute [rw] statement_name
@@ -1028,9 +1355,91 @@ module Aws::RedshiftDataAPIService
     class StatementData < Struct.new(
       :created_at,
       :id,
+      :is_batch_statement,
+      :query_parameters,
       :query_string,
+      :query_strings,
       :secret_arn,
+      :session_id,
       :statement_name,
+      :status,
+      :updated_at)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Information about an SQL statement.
+    #
+    # @!attribute [rw] created_at
+    #   The date and time (UTC) the statement was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] duration
+    #   The amount of time in nanoseconds that the statement ran.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] error
+    #   The error message from the cluster if the SQL statement encountered
+    #   an error while running.
+    #   @return [String]
+    #
+    # @!attribute [rw] has_result_set
+    #   A value that indicates whether the statement has a result set. The
+    #   result set can be empty. The value is true for an empty result set.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] id
+    #   The identifier of the SQL statement. This value is a universally
+    #   unique identifier (UUID) generated by Amazon Redshift Data API. A
+    #   suffix indicates the number of the SQL statement. For example,
+    #   `d9b6c0c9-0747-4bf4-b142-e8883122f766:2` has a suffix of `:2` that
+    #   indicates the second SQL statement of a batch query.
+    #   @return [String]
+    #
+    # @!attribute [rw] query_string
+    #   The SQL statement text.
+    #   @return [String]
+    #
+    # @!attribute [rw] redshift_query_id
+    #   The SQL statement identifier. This value is a universally unique
+    #   identifier (UUID) generated by Amazon Redshift Data API.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] result_rows
+    #   Either the number of rows returned from the SQL statement or the
+    #   number of rows affected. If result size is greater than zero, the
+    #   result rows can be the number of rows affected by SQL statements
+    #   such as INSERT, UPDATE, DELETE, COPY, and others. A `-1` indicates
+    #   the value is null.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] result_size
+    #   The size in bytes of the returned results. A `-1` indicates the
+    #   value is null.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] status
+    #   The status of the SQL statement. An example is the that the SQL
+    #   statement finished.
+    #   @return [String]
+    #
+    # @!attribute [rw] updated_at
+    #   The date and time (UTC) that the statement metadata was last
+    #   updated.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/redshift-data-2019-12-20/SubStatementData AWS API Documentation
+    #
+    class SubStatementData < Struct.new(
+      :created_at,
+      :duration,
+      :error,
+      :has_result_set,
+      :id,
+      :query_string,
+      :redshift_query_id,
+      :result_rows,
+      :result_size,
       :status,
       :updated_at)
       SENSITIVE = []
@@ -1078,3 +1487,4 @@ module Aws::RedshiftDataAPIService
 
   end
 end
+

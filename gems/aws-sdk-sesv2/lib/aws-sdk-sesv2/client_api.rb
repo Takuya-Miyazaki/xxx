@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::SESV2
   # @api private
@@ -17,10 +18,15 @@ module Aws::SESV2
     AccountSuspendedException = Shapes::StructureShape.new(name: 'AccountSuspendedException')
     AdditionalContactEmailAddress = Shapes::StringShape.new(name: 'AdditionalContactEmailAddress')
     AdditionalContactEmailAddresses = Shapes::ListShape.new(name: 'AdditionalContactEmailAddresses')
+    AdminEmail = Shapes::StringShape.new(name: 'AdminEmail')
     AlreadyExistsException = Shapes::StructureShape.new(name: 'AlreadyExistsException')
     AmazonResourceName = Shapes::StringShape.new(name: 'AmazonResourceName')
     AttributesData = Shapes::StringShape.new(name: 'AttributesData')
     BadRequestException = Shapes::StructureShape.new(name: 'BadRequestException')
+    BatchGetMetricDataQueries = Shapes::ListShape.new(name: 'BatchGetMetricDataQueries')
+    BatchGetMetricDataQuery = Shapes::StructureShape.new(name: 'BatchGetMetricDataQuery')
+    BatchGetMetricDataRequest = Shapes::StructureShape.new(name: 'BatchGetMetricDataRequest')
+    BatchGetMetricDataResponse = Shapes::StructureShape.new(name: 'BatchGetMetricDataResponse')
     BehaviorOnMxFailure = Shapes::StringShape.new(name: 'BehaviorOnMxFailure')
     BlacklistEntries = Shapes::ListShape.new(name: 'BlacklistEntries')
     BlacklistEntry = Shapes::StructureShape.new(name: 'BlacklistEntry')
@@ -29,6 +35,9 @@ module Aws::SESV2
     BlacklistReport = Shapes::MapShape.new(name: 'BlacklistReport')
     BlacklistingDescription = Shapes::StringShape.new(name: 'BlacklistingDescription')
     Body = Shapes::StructureShape.new(name: 'Body')
+    Bounce = Shapes::StructureShape.new(name: 'Bounce')
+    BounceSubType = Shapes::StringShape.new(name: 'BounceSubType')
+    BounceType = Shapes::StringShape.new(name: 'BounceType')
     BulkEmailContent = Shapes::StructureShape.new(name: 'BulkEmailContent')
     BulkEmailEntry = Shapes::StructureShape.new(name: 'BulkEmailEntry')
     BulkEmailEntryList = Shapes::ListShape.new(name: 'BulkEmailEntryList')
@@ -36,11 +45,16 @@ module Aws::SESV2
     BulkEmailEntryResultList = Shapes::ListShape.new(name: 'BulkEmailEntryResultList')
     BulkEmailStatus = Shapes::StringShape.new(name: 'BulkEmailStatus')
     CampaignId = Shapes::StringShape.new(name: 'CampaignId')
+    CancelExportJobRequest = Shapes::StructureShape.new(name: 'CancelExportJobRequest')
+    CancelExportJobResponse = Shapes::StructureShape.new(name: 'CancelExportJobResponse')
     CaseId = Shapes::StringShape.new(name: 'CaseId')
     Charset = Shapes::StringShape.new(name: 'Charset')
     CloudWatchDestination = Shapes::StructureShape.new(name: 'CloudWatchDestination')
     CloudWatchDimensionConfiguration = Shapes::StructureShape.new(name: 'CloudWatchDimensionConfiguration')
     CloudWatchDimensionConfigurations = Shapes::ListShape.new(name: 'CloudWatchDimensionConfigurations')
+    Complaint = Shapes::StructureShape.new(name: 'Complaint')
+    ComplaintFeedbackType = Shapes::StringShape.new(name: 'ComplaintFeedbackType')
+    ComplaintSubType = Shapes::StringShape.new(name: 'ComplaintSubType')
     ConcurrentModificationException = Shapes::StructureShape.new(name: 'ConcurrentModificationException')
     ConfigurationSetName = Shapes::StringShape.new(name: 'ConfigurationSetName')
     ConfigurationSetNameList = Shapes::ListShape.new(name: 'ConfigurationSetNameList')
@@ -52,6 +66,7 @@ module Aws::SESV2
     ContactListImportAction = Shapes::StringShape.new(name: 'ContactListImportAction')
     ContactListName = Shapes::StringShape.new(name: 'ContactListName')
     Content = Shapes::StructureShape.new(name: 'Content')
+    Counter = Shapes::IntegerShape.new(name: 'Counter')
     CreateConfigurationSetEventDestinationRequest = Shapes::StructureShape.new(name: 'CreateConfigurationSetEventDestinationRequest')
     CreateConfigurationSetEventDestinationResponse = Shapes::StructureShape.new(name: 'CreateConfigurationSetEventDestinationResponse')
     CreateConfigurationSetRequest = Shapes::StructureShape.new(name: 'CreateConfigurationSetRequest')
@@ -72,6 +87,8 @@ module Aws::SESV2
     CreateEmailIdentityResponse = Shapes::StructureShape.new(name: 'CreateEmailIdentityResponse')
     CreateEmailTemplateRequest = Shapes::StructureShape.new(name: 'CreateEmailTemplateRequest')
     CreateEmailTemplateResponse = Shapes::StructureShape.new(name: 'CreateEmailTemplateResponse')
+    CreateExportJobRequest = Shapes::StructureShape.new(name: 'CreateExportJobRequest')
+    CreateExportJobResponse = Shapes::StructureShape.new(name: 'CreateExportJobResponse')
     CreateImportJobRequest = Shapes::StructureShape.new(name: 'CreateImportJobRequest')
     CreateImportJobResponse = Shapes::StructureShape.new(name: 'CreateImportJobResponse')
     CustomRedirectDomain = Shapes::StringShape.new(name: 'CustomRedirectDomain')
@@ -79,9 +96,12 @@ module Aws::SESV2
     CustomVerificationEmailTemplatesList = Shapes::ListShape.new(name: 'CustomVerificationEmailTemplatesList')
     DailyVolume = Shapes::StructureShape.new(name: 'DailyVolume')
     DailyVolumes = Shapes::ListShape.new(name: 'DailyVolumes')
+    DashboardAttributes = Shapes::StructureShape.new(name: 'DashboardAttributes')
+    DashboardOptions = Shapes::StructureShape.new(name: 'DashboardOptions')
     DataFormat = Shapes::StringShape.new(name: 'DataFormat')
     DedicatedIp = Shapes::StructureShape.new(name: 'DedicatedIp')
     DedicatedIpList = Shapes::ListShape.new(name: 'DedicatedIpList')
+    DedicatedIpPool = Shapes::StructureShape.new(name: 'DedicatedIpPool')
     DefaultDimensionValue = Shapes::StringShape.new(name: 'DefaultDimensionValue')
     DeleteConfigurationSetEventDestinationRequest = Shapes::StructureShape.new(name: 'DeleteConfigurationSetEventDestinationRequest')
     DeleteConfigurationSetEventDestinationResponse = Shapes::StructureShape.new(name: 'DeleteConfigurationSetEventDestinationResponse')
@@ -108,15 +128,19 @@ module Aws::SESV2
     DeliverabilityTestReports = Shapes::ListShape.new(name: 'DeliverabilityTestReports')
     DeliverabilityTestStatus = Shapes::StringShape.new(name: 'DeliverabilityTestStatus')
     DeliverabilityTestSubject = Shapes::StringShape.new(name: 'DeliverabilityTestSubject')
+    DeliveryEventType = Shapes::StringShape.new(name: 'DeliveryEventType')
     DeliveryOptions = Shapes::StructureShape.new(name: 'DeliveryOptions')
     Description = Shapes::StringShape.new(name: 'Description')
     Destination = Shapes::StructureShape.new(name: 'Destination')
+    DiagnosticCode = Shapes::StringShape.new(name: 'DiagnosticCode')
     DimensionName = Shapes::StringShape.new(name: 'DimensionName')
     DimensionValueSource = Shapes::StringShape.new(name: 'DimensionValueSource')
+    Dimensions = Shapes::MapShape.new(name: 'Dimensions')
     DisplayName = Shapes::StringShape.new(name: 'DisplayName')
     DkimAttributes = Shapes::StructureShape.new(name: 'DkimAttributes')
     DkimSigningAttributes = Shapes::StructureShape.new(name: 'DkimSigningAttributes')
     DkimSigningAttributesOrigin = Shapes::StringShape.new(name: 'DkimSigningAttributesOrigin')
+    DkimSigningKeyLength = Shapes::StringShape.new(name: 'DkimSigningKeyLength')
     DkimStatus = Shapes::StringShape.new(name: 'DkimStatus')
     DnsToken = Shapes::StringShape.new(name: 'DnsToken')
     DnsTokenList = Shapes::ListShape.new(name: 'DnsTokenList')
@@ -128,8 +152,13 @@ module Aws::SESV2
     DomainIspPlacement = Shapes::StructureShape.new(name: 'DomainIspPlacement')
     DomainIspPlacements = Shapes::ListShape.new(name: 'DomainIspPlacements')
     EmailAddress = Shapes::StringShape.new(name: 'EmailAddress')
+    EmailAddressFilterList = Shapes::ListShape.new(name: 'EmailAddressFilterList')
     EmailAddressList = Shapes::ListShape.new(name: 'EmailAddressList')
     EmailContent = Shapes::StructureShape.new(name: 'EmailContent')
+    EmailInsights = Shapes::StructureShape.new(name: 'EmailInsights')
+    EmailInsightsList = Shapes::ListShape.new(name: 'EmailInsightsList')
+    EmailSubject = Shapes::StringShape.new(name: 'EmailSubject')
+    EmailSubjectFilterList = Shapes::ListShape.new(name: 'EmailSubjectFilterList')
     EmailTemplateContent = Shapes::StructureShape.new(name: 'EmailTemplateContent')
     EmailTemplateData = Shapes::StringShape.new(name: 'EmailTemplateData')
     EmailTemplateHtml = Shapes::StringShape.new(name: 'EmailTemplateHtml')
@@ -140,19 +169,34 @@ module Aws::SESV2
     EmailTemplateText = Shapes::StringShape.new(name: 'EmailTemplateText')
     Enabled = Shapes::BooleanShape.new(name: 'Enabled')
     EnabledWrapper = Shapes::BooleanShape.new(name: 'EnabledWrapper')
+    EngagementEventType = Shapes::StringShape.new(name: 'EngagementEventType')
     ErrorMessage = Shapes::StringShape.new(name: 'ErrorMessage')
     Esp = Shapes::StringShape.new(name: 'Esp')
     Esps = Shapes::ListShape.new(name: 'Esps')
+    EventBridgeDestination = Shapes::StructureShape.new(name: 'EventBridgeDestination')
     EventDestination = Shapes::StructureShape.new(name: 'EventDestination')
     EventDestinationDefinition = Shapes::StructureShape.new(name: 'EventDestinationDefinition')
     EventDestinationName = Shapes::StringShape.new(name: 'EventDestinationName')
     EventDestinations = Shapes::ListShape.new(name: 'EventDestinations')
+    EventDetails = Shapes::StructureShape.new(name: 'EventDetails')
     EventType = Shapes::StringShape.new(name: 'EventType')
     EventTypes = Shapes::ListShape.new(name: 'EventTypes')
+    ExportDataSource = Shapes::StructureShape.new(name: 'ExportDataSource')
+    ExportDestination = Shapes::StructureShape.new(name: 'ExportDestination')
+    ExportDimensionValue = Shapes::ListShape.new(name: 'ExportDimensionValue')
+    ExportDimensions = Shapes::MapShape.new(name: 'ExportDimensions')
+    ExportJobSummary = Shapes::StructureShape.new(name: 'ExportJobSummary')
+    ExportJobSummaryList = Shapes::ListShape.new(name: 'ExportJobSummaryList')
+    ExportMetric = Shapes::StructureShape.new(name: 'ExportMetric')
+    ExportMetrics = Shapes::ListShape.new(name: 'ExportMetrics')
+    ExportSourceType = Shapes::StringShape.new(name: 'ExportSourceType')
+    ExportStatistics = Shapes::StructureShape.new(name: 'ExportStatistics')
+    ExportedRecordsCount = Shapes::IntegerShape.new(name: 'ExportedRecordsCount')
     FailedRecordsCount = Shapes::IntegerShape.new(name: 'FailedRecordsCount')
     FailedRecordsS3Url = Shapes::StringShape.new(name: 'FailedRecordsS3Url')
     FailureInfo = Shapes::StructureShape.new(name: 'FailureInfo')
     FailureRedirectionURL = Shapes::StringShape.new(name: 'FailureRedirectionURL')
+    FeatureStatus = Shapes::StringShape.new(name: 'FeatureStatus')
     FeedbackId = Shapes::StringShape.new(name: 'FeedbackId')
     GeneralEnforcementStatus = Shapes::StringShape.new(name: 'GeneralEnforcementStatus')
     GetAccountRequest = Shapes::StructureShape.new(name: 'GetAccountRequest')
@@ -169,6 +213,8 @@ module Aws::SESV2
     GetContactResponse = Shapes::StructureShape.new(name: 'GetContactResponse')
     GetCustomVerificationEmailTemplateRequest = Shapes::StructureShape.new(name: 'GetCustomVerificationEmailTemplateRequest')
     GetCustomVerificationEmailTemplateResponse = Shapes::StructureShape.new(name: 'GetCustomVerificationEmailTemplateResponse')
+    GetDedicatedIpPoolRequest = Shapes::StructureShape.new(name: 'GetDedicatedIpPoolRequest')
+    GetDedicatedIpPoolResponse = Shapes::StructureShape.new(name: 'GetDedicatedIpPoolResponse')
     GetDedicatedIpRequest = Shapes::StructureShape.new(name: 'GetDedicatedIpRequest')
     GetDedicatedIpResponse = Shapes::StructureShape.new(name: 'GetDedicatedIpResponse')
     GetDedicatedIpsRequest = Shapes::StructureShape.new(name: 'GetDedicatedIpsRequest')
@@ -187,10 +233,17 @@ module Aws::SESV2
     GetEmailIdentityResponse = Shapes::StructureShape.new(name: 'GetEmailIdentityResponse')
     GetEmailTemplateRequest = Shapes::StructureShape.new(name: 'GetEmailTemplateRequest')
     GetEmailTemplateResponse = Shapes::StructureShape.new(name: 'GetEmailTemplateResponse')
+    GetExportJobRequest = Shapes::StructureShape.new(name: 'GetExportJobRequest')
+    GetExportJobResponse = Shapes::StructureShape.new(name: 'GetExportJobResponse')
     GetImportJobRequest = Shapes::StructureShape.new(name: 'GetImportJobRequest')
     GetImportJobResponse = Shapes::StructureShape.new(name: 'GetImportJobResponse')
+    GetMessageInsightsRequest = Shapes::StructureShape.new(name: 'GetMessageInsightsRequest')
+    GetMessageInsightsResponse = Shapes::StructureShape.new(name: 'GetMessageInsightsResponse')
     GetSuppressedDestinationRequest = Shapes::StructureShape.new(name: 'GetSuppressedDestinationRequest')
     GetSuppressedDestinationResponse = Shapes::StructureShape.new(name: 'GetSuppressedDestinationResponse')
+    GuardianAttributes = Shapes::StructureShape.new(name: 'GuardianAttributes')
+    GuardianOptions = Shapes::StructureShape.new(name: 'GuardianOptions')
+    HttpsPolicy = Shapes::StringShape.new(name: 'HttpsPolicy')
     Identity = Shapes::StringShape.new(name: 'Identity')
     IdentityInfo = Shapes::StructureShape.new(name: 'IdentityInfo')
     IdentityInfoList = Shapes::ListShape.new(name: 'IdentityInfoList')
@@ -202,9 +255,15 @@ module Aws::SESV2
     ImportJobSummary = Shapes::StructureShape.new(name: 'ImportJobSummary')
     ImportJobSummaryList = Shapes::ListShape.new(name: 'ImportJobSummaryList')
     InboxPlacementTrackingOption = Shapes::StructureShape.new(name: 'InboxPlacementTrackingOption')
+    InsightsEmailAddress = Shapes::StringShape.new(name: 'InsightsEmailAddress')
+    InsightsEvent = Shapes::StructureShape.new(name: 'InsightsEvent')
+    InsightsEvents = Shapes::ListShape.new(name: 'InsightsEvents')
+    InternalServiceErrorException = Shapes::StructureShape.new(name: 'InternalServiceErrorException')
     InvalidNextTokenException = Shapes::StructureShape.new(name: 'InvalidNextTokenException')
     Ip = Shapes::StringShape.new(name: 'Ip')
     IpList = Shapes::ListShape.new(name: 'IpList')
+    Isp = Shapes::StringShape.new(name: 'Isp')
+    IspFilterList = Shapes::ListShape.new(name: 'IspFilterList')
     IspName = Shapes::StringShape.new(name: 'IspName')
     IspNameList = Shapes::ListShape.new(name: 'IspNameList')
     IspPlacement = Shapes::StructureShape.new(name: 'IspPlacement')
@@ -212,6 +271,8 @@ module Aws::SESV2
     JobId = Shapes::StringShape.new(name: 'JobId')
     JobStatus = Shapes::StringShape.new(name: 'JobStatus')
     KinesisFirehoseDestination = Shapes::StructureShape.new(name: 'KinesisFirehoseDestination')
+    LastDeliveryEventList = Shapes::ListShape.new(name: 'LastDeliveryEventList')
+    LastEngagementEventList = Shapes::ListShape.new(name: 'LastEngagementEventList')
     LastFreshStart = Shapes::TimestampShape.new(name: 'LastFreshStart')
     LimitExceededException = Shapes::StructureShape.new(name: 'LimitExceededException')
     ListConfigurationSetsRequest = Shapes::StructureShape.new(name: 'ListConfigurationSetsRequest')
@@ -233,12 +294,19 @@ module Aws::SESV2
     ListEmailIdentitiesResponse = Shapes::StructureShape.new(name: 'ListEmailIdentitiesResponse')
     ListEmailTemplatesRequest = Shapes::StructureShape.new(name: 'ListEmailTemplatesRequest')
     ListEmailTemplatesResponse = Shapes::StructureShape.new(name: 'ListEmailTemplatesResponse')
+    ListExportJobsRequest = Shapes::StructureShape.new(name: 'ListExportJobsRequest')
+    ListExportJobsResponse = Shapes::StructureShape.new(name: 'ListExportJobsResponse')
     ListImportJobsRequest = Shapes::StructureShape.new(name: 'ListImportJobsRequest')
     ListImportJobsResponse = Shapes::StructureShape.new(name: 'ListImportJobsResponse')
     ListManagementOptions = Shapes::StructureShape.new(name: 'ListManagementOptions')
     ListOfContactLists = Shapes::ListShape.new(name: 'ListOfContactLists')
     ListOfContacts = Shapes::ListShape.new(name: 'ListOfContacts')
     ListOfDedicatedIpPools = Shapes::ListShape.new(name: 'ListOfDedicatedIpPools')
+    ListRecommendationFilterValue = Shapes::StringShape.new(name: 'ListRecommendationFilterValue')
+    ListRecommendationsFilter = Shapes::MapShape.new(name: 'ListRecommendationsFilter')
+    ListRecommendationsFilterKey = Shapes::StringShape.new(name: 'ListRecommendationsFilterKey')
+    ListRecommendationsRequest = Shapes::StructureShape.new(name: 'ListRecommendationsRequest')
+    ListRecommendationsResponse = Shapes::StructureShape.new(name: 'ListRecommendationsResponse')
     ListSuppressedDestinationsRequest = Shapes::StructureShape.new(name: 'ListSuppressedDestinationsRequest')
     ListSuppressedDestinationsResponse = Shapes::StructureShape.new(name: 'ListSuppressedDestinationsResponse')
     ListTagsForResourceRequest = Shapes::StructureShape.new(name: 'ListTagsForResourceRequest')
@@ -254,11 +322,29 @@ module Aws::SESV2
     Message = Shapes::StructureShape.new(name: 'Message')
     MessageContent = Shapes::StringShape.new(name: 'MessageContent')
     MessageData = Shapes::StringShape.new(name: 'MessageData')
+    MessageHeader = Shapes::StructureShape.new(name: 'MessageHeader')
+    MessageHeaderList = Shapes::ListShape.new(name: 'MessageHeaderList')
+    MessageHeaderName = Shapes::StringShape.new(name: 'MessageHeaderName')
+    MessageHeaderValue = Shapes::StringShape.new(name: 'MessageHeaderValue')
+    MessageInsightsDataSource = Shapes::StructureShape.new(name: 'MessageInsightsDataSource')
+    MessageInsightsExportMaxResults = Shapes::IntegerShape.new(name: 'MessageInsightsExportMaxResults')
+    MessageInsightsFilters = Shapes::StructureShape.new(name: 'MessageInsightsFilters')
     MessageRejected = Shapes::StructureShape.new(name: 'MessageRejected')
     MessageTag = Shapes::StructureShape.new(name: 'MessageTag')
     MessageTagList = Shapes::ListShape.new(name: 'MessageTagList')
     MessageTagName = Shapes::StringShape.new(name: 'MessageTagName')
     MessageTagValue = Shapes::StringShape.new(name: 'MessageTagValue')
+    Metric = Shapes::StringShape.new(name: 'Metric')
+    MetricAggregation = Shapes::StringShape.new(name: 'MetricAggregation')
+    MetricDataError = Shapes::StructureShape.new(name: 'MetricDataError')
+    MetricDataErrorList = Shapes::ListShape.new(name: 'MetricDataErrorList')
+    MetricDataResult = Shapes::StructureShape.new(name: 'MetricDataResult')
+    MetricDataResultList = Shapes::ListShape.new(name: 'MetricDataResultList')
+    MetricDimensionName = Shapes::StringShape.new(name: 'MetricDimensionName')
+    MetricDimensionValue = Shapes::StringShape.new(name: 'MetricDimensionValue')
+    MetricNamespace = Shapes::StringShape.new(name: 'MetricNamespace')
+    MetricValueList = Shapes::ListShape.new(name: 'MetricValueList')
+    MetricsDataSource = Shapes::StructureShape.new(name: 'MetricsDataSource')
     NextToken = Shapes::StringShape.new(name: 'NextToken')
     NotFoundException = Shapes::StructureShape.new(name: 'NotFoundException')
     OutboundMessageId = Shapes::StringShape.new(name: 'OutboundMessageId')
@@ -271,6 +357,7 @@ module Aws::SESV2
     PolicyMap = Shapes::MapShape.new(name: 'PolicyMap')
     PolicyName = Shapes::StringShape.new(name: 'PolicyName')
     PoolName = Shapes::StringShape.new(name: 'PoolName')
+    PrimaryNameServer = Shapes::StringShape.new(name: 'PrimaryNameServer')
     PrivateKey = Shapes::StringShape.new(name: 'PrivateKey')
     ProcessedRecordsCount = Shapes::IntegerShape.new(name: 'ProcessedRecordsCount')
     PutAccountDedicatedIpWarmupAttributesRequest = Shapes::StructureShape.new(name: 'PutAccountDedicatedIpWarmupAttributesRequest')
@@ -281,6 +368,8 @@ module Aws::SESV2
     PutAccountSendingAttributesResponse = Shapes::StructureShape.new(name: 'PutAccountSendingAttributesResponse')
     PutAccountSuppressionAttributesRequest = Shapes::StructureShape.new(name: 'PutAccountSuppressionAttributesRequest')
     PutAccountSuppressionAttributesResponse = Shapes::StructureShape.new(name: 'PutAccountSuppressionAttributesResponse')
+    PutAccountVdmAttributesRequest = Shapes::StructureShape.new(name: 'PutAccountVdmAttributesRequest')
+    PutAccountVdmAttributesResponse = Shapes::StructureShape.new(name: 'PutAccountVdmAttributesResponse')
     PutConfigurationSetDeliveryOptionsRequest = Shapes::StructureShape.new(name: 'PutConfigurationSetDeliveryOptionsRequest')
     PutConfigurationSetDeliveryOptionsResponse = Shapes::StructureShape.new(name: 'PutConfigurationSetDeliveryOptionsResponse')
     PutConfigurationSetReputationOptionsRequest = Shapes::StructureShape.new(name: 'PutConfigurationSetReputationOptionsRequest')
@@ -291,12 +380,18 @@ module Aws::SESV2
     PutConfigurationSetSuppressionOptionsResponse = Shapes::StructureShape.new(name: 'PutConfigurationSetSuppressionOptionsResponse')
     PutConfigurationSetTrackingOptionsRequest = Shapes::StructureShape.new(name: 'PutConfigurationSetTrackingOptionsRequest')
     PutConfigurationSetTrackingOptionsResponse = Shapes::StructureShape.new(name: 'PutConfigurationSetTrackingOptionsResponse')
+    PutConfigurationSetVdmOptionsRequest = Shapes::StructureShape.new(name: 'PutConfigurationSetVdmOptionsRequest')
+    PutConfigurationSetVdmOptionsResponse = Shapes::StructureShape.new(name: 'PutConfigurationSetVdmOptionsResponse')
     PutDedicatedIpInPoolRequest = Shapes::StructureShape.new(name: 'PutDedicatedIpInPoolRequest')
     PutDedicatedIpInPoolResponse = Shapes::StructureShape.new(name: 'PutDedicatedIpInPoolResponse')
+    PutDedicatedIpPoolScalingAttributesRequest = Shapes::StructureShape.new(name: 'PutDedicatedIpPoolScalingAttributesRequest')
+    PutDedicatedIpPoolScalingAttributesResponse = Shapes::StructureShape.new(name: 'PutDedicatedIpPoolScalingAttributesResponse')
     PutDedicatedIpWarmupAttributesRequest = Shapes::StructureShape.new(name: 'PutDedicatedIpWarmupAttributesRequest')
     PutDedicatedIpWarmupAttributesResponse = Shapes::StructureShape.new(name: 'PutDedicatedIpWarmupAttributesResponse')
     PutDeliverabilityDashboardOptionRequest = Shapes::StructureShape.new(name: 'PutDeliverabilityDashboardOptionRequest')
     PutDeliverabilityDashboardOptionResponse = Shapes::StructureShape.new(name: 'PutDeliverabilityDashboardOptionResponse')
+    PutEmailIdentityConfigurationSetAttributesRequest = Shapes::StructureShape.new(name: 'PutEmailIdentityConfigurationSetAttributesRequest')
+    PutEmailIdentityConfigurationSetAttributesResponse = Shapes::StructureShape.new(name: 'PutEmailIdentityConfigurationSetAttributesResponse')
     PutEmailIdentityDkimAttributesRequest = Shapes::StructureShape.new(name: 'PutEmailIdentityDkimAttributesRequest')
     PutEmailIdentityDkimAttributesResponse = Shapes::StructureShape.new(name: 'PutEmailIdentityDkimAttributesResponse')
     PutEmailIdentityDkimSigningAttributesRequest = Shapes::StructureShape.new(name: 'PutEmailIdentityDkimSigningAttributesRequest')
@@ -307,9 +402,18 @@ module Aws::SESV2
     PutEmailIdentityMailFromAttributesResponse = Shapes::StructureShape.new(name: 'PutEmailIdentityMailFromAttributesResponse')
     PutSuppressedDestinationRequest = Shapes::StructureShape.new(name: 'PutSuppressedDestinationRequest')
     PutSuppressedDestinationResponse = Shapes::StructureShape.new(name: 'PutSuppressedDestinationResponse')
+    QueryErrorCode = Shapes::StringShape.new(name: 'QueryErrorCode')
+    QueryErrorMessage = Shapes::StringShape.new(name: 'QueryErrorMessage')
+    QueryIdentifier = Shapes::StringShape.new(name: 'QueryIdentifier')
     RawMessage = Shapes::StructureShape.new(name: 'RawMessage')
     RawMessageData = Shapes::BlobShape.new(name: 'RawMessageData')
     RblName = Shapes::StringShape.new(name: 'RblName')
+    Recommendation = Shapes::StructureShape.new(name: 'Recommendation')
+    RecommendationDescription = Shapes::StringShape.new(name: 'RecommendationDescription')
+    RecommendationImpact = Shapes::StringShape.new(name: 'RecommendationImpact')
+    RecommendationStatus = Shapes::StringShape.new(name: 'RecommendationStatus')
+    RecommendationType = Shapes::StringShape.new(name: 'RecommendationType')
+    RecommendationsList = Shapes::ListShape.new(name: 'RecommendationsList')
     RenderedEmailTemplate = Shapes::StringShape.new(name: 'RenderedEmailTemplate')
     ReplacementEmailContent = Shapes::StructureShape.new(name: 'ReplacementEmailContent')
     ReplacementTemplate = Shapes::StructureShape.new(name: 'ReplacementTemplate')
@@ -319,6 +423,8 @@ module Aws::SESV2
     ReviewDetails = Shapes::StructureShape.new(name: 'ReviewDetails')
     ReviewStatus = Shapes::StringShape.new(name: 'ReviewStatus')
     S3Url = Shapes::StringShape.new(name: 'S3Url')
+    SOARecord = Shapes::StructureShape.new(name: 'SOARecord')
+    ScalingMode = Shapes::StringShape.new(name: 'ScalingMode')
     Selector = Shapes::StringShape.new(name: 'Selector')
     SendBulkEmailRequest = Shapes::StructureShape.new(name: 'SendBulkEmailRequest')
     SendBulkEmailResponse = Shapes::StructureShape.new(name: 'SendBulkEmailResponse')
@@ -331,6 +437,7 @@ module Aws::SESV2
     SendingPausedException = Shapes::StructureShape.new(name: 'SendingPausedException')
     SendingPoolName = Shapes::StringShape.new(name: 'SendingPoolName')
     SentLast24Hours = Shapes::FloatShape.new(name: 'SentLast24Hours')
+    SerialNumber = Shapes::IntegerShape.new(name: 'SerialNumber')
     SnsDestination = Shapes::StructureShape.new(name: 'SnsDestination')
     Subject = Shapes::StringShape.new(name: 'Subject')
     SubscriptionStatus = Shapes::StringShape.new(name: 'SubscriptionStatus')
@@ -357,6 +464,7 @@ module Aws::SESV2
     TestRenderEmailTemplateRequest = Shapes::StructureShape.new(name: 'TestRenderEmailTemplateRequest')
     TestRenderEmailTemplateResponse = Shapes::StructureShape.new(name: 'TestRenderEmailTemplateResponse')
     Timestamp = Shapes::TimestampShape.new(name: 'Timestamp')
+    TimestampList = Shapes::ListShape.new(name: 'TimestampList')
     TlsPolicy = Shapes::StringShape.new(name: 'TlsPolicy')
     TooManyRequestsException = Shapes::StructureShape.new(name: 'TooManyRequestsException')
     Topic = Shapes::StructureShape.new(name: 'Topic')
@@ -383,6 +491,11 @@ module Aws::SESV2
     UpdateEmailTemplateResponse = Shapes::StructureShape.new(name: 'UpdateEmailTemplateResponse')
     UseCaseDescription = Shapes::StringShape.new(name: 'UseCaseDescription')
     UseDefaultIfPreferenceUnavailable = Shapes::BooleanShape.new(name: 'UseDefaultIfPreferenceUnavailable')
+    VdmAttributes = Shapes::StructureShape.new(name: 'VdmAttributes')
+    VdmOptions = Shapes::StructureShape.new(name: 'VdmOptions')
+    VerificationError = Shapes::StringShape.new(name: 'VerificationError')
+    VerificationInfo = Shapes::StructureShape.new(name: 'VerificationInfo')
+    VerificationStatus = Shapes::StringShape.new(name: 'VerificationStatus')
     Volume = Shapes::IntegerShape.new(name: 'Volume')
     VolumeStatistics = Shapes::StructureShape.new(name: 'VolumeStatistics')
     WarmupStatus = Shapes::StringShape.new(name: 'WarmupStatus')
@@ -391,7 +504,7 @@ module Aws::SESV2
     AccountDetails.add_member(:mail_type, Shapes::ShapeRef.new(shape: MailType, location_name: "MailType"))
     AccountDetails.add_member(:website_url, Shapes::ShapeRef.new(shape: WebsiteURL, location_name: "WebsiteURL"))
     AccountDetails.add_member(:contact_language, Shapes::ShapeRef.new(shape: ContactLanguage, location_name: "ContactLanguage"))
-    AccountDetails.add_member(:use_case_description, Shapes::ShapeRef.new(shape: UseCaseDescription, location_name: "UseCaseDescription"))
+    AccountDetails.add_member(:use_case_description, Shapes::ShapeRef.new(shape: UseCaseDescription, deprecated: true, location_name: "UseCaseDescription"))
     AccountDetails.add_member(:additional_contact_email_addresses, Shapes::ShapeRef.new(shape: AdditionalContactEmailAddresses, location_name: "AdditionalContactEmailAddresses"))
     AccountDetails.add_member(:review_details, Shapes::ShapeRef.new(shape: ReviewDetails, location_name: "ReviewDetails"))
     AccountDetails.struct_class = Types::AccountDetails
@@ -403,6 +516,23 @@ module Aws::SESV2
     AlreadyExistsException.struct_class = Types::AlreadyExistsException
 
     BadRequestException.struct_class = Types::BadRequestException
+
+    BatchGetMetricDataQueries.member = Shapes::ShapeRef.new(shape: BatchGetMetricDataQuery)
+
+    BatchGetMetricDataQuery.add_member(:id, Shapes::ShapeRef.new(shape: QueryIdentifier, required: true, location_name: "Id"))
+    BatchGetMetricDataQuery.add_member(:namespace, Shapes::ShapeRef.new(shape: MetricNamespace, required: true, location_name: "Namespace"))
+    BatchGetMetricDataQuery.add_member(:metric, Shapes::ShapeRef.new(shape: Metric, required: true, location_name: "Metric"))
+    BatchGetMetricDataQuery.add_member(:dimensions, Shapes::ShapeRef.new(shape: Dimensions, location_name: "Dimensions"))
+    BatchGetMetricDataQuery.add_member(:start_date, Shapes::ShapeRef.new(shape: Timestamp, required: true, location_name: "StartDate"))
+    BatchGetMetricDataQuery.add_member(:end_date, Shapes::ShapeRef.new(shape: Timestamp, required: true, location_name: "EndDate"))
+    BatchGetMetricDataQuery.struct_class = Types::BatchGetMetricDataQuery
+
+    BatchGetMetricDataRequest.add_member(:queries, Shapes::ShapeRef.new(shape: BatchGetMetricDataQueries, required: true, location_name: "Queries"))
+    BatchGetMetricDataRequest.struct_class = Types::BatchGetMetricDataRequest
+
+    BatchGetMetricDataResponse.add_member(:results, Shapes::ShapeRef.new(shape: MetricDataResultList, location_name: "Results"))
+    BatchGetMetricDataResponse.add_member(:errors, Shapes::ShapeRef.new(shape: MetricDataErrorList, location_name: "Errors"))
+    BatchGetMetricDataResponse.struct_class = Types::BatchGetMetricDataResponse
 
     BlacklistEntries.member = Shapes::ShapeRef.new(shape: BlacklistEntry)
 
@@ -420,12 +550,18 @@ module Aws::SESV2
     Body.add_member(:html, Shapes::ShapeRef.new(shape: Content, location_name: "Html"))
     Body.struct_class = Types::Body
 
+    Bounce.add_member(:bounce_type, Shapes::ShapeRef.new(shape: BounceType, location_name: "BounceType"))
+    Bounce.add_member(:bounce_sub_type, Shapes::ShapeRef.new(shape: BounceSubType, location_name: "BounceSubType"))
+    Bounce.add_member(:diagnostic_code, Shapes::ShapeRef.new(shape: DiagnosticCode, location_name: "DiagnosticCode"))
+    Bounce.struct_class = Types::Bounce
+
     BulkEmailContent.add_member(:template, Shapes::ShapeRef.new(shape: Template, location_name: "Template"))
     BulkEmailContent.struct_class = Types::BulkEmailContent
 
     BulkEmailEntry.add_member(:destination, Shapes::ShapeRef.new(shape: Destination, required: true, location_name: "Destination"))
     BulkEmailEntry.add_member(:replacement_tags, Shapes::ShapeRef.new(shape: MessageTagList, location_name: "ReplacementTags"))
     BulkEmailEntry.add_member(:replacement_email_content, Shapes::ShapeRef.new(shape: ReplacementEmailContent, location_name: "ReplacementEmailContent"))
+    BulkEmailEntry.add_member(:replacement_headers, Shapes::ShapeRef.new(shape: MessageHeaderList, location_name: "ReplacementHeaders"))
     BulkEmailEntry.struct_class = Types::BulkEmailEntry
 
     BulkEmailEntryList.member = Shapes::ShapeRef.new(shape: BulkEmailEntry)
@@ -437,6 +573,11 @@ module Aws::SESV2
 
     BulkEmailEntryResultList.member = Shapes::ShapeRef.new(shape: BulkEmailEntryResult)
 
+    CancelExportJobRequest.add_member(:job_id, Shapes::ShapeRef.new(shape: JobId, required: true, location: "uri", location_name: "JobId"))
+    CancelExportJobRequest.struct_class = Types::CancelExportJobRequest
+
+    CancelExportJobResponse.struct_class = Types::CancelExportJobResponse
+
     CloudWatchDestination.add_member(:dimension_configurations, Shapes::ShapeRef.new(shape: CloudWatchDimensionConfigurations, required: true, location_name: "DimensionConfigurations"))
     CloudWatchDestination.struct_class = Types::CloudWatchDestination
 
@@ -446,6 +587,10 @@ module Aws::SESV2
     CloudWatchDimensionConfiguration.struct_class = Types::CloudWatchDimensionConfiguration
 
     CloudWatchDimensionConfigurations.member = Shapes::ShapeRef.new(shape: CloudWatchDimensionConfiguration)
+
+    Complaint.add_member(:complaint_sub_type, Shapes::ShapeRef.new(shape: ComplaintSubType, location_name: "ComplaintSubType"))
+    Complaint.add_member(:complaint_feedback_type, Shapes::ShapeRef.new(shape: ComplaintFeedbackType, location_name: "ComplaintFeedbackType"))
+    Complaint.struct_class = Types::Complaint
 
     ConcurrentModificationException.struct_class = Types::ConcurrentModificationException
 
@@ -486,6 +631,7 @@ module Aws::SESV2
     CreateConfigurationSetRequest.add_member(:sending_options, Shapes::ShapeRef.new(shape: SendingOptions, location_name: "SendingOptions"))
     CreateConfigurationSetRequest.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
     CreateConfigurationSetRequest.add_member(:suppression_options, Shapes::ShapeRef.new(shape: SuppressionOptions, location_name: "SuppressionOptions"))
+    CreateConfigurationSetRequest.add_member(:vdm_options, Shapes::ShapeRef.new(shape: VdmOptions, location_name: "VdmOptions"))
     CreateConfigurationSetRequest.struct_class = Types::CreateConfigurationSetRequest
 
     CreateConfigurationSetResponse.struct_class = Types::CreateConfigurationSetResponse
@@ -519,6 +665,7 @@ module Aws::SESV2
 
     CreateDedicatedIpPoolRequest.add_member(:pool_name, Shapes::ShapeRef.new(shape: PoolName, required: true, location_name: "PoolName"))
     CreateDedicatedIpPoolRequest.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
+    CreateDedicatedIpPoolRequest.add_member(:scaling_mode, Shapes::ShapeRef.new(shape: ScalingMode, location_name: "ScalingMode"))
     CreateDedicatedIpPoolRequest.struct_class = Types::CreateDedicatedIpPoolRequest
 
     CreateDedicatedIpPoolResponse.struct_class = Types::CreateDedicatedIpPoolResponse
@@ -543,6 +690,7 @@ module Aws::SESV2
     CreateEmailIdentityRequest.add_member(:email_identity, Shapes::ShapeRef.new(shape: Identity, required: true, location_name: "EmailIdentity"))
     CreateEmailIdentityRequest.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
     CreateEmailIdentityRequest.add_member(:dkim_signing_attributes, Shapes::ShapeRef.new(shape: DkimSigningAttributes, location_name: "DkimSigningAttributes"))
+    CreateEmailIdentityRequest.add_member(:configuration_set_name, Shapes::ShapeRef.new(shape: ConfigurationSetName, location_name: "ConfigurationSetName"))
     CreateEmailIdentityRequest.struct_class = Types::CreateEmailIdentityRequest
 
     CreateEmailIdentityResponse.add_member(:identity_type, Shapes::ShapeRef.new(shape: IdentityType, location_name: "IdentityType"))
@@ -555,6 +703,13 @@ module Aws::SESV2
     CreateEmailTemplateRequest.struct_class = Types::CreateEmailTemplateRequest
 
     CreateEmailTemplateResponse.struct_class = Types::CreateEmailTemplateResponse
+
+    CreateExportJobRequest.add_member(:export_data_source, Shapes::ShapeRef.new(shape: ExportDataSource, required: true, location_name: "ExportDataSource"))
+    CreateExportJobRequest.add_member(:export_destination, Shapes::ShapeRef.new(shape: ExportDestination, required: true, location_name: "ExportDestination"))
+    CreateExportJobRequest.struct_class = Types::CreateExportJobRequest
+
+    CreateExportJobResponse.add_member(:job_id, Shapes::ShapeRef.new(shape: JobId, location_name: "JobId"))
+    CreateExportJobResponse.struct_class = Types::CreateExportJobResponse
 
     CreateImportJobRequest.add_member(:import_destination, Shapes::ShapeRef.new(shape: ImportDestination, required: true, location_name: "ImportDestination"))
     CreateImportJobRequest.add_member(:import_data_source, Shapes::ShapeRef.new(shape: ImportDataSource, required: true, location_name: "ImportDataSource"))
@@ -579,6 +734,12 @@ module Aws::SESV2
 
     DailyVolumes.member = Shapes::ShapeRef.new(shape: DailyVolume)
 
+    DashboardAttributes.add_member(:engagement_metrics, Shapes::ShapeRef.new(shape: FeatureStatus, location_name: "EngagementMetrics"))
+    DashboardAttributes.struct_class = Types::DashboardAttributes
+
+    DashboardOptions.add_member(:engagement_metrics, Shapes::ShapeRef.new(shape: FeatureStatus, location_name: "EngagementMetrics"))
+    DashboardOptions.struct_class = Types::DashboardOptions
+
     DedicatedIp.add_member(:ip, Shapes::ShapeRef.new(shape: Ip, required: true, location_name: "Ip"))
     DedicatedIp.add_member(:warmup_status, Shapes::ShapeRef.new(shape: WarmupStatus, required: true, location_name: "WarmupStatus"))
     DedicatedIp.add_member(:warmup_percentage, Shapes::ShapeRef.new(shape: Percentage100Wrapper, required: true, location_name: "WarmupPercentage"))
@@ -586,6 +747,10 @@ module Aws::SESV2
     DedicatedIp.struct_class = Types::DedicatedIp
 
     DedicatedIpList.member = Shapes::ShapeRef.new(shape: DedicatedIp)
+
+    DedicatedIpPool.add_member(:pool_name, Shapes::ShapeRef.new(shape: PoolName, required: true, location_name: "PoolName"))
+    DedicatedIpPool.add_member(:scaling_mode, Shapes::ShapeRef.new(shape: ScalingMode, required: true, location_name: "ScalingMode"))
+    DedicatedIpPool.struct_class = Types::DedicatedIpPool
 
     DeleteConfigurationSetEventDestinationRequest.add_member(:configuration_set_name, Shapes::ShapeRef.new(shape: ConfigurationSetName, required: true, location: "uri", location_name: "ConfigurationSetName"))
     DeleteConfigurationSetEventDestinationRequest.add_member(:event_destination_name, Shapes::ShapeRef.new(shape: EventDestinationName, required: true, location: "uri", location_name: "EventDestinationName"))
@@ -659,14 +824,21 @@ module Aws::SESV2
     Destination.add_member(:bcc_addresses, Shapes::ShapeRef.new(shape: EmailAddressList, location_name: "BccAddresses"))
     Destination.struct_class = Types::Destination
 
+    Dimensions.key = Shapes::ShapeRef.new(shape: MetricDimensionName)
+    Dimensions.value = Shapes::ShapeRef.new(shape: MetricDimensionValue)
+
     DkimAttributes.add_member(:signing_enabled, Shapes::ShapeRef.new(shape: Enabled, location_name: "SigningEnabled"))
     DkimAttributes.add_member(:status, Shapes::ShapeRef.new(shape: DkimStatus, location_name: "Status"))
     DkimAttributes.add_member(:tokens, Shapes::ShapeRef.new(shape: DnsTokenList, location_name: "Tokens"))
     DkimAttributes.add_member(:signing_attributes_origin, Shapes::ShapeRef.new(shape: DkimSigningAttributesOrigin, location_name: "SigningAttributesOrigin"))
+    DkimAttributes.add_member(:next_signing_key_length, Shapes::ShapeRef.new(shape: DkimSigningKeyLength, location_name: "NextSigningKeyLength"))
+    DkimAttributes.add_member(:current_signing_key_length, Shapes::ShapeRef.new(shape: DkimSigningKeyLength, location_name: "CurrentSigningKeyLength"))
+    DkimAttributes.add_member(:last_key_generation_timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "LastKeyGenerationTimestamp"))
     DkimAttributes.struct_class = Types::DkimAttributes
 
-    DkimSigningAttributes.add_member(:domain_signing_selector, Shapes::ShapeRef.new(shape: Selector, required: true, location_name: "DomainSigningSelector"))
-    DkimSigningAttributes.add_member(:domain_signing_private_key, Shapes::ShapeRef.new(shape: PrivateKey, required: true, location_name: "DomainSigningPrivateKey"))
+    DkimSigningAttributes.add_member(:domain_signing_selector, Shapes::ShapeRef.new(shape: Selector, location_name: "DomainSigningSelector"))
+    DkimSigningAttributes.add_member(:domain_signing_private_key, Shapes::ShapeRef.new(shape: PrivateKey, location_name: "DomainSigningPrivateKey"))
+    DkimSigningAttributes.add_member(:next_signing_key_length, Shapes::ShapeRef.new(shape: DkimSigningKeyLength, location_name: "NextSigningKeyLength"))
     DkimSigningAttributes.struct_class = Types::DkimSigningAttributes
 
     DnsTokenList.member = Shapes::ShapeRef.new(shape: DnsToken)
@@ -705,12 +877,23 @@ module Aws::SESV2
 
     DomainIspPlacements.member = Shapes::ShapeRef.new(shape: DomainIspPlacement)
 
+    EmailAddressFilterList.member = Shapes::ShapeRef.new(shape: InsightsEmailAddress)
+
     EmailAddressList.member = Shapes::ShapeRef.new(shape: EmailAddress)
 
     EmailContent.add_member(:simple, Shapes::ShapeRef.new(shape: Message, location_name: "Simple"))
     EmailContent.add_member(:raw, Shapes::ShapeRef.new(shape: RawMessage, location_name: "Raw"))
     EmailContent.add_member(:template, Shapes::ShapeRef.new(shape: Template, location_name: "Template"))
     EmailContent.struct_class = Types::EmailContent
+
+    EmailInsights.add_member(:destination, Shapes::ShapeRef.new(shape: InsightsEmailAddress, location_name: "Destination"))
+    EmailInsights.add_member(:isp, Shapes::ShapeRef.new(shape: Isp, location_name: "Isp"))
+    EmailInsights.add_member(:events, Shapes::ShapeRef.new(shape: InsightsEvents, location_name: "Events"))
+    EmailInsights.struct_class = Types::EmailInsights
+
+    EmailInsightsList.member = Shapes::ShapeRef.new(shape: EmailInsights)
+
+    EmailSubjectFilterList.member = Shapes::ShapeRef.new(shape: EmailSubject)
 
     EmailTemplateContent.add_member(:subject, Shapes::ShapeRef.new(shape: EmailTemplateSubject, location_name: "Subject"))
     EmailTemplateContent.add_member(:text, Shapes::ShapeRef.new(shape: EmailTemplateText, location_name: "Text"))
@@ -725,12 +908,16 @@ module Aws::SESV2
 
     Esps.member = Shapes::ShapeRef.new(shape: Esp)
 
+    EventBridgeDestination.add_member(:event_bus_arn, Shapes::ShapeRef.new(shape: AmazonResourceName, required: true, location_name: "EventBusArn"))
+    EventBridgeDestination.struct_class = Types::EventBridgeDestination
+
     EventDestination.add_member(:name, Shapes::ShapeRef.new(shape: EventDestinationName, required: true, location_name: "Name"))
     EventDestination.add_member(:enabled, Shapes::ShapeRef.new(shape: Enabled, location_name: "Enabled"))
     EventDestination.add_member(:matching_event_types, Shapes::ShapeRef.new(shape: EventTypes, required: true, location_name: "MatchingEventTypes"))
     EventDestination.add_member(:kinesis_firehose_destination, Shapes::ShapeRef.new(shape: KinesisFirehoseDestination, location_name: "KinesisFirehoseDestination"))
     EventDestination.add_member(:cloud_watch_destination, Shapes::ShapeRef.new(shape: CloudWatchDestination, location_name: "CloudWatchDestination"))
     EventDestination.add_member(:sns_destination, Shapes::ShapeRef.new(shape: SnsDestination, location_name: "SnsDestination"))
+    EventDestination.add_member(:event_bridge_destination, Shapes::ShapeRef.new(shape: EventBridgeDestination, location_name: "EventBridgeDestination"))
     EventDestination.add_member(:pinpoint_destination, Shapes::ShapeRef.new(shape: PinpointDestination, location_name: "PinpointDestination"))
     EventDestination.struct_class = Types::EventDestination
 
@@ -739,12 +926,49 @@ module Aws::SESV2
     EventDestinationDefinition.add_member(:kinesis_firehose_destination, Shapes::ShapeRef.new(shape: KinesisFirehoseDestination, location_name: "KinesisFirehoseDestination"))
     EventDestinationDefinition.add_member(:cloud_watch_destination, Shapes::ShapeRef.new(shape: CloudWatchDestination, location_name: "CloudWatchDestination"))
     EventDestinationDefinition.add_member(:sns_destination, Shapes::ShapeRef.new(shape: SnsDestination, location_name: "SnsDestination"))
+    EventDestinationDefinition.add_member(:event_bridge_destination, Shapes::ShapeRef.new(shape: EventBridgeDestination, location_name: "EventBridgeDestination"))
     EventDestinationDefinition.add_member(:pinpoint_destination, Shapes::ShapeRef.new(shape: PinpointDestination, location_name: "PinpointDestination"))
     EventDestinationDefinition.struct_class = Types::EventDestinationDefinition
 
     EventDestinations.member = Shapes::ShapeRef.new(shape: EventDestination)
 
+    EventDetails.add_member(:bounce, Shapes::ShapeRef.new(shape: Bounce, location_name: "Bounce"))
+    EventDetails.add_member(:complaint, Shapes::ShapeRef.new(shape: Complaint, location_name: "Complaint"))
+    EventDetails.struct_class = Types::EventDetails
+
     EventTypes.member = Shapes::ShapeRef.new(shape: EventType)
+
+    ExportDataSource.add_member(:metrics_data_source, Shapes::ShapeRef.new(shape: MetricsDataSource, location_name: "MetricsDataSource"))
+    ExportDataSource.add_member(:message_insights_data_source, Shapes::ShapeRef.new(shape: MessageInsightsDataSource, location_name: "MessageInsightsDataSource"))
+    ExportDataSource.struct_class = Types::ExportDataSource
+
+    ExportDestination.add_member(:data_format, Shapes::ShapeRef.new(shape: DataFormat, required: true, location_name: "DataFormat"))
+    ExportDestination.add_member(:s3_url, Shapes::ShapeRef.new(shape: S3Url, location_name: "S3Url"))
+    ExportDestination.struct_class = Types::ExportDestination
+
+    ExportDimensionValue.member = Shapes::ShapeRef.new(shape: MetricDimensionValue)
+
+    ExportDimensions.key = Shapes::ShapeRef.new(shape: MetricDimensionName)
+    ExportDimensions.value = Shapes::ShapeRef.new(shape: ExportDimensionValue)
+
+    ExportJobSummary.add_member(:job_id, Shapes::ShapeRef.new(shape: JobId, location_name: "JobId"))
+    ExportJobSummary.add_member(:export_source_type, Shapes::ShapeRef.new(shape: ExportSourceType, location_name: "ExportSourceType"))
+    ExportJobSummary.add_member(:job_status, Shapes::ShapeRef.new(shape: JobStatus, location_name: "JobStatus"))
+    ExportJobSummary.add_member(:created_timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "CreatedTimestamp"))
+    ExportJobSummary.add_member(:completed_timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "CompletedTimestamp"))
+    ExportJobSummary.struct_class = Types::ExportJobSummary
+
+    ExportJobSummaryList.member = Shapes::ShapeRef.new(shape: ExportJobSummary)
+
+    ExportMetric.add_member(:name, Shapes::ShapeRef.new(shape: Metric, location_name: "Name"))
+    ExportMetric.add_member(:aggregation, Shapes::ShapeRef.new(shape: MetricAggregation, location_name: "Aggregation"))
+    ExportMetric.struct_class = Types::ExportMetric
+
+    ExportMetrics.member = Shapes::ShapeRef.new(shape: ExportMetric)
+
+    ExportStatistics.add_member(:processed_records_count, Shapes::ShapeRef.new(shape: ProcessedRecordsCount, location_name: "ProcessedRecordsCount"))
+    ExportStatistics.add_member(:exported_records_count, Shapes::ShapeRef.new(shape: ExportedRecordsCount, location_name: "ExportedRecordsCount"))
+    ExportStatistics.struct_class = Types::ExportStatistics
 
     FailureInfo.add_member(:failed_records_s3_url, Shapes::ShapeRef.new(shape: FailedRecordsS3Url, location_name: "FailedRecordsS3Url"))
     FailureInfo.add_member(:error_message, Shapes::ShapeRef.new(shape: ErrorMessage, location_name: "ErrorMessage"))
@@ -759,6 +983,7 @@ module Aws::SESV2
     GetAccountResponse.add_member(:sending_enabled, Shapes::ShapeRef.new(shape: Enabled, location_name: "SendingEnabled"))
     GetAccountResponse.add_member(:suppression_attributes, Shapes::ShapeRef.new(shape: SuppressionAttributes, location_name: "SuppressionAttributes"))
     GetAccountResponse.add_member(:details, Shapes::ShapeRef.new(shape: AccountDetails, location_name: "Details"))
+    GetAccountResponse.add_member(:vdm_attributes, Shapes::ShapeRef.new(shape: VdmAttributes, location_name: "VdmAttributes"))
     GetAccountResponse.struct_class = Types::GetAccountResponse
 
     GetBlacklistReportsRequest.add_member(:blacklist_item_names, Shapes::ShapeRef.new(shape: BlacklistItemNames, required: true, location: "querystring", location_name: "BlacklistItemNames"))
@@ -783,6 +1008,7 @@ module Aws::SESV2
     GetConfigurationSetResponse.add_member(:sending_options, Shapes::ShapeRef.new(shape: SendingOptions, location_name: "SendingOptions"))
     GetConfigurationSetResponse.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
     GetConfigurationSetResponse.add_member(:suppression_options, Shapes::ShapeRef.new(shape: SuppressionOptions, location_name: "SuppressionOptions"))
+    GetConfigurationSetResponse.add_member(:vdm_options, Shapes::ShapeRef.new(shape: VdmOptions, location_name: "VdmOptions"))
     GetConfigurationSetResponse.struct_class = Types::GetConfigurationSetResponse
 
     GetContactListRequest.add_member(:contact_list_name, Shapes::ShapeRef.new(shape: ContactListName, required: true, location: "uri", location_name: "ContactListName"))
@@ -820,6 +1046,12 @@ module Aws::SESV2
     GetCustomVerificationEmailTemplateResponse.add_member(:success_redirection_url, Shapes::ShapeRef.new(shape: SuccessRedirectionURL, location_name: "SuccessRedirectionURL"))
     GetCustomVerificationEmailTemplateResponse.add_member(:failure_redirection_url, Shapes::ShapeRef.new(shape: FailureRedirectionURL, location_name: "FailureRedirectionURL"))
     GetCustomVerificationEmailTemplateResponse.struct_class = Types::GetCustomVerificationEmailTemplateResponse
+
+    GetDedicatedIpPoolRequest.add_member(:pool_name, Shapes::ShapeRef.new(shape: PoolName, required: true, location: "uri", location_name: "PoolName"))
+    GetDedicatedIpPoolRequest.struct_class = Types::GetDedicatedIpPoolRequest
+
+    GetDedicatedIpPoolResponse.add_member(:dedicated_ip_pool, Shapes::ShapeRef.new(shape: DedicatedIpPool, location_name: "DedicatedIpPool"))
+    GetDedicatedIpPoolResponse.struct_class = Types::GetDedicatedIpPoolResponse
 
     GetDedicatedIpRequest.add_member(:ip, Shapes::ShapeRef.new(shape: Ip, required: true, location: "uri", location_name: "IP"))
     GetDedicatedIpRequest.struct_class = Types::GetDedicatedIpRequest
@@ -886,6 +1118,9 @@ module Aws::SESV2
     GetEmailIdentityResponse.add_member(:mail_from_attributes, Shapes::ShapeRef.new(shape: MailFromAttributes, location_name: "MailFromAttributes"))
     GetEmailIdentityResponse.add_member(:policies, Shapes::ShapeRef.new(shape: PolicyMap, location_name: "Policies"))
     GetEmailIdentityResponse.add_member(:tags, Shapes::ShapeRef.new(shape: TagList, location_name: "Tags"))
+    GetEmailIdentityResponse.add_member(:configuration_set_name, Shapes::ShapeRef.new(shape: ConfigurationSetName, location_name: "ConfigurationSetName"))
+    GetEmailIdentityResponse.add_member(:verification_status, Shapes::ShapeRef.new(shape: VerificationStatus, location_name: "VerificationStatus"))
+    GetEmailIdentityResponse.add_member(:verification_info, Shapes::ShapeRef.new(shape: VerificationInfo, location_name: "VerificationInfo"))
     GetEmailIdentityResponse.struct_class = Types::GetEmailIdentityResponse
 
     GetEmailTemplateRequest.add_member(:template_name, Shapes::ShapeRef.new(shape: EmailTemplateName, required: true, location: "uri", location_name: "TemplateName"))
@@ -894,6 +1129,20 @@ module Aws::SESV2
     GetEmailTemplateResponse.add_member(:template_name, Shapes::ShapeRef.new(shape: EmailTemplateName, required: true, location_name: "TemplateName"))
     GetEmailTemplateResponse.add_member(:template_content, Shapes::ShapeRef.new(shape: EmailTemplateContent, required: true, location_name: "TemplateContent"))
     GetEmailTemplateResponse.struct_class = Types::GetEmailTemplateResponse
+
+    GetExportJobRequest.add_member(:job_id, Shapes::ShapeRef.new(shape: JobId, required: true, location: "uri", location_name: "JobId"))
+    GetExportJobRequest.struct_class = Types::GetExportJobRequest
+
+    GetExportJobResponse.add_member(:job_id, Shapes::ShapeRef.new(shape: JobId, location_name: "JobId"))
+    GetExportJobResponse.add_member(:export_source_type, Shapes::ShapeRef.new(shape: ExportSourceType, location_name: "ExportSourceType"))
+    GetExportJobResponse.add_member(:job_status, Shapes::ShapeRef.new(shape: JobStatus, location_name: "JobStatus"))
+    GetExportJobResponse.add_member(:export_destination, Shapes::ShapeRef.new(shape: ExportDestination, location_name: "ExportDestination"))
+    GetExportJobResponse.add_member(:export_data_source, Shapes::ShapeRef.new(shape: ExportDataSource, location_name: "ExportDataSource"))
+    GetExportJobResponse.add_member(:created_timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "CreatedTimestamp"))
+    GetExportJobResponse.add_member(:completed_timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "CompletedTimestamp"))
+    GetExportJobResponse.add_member(:failure_info, Shapes::ShapeRef.new(shape: FailureInfo, location_name: "FailureInfo"))
+    GetExportJobResponse.add_member(:statistics, Shapes::ShapeRef.new(shape: ExportStatistics, location_name: "Statistics"))
+    GetExportJobResponse.struct_class = Types::GetExportJobResponse
 
     GetImportJobRequest.add_member(:job_id, Shapes::ShapeRef.new(shape: JobId, required: true, location: "uri", location_name: "JobId"))
     GetImportJobRequest.struct_class = Types::GetImportJobRequest
@@ -909,15 +1158,32 @@ module Aws::SESV2
     GetImportJobResponse.add_member(:failed_records_count, Shapes::ShapeRef.new(shape: FailedRecordsCount, location_name: "FailedRecordsCount"))
     GetImportJobResponse.struct_class = Types::GetImportJobResponse
 
+    GetMessageInsightsRequest.add_member(:message_id, Shapes::ShapeRef.new(shape: OutboundMessageId, required: true, location: "uri", location_name: "MessageId"))
+    GetMessageInsightsRequest.struct_class = Types::GetMessageInsightsRequest
+
+    GetMessageInsightsResponse.add_member(:message_id, Shapes::ShapeRef.new(shape: OutboundMessageId, location_name: "MessageId"))
+    GetMessageInsightsResponse.add_member(:from_email_address, Shapes::ShapeRef.new(shape: InsightsEmailAddress, location_name: "FromEmailAddress"))
+    GetMessageInsightsResponse.add_member(:subject, Shapes::ShapeRef.new(shape: EmailSubject, location_name: "Subject"))
+    GetMessageInsightsResponse.add_member(:email_tags, Shapes::ShapeRef.new(shape: MessageTagList, location_name: "EmailTags"))
+    GetMessageInsightsResponse.add_member(:insights, Shapes::ShapeRef.new(shape: EmailInsightsList, location_name: "Insights"))
+    GetMessageInsightsResponse.struct_class = Types::GetMessageInsightsResponse
+
     GetSuppressedDestinationRequest.add_member(:email_address, Shapes::ShapeRef.new(shape: EmailAddress, required: true, location: "uri", location_name: "EmailAddress"))
     GetSuppressedDestinationRequest.struct_class = Types::GetSuppressedDestinationRequest
 
     GetSuppressedDestinationResponse.add_member(:suppressed_destination, Shapes::ShapeRef.new(shape: SuppressedDestination, required: true, location_name: "SuppressedDestination"))
     GetSuppressedDestinationResponse.struct_class = Types::GetSuppressedDestinationResponse
 
+    GuardianAttributes.add_member(:optimized_shared_delivery, Shapes::ShapeRef.new(shape: FeatureStatus, location_name: "OptimizedSharedDelivery"))
+    GuardianAttributes.struct_class = Types::GuardianAttributes
+
+    GuardianOptions.add_member(:optimized_shared_delivery, Shapes::ShapeRef.new(shape: FeatureStatus, location_name: "OptimizedSharedDelivery"))
+    GuardianOptions.struct_class = Types::GuardianOptions
+
     IdentityInfo.add_member(:identity_type, Shapes::ShapeRef.new(shape: IdentityType, location_name: "IdentityType"))
     IdentityInfo.add_member(:identity_name, Shapes::ShapeRef.new(shape: Identity, location_name: "IdentityName"))
     IdentityInfo.add_member(:sending_enabled, Shapes::ShapeRef.new(shape: Enabled, location_name: "SendingEnabled"))
+    IdentityInfo.add_member(:verification_status, Shapes::ShapeRef.new(shape: VerificationStatus, location_name: "VerificationStatus"))
     IdentityInfo.struct_class = Types::IdentityInfo
 
     IdentityInfoList.member = Shapes::ShapeRef.new(shape: IdentityInfo)
@@ -934,6 +1200,8 @@ module Aws::SESV2
     ImportJobSummary.add_member(:import_destination, Shapes::ShapeRef.new(shape: ImportDestination, location_name: "ImportDestination"))
     ImportJobSummary.add_member(:job_status, Shapes::ShapeRef.new(shape: JobStatus, location_name: "JobStatus"))
     ImportJobSummary.add_member(:created_timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "CreatedTimestamp"))
+    ImportJobSummary.add_member(:processed_records_count, Shapes::ShapeRef.new(shape: ProcessedRecordsCount, location_name: "ProcessedRecordsCount"))
+    ImportJobSummary.add_member(:failed_records_count, Shapes::ShapeRef.new(shape: FailedRecordsCount, location_name: "FailedRecordsCount"))
     ImportJobSummary.struct_class = Types::ImportJobSummary
 
     ImportJobSummaryList.member = Shapes::ShapeRef.new(shape: ImportJobSummary)
@@ -942,9 +1210,20 @@ module Aws::SESV2
     InboxPlacementTrackingOption.add_member(:tracked_isps, Shapes::ShapeRef.new(shape: IspNameList, location_name: "TrackedIsps"))
     InboxPlacementTrackingOption.struct_class = Types::InboxPlacementTrackingOption
 
+    InsightsEvent.add_member(:timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "Timestamp"))
+    InsightsEvent.add_member(:type, Shapes::ShapeRef.new(shape: EventType, location_name: "Type"))
+    InsightsEvent.add_member(:details, Shapes::ShapeRef.new(shape: EventDetails, location_name: "Details"))
+    InsightsEvent.struct_class = Types::InsightsEvent
+
+    InsightsEvents.member = Shapes::ShapeRef.new(shape: InsightsEvent)
+
+    InternalServiceErrorException.struct_class = Types::InternalServiceErrorException
+
     InvalidNextTokenException.struct_class = Types::InvalidNextTokenException
 
     IpList.member = Shapes::ShapeRef.new(shape: Ip)
+
+    IspFilterList.member = Shapes::ShapeRef.new(shape: Isp)
 
     IspNameList.member = Shapes::ShapeRef.new(shape: IspName)
 
@@ -957,6 +1236,10 @@ module Aws::SESV2
     KinesisFirehoseDestination.add_member(:iam_role_arn, Shapes::ShapeRef.new(shape: AmazonResourceName, required: true, location_name: "IamRoleArn"))
     KinesisFirehoseDestination.add_member(:delivery_stream_arn, Shapes::ShapeRef.new(shape: AmazonResourceName, required: true, location_name: "DeliveryStreamArn"))
     KinesisFirehoseDestination.struct_class = Types::KinesisFirehoseDestination
+
+    LastDeliveryEventList.member = Shapes::ShapeRef.new(shape: DeliveryEventType)
+
+    LastEngagementEventList.member = Shapes::ShapeRef.new(shape: EngagementEventType)
 
     LimitExceededException.struct_class = Types::LimitExceededException
 
@@ -982,8 +1265,8 @@ module Aws::SESV2
 
     ListContactsRequest.add_member(:contact_list_name, Shapes::ShapeRef.new(shape: ContactListName, required: true, location: "uri", location_name: "ContactListName"))
     ListContactsRequest.add_member(:filter, Shapes::ShapeRef.new(shape: ListContactsFilter, location_name: "Filter"))
-    ListContactsRequest.add_member(:page_size, Shapes::ShapeRef.new(shape: MaxItems, location: "querystring", location_name: "PageSize"))
-    ListContactsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location: "querystring", location_name: "NextToken"))
+    ListContactsRequest.add_member(:page_size, Shapes::ShapeRef.new(shape: MaxItems, location_name: "PageSize"))
+    ListContactsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
     ListContactsRequest.struct_class = Types::ListContactsRequest
 
     ListContactsResponse.add_member(:contacts, Shapes::ShapeRef.new(shape: ListOfContacts, location_name: "Contacts"))
@@ -1041,9 +1324,19 @@ module Aws::SESV2
     ListEmailTemplatesResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
     ListEmailTemplatesResponse.struct_class = Types::ListEmailTemplatesResponse
 
+    ListExportJobsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    ListExportJobsRequest.add_member(:page_size, Shapes::ShapeRef.new(shape: MaxItems, location_name: "PageSize"))
+    ListExportJobsRequest.add_member(:export_source_type, Shapes::ShapeRef.new(shape: ExportSourceType, location_name: "ExportSourceType"))
+    ListExportJobsRequest.add_member(:job_status, Shapes::ShapeRef.new(shape: JobStatus, location_name: "JobStatus"))
+    ListExportJobsRequest.struct_class = Types::ListExportJobsRequest
+
+    ListExportJobsResponse.add_member(:export_jobs, Shapes::ShapeRef.new(shape: ExportJobSummaryList, location_name: "ExportJobs"))
+    ListExportJobsResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    ListExportJobsResponse.struct_class = Types::ListExportJobsResponse
+
     ListImportJobsRequest.add_member(:import_destination_type, Shapes::ShapeRef.new(shape: ImportDestinationType, location_name: "ImportDestinationType"))
-    ListImportJobsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location: "querystring", location_name: "NextToken"))
-    ListImportJobsRequest.add_member(:page_size, Shapes::ShapeRef.new(shape: MaxItems, location: "querystring", location_name: "PageSize"))
+    ListImportJobsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    ListImportJobsRequest.add_member(:page_size, Shapes::ShapeRef.new(shape: MaxItems, location_name: "PageSize"))
     ListImportJobsRequest.struct_class = Types::ListImportJobsRequest
 
     ListImportJobsResponse.add_member(:import_jobs, Shapes::ShapeRef.new(shape: ImportJobSummaryList, location_name: "ImportJobs"))
@@ -1059,6 +1352,18 @@ module Aws::SESV2
     ListOfContacts.member = Shapes::ShapeRef.new(shape: Contact)
 
     ListOfDedicatedIpPools.member = Shapes::ShapeRef.new(shape: PoolName)
+
+    ListRecommendationsFilter.key = Shapes::ShapeRef.new(shape: ListRecommendationsFilterKey)
+    ListRecommendationsFilter.value = Shapes::ShapeRef.new(shape: ListRecommendationFilterValue)
+
+    ListRecommendationsRequest.add_member(:filter, Shapes::ShapeRef.new(shape: ListRecommendationsFilter, location_name: "Filter"))
+    ListRecommendationsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    ListRecommendationsRequest.add_member(:page_size, Shapes::ShapeRef.new(shape: MaxItems, location_name: "PageSize"))
+    ListRecommendationsRequest.struct_class = Types::ListRecommendationsRequest
+
+    ListRecommendationsResponse.add_member(:recommendations, Shapes::ShapeRef.new(shape: RecommendationsList, location_name: "Recommendations"))
+    ListRecommendationsResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    ListRecommendationsResponse.struct_class = Types::ListRecommendationsResponse
 
     ListSuppressedDestinationsRequest.add_member(:reasons, Shapes::ShapeRef.new(shape: SuppressionListReasons, location: "querystring", location_name: "Reason"))
     ListSuppressedDestinationsRequest.add_member(:start_date, Shapes::ShapeRef.new(shape: Timestamp, location: "querystring", location_name: "StartDate"))
@@ -1086,7 +1391,29 @@ module Aws::SESV2
 
     Message.add_member(:subject, Shapes::ShapeRef.new(shape: Content, required: true, location_name: "Subject"))
     Message.add_member(:body, Shapes::ShapeRef.new(shape: Body, required: true, location_name: "Body"))
+    Message.add_member(:headers, Shapes::ShapeRef.new(shape: MessageHeaderList, location_name: "Headers"))
     Message.struct_class = Types::Message
+
+    MessageHeader.add_member(:name, Shapes::ShapeRef.new(shape: MessageHeaderName, required: true, location_name: "Name"))
+    MessageHeader.add_member(:value, Shapes::ShapeRef.new(shape: MessageHeaderValue, required: true, location_name: "Value"))
+    MessageHeader.struct_class = Types::MessageHeader
+
+    MessageHeaderList.member = Shapes::ShapeRef.new(shape: MessageHeader)
+
+    MessageInsightsDataSource.add_member(:start_date, Shapes::ShapeRef.new(shape: Timestamp, required: true, location_name: "StartDate"))
+    MessageInsightsDataSource.add_member(:end_date, Shapes::ShapeRef.new(shape: Timestamp, required: true, location_name: "EndDate"))
+    MessageInsightsDataSource.add_member(:include, Shapes::ShapeRef.new(shape: MessageInsightsFilters, location_name: "Include"))
+    MessageInsightsDataSource.add_member(:exclude, Shapes::ShapeRef.new(shape: MessageInsightsFilters, location_name: "Exclude"))
+    MessageInsightsDataSource.add_member(:max_results, Shapes::ShapeRef.new(shape: MessageInsightsExportMaxResults, location_name: "MaxResults"))
+    MessageInsightsDataSource.struct_class = Types::MessageInsightsDataSource
+
+    MessageInsightsFilters.add_member(:from_email_address, Shapes::ShapeRef.new(shape: EmailAddressFilterList, location_name: "FromEmailAddress"))
+    MessageInsightsFilters.add_member(:destination, Shapes::ShapeRef.new(shape: EmailAddressFilterList, location_name: "Destination"))
+    MessageInsightsFilters.add_member(:subject, Shapes::ShapeRef.new(shape: EmailSubjectFilterList, location_name: "Subject"))
+    MessageInsightsFilters.add_member(:isp, Shapes::ShapeRef.new(shape: IspFilterList, location_name: "Isp"))
+    MessageInsightsFilters.add_member(:last_delivery_event, Shapes::ShapeRef.new(shape: LastDeliveryEventList, location_name: "LastDeliveryEvent"))
+    MessageInsightsFilters.add_member(:last_engagement_event, Shapes::ShapeRef.new(shape: LastEngagementEventList, location_name: "LastEngagementEvent"))
+    MessageInsightsFilters.struct_class = Types::MessageInsightsFilters
 
     MessageRejected.struct_class = Types::MessageRejected
 
@@ -1095,6 +1422,29 @@ module Aws::SESV2
     MessageTag.struct_class = Types::MessageTag
 
     MessageTagList.member = Shapes::ShapeRef.new(shape: MessageTag)
+
+    MetricDataError.add_member(:id, Shapes::ShapeRef.new(shape: QueryIdentifier, location_name: "Id"))
+    MetricDataError.add_member(:code, Shapes::ShapeRef.new(shape: QueryErrorCode, location_name: "Code"))
+    MetricDataError.add_member(:message, Shapes::ShapeRef.new(shape: QueryErrorMessage, location_name: "Message"))
+    MetricDataError.struct_class = Types::MetricDataError
+
+    MetricDataErrorList.member = Shapes::ShapeRef.new(shape: MetricDataError)
+
+    MetricDataResult.add_member(:id, Shapes::ShapeRef.new(shape: QueryIdentifier, location_name: "Id"))
+    MetricDataResult.add_member(:timestamps, Shapes::ShapeRef.new(shape: TimestampList, location_name: "Timestamps"))
+    MetricDataResult.add_member(:values, Shapes::ShapeRef.new(shape: MetricValueList, location_name: "Values"))
+    MetricDataResult.struct_class = Types::MetricDataResult
+
+    MetricDataResultList.member = Shapes::ShapeRef.new(shape: MetricDataResult)
+
+    MetricValueList.member = Shapes::ShapeRef.new(shape: Counter)
+
+    MetricsDataSource.add_member(:dimensions, Shapes::ShapeRef.new(shape: ExportDimensions, required: true, location_name: "Dimensions"))
+    MetricsDataSource.add_member(:namespace, Shapes::ShapeRef.new(shape: MetricNamespace, required: true, location_name: "Namespace"))
+    MetricsDataSource.add_member(:metrics, Shapes::ShapeRef.new(shape: ExportMetrics, required: true, location_name: "Metrics"))
+    MetricsDataSource.add_member(:start_date, Shapes::ShapeRef.new(shape: Timestamp, required: true, location_name: "StartDate"))
+    MetricsDataSource.add_member(:end_date, Shapes::ShapeRef.new(shape: Timestamp, required: true, location_name: "EndDate"))
+    MetricsDataSource.struct_class = Types::MetricsDataSource
 
     NotFoundException.struct_class = Types::NotFoundException
 
@@ -1124,7 +1474,7 @@ module Aws::SESV2
     PutAccountDetailsRequest.add_member(:mail_type, Shapes::ShapeRef.new(shape: MailType, required: true, location_name: "MailType"))
     PutAccountDetailsRequest.add_member(:website_url, Shapes::ShapeRef.new(shape: WebsiteURL, required: true, location_name: "WebsiteURL"))
     PutAccountDetailsRequest.add_member(:contact_language, Shapes::ShapeRef.new(shape: ContactLanguage, location_name: "ContactLanguage"))
-    PutAccountDetailsRequest.add_member(:use_case_description, Shapes::ShapeRef.new(shape: UseCaseDescription, required: true, location_name: "UseCaseDescription"))
+    PutAccountDetailsRequest.add_member(:use_case_description, Shapes::ShapeRef.new(shape: UseCaseDescription, deprecated: true, location_name: "UseCaseDescription"))
     PutAccountDetailsRequest.add_member(:additional_contact_email_addresses, Shapes::ShapeRef.new(shape: AdditionalContactEmailAddresses, location_name: "AdditionalContactEmailAddresses"))
     PutAccountDetailsRequest.add_member(:production_access_enabled, Shapes::ShapeRef.new(shape: EnabledWrapper, location_name: "ProductionAccessEnabled"))
     PutAccountDetailsRequest.struct_class = Types::PutAccountDetailsRequest
@@ -1140,6 +1490,11 @@ module Aws::SESV2
     PutAccountSuppressionAttributesRequest.struct_class = Types::PutAccountSuppressionAttributesRequest
 
     PutAccountSuppressionAttributesResponse.struct_class = Types::PutAccountSuppressionAttributesResponse
+
+    PutAccountVdmAttributesRequest.add_member(:vdm_attributes, Shapes::ShapeRef.new(shape: VdmAttributes, required: true, location_name: "VdmAttributes"))
+    PutAccountVdmAttributesRequest.struct_class = Types::PutAccountVdmAttributesRequest
+
+    PutAccountVdmAttributesResponse.struct_class = Types::PutAccountVdmAttributesResponse
 
     PutConfigurationSetDeliveryOptionsRequest.add_member(:configuration_set_name, Shapes::ShapeRef.new(shape: ConfigurationSetName, required: true, location: "uri", location_name: "ConfigurationSetName"))
     PutConfigurationSetDeliveryOptionsRequest.add_member(:tls_policy, Shapes::ShapeRef.new(shape: TlsPolicy, location_name: "TlsPolicy"))
@@ -1168,15 +1523,28 @@ module Aws::SESV2
 
     PutConfigurationSetTrackingOptionsRequest.add_member(:configuration_set_name, Shapes::ShapeRef.new(shape: ConfigurationSetName, required: true, location: "uri", location_name: "ConfigurationSetName"))
     PutConfigurationSetTrackingOptionsRequest.add_member(:custom_redirect_domain, Shapes::ShapeRef.new(shape: CustomRedirectDomain, location_name: "CustomRedirectDomain"))
+    PutConfigurationSetTrackingOptionsRequest.add_member(:https_policy, Shapes::ShapeRef.new(shape: HttpsPolicy, location_name: "HttpsPolicy"))
     PutConfigurationSetTrackingOptionsRequest.struct_class = Types::PutConfigurationSetTrackingOptionsRequest
 
     PutConfigurationSetTrackingOptionsResponse.struct_class = Types::PutConfigurationSetTrackingOptionsResponse
+
+    PutConfigurationSetVdmOptionsRequest.add_member(:configuration_set_name, Shapes::ShapeRef.new(shape: ConfigurationSetName, required: true, location: "uri", location_name: "ConfigurationSetName"))
+    PutConfigurationSetVdmOptionsRequest.add_member(:vdm_options, Shapes::ShapeRef.new(shape: VdmOptions, location_name: "VdmOptions"))
+    PutConfigurationSetVdmOptionsRequest.struct_class = Types::PutConfigurationSetVdmOptionsRequest
+
+    PutConfigurationSetVdmOptionsResponse.struct_class = Types::PutConfigurationSetVdmOptionsResponse
 
     PutDedicatedIpInPoolRequest.add_member(:ip, Shapes::ShapeRef.new(shape: Ip, required: true, location: "uri", location_name: "IP"))
     PutDedicatedIpInPoolRequest.add_member(:destination_pool_name, Shapes::ShapeRef.new(shape: PoolName, required: true, location_name: "DestinationPoolName"))
     PutDedicatedIpInPoolRequest.struct_class = Types::PutDedicatedIpInPoolRequest
 
     PutDedicatedIpInPoolResponse.struct_class = Types::PutDedicatedIpInPoolResponse
+
+    PutDedicatedIpPoolScalingAttributesRequest.add_member(:pool_name, Shapes::ShapeRef.new(shape: PoolName, required: true, location: "uri", location_name: "PoolName"))
+    PutDedicatedIpPoolScalingAttributesRequest.add_member(:scaling_mode, Shapes::ShapeRef.new(shape: ScalingMode, required: true, location_name: "ScalingMode"))
+    PutDedicatedIpPoolScalingAttributesRequest.struct_class = Types::PutDedicatedIpPoolScalingAttributesRequest
+
+    PutDedicatedIpPoolScalingAttributesResponse.struct_class = Types::PutDedicatedIpPoolScalingAttributesResponse
 
     PutDedicatedIpWarmupAttributesRequest.add_member(:ip, Shapes::ShapeRef.new(shape: Ip, required: true, location: "uri", location_name: "IP"))
     PutDedicatedIpWarmupAttributesRequest.add_member(:warmup_percentage, Shapes::ShapeRef.new(shape: Percentage100Wrapper, required: true, location_name: "WarmupPercentage"))
@@ -1189,6 +1557,12 @@ module Aws::SESV2
     PutDeliverabilityDashboardOptionRequest.struct_class = Types::PutDeliverabilityDashboardOptionRequest
 
     PutDeliverabilityDashboardOptionResponse.struct_class = Types::PutDeliverabilityDashboardOptionResponse
+
+    PutEmailIdentityConfigurationSetAttributesRequest.add_member(:email_identity, Shapes::ShapeRef.new(shape: Identity, required: true, location: "uri", location_name: "EmailIdentity"))
+    PutEmailIdentityConfigurationSetAttributesRequest.add_member(:configuration_set_name, Shapes::ShapeRef.new(shape: ConfigurationSetName, location_name: "ConfigurationSetName"))
+    PutEmailIdentityConfigurationSetAttributesRequest.struct_class = Types::PutEmailIdentityConfigurationSetAttributesRequest
+
+    PutEmailIdentityConfigurationSetAttributesResponse.struct_class = Types::PutEmailIdentityConfigurationSetAttributesResponse
 
     PutEmailIdentityDkimAttributesRequest.add_member(:email_identity, Shapes::ShapeRef.new(shape: Identity, required: true, location: "uri", location_name: "EmailIdentity"))
     PutEmailIdentityDkimAttributesRequest.add_member(:signing_enabled, Shapes::ShapeRef.new(shape: Enabled, location_name: "SigningEnabled"))
@@ -1227,6 +1601,17 @@ module Aws::SESV2
     RawMessage.add_member(:data, Shapes::ShapeRef.new(shape: RawMessageData, required: true, location_name: "Data"))
     RawMessage.struct_class = Types::RawMessage
 
+    Recommendation.add_member(:resource_arn, Shapes::ShapeRef.new(shape: AmazonResourceName, location_name: "ResourceArn"))
+    Recommendation.add_member(:type, Shapes::ShapeRef.new(shape: RecommendationType, location_name: "Type"))
+    Recommendation.add_member(:description, Shapes::ShapeRef.new(shape: RecommendationDescription, location_name: "Description"))
+    Recommendation.add_member(:status, Shapes::ShapeRef.new(shape: RecommendationStatus, location_name: "Status"))
+    Recommendation.add_member(:created_timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "CreatedTimestamp"))
+    Recommendation.add_member(:last_updated_timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "LastUpdatedTimestamp"))
+    Recommendation.add_member(:impact, Shapes::ShapeRef.new(shape: RecommendationImpact, location_name: "Impact"))
+    Recommendation.struct_class = Types::Recommendation
+
+    RecommendationsList.member = Shapes::ShapeRef.new(shape: Recommendation)
+
     ReplacementEmailContent.add_member(:replacement_template, Shapes::ShapeRef.new(shape: ReplacementTemplate, location_name: "ReplacementTemplate"))
     ReplacementEmailContent.struct_class = Types::ReplacementEmailContent
 
@@ -1240,6 +1625,11 @@ module Aws::SESV2
     ReviewDetails.add_member(:status, Shapes::ShapeRef.new(shape: ReviewStatus, location_name: "Status"))
     ReviewDetails.add_member(:case_id, Shapes::ShapeRef.new(shape: CaseId, location_name: "CaseId"))
     ReviewDetails.struct_class = Types::ReviewDetails
+
+    SOARecord.add_member(:primary_name_server, Shapes::ShapeRef.new(shape: PrimaryNameServer, location_name: "PrimaryNameServer"))
+    SOARecord.add_member(:admin_email, Shapes::ShapeRef.new(shape: AdminEmail, location_name: "AdminEmail"))
+    SOARecord.add_member(:serial_number, Shapes::ShapeRef.new(shape: SerialNumber, location_name: "SerialNumber"))
+    SOARecord.struct_class = Types::SOARecord
 
     SendBulkEmailRequest.add_member(:from_email_address, Shapes::ShapeRef.new(shape: EmailAddress, location_name: "FromEmailAddress"))
     SendBulkEmailRequest.add_member(:from_email_address_identity_arn, Shapes::ShapeRef.new(shape: AmazonResourceName, location_name: "FromEmailAddressIdentityArn"))
@@ -1336,6 +1726,7 @@ module Aws::SESV2
     Template.add_member(:template_name, Shapes::ShapeRef.new(shape: EmailTemplateName, location_name: "TemplateName"))
     Template.add_member(:template_arn, Shapes::ShapeRef.new(shape: AmazonResourceName, location_name: "TemplateArn"))
     Template.add_member(:template_data, Shapes::ShapeRef.new(shape: EmailTemplateData, location_name: "TemplateData"))
+    Template.add_member(:headers, Shapes::ShapeRef.new(shape: MessageHeaderList, location_name: "Headers"))
     Template.struct_class = Types::Template
 
     TestRenderEmailTemplateRequest.add_member(:template_name, Shapes::ShapeRef.new(shape: EmailTemplateName, required: true, location: "uri", location_name: "TemplateName"))
@@ -1344,6 +1735,8 @@ module Aws::SESV2
 
     TestRenderEmailTemplateResponse.add_member(:rendered_template, Shapes::ShapeRef.new(shape: RenderedEmailTemplate, required: true, location_name: "RenderedTemplate"))
     TestRenderEmailTemplateResponse.struct_class = Types::TestRenderEmailTemplateResponse
+
+    TimestampList.member = Shapes::ShapeRef.new(shape: Timestamp)
 
     TooManyRequestsException.struct_class = Types::TooManyRequestsException
 
@@ -1366,6 +1759,7 @@ module Aws::SESV2
     Topics.member = Shapes::ShapeRef.new(shape: Topic)
 
     TrackingOptions.add_member(:custom_redirect_domain, Shapes::ShapeRef.new(shape: CustomRedirectDomain, required: true, location_name: "CustomRedirectDomain"))
+    TrackingOptions.add_member(:https_policy, Shapes::ShapeRef.new(shape: HttpsPolicy, location_name: "HttpsPolicy"))
     TrackingOptions.struct_class = Types::TrackingOptions
 
     UntagResourceRequest.add_member(:resource_arn, Shapes::ShapeRef.new(shape: AmazonResourceName, required: true, location: "querystring", location_name: "ResourceArn"))
@@ -1420,6 +1814,21 @@ module Aws::SESV2
 
     UpdateEmailTemplateResponse.struct_class = Types::UpdateEmailTemplateResponse
 
+    VdmAttributes.add_member(:vdm_enabled, Shapes::ShapeRef.new(shape: FeatureStatus, required: true, location_name: "VdmEnabled"))
+    VdmAttributes.add_member(:dashboard_attributes, Shapes::ShapeRef.new(shape: DashboardAttributes, location_name: "DashboardAttributes"))
+    VdmAttributes.add_member(:guardian_attributes, Shapes::ShapeRef.new(shape: GuardianAttributes, location_name: "GuardianAttributes"))
+    VdmAttributes.struct_class = Types::VdmAttributes
+
+    VdmOptions.add_member(:dashboard_options, Shapes::ShapeRef.new(shape: DashboardOptions, location_name: "DashboardOptions"))
+    VdmOptions.add_member(:guardian_options, Shapes::ShapeRef.new(shape: GuardianOptions, location_name: "GuardianOptions"))
+    VdmOptions.struct_class = Types::VdmOptions
+
+    VerificationInfo.add_member(:last_checked_timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "LastCheckedTimestamp"))
+    VerificationInfo.add_member(:last_success_timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "LastSuccessTimestamp"))
+    VerificationInfo.add_member(:error_type, Shapes::ShapeRef.new(shape: VerificationError, location_name: "ErrorType"))
+    VerificationInfo.add_member(:soa_record, Shapes::ShapeRef.new(shape: SOARecord, location_name: "SOARecord"))
+    VerificationInfo.struct_class = Types::VerificationInfo
+
     VolumeStatistics.add_member(:inbox_raw_count, Shapes::ShapeRef.new(shape: Volume, location_name: "InboxRawCount"))
     VolumeStatistics.add_member(:spam_raw_count, Shapes::ShapeRef.new(shape: Volume, location_name: "SpamRawCount"))
     VolumeStatistics.add_member(:projected_inbox, Shapes::ShapeRef.new(shape: Volume, location_name: "ProjectedInbox"))
@@ -1434,9 +1843,11 @@ module Aws::SESV2
 
       api.metadata = {
         "apiVersion" => "2019-09-27",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "email",
         "jsonVersion" => "1.1",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceAbbreviation" => "Amazon SES V2",
         "serviceFullName" => "Amazon Simple Email Service",
         "serviceId" => "SESv2",
@@ -1444,6 +1855,29 @@ module Aws::SESV2
         "signingName" => "ses",
         "uid" => "sesv2-2019-09-27",
       }
+
+      api.add_operation(:batch_get_metric_data, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "BatchGetMetricData"
+        o.http_method = "POST"
+        o.http_request_uri = "/v2/email/metrics/batch"
+        o.input = Shapes::ShapeRef.new(shape: BatchGetMetricDataRequest)
+        o.output = Shapes::ShapeRef.new(shape: BatchGetMetricDataResponse)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
+      end)
+
+      api.add_operation(:cancel_export_job, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "CancelExportJob"
+        o.http_method = "PUT"
+        o.http_request_uri = "/v2/email/export-jobs/{JobId}/cancel"
+        o.input = Shapes::ShapeRef.new(shape: CancelExportJobRequest)
+        o.output = Shapes::ShapeRef.new(shape: CancelExportJobResponse)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+      end)
 
       api.add_operation(:create_configuration_set, Seahorse::Model::Operation.new.tap do |o|
         o.name = "CreateConfigurationSet"
@@ -1550,6 +1984,7 @@ module Aws::SESV2
         o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
         o.errors << Shapes::ShapeRef.new(shape: ConcurrentModificationException)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
       end)
 
       api.add_operation(:create_email_identity_policy, Seahorse::Model::Operation.new.tap do |o|
@@ -1574,6 +2009,18 @@ module Aws::SESV2
         o.errors << Shapes::ShapeRef.new(shape: AlreadyExistsException)
         o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+        o.errors << Shapes::ShapeRef.new(shape: LimitExceededException)
+      end)
+
+      api.add_operation(:create_export_job, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "CreateExportJob"
+        o.http_method = "POST"
+        o.http_request_uri = "/v2/email/export-jobs"
+        o.input = Shapes::ShapeRef.new(shape: CreateExportJobRequest)
+        o.output = Shapes::ShapeRef.new(shape: CreateExportJobResponse)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: LimitExceededException)
       end)
 
@@ -1789,6 +2236,17 @@ module Aws::SESV2
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
       end)
 
+      api.add_operation(:get_dedicated_ip_pool, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "GetDedicatedIpPool"
+        o.http_method = "GET"
+        o.http_request_uri = "/v2/email/dedicated-ip-pools/{PoolName}"
+        o.input = Shapes::ShapeRef.new(shape: GetDedicatedIpPoolRequest)
+        o.output = Shapes::ShapeRef.new(shape: GetDedicatedIpPoolResponse)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+      end)
+
       api.add_operation(:get_dedicated_ips, Seahorse::Model::Operation.new.tap do |o|
         o.name = "GetDedicatedIps"
         o.http_method = "GET"
@@ -1883,6 +2341,17 @@ module Aws::SESV2
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
       end)
 
+      api.add_operation(:get_export_job, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "GetExportJob"
+        o.http_method = "GET"
+        o.http_request_uri = "/v2/email/export-jobs/{JobId}"
+        o.input = Shapes::ShapeRef.new(shape: GetExportJobRequest)
+        o.output = Shapes::ShapeRef.new(shape: GetExportJobResponse)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+      end)
+
       api.add_operation(:get_import_job, Seahorse::Model::Operation.new.tap do |o|
         o.name = "GetImportJob"
         o.http_method = "GET"
@@ -1892,6 +2361,17 @@ module Aws::SESV2
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
         o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+      end)
+
+      api.add_operation(:get_message_insights, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "GetMessageInsights"
+        o.http_method = "GET"
+        o.http_request_uri = "/v2/email/insights/{MessageId}/"
+        o.input = Shapes::ShapeRef.new(shape: GetMessageInsightsRequest)
+        o.output = Shapes::ShapeRef.new(shape: GetMessageInsightsResponse)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
       end)
 
       api.add_operation(:get_suppressed_destination, Seahorse::Model::Operation.new.tap do |o|
@@ -1939,8 +2419,8 @@ module Aws::SESV2
 
       api.add_operation(:list_contacts, Seahorse::Model::Operation.new.tap do |o|
         o.name = "ListContacts"
-        o.http_method = "GET"
-        o.http_request_uri = "/v2/email/contact-lists/{ContactListName}/contacts"
+        o.http_method = "POST"
+        o.http_request_uri = "/v2/email/contact-lists/{ContactListName}/contacts/list"
         o.input = Shapes::ShapeRef.new(shape: ListContactsRequest)
         o.output = Shapes::ShapeRef.new(shape: ListContactsResponse)
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
@@ -2052,14 +2532,47 @@ module Aws::SESV2
         )
       end)
 
+      api.add_operation(:list_export_jobs, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ListExportJobs"
+        o.http_method = "POST"
+        o.http_request_uri = "/v2/email/list-export-jobs"
+        o.input = Shapes::ShapeRef.new(shape: ListExportJobsRequest)
+        o.output = Shapes::ShapeRef.new(shape: ListExportJobsResponse)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "page_size",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
       api.add_operation(:list_import_jobs, Seahorse::Model::Operation.new.tap do |o|
         o.name = "ListImportJobs"
-        o.http_method = "GET"
-        o.http_request_uri = "/v2/email/import-jobs"
+        o.http_method = "POST"
+        o.http_request_uri = "/v2/email/import-jobs/list"
         o.input = Shapes::ShapeRef.new(shape: ListImportJobsRequest)
         o.output = Shapes::ShapeRef.new(shape: ListImportJobsResponse)
         o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "page_size",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
+      api.add_operation(:list_recommendations, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ListRecommendations"
+        o.http_method = "POST"
+        o.http_request_uri = "/v2/email/vdm/recommendations"
+        o.input = Shapes::ShapeRef.new(shape: ListRecommendationsRequest)
+        o.output = Shapes::ShapeRef.new(shape: ListRecommendationsResponse)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
         o[:pager] = Aws::Pager.new(
           limit_key: "page_size",
           tokens: {
@@ -2137,6 +2650,16 @@ module Aws::SESV2
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
       end)
 
+      api.add_operation(:put_account_vdm_attributes, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "PutAccountVdmAttributes"
+        o.http_method = "PUT"
+        o.http_request_uri = "/v2/email/account/vdm"
+        o.input = Shapes::ShapeRef.new(shape: PutAccountVdmAttributesRequest)
+        o.output = Shapes::ShapeRef.new(shape: PutAccountVdmAttributesResponse)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+      end)
+
       api.add_operation(:put_configuration_set_delivery_options, Seahorse::Model::Operation.new.tap do |o|
         o.name = "PutConfigurationSetDeliveryOptions"
         o.http_method = "PUT"
@@ -2192,6 +2715,17 @@ module Aws::SESV2
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
       end)
 
+      api.add_operation(:put_configuration_set_vdm_options, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "PutConfigurationSetVdmOptions"
+        o.http_method = "PUT"
+        o.http_request_uri = "/v2/email/configuration-sets/{ConfigurationSetName}/vdm-options"
+        o.input = Shapes::ShapeRef.new(shape: PutConfigurationSetVdmOptionsRequest)
+        o.output = Shapes::ShapeRef.new(shape: PutConfigurationSetVdmOptionsResponse)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+      end)
+
       api.add_operation(:put_dedicated_ip_in_pool, Seahorse::Model::Operation.new.tap do |o|
         o.name = "PutDedicatedIpInPool"
         o.http_method = "PUT"
@@ -2199,6 +2733,18 @@ module Aws::SESV2
         o.input = Shapes::ShapeRef.new(shape: PutDedicatedIpInPoolRequest)
         o.output = Shapes::ShapeRef.new(shape: PutDedicatedIpInPoolResponse)
         o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+      end)
+
+      api.add_operation(:put_dedicated_ip_pool_scaling_attributes, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "PutDedicatedIpPoolScalingAttributes"
+        o.http_method = "PUT"
+        o.http_request_uri = "/v2/email/dedicated-ip-pools/{PoolName}/scaling"
+        o.input = Shapes::ShapeRef.new(shape: PutDedicatedIpPoolScalingAttributesRequest)
+        o.output = Shapes::ShapeRef.new(shape: PutDedicatedIpPoolScalingAttributesResponse)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: ConcurrentModificationException)
         o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
       end)
@@ -2224,6 +2770,17 @@ module Aws::SESV2
         o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
         o.errors << Shapes::ShapeRef.new(shape: LimitExceededException)
+        o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
+      end)
+
+      api.add_operation(:put_email_identity_configuration_set_attributes, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "PutEmailIdentityConfigurationSetAttributes"
+        o.http_method = "PUT"
+        o.http_request_uri = "/v2/email/identities/{EmailIdentity}/configuration-set"
+        o.input = Shapes::ShapeRef.new(shape: PutEmailIdentityConfigurationSetAttributesRequest)
+        o.output = Shapes::ShapeRef.new(shape: PutEmailIdentityConfigurationSetAttributesResponse)
+        o.errors << Shapes::ShapeRef.new(shape: NotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: TooManyRequestsException)
         o.errors << Shapes::ShapeRef.new(shape: BadRequestException)
       end)
 

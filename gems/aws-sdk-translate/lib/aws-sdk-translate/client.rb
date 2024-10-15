@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,20 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:translate)
+require 'aws-sdk-translate/plugins/translate_document_encoding.rb'
 
 module Aws::Translate
   # An API client for Translate.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +73,29 @@ module Aws::Translate
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::Translate::Plugins::TranslateDocumentEncoding)
+    add_plugin(Aws::Translate::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +130,18 @@ module Aws::Translate
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +156,8 @@ module Aws::Translate
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +197,28 @@ module Aws::Translate
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +234,10 @@ module Aws::Translate
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +258,11 @@ module Aws::Translate
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +308,31 @@ module Aws::Translate
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +343,112 @@ module Aws::Translate
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::Translate::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::Translate::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -338,10 +457,10 @@ module Aws::Translate
     # @!group API Operations
 
     # Creates a parallel data resource in Amazon Translate by importing an
-    # input file from Amazon S3. Parallel data files contain examples of
-    # source phrases and their translations from your translation memory. By
-    # adding parallel data, you can influence the style, tone, and word
-    # choice in your translation output.
+    # input file from Amazon S3. Parallel data files contain examples that
+    # show how you want segments of text to be translated. By adding
+    # parallel data, you can influence the style, tone, and word choice in
+    # your translation output.
     #
     # @option params [required, String] :name
     #   A custom name for the parallel data resource in Amazon Translate. You
@@ -364,6 +483,15 @@ module Aws::Translate
     #   **A suitable default value is auto-generated.** You should normally
     #   not need to pass this option.**
     #
+    # @option params [Array<Types::Tag>] :tags
+    #   Tags to be associated with this resource. A tag is a key-value pair
+    #   that adds metadata to a resource. Each tag key for the resource must
+    #   be unique. For more information, see [ Tagging your resources][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/tagging.html
+    #
     # @return [Types::CreateParallelDataResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateParallelDataResponse#name #name} => String
@@ -375,14 +503,20 @@ module Aws::Translate
     #     name: "ResourceName", # required
     #     description: "Description",
     #     parallel_data_config: { # required
-    #       s3_uri: "S3Uri", # required
-    #       format: "TSV", # required, accepts TSV, CSV, TMX
+    #       s3_uri: "S3Uri",
+    #       format: "TSV", # accepts TSV, CSV, TMX
     #     },
     #     encryption_key: {
     #       type: "KMS", # required, accepts KMS
     #       id: "EncryptionKeyID", # required
     #     },
     #     client_token: "ClientTokenString", # required
+    #     tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue", # required
+    #       },
+    #     ],
     #   })
     #
     # @example Response structure
@@ -451,7 +585,7 @@ module Aws::Translate
       req.send_request(options)
     end
 
-    # Gets the properties associated with an asycnhronous batch translation
+    # Gets the properties associated with an asynchronous batch translation
     # job including name, ID, status, source and target languages,
     # input/output S3 buckets, and so on.
     #
@@ -491,7 +625,12 @@ module Aws::Translate
     #   resp.text_translation_job_properties.input_data_config.s3_uri #=> String
     #   resp.text_translation_job_properties.input_data_config.content_type #=> String
     #   resp.text_translation_job_properties.output_data_config.s3_uri #=> String
+    #   resp.text_translation_job_properties.output_data_config.encryption_key.type #=> String, one of "KMS"
+    #   resp.text_translation_job_properties.output_data_config.encryption_key.id #=> String
     #   resp.text_translation_job_properties.data_access_role_arn #=> String
+    #   resp.text_translation_job_properties.settings.formality #=> String, one of "FORMAL", "INFORMAL"
+    #   resp.text_translation_job_properties.settings.profanity #=> String, one of "MASK"
+    #   resp.text_translation_job_properties.settings.brevity #=> String, one of "ON"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/DescribeTextTranslationJob AWS API Documentation
     #
@@ -563,20 +702,29 @@ module Aws::Translate
     # @option params [required, String] :name
     #   The name of the custom terminology being retrieved.
     #
-    # @option params [required, String] :terminology_data_format
-    #   The data format of the custom terminology being retrieved, either CSV
-    #   or TMX.
+    # @option params [String] :terminology_data_format
+    #   The data format of the custom terminology being retrieved.
+    #
+    #   If you don't specify this parameter, Amazon Translate returns a file
+    #   with the same format as the file that was imported to create the
+    #   terminology.
+    #
+    #   If you specify this parameter when you retrieve a multi-directional
+    #   terminology resource, you must specify the same format as the input
+    #   file that was imported to create it. Otherwise, Amazon Translate
+    #   throws an error.
     #
     # @return [Types::GetTerminologyResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::GetTerminologyResponse#terminology_properties #terminology_properties} => Types::TerminologyProperties
     #   * {Types::GetTerminologyResponse#terminology_data_location #terminology_data_location} => Types::TerminologyDataLocation
+    #   * {Types::GetTerminologyResponse#auxiliary_data_location #auxiliary_data_location} => Types::TerminologyDataLocation
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.get_terminology({
     #     name: "ResourceName", # required
-    #     terminology_data_format: "CSV", # required, accepts CSV, TMX
+    #     terminology_data_format: "CSV", # accepts CSV, TMX, TSV
     #   })
     #
     # @example Response structure
@@ -593,8 +741,14 @@ module Aws::Translate
     #   resp.terminology_properties.term_count #=> Integer
     #   resp.terminology_properties.created_at #=> Time
     #   resp.terminology_properties.last_updated_at #=> Time
+    #   resp.terminology_properties.directionality #=> String, one of "UNI", "MULTI"
+    #   resp.terminology_properties.message #=> String
+    #   resp.terminology_properties.skipped_term_count #=> Integer
+    #   resp.terminology_properties.format #=> String, one of "CSV", "TMX", "TSV"
     #   resp.terminology_data_location.repository_type #=> String
     #   resp.terminology_data_location.location #=> String
+    #   resp.auxiliary_data_location.repository_type #=> String
+    #   resp.auxiliary_data_location.location #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/GetTerminology AWS API Documentation
     #
@@ -605,17 +759,16 @@ module Aws::Translate
       req.send_request(options)
     end
 
-    # Creates or updates a custom terminology, depending on whether or not
-    # one already exists for the given terminology name. Importing a
-    # terminology with the same name as an existing one will merge the
-    # terminologies based on the chosen merge strategy. Currently, the only
-    # supported merge strategy is OVERWRITE, and so the imported terminology
-    # will overwrite an existing terminology of the same name.
+    # Creates or updates a custom terminology, depending on whether one
+    # already exists for the given terminology name. Importing a terminology
+    # with the same name as an existing one will merge the terminologies
+    # based on the chosen merge strategy. The only supported merge strategy
+    # is OVERWRITE, where the imported terminology overwrites the existing
+    # terminology of the same name.
     #
     # If you import a terminology that overwrites an existing one, the new
-    # terminology take up to 10 minutes to fully propagate and be available
-    # for use in a translation due to cache policies with the DataPlane
-    # service that performs the translations.
+    # terminology takes up to 10 minutes to fully propagate. After that,
+    # translations have access to the new terminology.
     #
     # @option params [required, String] :name
     #   The name of the custom terminology being imported.
@@ -635,9 +788,19 @@ module Aws::Translate
     # @option params [Types::EncryptionKey] :encryption_key
     #   The encryption key for the custom terminology being imported.
     #
+    # @option params [Array<Types::Tag>] :tags
+    #   Tags to be associated with this resource. A tag is a key-value pair
+    #   that adds metadata to a resource. Each tag key for the resource must
+    #   be unique. For more information, see [ Tagging your resources][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/tagging.html
+    #
     # @return [Types::ImportTerminologyResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ImportTerminologyResponse#terminology_properties #terminology_properties} => Types::TerminologyProperties
+    #   * {Types::ImportTerminologyResponse#auxiliary_data_location #auxiliary_data_location} => Types::TerminologyDataLocation
     #
     # @example Request syntax with placeholder values
     #
@@ -647,12 +810,19 @@ module Aws::Translate
     #     description: "Description",
     #     terminology_data: { # required
     #       file: "data", # required
-    #       format: "CSV", # required, accepts CSV, TMX
+    #       format: "CSV", # required, accepts CSV, TMX, TSV
+    #       directionality: "UNI", # accepts UNI, MULTI
     #     },
     #     encryption_key: {
     #       type: "KMS", # required, accepts KMS
     #       id: "EncryptionKeyID", # required
     #     },
+    #     tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue", # required
+    #       },
+    #     ],
     #   })
     #
     # @example Response structure
@@ -669,6 +839,12 @@ module Aws::Translate
     #   resp.terminology_properties.term_count #=> Integer
     #   resp.terminology_properties.created_at #=> Time
     #   resp.terminology_properties.last_updated_at #=> Time
+    #   resp.terminology_properties.directionality #=> String, one of "UNI", "MULTI"
+    #   resp.terminology_properties.message #=> String
+    #   resp.terminology_properties.skipped_term_count #=> Integer
+    #   resp.terminology_properties.format #=> String, one of "CSV", "TMX", "TSV"
+    #   resp.auxiliary_data_location.repository_type #=> String
+    #   resp.auxiliary_data_location.location #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/ImportTerminology AWS API Documentation
     #
@@ -676,6 +852,53 @@ module Aws::Translate
     # @param [Hash] params ({})
     def import_terminology(params = {}, options = {})
       req = build_request(:import_terminology, params)
+      req.send_request(options)
+    end
+
+    # Provides a list of languages (RFC-5646 codes and names) that Amazon
+    # Translate supports.
+    #
+    # @option params [String] :display_language_code
+    #   The language code for the language to use to display the language
+    #   names in the response. The language code is `en` by default.
+    #
+    # @option params [String] :next_token
+    #   Include the NextToken value to fetch the next group of supported
+    #   languages.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return in each response.
+    #
+    # @return [Types::ListLanguagesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListLanguagesResponse#languages #languages} => Array&lt;Types::Language&gt;
+    #   * {Types::ListLanguagesResponse#display_language_code #display_language_code} => String
+    #   * {Types::ListLanguagesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_languages({
+    #     display_language_code: "de", # accepts de, en, es, fr, it, ja, ko, pt, zh, zh-TW
+    #     next_token: "NextToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.languages #=> Array
+    #   resp.languages[0].language_name #=> String
+    #   resp.languages[0].language_code #=> String
+    #   resp.display_language_code #=> String, one of "de", "en", "es", "fr", "it", "ja", "ko", "pt", "zh", "zh-TW"
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/ListLanguages AWS API Documentation
+    #
+    # @overload list_languages(params = {})
+    # @param [Hash] params ({})
+    def list_languages(params = {}, options = {})
+      req = build_request(:list_languages, params)
       req.send_request(options)
     end
 
@@ -737,6 +960,42 @@ module Aws::Translate
       req.send_request(options)
     end
 
+    # Lists all tags associated with a given Amazon Translate resource. For
+    # more information, see [ Tagging your resources][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/translate/latest/dg/tagging.html
+    #
+    # @option params [required, String] :resource_arn
+    #   The Amazon Resource Name (ARN) of the given Amazon Translate resource
+    #   you are querying.
+    #
+    # @return [Types::ListTagsForResourceResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListTagsForResourceResponse#tags #tags} => Array&lt;Types::Tag&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_tags_for_resource({
+    #     resource_arn: "ResourceArn", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.tags #=> Array
+    #   resp.tags[0].key #=> String
+    #   resp.tags[0].value #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/ListTagsForResource AWS API Documentation
+    #
+    # @overload list_tags_for_resource(params = {})
+    # @param [Hash] params ({})
+    def list_tags_for_resource(params = {}, options = {})
+      req = build_request(:list_tags_for_resource, params)
+      req.send_request(options)
+    end
+
     # Provides a list of custom terminologies associated with your account.
     #
     # @option params [String] :next_token
@@ -775,6 +1034,10 @@ module Aws::Translate
     #   resp.terminology_properties_list[0].term_count #=> Integer
     #   resp.terminology_properties_list[0].created_at #=> Time
     #   resp.terminology_properties_list[0].last_updated_at #=> Time
+    #   resp.terminology_properties_list[0].directionality #=> String, one of "UNI", "MULTI"
+    #   resp.terminology_properties_list[0].message #=> String
+    #   resp.terminology_properties_list[0].skipped_term_count #=> Integer
+    #   resp.terminology_properties_list[0].format #=> String, one of "CSV", "TMX", "TSV"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/ListTerminologies AWS API Documentation
@@ -842,7 +1105,12 @@ module Aws::Translate
     #   resp.text_translation_job_properties_list[0].input_data_config.s3_uri #=> String
     #   resp.text_translation_job_properties_list[0].input_data_config.content_type #=> String
     #   resp.text_translation_job_properties_list[0].output_data_config.s3_uri #=> String
+    #   resp.text_translation_job_properties_list[0].output_data_config.encryption_key.type #=> String, one of "KMS"
+    #   resp.text_translation_job_properties_list[0].output_data_config.encryption_key.id #=> String
     #   resp.text_translation_job_properties_list[0].data_access_role_arn #=> String
+    #   resp.text_translation_job_properties_list[0].settings.formality #=> String, one of "FORMAL", "INFORMAL"
+    #   resp.text_translation_job_properties_list[0].settings.profanity #=> String, one of "MASK"
+    #   resp.text_translation_job_properties_list[0].settings.brevity #=> String, one of "ON"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/ListTextTranslationJobs AWS API Documentation
@@ -854,25 +1122,28 @@ module Aws::Translate
       req.send_request(options)
     end
 
-    # Starts an asynchronous batch translation job. Batch translation jobs
-    # can be used to translate large volumes of text across multiple
-    # documents at once. For more information, see async.
+    # Starts an asynchronous batch translation job. Use batch translation
+    # jobs to translate large volumes of text across multiple documents at
+    # once. For batch translation, you can input documents with different
+    # source languages (specify `auto` as the source language). You can
+    # specify one or more target languages. Batch translation translates
+    # each input document into each of the target languages. For more
+    # information, see [Asynchronous batch processing][1].
     #
     # Batch translation jobs can be described with the
     # DescribeTextTranslationJob operation, listed with the
     # ListTextTranslationJobs operation, and stopped with the
     # StopTextTranslationJob operation.
     #
-    # <note markdown="1"> Amazon Translate does not support batch translation of multiple source
-    # languages at once.
     #
-    #  </note>
+    #
+    # [1]: https://docs.aws.amazon.com/translate/latest/dg/async.html
     #
     # @option params [String] :job_name
     #   The name of the batch translation job to be performed.
     #
     # @option params [required, Types::InputDataConfig] :input_data_config
-    #   Specifies the format and S3 location of the input documents for the
+    #   Specifies the format and location of the input documents for the
     #   translation job.
     #
     # @option params [required, Types::OutputDataConfig] :output_data_config
@@ -881,33 +1152,102 @@ module Aws::Translate
     # @option params [required, String] :data_access_role_arn
     #   The Amazon Resource Name (ARN) of an AWS Identity Access and
     #   Management (IAM) role that grants Amazon Translate read access to your
-    #   input data. For more nformation, see identity-and-access-management.
+    #   input data. For more information, see [Identity and access management
+    #   ][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/identity-and-access-management.html
     #
     # @option params [required, String] :source_language_code
-    #   The language code of the input language. For a list of language codes,
-    #   see what-is-languages.
+    #   The language code of the input language. Specify the language if all
+    #   input documents share the same language. If you don't know the
+    #   language of the source files, or your input documents contains
+    #   different source languages, select `auto`. Amazon Translate auto
+    #   detects the source language for each input document. For a list of
+    #   supported language codes, see [Supported languages][1].
     #
-    #   Amazon Translate does not automatically detect a source language
-    #   during batch translation jobs.
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
     #
     # @option params [required, Array<String>] :target_language_codes
-    #   The language code of the output language.
+    #   The target languages of the translation job. Enter up to 10 language
+    #   codes. Each input file is translated into each target language.
+    #
+    #   Each language code is 2 or 5 characters long. For a list of language
+    #   codes, see [Supported languages][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
     #
     # @option params [Array<String>] :terminology_names
-    #   The name of the terminology to use in the batch translation job. For a
-    #   list of available terminologies, use the ListTerminologies operation.
+    #   The name of a custom terminology resource to add to the translation
+    #   job. This resource lists examples source terms and the desired
+    #   translation for each term.
+    #
+    #   This parameter accepts only one custom terminology resource.
+    #
+    #   If you specify multiple target languages for the job, translate uses
+    #   the designated terminology for each requested target language that has
+    #   an entry for the source term in the terminology file.
+    #
+    #   For a list of available custom terminology resources, use the
+    #   ListTerminologies operation.
+    #
+    #   For more information, see [Custom terminology][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/how-custom-terminology.html
     #
     # @option params [Array<String>] :parallel_data_names
-    #   The names of the parallel data resources to use in the batch
-    #   translation job. For a list of available parallel data resources, use
-    #   the ListParallelData operation.
+    #   The name of a parallel data resource to add to the translation job.
+    #   This resource consists of examples that show how you want segments of
+    #   text to be translated. If you specify multiple target languages for
+    #   the job, the parallel data file must include translations for all the
+    #   target languages.
+    #
+    #   When you add parallel data to a translation job, you create an *Active
+    #   Custom Translation* job.
+    #
+    #   This parameter accepts only one parallel data resource.
+    #
+    #   <note markdown="1"> Active Custom Translation jobs are priced at a higher rate than other
+    #   jobs that don't use parallel data. For more information, see [Amazon
+    #   Translate pricing][1].
+    #
+    #    </note>
+    #
+    #   For a list of available parallel data resources, use the
+    #   ListParallelData operation.
+    #
+    #   For more information, see [ Customizing your translations with
+    #   parallel data][2].
+    #
+    #
+    #
+    #   [1]: http://aws.amazon.com/translate/pricing/
+    #   [2]: https://docs.aws.amazon.com/translate/latest/dg/customizing-translations-parallel-data.html
     #
     # @option params [required, String] :client_token
-    #   A unique identifier for the request. This token is auto-generated when
-    #   using the Amazon Translate SDK.
+    #   A unique identifier for the request. This token is generated for you
+    #   when using the Amazon Translate SDK.
     #
     #   **A suitable default value is auto-generated.** You should normally
     #   not need to pass this option.**
+    #
+    # @option params [Types::TranslationSettings] :settings
+    #   Settings to configure your translation output. You can configure the
+    #   following options:
+    #
+    #   * Brevity: not supported.
+    #
+    #   * Formality: sets the formality level of the output text.
+    #
+    #   * Profanity: masks profane words and phrases in your translation
+    #     output.
     #
     # @return [Types::StartTextTranslationJobResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -924,6 +1264,10 @@ module Aws::Translate
     #     },
     #     output_data_config: { # required
     #       s3_uri: "S3Uri", # required
+    #       encryption_key: {
+    #         type: "KMS", # required, accepts KMS
+    #         id: "EncryptionKeyID", # required
+    #       },
     #     },
     #     data_access_role_arn: "IamRoleArn", # required
     #     source_language_code: "LanguageCodeString", # required
@@ -931,6 +1275,11 @@ module Aws::Translate
     #     terminology_names: ["ResourceName"],
     #     parallel_data_names: ["ResourceName"],
     #     client_token: "ClientTokenString", # required
+    #     settings: {
+    #       formality: "FORMAL", # accepts FORMAL, INFORMAL
+    #       profanity: "MASK", # accepts MASK
+    #       brevity: "ON", # accepts ON
+    #     },
     #   })
     #
     # @example Response structure
@@ -987,37 +1336,236 @@ module Aws::Translate
       req.send_request(options)
     end
 
-    # Translates input text from the source language to the target language.
-    # For a list of available languages and language codes, see
-    # what-is-languages.
+    # Associates a specific tag with a resource. A tag is a key-value pair
+    # that adds as a metadata to a resource. For more information, see [
+    # Tagging your resources][1].
     #
-    # @option params [required, String] :text
-    #   The text to translate. The text string can be a maximum of 5,000 bytes
-    #   long. Depending on your character set, this may be fewer than 5,000
-    #   characters.
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/translate/latest/dg/tagging.html
+    #
+    # @option params [required, String] :resource_arn
+    #   The Amazon Resource Name (ARN) of the given Amazon Translate resource
+    #   to which you want to associate the tags.
+    #
+    # @option params [required, Array<Types::Tag>] :tags
+    #   Tags being associated with a specific Amazon Translate resource. There
+    #   can be a maximum of 50 tags (both existing and pending) associated
+    #   with a specific resource.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.tag_resource({
+    #     resource_arn: "ResourceArn", # required
+    #     tags: [ # required
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue", # required
+    #       },
+    #     ],
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/TagResource AWS API Documentation
+    #
+    # @overload tag_resource(params = {})
+    # @param [Hash] params ({})
+    def tag_resource(params = {}, options = {})
+      req = build_request(:tag_resource, params)
+      req.send_request(options)
+    end
+
+    # Translates the input document from the source language to the target
+    # language. This synchronous operation supports text, HTML, or Word
+    # documents as the input document. `TranslateDocument` supports
+    # translations from English to any supported language, and from any
+    # supported language to English. Therefore, specify either the source
+    # language code or the target language code as “en” (English).
+    #
+    # If you set the `Formality` parameter, the request will fail if the
+    # target language does not support formality. For a list of target
+    # languages that support formality, see [Setting formality][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/translate/latest/dg/customizing-translations-formality.html
+    #
+    # @option params [required, Types::Document] :document
+    #   The content and content type for the document to be translated. The
+    #   document size must not exceed 100 KB.
     #
     # @option params [Array<String>] :terminology_names
-    #   The name of the terminology list file to be used in the TranslateText
-    #   request. You can use 1 terminology list at most in a `TranslateText`
-    #   request. Terminology lists can contain a maximum of 256 terms.
+    #   The name of a terminology list file to add to the translation job.
+    #   This file provides source terms and the desired translation for each
+    #   term. A terminology list can contain a maximum of 256 terms. You can
+    #   use one custom terminology resource in your translation request.
+    #
+    #   Use the ListTerminologies operation to get the available terminology
+    #   lists.
+    #
+    #   For more information about custom terminology lists, see [Custom
+    #   terminology][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/how-custom-terminology.html
     #
     # @option params [required, String] :source_language_code
-    #   The language code for the language of the source text. The language
-    #   must be a language supported by Amazon Translate. For a list of
-    #   language codes, see what-is-languages.
+    #   The language code for the language of the source text. For a list of
+    #   supported language codes, see [Supported languages][1].
     #
     #   To have Amazon Translate determine the source language of your text,
     #   you can specify `auto` in the `SourceLanguageCode` field. If you
-    #   specify `auto`, Amazon Translate will call [Amazon Comprehend][1] to
+    #   specify `auto`, Amazon Translate will call [Amazon Comprehend][2] to
     #   determine the source language.
     #
+    #   <note markdown="1"> If you specify `auto`, you must send the `TranslateDocument` request
+    #   in a region that supports Amazon Comprehend. Otherwise, the request
+    #   returns an error indicating that autodetect is not supported.
+    #
+    #    </note>
     #
     #
-    #   [1]: https://docs.aws.amazon.com/comprehend/latest/dg/comprehend-general.html
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
+    #   [2]: https://docs.aws.amazon.com/comprehend/latest/dg/comprehend-general.html
     #
     # @option params [required, String] :target_language_code
-    #   The language code requested for the language of the target text. The
-    #   language must be a language supported by Amazon Translate.
+    #   The language code requested for the translated document. For a list of
+    #   supported language codes, see [Supported languages][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
+    #
+    # @option params [Types::TranslationSettings] :settings
+    #   Settings to configure your translation output. You can configure the
+    #   following options:
+    #
+    #   * Brevity: not supported.
+    #
+    #   * Formality: sets the formality level of the output text.
+    #
+    #   * Profanity: masks profane words and phrases in your translation
+    #     output.
+    #
+    # @return [Types::TranslateDocumentResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::TranslateDocumentResponse#translated_document #translated_document} => Types::TranslatedDocument
+    #   * {Types::TranslateDocumentResponse#source_language_code #source_language_code} => String
+    #   * {Types::TranslateDocumentResponse#target_language_code #target_language_code} => String
+    #   * {Types::TranslateDocumentResponse#applied_terminologies #applied_terminologies} => Array&lt;Types::AppliedTerminology&gt;
+    #   * {Types::TranslateDocumentResponse#applied_settings #applied_settings} => Types::TranslationSettings
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.translate_document({
+    #     document: { # required
+    #       content: "data", # required
+    #       content_type: "ContentType", # required
+    #     },
+    #     terminology_names: ["ResourceName"],
+    #     source_language_code: "LanguageCodeString", # required
+    #     target_language_code: "LanguageCodeString", # required
+    #     settings: {
+    #       formality: "FORMAL", # accepts FORMAL, INFORMAL
+    #       profanity: "MASK", # accepts MASK
+    #       brevity: "ON", # accepts ON
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.translated_document.content #=> String
+    #   resp.source_language_code #=> String
+    #   resp.target_language_code #=> String
+    #   resp.applied_terminologies #=> Array
+    #   resp.applied_terminologies[0].name #=> String
+    #   resp.applied_terminologies[0].terms #=> Array
+    #   resp.applied_terminologies[0].terms[0].source_text #=> String
+    #   resp.applied_terminologies[0].terms[0].target_text #=> String
+    #   resp.applied_settings.formality #=> String, one of "FORMAL", "INFORMAL"
+    #   resp.applied_settings.profanity #=> String, one of "MASK"
+    #   resp.applied_settings.brevity #=> String, one of "ON"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/TranslateDocument AWS API Documentation
+    #
+    # @overload translate_document(params = {})
+    # @param [Hash] params ({})
+    def translate_document(params = {}, options = {})
+      req = build_request(:translate_document, params)
+      req.send_request(options)
+    end
+
+    # Translates input text from the source language to the target language.
+    # For a list of available languages and language codes, see [Supported
+    # languages][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
+    #
+    # @option params [required, String] :text
+    #   The text to translate. The text string can be a maximum of 10,000
+    #   bytes long. Depending on your character set, this may be fewer than
+    #   10,000 characters.
+    #
+    # @option params [Array<String>] :terminology_names
+    #   The name of a terminology list file to add to the translation job.
+    #   This file provides source terms and the desired translation for each
+    #   term. A terminology list can contain a maximum of 256 terms. You can
+    #   use one custom terminology resource in your translation request.
+    #
+    #   Use the ListTerminologies operation to get the available terminology
+    #   lists.
+    #
+    #   For more information about custom terminology lists, see [Custom
+    #   terminology][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/how-custom-terminology.html
+    #
+    # @option params [required, String] :source_language_code
+    #   The language code for the language of the source text. For a list of
+    #   language codes, see [Supported languages][1].
+    #
+    #   To have Amazon Translate determine the source language of your text,
+    #   you can specify `auto` in the `SourceLanguageCode` field. If you
+    #   specify `auto`, Amazon Translate will call [Amazon Comprehend][2] to
+    #   determine the source language.
+    #
+    #   <note markdown="1"> If you specify `auto`, you must send the `TranslateText` request in a
+    #   region that supports Amazon Comprehend. Otherwise, the request returns
+    #   an error indicating that autodetect is not supported.
+    #
+    #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
+    #   [2]: https://docs.aws.amazon.com/comprehend/latest/dg/comprehend-general.html
+    #
+    # @option params [required, String] :target_language_code
+    #   The language code requested for the language of the target text. For a
+    #   list of language codes, see [Supported languages][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
+    #
+    # @option params [Types::TranslationSettings] :settings
+    #   Settings to configure your translation output. You can configure the
+    #   following options:
+    #
+    #   * Brevity: reduces the length of the translated output for most
+    #     translations.
+    #
+    #   * Formality: sets the formality level of the output text.
+    #
+    #   * Profanity: masks profane words and phrases in your translation
+    #     output.
     #
     # @return [Types::TranslateTextResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1025,6 +1573,7 @@ module Aws::Translate
     #   * {Types::TranslateTextResponse#source_language_code #source_language_code} => String
     #   * {Types::TranslateTextResponse#target_language_code #target_language_code} => String
     #   * {Types::TranslateTextResponse#applied_terminologies #applied_terminologies} => Array&lt;Types::AppliedTerminology&gt;
+    #   * {Types::TranslateTextResponse#applied_settings #applied_settings} => Types::TranslationSettings
     #
     # @example Request syntax with placeholder values
     #
@@ -1033,6 +1582,11 @@ module Aws::Translate
     #     terminology_names: ["ResourceName"],
     #     source_language_code: "LanguageCodeString", # required
     #     target_language_code: "LanguageCodeString", # required
+    #     settings: {
+    #       formality: "FORMAL", # accepts FORMAL, INFORMAL
+    #       profanity: "MASK", # accepts MASK
+    #       brevity: "ON", # accepts ON
+    #     },
     #   })
     #
     # @example Response structure
@@ -1045,6 +1599,9 @@ module Aws::Translate
     #   resp.applied_terminologies[0].terms #=> Array
     #   resp.applied_terminologies[0].terms[0].source_text #=> String
     #   resp.applied_terminologies[0].terms[0].target_text #=> String
+    #   resp.applied_settings.formality #=> String, one of "FORMAL", "INFORMAL"
+    #   resp.applied_settings.profanity #=> String, one of "MASK"
+    #   resp.applied_settings.brevity #=> String, one of "ON"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/TranslateText AWS API Documentation
     #
@@ -1052,6 +1609,40 @@ module Aws::Translate
     # @param [Hash] params ({})
     def translate_text(params = {}, options = {})
       req = build_request(:translate_text, params)
+      req.send_request(options)
+    end
+
+    # Removes a specific tag associated with an Amazon Translate resource.
+    # For more information, see [ Tagging your resources][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/translate/latest/dg/tagging.html
+    #
+    # @option params [required, String] :resource_arn
+    #   The Amazon Resource Name (ARN) of the given Amazon Translate resource
+    #   from which you want to remove the tags.
+    #
+    # @option params [required, Array<String>] :tag_keys
+    #   The initial part of a key-value pair that forms a tag being removed
+    #   from a given resource. Keys must be unique and cannot be duplicated
+    #   for a particular resource.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.untag_resource({
+    #     resource_arn: "ResourceArn", # required
+    #     tag_keys: ["TagKey"], # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/translate-2017-07-01/UntagResource AWS API Documentation
+    #
+    # @overload untag_resource(params = {})
+    # @param [Hash] params ({})
+    def untag_resource(params = {}, options = {})
+      req = build_request(:untag_resource, params)
       req.send_request(options)
     end
 
@@ -1088,8 +1679,8 @@ module Aws::Translate
     #     name: "ResourceName", # required
     #     description: "Description",
     #     parallel_data_config: { # required
-    #       s3_uri: "S3Uri", # required
-    #       format: "TSV", # required, accepts TSV, CSV, TMX
+    #       s3_uri: "S3Uri",
+    #       format: "TSV", # accepts TSV, CSV, TMX
     #     },
     #     client_token: "ClientTokenString", # required
     #   })
@@ -1116,14 +1707,19 @@ module Aws::Translate
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::Translate')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-translate'
-      context[:gem_version] = '1.29.0'
+      context[:gem_version] = '1.76.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

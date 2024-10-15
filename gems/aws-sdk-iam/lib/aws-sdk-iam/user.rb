@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -36,7 +36,10 @@ module Aws::IAM
     alias :user_name :name
 
     # The path to the user. For more information about paths, see [IAM
-    # Identifiers][1] in the *IAM User Guide*.
+    # identifiers][1] in the *IAM User Guide*.
+    #
+    # The ARN of the policy used to set the permissions boundary for the
+    # user.
     #
     #
     #
@@ -47,7 +50,7 @@ module Aws::IAM
     end
 
     # The stable and unique string identifying the user. For more
-    # information about IDs, see [IAM Identifiers][1] in the *IAM User
+    # information about IDs, see [IAM identifiers][1] in the *IAM User
     # Guide*.
     #
     #
@@ -82,12 +85,13 @@ module Aws::IAM
     end
 
     # The date and time, in [ISO 8601 date-time format][1], when the user's
-    # password was last used to sign in to an AWS website. For a list of AWS
-    # websites that capture a user's last sign-in time, see the [Credential
-    # Reports][2] topic in the *IAM User Guide*. If a password is used more
-    # than once in a five-minute span, only the first use is returned in
-    # this field. If the field is null (no value), then it indicates that
-    # they never signed in with a password. This can be because:
+    # password was last used to sign in to an Amazon Web Services website.
+    # For a list of Amazon Web Services websites that capture a user's last
+    # sign-in time, see the [Credential reports][2] topic in the *IAM User
+    # Guide*. If a password is used more than once in a five-minute span,
+    # only the first use is returned in this field. If the field is null (no
+    # value), then it indicates that they never signed in with a password.
+    # This can be because:
     #
     # * The user never had a password.
     #
@@ -110,11 +114,8 @@ module Aws::IAM
       data[:password_last_used]
     end
 
-    # The ARN of the policy used to set the permissions boundary for the
-    # user.
-    #
     # For more information about permissions boundaries, see [Permissions
-    # Boundaries for IAM Identities ][1] in the *IAM User Guide*.
+    # boundaries for IAM identities ][1] in the *IAM User Guide*.
     #
     #
     #
@@ -124,9 +125,8 @@ module Aws::IAM
       data[:permissions_boundary]
     end
 
-    # A list of tags that are associated with the specified user. For more
-    # information about tagging, see [Tagging IAM Identities][1] in the *IAM
-    # User Guide*.
+    # A list of tags that are associated with the user. For more information
+    # about tagging, see [Tagging IAM resources][1] in the *IAM User Guide*.
     #
     #
     #
@@ -150,7 +150,9 @@ module Aws::IAM
     #
     # @return [self]
     def load
-      resp = @client.get_user(user_name: @name)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_user(user_name: @name)
+      end
       @data = resp.user
       self
     end
@@ -195,7 +197,9 @@ module Aws::IAM
       options, params = separate_params_and_options(options)
       waiter = Waiters::UserExists.new(options)
       yield_waiter_and_warn(waiter, &block) if block_given?
-      waiter.wait(params.merge(user_name: @name))
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        waiter.wait(params.merge(user_name: @name))
+      end
       User.new({
         name: @name,
         client: @client
@@ -296,7 +300,9 @@ module Aws::IAM
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -321,7 +327,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def add_group(options = {})
       options = options.merge(user_name: @name)
-      resp = @client.add_user_to_group(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.add_user_to_group(options)
+      end
       resp.data
     end
 
@@ -334,8 +342,8 @@ module Aws::IAM
     # @option options [required, String] :policy_arn
     #   The Amazon Resource Name (ARN) of the IAM policy you want to attach.
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs) and
-    #   AWS Service Namespaces][1] in the *AWS General Reference*.
+    #   For more information about ARNs, see [Amazon Resource Names (ARNs)][1]
+    #   in the *Amazon Web Services General Reference*.
     #
     #
     #
@@ -343,7 +351,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def attach_policy(options = {})
       options = options.merge(user_name: @name)
-      resp = @client.attach_user_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.attach_user_policy(options)
+      end
       resp.data
     end
 
@@ -362,7 +372,7 @@ module Aws::IAM
     # @param [Hash] options ({})
     # @option options [String] :path
     #   The path for the user name. For more information about paths, see [IAM
-    #   Identifiers][1] in the *IAM User Guide*.
+    #   identifiers][1] in the *IAM User Guide*.
     #
     #   This parameter is optional. If it is not included, it defaults to a
     #   slash (/).
@@ -379,16 +389,30 @@ module Aws::IAM
     #   [1]: https://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html
     #   [2]: http://wikipedia.org/wiki/regex
     # @option options [String] :permissions_boundary
-    #   The ARN of the policy that is used to set the permissions boundary for
-    #   the user.
-    # @option options [Array<Types::Tag>] :tags
-    #   A list of tags that you want to attach to the newly created user. Each
-    #   tag consists of a key name and an associated value. For more
-    #   information about tagging, see [Tagging IAM Identities][1] in the *IAM
-    #   User Guide*.
+    #   The ARN of the managed policy that is used to set the permissions
+    #   boundary for the user.
     #
-    #   <note markdown="1"> If any one of the tags is invalid or if you exceed the allowed number
-    #   of tags per user, then the entire request fails and the user is not
+    #   A permissions boundary policy defines the maximum permissions that
+    #   identity-based policies can grant to an entity, but does not grant
+    #   permissions. Permissions boundaries do not define the maximum
+    #   permissions that a resource-based policy can grant to an entity. To
+    #   learn more, see [Permissions boundaries for IAM entities][1] in the
+    #   *IAM User Guide*.
+    #
+    #   For more information about policy types, see [Policy types ][2] in the
+    #   *IAM User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html
+    #   [2]: https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html#access_policy-types
+    # @option options [Array<Types::Tag>] :tags
+    #   A list of tags that you want to attach to the new user. Each tag
+    #   consists of a key name and an associated value. For more information
+    #   about tagging, see [Tagging IAM resources][1] in the *IAM User Guide*.
+    #
+    #   <note markdown="1"> If any one of the tags is invalid or if you exceed the allowed maximum
+    #   number of tags, then the entire request fails and the resource is not
     #   created.
     #
     #    </note>
@@ -399,7 +423,9 @@ module Aws::IAM
     # @return [User]
     def create(options = {})
       options = options.merge(user_name: @name)
-      resp = @client.create_user(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.create_user(options)
+      end
       User.new(
         name: options[:user_name],
         data: resp.data.user,
@@ -414,7 +440,9 @@ module Aws::IAM
     # @return [AccessKeyPair]
     def create_access_key_pair(options = {})
       options = options.merge(user_name: @name)
-      resp = @client.create_access_key(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.create_access_key(options)
+      end
       AccessKeyPair.new(
         user_name: @name,
         id: resp.data.access_key.access_key_id,
@@ -440,8 +468,9 @@ module Aws::IAM
     #   character range (`\u00FF`). You can also include the tab (`\u0009`),
     #   line feed (`\u000A`), and carriage return (`\u000D`) characters. Any
     #   of these characters are valid in a password. However, many tools, such
-    #   as the AWS Management Console, might restrict the ability to type
-    #   certain characters because they have special meaning within that tool.
+    #   as the Amazon Web Services Management Console, might restrict the
+    #   ability to type certain characters because they have special meaning
+    #   within that tool.
     #
     #
     #
@@ -452,7 +481,9 @@ module Aws::IAM
     # @return [LoginProfile]
     def create_login_profile(options = {})
       options = options.merge(user_name: @name)
-      resp = @client.create_login_profile(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.create_login_profile(options)
+      end
       LoginProfile.new(
         user_name: resp.data.login_profile.user_name,
         data: resp.data.login_profile,
@@ -481,10 +512,10 @@ module Aws::IAM
     # @option options [required, String] :policy_document
     #   The policy document.
     #
-    #   You must provide policies in JSON format in IAM. However, for AWS
+    #   You must provide policies in JSON format in IAM. However, for
     #   CloudFormation templates formatted in YAML, you can provide the policy
-    #   in JSON or YAML format. AWS CloudFormation always converts a YAML
-    #   policy to JSON format before submitting it to IAM.
+    #   in JSON or YAML format. CloudFormation always converts a YAML policy
+    #   to JSON format before submitting it to IAM.
     #
     #   The [regex pattern][1] used to validate this parameter is a string of
     #   characters consisting of the following:
@@ -504,7 +535,9 @@ module Aws::IAM
     # @return [UserPolicy]
     def create_policy(options = {})
       options = options.merge(user_name: @name)
-      @client.put_user_policy(options)
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.put_user_policy(options)
+      end
       UserPolicy.new(
         user_name: @name,
         name: options[:policy_name],
@@ -519,7 +552,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(user_name: @name)
-      resp = @client.delete_user(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_user(options)
+      end
       resp.data
     end
 
@@ -532,8 +567,8 @@ module Aws::IAM
     # @option options [required, String] :policy_arn
     #   The Amazon Resource Name (ARN) of the IAM policy you want to detach.
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs) and
-    #   AWS Service Namespaces][1] in the *AWS General Reference*.
+    #   For more information about ARNs, see [Amazon Resource Names (ARNs)][1]
+    #   in the *Amazon Web Services General Reference*.
     #
     #
     #
@@ -541,7 +576,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def detach_policy(options = {})
       options = options.merge(user_name: @name)
-      resp = @client.detach_user_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.detach_user_policy(options)
+      end
       resp.data
     end
 
@@ -598,7 +635,9 @@ module Aws::IAM
     # @return [MfaDevice]
     def enable_mfa(options = {})
       options = options.merge(user_name: @name)
-      @client.enable_mfa_device(options)
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.enable_mfa_device(options)
+      end
       MfaDevice.new(
         user_name: @name,
         serial_number: options[:serial_number],
@@ -626,7 +665,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def remove_group(options = {})
       options = options.merge(user_name: @name)
-      resp = @client.remove_user_from_group(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.remove_user_from_group(options)
+      end
       resp.data
     end
 
@@ -661,7 +702,9 @@ module Aws::IAM
     # @return [User]
     def update(options = {})
       options = options.merge(user_name: @name)
-      @client.update_user(options)
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.update_user(options)
+      end
       User.new(
         name: options[:new_user_name],
         client: @client
@@ -688,7 +731,9 @@ module Aws::IAM
     def access_keys(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(user_name: @name)
-        resp = @client.list_access_keys(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_access_keys(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.access_key_metadata.each do |a|
@@ -730,7 +775,9 @@ module Aws::IAM
     def attached_policies(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(user_name: @name)
-        resp = @client.list_attached_user_policies(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_attached_user_policies(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.attached_policies.each do |a|
@@ -753,7 +800,9 @@ module Aws::IAM
     def groups(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(user_name: @name)
-        resp = @client.list_groups_for_user(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_groups_for_user(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.groups.each do |g|
@@ -795,7 +844,9 @@ module Aws::IAM
     def mfa_devices(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(user_name: @name)
-        resp = @client.list_mfa_devices(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_mfa_devices(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.mfa_devices.each do |m|
@@ -820,7 +871,9 @@ module Aws::IAM
     def policies(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(user_name: @name)
-        resp = @client.list_user_policies(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_user_policies(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.policy_names.each do |p|
@@ -864,7 +917,9 @@ module Aws::IAM
     def signing_certificates(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(user_name: @name)
-        resp = @client.list_signing_certificates(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_signing_certificates(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.certificates.each do |c|

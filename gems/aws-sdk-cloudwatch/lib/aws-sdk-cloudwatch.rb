@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,16 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-cloudwatch/types'
-require_relative 'aws-sdk-cloudwatch/client_api'
-require_relative 'aws-sdk-cloudwatch/client'
-require_relative 'aws-sdk-cloudwatch/errors'
-require_relative 'aws-sdk-cloudwatch/waiters'
-require_relative 'aws-sdk-cloudwatch/resource'
-require_relative 'aws-sdk-cloudwatch/alarm'
-require_relative 'aws-sdk-cloudwatch/composite_alarm'
-require_relative 'aws-sdk-cloudwatch/metric'
-require_relative 'aws-sdk-cloudwatch/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:cloudwatch)
 
 # This module provides support for Amazon CloudWatch. This module is available in the
 # `aws-sdk-cloudwatch` gem.
@@ -51,7 +42,24 @@ require_relative 'aws-sdk-cloudwatch/customizations'
 #
 # @!group service
 module Aws::CloudWatch
+  autoload :Types, 'aws-sdk-cloudwatch/types'
+  autoload :ClientApi, 'aws-sdk-cloudwatch/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-cloudwatch/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-cloudwatch/client'
+  autoload :Errors, 'aws-sdk-cloudwatch/errors'
+  autoload :Waiters, 'aws-sdk-cloudwatch/waiters'
+  autoload :Resource, 'aws-sdk-cloudwatch/resource'
+  autoload :EndpointParameters, 'aws-sdk-cloudwatch/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-cloudwatch/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-cloudwatch/endpoints'
+  autoload :Alarm, 'aws-sdk-cloudwatch/alarm'
+  autoload :CompositeAlarm, 'aws-sdk-cloudwatch/composite_alarm'
+  autoload :Metric, 'aws-sdk-cloudwatch/metric'
 
-  GEM_VERSION = '1.47.0'
+  GEM_VERSION = '1.103.0'
 
 end
+
+require_relative 'aws-sdk-cloudwatch/customizations'

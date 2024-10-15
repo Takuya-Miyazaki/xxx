@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::MigrationHub
   # @api private
@@ -329,9 +330,11 @@ module Aws::MigrationHub
 
       api.metadata = {
         "apiVersion" => "2017-05-31",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "mgh",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceFullName" => "AWS Migration Hub",
         "serviceId" => "Migration Hub",
         "signatureVersion" => "v4",

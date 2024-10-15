@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-dynamodbstreams/types'
-require_relative 'aws-sdk-dynamodbstreams/client_api'
-require_relative 'aws-sdk-dynamodbstreams/client'
-require_relative 'aws-sdk-dynamodbstreams/errors'
-require_relative 'aws-sdk-dynamodbstreams/resource'
-require_relative 'aws-sdk-dynamodbstreams/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:dynamodbstreams)
 
 # This module provides support for Amazon DynamoDB Streams. This module is available in the
 # `aws-sdk-dynamodbstreams` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-dynamodbstreams/customizations'
 #
 # @!group service
 module Aws::DynamoDBStreams
+  autoload :Types, 'aws-sdk-dynamodbstreams/types'
+  autoload :ClientApi, 'aws-sdk-dynamodbstreams/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-dynamodbstreams/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-dynamodbstreams/client'
+  autoload :Errors, 'aws-sdk-dynamodbstreams/errors'
+  autoload :Resource, 'aws-sdk-dynamodbstreams/resource'
+  autoload :EndpointParameters, 'aws-sdk-dynamodbstreams/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-dynamodbstreams/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-dynamodbstreams/endpoints'
 
-  GEM_VERSION = '1.27.0'
+  GEM_VERSION = '1.68.1'
 
 end
+
+require_relative 'aws-sdk-dynamodbstreams/customizations'

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:iotanalytics)
 
 module Aws::IoTAnalytics
   # An API client for IoTAnalytics.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::IoTAnalytics
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::IoTAnalytics::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::IoTAnalytics
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::IoTAnalytics
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::IoTAnalytics
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::IoTAnalytics
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::IoTAnalytics
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::IoTAnalytics
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::IoTAnalytics
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::IoTAnalytics::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::IoTAnalytics::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -336,7 +456,7 @@ module Aws::IoTAnalytics
     #   The list of messages to be sent. Each message has the format: \\\{
     #   "messageId": "string", "payload": "string"\\}.
     #
-    #   The field names of message payloads (data) that you send to AWS IoT
+    #   The field names of message payloads (data) that you send to IoT
     #   Analytics:
     #
     #   * Must contain only alphanumeric characters and undescores (\_). No
@@ -413,9 +533,9 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Creates a channel. A channel collects data from an MQTT topic and
-    # archives the raw, unprocessed messages before publishing the data to a
-    # pipeline.
+    # Used to create a channel. A channel collects data from an MQTT topic
+    # and archives the raw, unprocessed messages before publishing the data
+    # to a pipeline.
     #
     # @option params [required, String] :channel_name
     #   The name of the channel.
@@ -423,7 +543,7 @@ module Aws::IoTAnalytics
     # @option params [Types::ChannelStorage] :channel_storage
     #   Where channel data is stored. You can choose one of `serviceManagedS3`
     #   or `customerManagedS3` storage. If not specified, the default is
-    #   `serviceManagedS3`. You cannot change this storage option after the
+    #   `serviceManagedS3`. You can't change this storage option after the
     #   channel is created.
     #
     # @option params [Types::RetentionPeriod] :retention_period
@@ -478,22 +598,22 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Creates a dataset. A dataset stores data retrieved from a data store
-    # by applying a `queryAction` (a SQL query) or a `containerAction`
+    # Used to create a dataset. A dataset stores data retrieved from a data
+    # store by applying a `queryAction` (a SQL query) or a `containerAction`
     # (executing a containerized application). This operation creates the
     # skeleton of a dataset. The dataset can be populated manually by
     # calling `CreateDatasetContent` or automatically according to a trigger
     # you specify.
     #
     # @option params [required, String] :dataset_name
-    #   The name of the data set.
+    #   The name of the dataset.
     #
     # @option params [required, Array<Types::DatasetAction>] :actions
-    #   A list of actions that create the data set contents.
+    #   A list of actions that create the dataset contents.
     #
     # @option params [Array<Types::DatasetTrigger>] :triggers
-    #   A list of triggers. A trigger causes data set contents to be populated
-    #   at a specified time interval or when another data set's contents are
+    #   A list of triggers. A trigger causes dataset contents to be populated
+    #   at a specified time interval or when another dataset's contents are
     #   created. The list of triggers can be empty or contain up to five
     #   `DataSetTrigger` objects.
     #
@@ -506,9 +626,9 @@ module Aws::IoTAnalytics
     #   the dataset. If not specified or set to `null`, versions of dataset
     #   contents are retained for at most 90 days. The number of versions of
     #   dataset contents retained is determined by the
-    #   `versioningConfiguration` parameter. For more information, see
-    #   [Keeping Multiple Versions of AWS IoT Analytics Data Sets][1] in the
-    #   *AWS IoT Analytics User Guide*.
+    #   `versioningConfiguration` parameter. For more information, see [
+    #   Keeping Multiple Versions of IoT Analytics datasets][1] in the *IoT
+    #   Analytics User Guide*.
     #
     #
     #
@@ -519,20 +639,20 @@ module Aws::IoTAnalytics
     #   specified or set to null, only the latest version plus the latest
     #   succeeded version (if they are different) are kept for the time period
     #   specified by the `retentionPeriod` parameter. For more information,
-    #   see [Keeping Multiple Versions of AWS IoT Analytics Data Sets][1] in
-    #   the *AWS IoT Analytics User Guide*.
+    #   see [Keeping Multiple Versions of IoT Analytics datasets][1] in the
+    #   *IoT Analytics User Guide*.
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/iotanalytics/latest/userguide/getting-started.html#aws-iot-analytics-dataset-versions
     #
     # @option params [Array<Types::Tag>] :tags
-    #   Metadata which can be used to manage the data set.
+    #   Metadata which can be used to manage the dataset.
     #
     # @option params [Array<Types::LateDataRule>] :late_data_rules
-    #   A list of data rules that send notifications to Amazon CloudWatch,
-    #   when data arrives late. To specify `lateDataRules`, the dataset must
-    #   use a [DeltaTimer][1] filter.
+    #   A list of data rules that send notifications to CloudWatch, when data
+    #   arrives late. To specify `lateDataRules`, the dataset must use a
+    #   [DeltaTimer][1] filter.
     #
     #
     #
@@ -655,7 +775,7 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Creates the content of a data set by applying a `queryAction` (a SQL
+    # Creates the content of a dataset by applying a `queryAction` (a SQL
     # query) or a `containerAction` (executing a containerized application).
     #
     # @option params [required, String] :dataset_name
@@ -697,10 +817,11 @@ module Aws::IoTAnalytics
     #   The name of the data store.
     #
     # @option params [Types::DatastoreStorage] :datastore_storage
-    #   Where data store data is stored. You can choose one of
-    #   `serviceManagedS3` or `customerManagedS3` storage. If not specified,
-    #   the default is `serviceManagedS3`. You cannot change this storage
-    #   option after the data store is created.
+    #   Where data in a data store is stored.. You can choose
+    #   `serviceManagedS3` storage, `customerManagedS3` storage, or
+    #   `iotSiteWiseMultiLayerStorage` storage. The default is
+    #   `serviceManagedS3`. You can't change the choice of Amazon S3 storage
+    #   after your data store is created.
     #
     # @option params [Types::RetentionPeriod] :retention_period
     #   How long, in days, message data is kept for the data store. When
@@ -710,8 +831,8 @@ module Aws::IoTAnalytics
     #   Metadata which can be used to manage the data store.
     #
     # @option params [Types::FileFormatConfiguration] :file_format_configuration
-    #   Contains the configuration information of file formats. AWS IoT
-    #   Analytics data stores support JSON and [Parquet][1].
+    #   Contains the configuration information of file formats. IoT Analytics
+    #   data stores support JSON and [Parquet][1].
     #
     #   The default file format is JSON. You can specify only one format.
     #
@@ -720,6 +841,9 @@ module Aws::IoTAnalytics
     #
     #
     #   [1]: https://parquet.apache.org/
+    #
+    # @option params [Types::DatastorePartitions] :datastore_partitions
+    #   Contains information about the partition dimensions in a data store.
     #
     # @return [Types::CreateDatastoreResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -738,6 +862,12 @@ module Aws::IoTAnalytics
     #         bucket: "BucketName", # required
     #         key_prefix: "S3KeyPrefix",
     #         role_arn: "RoleArn", # required
+    #       },
+    #       iot_site_wise_multi_layer_storage: {
+    #         customer_managed_s3_storage: { # required
+    #           bucket: "BucketName", # required
+    #           key_prefix: "S3KeyPrefix",
+    #         },
     #       },
     #     },
     #     retention_period: {
@@ -763,6 +893,19 @@ module Aws::IoTAnalytics
     #           ],
     #         },
     #       },
+    #     },
+    #     datastore_partitions: {
+    #       partitions: [
+    #         {
+    #           attribute_partition: {
+    #             attribute_name: "PartitionAttributeName", # required
+    #           },
+    #           timestamp_partition: {
+    #             attribute_name: "PartitionAttributeName", # required
+    #             timestamp_format: "TimestampFormat",
+    #           },
+    #         },
+    #       ],
     #     },
     #   })
     #
@@ -793,7 +936,7 @@ module Aws::IoTAnalytics
     #   A list of `PipelineActivity` objects. Activities perform
     #   transformations on your messages, such as removing, renaming or adding
     #   message attributes; filtering messages based on attribute values;
-    #   invoking your Lambda functions on messages for advanced processing; or
+    #   invoking your Lambda unctions on messages for advanced processing; or
     #   performing mathematical transformations to normalize device data.
     #
     #   The list can be 2-25 `PipelineActivity` objects and must contain both
@@ -922,7 +1065,7 @@ module Aws::IoTAnalytics
     # perform this operation.
     #
     # @option params [required, String] :dataset_name
-    #   The name of the data set to delete.
+    #   The name of the dataset to delete.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -1013,7 +1156,7 @@ module Aws::IoTAnalytics
     #
     # @option params [Boolean] :include_statistics
     #   If true, additional statistical information about the channel is
-    #   included in the response. This feature cannot be used with a channel
+    #   included in the response. This feature can't be used with a channel
     #   whose S3 storage is customer-managed.
     #
     # @return [Types::DescribeChannelResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -1054,7 +1197,7 @@ module Aws::IoTAnalytics
     # Retrieves information about a dataset.
     #
     # @option params [required, String] :dataset_name
-    #   The name of the data set whose information is retrieved.
+    #   The name of the dataset whose information is retrieved.
     #
     # @return [Types::DescribeDatasetResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1123,7 +1266,7 @@ module Aws::IoTAnalytics
     #
     # @option params [Boolean] :include_statistics
     #   If true, additional statistical information about the data store is
-    #   included in the response. This feature cannot be used with a data
+    #   included in the response. This feature can't be used with a data
     #   store whose S3 storage is customer-managed.
     #
     # @return [Types::DescribeDatastoreResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -1144,6 +1287,8 @@ module Aws::IoTAnalytics
     #   resp.datastore.storage.customer_managed_s3.bucket #=> String
     #   resp.datastore.storage.customer_managed_s3.key_prefix #=> String
     #   resp.datastore.storage.customer_managed_s3.role_arn #=> String
+    #   resp.datastore.storage.iot_site_wise_multi_layer_storage.customer_managed_s3_storage.bucket #=> String
+    #   resp.datastore.storage.iot_site_wise_multi_layer_storage.customer_managed_s3_storage.key_prefix #=> String
     #   resp.datastore.arn #=> String
     #   resp.datastore.status #=> String, one of "CREATING", "ACTIVE", "DELETING"
     #   resp.datastore.retention_period.unlimited #=> Boolean
@@ -1154,6 +1299,10 @@ module Aws::IoTAnalytics
     #   resp.datastore.file_format_configuration.parquet_configuration.schema_definition.columns #=> Array
     #   resp.datastore.file_format_configuration.parquet_configuration.schema_definition.columns[0].name #=> String
     #   resp.datastore.file_format_configuration.parquet_configuration.schema_definition.columns[0].type #=> String
+    #   resp.datastore.datastore_partitions.partitions #=> Array
+    #   resp.datastore.datastore_partitions.partitions[0].attribute_partition.attribute_name #=> String
+    #   resp.datastore.datastore_partitions.partitions[0].timestamp_partition.attribute_name #=> String
+    #   resp.datastore.datastore_partitions.partitions[0].timestamp_partition.timestamp_format #=> String
     #   resp.statistics.size.estimated_size_in_bytes #=> Float
     #   resp.statistics.size.estimated_on #=> Time
     #
@@ -1164,8 +1313,7 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Retrieves the current settings of the AWS IoT Analytics logging
-    # options.
+    # Retrieves the current settings of the IoT Analytics logging options.
     #
     # @return [Types::DescribeLoggingOptionsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1256,20 +1404,20 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Retrieves the contents of a data set as presigned URIs.
+    # Retrieves the contents of a dataset as presigned URIs.
     #
     # @option params [required, String] :dataset_name
-    #   The name of the data set whose contents are retrieved.
+    #   The name of the dataset whose contents are retrieved.
     #
     # @option params [String] :version_id
-    #   The version of the data set whose contents are retrieved. You can also
+    #   The version of the dataset whose contents are retrieved. You can also
     #   use the strings "$LATEST" or "$LATEST\_SUCCEEDED" to retrieve the
-    #   contents of the latest or latest successfully completed data set. If
+    #   contents of the latest or latest successfully completed dataset. If
     #   not specified, "$LATEST\_SUCCEEDED" is the default.
     #
     # @return [Types::GetDatasetContentResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
-    #   * {Types::GetDatasetContentResponse#entries #entries} => Array&lt;Types::DatasetEntry&gt;
+    #   * {Types::GetDatasetContentResponse#entries #data.entries} => Array&lt;Types::DatasetEntry&gt; (This method conflicts with a method on Response, call it through the data member)
     #   * {Types::GetDatasetContentResponse#timestamp #timestamp} => Time
     #   * {Types::GetDatasetContentResponse#status #status} => Types::DatasetContentStatus
     #
@@ -1282,9 +1430,9 @@ module Aws::IoTAnalytics
     #
     # @example Response structure
     #
-    #   resp.entries #=> Array
-    #   resp.entries[0].entry_name #=> String
-    #   resp.entries[0].data_uri #=> String
+    #   resp.data.entries #=> Array
+    #   resp.data.entries[0].entry_name #=> String
+    #   resp.data.entries[0].data_uri #=> String
     #   resp.timestamp #=> Time
     #   resp.status.state #=> String, one of "CREATING", "SUCCEEDED", "FAILED"
     #   resp.status.reason #=> String
@@ -1340,10 +1488,10 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Lists information about data set contents that have been created.
+    # Lists information about dataset contents that have been created.
     #
     # @option params [required, String] :dataset_name
-    #   The name of the data set whose contents information you want to list.
+    #   The name of the dataset whose contents information you want to list.
     #
     # @option params [String] :next_token
     #   The token for the next set of results.
@@ -1352,12 +1500,12 @@ module Aws::IoTAnalytics
     #   The maximum number of results to return in this request.
     #
     # @option params [Time,DateTime,Date,Integer,String] :scheduled_on_or_after
-    #   A filter to limit results to those data set contents whose creation is
+    #   A filter to limit results to those dataset contents whose creation is
     #   scheduled on or after the given time. See the field
     #   `triggers.schedule` in the `CreateDataset` request. (timestamp)
     #
     # @option params [Time,DateTime,Date,Integer,String] :scheduled_before
-    #   A filter to limit results to those data set contents whose creation is
+    #   A filter to limit results to those dataset contents whose creation is
     #   scheduled before the given time. See the field `triggers.schedule` in
     #   the `CreateDataset` request. (timestamp)
     #
@@ -1396,7 +1544,7 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Retrieves information about data sets.
+    # Retrieves information about datasets.
     #
     # @option params [String] :next_token
     #   The token for the next set of results.
@@ -1473,11 +1621,17 @@ module Aws::IoTAnalytics
     #   resp.datastore_summaries[0].datastore_storage.customer_managed_s3.bucket #=> String
     #   resp.datastore_summaries[0].datastore_storage.customer_managed_s3.key_prefix #=> String
     #   resp.datastore_summaries[0].datastore_storage.customer_managed_s3.role_arn #=> String
+    #   resp.datastore_summaries[0].datastore_storage.iot_site_wise_multi_layer_storage.customer_managed_s3_storage.bucket #=> String
+    #   resp.datastore_summaries[0].datastore_storage.iot_site_wise_multi_layer_storage.customer_managed_s3_storage.key_prefix #=> String
     #   resp.datastore_summaries[0].status #=> String, one of "CREATING", "ACTIVE", "DELETING"
     #   resp.datastore_summaries[0].creation_time #=> Time
     #   resp.datastore_summaries[0].last_update_time #=> Time
     #   resp.datastore_summaries[0].last_message_arrival_time #=> Time
     #   resp.datastore_summaries[0].file_format_type #=> String, one of "JSON", "PARQUET"
+    #   resp.datastore_summaries[0].datastore_partitions.partitions #=> Array
+    #   resp.datastore_summaries[0].datastore_partitions.partitions[0].attribute_partition.attribute_name #=> String
+    #   resp.datastore_summaries[0].datastore_partitions.partitions[0].timestamp_partition.attribute_name #=> String
+    #   resp.datastore_summaries[0].datastore_partitions.partitions[0].timestamp_partition.timestamp_format #=> String
     #   resp.next_token #=> String
     #
     # @overload list_datastores(params = {})
@@ -1558,7 +1712,7 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Sets or updates the AWS IoT Analytics logging options.
+    # Sets or updates the IoT Analytics logging options.
     #
     # If you update the value of any `loggingOptions` field, it takes up to
     # one minute for the change to take effect. Also, if you change the
@@ -1567,7 +1721,7 @@ module Aws::IoTAnalytics
     # for that change to take effect.
     #
     # @option params [required, Types::LoggingOptions] :logging_options
-    #   The new values of the AWS IoT Analytics logging options.
+    #   The new values of the IoT Analytics logging options.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -1593,9 +1747,9 @@ module Aws::IoTAnalytics
     #
     # @option params [required, Types::PipelineActivity] :pipeline_activity
     #   The pipeline activity that is run. This must not be a channel activity
-    #   or a datastore activity because these activities are used in a
+    #   or a data store activity because these activities are used in a
     #   pipeline only to load the original message and to store the (possibly)
-    #   transformed message. If a lambda activity is specified, only
+    #   transformed message. If a Lambda activity is specified, only
     #   short-running Lambda functions (those with a timeout of less than 30
     #   seconds or less) can be used.
     #
@@ -1830,7 +1984,7 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Updates the settings of a channel.
+    # Used to update the settings of a channel.
     #
     # @option params [required, String] :channel_name
     #   The name of the channel to be updated.
@@ -1838,12 +1992,12 @@ module Aws::IoTAnalytics
     # @option params [Types::ChannelStorage] :channel_storage
     #   Where channel data is stored. You can choose one of `serviceManagedS3`
     #   or `customerManagedS3` storage. If not specified, the default is
-    #   `serviceManagedS3`. You cannot change this storage option after the
+    #   `serviceManagedS3`. You can't change this storage option after the
     #   channel is created.
     #
     # @option params [Types::RetentionPeriod] :retention_period
     #   How long, in days, message data is kept for the channel. The retention
-    #   period cannot be updated if the channel's S3 storage is
+    #   period can't be updated if the channel's Amazon S3 storage is
     #   customer-managed.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
@@ -1874,10 +2028,10 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Updates the settings of a data set.
+    # Updates the settings of a dataset.
     #
     # @option params [required, String] :dataset_name
-    #   The name of the data set to update.
+    #   The name of the dataset to update.
     #
     # @option params [required, Array<Types::DatasetAction>] :actions
     #   A list of `DatasetAction` objects.
@@ -1898,17 +2052,17 @@ module Aws::IoTAnalytics
     #   specified or set to null, only the latest version plus the latest
     #   succeeded version (if they are different) are kept for the time period
     #   specified by the `retentionPeriod` parameter. For more information,
-    #   see [Keeping Multiple Versions of AWS IoT Analytics Data Sets][1] in
-    #   the *AWS IoT Analytics User Guide*.
+    #   see [Keeping Multiple Versions of IoT Analytics datasets][1] in the
+    #   *IoT Analytics User Guide*.
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/iotanalytics/latest/userguide/getting-started.html#aws-iot-analytics-dataset-versions
     #
     # @option params [Array<Types::LateDataRule>] :late_data_rules
-    #   A list of data rules that send notifications to Amazon CloudWatch,
-    #   when data arrives late. To specify `lateDataRules`, the dataset must
-    #   use a [DeltaTimer][1] filter.
+    #   A list of data rules that send notifications to CloudWatch, when data
+    #   arrives late. To specify `lateDataRules`, the dataset must use a
+    #   [DeltaTimer][1] filter.
     #
     #
     #
@@ -2014,25 +2168,26 @@ module Aws::IoTAnalytics
       req.send_request(options)
     end
 
-    # Updates the settings of a data store.
+    # Used to update the settings of a data store.
     #
     # @option params [required, String] :datastore_name
     #   The name of the data store to be updated.
     #
     # @option params [Types::RetentionPeriod] :retention_period
     #   How long, in days, message data is kept for the data store. The
-    #   retention period cannot be updated if the data store's S3 storage is
-    #   customer-managed.
+    #   retention period can't be updated if the data store's Amazon S3
+    #   storage is customer-managed.
     #
     # @option params [Types::DatastoreStorage] :datastore_storage
-    #   Where data store data is stored. You can choose one of
-    #   `serviceManagedS3` or `customerManagedS3` storage. If not specified,
-    #   the default is`serviceManagedS3`. You cannot change this storage
-    #   option after the data store is created.
+    #   Where data in a data store is stored.. You can choose
+    #   `serviceManagedS3` storage, `customerManagedS3` storage, or
+    #   `iotSiteWiseMultiLayerStorage` storage. The default is
+    #   `serviceManagedS3`. You can't change the choice of Amazon S3 storage
+    #   after your data store is created.
     #
     # @option params [Types::FileFormatConfiguration] :file_format_configuration
-    #   Contains the configuration information of file formats. AWS IoT
-    #   Analytics data stores support JSON and [Parquet][1].
+    #   Contains the configuration information of file formats. IoT Analytics
+    #   data stores support JSON and [Parquet][1].
     #
     #   The default file format is JSON. You can specify only one format.
     #
@@ -2059,6 +2214,12 @@ module Aws::IoTAnalytics
     #         bucket: "BucketName", # required
     #         key_prefix: "S3KeyPrefix",
     #         role_arn: "RoleArn", # required
+    #       },
+    #       iot_site_wise_multi_layer_storage: {
+    #         customer_managed_s3_storage: { # required
+    #           bucket: "BucketName", # required
+    #           key_prefix: "S3KeyPrefix",
+    #         },
     #       },
     #     },
     #     file_format_configuration: {
@@ -2187,14 +2348,19 @@ module Aws::IoTAnalytics
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::IoTAnalytics')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-iotanalytics'
-      context[:gem_version] = '1.36.0'
+      context[:gem_version] = '1.74.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

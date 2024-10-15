@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:workdocs)
 
 module Aws::WorkDocs
   # An API client for WorkDocs.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::WorkDocs
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::WorkDocs::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::WorkDocs
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::WorkDocs
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::WorkDocs
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::WorkDocs
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::WorkDocs
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::WorkDocs
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::WorkDocs
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::WorkDocs::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::WorkDocs::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -333,8 +453,8 @@ module Aws::WorkDocs
     # document version, or fails to do so.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -368,8 +488,8 @@ module Aws::WorkDocs
     #   The ID of the user.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @return [Types::ActivateUserResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -416,8 +536,8 @@ module Aws::WorkDocs
     # different permissions.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :resource_id
     #   The ID of the resource.
@@ -472,8 +592,8 @@ module Aws::WorkDocs
     # Adds a new comment to the specified document version.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -558,8 +678,8 @@ module Aws::WorkDocs
     # folder, document, or version).
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :resource_id
     #   The ID of the resource.
@@ -596,8 +716,8 @@ module Aws::WorkDocs
     # Creates a folder with the specified name and parent folder.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [String] :name
     #   The name of the new folder.
@@ -651,8 +771,8 @@ module Aws::WorkDocs
     #   List of labels to add to the resource.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -677,12 +797,12 @@ module Aws::WorkDocs
     # endpoint receives a confirmation message, and must confirm the
     # subscription.
     #
-    # For more information, see [Subscribe to Notifications][1] in the
-    # *Amazon WorkDocs Developer Guide*.
+    # For more information, see [Setting up notifications for an IAM user or
+    # role][1] in the *Amazon WorkDocs Developer Guide*.
     #
     #
     #
-    # [1]: https://docs.aws.amazon.com/workdocs/latest/developerguide/subscribe-notifications.html
+    # [1]: https://docs.aws.amazon.com/workdocs/latest/developerguide/manage-notifications.html
     #
     # @option params [required, String] :organization_id
     #   The ID of the organization.
@@ -707,7 +827,7 @@ module Aws::WorkDocs
     #   resp = client.create_notification_subscription({
     #     organization_id: "IdType", # required
     #     endpoint: "SubscriptionEndPointType", # required
-    #     protocol: "HTTPS", # required, accepts HTTPS
+    #     protocol: "HTTPS", # required, accepts HTTPS, SQS
     #     subscription_type: "ALL", # required, accepts ALL
     #   })
     #
@@ -715,7 +835,7 @@ module Aws::WorkDocs
     #
     #   resp.subscription.subscription_id #=> String
     #   resp.subscription.end_point #=> String
-    #   resp.subscription.protocol #=> String, one of "HTTPS"
+    #   resp.subscription.protocol #=> String, one of "HTTPS", "SQS"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workdocs-2016-05-01/CreateNotificationSubscription AWS API Documentation
     #
@@ -755,8 +875,8 @@ module Aws::WorkDocs
     #   The amount of storage for the user.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @return [Types::CreateUserResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -815,8 +935,8 @@ module Aws::WorkDocs
     #   The ID of the user.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -839,8 +959,8 @@ module Aws::WorkDocs
     # Deletes the specified comment from the document version.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -874,8 +994,8 @@ module Aws::WorkDocs
     # Deletes custom metadata from the specified resource.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :resource_id
     #   The ID of the resource, either a document or folder.
@@ -916,8 +1036,8 @@ module Aws::WorkDocs
     # metadata.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -940,11 +1060,46 @@ module Aws::WorkDocs
       req.send_request(options)
     end
 
+    # Deletes a specific version of a document.
+    #
+    # @option params [String] :authentication_token
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
+    #
+    # @option params [required, String] :document_id
+    #   The ID of the document associated with the version being deleted.
+    #
+    # @option params [required, String] :version_id
+    #   The ID of the version being deleted.
+    #
+    # @option params [required, Boolean] :delete_prior_versions
+    #   Deletes all versions of a document prior to the current version.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_document_version({
+    #     authentication_token: "AuthenticationHeaderType",
+    #     document_id: "ResourceIdType", # required
+    #     version_id: "DocumentVersionIdType", # required
+    #     delete_prior_versions: false, # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workdocs-2016-05-01/DeleteDocumentVersion AWS API Documentation
+    #
+    # @overload delete_document_version(params = {})
+    # @param [Hash] params ({})
+    def delete_document_version(params = {}, options = {})
+      req = build_request(:delete_document_version, params)
+      req.send_request(options)
+    end
+
     # Permanently deletes the specified folder and its contents.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :folder_id
     #   The ID of the folder.
@@ -970,8 +1125,8 @@ module Aws::WorkDocs
     # Deletes the contents of the specified folder.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :folder_id
     #   The ID of the folder.
@@ -1000,8 +1155,8 @@ module Aws::WorkDocs
     #   The ID of the resource.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [Array<String>] :labels
     #   List of labels to delete from the resource.
@@ -1057,10 +1212,14 @@ module Aws::WorkDocs
 
     # Deletes the specified user from a Simple AD or Microsoft AD directory.
     #
+    # Deleting a user immediately and permanently deletes all content in
+    # that user's folder structure. Site retention policies do NOT apply to
+    # this type of deletion.
+    #
     # @option params [String] :authentication_token
     #   Amazon WorkDocs authentication token. Do not set this field when using
-    #   administrative API actions, as in accessing the API using AWS
-    #   credentials.
+    #   administrative API actions, as in accessing the API using Amazon Web
+    #   Services credentials.
     #
     # @option params [required, String] :user_id
     #   The ID of the user.
@@ -1086,8 +1245,8 @@ module Aws::WorkDocs
     # Describes the user activities in a specified time period.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [Time,DateTime,Date,Integer,String] :start_time
     #   The timestamp that determines the starting time of the activities. The
@@ -1132,6 +1291,8 @@ module Aws::WorkDocs
     #   * {Types::DescribeActivitiesResponse#user_activities #user_activities} => Array&lt;Types::Activity&gt;
     #   * {Types::DescribeActivitiesResponse#marker #marker} => String
     #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_activities({
@@ -1144,7 +1305,7 @@ module Aws::WorkDocs
     #     user_id: "IdType",
     #     include_indirect_activities: false,
     #     limit: 1,
-    #     marker: "MarkerType",
+    #     marker: "SearchMarkerType",
     #   })
     #
     # @example Response structure
@@ -1211,6 +1372,7 @@ module Aws::WorkDocs
     #   resp.user_activities[0].comment_metadata.created_timestamp #=> Time
     #   resp.user_activities[0].comment_metadata.comment_status #=> String, one of "DRAFT", "PUBLISHED", "DELETED"
     #   resp.user_activities[0].comment_metadata.recipient_id #=> String
+    #   resp.user_activities[0].comment_metadata.contributor_id #=> String
     #   resp.marker #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workdocs-2016-05-01/DescribeActivities AWS API Documentation
@@ -1225,8 +1387,8 @@ module Aws::WorkDocs
     # List all the comments for the specified document version.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -1245,6 +1407,8 @@ module Aws::WorkDocs
     #
     #   * {Types::DescribeCommentsResponse#comments #comments} => Array&lt;Types::Comment&gt;
     #   * {Types::DescribeCommentsResponse#marker #marker} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
     # @example Request syntax with placeholder values
     #
@@ -1300,8 +1464,8 @@ module Aws::WorkDocs
     # By default, only active versions are returned.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -1377,8 +1541,8 @@ module Aws::WorkDocs
     # You can also request initialized documents.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :folder_id
     #   The ID of the folder.
@@ -1478,8 +1642,8 @@ module Aws::WorkDocs
     # underlying Active Directory.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :search_query
     #   A query to describe groups by group name.
@@ -1498,6 +1662,8 @@ module Aws::WorkDocs
     #
     #   * {Types::DescribeGroupsResponse#groups #groups} => Array&lt;Types::GroupMetadata&gt;
     #   * {Types::DescribeGroupsResponse#marker #marker} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
     # @example Request syntax with placeholder values
     #
@@ -1542,6 +1708,8 @@ module Aws::WorkDocs
     #   * {Types::DescribeNotificationSubscriptionsResponse#subscriptions #subscriptions} => Array&lt;Types::Subscription&gt;
     #   * {Types::DescribeNotificationSubscriptionsResponse#marker #marker} => String
     #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_notification_subscriptions({
@@ -1555,7 +1723,7 @@ module Aws::WorkDocs
     #   resp.subscriptions #=> Array
     #   resp.subscriptions[0].subscription_id #=> String
     #   resp.subscriptions[0].end_point #=> String
-    #   resp.subscriptions[0].protocol #=> String, one of "HTTPS"
+    #   resp.subscriptions[0].protocol #=> String, one of "HTTPS", "SQS"
     #   resp.marker #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/workdocs-2016-05-01/DescribeNotificationSubscriptions AWS API Documentation
@@ -1570,8 +1738,8 @@ module Aws::WorkDocs
     # Describes the permissions of a specified resource.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :resource_id
     #   The ID of the resource.
@@ -1590,6 +1758,8 @@ module Aws::WorkDocs
     #
     #   * {Types::DescribeResourcePermissionsResponse#principals #principals} => Array&lt;Types::Principal&gt;
     #   * {Types::DescribeResourcePermissionsResponse#marker #marker} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
     # @example Request syntax with placeholder values
     #
@@ -1649,6 +1819,8 @@ module Aws::WorkDocs
     #   * {Types::DescribeRootFoldersResponse#folders #folders} => Array&lt;Types::FolderMetadata&gt;
     #   * {Types::DescribeRootFoldersResponse#marker #marker} => String
     #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_root_folders({
@@ -1691,8 +1863,8 @@ module Aws::WorkDocs
     # you can use to request the next set of results.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [String] :organization_id
     #   The ID of the organization.
@@ -1701,7 +1873,28 @@ module Aws::WorkDocs
     #   The IDs of the users.
     #
     # @option params [String] :query
-    #   A query to filter users by user name.
+    #   A query to filter users by user name. Remember the following about the
+    #   `Userids` and `Query` parameters:
+    #
+    #   * If you don't use either parameter, the API returns a paginated list
+    #     of all users on the site.
+    #
+    #   * If you use both parameters, the API ignores the `Query` parameter.
+    #
+    #   * The `Userid` parameter only returns user names that match a
+    #     corresponding user ID.
+    #
+    #   * The `Query` parameter runs a "prefix" search for users by the
+    #     `GivenName`, `SurName`, or `UserName` fields included in a
+    #     [CreateUser][1] API call. For example, querying on `Ma` returns
+    #     Márcia Oliveira, María García, and Mateo Jackson. If you use
+    #     multiple characters, the API only returns data that matches all
+    #     characters. For example, querying on `Ma J` only returns Mateo
+    #     Jackson.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/workdocs/latest/APIReference/API_CreateUser.html
     #
     # @option params [String] :include
     #   The state of the users. Specify "ALL" to include inactive users.
@@ -1836,8 +2029,8 @@ module Aws::WorkDocs
     # Retrieves details of a document.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -1904,8 +2097,8 @@ module Aws::WorkDocs
     # can also request the names of the parent folders.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -1952,8 +2145,8 @@ module Aws::WorkDocs
     # Retrieves version metadata for the specified document.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -2015,8 +2208,8 @@ module Aws::WorkDocs
     # Retrieves the metadata of the specified folder.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :folder_id
     #   The ID of the folder.
@@ -2072,8 +2265,8 @@ module Aws::WorkDocs
     # can also request the parent folder names.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :folder_id
     #   The ID of the folder.
@@ -2121,8 +2314,8 @@ module Aws::WorkDocs
     # The only `CollectionType` supported is `SHARED_WITH_ME`.
     #
     # @option params [String] :authentication_token
-    #   The Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   The Amazon WorkDocs authentication token. Not required when using
+    #   Amazon Web Services administrator credentials to access the API.
     #
     # @option params [String] :user_id
     #   The user ID for the resource collection. This is a required field for
@@ -2215,8 +2408,8 @@ module Aws::WorkDocs
     # To cancel the document upload, call AbortDocumentVersionUpload.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [String] :id
     #   The ID of the document.
@@ -2236,7 +2429,7 @@ module Aws::WorkDocs
     # @option params [Integer] :document_size_in_bytes
     #   The size of the document, in bytes.
     #
-    # @option params [required, String] :parent_folder_id
+    # @option params [String] :parent_folder_id
     #   The ID of the parent folder.
     #
     # @return [Types::InitiateDocumentVersionUploadResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -2254,7 +2447,7 @@ module Aws::WorkDocs
     #     content_modified_timestamp: Time.now,
     #     content_type: "DocumentContentType",
     #     document_size_in_bytes: 1,
-    #     parent_folder_id: "ResourceIdType", # required
+    #     parent_folder_id: "ResourceIdType",
     #   })
     #
     # @example Response structure
@@ -2298,8 +2491,8 @@ module Aws::WorkDocs
     # Removes all the permissions from the specified resource.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :resource_id
     #   The ID of the resource.
@@ -2326,8 +2519,8 @@ module Aws::WorkDocs
     # resource.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :resource_id
     #   The ID of the resource.
@@ -2358,12 +2551,215 @@ module Aws::WorkDocs
       req.send_request(options)
     end
 
+    # Recovers a deleted version of an Amazon WorkDocs document.
+    #
+    # @option params [String] :authentication_token
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
+    #
+    # @option params [required, String] :document_id
+    #   The ID of the document.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.restore_document_versions({
+    #     authentication_token: "AuthenticationHeaderType",
+    #     document_id: "ResourceIdType", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workdocs-2016-05-01/RestoreDocumentVersions AWS API Documentation
+    #
+    # @overload restore_document_versions(params = {})
+    # @param [Hash] params ({})
+    def restore_document_versions(params = {}, options = {})
+      req = build_request(:restore_document_versions, params)
+      req.send_request(options)
+    end
+
+    # Searches metadata and the content of folders, documents, document
+    # versions, and comments.
+    #
+    # @option params [String] :authentication_token
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
+    #
+    # @option params [String] :query_text
+    #   The String to search for. Searches across different text fields based
+    #   on request parameters. Use double quotes around the query string for
+    #   exact phrase matches.
+    #
+    # @option params [Array<String>] :query_scopes
+    #   Filter based on the text field type. A Folder has only a name and no
+    #   content. A Comment has only content and no name. A Document or
+    #   Document Version has a name and content
+    #
+    # @option params [String] :organization_id
+    #   Filters based on the resource owner OrgId. This is a mandatory
+    #   parameter when using Admin SigV4 credentials.
+    #
+    # @option params [Array<String>] :additional_response_fields
+    #   A list of attributes to include in the response. Used to request
+    #   fields that are not normally returned in a standard response.
+    #
+    # @option params [Types::Filters] :filters
+    #   Filters results based on entity metadata.
+    #
+    # @option params [Array<Types::SearchSortResult>] :order_by
+    #   Order by results in one or more categories.
+    #
+    # @option params [Integer] :limit
+    #   Max results count per page.
+    #
+    # @option params [String] :marker
+    #   The marker for the next set of results.
+    #
+    # @return [Types::SearchResourcesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::SearchResourcesResponse#items #items} => Array&lt;Types::ResponseItem&gt;
+    #   * {Types::SearchResourcesResponse#marker #marker} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.search_resources({
+    #     authentication_token: "AuthenticationHeaderType",
+    #     query_text: "SearchQueryType",
+    #     query_scopes: ["NAME"], # accepts NAME, CONTENT
+    #     organization_id: "IdType",
+    #     additional_response_fields: ["WEBURL"], # accepts WEBURL
+    #     filters: {
+    #       text_locales: ["AR"], # accepts AR, BG, BN, DA, DE, CS, EL, EN, ES, FA, FI, FR, HI, HU, ID, IT, JA, KO, LT, LV, NL, NO, PT, RO, RU, SV, SW, TH, TR, ZH, DEFAULT
+    #       content_categories: ["IMAGE"], # accepts IMAGE, DOCUMENT, PDF, SPREADSHEET, PRESENTATION, AUDIO, VIDEO, SOURCE_CODE, OTHER
+    #       resource_types: ["FOLDER"], # accepts FOLDER, DOCUMENT, COMMENT, DOCUMENT_VERSION
+    #       labels: ["SearchLabel"],
+    #       principals: [
+    #         {
+    #           id: "IdType", # required
+    #           roles: ["VIEWER"], # accepts VIEWER, CONTRIBUTOR, OWNER, COOWNER
+    #         },
+    #       ],
+    #       ancestor_ids: ["SearchAncestorId"],
+    #       search_collection_types: ["OWNED"], # accepts OWNED, SHARED_WITH_ME
+    #       size_range: {
+    #         start_value: 1,
+    #         end_value: 1,
+    #       },
+    #       created_range: {
+    #         start_value: Time.now,
+    #         end_value: Time.now,
+    #       },
+    #       modified_range: {
+    #         start_value: Time.now,
+    #         end_value: Time.now,
+    #       },
+    #     },
+    #     order_by: [
+    #       {
+    #         field: "RELEVANCE", # accepts RELEVANCE, NAME, SIZE, CREATED_TIMESTAMP, MODIFIED_TIMESTAMP
+    #         order: "ASC", # accepts ASC, DESC
+    #       },
+    #     ],
+    #     limit: 1,
+    #     marker: "NextMarkerType",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.items #=> Array
+    #   resp.items[0].resource_type #=> String, one of "DOCUMENT", "FOLDER", "COMMENT", "DOCUMENT_VERSION"
+    #   resp.items[0].web_url #=> String
+    #   resp.items[0].document_metadata.id #=> String
+    #   resp.items[0].document_metadata.creator_id #=> String
+    #   resp.items[0].document_metadata.parent_folder_id #=> String
+    #   resp.items[0].document_metadata.created_timestamp #=> Time
+    #   resp.items[0].document_metadata.modified_timestamp #=> Time
+    #   resp.items[0].document_metadata.latest_version_metadata.id #=> String
+    #   resp.items[0].document_metadata.latest_version_metadata.name #=> String
+    #   resp.items[0].document_metadata.latest_version_metadata.content_type #=> String
+    #   resp.items[0].document_metadata.latest_version_metadata.size #=> Integer
+    #   resp.items[0].document_metadata.latest_version_metadata.signature #=> String
+    #   resp.items[0].document_metadata.latest_version_metadata.status #=> String, one of "INITIALIZED", "ACTIVE"
+    #   resp.items[0].document_metadata.latest_version_metadata.created_timestamp #=> Time
+    #   resp.items[0].document_metadata.latest_version_metadata.modified_timestamp #=> Time
+    #   resp.items[0].document_metadata.latest_version_metadata.content_created_timestamp #=> Time
+    #   resp.items[0].document_metadata.latest_version_metadata.content_modified_timestamp #=> Time
+    #   resp.items[0].document_metadata.latest_version_metadata.creator_id #=> String
+    #   resp.items[0].document_metadata.latest_version_metadata.thumbnail #=> Hash
+    #   resp.items[0].document_metadata.latest_version_metadata.thumbnail["DocumentThumbnailType"] #=> String
+    #   resp.items[0].document_metadata.latest_version_metadata.source #=> Hash
+    #   resp.items[0].document_metadata.latest_version_metadata.source["DocumentSourceType"] #=> String
+    #   resp.items[0].document_metadata.resource_state #=> String, one of "ACTIVE", "RESTORING", "RECYCLING", "RECYCLED"
+    #   resp.items[0].document_metadata.labels #=> Array
+    #   resp.items[0].document_metadata.labels[0] #=> String
+    #   resp.items[0].folder_metadata.id #=> String
+    #   resp.items[0].folder_metadata.name #=> String
+    #   resp.items[0].folder_metadata.creator_id #=> String
+    #   resp.items[0].folder_metadata.parent_folder_id #=> String
+    #   resp.items[0].folder_metadata.created_timestamp #=> Time
+    #   resp.items[0].folder_metadata.modified_timestamp #=> Time
+    #   resp.items[0].folder_metadata.resource_state #=> String, one of "ACTIVE", "RESTORING", "RECYCLING", "RECYCLED"
+    #   resp.items[0].folder_metadata.signature #=> String
+    #   resp.items[0].folder_metadata.labels #=> Array
+    #   resp.items[0].folder_metadata.labels[0] #=> String
+    #   resp.items[0].folder_metadata.size #=> Integer
+    #   resp.items[0].folder_metadata.latest_version_size #=> Integer
+    #   resp.items[0].comment_metadata.comment_id #=> String
+    #   resp.items[0].comment_metadata.contributor.id #=> String
+    #   resp.items[0].comment_metadata.contributor.username #=> String
+    #   resp.items[0].comment_metadata.contributor.email_address #=> String
+    #   resp.items[0].comment_metadata.contributor.given_name #=> String
+    #   resp.items[0].comment_metadata.contributor.surname #=> String
+    #   resp.items[0].comment_metadata.contributor.organization_id #=> String
+    #   resp.items[0].comment_metadata.contributor.root_folder_id #=> String
+    #   resp.items[0].comment_metadata.contributor.recycle_bin_folder_id #=> String
+    #   resp.items[0].comment_metadata.contributor.status #=> String, one of "ACTIVE", "INACTIVE", "PENDING"
+    #   resp.items[0].comment_metadata.contributor.type #=> String, one of "USER", "ADMIN", "POWERUSER", "MINIMALUSER", "WORKSPACESUSER"
+    #   resp.items[0].comment_metadata.contributor.created_timestamp #=> Time
+    #   resp.items[0].comment_metadata.contributor.modified_timestamp #=> Time
+    #   resp.items[0].comment_metadata.contributor.time_zone_id #=> String
+    #   resp.items[0].comment_metadata.contributor.locale #=> String, one of "en", "fr", "ko", "de", "es", "ja", "ru", "zh_CN", "zh_TW", "pt_BR", "default"
+    #   resp.items[0].comment_metadata.contributor.storage.storage_utilized_in_bytes #=> Integer
+    #   resp.items[0].comment_metadata.contributor.storage.storage_rule.storage_allocated_in_bytes #=> Integer
+    #   resp.items[0].comment_metadata.contributor.storage.storage_rule.storage_type #=> String, one of "UNLIMITED", "QUOTA"
+    #   resp.items[0].comment_metadata.created_timestamp #=> Time
+    #   resp.items[0].comment_metadata.comment_status #=> String, one of "DRAFT", "PUBLISHED", "DELETED"
+    #   resp.items[0].comment_metadata.recipient_id #=> String
+    #   resp.items[0].comment_metadata.contributor_id #=> String
+    #   resp.items[0].document_version_metadata.id #=> String
+    #   resp.items[0].document_version_metadata.name #=> String
+    #   resp.items[0].document_version_metadata.content_type #=> String
+    #   resp.items[0].document_version_metadata.size #=> Integer
+    #   resp.items[0].document_version_metadata.signature #=> String
+    #   resp.items[0].document_version_metadata.status #=> String, one of "INITIALIZED", "ACTIVE"
+    #   resp.items[0].document_version_metadata.created_timestamp #=> Time
+    #   resp.items[0].document_version_metadata.modified_timestamp #=> Time
+    #   resp.items[0].document_version_metadata.content_created_timestamp #=> Time
+    #   resp.items[0].document_version_metadata.content_modified_timestamp #=> Time
+    #   resp.items[0].document_version_metadata.creator_id #=> String
+    #   resp.items[0].document_version_metadata.thumbnail #=> Hash
+    #   resp.items[0].document_version_metadata.thumbnail["DocumentThumbnailType"] #=> String
+    #   resp.items[0].document_version_metadata.source #=> Hash
+    #   resp.items[0].document_version_metadata.source["DocumentSourceType"] #=> String
+    #   resp.marker #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/workdocs-2016-05-01/SearchResources AWS API Documentation
+    #
+    # @overload search_resources(params = {})
+    # @param [Hash] params ({})
+    def search_resources(params = {}, options = {})
+      req = build_request(:search_resources, params)
+      req.send_request(options)
+    end
+
     # Updates the specified attributes of a document. The user must have
     # access to both the document and its parent folder, if applicable.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -2407,8 +2803,8 @@ module Aws::WorkDocs
     # InitiateDocumentVersionUpload.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :document_id
     #   The ID of the document.
@@ -2444,8 +2840,8 @@ module Aws::WorkDocs
     # applicable.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :folder_id
     #   The ID of the folder.
@@ -2485,8 +2881,8 @@ module Aws::WorkDocs
     # revokes administrative privileges to the Amazon WorkDocs site.
     #
     # @option params [String] :authentication_token
-    #   Amazon WorkDocs authentication token. Not required when using AWS
-    #   administrator credentials to access the API.
+    #   Amazon WorkDocs authentication token. Not required when using Amazon
+    #   Web Services administrator credentials to access the API.
     #
     # @option params [required, String] :user_id
     #   The ID of the user.
@@ -2510,7 +2906,7 @@ module Aws::WorkDocs
     #   The locale of the user.
     #
     # @option params [String] :grant_poweruser_privileges
-    #   Boolean value to determine whether the user is granted Poweruser
+    #   Boolean value to determine whether the user is granted Power user
     #   privileges.
     #
     # @return [Types::UpdateUserResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -2569,14 +2965,19 @@ module Aws::WorkDocs
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::WorkDocs')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-workdocs'
-      context[:gem_version] = '1.28.0'
+      context[:gem_version] = '1.68.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

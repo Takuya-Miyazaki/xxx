@@ -3,20 +3,30 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::EFS
   module Types
 
-    # Returned if the access point you are trying to create already exists,
-    # with the creation token you provided in the request.
+    # Returned if the access point that you are trying to create already
+    # exists, with the creation token you provided in the request.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @!attribute [rw] access_point_id
@@ -68,12 +78,13 @@ module Aws::EFS
     #   @return [Types::PosixUser]
     #
     # @!attribute [rw] root_directory
-    #   The directory on the Amazon EFS file system that the access point
-    #   exposes as the root directory to NFS clients using the access point.
+    #   The directory on the EFS file system that the access point exposes
+    #   as the root directory to NFS clients using the access point.
     #   @return [Types::RootDirectory]
     #
     # @!attribute [rw] owner_id
-    #   Identified the AWS account that owns the access point resource.
+    #   Identifies the Amazon Web Services account that owns the access
+    #   point resource.
     #   @return [String]
     #
     # @!attribute [rw] life_cycle_state
@@ -97,13 +108,29 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # Returned if the AWS account has already created the maximum number of
-    # access points allowed per file system.
+    # Returned if the Amazon Web Services account has already created the
+    # maximum number of access points allowed per file system. For more
+    # informaton, see
+    # [https://docs.aws.amazon.com/efs/latest/ug/limits.html#limits-efs-resources-per-account-per-region][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/efs/latest/ug/limits.html#limits-efs-resources-per-account-per-region
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/AccessPointLimitExceeded AWS API Documentation
@@ -116,12 +143,22 @@ module Aws::EFS
     end
 
     # Returned if the specified `AccessPointId` value doesn't exist in the
-    # requester's AWS account.
+    # requester's Amazon Web Services account.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/AccessPointNotFound AWS API Documentation
@@ -133,30 +170,63 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # The backup policy for the file system, showing the curent status. If
-    # `ENABLED`, the file system is being backed up.
+    # Returned if the Availability Zone that was specified for a mount
+    # target is different from the Availability Zone that was specified for
+    # One Zone storage. For more information, see [Regional and One Zone
+    # storage redundancy][1].
     #
-    # @note When making an API call, you may pass BackupPolicy
-    #   data as a hash:
     #
-    #       {
-    #         status: "ENABLED", # required, accepts ENABLED, ENABLING, DISABLED, DISABLING
-    #       }
+    #
+    # [1]: https://docs.aws.amazon.com/efs/latest/ug/availability-durability.html
+    #
+    # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
+    #   @return [String]
+    #
+    # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/AvailabilityZonesMismatch AWS API Documentation
+    #
+    class AvailabilityZonesMismatch < Struct.new(
+      :error_code,
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The backup policy for the file system used to create automatic daily
+    # backups. If status has a value of `ENABLED`, the file system is being
+    # automatically backed up. For more information, see [Automatic
+    # backups][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/efs/latest/ug/awsbackup.html#automatic-backups
     #
     # @!attribute [rw] status
     #   Describes the status of the file system's backup policy.
     #
-    #   * <i> <code>ENABLED</code> - EFS is automatically backing up the
-    #     file system.</i>
+    #   * <b> <code>ENABLED</code> </b> – EFS is automatically backing up
+    #     the file system.
     #
-    #   * <i> <code>ENABLING</code> - EFS is turning on automatic backups
-    #     for the file system.</i>
+    #   * <b> <code>ENABLING</code> </b> – EFS is turning on automatic
+    #     backups for the file system.
     #
-    #   * <i> <code>DISABLED</code> - automatic back ups are turned off for
-    #     the file system.</i>
+    #   * <b> <code>DISABLED</code> </b> – Automatic back ups are turned off
+    #     for the file system.
     #
-    #   * <i> <code>DISABLED</code> - EFS is turning off automatic backups
-    #     for the file system.</i>
+    #   * <b> <code>DISABLING</code> </b> – EFS is turning off automatic
+    #     backups for the file system.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/BackupPolicy AWS API Documentation
@@ -169,7 +239,7 @@ module Aws::EFS
 
     # @!attribute [rw] backup_policy
     #   Describes the file system's backup policy, indicating whether
-    #   automatic backups are turned on or off..
+    #   automatic backups are turned on or off.
     #   @return [Types::BackupPolicy]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/BackupPolicyDescription AWS API Documentation
@@ -184,9 +254,19 @@ module Aws::EFS
     # invalid parameter value or a missing required parameter.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/BadRequest AWS API Documentation
@@ -198,33 +278,34 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateAccessPointRequest
-    #   data as a hash:
+    # Returned if the source file system in a replication is encrypted but
+    # the destination file system is unencrypted.
     #
-    #       {
-    #         client_token: "ClientToken", # required
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #         file_system_id: "FileSystemId", # required
-    #         posix_user: {
-    #           uid: 1, # required
-    #           gid: 1, # required
-    #           secondary_gids: [1],
-    #         },
-    #         root_directory: {
-    #           path: "Path",
-    #           creation_info: {
-    #             owner_uid: 1, # required
-    #             owner_gid: 1, # required
-    #             permissions: "Permissions", # required
-    #           },
-    #         },
-    #       }
+    # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
+    #   @return [String]
     #
+    # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/ConflictException AWS API Documentation
+    #
+    class ConflictException < Struct.new(
+      :error_code,
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] client_token
     #   A string of up to 64 ASCII characters that Amazon EFS uses to ensure
     #   idempotent creation.
@@ -235,7 +316,13 @@ module Aws::EFS
     #
     # @!attribute [rw] tags
     #   Creates tags associated with the access point. Each tag is a
-    #   key-value pair.
+    #   key-value pair, each key must be unique. For more information, see
+    #   [Tagging Amazon Web Services resources][1] in the *Amazon Web
+    #   Services General Reference Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html
     #   @return [Array<Types::Tag>]
     #
     # @!attribute [rw] file_system_id
@@ -249,14 +336,20 @@ module Aws::EFS
     #   @return [Types::PosixUser]
     #
     # @!attribute [rw] root_directory
-    #   Specifies the directory on the Amazon EFS file system that the
-    #   access point exposes as the root directory of your file system to
-    #   NFS clients using the access point. The clients using the access
-    #   point can only access the root directory and below. If the
-    #   `RootDirectory` &gt; `Path` specified does not exist, EFS creates it
-    #   and applies the `CreationInfo` settings when a client connects to an
-    #   access point. When specifying a `RootDirectory`, you need to provide
-    #   the `Path`, and the `CreationInfo` is optional.
+    #   Specifies the directory on the EFS file system that the access point
+    #   exposes as the root directory of your file system to NFS clients
+    #   using the access point. The clients using the access point can only
+    #   access the root directory and below. If the `RootDirectory` &gt;
+    #   `Path` specified does not exist, Amazon EFS creates it and applies
+    #   the `CreationInfo` settings when a client connects to an access
+    #   point. When specifying a `RootDirectory`, you must provide the
+    #   `Path`, and the `CreationInfo`.
+    #
+    #   Amazon EFS creates a root directory only if you have provided the
+    #   CreationInfo: OwnUid, OwnGID, and permissions for the directory. If
+    #   you do not provide this information, Amazon EFS does not create the
+    #   root directory. If the root directory does not exist, attempts to
+    #   mount using the access point will fail.
     #   @return [Types::RootDirectory]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/CreateAccessPointRequest AWS API Documentation
@@ -271,24 +364,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateFileSystemRequest
-    #   data as a hash:
-    #
-    #       {
-    #         creation_token: "CreationToken", # required
-    #         performance_mode: "generalPurpose", # accepts generalPurpose, maxIO
-    #         encrypted: false,
-    #         kms_key_id: "KmsKeyId",
-    #         throughput_mode: "bursting", # accepts bursting, provisioned
-    #         provisioned_throughput_in_mibps: 1.0,
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] creation_token
     #   A string of up to 64 ASCII characters. Amazon EFS uses this to
     #   ensure idempotent creation.
@@ -298,31 +373,35 @@ module Aws::EFS
     #   @return [String]
     #
     # @!attribute [rw] performance_mode
-    #   The performance mode of the file system. We recommend
-    #   `generalPurpose` performance mode for most file systems. File
-    #   systems using the `maxIO` performance mode can scale to higher
-    #   levels of aggregate throughput and operations per second with a
-    #   tradeoff of slightly higher latencies for most file operations. The
-    #   performance mode can't be changed after the file system has been
-    #   created.
+    #   The Performance mode of the file system. We recommend
+    #   `generalPurpose` performance mode for all file systems. File systems
+    #   using the `maxIO` performance mode can scale to higher levels of
+    #   aggregate throughput and operations per second with a tradeoff of
+    #   slightly higher latencies for most file operations. The performance
+    #   mode can't be changed after the file system has been created. The
+    #   `maxIO` mode is not supported on One Zone file systems.
+    #
+    #   Due to the higher per-operation latencies with Max I/O, we recommend
+    #   using General Purpose performance mode for all file systems.
+    #
+    #   Default is `generalPurpose`.
     #   @return [String]
     #
     # @!attribute [rw] encrypted
     #   A Boolean value that, if true, creates an encrypted file system.
     #   When creating an encrypted file system, you have the option of
-    #   specifying CreateFileSystemRequest$KmsKeyId for an existing AWS Key
-    #   Management Service (AWS KMS) customer master key (CMK). If you
-    #   don't specify a CMK, then the default CMK for Amazon EFS,
+    #   specifying an existing Key Management Service key (KMS key). If you
+    #   don't specify a KMS key, then the default KMS key for Amazon EFS,
     #   `/aws/elasticfilesystem`, is used to protect the encrypted file
     #   system.
     #   @return [Boolean]
     #
     # @!attribute [rw] kms_key_id
-    #   The ID of the AWS KMS CMK to be used to protect the encrypted file
-    #   system. This parameter is only required if you want to use a
-    #   nondefault CMK. If this parameter is not specified, the default CMK
-    #   for Amazon EFS is used. This ID can be in one of the following
-    #   formats:
+    #   The ID of the KMS key that you want to use to protect the encrypted
+    #   file system. This parameter is required only if you want to use a
+    #   non-default KMS key. If this parameter is not specified, the default
+    #   KMS key for Amazon EFS is used. You can specify a KMS key ID using
+    #   the following formats:
     #
     #   * Key ID - A unique identifier of the key, for example
     #     `1234abcd-12ab-34cd-56ef-1234567890ab`.
@@ -336,23 +415,24 @@ module Aws::EFS
     #   * Key alias ARN - An ARN for a key alias, for example
     #     `arn:aws:kms:us-west-2:444455556666:alias/projectKey1`.
     #
-    #   If `KmsKeyId` is specified, the CreateFileSystemRequest$Encrypted
-    #   parameter must be set to true.
+    #   If you use `KmsKeyId`, you must set the
+    #   CreateFileSystemRequest$Encrypted parameter to true.
     #
-    #   EFS accepts only symmetric CMKs. You cannot use asymmetric CMKs with
-    #   EFS file systems.
+    #   EFS accepts only symmetric KMS keys. You cannot use asymmetric KMS
+    #   keys with Amazon EFS file systems.
     #   @return [String]
     #
     # @!attribute [rw] throughput_mode
-    #   The throughput mode for the file system to be created. There are two
-    #   throughput modes to choose from for your file system: `bursting` and
-    #   `provisioned`. If you set `ThroughputMode` to `provisioned`, you
-    #   must also set a value for `ProvisionedThroughPutInMibps`. You can
-    #   decrease your file system's throughput in Provisioned Throughput
-    #   mode or change between the throughput modes as long as it’s been
-    #   more than 24 hours since the last decrease or throughput mode
-    #   change. For more, see [Specifying Throughput with Provisioned
-    #   Mode][1] in the *Amazon EFS User Guide.*
+    #   Specifies the throughput mode for the file system. The mode can be
+    #   `bursting`, `provisioned`, or `elastic`. If you set `ThroughputMode`
+    #   to `provisioned`, you must also set a value for
+    #   `ProvisionedThroughputInMibps`. After you create the file system,
+    #   you can decrease your file system's Provisioned throughput or
+    #   change between the throughput modes, with certain time restrictions.
+    #   For more information, see [Specifying throughput with provisioned
+    #   mode][1] in the *Amazon EFS User Guide*.
+    #
+    #   Default is `bursting`.
     #
     #
     #
@@ -360,23 +440,67 @@ module Aws::EFS
     #   @return [String]
     #
     # @!attribute [rw] provisioned_throughput_in_mibps
-    #   The throughput, measured in MiB/s, that you want to provision for a
-    #   file system that you're creating. Valid values are 1-1024. Required
-    #   if `ThroughputMode` is set to `provisioned`. The upper limit for
-    #   throughput is 1024 MiB/s. You can get this limit increased by
-    #   contacting AWS Support. For more information, see [Amazon EFS Limits
-    #   That You Can Increase][1] in the *Amazon EFS User Guide.*
+    #   The throughput, measured in mebibytes per second (MiBps), that you
+    #   want to provision for a file system that you're creating. Required
+    #   if `ThroughputMode` is set to `provisioned`. Valid values are 1-3414
+    #   MiBps, with the upper limit depending on Region. To increase this
+    #   limit, contact Amazon Web Services Support. For more information,
+    #   see [Amazon EFS quotas that you can increase][1] in the *Amazon EFS
+    #   User Guide*.
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/efs/latest/ug/limits.html#soft-limits
     #   @return [Float]
     #
+    # @!attribute [rw] availability_zone_name
+    #   Used to create a One Zone file system. It specifies the Amazon Web
+    #   Services Availability Zone in which to create the file system. Use
+    #   the format `us-east-1a` to specify the Availability Zone. For more
+    #   information about One Zone file systems, see [Using EFS storage
+    #   classes][1] in the *Amazon EFS User Guide*.
+    #
+    #   <note markdown="1"> One Zone file systems are not available in all Availability Zones in
+    #   Amazon Web Services Regions where Amazon EFS is available.
+    #
+    #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/efs/latest/ug/storage-classes.html
+    #   @return [String]
+    #
+    # @!attribute [rw] backup
+    #   Specifies whether automatic backups are enabled on the file system
+    #   that you are creating. Set the value to `true` to enable automatic
+    #   backups. If you are creating a One Zone file system, automatic
+    #   backups are enabled by default. For more information, see [Automatic
+    #   backups][1] in the *Amazon EFS User Guide*.
+    #
+    #   Default is `false`. However, if you specify an
+    #   `AvailabilityZoneName`, the default is `true`.
+    #
+    #   <note markdown="1"> Backup is not available in all Amazon Web Services Regions where
+    #   Amazon EFS is available.
+    #
+    #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/efs/latest/ug/awsbackup.html#automatic-backups
+    #   @return [Boolean]
+    #
     # @!attribute [rw] tags
-    #   A value that specifies to create one or more tags associated with
-    #   the file system. Each tag is a user-defined key-value pair. Name
-    #   your file system on creation by including a
-    #   `"Key":"Name","Value":"\{value\}"` key-value pair.
+    #   Use to create one or more tags associated with the file system. Each
+    #   tag is a user-defined key-value pair. Name your file system on
+    #   creation by including a `"Key":"Name","Value":"\{value\}"` key-value
+    #   pair. Each key must be unique. For more information, see [Tagging
+    #   Amazon Web Services resources][1] in the *Amazon Web Services
+    #   General Reference Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html
     #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/CreateFileSystemRequest AWS API Documentation
@@ -388,27 +512,21 @@ module Aws::EFS
       :kms_key_id,
       :throughput_mode,
       :provisioned_throughput_in_mibps,
+      :availability_zone_name,
+      :backup,
       :tags)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateMountTargetRequest
-    #   data as a hash:
-    #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #         subnet_id: "SubnetId", # required
-    #         ip_address: "IpAddress",
-    #         security_groups: ["SecurityGroup"],
-    #       }
-    #
     # @!attribute [rw] file_system_id
     #   The ID of the file system for which to create the mount target.
     #   @return [String]
     #
     # @!attribute [rw] subnet_id
-    #   The ID of the subnet to add the mount target in.
+    #   The ID of the subnet to add the mount target in. For One Zone file
+    #   systems, use the subnet that is associated with the file system's
+    #   Availability Zone.
     #   @return [String]
     #
     # @!attribute [rw] ip_address
@@ -431,19 +549,26 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateTagsRequest
-    #   data as a hash:
+    # @!attribute [rw] source_file_system_id
+    #   Specifies the Amazon EFS file system that you want to replicate.
+    #   This file system cannot already be a source or destination file
+    #   system in another replication configuration.
+    #   @return [String]
     #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
+    # @!attribute [rw] destinations
+    #   An array of destination configuration objects. Only one destination
+    #   configuration object is supported.
+    #   @return [Array<Types::DestinationToCreate>]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/CreateReplicationConfigurationRequest AWS API Documentation
+    #
+    class CreateReplicationConfigurationRequest < Struct.new(
+      :source_file_system_id,
+      :destinations)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] file_system_id
     #   The ID of the file system whose tags you want to modify (String).
     #   This operation modifies the tags only, not the file system.
@@ -470,18 +595,15 @@ module Aws::EFS
     # client connects to the access point. When specifying `CreationInfo`,
     # you must include values for all properties.
     #
+    # Amazon EFS creates a root directory only if you have provided the
+    # CreationInfo: OwnUid, OwnGID, and permissions for the directory. If
+    # you do not provide this information, Amazon EFS does not create the
+    # root directory. If the root directory does not exist, attempts to
+    # mount using the access point will fail.
+    #
     # If you do not provide `CreationInfo` and the specified `RootDirectory`
     # does not exist, attempts to mount the file system using the access
     # point will fail.
-    #
-    # @note When making an API call, you may pass CreationInfo
-    #   data as a hash:
-    #
-    #       {
-    #         owner_uid: 1, # required
-    #         owner_gid: 1, # required
-    #         permissions: "Permissions", # required
-    #       }
     #
     # @!attribute [rw] owner_uid
     #   Specifies the POSIX user ID to apply to the `RootDirectory`. Accepts
@@ -508,13 +630,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteAccessPointRequest
-    #   data as a hash:
-    #
-    #       {
-    #         access_point_id: "AccessPointId", # required
-    #       }
-    #
     # @!attribute [rw] access_point_id
     #   The ID of the access point that you want to delete.
     #   @return [String]
@@ -527,13 +642,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteFileSystemPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #       }
-    #
     # @!attribute [rw] file_system_id
     #   Specifies the EFS file system for which to delete the
     #   `FileSystemPolicy`.
@@ -547,13 +655,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteFileSystemRequest
-    #   data as a hash:
-    #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #       }
-    #
     # @!attribute [rw] file_system_id
     #   The ID of the file system you want to delete.
     #   @return [String]
@@ -566,13 +667,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteMountTargetRequest
-    #   data as a hash:
-    #
-    #       {
-    #         mount_target_id: "MountTargetId", # required
-    #       }
-    #
     # @!attribute [rw] mount_target_id
     #   The ID of the mount target to delete (String).
     #   @return [String]
@@ -585,14 +679,18 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteTagsRequest
-    #   data as a hash:
+    # @!attribute [rw] source_file_system_id
+    #   The ID of the source file system in the replication configuration.
+    #   @return [String]
     #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/DeleteReplicationConfigurationRequest AWS API Documentation
     #
+    class DeleteReplicationConfigurationRequest < Struct.new(
+      :source_file_system_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] file_system_id
     #   The ID of the file system whose tags you want to delete (String).
     #   @return [String]
@@ -614,9 +712,19 @@ module Aws::EFS
     # should try the call again.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/DependencyTimeout AWS API Documentation
@@ -628,16 +736,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeAccessPointsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         max_results: 1,
-    #         next_token: "Token",
-    #         access_point_id: "AccessPointId",
-    #         file_system_id: "FileSystemId",
-    #       }
-    #
     # @!attribute [rw] max_results
     #   (Optional) When retrieving all access points for a file system, you
     #   can optionally specify the `MaxItems` parameter to limit the number
@@ -691,15 +789,51 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeBackupPolicyRequest
-    #   data as a hash:
+    # @!attribute [rw] next_token
+    #   (Optional) You can use `NextToken` in a subsequent request to fetch
+    #   the next page of Amazon Web Services account preferences if the
+    #   response payload was paginated.
+    #   @return [String]
     #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #       }
+    # @!attribute [rw] max_results
+    #   (Optional) When retrieving account preferences, you can optionally
+    #   specify the `MaxItems` parameter to limit the number of objects
+    #   returned in a response. The default value is 100.
+    #   @return [Integer]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/DescribeAccountPreferencesRequest AWS API Documentation
+    #
+    class DescribeAccountPreferencesRequest < Struct.new(
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] resource_id_preference
+    #   Describes the resource ID preference setting for the Amazon Web
+    #   Services account associated with the user making the request, in the
+    #   current Amazon Web Services Region.
+    #   @return [Types::ResourceIdPreference]
+    #
+    # @!attribute [rw] next_token
+    #   Present if there are more records than returned in the response. You
+    #   can use the `NextToken` in the subsequent request to fetch the
+    #   additional descriptions.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/DescribeAccountPreferencesResponse AWS API Documentation
+    #
+    class DescribeAccountPreferencesResponse < Struct.new(
+      :resource_id_preference,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] file_system_id
-    #   Specifies which EFS file system to retrieve the `BackupPolicy` for.
+    #   Specifies which EFS file system for which to retrieve the
+    #   `BackupPolicy`.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/DescribeBackupPolicyRequest AWS API Documentation
@@ -710,13 +844,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeFileSystemPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #       }
-    #
     # @!attribute [rw] file_system_id
     #   Specifies which EFS file system to retrieve the `FileSystemPolicy`
     #   for.
@@ -730,16 +857,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeFileSystemsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         max_items: 1,
-    #         marker: "Marker",
-    #         creation_token: "CreationToken",
-    #         file_system_id: "FileSystemId",
-    #       }
-    #
     # @!attribute [rw] max_items
     #   (Optional) Specifies the maximum number of file systems to return in
     #   the response (integer). This number is automatically set to 100. The
@@ -799,13 +916,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeLifecycleConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #       }
-    #
     # @!attribute [rw] file_system_id
     #   The ID of the file system whose `LifecycleConfiguration` object you
     #   want to retrieve (String).
@@ -819,13 +929,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeMountTargetSecurityGroupsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         mount_target_id: "MountTargetId", # required
-    #       }
-    #
     # @!attribute [rw] mount_target_id
     #   The ID of the mount target whose security groups you want to
     #   retrieve.
@@ -851,17 +954,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeMountTargetsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         max_items: 1,
-    #         marker: "Marker",
-    #         file_system_id: "FileSystemId",
-    #         mount_target_id: "MountTargetId",
-    #         access_point_id: "AccessPointId",
-    #       }
-    #
     # @!attribute [rw] max_items
     #   (Optional) Maximum number of mount targets to return in the
     #   response. Currently, this number is automatically set to 10, and
@@ -934,15 +1026,50 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeTagsRequest
-    #   data as a hash:
+    # @!attribute [rw] file_system_id
+    #   You can retrieve the replication configuration for a specific file
+    #   system by providing its file system ID.
+    #   @return [String]
     #
-    #       {
-    #         max_items: 1,
-    #         marker: "Marker",
-    #         file_system_id: "FileSystemId", # required
-    #       }
+    # @!attribute [rw] next_token
+    #   `NextToken` is present if the response is paginated. You can use
+    #   `NextToken` in a subsequent request to fetch the next page of
+    #   output.
+    #   @return [String]
     #
+    # @!attribute [rw] max_results
+    #   (Optional) To limit the number of objects returned in a response,
+    #   you can specify the `MaxItems` parameter. The default value is 100.
+    #   @return [Integer]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/DescribeReplicationConfigurationsRequest AWS API Documentation
+    #
+    class DescribeReplicationConfigurationsRequest < Struct.new(
+      :file_system_id,
+      :next_token,
+      :max_results)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] replications
+    #   The collection of replication configurations that is returned.
+    #   @return [Array<Types::ReplicationConfigurationDescription>]
+    #
+    # @!attribute [rw] next_token
+    #   You can use the `NextToken` from the previous response in a
+    #   subsequent request to fetch the additional descriptions.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/DescribeReplicationConfigurationsResponse AWS API Documentation
+    #
+    class DescribeReplicationConfigurationsResponse < Struct.new(
+      :replications,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] max_items
     #   (Optional) The maximum number of file system tags to return in the
     #   response. Currently, this number is automatically set to 100, and
@@ -997,13 +1124,131 @@ module Aws::EFS
       include Aws::Structure
     end
 
+    # Describes the destination file system in the replication
+    # configuration.
+    #
+    # @!attribute [rw] status
+    #   Describes the status of the destination EFS file system.
+    #
+    #   * The `Paused` state occurs as a result of opting out of the source
+    #     or destination Region after the replication configuration was
+    #     created. To resume replication for the file system, you need to
+    #     again opt in to the Amazon Web Services Region. For more
+    #     information, see [Managing Amazon Web Services Regions][1] in the
+    #     *Amazon Web Services General Reference Guide*.
+    #
+    #   * The `Error` state occurs when either the source or the destination
+    #     file system (or both) is in a failed state and is unrecoverable.
+    #     For more information, see [Monitoring replication status][2] in
+    #     the *Amazon EFS User Guide*. You must delete the replication
+    #     configuration, and then restore the most recent backup of the
+    #     failed file system (either the source or the destination) to a new
+    #     file system.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/general/latest/gr/rande-manage.html#rande-manage-enable
+    #   [2]: https://docs.aws.amazon.com/efs/latest/ug/awsbackup.html#restoring-backup-efsmonitoring-replication-status.html
+    #   @return [String]
+    #
+    # @!attribute [rw] file_system_id
+    #   The ID of the destination Amazon EFS file system.
+    #   @return [String]
+    #
+    # @!attribute [rw] region
+    #   The Amazon Web Services Region in which the destination file system
+    #   is located.
+    #   @return [String]
+    #
+    # @!attribute [rw] last_replicated_timestamp
+    #   The time when the most recent sync was successfully completed on the
+    #   destination file system. Any changes to data on the source file
+    #   system that occurred before this time have been successfully
+    #   replicated to the destination file system. Any changes that occurred
+    #   after this time might not be fully replicated.
+    #   @return [Time]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/Destination AWS API Documentation
+    #
+    class Destination < Struct.new(
+      :status,
+      :file_system_id,
+      :region,
+      :last_replicated_timestamp)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the new or existing destination file system for the
+    # replication configuration.
+    #
+    # @!attribute [rw] region
+    #   To create a file system that uses Regional storage, specify the
+    #   Amazon Web Services Region in which to create the destination file
+    #   system.
+    #   @return [String]
+    #
+    # @!attribute [rw] availability_zone_name
+    #   To create a file system that uses One Zone storage, specify the name
+    #   of the Availability Zone in which to create the destination file
+    #   system.
+    #   @return [String]
+    #
+    # @!attribute [rw] kms_key_id
+    #   Specify the Key Management Service (KMS) key that you want to use to
+    #   encrypt the destination file system. If you do not specify a KMS
+    #   key, Amazon EFS uses your default KMS key for Amazon EFS,
+    #   `/aws/elasticfilesystem`. This ID can be in one of the following
+    #   formats:
+    #
+    #   * Key ID - The unique identifier of the key, for example
+    #     `1234abcd-12ab-34cd-56ef-1234567890ab`.
+    #
+    #   * ARN - The Amazon Resource Name (ARN) for the key, for example
+    #     `arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab`.
+    #
+    #   * Key alias - A previously created display name for a key, for
+    #     example `alias/projectKey1`.
+    #
+    #   * Key alias ARN - The ARN for a key alias, for example
+    #     `arn:aws:kms:us-west-2:444455556666:alias/projectKey1`.
+    #   @return [String]
+    #
+    # @!attribute [rw] file_system_id
+    #   The ID of the file system to use for the destination. The file
+    #   system's replication overwrite replication must be disabled. If you
+    #   do not provide an ID, then EFS creates a new file system for the
+    #   replication destination.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/DestinationToCreate AWS API Documentation
+    #
+    class DestinationToCreate < Struct.new(
+      :region,
+      :availability_zone_name,
+      :kms_key_id,
+      :file_system_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Returned if the file system you are trying to create already exists,
     # with the creation token you provided.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @!attribute [rw] file_system_id
@@ -1022,9 +1267,7 @@ module Aws::EFS
     # A description of the file system.
     #
     # @!attribute [rw] owner_id
-    #   The AWS account that created the file system. If the file system was
-    #   created by an IAM user, the parent account to which the user belongs
-    #   is the owner.
+    #   The Amazon Web Services account that created the file system.
     #   @return [String]
     #
     # @!attribute [rw] creation_token
@@ -1077,7 +1320,7 @@ module Aws::EFS
     #   @return [Types::FileSystemSize]
     #
     # @!attribute [rw] performance_mode
-    #   The performance mode of the file system.
+    #   The Performance mode of the file system.
     #   @return [String]
     #
     # @!attribute [rw] encrypted
@@ -1086,38 +1329,51 @@ module Aws::EFS
     #   @return [Boolean]
     #
     # @!attribute [rw] kms_key_id
-    #   The ID of an AWS Key Management Service (AWS KMS) customer master
-    #   key (CMK) that was used to protect the encrypted file system.
+    #   The ID of an KMS key used to protect the encrypted file system.
     #   @return [String]
     #
     # @!attribute [rw] throughput_mode
-    #   The throughput mode for a file system. There are two throughput
-    #   modes to choose from for your file system: `bursting` and
-    #   `provisioned`. If you set `ThroughputMode` to `provisioned`, you
-    #   must also set a value for `ProvisionedThroughPutInMibps`. You can
-    #   decrease your file system's throughput in Provisioned Throughput
-    #   mode or change between the throughput modes as long as it’s been
-    #   more than 24 hours since the last decrease or throughput mode
-    #   change.
+    #   Displays the file system's throughput mode. For more information,
+    #   see [Throughput modes][1] in the *Amazon EFS User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/efs/latest/ug/performance.html#throughput-modes
     #   @return [String]
     #
     # @!attribute [rw] provisioned_throughput_in_mibps
-    #   The throughput, measured in MiB/s, that you want to provision for a
-    #   file system. Valid values are 1-1024. Required if `ThroughputMode`
-    #   is set to `provisioned`. The limit on throughput is 1024 MiB/s. You
-    #   can get these limits increased by contacting AWS Support. For more
-    #   information, see [Amazon EFS Limits That You Can Increase][1] in the
-    #   *Amazon EFS User Guide.*
-    #
-    #
-    #
-    #   [1]: https://docs.aws.amazon.com/efs/latest/ug/limits.html#soft-limits
+    #   The amount of provisioned throughput, measured in MiBps, for the
+    #   file system. Valid for file systems using `ThroughputMode` set to
+    #   `provisioned`.
     #   @return [Float]
+    #
+    # @!attribute [rw] availability_zone_name
+    #   Describes the Amazon Web Services Availability Zone in which the
+    #   file system is located, and is valid only for One Zone file systems.
+    #   For more information, see [Using EFS storage classes][1] in the
+    #   *Amazon EFS User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/efs/latest/ug/storage-classes.html
+    #   @return [String]
+    #
+    # @!attribute [rw] availability_zone_id
+    #   The unique and consistent identifier of the Availability Zone in
+    #   which the file system is located, and is valid only for One Zone
+    #   file systems. For example, `use1-az1` is an Availability Zone ID for
+    #   the us-east-1 Amazon Web Services Region, and it has the same
+    #   location in every Amazon Web Services account.
+    #   @return [String]
     #
     # @!attribute [rw] tags
     #   The tags associated with the file system, presented as an array of
     #   `Tag` objects.
     #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] file_system_protection
+    #   Describes the protection on the file system.
+    #   @return [Types::FileSystemProtectionDescription]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/FileSystemDescription AWS API Documentation
     #
@@ -1136,7 +1392,10 @@ module Aws::EFS
       :kms_key_id,
       :throughput_mode,
       :provisioned_throughput_in_mibps,
-      :tags)
+      :availability_zone_name,
+      :availability_zone_id,
+      :tags,
+      :file_system_protection)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1144,9 +1403,19 @@ module Aws::EFS
     # Returned if a file system has mount targets.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/FileSystemInUse AWS API Documentation
@@ -1158,13 +1427,23 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # Returned if the AWS account has already created the maximum number of
-    # file systems allowed per account.
+    # Returned if the Amazon Web Services account has already created the
+    # maximum number of file systems allowed per account.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/FileSystemLimitExceeded AWS API Documentation
@@ -1177,12 +1456,22 @@ module Aws::EFS
     end
 
     # Returned if the specified `FileSystemId` value doesn't exist in the
-    # requester's AWS account.
+    # requester's Amazon Web Services account.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/FileSystemNotFound AWS API Documentation
@@ -1208,6 +1497,37 @@ module Aws::EFS
     class FileSystemPolicyDescription < Struct.new(
       :file_system_id,
       :policy)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the protection on a file system.
+    #
+    # @!attribute [rw] replication_overwrite_protection
+    #   The status of the file system's replication overwrite protection.
+    #
+    #   * `ENABLED` – The file system cannot be used as the destination file
+    #     system in a replication configuration. The file system is
+    #     writeable. Replication overwrite protection is `ENABLED` by
+    #     default.
+    #
+    #   * `DISABLED` – The file system can be used as the destination file
+    #     system in a replication configuration. The file system is
+    #     read-only and can only be modified by EFS replication.
+    #
+    #   * `REPLICATING` – The file system is being used as the destination
+    #     file system in a replication configuration. The file system is
+    #     read-only and is only modified only by EFS replication.
+    #
+    #   If the replication configuration is deleted, the file system's
+    #   replication overwrite protection is re-enabled, the file system
+    #   becomes writeable.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/FileSystemProtectionDescription AWS API Documentation
+    #
+    class FileSystemProtectionDescription < Struct.new(
+      :replication_overwrite_protection)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1243,13 +1563,19 @@ module Aws::EFS
     #   Standard storage class.
     #   @return [Integer]
     #
+    # @!attribute [rw] value_in_archive
+    #   The latest known metered size (in bytes) of data stored in the
+    #   Archive storage class.
+    #   @return [Integer]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/FileSystemSize AWS API Documentation
     #
     class FileSystemSize < Struct.new(
       :value,
       :timestamp,
       :value_in_ia,
-      :value_in_standard)
+      :value_in_standard,
+      :value_in_archive)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1257,9 +1583,19 @@ module Aws::EFS
     # Returned if the file system's lifecycle state is not "available".
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/IncorrectFileSystemLifeCycleState AWS API Documentation
@@ -1275,9 +1611,19 @@ module Aws::EFS
     # operation.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/IncorrectMountTargetState AWS API Documentation
@@ -1293,13 +1639,23 @@ module Aws::EFS
     # throughput. This value might be returned when you try to create a file
     # system in provisioned throughput mode, when you attempt to increase
     # the provisioned throughput of an existing file system, or when you
-    # attempt to change an existing file system from bursting to provisioned
-    # throughput mode.
+    # attempt to change an existing file system from Bursting Throughput to
+    # Provisioned Throughput mode. Try again later.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/InsufficientThroughputCapacity AWS API Documentation
@@ -1314,9 +1670,19 @@ module Aws::EFS
     # Returned if an error occurred on the server side.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/InternalServerError AWS API Documentation
@@ -1328,15 +1694,25 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # Returned if the `FileSystemPolicy` is is malformed or contains an
-    # error such as an invalid parameter value or a missing required
+    # Returned if the `FileSystemPolicy` is malformed or contains an error
+    # such as a parameter value that is not valid or a missing required
     # parameter. Returned in the case of a policy lockout safety check
     # error.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/InvalidPolicyException AWS API Documentation
@@ -1352,9 +1728,19 @@ module Aws::EFS
     # use in the subnet.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/IpAddressInUse AWS API Documentation
@@ -1367,8 +1753,8 @@ module Aws::EFS
     end
 
     # @!attribute [rw] lifecycle_policies
-    #   An array of lifecycle management policies. Currently, EFS supports a
-    #   maximum of one policy per file system.
+    #   An array of lifecycle management policies. EFS supports a maximum of
+    #   one policy per file system.
     #   @return [Array<Types::LifecyclePolicy>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/LifecycleConfigurationDescription AWS API Documentation
@@ -1379,40 +1765,55 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # Describes a policy used by EFS lifecycle management to transition
-    # files to the Infrequent Access (IA) storage class.
+    # Describes a policy used by Lifecycle management that specifies when to
+    # transition files into and out of storage classes. For more
+    # information, see [Managing file system storage][1].
     #
-    # @note When making an API call, you may pass LifecyclePolicy
-    #   data as a hash:
+    # <note markdown="1"> When using the `put-lifecycle-configuration` CLI command or the
+    # `PutLifecycleConfiguration` API action, Amazon EFS requires that each
+    # `LifecyclePolicy` object have only a single transition. This means
+    # that in a request body, `LifecyclePolicies` must be structured as an
+    # array of `LifecyclePolicy` objects, one object for each transition.
+    # For more information, see the request examples in
+    # PutLifecycleConfiguration.
     #
-    #       {
-    #         transition_to_ia: "AFTER_7_DAYS", # accepts AFTER_7_DAYS, AFTER_14_DAYS, AFTER_30_DAYS, AFTER_60_DAYS, AFTER_90_DAYS
-    #       }
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/efs/latest/ug/lifecycle-management-efs.html
     #
     # @!attribute [rw] transition_to_ia
-    #   A value that describes the period of time that a file is not
-    #   accessed, after which it transitions to the IA storage class.
-    #   Metadata operations such as listing the contents of a directory
-    #   don't count as file access events.
+    #   The number of days after files were last accessed in primary storage
+    #   (the Standard storage class) at which to move them to Infrequent
+    #   Access (IA) storage. Metadata operations such as listing the
+    #   contents of a directory don't count as file access events.
+    #   @return [String]
+    #
+    # @!attribute [rw] transition_to_primary_storage_class
+    #   Whether to move files back to primary (Standard) storage after they
+    #   are accessed in IA or Archive storage. Metadata operations such as
+    #   listing the contents of a directory don't count as file access
+    #   events.
+    #   @return [String]
+    #
+    # @!attribute [rw] transition_to_archive
+    #   The number of days after files were last accessed in primary storage
+    #   (the Standard storage class) files at which to move them to Archive
+    #   storage. Metadata operations such as listing the contents of a
+    #   directory don't count as file access events.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/LifecyclePolicy AWS API Documentation
     #
     class LifecyclePolicy < Struct.new(
-      :transition_to_ia)
+      :transition_to_ia,
+      :transition_to_primary_storage_class,
+      :transition_to_archive)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_id: "ResourceId", # required
-    #         max_results: 1,
-    #         next_token: "Token",
-    #       }
-    #
     # @!attribute [rw] resource_id
     #   Specifies the EFS resource you want to retrieve tags for. You can
     #   retrieve tags for EFS file systems and access points using this API
@@ -1425,9 +1826,9 @@ module Aws::EFS
     #   @return [Integer]
     #
     # @!attribute [rw] next_token
-    #   You can use `NextToken` in a subsequent request to fetch the next
-    #   page of access point descriptions if the response payload was
-    #   paginated.
+    #   (Optional) You can use `NextToken` in a subsequent request to fetch
+    #   the next page of access point descriptions if the response payload
+    #   was paginated.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/ListTagsForResourceRequest AWS API Documentation
@@ -1459,14 +1860,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ModifyMountTargetSecurityGroupsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         mount_target_id: "MountTargetId", # required
-    #         security_groups: ["SecurityGroup"],
-    #       }
-    #
     # @!attribute [rw] mount_target_id
     #   The ID of the mount target whose security groups you want to modify.
     #   @return [String]
@@ -1488,9 +1881,19 @@ module Aws::EFS
     # restrictions based on the file system's existing mount targets.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/MountTargetConflict AWS API Documentation
@@ -1505,7 +1908,7 @@ module Aws::EFS
     # Provides a description of a mount target.
     #
     # @!attribute [rw] owner_id
-    #   AWS account ID that owns the resource.
+    #   Amazon Web Services account ID that owns the resource.
     #   @return [String]
     #
     # @!attribute [rw] mount_target_id
@@ -1535,22 +1938,23 @@ module Aws::EFS
     #   @return [String]
     #
     # @!attribute [rw] availability_zone_id
-    #   The unique and consistent identifier of the Availability Zone (AZ)
-    #   that the mount target resides in. For example, `use1-az1` is an AZ
-    #   ID for the us-east-1 Region and it has the same location in every
-    #   AWS account.
+    #   The unique and consistent identifier of the Availability Zone that
+    #   the mount target resides in. For example, `use1-az1` is an AZ ID for
+    #   the us-east-1 Region and it has the same location in every Amazon
+    #   Web Services account.
     #   @return [String]
     #
     # @!attribute [rw] availability_zone_name
-    #   The name of the Availability Zone (AZ) that the mount target resides
-    #   in. AZs are independently mapped to names for each AWS account. For
-    #   example, the Availability Zone `us-east-1a` for your AWS account
-    #   might not be the same location as `us-east-1a` for another AWS
+    #   The name of the Availability Zone in which the mount target is
+    #   located. Availability Zones are independently mapped to names for
+    #   each Amazon Web Services account. For example, the Availability Zone
+    #   `us-east-1a` for your Amazon Web Services account might not be the
+    #   same location as `us-east-1a` for another Amazon Web Services
     #   account.
     #   @return [String]
     #
     # @!attribute [rw] vpc_id
-    #   The Virtual Private Cloud (VPC) ID that the mount target is
+    #   The virtual private cloud (VPC) ID that the mount target is
     #   configured in.
     #   @return [String]
     #
@@ -1572,12 +1976,22 @@ module Aws::EFS
     end
 
     # Returned if there is no mount target with the specified ID found in
-    # the caller's account.
+    # the caller's Amazon Web Services account.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/MountTargetNotFound AWS API Documentation
@@ -1590,20 +2004,30 @@ module Aws::EFS
     end
 
     # The calling account has reached the limit for elastic network
-    # interfaces for the specific AWS Region. The client should try to
-    # delete some elastic network interfaces or get the account limit
-    # raised. For more information, see [Amazon VPC Limits][1] in the
-    # <i>Amazon VPC User Guide </i> (see the Network interfaces per VPC
-    # entry in the table).
+    # interfaces for the specific Amazon Web Services Region. Either delete
+    # some network interfaces or request that the account quota be raised.
+    # For more information, see [Amazon VPC Quotas][1] in the *Amazon VPC
+    # User Guide* (see the **Network interfaces per Region** entry in the
+    # **Network interfaces** table).
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Appendix_Limits.html
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/NetworkInterfaceLimitExceeded AWS API Documentation
@@ -1619,9 +2043,19 @@ module Aws::EFS
     # no free IP addresses in the subnet.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/NoFreeAddressesInSubnet AWS API Documentation
@@ -1637,9 +2071,19 @@ module Aws::EFS
     # file system specified.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/PolicyNotFound AWS API Documentation
@@ -1654,15 +2098,6 @@ module Aws::EFS
     # The full POSIX identity, including the user ID, group ID, and any
     # secondary group IDs, on the access point that is used for all file
     # system operations performed by NFS clients using the access point.
-    #
-    # @note When making an API call, you may pass PosixUser
-    #   data as a hash:
-    #
-    #       {
-    #         uid: 1, # required
-    #         gid: 1, # required
-    #         secondary_gids: [1],
-    #       }
     #
     # @!attribute [rw] uid
     #   The POSIX user ID used for all file system operations using this
@@ -1689,16 +2124,42 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutBackupPolicyRequest
-    #   data as a hash:
+    # @!attribute [rw] resource_id_type
+    #   Specifies the EFS resource ID preference to set for the user's
+    #   Amazon Web Services account, in the current Amazon Web Services
+    #   Region, either `LONG_ID` (17 characters), or `SHORT_ID` (8
+    #   characters).
     #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #         backup_policy: { # required
-    #           status: "ENABLED", # required, accepts ENABLED, ENABLING, DISABLED, DISABLING
-    #         },
-    #       }
+    #   <note markdown="1"> Starting in October, 2021, you will receive an error when setting
+    #   the account preference to `SHORT_ID`. Contact Amazon Web Services
+    #   support if you receive an error and must use short IDs for file
+    #   system and mount target resources.
     #
+    #    </note>
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/PutAccountPreferencesRequest AWS API Documentation
+    #
+    class PutAccountPreferencesRequest < Struct.new(
+      :resource_id_type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] resource_id_preference
+    #   Describes the resource type and its ID preference for the user's
+    #   Amazon Web Services account, in the current Amazon Web Services
+    #   Region.
+    #   @return [Types::ResourceIdPreference]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/PutAccountPreferencesResponse AWS API Documentation
+    #
+    class PutAccountPreferencesResponse < Struct.new(
+      :resource_id_preference)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] file_system_id
     #   Specifies which EFS file system to update the backup policy for.
     #   @return [String]
@@ -1716,15 +2177,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutFileSystemPolicyRequest
-    #   data as a hash:
-    #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #         policy: "Policy", # required
-    #         bypass_policy_lockout_safety_check: false,
-    #       }
-    #
     # @!attribute [rw] file_system_id
     #   The ID of the EFS file system that you want to create or update the
     #   `FileSystemPolicy` for.
@@ -1732,9 +2184,9 @@ module Aws::EFS
     #
     # @!attribute [rw] policy
     #   The `FileSystemPolicy` that you're creating. Accepts a JSON
-    #   formatted policy definition. To find out more about the elements
-    #   that make up a file system policy, see [EFS Resource-based
-    #   Policies][1].
+    #   formatted policy definition. EFS file system policies have a 20,000
+    #   character limit. To find out more about the elements that make up a
+    #   file system policy, see [EFS Resource-based Policies][1].
     #
     #
     #
@@ -1742,15 +2194,15 @@ module Aws::EFS
     #   @return [String]
     #
     # @!attribute [rw] bypass_policy_lockout_safety_check
-    #   (Optional) A flag to indicate whether to bypass the
-    #   `FileSystemPolicy` lockout safety check. The policy lockout safety
-    #   check determines whether the policy in the request will prevent the
-    #   principal making the request will be locked out from making future
-    #   `PutFileSystemPolicy` requests on the file system. Set
+    #   (Optional) A boolean that specifies whether or not to bypass the
+    #   `FileSystemPolicy` lockout safety check. The lockout safety check
+    #   determines whether the policy in the request will lock out, or
+    #   prevent, the IAM principal that is making the request from making
+    #   future `PutFileSystemPolicy` requests on this file system. Set
     #   `BypassPolicyLockoutSafetyCheck` to `True` only when you intend to
-    #   prevent the principal that is making the request from making a
-    #   subsequent `PutFileSystemPolicy` request on the file system. The
-    #   default value is False.
+    #   prevent the IAM principal that is making the request from making
+    #   subsequent `PutFileSystemPolicy` requests on this file system. The
+    #   default value is `False`.
     #   @return [Boolean]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/PutFileSystemPolicyRequest AWS API Documentation
@@ -1763,18 +2215,6 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutLifecycleConfigurationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #         lifecycle_policies: [ # required
-    #           {
-    #             transition_to_ia: "AFTER_7_DAYS", # accepts AFTER_7_DAYS, AFTER_14_DAYS, AFTER_30_DAYS, AFTER_60_DAYS, AFTER_90_DAYS
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] file_system_id
     #   The ID of the file system for which you are creating the
     #   `LifecycleConfiguration` object (String).
@@ -1783,8 +2223,39 @@ module Aws::EFS
     # @!attribute [rw] lifecycle_policies
     #   An array of `LifecyclePolicy` objects that define the file system's
     #   `LifecycleConfiguration` object. A `LifecycleConfiguration` object
-    #   tells lifecycle management when to transition files from the
-    #   Standard storage class to the Infrequent Access storage class.
+    #   informs EFS Lifecycle management of the following:
+    #
+    #   * <b> <code>TransitionToIA</code> </b> – When to move files in the
+    #     file system from primary storage (Standard storage class) into the
+    #     Infrequent Access (IA) storage.
+    #
+    #   * <b> <code>TransitionToArchive</code> </b> – When to move files in
+    #     the file system from their current storage class (either IA or
+    #     Standard storage) into the Archive storage.
+    #
+    #     File systems cannot transition into Archive storage before
+    #     transitioning into IA storage. Therefore, TransitionToArchive must
+    #     either not be set or must be later than TransitionToIA.
+    #
+    #     <note markdown="1"> The Archive storage class is available only for file systems that
+    #     use the Elastic Throughput mode and the General Purpose
+    #     Performance mode.
+    #
+    #      </note>
+    #
+    #   * <b> <code>TransitionToPrimaryStorageClass</code> </b> – Whether to
+    #     move files in the file system back to primary storage (Standard
+    #     storage class) after they are accessed in IA or Archive storage.
+    #
+    #   <note markdown="1"> When using the `put-lifecycle-configuration` CLI command or the
+    #   `PutLifecycleConfiguration` API action, Amazon EFS requires that
+    #   each `LifecyclePolicy` object have only a single transition. This
+    #   means that in a request body, `LifecyclePolicies` must be structured
+    #   as an array of `LifecyclePolicy` objects, one object for each
+    #   storage transition. See the example requests in the following
+    #   section for more information.
+    #
+    #    </note>
     #   @return [Array<Types::LifecyclePolicy>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/PutLifecycleConfigurationRequest AWS API Documentation
@@ -1796,24 +2267,133 @@ module Aws::EFS
       include Aws::Structure
     end
 
+    # Returned if the file system is already included in a replication
+    # configuration.&gt;
+    #
+    # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
+    #   @return [String]
+    #
+    # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/ReplicationAlreadyExists AWS API Documentation
+    #
+    class ReplicationAlreadyExists < Struct.new(
+      :error_code,
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the replication configuration for a specific file system.
+    #
+    # @!attribute [rw] source_file_system_id
+    #   The ID of the source Amazon EFS file system that is being
+    #   replicated.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_file_system_region
+    #   The Amazon Web Services Region in which the source EFS file system
+    #   is located.
+    #   @return [String]
+    #
+    # @!attribute [rw] source_file_system_arn
+    #   The Amazon Resource Name (ARN) of the current source file system in
+    #   the replication configuration.
+    #   @return [String]
+    #
+    # @!attribute [rw] original_source_file_system_arn
+    #   The Amazon Resource Name (ARN) of the original source EFS file
+    #   system in the replication configuration.
+    #   @return [String]
+    #
+    # @!attribute [rw] creation_time
+    #   Describes when the replication configuration was created.
+    #   @return [Time]
+    #
+    # @!attribute [rw] destinations
+    #   An array of destination objects. Only one destination object is
+    #   supported.
+    #   @return [Array<Types::Destination>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/ReplicationConfigurationDescription AWS API Documentation
+    #
+    class ReplicationConfigurationDescription < Struct.new(
+      :source_file_system_id,
+      :source_file_system_region,
+      :source_file_system_arn,
+      :original_source_file_system_arn,
+      :creation_time,
+      :destinations)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Returned if the specified file system does not have a replication
+    # configuration.
+    #
+    # @!attribute [rw] error_code
+    #   ReplicationNotFound
+    #   @return [String]
+    #
+    # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/ReplicationNotFound AWS API Documentation
+    #
+    class ReplicationNotFound < Struct.new(
+      :error_code,
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the resource type and its ID preference for the user's
+    # Amazon Web Services account, in the current Amazon Web Services
+    # Region.
+    #
+    # @!attribute [rw] resource_id_type
+    #   Identifies the EFS resource ID preference, either `LONG_ID` (17
+    #   characters) or `SHORT_ID` (8 characters).
+    #   @return [String]
+    #
+    # @!attribute [rw] resources
+    #   Identifies the Amazon EFS resources to which the ID preference
+    #   setting applies, `FILE_SYSTEM` and `MOUNT_TARGET`.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/ResourceIdPreference AWS API Documentation
+    #
+    class ResourceIdPreference < Struct.new(
+      :resource_id_type,
+      :resources)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Specifies the directory on the Amazon EFS file system that the access
     # point provides access to. The access point exposes the specified file
     # system path as the root directory of your file system to applications
     # using the access point. NFS clients using the access point can only
     # access data in the access point's `RootDirectory` and it's
     # subdirectories.
-    #
-    # @note When making an API call, you may pass RootDirectory
-    #   data as a hash:
-    #
-    #       {
-    #         path: "Path",
-    #         creation_info: {
-    #           owner_uid: 1, # required
-    #           owner_gid: 1, # required
-    #           permissions: "Permissions", # required
-    #         },
-    #       }
     #
     # @!attribute [rw] path
     #   Specifies the path on the EFS file system to expose as the root
@@ -1849,9 +2429,19 @@ module Aws::EFS
     # greater than five.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/SecurityGroupLimitExceeded AWS API Documentation
@@ -1864,12 +2454,22 @@ module Aws::EFS
     end
 
     # Returned if one of the specified security groups doesn't exist in the
-    # subnet's VPC.
+    # subnet's virtual private cloud (VPC).
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/SecurityGroupNotFound AWS API Documentation
@@ -1885,9 +2485,19 @@ module Aws::EFS
     # request.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/SubnetNotFound AWS API Documentation
@@ -1901,15 +2511,7 @@ module Aws::EFS
 
     # A tag is a key-value pair. Allowed characters are letters, white
     # space, and numbers that can be represented in UTF-8, and the following
-    # characters:` + - = . _ : /`
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey", # required
-    #         value: "TagValue", # required
-    #       }
+    # characters:` + - = . _ : /`.
     #
     # @!attribute [rw] key
     #   The tag key (String). The key can't start with `aws:`.
@@ -1928,25 +2530,14 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_id: "ResourceId", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue", # required
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] resource_id
     #   The ID specifying the EFS resource that you want to create a tag
     #   for.
     #   @return [String]
     #
     # @!attribute [rw] tags
+    #   An array of `Tag` objects to add. Each `Tag` object is a key-value
+    #   pair.
     #   @return [Array<Types::Tag>]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/TagResourceRequest AWS API Documentation
@@ -1958,14 +2549,57 @@ module Aws::EFS
       include Aws::Structure
     end
 
+    # Returned when the `CreateAccessPoint` API action is called too quickly
+    # and the number of Access Points on the file system is nearing the
+    # [limit of 120][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/efs/latest/ug/limits.html#limits-efs-resources-per-account-per-region
+    #
+    # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
+    #   @return [String]
+    #
+    # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/ThrottlingException AWS API Documentation
+    #
+    class ThrottlingException < Struct.new(
+      :error_code,
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Returned if the throughput mode or amount of provisioned throughput
     # can't be changed because the throughput limit of 1024 MiB/s has been
     # reached.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/ThroughputLimitExceeded AWS API Documentation
@@ -1977,13 +2611,23 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # Returned if you don’t wait at least 24 hours before changing the
-    # throughput mode, or decreasing the Provisioned Throughput value.
+    # Returned if you don’t wait at least 24 hours before either changing
+    # the throughput mode, or decreasing the Provisioned Throughput value.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/TooManyRequests AWS API Documentation
@@ -1995,10 +2639,23 @@ module Aws::EFS
       include Aws::Structure
     end
 
+    # Returned if the requested Amazon EFS functionality is not available in
+    # the specified Availability Zone.
+    #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/UnsupportedAvailabilityZone AWS API Documentation
@@ -2010,20 +2667,12 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_id: "ResourceId", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_id
     #   Specifies the EFS resource that you want to remove tags from.
     #   @return [String]
     #
     # @!attribute [rw] tag_keys
-    #   The keys of the key:value tag pairs that you want to remove from the
+    #   The keys of the key-value tag pairs that you want to remove from the
     #   specified EFS resource.
     #   @return [Array<String>]
     #
@@ -2036,33 +2685,64 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateFileSystemRequest
-    #   data as a hash:
+    # @!attribute [rw] file_system_id
+    #   The ID of the file system to update.
+    #   @return [String]
     #
-    #       {
-    #         file_system_id: "FileSystemId", # required
-    #         throughput_mode: "bursting", # accepts bursting, provisioned
-    #         provisioned_throughput_in_mibps: 1.0,
-    #       }
+    # @!attribute [rw] replication_overwrite_protection
+    #   The status of the file system's replication overwrite protection.
     #
+    #   * `ENABLED` – The file system cannot be used as the destination file
+    #     system in a replication configuration. The file system is
+    #     writeable. Replication overwrite protection is `ENABLED` by
+    #     default.
+    #
+    #   * `DISABLED` – The file system can be used as the destination file
+    #     system in a replication configuration. The file system is
+    #     read-only and can only be modified by EFS replication.
+    #
+    #   * `REPLICATING` – The file system is being used as the destination
+    #     file system in a replication configuration. The file system is
+    #     read-only and is only modified only by EFS replication.
+    #
+    #   If the replication configuration is deleted, the file system's
+    #   replication overwrite protection is re-enabled, the file system
+    #   becomes writeable.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/UpdateFileSystemProtectionRequest AWS API Documentation
+    #
+    class UpdateFileSystemProtectionRequest < Struct.new(
+      :file_system_id,
+      :replication_overwrite_protection)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] file_system_id
     #   The ID of the file system that you want to update.
     #   @return [String]
     #
     # @!attribute [rw] throughput_mode
-    #   (Optional) The throughput mode that you want your file system to
-    #   use. If you're not updating your throughput mode, you don't need
-    #   to provide this value in your request. If you are changing the
-    #   `ThroughputMode` to `provisioned`, you must also set a value for
+    #   (Optional) Updates the file system's throughput mode. If you're
+    #   not updating your throughput mode, you don't need to provide this
+    #   value in your request. If you are changing the `ThroughputMode` to
+    #   `provisioned`, you must also set a value for
     #   `ProvisionedThroughputInMibps`.
     #   @return [String]
     #
     # @!attribute [rw] provisioned_throughput_in_mibps
-    #   (Optional) The amount of throughput, in MiB/s, that you want to
-    #   provision for your file system. Valid values are 1-1024. Required if
-    #   `ThroughputMode` is changed to `provisioned` on update. If you're
-    #   not updating the amount of provisioned throughput for your file
-    #   system, you don't need to provide this value in your request.
+    #   (Optional) The throughput, measured in mebibytes per second (MiBps),
+    #   that you want to provision for a file system that you're creating.
+    #   Required if `ThroughputMode` is set to `provisioned`. Valid values
+    #   are 1-3414 MiBps, with the upper limit depending on Region. To
+    #   increase this limit, contact Amazon Web Services Support. For more
+    #   information, see [Amazon EFS quotas that you can increase][1] in the
+    #   *Amazon EFS User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/efs/latest/ug/limits.html#soft-limits
     #   @return [Float]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/UpdateFileSystemRequest AWS API Documentation
@@ -2075,13 +2755,23 @@ module Aws::EFS
       include Aws::Structure
     end
 
-    # Returned if the AWS Backup service is not available in the region that
-    # the request was made.
+    # Returned if the Backup service is not available in the Amazon Web
+    # Services Region in which the request was made.
     #
     # @!attribute [rw] error_code
+    #   The error code is a string that uniquely identifies an error
+    #   condition. It is meant to be read and understood by programs that
+    #   detect and handle errors by type.
     #   @return [String]
     #
     # @!attribute [rw] message
+    #   The error message contains a generic description of the error
+    #   condition in English. It is intended for a human audience. Simple
+    #   programs display the message directly to the end user if they
+    #   encounter an error condition they don't know how or don't care to
+    #   handle. Sophisticated programs with more exhaustive error handling
+    #   and proper internationalization are more likely to ignore the error
+    #   message.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/elasticfilesystem-2015-02-01/ValidationException AWS API Documentation
@@ -2095,3 +2785,4 @@ module Aws::EFS
 
   end
 end
+

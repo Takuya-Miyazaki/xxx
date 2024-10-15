@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:elasticsearchservice)
 
 module Aws::ElasticsearchService
   # An API client for ElasticsearchService.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::ElasticsearchService
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::ElasticsearchService::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::ElasticsearchService
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::ElasticsearchService
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::ElasticsearchService
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::ElasticsearchService
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::ElasticsearchService
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::ElasticsearchService
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::ElasticsearchService
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::ElasticsearchService::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::ElasticsearchService::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -435,6 +555,78 @@ module Aws::ElasticsearchService
     # @param [Hash] params ({})
     def associate_package(params = {}, options = {})
       req = build_request(:associate_package, params)
+      req.send_request(options)
+    end
+
+    # Provides access to an Amazon OpenSearch Service domain through the use
+    # of an interface VPC endpoint.
+    #
+    # @option params [required, String] :domain_name
+    #   The name of the OpenSearch Service domain to provide access to.
+    #
+    # @option params [required, String] :account
+    #   The account ID to grant access to.
+    #
+    # @return [Types::AuthorizeVpcEndpointAccessResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::AuthorizeVpcEndpointAccessResponse#authorized_principal #authorized_principal} => Types::AuthorizedPrincipal
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.authorize_vpc_endpoint_access({
+    #     domain_name: "DomainName", # required
+    #     account: "AWSAccount", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.authorized_principal.principal_type #=> String, one of "AWS_ACCOUNT", "AWS_SERVICE"
+    #   resp.authorized_principal.principal #=> String
+    #
+    # @overload authorize_vpc_endpoint_access(params = {})
+    # @param [Hash] params ({})
+    def authorize_vpc_endpoint_access(params = {}, options = {})
+      req = build_request(:authorize_vpc_endpoint_access, params)
+      req.send_request(options)
+    end
+
+    # Cancels a pending configuration change on an Amazon OpenSearch Service
+    # domain.
+    #
+    # @option params [required, String] :domain_name
+    #   Name of the OpenSearch Service domain configuration request to cancel.
+    #
+    # @option params [Boolean] :dry_run
+    #   When set to **True**, returns the list of change IDs and properties
+    #   that will be cancelled without actually cancelling the change.
+    #
+    # @return [Types::CancelDomainConfigChangeResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CancelDomainConfigChangeResponse#dry_run #dry_run} => Boolean
+    #   * {Types::CancelDomainConfigChangeResponse#cancelled_change_ids #cancelled_change_ids} => Array&lt;String&gt;
+    #   * {Types::CancelDomainConfigChangeResponse#cancelled_change_properties #cancelled_change_properties} => Array&lt;Types::CancelledChangeProperty&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.cancel_domain_config_change({
+    #     domain_name: "DomainName", # required
+    #     dry_run: false,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.dry_run #=> Boolean
+    #   resp.cancelled_change_ids #=> Array
+    #   resp.cancelled_change_ids[0] #=> String
+    #   resp.cancelled_change_properties #=> Array
+    #   resp.cancelled_change_properties[0].property_name #=> String
+    #   resp.cancelled_change_properties[0].cancelled_value #=> String
+    #   resp.cancelled_change_properties[0].active_value #=> String
+    #
+    # @overload cancel_domain_config_change(params = {})
+    # @param [Hash] params ({})
+    def cancel_domain_config_change(params = {}, options = {})
+      req = build_request(:cancel_domain_config_change, params)
       req.send_request(options)
     end
 
@@ -559,6 +751,12 @@ module Aws::ElasticsearchService
     # @option params [Types::AdvancedSecurityOptionsInput] :advanced_security_options
     #   Specifies advanced security options.
     #
+    # @option params [Types::AutoTuneOptionsInput] :auto_tune_options
+    #   Specifies Auto-Tune options.
+    #
+    # @option params [Array<Types::Tag>] :tag_list
+    #   A list of `Tag` added during domain creation.
+    #
     # @return [Types::CreateElasticsearchDomainResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateElasticsearchDomainResponse#domain_status #domain_status} => Types::ElasticsearchDomainStatus
@@ -581,12 +779,16 @@ module Aws::ElasticsearchService
     #       warm_enabled: false,
     #       warm_type: "ultrawarm1.medium.elasticsearch", # accepts ultrawarm1.medium.elasticsearch, ultrawarm1.large.elasticsearch
     #       warm_count: 1,
+    #       cold_storage_options: {
+    #         enabled: false, # required
+    #       },
     #     },
     #     ebs_options: {
     #       ebs_enabled: false,
-    #       volume_type: "standard", # accepts standard, gp2, io1
+    #       volume_type: "standard", # accepts standard, gp2, io1, gp3
     #       volume_size: 1,
     #       iops: 1,
+    #       throughput: 1,
     #     },
     #     access_policies: "PolicyDocument",
     #     snapshot_options: {
@@ -620,7 +822,7 @@ module Aws::ElasticsearchService
     #     },
     #     domain_endpoint_options: {
     #       enforce_https: false,
-    #       tls_security_policy: "Policy-Min-TLS-1-0-2019-07", # accepts Policy-Min-TLS-1-0-2019-07, Policy-Min-TLS-1-2-2019-07
+    #       tls_security_policy: "Policy-Min-TLS-1-0-2019-07", # accepts Policy-Min-TLS-1-0-2019-07, Policy-Min-TLS-1-2-2019-07, Policy-Min-TLS-1-2-PFS-2023-10
     #       custom_endpoint_enabled: false,
     #       custom_endpoint: "DomainNameFqdn",
     #       custom_endpoint_certificate_arn: "ARN",
@@ -645,7 +847,27 @@ module Aws::ElasticsearchService
     #         roles_key: "String",
     #         session_timeout_minutes: 1,
     #       },
+    #       anonymous_auth_enabled: false,
     #     },
+    #     auto_tune_options: {
+    #       desired_state: "ENABLED", # accepts ENABLED, DISABLED
+    #       maintenance_schedules: [
+    #         {
+    #           start_at: Time.now,
+    #           duration: {
+    #             value: 1,
+    #             unit: "HOURS", # accepts HOURS
+    #           },
+    #           cron_expression_for_recurrence: "String",
+    #         },
+    #       ],
+    #     },
+    #     tag_list: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue", # required
+    #       },
+    #     ],
     #   })
     #
     # @example Response structure
@@ -671,10 +893,12 @@ module Aws::ElasticsearchService
     #   resp.domain_status.elasticsearch_cluster_config.warm_enabled #=> Boolean
     #   resp.domain_status.elasticsearch_cluster_config.warm_type #=> String, one of "ultrawarm1.medium.elasticsearch", "ultrawarm1.large.elasticsearch"
     #   resp.domain_status.elasticsearch_cluster_config.warm_count #=> Integer
+    #   resp.domain_status.elasticsearch_cluster_config.cold_storage_options.enabled #=> Boolean
     #   resp.domain_status.ebs_options.ebs_enabled #=> Boolean
-    #   resp.domain_status.ebs_options.volume_type #=> String, one of "standard", "gp2", "io1"
+    #   resp.domain_status.ebs_options.volume_type #=> String, one of "standard", "gp2", "io1", "gp3"
     #   resp.domain_status.ebs_options.volume_size #=> Integer
     #   resp.domain_status.ebs_options.iops #=> Integer
+    #   resp.domain_status.ebs_options.throughput #=> Integer
     #   resp.domain_status.access_policies #=> String
     #   resp.domain_status.snapshot_options.automated_snapshot_start_hour #=> Integer
     #   resp.domain_status.vpc_options.vpc_id #=> String
@@ -705,7 +929,7 @@ module Aws::ElasticsearchService
     #   resp.domain_status.service_software_options.automated_update_date #=> Time
     #   resp.domain_status.service_software_options.optional_deployment #=> Boolean
     #   resp.domain_status.domain_endpoint_options.enforce_https #=> Boolean
-    #   resp.domain_status.domain_endpoint_options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07"
+    #   resp.domain_status.domain_endpoint_options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07", "Policy-Min-TLS-1-2-PFS-2023-10"
     #   resp.domain_status.domain_endpoint_options.custom_endpoint_enabled #=> Boolean
     #   resp.domain_status.domain_endpoint_options.custom_endpoint #=> String
     #   resp.domain_status.domain_endpoint_options.custom_endpoint_certificate_arn #=> String
@@ -717,6 +941,22 @@ module Aws::ElasticsearchService
     #   resp.domain_status.advanced_security_options.saml_options.subject_key #=> String
     #   resp.domain_status.advanced_security_options.saml_options.roles_key #=> String
     #   resp.domain_status.advanced_security_options.saml_options.session_timeout_minutes #=> Integer
+    #   resp.domain_status.advanced_security_options.anonymous_auth_disable_date #=> Time
+    #   resp.domain_status.advanced_security_options.anonymous_auth_enabled #=> Boolean
+    #   resp.domain_status.auto_tune_options.state #=> String, one of "ENABLED", "DISABLED", "ENABLE_IN_PROGRESS", "DISABLE_IN_PROGRESS", "DISABLED_AND_ROLLBACK_SCHEDULED", "DISABLED_AND_ROLLBACK_IN_PROGRESS", "DISABLED_AND_ROLLBACK_COMPLETE", "DISABLED_AND_ROLLBACK_ERROR", "ERROR"
+    #   resp.domain_status.auto_tune_options.error_message #=> String
+    #   resp.domain_status.change_progress_details.change_id #=> String
+    #   resp.domain_status.change_progress_details.message #=> String
+    #   resp.domain_status.change_progress_details.config_change_status #=> String, one of "Pending", "Initializing", "Validating", "ValidationFailed", "ApplyingChanges", "Completed", "PendingUserInput", "Cancelled"
+    #   resp.domain_status.change_progress_details.start_time #=> Time
+    #   resp.domain_status.change_progress_details.last_updated_time #=> Time
+    #   resp.domain_status.change_progress_details.initiated_by #=> String, one of "CUSTOMER", "SERVICE"
+    #   resp.domain_status.domain_processing_status #=> String, one of "Creating", "Active", "Modifying", "UpgradingEngineVersion", "UpdatingServiceSoftware", "Isolated", "Deleting"
+    #   resp.domain_status.modifying_properties #=> Array
+    #   resp.domain_status.modifying_properties[0].name #=> String
+    #   resp.domain_status.modifying_properties[0].active_value #=> String
+    #   resp.domain_status.modifying_properties[0].pending_value #=> String
+    #   resp.domain_status.modifying_properties[0].value_type #=> String, one of "PLAIN_TEXT", "STRINGIFIED_JSON"
     #
     # @overload create_elasticsearch_domain(params = {})
     # @param [Hash] params ({})
@@ -833,6 +1073,55 @@ module Aws::ElasticsearchService
       req.send_request(options)
     end
 
+    # Creates an Amazon OpenSearch Service-managed VPC endpoint.
+    #
+    # @option params [required, String] :domain_arn
+    #   The Amazon Resource Name (ARN) of the domain to grant access to.
+    #
+    # @option params [required, Types::VPCOptions] :vpc_options
+    #   Options to specify the subnets and security groups for the endpoint.
+    #
+    # @option params [String] :client_token
+    #   Unique, case-sensitive identifier to ensure idempotency of the
+    #   request.
+    #
+    # @return [Types::CreateVpcEndpointResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateVpcEndpointResponse#vpc_endpoint #vpc_endpoint} => Types::VpcEndpoint
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_vpc_endpoint({
+    #     domain_arn: "DomainArn", # required
+    #     vpc_options: { # required
+    #       subnet_ids: ["String"],
+    #       security_group_ids: ["String"],
+    #     },
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.vpc_endpoint.vpc_endpoint_id #=> String
+    #   resp.vpc_endpoint.vpc_endpoint_owner #=> String
+    #   resp.vpc_endpoint.domain_arn #=> String
+    #   resp.vpc_endpoint.vpc_options.vpc_id #=> String
+    #   resp.vpc_endpoint.vpc_options.subnet_ids #=> Array
+    #   resp.vpc_endpoint.vpc_options.subnet_ids[0] #=> String
+    #   resp.vpc_endpoint.vpc_options.availability_zones #=> Array
+    #   resp.vpc_endpoint.vpc_options.availability_zones[0] #=> String
+    #   resp.vpc_endpoint.vpc_options.security_group_ids #=> Array
+    #   resp.vpc_endpoint.vpc_options.security_group_ids[0] #=> String
+    #   resp.vpc_endpoint.status #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "UPDATING", "UPDATE_FAILED", "DELETING", "DELETE_FAILED"
+    #   resp.vpc_endpoint.endpoint #=> String
+    #
+    # @overload create_vpc_endpoint(params = {})
+    # @param [Hash] params ({})
+    def create_vpc_endpoint(params = {}, options = {})
+      req = build_request(:create_vpc_endpoint, params)
+      req.send_request(options)
+    end
+
     # Permanently deletes the specified Elasticsearch domain and all of its
     # data. Once a domain is deleted, it cannot be recovered.
     #
@@ -873,10 +1162,12 @@ module Aws::ElasticsearchService
     #   resp.domain_status.elasticsearch_cluster_config.warm_enabled #=> Boolean
     #   resp.domain_status.elasticsearch_cluster_config.warm_type #=> String, one of "ultrawarm1.medium.elasticsearch", "ultrawarm1.large.elasticsearch"
     #   resp.domain_status.elasticsearch_cluster_config.warm_count #=> Integer
+    #   resp.domain_status.elasticsearch_cluster_config.cold_storage_options.enabled #=> Boolean
     #   resp.domain_status.ebs_options.ebs_enabled #=> Boolean
-    #   resp.domain_status.ebs_options.volume_type #=> String, one of "standard", "gp2", "io1"
+    #   resp.domain_status.ebs_options.volume_type #=> String, one of "standard", "gp2", "io1", "gp3"
     #   resp.domain_status.ebs_options.volume_size #=> Integer
     #   resp.domain_status.ebs_options.iops #=> Integer
+    #   resp.domain_status.ebs_options.throughput #=> Integer
     #   resp.domain_status.access_policies #=> String
     #   resp.domain_status.snapshot_options.automated_snapshot_start_hour #=> Integer
     #   resp.domain_status.vpc_options.vpc_id #=> String
@@ -907,7 +1198,7 @@ module Aws::ElasticsearchService
     #   resp.domain_status.service_software_options.automated_update_date #=> Time
     #   resp.domain_status.service_software_options.optional_deployment #=> Boolean
     #   resp.domain_status.domain_endpoint_options.enforce_https #=> Boolean
-    #   resp.domain_status.domain_endpoint_options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07"
+    #   resp.domain_status.domain_endpoint_options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07", "Policy-Min-TLS-1-2-PFS-2023-10"
     #   resp.domain_status.domain_endpoint_options.custom_endpoint_enabled #=> Boolean
     #   resp.domain_status.domain_endpoint_options.custom_endpoint #=> String
     #   resp.domain_status.domain_endpoint_options.custom_endpoint_certificate_arn #=> String
@@ -919,6 +1210,22 @@ module Aws::ElasticsearchService
     #   resp.domain_status.advanced_security_options.saml_options.subject_key #=> String
     #   resp.domain_status.advanced_security_options.saml_options.roles_key #=> String
     #   resp.domain_status.advanced_security_options.saml_options.session_timeout_minutes #=> Integer
+    #   resp.domain_status.advanced_security_options.anonymous_auth_disable_date #=> Time
+    #   resp.domain_status.advanced_security_options.anonymous_auth_enabled #=> Boolean
+    #   resp.domain_status.auto_tune_options.state #=> String, one of "ENABLED", "DISABLED", "ENABLE_IN_PROGRESS", "DISABLE_IN_PROGRESS", "DISABLED_AND_ROLLBACK_SCHEDULED", "DISABLED_AND_ROLLBACK_IN_PROGRESS", "DISABLED_AND_ROLLBACK_COMPLETE", "DISABLED_AND_ROLLBACK_ERROR", "ERROR"
+    #   resp.domain_status.auto_tune_options.error_message #=> String
+    #   resp.domain_status.change_progress_details.change_id #=> String
+    #   resp.domain_status.change_progress_details.message #=> String
+    #   resp.domain_status.change_progress_details.config_change_status #=> String, one of "Pending", "Initializing", "Validating", "ValidationFailed", "ApplyingChanges", "Completed", "PendingUserInput", "Cancelled"
+    #   resp.domain_status.change_progress_details.start_time #=> Time
+    #   resp.domain_status.change_progress_details.last_updated_time #=> Time
+    #   resp.domain_status.change_progress_details.initiated_by #=> String, one of "CUSTOMER", "SERVICE"
+    #   resp.domain_status.domain_processing_status #=> String, one of "Creating", "Active", "Modifying", "UpgradingEngineVersion", "UpdatingServiceSoftware", "Isolated", "Deleting"
+    #   resp.domain_status.modifying_properties #=> Array
+    #   resp.domain_status.modifying_properties[0].name #=> String
+    #   resp.domain_status.modifying_properties[0].active_value #=> String
+    #   resp.domain_status.modifying_properties[0].pending_value #=> String
+    #   resp.domain_status.modifying_properties[0].value_type #=> String, one of "PLAIN_TEXT", "STRINGIFIED_JSON"
     #
     # @overload delete_elasticsearch_domain(params = {})
     # @param [Hash] params ({})
@@ -1054,6 +1361,130 @@ module Aws::ElasticsearchService
       req.send_request(options)
     end
 
+    # Deletes an Amazon OpenSearch Service-managed interface VPC endpoint.
+    #
+    # @option params [required, String] :vpc_endpoint_id
+    #   The unique identifier of the endpoint to be deleted.
+    #
+    # @return [Types::DeleteVpcEndpointResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteVpcEndpointResponse#vpc_endpoint_summary #vpc_endpoint_summary} => Types::VpcEndpointSummary
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_vpc_endpoint({
+    #     vpc_endpoint_id: "VpcEndpointId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.vpc_endpoint_summary.vpc_endpoint_id #=> String
+    #   resp.vpc_endpoint_summary.vpc_endpoint_owner #=> String
+    #   resp.vpc_endpoint_summary.domain_arn #=> String
+    #   resp.vpc_endpoint_summary.status #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "UPDATING", "UPDATE_FAILED", "DELETING", "DELETE_FAILED"
+    #
+    # @overload delete_vpc_endpoint(params = {})
+    # @param [Hash] params ({})
+    def delete_vpc_endpoint(params = {}, options = {})
+      req = build_request(:delete_vpc_endpoint, params)
+      req.send_request(options)
+    end
+
+    # Provides scheduled Auto-Tune action details for the Elasticsearch
+    # domain, such as Auto-Tune action type, description, severity, and
+    # scheduled date.
+    #
+    # @option params [required, String] :domain_name
+    #   Specifies the domain name for which you want Auto-Tune action details.
+    #
+    # @option params [Integer] :max_results
+    #   Set this value to limit the number of results returned. If not
+    #   specified, defaults to 100.
+    #
+    # @option params [String] :next_token
+    #   NextToken is sent in case the earlier API call results contain the
+    #   NextToken. It is used for pagination.
+    #
+    # @return [Types::DescribeDomainAutoTunesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeDomainAutoTunesResponse#auto_tunes #auto_tunes} => Array&lt;Types::AutoTune&gt;
+    #   * {Types::DescribeDomainAutoTunesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_domain_auto_tunes({
+    #     domain_name: "DomainName", # required
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.auto_tunes #=> Array
+    #   resp.auto_tunes[0].auto_tune_type #=> String, one of "SCHEDULED_ACTION"
+    #   resp.auto_tunes[0].auto_tune_details.scheduled_auto_tune_details.date #=> Time
+    #   resp.auto_tunes[0].auto_tune_details.scheduled_auto_tune_details.action_type #=> String, one of "JVM_HEAP_SIZE_TUNING", "JVM_YOUNG_GEN_TUNING"
+    #   resp.auto_tunes[0].auto_tune_details.scheduled_auto_tune_details.action #=> String
+    #   resp.auto_tunes[0].auto_tune_details.scheduled_auto_tune_details.severity #=> String, one of "LOW", "MEDIUM", "HIGH"
+    #   resp.next_token #=> String
+    #
+    # @overload describe_domain_auto_tunes(params = {})
+    # @param [Hash] params ({})
+    def describe_domain_auto_tunes(params = {}, options = {})
+      req = build_request(:describe_domain_auto_tunes, params)
+      req.send_request(options)
+    end
+
+    # Returns information about the current blue/green deployment happening
+    # on a domain, including a change ID, status, and progress stages.
+    #
+    # @option params [required, String] :domain_name
+    #   The domain you want to get the progress information about.
+    #
+    # @option params [String] :change_id
+    #   The specific change ID for which you want to get progress information.
+    #   This is an optional parameter. If omitted, the service returns
+    #   information about the most recent configuration change.
+    #
+    # @return [Types::DescribeDomainChangeProgressResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeDomainChangeProgressResponse#change_progress_status #change_progress_status} => Types::ChangeProgressStatusDetails
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_domain_change_progress({
+    #     domain_name: "DomainName", # required
+    #     change_id: "GUID",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.change_progress_status.change_id #=> String
+    #   resp.change_progress_status.start_time #=> Time
+    #   resp.change_progress_status.status #=> String, one of "PENDING", "PROCESSING", "COMPLETED", "FAILED"
+    #   resp.change_progress_status.pending_properties #=> Array
+    #   resp.change_progress_status.pending_properties[0] #=> String
+    #   resp.change_progress_status.completed_properties #=> Array
+    #   resp.change_progress_status.completed_properties[0] #=> String
+    #   resp.change_progress_status.total_number_of_stages #=> Integer
+    #   resp.change_progress_status.change_progress_stages #=> Array
+    #   resp.change_progress_status.change_progress_stages[0].name #=> String
+    #   resp.change_progress_status.change_progress_stages[0].status #=> String
+    #   resp.change_progress_status.change_progress_stages[0].description #=> String
+    #   resp.change_progress_status.change_progress_stages[0].last_updated #=> Time
+    #   resp.change_progress_status.config_change_status #=> String, one of "Pending", "Initializing", "Validating", "ValidationFailed", "ApplyingChanges", "Completed", "PendingUserInput", "Cancelled"
+    #   resp.change_progress_status.last_updated_time #=> Time
+    #   resp.change_progress_status.initiated_by #=> String, one of "CUSTOMER", "SERVICE"
+    #
+    # @overload describe_domain_change_progress(params = {})
+    # @param [Hash] params ({})
+    def describe_domain_change_progress(params = {}, options = {})
+      req = build_request(:describe_domain_change_progress, params)
+      req.send_request(options)
+    end
+
     # Returns domain configuration information about the specified
     # Elasticsearch domain, including the domain ID, domain endpoint, and
     # domain ARN.
@@ -1094,10 +1525,12 @@ module Aws::ElasticsearchService
     #   resp.domain_status.elasticsearch_cluster_config.warm_enabled #=> Boolean
     #   resp.domain_status.elasticsearch_cluster_config.warm_type #=> String, one of "ultrawarm1.medium.elasticsearch", "ultrawarm1.large.elasticsearch"
     #   resp.domain_status.elasticsearch_cluster_config.warm_count #=> Integer
+    #   resp.domain_status.elasticsearch_cluster_config.cold_storage_options.enabled #=> Boolean
     #   resp.domain_status.ebs_options.ebs_enabled #=> Boolean
-    #   resp.domain_status.ebs_options.volume_type #=> String, one of "standard", "gp2", "io1"
+    #   resp.domain_status.ebs_options.volume_type #=> String, one of "standard", "gp2", "io1", "gp3"
     #   resp.domain_status.ebs_options.volume_size #=> Integer
     #   resp.domain_status.ebs_options.iops #=> Integer
+    #   resp.domain_status.ebs_options.throughput #=> Integer
     #   resp.domain_status.access_policies #=> String
     #   resp.domain_status.snapshot_options.automated_snapshot_start_hour #=> Integer
     #   resp.domain_status.vpc_options.vpc_id #=> String
@@ -1128,7 +1561,7 @@ module Aws::ElasticsearchService
     #   resp.domain_status.service_software_options.automated_update_date #=> Time
     #   resp.domain_status.service_software_options.optional_deployment #=> Boolean
     #   resp.domain_status.domain_endpoint_options.enforce_https #=> Boolean
-    #   resp.domain_status.domain_endpoint_options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07"
+    #   resp.domain_status.domain_endpoint_options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07", "Policy-Min-TLS-1-2-PFS-2023-10"
     #   resp.domain_status.domain_endpoint_options.custom_endpoint_enabled #=> Boolean
     #   resp.domain_status.domain_endpoint_options.custom_endpoint #=> String
     #   resp.domain_status.domain_endpoint_options.custom_endpoint_certificate_arn #=> String
@@ -1140,6 +1573,22 @@ module Aws::ElasticsearchService
     #   resp.domain_status.advanced_security_options.saml_options.subject_key #=> String
     #   resp.domain_status.advanced_security_options.saml_options.roles_key #=> String
     #   resp.domain_status.advanced_security_options.saml_options.session_timeout_minutes #=> Integer
+    #   resp.domain_status.advanced_security_options.anonymous_auth_disable_date #=> Time
+    #   resp.domain_status.advanced_security_options.anonymous_auth_enabled #=> Boolean
+    #   resp.domain_status.auto_tune_options.state #=> String, one of "ENABLED", "DISABLED", "ENABLE_IN_PROGRESS", "DISABLE_IN_PROGRESS", "DISABLED_AND_ROLLBACK_SCHEDULED", "DISABLED_AND_ROLLBACK_IN_PROGRESS", "DISABLED_AND_ROLLBACK_COMPLETE", "DISABLED_AND_ROLLBACK_ERROR", "ERROR"
+    #   resp.domain_status.auto_tune_options.error_message #=> String
+    #   resp.domain_status.change_progress_details.change_id #=> String
+    #   resp.domain_status.change_progress_details.message #=> String
+    #   resp.domain_status.change_progress_details.config_change_status #=> String, one of "Pending", "Initializing", "Validating", "ValidationFailed", "ApplyingChanges", "Completed", "PendingUserInput", "Cancelled"
+    #   resp.domain_status.change_progress_details.start_time #=> Time
+    #   resp.domain_status.change_progress_details.last_updated_time #=> Time
+    #   resp.domain_status.change_progress_details.initiated_by #=> String, one of "CUSTOMER", "SERVICE"
+    #   resp.domain_status.domain_processing_status #=> String, one of "Creating", "Active", "Modifying", "UpgradingEngineVersion", "UpdatingServiceSoftware", "Isolated", "Deleting"
+    #   resp.domain_status.modifying_properties #=> Array
+    #   resp.domain_status.modifying_properties[0].name #=> String
+    #   resp.domain_status.modifying_properties[0].active_value #=> String
+    #   resp.domain_status.modifying_properties[0].pending_value #=> String
+    #   resp.domain_status.modifying_properties[0].value_type #=> String, one of "PLAIN_TEXT", "STRINGIFIED_JSON"
     #
     # @overload describe_elasticsearch_domain(params = {})
     # @param [Hash] params ({})
@@ -1183,15 +1632,17 @@ module Aws::ElasticsearchService
     #   resp.domain_config.elasticsearch_cluster_config.options.warm_enabled #=> Boolean
     #   resp.domain_config.elasticsearch_cluster_config.options.warm_type #=> String, one of "ultrawarm1.medium.elasticsearch", "ultrawarm1.large.elasticsearch"
     #   resp.domain_config.elasticsearch_cluster_config.options.warm_count #=> Integer
+    #   resp.domain_config.elasticsearch_cluster_config.options.cold_storage_options.enabled #=> Boolean
     #   resp.domain_config.elasticsearch_cluster_config.status.creation_date #=> Time
     #   resp.domain_config.elasticsearch_cluster_config.status.update_date #=> Time
     #   resp.domain_config.elasticsearch_cluster_config.status.update_version #=> Integer
     #   resp.domain_config.elasticsearch_cluster_config.status.state #=> String, one of "RequiresIndexDocuments", "Processing", "Active"
     #   resp.domain_config.elasticsearch_cluster_config.status.pending_deletion #=> Boolean
     #   resp.domain_config.ebs_options.options.ebs_enabled #=> Boolean
-    #   resp.domain_config.ebs_options.options.volume_type #=> String, one of "standard", "gp2", "io1"
+    #   resp.domain_config.ebs_options.options.volume_type #=> String, one of "standard", "gp2", "io1", "gp3"
     #   resp.domain_config.ebs_options.options.volume_size #=> Integer
     #   resp.domain_config.ebs_options.options.iops #=> Integer
+    #   resp.domain_config.ebs_options.options.throughput #=> Integer
     #   resp.domain_config.ebs_options.status.creation_date #=> Time
     #   resp.domain_config.ebs_options.status.update_date #=> Time
     #   resp.domain_config.ebs_options.status.update_version #=> Integer
@@ -1259,7 +1710,7 @@ module Aws::ElasticsearchService
     #   resp.domain_config.log_publishing_options.status.state #=> String, one of "RequiresIndexDocuments", "Processing", "Active"
     #   resp.domain_config.log_publishing_options.status.pending_deletion #=> Boolean
     #   resp.domain_config.domain_endpoint_options.options.enforce_https #=> Boolean
-    #   resp.domain_config.domain_endpoint_options.options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07"
+    #   resp.domain_config.domain_endpoint_options.options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07", "Policy-Min-TLS-1-2-PFS-2023-10"
     #   resp.domain_config.domain_endpoint_options.options.custom_endpoint_enabled #=> Boolean
     #   resp.domain_config.domain_endpoint_options.options.custom_endpoint #=> String
     #   resp.domain_config.domain_endpoint_options.options.custom_endpoint_certificate_arn #=> String
@@ -1276,11 +1727,37 @@ module Aws::ElasticsearchService
     #   resp.domain_config.advanced_security_options.options.saml_options.subject_key #=> String
     #   resp.domain_config.advanced_security_options.options.saml_options.roles_key #=> String
     #   resp.domain_config.advanced_security_options.options.saml_options.session_timeout_minutes #=> Integer
+    #   resp.domain_config.advanced_security_options.options.anonymous_auth_disable_date #=> Time
+    #   resp.domain_config.advanced_security_options.options.anonymous_auth_enabled #=> Boolean
     #   resp.domain_config.advanced_security_options.status.creation_date #=> Time
     #   resp.domain_config.advanced_security_options.status.update_date #=> Time
     #   resp.domain_config.advanced_security_options.status.update_version #=> Integer
     #   resp.domain_config.advanced_security_options.status.state #=> String, one of "RequiresIndexDocuments", "Processing", "Active"
     #   resp.domain_config.advanced_security_options.status.pending_deletion #=> Boolean
+    #   resp.domain_config.auto_tune_options.options.desired_state #=> String, one of "ENABLED", "DISABLED"
+    #   resp.domain_config.auto_tune_options.options.rollback_on_disable #=> String, one of "NO_ROLLBACK", "DEFAULT_ROLLBACK"
+    #   resp.domain_config.auto_tune_options.options.maintenance_schedules #=> Array
+    #   resp.domain_config.auto_tune_options.options.maintenance_schedules[0].start_at #=> Time
+    #   resp.domain_config.auto_tune_options.options.maintenance_schedules[0].duration.value #=> Integer
+    #   resp.domain_config.auto_tune_options.options.maintenance_schedules[0].duration.unit #=> String, one of "HOURS"
+    #   resp.domain_config.auto_tune_options.options.maintenance_schedules[0].cron_expression_for_recurrence #=> String
+    #   resp.domain_config.auto_tune_options.status.creation_date #=> Time
+    #   resp.domain_config.auto_tune_options.status.update_date #=> Time
+    #   resp.domain_config.auto_tune_options.status.update_version #=> Integer
+    #   resp.domain_config.auto_tune_options.status.state #=> String, one of "ENABLED", "DISABLED", "ENABLE_IN_PROGRESS", "DISABLE_IN_PROGRESS", "DISABLED_AND_ROLLBACK_SCHEDULED", "DISABLED_AND_ROLLBACK_IN_PROGRESS", "DISABLED_AND_ROLLBACK_COMPLETE", "DISABLED_AND_ROLLBACK_ERROR", "ERROR"
+    #   resp.domain_config.auto_tune_options.status.error_message #=> String
+    #   resp.domain_config.auto_tune_options.status.pending_deletion #=> Boolean
+    #   resp.domain_config.change_progress_details.change_id #=> String
+    #   resp.domain_config.change_progress_details.message #=> String
+    #   resp.domain_config.change_progress_details.config_change_status #=> String, one of "Pending", "Initializing", "Validating", "ValidationFailed", "ApplyingChanges", "Completed", "PendingUserInput", "Cancelled"
+    #   resp.domain_config.change_progress_details.start_time #=> Time
+    #   resp.domain_config.change_progress_details.last_updated_time #=> Time
+    #   resp.domain_config.change_progress_details.initiated_by #=> String, one of "CUSTOMER", "SERVICE"
+    #   resp.domain_config.modifying_properties #=> Array
+    #   resp.domain_config.modifying_properties[0].name #=> String
+    #   resp.domain_config.modifying_properties[0].active_value #=> String
+    #   resp.domain_config.modifying_properties[0].pending_value #=> String
+    #   resp.domain_config.modifying_properties[0].value_type #=> String, one of "PLAIN_TEXT", "STRINGIFIED_JSON"
     #
     # @overload describe_elasticsearch_domain_config(params = {})
     # @param [Hash] params ({})
@@ -1330,10 +1807,12 @@ module Aws::ElasticsearchService
     #   resp.domain_status_list[0].elasticsearch_cluster_config.warm_enabled #=> Boolean
     #   resp.domain_status_list[0].elasticsearch_cluster_config.warm_type #=> String, one of "ultrawarm1.medium.elasticsearch", "ultrawarm1.large.elasticsearch"
     #   resp.domain_status_list[0].elasticsearch_cluster_config.warm_count #=> Integer
+    #   resp.domain_status_list[0].elasticsearch_cluster_config.cold_storage_options.enabled #=> Boolean
     #   resp.domain_status_list[0].ebs_options.ebs_enabled #=> Boolean
-    #   resp.domain_status_list[0].ebs_options.volume_type #=> String, one of "standard", "gp2", "io1"
+    #   resp.domain_status_list[0].ebs_options.volume_type #=> String, one of "standard", "gp2", "io1", "gp3"
     #   resp.domain_status_list[0].ebs_options.volume_size #=> Integer
     #   resp.domain_status_list[0].ebs_options.iops #=> Integer
+    #   resp.domain_status_list[0].ebs_options.throughput #=> Integer
     #   resp.domain_status_list[0].access_policies #=> String
     #   resp.domain_status_list[0].snapshot_options.automated_snapshot_start_hour #=> Integer
     #   resp.domain_status_list[0].vpc_options.vpc_id #=> String
@@ -1364,7 +1843,7 @@ module Aws::ElasticsearchService
     #   resp.domain_status_list[0].service_software_options.automated_update_date #=> Time
     #   resp.domain_status_list[0].service_software_options.optional_deployment #=> Boolean
     #   resp.domain_status_list[0].domain_endpoint_options.enforce_https #=> Boolean
-    #   resp.domain_status_list[0].domain_endpoint_options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07"
+    #   resp.domain_status_list[0].domain_endpoint_options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07", "Policy-Min-TLS-1-2-PFS-2023-10"
     #   resp.domain_status_list[0].domain_endpoint_options.custom_endpoint_enabled #=> Boolean
     #   resp.domain_status_list[0].domain_endpoint_options.custom_endpoint #=> String
     #   resp.domain_status_list[0].domain_endpoint_options.custom_endpoint_certificate_arn #=> String
@@ -1376,6 +1855,22 @@ module Aws::ElasticsearchService
     #   resp.domain_status_list[0].advanced_security_options.saml_options.subject_key #=> String
     #   resp.domain_status_list[0].advanced_security_options.saml_options.roles_key #=> String
     #   resp.domain_status_list[0].advanced_security_options.saml_options.session_timeout_minutes #=> Integer
+    #   resp.domain_status_list[0].advanced_security_options.anonymous_auth_disable_date #=> Time
+    #   resp.domain_status_list[0].advanced_security_options.anonymous_auth_enabled #=> Boolean
+    #   resp.domain_status_list[0].auto_tune_options.state #=> String, one of "ENABLED", "DISABLED", "ENABLE_IN_PROGRESS", "DISABLE_IN_PROGRESS", "DISABLED_AND_ROLLBACK_SCHEDULED", "DISABLED_AND_ROLLBACK_IN_PROGRESS", "DISABLED_AND_ROLLBACK_COMPLETE", "DISABLED_AND_ROLLBACK_ERROR", "ERROR"
+    #   resp.domain_status_list[0].auto_tune_options.error_message #=> String
+    #   resp.domain_status_list[0].change_progress_details.change_id #=> String
+    #   resp.domain_status_list[0].change_progress_details.message #=> String
+    #   resp.domain_status_list[0].change_progress_details.config_change_status #=> String, one of "Pending", "Initializing", "Validating", "ValidationFailed", "ApplyingChanges", "Completed", "PendingUserInput", "Cancelled"
+    #   resp.domain_status_list[0].change_progress_details.start_time #=> Time
+    #   resp.domain_status_list[0].change_progress_details.last_updated_time #=> Time
+    #   resp.domain_status_list[0].change_progress_details.initiated_by #=> String, one of "CUSTOMER", "SERVICE"
+    #   resp.domain_status_list[0].domain_processing_status #=> String, one of "Creating", "Active", "Modifying", "UpgradingEngineVersion", "UpdatingServiceSoftware", "Isolated", "Deleting"
+    #   resp.domain_status_list[0].modifying_properties #=> Array
+    #   resp.domain_status_list[0].modifying_properties[0].name #=> String
+    #   resp.domain_status_list[0].modifying_properties[0].active_value #=> String
+    #   resp.domain_status_list[0].modifying_properties[0].pending_value #=> String
+    #   resp.domain_status_list[0].modifying_properties[0].value_type #=> String, one of "PLAIN_TEXT", "STRINGIFIED_JSON"
     #
     # @overload describe_elasticsearch_domains(params = {})
     # @param [Hash] params ({})
@@ -1726,6 +2221,49 @@ module Aws::ElasticsearchService
       req.send_request(options)
     end
 
+    # Describes one or more Amazon OpenSearch Service-managed VPC endpoints.
+    #
+    # @option params [required, Array<String>] :vpc_endpoint_ids
+    #   The unique identifiers of the endpoints to get information about.
+    #
+    # @return [Types::DescribeVpcEndpointsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeVpcEndpointsResponse#vpc_endpoints #vpc_endpoints} => Array&lt;Types::VpcEndpoint&gt;
+    #   * {Types::DescribeVpcEndpointsResponse#vpc_endpoint_errors #vpc_endpoint_errors} => Array&lt;Types::VpcEndpointError&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_vpc_endpoints({
+    #     vpc_endpoint_ids: ["VpcEndpointId"], # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.vpc_endpoints #=> Array
+    #   resp.vpc_endpoints[0].vpc_endpoint_id #=> String
+    #   resp.vpc_endpoints[0].vpc_endpoint_owner #=> String
+    #   resp.vpc_endpoints[0].domain_arn #=> String
+    #   resp.vpc_endpoints[0].vpc_options.vpc_id #=> String
+    #   resp.vpc_endpoints[0].vpc_options.subnet_ids #=> Array
+    #   resp.vpc_endpoints[0].vpc_options.subnet_ids[0] #=> String
+    #   resp.vpc_endpoints[0].vpc_options.availability_zones #=> Array
+    #   resp.vpc_endpoints[0].vpc_options.availability_zones[0] #=> String
+    #   resp.vpc_endpoints[0].vpc_options.security_group_ids #=> Array
+    #   resp.vpc_endpoints[0].vpc_options.security_group_ids[0] #=> String
+    #   resp.vpc_endpoints[0].status #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "UPDATING", "UPDATE_FAILED", "DELETING", "DELETE_FAILED"
+    #   resp.vpc_endpoints[0].endpoint #=> String
+    #   resp.vpc_endpoint_errors #=> Array
+    #   resp.vpc_endpoint_errors[0].vpc_endpoint_id #=> String
+    #   resp.vpc_endpoint_errors[0].error_code #=> String, one of "ENDPOINT_NOT_FOUND", "SERVER_ERROR"
+    #   resp.vpc_endpoint_errors[0].error_message #=> String
+    #
+    # @overload describe_vpc_endpoints(params = {})
+    # @param [Hash] params ({})
+    def describe_vpc_endpoints(params = {}, options = {})
+      req = build_request(:describe_vpc_endpoints, params)
+      req.send_request(options)
+    end
+
     # Dissociates a package from the Amazon ES domain.
     #
     # @option params [required, String] :package_id
@@ -1936,14 +2474,25 @@ module Aws::ElasticsearchService
     # Returns the name of all Elasticsearch domains owned by the current
     # user's account.
     #
+    # @option params [String] :engine_type
+    #   Optional parameter to filter the output by domain engine type.
+    #   Acceptable values are 'Elasticsearch' and 'OpenSearch'.
+    #
     # @return [Types::ListDomainNamesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ListDomainNamesResponse#domain_names #domain_names} => Array&lt;Types::DomainInfo&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_domain_names({
+    #     engine_type: "OpenSearch", # accepts OpenSearch, Elasticsearch
+    #   })
     #
     # @example Response structure
     #
     #   resp.domain_names #=> Array
     #   resp.domain_names[0].domain_name #=> String
+    #   resp.domain_names[0].engine_type #=> String, one of "OpenSearch", "Elasticsearch"
     #
     # @overload list_domain_names(params = {})
     # @param [Hash] params ({})
@@ -2168,6 +2717,113 @@ module Aws::ElasticsearchService
       req.send_request(options)
     end
 
+    # Retrieves information about each principal that is allowed to access a
+    # given Amazon OpenSearch Service domain through the use of an interface
+    # VPC endpoint.
+    #
+    # @option params [required, String] :domain_name
+    #   The name of the OpenSearch Service domain to retrieve access
+    #   information for.
+    #
+    # @option params [String] :next_token
+    #   Provides an identifier to allow retrieval of paginated results.
+    #
+    # @return [Types::ListVpcEndpointAccessResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListVpcEndpointAccessResponse#authorized_principal_list #authorized_principal_list} => Array&lt;Types::AuthorizedPrincipal&gt;
+    #   * {Types::ListVpcEndpointAccessResponse#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_vpc_endpoint_access({
+    #     domain_name: "DomainName", # required
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.authorized_principal_list #=> Array
+    #   resp.authorized_principal_list[0].principal_type #=> String, one of "AWS_ACCOUNT", "AWS_SERVICE"
+    #   resp.authorized_principal_list[0].principal #=> String
+    #   resp.next_token #=> String
+    #
+    # @overload list_vpc_endpoint_access(params = {})
+    # @param [Hash] params ({})
+    def list_vpc_endpoint_access(params = {}, options = {})
+      req = build_request(:list_vpc_endpoint_access, params)
+      req.send_request(options)
+    end
+
+    # Retrieves all Amazon OpenSearch Service-managed VPC endpoints in the
+    # current account and Region.
+    #
+    # @option params [String] :next_token
+    #   Identifier to allow retrieval of paginated results.
+    #
+    # @return [Types::ListVpcEndpointsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListVpcEndpointsResponse#vpc_endpoint_summary_list #vpc_endpoint_summary_list} => Array&lt;Types::VpcEndpointSummary&gt;
+    #   * {Types::ListVpcEndpointsResponse#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_vpc_endpoints({
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.vpc_endpoint_summary_list #=> Array
+    #   resp.vpc_endpoint_summary_list[0].vpc_endpoint_id #=> String
+    #   resp.vpc_endpoint_summary_list[0].vpc_endpoint_owner #=> String
+    #   resp.vpc_endpoint_summary_list[0].domain_arn #=> String
+    #   resp.vpc_endpoint_summary_list[0].status #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "UPDATING", "UPDATE_FAILED", "DELETING", "DELETE_FAILED"
+    #   resp.next_token #=> String
+    #
+    # @overload list_vpc_endpoints(params = {})
+    # @param [Hash] params ({})
+    def list_vpc_endpoints(params = {}, options = {})
+      req = build_request(:list_vpc_endpoints, params)
+      req.send_request(options)
+    end
+
+    # Retrieves all Amazon OpenSearch Service-managed VPC endpoints
+    # associated with a particular domain.
+    #
+    # @option params [required, String] :domain_name
+    #   Name of the ElasticSearch domain whose VPC endpoints are to be listed.
+    #
+    # @option params [String] :next_token
+    #   Provides an identifier to allow retrieval of paginated results.
+    #
+    # @return [Types::ListVpcEndpointsForDomainResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListVpcEndpointsForDomainResponse#vpc_endpoint_summary_list #vpc_endpoint_summary_list} => Array&lt;Types::VpcEndpointSummary&gt;
+    #   * {Types::ListVpcEndpointsForDomainResponse#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_vpc_endpoints_for_domain({
+    #     domain_name: "DomainName", # required
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.vpc_endpoint_summary_list #=> Array
+    #   resp.vpc_endpoint_summary_list[0].vpc_endpoint_id #=> String
+    #   resp.vpc_endpoint_summary_list[0].vpc_endpoint_owner #=> String
+    #   resp.vpc_endpoint_summary_list[0].domain_arn #=> String
+    #   resp.vpc_endpoint_summary_list[0].status #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "UPDATING", "UPDATE_FAILED", "DELETING", "DELETE_FAILED"
+    #   resp.next_token #=> String
+    #
+    # @overload list_vpc_endpoints_for_domain(params = {})
+    # @param [Hash] params ({})
+    def list_vpc_endpoints_for_domain(params = {}, options = {})
+      req = build_request(:list_vpc_endpoints_for_domain, params)
+      req.send_request(options)
+    end
+
     # Allows you to purchase reserved Elasticsearch instances.
     #
     # @option params [required, String] :reserved_elasticsearch_instance_offering_id
@@ -2266,6 +2922,31 @@ module Aws::ElasticsearchService
       req.send_request(options)
     end
 
+    # Revokes access to an Amazon OpenSearch Service domain that was
+    # provided through an interface VPC endpoint.
+    #
+    # @option params [required, String] :domain_name
+    #   The name of the OpenSearch Service domain.
+    #
+    # @option params [required, String] :account
+    #   The account ID to revoke access from.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.revoke_vpc_endpoint_access({
+    #     domain_name: "DomainName", # required
+    #     account: "AWSAccount", # required
+    #   })
+    #
+    # @overload revoke_vpc_endpoint_access(params = {})
+    # @param [Hash] params ({})
+    def revoke_vpc_endpoint_access(params = {}, options = {})
+      req = build_request(:revoke_vpc_endpoint_access, params)
+      req.send_request(options)
+    end
+
     # Schedules a service software update for an Amazon ES domain.
     #
     # @option params [required, String] :domain_name
@@ -2360,9 +3041,27 @@ module Aws::ElasticsearchService
     # @option params [Types::AdvancedSecurityOptionsInput] :advanced_security_options
     #   Specifies advanced security options.
     #
+    # @option params [Types::NodeToNodeEncryptionOptions] :node_to_node_encryption_options
+    #   Specifies the NodeToNodeEncryptionOptions.
+    #
+    # @option params [Types::EncryptionAtRestOptions] :encryption_at_rest_options
+    #   Specifies the Encryption At Rest Options.
+    #
+    # @option params [Types::AutoTuneOptions] :auto_tune_options
+    #   Specifies Auto-Tune options.
+    #
+    # @option params [Boolean] :dry_run
+    #   This flag, when set to True, specifies whether the
+    #   `UpdateElasticsearchDomain` request should return the results of
+    #   validation checks without actually applying the change. This flag,
+    #   when set to True, specifies the deployment mechanism through which the
+    #   update shall be applied on the domain. This will not actually perform
+    #   the Update.
+    #
     # @return [Types::UpdateElasticsearchDomainConfigResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateElasticsearchDomainConfigResponse#domain_config #domain_config} => Types::ElasticsearchDomainConfig
+    #   * {Types::UpdateElasticsearchDomainConfigResponse#dry_run_results #dry_run_results} => Types::DryRunResults
     #
     # @example Request syntax with placeholder values
     #
@@ -2381,12 +3080,16 @@ module Aws::ElasticsearchService
     #       warm_enabled: false,
     #       warm_type: "ultrawarm1.medium.elasticsearch", # accepts ultrawarm1.medium.elasticsearch, ultrawarm1.large.elasticsearch
     #       warm_count: 1,
+    #       cold_storage_options: {
+    #         enabled: false, # required
+    #       },
     #     },
     #     ebs_options: {
     #       ebs_enabled: false,
-    #       volume_type: "standard", # accepts standard, gp2, io1
+    #       volume_type: "standard", # accepts standard, gp2, io1, gp3
     #       volume_size: 1,
     #       iops: 1,
+    #       throughput: 1,
     #     },
     #     snapshot_options: {
     #       automated_snapshot_start_hour: 1,
@@ -2413,7 +3116,7 @@ module Aws::ElasticsearchService
     #     },
     #     domain_endpoint_options: {
     #       enforce_https: false,
-    #       tls_security_policy: "Policy-Min-TLS-1-0-2019-07", # accepts Policy-Min-TLS-1-0-2019-07, Policy-Min-TLS-1-2-2019-07
+    #       tls_security_policy: "Policy-Min-TLS-1-0-2019-07", # accepts Policy-Min-TLS-1-0-2019-07, Policy-Min-TLS-1-2-2019-07, Policy-Min-TLS-1-2-PFS-2023-10
     #       custom_endpoint_enabled: false,
     #       custom_endpoint: "DomainNameFqdn",
     #       custom_endpoint_certificate_arn: "ARN",
@@ -2438,7 +3141,30 @@ module Aws::ElasticsearchService
     #         roles_key: "String",
     #         session_timeout_minutes: 1,
     #       },
+    #       anonymous_auth_enabled: false,
     #     },
+    #     node_to_node_encryption_options: {
+    #       enabled: false,
+    #     },
+    #     encryption_at_rest_options: {
+    #       enabled: false,
+    #       kms_key_id: "KmsKeyId",
+    #     },
+    #     auto_tune_options: {
+    #       desired_state: "ENABLED", # accepts ENABLED, DISABLED
+    #       rollback_on_disable: "NO_ROLLBACK", # accepts NO_ROLLBACK, DEFAULT_ROLLBACK
+    #       maintenance_schedules: [
+    #         {
+    #           start_at: Time.now,
+    #           duration: {
+    #             value: 1,
+    #             unit: "HOURS", # accepts HOURS
+    #           },
+    #           cron_expression_for_recurrence: "String",
+    #         },
+    #       ],
+    #     },
+    #     dry_run: false,
     #   })
     #
     # @example Response structure
@@ -2459,15 +3185,17 @@ module Aws::ElasticsearchService
     #   resp.domain_config.elasticsearch_cluster_config.options.warm_enabled #=> Boolean
     #   resp.domain_config.elasticsearch_cluster_config.options.warm_type #=> String, one of "ultrawarm1.medium.elasticsearch", "ultrawarm1.large.elasticsearch"
     #   resp.domain_config.elasticsearch_cluster_config.options.warm_count #=> Integer
+    #   resp.domain_config.elasticsearch_cluster_config.options.cold_storage_options.enabled #=> Boolean
     #   resp.domain_config.elasticsearch_cluster_config.status.creation_date #=> Time
     #   resp.domain_config.elasticsearch_cluster_config.status.update_date #=> Time
     #   resp.domain_config.elasticsearch_cluster_config.status.update_version #=> Integer
     #   resp.domain_config.elasticsearch_cluster_config.status.state #=> String, one of "RequiresIndexDocuments", "Processing", "Active"
     #   resp.domain_config.elasticsearch_cluster_config.status.pending_deletion #=> Boolean
     #   resp.domain_config.ebs_options.options.ebs_enabled #=> Boolean
-    #   resp.domain_config.ebs_options.options.volume_type #=> String, one of "standard", "gp2", "io1"
+    #   resp.domain_config.ebs_options.options.volume_type #=> String, one of "standard", "gp2", "io1", "gp3"
     #   resp.domain_config.ebs_options.options.volume_size #=> Integer
     #   resp.domain_config.ebs_options.options.iops #=> Integer
+    #   resp.domain_config.ebs_options.options.throughput #=> Integer
     #   resp.domain_config.ebs_options.status.creation_date #=> Time
     #   resp.domain_config.ebs_options.status.update_date #=> Time
     #   resp.domain_config.ebs_options.status.update_version #=> Integer
@@ -2535,7 +3263,7 @@ module Aws::ElasticsearchService
     #   resp.domain_config.log_publishing_options.status.state #=> String, one of "RequiresIndexDocuments", "Processing", "Active"
     #   resp.domain_config.log_publishing_options.status.pending_deletion #=> Boolean
     #   resp.domain_config.domain_endpoint_options.options.enforce_https #=> Boolean
-    #   resp.domain_config.domain_endpoint_options.options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07"
+    #   resp.domain_config.domain_endpoint_options.options.tls_security_policy #=> String, one of "Policy-Min-TLS-1-0-2019-07", "Policy-Min-TLS-1-2-2019-07", "Policy-Min-TLS-1-2-PFS-2023-10"
     #   resp.domain_config.domain_endpoint_options.options.custom_endpoint_enabled #=> Boolean
     #   resp.domain_config.domain_endpoint_options.options.custom_endpoint #=> String
     #   resp.domain_config.domain_endpoint_options.options.custom_endpoint_certificate_arn #=> String
@@ -2552,11 +3280,39 @@ module Aws::ElasticsearchService
     #   resp.domain_config.advanced_security_options.options.saml_options.subject_key #=> String
     #   resp.domain_config.advanced_security_options.options.saml_options.roles_key #=> String
     #   resp.domain_config.advanced_security_options.options.saml_options.session_timeout_minutes #=> Integer
+    #   resp.domain_config.advanced_security_options.options.anonymous_auth_disable_date #=> Time
+    #   resp.domain_config.advanced_security_options.options.anonymous_auth_enabled #=> Boolean
     #   resp.domain_config.advanced_security_options.status.creation_date #=> Time
     #   resp.domain_config.advanced_security_options.status.update_date #=> Time
     #   resp.domain_config.advanced_security_options.status.update_version #=> Integer
     #   resp.domain_config.advanced_security_options.status.state #=> String, one of "RequiresIndexDocuments", "Processing", "Active"
     #   resp.domain_config.advanced_security_options.status.pending_deletion #=> Boolean
+    #   resp.domain_config.auto_tune_options.options.desired_state #=> String, one of "ENABLED", "DISABLED"
+    #   resp.domain_config.auto_tune_options.options.rollback_on_disable #=> String, one of "NO_ROLLBACK", "DEFAULT_ROLLBACK"
+    #   resp.domain_config.auto_tune_options.options.maintenance_schedules #=> Array
+    #   resp.domain_config.auto_tune_options.options.maintenance_schedules[0].start_at #=> Time
+    #   resp.domain_config.auto_tune_options.options.maintenance_schedules[0].duration.value #=> Integer
+    #   resp.domain_config.auto_tune_options.options.maintenance_schedules[0].duration.unit #=> String, one of "HOURS"
+    #   resp.domain_config.auto_tune_options.options.maintenance_schedules[0].cron_expression_for_recurrence #=> String
+    #   resp.domain_config.auto_tune_options.status.creation_date #=> Time
+    #   resp.domain_config.auto_tune_options.status.update_date #=> Time
+    #   resp.domain_config.auto_tune_options.status.update_version #=> Integer
+    #   resp.domain_config.auto_tune_options.status.state #=> String, one of "ENABLED", "DISABLED", "ENABLE_IN_PROGRESS", "DISABLE_IN_PROGRESS", "DISABLED_AND_ROLLBACK_SCHEDULED", "DISABLED_AND_ROLLBACK_IN_PROGRESS", "DISABLED_AND_ROLLBACK_COMPLETE", "DISABLED_AND_ROLLBACK_ERROR", "ERROR"
+    #   resp.domain_config.auto_tune_options.status.error_message #=> String
+    #   resp.domain_config.auto_tune_options.status.pending_deletion #=> Boolean
+    #   resp.domain_config.change_progress_details.change_id #=> String
+    #   resp.domain_config.change_progress_details.message #=> String
+    #   resp.domain_config.change_progress_details.config_change_status #=> String, one of "Pending", "Initializing", "Validating", "ValidationFailed", "ApplyingChanges", "Completed", "PendingUserInput", "Cancelled"
+    #   resp.domain_config.change_progress_details.start_time #=> Time
+    #   resp.domain_config.change_progress_details.last_updated_time #=> Time
+    #   resp.domain_config.change_progress_details.initiated_by #=> String, one of "CUSTOMER", "SERVICE"
+    #   resp.domain_config.modifying_properties #=> Array
+    #   resp.domain_config.modifying_properties[0].name #=> String
+    #   resp.domain_config.modifying_properties[0].active_value #=> String
+    #   resp.domain_config.modifying_properties[0].pending_value #=> String
+    #   resp.domain_config.modifying_properties[0].value_type #=> String, one of "PLAIN_TEXT", "STRINGIFIED_JSON"
+    #   resp.dry_run_results.deployment_type #=> String
+    #   resp.dry_run_results.message #=> String
     #
     # @overload update_elasticsearch_domain_config(params = {})
     # @param [Hash] params ({})
@@ -2617,6 +3373,50 @@ module Aws::ElasticsearchService
       req.send_request(options)
     end
 
+    # Modifies an Amazon OpenSearch Service-managed interface VPC endpoint.
+    #
+    # @option params [required, String] :vpc_endpoint_id
+    #   Unique identifier of the VPC endpoint to be updated.
+    #
+    # @option params [required, Types::VPCOptions] :vpc_options
+    #   The security groups and/or subnets to add, remove, or modify.
+    #
+    # @return [Types::UpdateVpcEndpointResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateVpcEndpointResponse#vpc_endpoint #vpc_endpoint} => Types::VpcEndpoint
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_vpc_endpoint({
+    #     vpc_endpoint_id: "VpcEndpointId", # required
+    #     vpc_options: { # required
+    #       subnet_ids: ["String"],
+    #       security_group_ids: ["String"],
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.vpc_endpoint.vpc_endpoint_id #=> String
+    #   resp.vpc_endpoint.vpc_endpoint_owner #=> String
+    #   resp.vpc_endpoint.domain_arn #=> String
+    #   resp.vpc_endpoint.vpc_options.vpc_id #=> String
+    #   resp.vpc_endpoint.vpc_options.subnet_ids #=> Array
+    #   resp.vpc_endpoint.vpc_options.subnet_ids[0] #=> String
+    #   resp.vpc_endpoint.vpc_options.availability_zones #=> Array
+    #   resp.vpc_endpoint.vpc_options.availability_zones[0] #=> String
+    #   resp.vpc_endpoint.vpc_options.security_group_ids #=> Array
+    #   resp.vpc_endpoint.vpc_options.security_group_ids[0] #=> String
+    #   resp.vpc_endpoint.status #=> String, one of "CREATING", "CREATE_FAILED", "ACTIVE", "UPDATING", "UPDATE_FAILED", "DELETING", "DELETE_FAILED"
+    #   resp.vpc_endpoint.endpoint #=> String
+    #
+    # @overload update_vpc_endpoint(params = {})
+    # @param [Hash] params ({})
+    def update_vpc_endpoint(params = {}, options = {})
+      req = build_request(:update_vpc_endpoint, params)
+      req.send_request(options)
+    end
+
     # Allows you to either upgrade your domain or perform an Upgrade
     # eligibility check to a compatible Elasticsearch version.
     #
@@ -2639,6 +3439,7 @@ module Aws::ElasticsearchService
     #   * {Types::UpgradeElasticsearchDomainResponse#domain_name #domain_name} => String
     #   * {Types::UpgradeElasticsearchDomainResponse#target_version #target_version} => String
     #   * {Types::UpgradeElasticsearchDomainResponse#perform_check_only #perform_check_only} => Boolean
+    #   * {Types::UpgradeElasticsearchDomainResponse#change_progress_details #change_progress_details} => Types::ChangeProgressDetails
     #
     # @example Request syntax with placeholder values
     #
@@ -2653,6 +3454,12 @@ module Aws::ElasticsearchService
     #   resp.domain_name #=> String
     #   resp.target_version #=> String
     #   resp.perform_check_only #=> Boolean
+    #   resp.change_progress_details.change_id #=> String
+    #   resp.change_progress_details.message #=> String
+    #   resp.change_progress_details.config_change_status #=> String, one of "Pending", "Initializing", "Validating", "ValidationFailed", "ApplyingChanges", "Completed", "PendingUserInput", "Cancelled"
+    #   resp.change_progress_details.start_time #=> Time
+    #   resp.change_progress_details.last_updated_time #=> Time
+    #   resp.change_progress_details.initiated_by #=> String, one of "CUSTOMER", "SERVICE"
     #
     # @overload upgrade_elasticsearch_domain(params = {})
     # @param [Hash] params ({})
@@ -2667,14 +3474,19 @@ module Aws::ElasticsearchService
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::ElasticsearchService')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-elasticsearchservice'
-      context[:gem_version] = '1.46.0'
+      context[:gem_version] = '1.95.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

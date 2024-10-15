@@ -1,17 +1,21 @@
 # frozen_string_literal: true
 
+require 'json'
+
 module Aws
   module Json
-    class JSONEngine
+    module JsonEngine
+      class << self
+        def load(json)
+          JSON.parse(json)
+        rescue JSON::ParserError => e
+          raise ParseError.new(e)
+        end
 
-      def self.load(json)
-        JSON.load(json)
+        def dump(value)
+          JSON.dump(value)
+        end
       end
-
-      def self.dump(value)
-        JSON.dump(value)
-      end
-
     end
   end
 end

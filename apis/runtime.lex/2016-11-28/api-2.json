@@ -5,11 +5,13 @@
     "endpointPrefix":"runtime.lex",
     "jsonVersion":"1.1",
     "protocol":"rest-json",
+    "protocols":["rest-json"],
     "serviceFullName":"Amazon Lex Runtime Service",
     "serviceId":"Lex Runtime Service",
     "signatureVersion":"v4",
     "signingName":"lex",
-    "uid":"runtime.lex-2016-11-28"
+    "uid":"runtime.lex-2016-11-28",
+    "auth":["aws.auth#sigv4"]
   },
   "operations":{
     "DeleteSession":{
@@ -64,7 +66,8 @@
         {"shape":"BadGatewayException"},
         {"shape":"LoopDetectedException"}
       ],
-      "authtype":"v4-unsigned-body"
+      "authtype":"v4-unsigned-body",
+      "unsignedPayload":true
     },
     "PostText":{
       "name":"PostText",
@@ -569,8 +572,15 @@
         },
         "message":{
           "shape":"Text",
+          "deprecated":true,
+          "deprecatedMessage":"The message field is deprecated, use the encodedMessage field instead. The message field is available only in the de-DE, en-AU, en-GB, en-US, es-419, es-ES, es-US, fr-CA, fr-FR and it-IT locales.",
           "location":"header",
           "locationName":"x-amz-lex-message"
+        },
+        "encodedMessage":{
+          "shape":"SensitiveString",
+          "location":"header",
+          "locationName":"x-amz-lex-encoded-message"
         },
         "messageFormat":{
           "shape":"MessageFormatType",
@@ -589,8 +599,15 @@
         },
         "inputTranscript":{
           "shape":"String",
+          "deprecated":true,
+          "deprecatedMessage":"The inputTranscript field is deprecated, use the encodedInputTranscript field instead. The inputTranscript field is available only in the de-DE, en-AU, en-GB, en-US, es-419, es-ES, es-US, fr-CA, fr-FR and it-IT locales.",
           "location":"header",
           "locationName":"x-amz-lex-input-transcript"
+        },
+        "encodedInputTranscript":{
+          "shape":"SensitiveStringUnbounded",
+          "location":"header",
+          "locationName":"x-amz-lex-encoded-input-transcript"
         },
         "audioStream":{"shape":"BlobStream"},
         "botVersion":{
@@ -730,8 +747,15 @@
         },
         "message":{
           "shape":"Text",
+          "deprecated":true,
+          "deprecatedMessage":"The message field is deprecated, use the encodedMessage field instead. The message field is available only in the de-DE, en-AU, en-GB, en-US, es-419, es-ES, es-US, fr-CA, fr-FR and it-IT locales.",
           "location":"header",
           "locationName":"x-amz-lex-message"
+        },
+        "encodedMessage":{
+          "shape":"SensitiveString",
+          "location":"header",
+          "locationName":"x-amz-lex-encoded-message"
         },
         "messageFormat":{
           "shape":"MessageFormatType",
@@ -778,6 +802,16 @@
         "contentType":{"shape":"ContentType"},
         "genericAttachments":{"shape":"genericAttachmentList"}
       }
+    },
+    "SensitiveString":{
+      "type":"string",
+      "max":1366,
+      "min":1,
+      "sensitive":true
+    },
+    "SensitiveStringUnbounded":{
+      "type":"string",
+      "sensitive":true
     },
     "SentimentLabel":{"type":"string"},
     "SentimentResponse":{

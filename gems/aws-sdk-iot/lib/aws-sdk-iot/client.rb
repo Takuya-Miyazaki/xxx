@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:iot)
 
 module Aws::IoT
   # An API client for IoT.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::IoT
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::IoT::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::IoT
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::IoT
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::IoT
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::IoT
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::IoT
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::IoT
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::IoT
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::IoT::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::IoT::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -332,6 +452,13 @@ module Aws::IoT
     #
     # To check for pending certificate transfers, call ListCertificates to
     # enumerate your certificates.
+    #
+    # Requires permission to access the [AcceptCertificateTransfer][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :certificate_id
     #   The ID of the certificate. (The last part of the certificate ARN
@@ -358,8 +485,19 @@ module Aws::IoT
 
     # Adds a thing to a billing group.
     #
+    # Requires permission to access the [AddThingToBillingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :billing_group_name
     #   The name of the billing group.
+    #
+    #   <note markdown="1"> This call is asynchronous. It might take several seconds for the
+    #   detachment to propagate.
+    #
+    #    </note>
     #
     # @option params [String] :billing_group_arn
     #   The ARN of the billing group.
@@ -389,6 +527,12 @@ module Aws::IoT
     end
 
     # Adds a thing to a thing group.
+    #
+    # Requires permission to access the [AddThingToThingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :thing_group_name
     #   The name of the group to which you are adding a thing.
@@ -427,6 +571,72 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Associates the selected software bill of materials (SBOM) with a
+    # specific software package version.
+    #
+    # Requires permission to access the [AssociateSbomWithPackageVersion][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the new software package.
+    #
+    # @option params [required, String] :version_name
+    #   The name of the new package version.
+    #
+    # @option params [required, Types::Sbom] :sbom
+    #   A specific software bill of matrerials associated with a software
+    #   package version.
+    #
+    # @option params [String] :client_token
+    #   A unique case-sensitive identifier that you can provide to ensure the
+    #   idempotency of the request. Don't reuse this client token if a new
+    #   idempotent request is required.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Types::AssociateSbomWithPackageVersionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::AssociateSbomWithPackageVersionResponse#package_name #package_name} => String
+    #   * {Types::AssociateSbomWithPackageVersionResponse#version_name #version_name} => String
+    #   * {Types::AssociateSbomWithPackageVersionResponse#sbom #sbom} => Types::Sbom
+    #   * {Types::AssociateSbomWithPackageVersionResponse#sbom_validation_status #sbom_validation_status} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.associate_sbom_with_package_version({
+    #     package_name: "PackageName", # required
+    #     version_name: "VersionName", # required
+    #     sbom: { # required
+    #       s3_location: {
+    #         bucket: "S3Bucket",
+    #         key: "S3Key",
+    #         version: "S3Version",
+    #       },
+    #     },
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.package_name #=> String
+    #   resp.version_name #=> String
+    #   resp.sbom.s3_location.bucket #=> String
+    #   resp.sbom.s3_location.key #=> String
+    #   resp.sbom.s3_location.version #=> String
+    #   resp.sbom_validation_status #=> String, one of "IN_PROGRESS", "FAILED", "SUCCEEDED"
+    #
+    # @overload associate_sbom_with_package_version(params = {})
+    # @param [Hash] params ({})
+    def associate_sbom_with_package_version(params = {}, options = {})
+      req = build_request(:associate_sbom_with_package_version, params)
+      req.send_request(options)
+    end
+
     # Associates a group with a continuous job. The following criteria must
     # be met:
     #
@@ -437,6 +647,12 @@ module Aws::IoT
     #
     # * The total number of targets associated with a job must not exceed
     #   100.
+    #
+    # Requires permission to access the [AssociateTargetsWithJob][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, Array<String>] :targets
     #   A list of thing group ARNs that define the targets of the job.
@@ -451,15 +667,21 @@ module Aws::IoT
     # @option params [String] :namespace_id
     #   The namespace used to indicate that a job is a customer-managed job.
     #
-    #   When you specify a value for this parameter, AWS IoT Core sends jobs
-    #   notifications to MQTT topics that contain the value in the following
-    #   format.
+    #   When you specify a value for this parameter, Amazon Web Services IoT
+    #   Core sends jobs notifications to MQTT topics that contain the value in
+    #   the following format.
     #
     #   `$aws/things/THING_NAME/jobs/JOB_ID/notify-namespace-NAMESPACE_ID/`
     #
-    #   <note markdown="1"> The `namespaceId` feature is in public preview.
+    #   <note markdown="1"> The `namespaceId` feature is only supported by IoT Greengrass at this
+    #   time. For more information, see [Setting up IoT Greengrass core
+    #   devices.][1]
     #
     #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/greengrass/v2/developerguide/setting-up.html
     #
     # @return [Types::AssociateTargetsWithJobResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -489,13 +711,21 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Attaches a policy to the specified target.
+    # Attaches the specified policy to the specified principal (certificate
+    # or other credential).
+    #
+    # Requires permission to access the [AttachPolicy][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The name of the policy to attach.
     #
     # @option params [required, String] :target
-    #   The [identity][1] to which the policy is attached.
+    #   The [identity][1] to which the policy is attached. For example, a
+    #   thing group or a certificate.
     #
     #
     #
@@ -520,7 +750,15 @@ module Aws::IoT
     # Attaches the specified policy to the specified principal (certificate
     # or other credential).
     #
-    # **Note:** This API is deprecated. Please use AttachPolicy instead.
+    # **Note:** This action is deprecated and works as expected for backward
+    # compatibility, but we won't add enhancements. Use AttachPolicy
+    # instead.
+    #
+    # Requires permission to access the [AttachPrincipalPolicy][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The policy name.
@@ -549,6 +787,12 @@ module Aws::IoT
     # this account. Each thing group or account can have up to five security
     # profiles associated with it.
     #
+    # Requires permission to access the [AttachSecurityProfile][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :security_profile_name
     #   The security profile that is attached.
     #
@@ -573,8 +817,14 @@ module Aws::IoT
     end
 
     # Attaches the specified principal to the specified thing. A principal
-    # can be X.509 certificates, IAM users, groups, and roles, Amazon
-    # Cognito identities or federated identities.
+    # can be X.509 certificates, Amazon Cognito identities or federated
+    # identities.
+    #
+    # Requires permission to access the [AttachThingPrincipal][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_name
     #   The name of the thing.
@@ -602,6 +852,13 @@ module Aws::IoT
     # Cancels a mitigation action task that is in progress. If the task is
     # not in progress, an InvalidRequestException occurs.
     #
+    # Requires permission to access the
+    # [CancelAuditMitigationActionsTask][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :task_id
     #   The unique identifier for the task that you want to cancel.
     #
@@ -623,6 +880,12 @@ module Aws::IoT
     # Cancels an audit that is in progress. The audit can be either
     # scheduled or on demand. If the audit isn't in progress, an
     # "InvalidRequestException" occurs.
+    #
+    # Requires permission to access the [CancelAuditTask][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :task_id
     #   The ID of the audit you want to cancel. You can only cancel an audit
@@ -647,13 +910,20 @@ module Aws::IoT
     #
     # **Note** Only the transfer source account can use this operation to
     # cancel a transfer. (Transfer destinations can use
-    # RejectCertificateTransfer instead.) After transfer, AWS IoT returns
-    # the certificate to the source account in the INACTIVE state. After the
+    # RejectCertificateTransfer instead.) After transfer, IoT returns the
+    # certificate to the source account in the INACTIVE state. After the
     # destination account has accepted the transfer, the transfer cannot be
     # cancelled.
     #
     # After a certificate transfer is cancelled, the status of the
     # certificate changes from PENDING\_TRANSFER to INACTIVE.
+    #
+    # Requires permission to access the [CancelCertificateTransfer][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :certificate_id
     #   The ID of the certificate. (The last part of the certificate ARN
@@ -676,6 +946,13 @@ module Aws::IoT
 
     # Cancels a Device Defender ML Detect mitigation action.
     #
+    # Requires permission to access the
+    # [CancelDetectMitigationActionsTask][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :task_id
     #   The unique identifier of the task.
     #
@@ -695,6 +972,12 @@ module Aws::IoT
     end
 
     # Cancels a job.
+    #
+    # Requires permission to access the [CancelJob][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :job_id
     #   The unique identifier you assigned to this job when it was created.
@@ -744,6 +1027,12 @@ module Aws::IoT
     end
 
     # Cancels the execution of a job for a given thing.
+    #
+    # Requires permission to access the [CancelJobExecution][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :job_id
     #   The ID of the job to be canceled.
@@ -800,6 +1089,12 @@ module Aws::IoT
 
     # Clears the default authorizer.
     #
+    # Requires permission to access the [ClearDefaultAuthorizer][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
     # @overload clear_default_authorizer(params = {})
@@ -810,10 +1105,17 @@ module Aws::IoT
     end
 
     # Confirms a topic rule destination. When you create a rule requiring a
-    # destination, AWS IoT sends a confirmation message to the endpoint or
-    # base address you specify. The message includes a token which you pass
-    # back when calling `ConfirmTopicRuleDestination` to confirm that you
-    # own or have access to the endpoint.
+    # destination, IoT sends a confirmation message to the endpoint or base
+    # address you specify. The message includes a token which you pass back
+    # when calling `ConfirmTopicRuleDestination` to confirm that you own or
+    # have access to the endpoint.
+    #
+    # Requires permission to access the [ConfirmTopicRuleDestination][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :confirmation_token
     #   The token used to confirm ownership or access to the topic rule
@@ -836,6 +1138,12 @@ module Aws::IoT
 
     # Creates a Device Defender audit suppression.
     #
+    # Requires permission to access the [CreateAuditSuppression][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :check_name
     #   An audit check name. Checks must be enabled for your account. (Use
     #   `DescribeAccountAuditConfiguration` to see the list of all checks,
@@ -855,7 +1163,10 @@ module Aws::IoT
     #   The description of the audit suppression.
     #
     # @option params [required, String] :client_request_token
-    #   The epoch timestamp in seconds at which this suppression expires.
+    #   Each audit supression must have a unique client request token. If you
+    #   try to create a new audit suppression with the same token as one that
+    #   already exists, an exception occurs. If you omit this value, Amazon
+    #   Web Services SDKs will automatically generate a unique client request.
     #
     #   **A suitable default value is auto-generated.** You should normally
     #   not need to pass this option.**
@@ -878,6 +1189,12 @@ module Aws::IoT
     #       account: "AwsAccountId",
     #       iam_role_arn: "RoleArn",
     #       role_alias_arn: "RoleAliasArn",
+    #       issuer_certificate_identifier: {
+    #         issuer_certificate_subject: "IssuerCertificateSubject",
+    #         issuer_id: "IssuerId",
+    #         issuer_certificate_serial_number: "IssuerCertificateSerialNumber",
+    #       },
+    #       device_certificate_arn: "CertificateArn",
     #     },
     #     expiration_date: Time.now,
     #     suppress_indefinitely: false,
@@ -893,6 +1210,12 @@ module Aws::IoT
     end
 
     # Creates an authorizer.
+    #
+    # Requires permission to access the [CreateAuthorizer][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :authorizer_name
     #   The authorizer name.
@@ -926,8 +1249,17 @@ module Aws::IoT
     #    </note>
     #
     # @option params [Boolean] :signing_disabled
-    #   Specifies whether AWS IoT validates the token signature in an
+    #   Specifies whether IoT validates the token signature in an
     #   authorization request.
+    #
+    # @option params [Boolean] :enable_caching_for_http
+    #   When `true`, the result from the authorizer’s Lambda function is
+    #   cached for clients that use persistent HTTP connections. The results
+    #   are cached for the time specified by the Lambda function in
+    #   `refreshAfterInSeconds`. This value does not affect authorization of
+    #   clients that use MQTT connections.
+    #
+    #   The default value is `false`.
     #
     # @return [Types::CreateAuthorizerResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -951,6 +1283,7 @@ module Aws::IoT
     #       },
     #     ],
     #     signing_disabled: false,
+    #     enable_caching_for_http: false,
     #   })
     #
     # @example Response structure
@@ -965,7 +1298,16 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Creates a billing group.
+    # Creates a billing group. If this call is made multiple times using the
+    # same billing group name and configuration, the call will succeed. If
+    # this call is made with the same billing group name but different
+    # configuration a `ResourceAlreadyExistsException` is thrown.
+    #
+    # Requires permission to access the [CreateBillingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :billing_group_name
     #   The name you wish to give to the billing group.
@@ -1013,51 +1355,63 @@ module Aws::IoT
     # Creates an X.509 certificate using the specified certificate signing
     # request.
     #
-    # **Note:** The CSR must include a public key that is either an RSA key
-    # with a length of at least 2048 bits or an ECC key from NIST P-256 or
-    # NIST P-384 curves.
+    # Requires permission to access the [CreateCertificateFromCsr][1]
+    # action.
     #
-    # **Note:** Reusing the same certificate signing request (CSR) results
-    # in a distinct certificate.
+    # <note markdown="1"> The CSR must include a public key that is either an RSA key with a
+    # length of at least 2048 bits or an ECC key from NIST P-256, NIST
+    # P-384, or NIST P-521 curves. For supported certificates, consult [
+    # Certificate signing algorithms supported by IoT][2].
+    #
+    #  </note>
+    #
+    # <note markdown="1"> Reusing the same certificate signing request (CSR) results in a
+    # distinct certificate.
+    #
+    #  </note>
     #
     # You can create multiple certificates in a batch by creating a
-    # directory, copying multiple .csr files into that directory, and then
+    # directory, copying multiple `.csr` files into that directory, and then
     # specifying that directory on the command line. The following commands
-    # show how to create a batch of certificates given a batch of CSRs.
-    #
-    # Assuming a set of CSRs are located inside of the directory
-    # my-csr-directory:
+    # show how to create a batch of certificates given a batch of CSRs. In
+    # the following commands, we assume that a set of CSRs are located
+    # inside of the directory my-csr-directory:
     #
     # On Linux and OS X, the command is:
     #
-    # $ ls my-csr-directory/ \| xargs -I \\\{\\} aws iot
+    # `$ ls my-csr-directory/ | xargs -I \{\} aws iot
     # create-certificate-from-csr --certificate-signing-request
-    # file://my-csr-directory/\\\{\\}
+    # file://my-csr-directory/\{\}`
     #
     # This command lists all of the CSRs in my-csr-directory and pipes each
-    # CSR file name to the aws iot create-certificate-from-csr AWS CLI
-    # command to create a certificate for the corresponding CSR.
+    # CSR file name to the `aws iot create-certificate-from-csr` Amazon Web
+    # Services CLI command to create a certificate for the corresponding
+    # CSR.
     #
-    # The aws iot create-certificate-from-csr part of the command can also
-    # be run in parallel to speed up the certificate creation process:
+    # You can also run the `aws iot create-certificate-from-csr` part of the
+    # command in parallel to speed up the certificate creation process:
     #
-    # $ ls my-csr-directory/ \| xargs -P 10 -I \\\{\\} aws iot
+    # `$ ls my-csr-directory/ | xargs -P 10 -I \{\} aws iot
     # create-certificate-from-csr --certificate-signing-request
-    # file://my-csr-directory/\\\{\\}
+    # file://my-csr-directory/\{\} `
     #
     # On Windows PowerShell, the command to create certificates for all CSRs
     # in my-csr-directory is:
     #
-    # &gt; ls -Name my-csr-directory \| %\\\{aws iot
-    # create-certificate-from-csr --certificate-signing-request
-    # file://my-csr-directory/$\_\\}
+    # `> ls -Name my-csr-directory | %\{aws iot create-certificate-from-csr
+    # --certificate-signing-request file://my-csr-directory/$_\} `
     #
     # On a Windows command prompt, the command to create certificates for
     # all CSRs in my-csr-directory is:
     #
-    # &gt; forfiles /p my-csr-directory /c "cmd /c aws iot
+    # `> forfiles /p my-csr-directory /c "cmd /c aws iot
     # create-certificate-from-csr --certificate-signing-request
-    # file://@path"
+    # file://@path" `
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    # [2]: https://docs.aws.amazon.com/iot/latest/developerguide/x509-client-certs.html#x509-cert-algorithms
     #
     # @option params [required, String] :certificate_signing_request
     #   The certificate signing request (CSR).
@@ -1091,22 +1445,108 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Creates an Amazon Web Services IoT Core certificate provider. You can
+    # use Amazon Web Services IoT Core certificate provider to customize how
+    # to sign a certificate signing request (CSR) in IoT fleet provisioning.
+    # For more information, see [Customizing certificate signing using
+    # Amazon Web Services IoT Core certificate provider][1] from *Amazon Web
+    # Services IoT Core Developer Guide*.
+    #
+    # Requires permission to access the [CreateCertificateProvider][2]
+    # action.
+    #
+    # After you create a certificate provider, the behavior of [
+    # `CreateCertificateFromCsr` API for fleet provisioning][3] will change
+    # and all API calls to `CreateCertificateFromCsr` will invoke the
+    # certificate provider to create the certificates. It can take up to a
+    # few minutes for this behavior to change after a certificate provider
+    # is created.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/iot/latest/developerguide/provisioning-cert-provider.html
+    # [2]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    # [3]: https://docs.aws.amazon.com/iot/latest/developerguide/fleet-provision-api.html#create-cert-csr
+    #
+    # @option params [required, String] :certificate_provider_name
+    #   The name of the certificate provider.
+    #
+    # @option params [required, String] :lambda_function_arn
+    #   The ARN of the Lambda function that defines the authentication logic.
+    #
+    # @option params [required, Array<String>] :account_default_for_operations
+    #   A list of the operations that the certificate provider will use to
+    #   generate certificates. Valid value: `CreateCertificateFromCsr`.
+    #
+    # @option params [String] :client_token
+    #   A string that you can optionally pass in the
+    #   `CreateCertificateProvider` request to make sure the request is
+    #   idempotent.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @option params [Array<Types::Tag>] :tags
+    #   Metadata which can be used to manage the certificate provider.
+    #
+    # @return [Types::CreateCertificateProviderResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateCertificateProviderResponse#certificate_provider_name #certificate_provider_name} => String
+    #   * {Types::CreateCertificateProviderResponse#certificate_provider_arn #certificate_provider_arn} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_certificate_provider({
+    #     certificate_provider_name: "CertificateProviderName", # required
+    #     lambda_function_arn: "CertificateProviderFunctionArn", # required
+    #     account_default_for_operations: ["CreateCertificateFromCsr"], # required, accepts CreateCertificateFromCsr
+    #     client_token: "ClientToken",
+    #     tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue",
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.certificate_provider_name #=> String
+    #   resp.certificate_provider_arn #=> String
+    #
+    # @overload create_certificate_provider(params = {})
+    # @param [Hash] params ({})
+    def create_certificate_provider(params = {}, options = {})
+      req = build_request(:create_certificate_provider, params)
+      req.send_request(options)
+    end
+
     # Use this API to define a Custom Metric published by your devices to
     # Device Defender.
     #
+    # Requires permission to access the [CreateCustomMetric][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :metric_name
     #   The name of the custom metric. This will be used in the metric report
-    #   submitted from the device/thing. Shouldn't begin with `aws:`. Cannot
-    #   be updated once defined.
+    #   submitted from the device/thing. The name can't begin with `aws:`.
+    #   You can't change the name after you define it.
     #
     # @option params [String] :display_name
-    #   Field represents a friendly name in the console for the custom metric;
-    #   it doesn't have to be unique. Don't use this name as the metric
-    #   identifier in the device metric report. Can be updated once defined.
+    #   The friendly name in the console for the custom metric. This name
+    #   doesn't have to be unique. Don't use this name as the metric
+    #   identifier in the device metric report. You can update the friendly
+    #   name after you define it.
     #
     # @option params [required, String] :metric_type
-    #   The type of the custom metric. Types include `string-list`,
-    #   `ip-address-list`, `number-list`, and `number`.
+    #   The type of the custom metric.
+    #
+    #   The type `number` only takes a single metric value as an input, but
+    #   when you submit the metrics value in the DeviceMetrics report, you
+    #   must pass it as an array with a single value.
     #
     # @option params [Array<Types::Tag>] :tags
     #   Metadata that can be used to manage the custom metric.
@@ -1114,8 +1554,8 @@ module Aws::IoT
     # @option params [required, String] :client_request_token
     #   Each custom metric must have a unique client request token. If you try
     #   to create a new custom metric that already exists with a different
-    #   token, an exception occurs. If you omit this value, AWS SDKs will
-    #   automatically generate a unique client request.
+    #   token, an exception occurs. If you omit this value, Amazon Web
+    #   Services SDKs will automatically generate a unique client request.
     #
     #   **A suitable default value is auto-generated.** You should normally
     #   not need to pass this option.**
@@ -1153,10 +1593,16 @@ module Aws::IoT
     end
 
     # Create a dimension that you can use to limit the scope of a metric
-    # used in a security profile for AWS IoT Device Defender. For example,
-    # using a `TOPIC_FILTER` dimension, you can narrow down the scope of the
+    # used in a security profile for IoT Device Defender. For example, using
+    # a `TOPIC_FILTER` dimension, you can narrow down the scope of the
     # metric only to MQTT topics whose name match the pattern specified in
     # the dimension.
+    #
+    # Requires permission to access the [CreateDimension][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :name
     #   A unique identifier for the dimension. Choose something that describes
@@ -1176,8 +1622,8 @@ module Aws::IoT
     # @option params [required, String] :client_request_token
     #   Each dimension must have a unique client request token. If you try to
     #   create a new dimension with the same token as a dimension that already
-    #   exists, an exception occurs. If you omit this value, AWS SDKs will
-    #   automatically generate a unique client request.
+    #   exists, an exception occurs. If you omit this value, Amazon Web
+    #   Services SDKs will automatically generate a unique client request.
     #
     #   **A suitable default value is auto-generated.** You should normally
     #   not need to pass this option.**
@@ -1216,10 +1662,12 @@ module Aws::IoT
 
     # Creates a domain configuration.
     #
-    # <note markdown="1"> The domain configuration feature is in public preview and is subject
-    # to change.
+    # Requires permission to access the [CreateDomainConfiguration][1]
+    # action.
     #
-    #  </note>
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :domain_configuration_name
     #   The name of the domain configuration. This value must be unique to a
@@ -1229,15 +1677,15 @@ module Aws::IoT
     #   The name of the domain.
     #
     # @option params [Array<String>] :server_certificate_arns
-    #   The ARNs of the certificates that AWS IoT passes to the device during
-    #   the TLS handshake. Currently you can specify only one certificate ARN.
-    #   This value is not required for AWS-managed domains.
+    #   The ARNs of the certificates that IoT passes to the device during the
+    #   TLS handshake. Currently you can specify only one certificate ARN.
+    #   This value is not required for Amazon Web Services-managed domains.
     #
     # @option params [String] :validation_certificate_arn
     #   The certificate used to validate the server certificate and prove
     #   domain name ownership. This certificate must be signed by a public
-    #   certificate authority. This value is not required for AWS-managed
-    #   domains.
+    #   certificate authority. This value is not required for Amazon Web
+    #   Services-managed domains.
     #
     # @option params [Types::AuthorizerConfig] :authorizer_config
     #   An object that specifies the authorization service for a domain.
@@ -1245,7 +1693,8 @@ module Aws::IoT
     # @option params [String] :service_type
     #   The type of service delivered by the endpoint.
     #
-    #   <note markdown="1"> AWS IoT Core currently supports only the `DATA` service type.
+    #   <note markdown="1"> Amazon Web Services IoT Core currently supports only the `DATA`
+    #   service type.
     #
     #    </note>
     #
@@ -1262,6 +1711,84 @@ module Aws::IoT
     #   "key1=value1&amp;key2=value2..."
     #
     #    </note>
+    #
+    # @option params [Types::TlsConfig] :tls_config
+    #   An object that specifies the TLS configuration for a domain.
+    #
+    # @option params [Types::ServerCertificateConfig] :server_certificate_config
+    #   The server certificate configuration.
+    #
+    # @option params [String] :authentication_type
+    #   An enumerated string that speciﬁes the authentication type.
+    #
+    #   * `CUSTOM_AUTH_X509` - Use custom authentication and authorization
+    #     with additional details from the X.509 client certificate.
+    #
+    #   ^
+    #   ^
+    #
+    #   * `CUSTOM_AUTH` - Use custom authentication and authorization. For
+    #     more information, see [Custom authentication and authorization][1].
+    #
+    #   ^
+    #   ^
+    #
+    #   * `AWS_X509` - Use X.509 client certificates without custom
+    #     authentication and authorization. For more information, see [X.509
+    #     client certificates][2].
+    #
+    #   ^
+    #   ^
+    #
+    #   * `AWS_SIGV4` - Use Amazon Web Services Signature Version 4. For more
+    #     information, see [IAM users, groups, and roles][1].
+    #
+    #   ^
+    #   ^
+    #
+    #   * `DEFAULT` - Use a combination of port and Application Layer Protocol
+    #     Negotiation (ALPN) to specify authentication type. For more
+    #     information, see [Device communication protocols][3].
+    #
+    #   ^
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/developerguide/custom-authentication.html
+    #   [2]: https://docs.aws.amazon.com/iot/latest/developerguide/x509-client-certs.html
+    #   [3]: https://docs.aws.amazon.com/iot/latest/developerguide/protocols.html
+    #
+    # @option params [String] :application_protocol
+    #   An enumerated string that speciﬁes the application-layer protocol.
+    #
+    #   * `SECURE_MQTT` - MQTT over TLS.
+    #
+    #   ^
+    #   ^
+    #
+    #   * `MQTT_WSS` - MQTT over WebSocket.
+    #
+    #   ^
+    #   ^
+    #
+    #   * `HTTPS` - HTTP over TLS.
+    #
+    #   ^
+    #   ^
+    #
+    #   * `DEFAULT` - Use a combination of port and Application Layer Protocol
+    #     Negotiation (ALPN) to specify application\_layer protocol. For more
+    #     information, see [Device communication protocols][1].
+    #
+    #   ^
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/developerguide/protocols.html
+    #
+    # @option params [Types::ClientCertificateConfig] :client_certificate_config
+    #   An object that speciﬁes the client certificate conﬁguration for a
+    #   domain.
     #
     # @return [Types::CreateDomainConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1286,6 +1813,17 @@ module Aws::IoT
     #         value: "TagValue",
     #       },
     #     ],
+    #     tls_config: {
+    #       security_policy: "SecurityPolicy",
+    #     },
+    #     server_certificate_config: {
+    #       enable_ocsp_check: false,
+    #     },
+    #     authentication_type: "CUSTOM_AUTH_X509", # accepts CUSTOM_AUTH_X509, CUSTOM_AUTH, AWS_X509, AWS_SIGV4, DEFAULT
+    #     application_protocol: "SECURE_MQTT", # accepts SECURE_MQTT, MQTT_WSS, HTTPS, DEFAULT
+    #     client_certificate_config: {
+    #       client_certificate_callback_arn: "ClientCertificateCallbackArn",
+    #     },
     #   })
     #
     # @example Response structure
@@ -1302,6 +1840,12 @@ module Aws::IoT
 
     # Creates a dynamic thing group.
     #
+    # Requires permission to access the [CreateDynamicThingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :thing_group_name
     #   The dynamic thing group name to create.
     #
@@ -1311,7 +1855,7 @@ module Aws::IoT
     # @option params [String] :index_name
     #   The dynamic thing group index name.
     #
-    #   <note markdown="1"> Currently one index is supported: "AWS\_Things".
+    #   <note markdown="1"> Currently one index is supported: `AWS_Things`.
     #
     #    </note>
     #
@@ -1384,33 +1928,123 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Creates a fleet metric.
+    #
+    # Requires permission to access the [CreateFleetMetric][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :metric_name
+    #   The name of the fleet metric to create.
+    #
+    # @option params [required, String] :query_string
+    #   The search query string.
+    #
+    # @option params [required, Types::AggregationType] :aggregation_type
+    #   The type of the aggregation query.
+    #
+    # @option params [required, Integer] :period
+    #   The time in seconds between fleet metric emissions. Range \[60(1 min),
+    #   86400(1 day)\] and must be multiple of 60.
+    #
+    # @option params [required, String] :aggregation_field
+    #   The field to aggregate.
+    #
+    # @option params [String] :description
+    #   The fleet metric description.
+    #
+    # @option params [String] :query_version
+    #   The query version.
+    #
+    # @option params [String] :index_name
+    #   The name of the index to search.
+    #
+    # @option params [String] :unit
+    #   Used to support unit transformation such as milliseconds to seconds.
+    #   The unit must be supported by [CW metric][1]. Default to null.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDatum.html
+    #
+    # @option params [Array<Types::Tag>] :tags
+    #   Metadata, which can be used to manage the fleet metric.
+    #
+    # @return [Types::CreateFleetMetricResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateFleetMetricResponse#metric_name #metric_name} => String
+    #   * {Types::CreateFleetMetricResponse#metric_arn #metric_arn} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_fleet_metric({
+    #     metric_name: "FleetMetricName", # required
+    #     query_string: "QueryString", # required
+    #     aggregation_type: { # required
+    #       name: "Statistics", # required, accepts Statistics, Percentiles, Cardinality
+    #       values: ["AggregationTypeValue"],
+    #     },
+    #     period: 1, # required
+    #     aggregation_field: "AggregationField", # required
+    #     description: "FleetMetricDescription",
+    #     query_version: "QueryVersion",
+    #     index_name: "IndexName",
+    #     unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
+    #     tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue",
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.metric_name #=> String
+    #   resp.metric_arn #=> String
+    #
+    # @overload create_fleet_metric(params = {})
+    # @param [Hash] params ({})
+    def create_fleet_metric(params = {}, options = {})
+      req = build_request(:create_fleet_metric, params)
+      req.send_request(options)
+    end
+
     # Creates a job.
     #
+    # Requires permission to access the [CreateJob][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :job_id
-    #   A job identifier which must be unique for your AWS account. We
-    #   recommend using a UUID. Alpha-numeric characters, "-" and "\_" are
-    #   valid for use here.
+    #   A job identifier which must be unique for your Amazon Web Services
+    #   account. We recommend using a UUID. Alpha-numeric characters, "-"
+    #   and "\_" are valid for use here.
     #
     # @option params [required, Array<String>] :targets
     #   A list of things and thing groups to which the job should be sent.
     #
     # @option params [String] :document_source
-    #   An S3 link to the job document.
+    #   An S3 link, or S3 object URL, to the job document. The link is an
+    #   Amazon S3 object URL and is required if you don't specify a value for
+    #   `document`.
+    #
+    #   For example, `--document-source
+    #   https://s3.region-code.amazonaws.com/example-firmware/device-firmware.1.0`
+    #
+    #   For more information, see [Methods for accessing a bucket][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html
     #
     # @option params [String] :document
-    #   The job document.
-    #
-    #   <note markdown="1"> If the job document resides in an S3 bucket, you must use a
-    #   placeholder link when specifying the document.
-    #
-    #    The placeholder link is of the following form:
-    #
-    #    `$\{aws:iot:s3-presigned-url:https://s3.amazonaws.com/bucket/key\}`
-    #
-    #    where *bucket* is your bucket name and *key* is the object in the
-    #   bucket to which you are linking.
-    #
-    #    </note>
+    #   The job document. Required if you don't specify a value for
+    #   `documentSource`.
     #
     # @option params [String] :description
     #   A short text description of the job.
@@ -1426,11 +2060,18 @@ module Aws::IoT
     #   a thing when the thing is added to a target group, even after the job
     #   was completed by all things originally in the group.
     #
+    #   <note markdown="1"> We recommend that you use continuous jobs instead of snapshot jobs for
+    #   dynamic thing group targets. By using continuous jobs, devices that
+    #   join the group receive the job execution even after the job has been
+    #   created.
+    #
+    #    </note>
+    #
     # @option params [Types::JobExecutionsRolloutConfig] :job_executions_rollout_config
     #   Allows you to create a staged rollout of the job.
     #
     # @option params [Types::AbortConfig] :abort_config
-    #   Allows you to create criteria to abort a job.
+    #   Allows you to create the criteria to abort a job.
     #
     # @option params [Types::TimeoutConfig] :timeout_config
     #   Specifies the amount of time each device has to finish its execution
@@ -1445,15 +2086,55 @@ module Aws::IoT
     # @option params [String] :namespace_id
     #   The namespace used to indicate that a job is a customer-managed job.
     #
-    #   When you specify a value for this parameter, AWS IoT Core sends jobs
-    #   notifications to MQTT topics that contain the value in the following
-    #   format.
+    #   When you specify a value for this parameter, Amazon Web Services IoT
+    #   Core sends jobs notifications to MQTT topics that contain the value in
+    #   the following format.
     #
     #   `$aws/things/THING_NAME/jobs/JOB_ID/notify-namespace-NAMESPACE_ID/`
     #
-    #   <note markdown="1"> The `namespaceId` feature is in public preview.
+    #   <note markdown="1"> The `namespaceId` feature is only supported by IoT Greengrass at this
+    #   time. For more information, see [Setting up IoT Greengrass core
+    #   devices.][1]
     #
     #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/greengrass/v2/developerguide/setting-up.html
+    #
+    # @option params [String] :job_template_arn
+    #   The ARN of the job template used to create the job.
+    #
+    # @option params [Types::JobExecutionsRetryConfig] :job_executions_retry_config
+    #   Allows you to create the criteria to retry a job.
+    #
+    # @option params [Hash<String,String>] :document_parameters
+    #   Parameters of an Amazon Web Services managed template that you can
+    #   specify to create the job document.
+    #
+    #   <note markdown="1"> `documentParameters` can only be used when creating jobs from Amazon
+    #   Web Services managed templates. This parameter can't be used with
+    #   custom job templates or to create jobs from them.
+    #
+    #    </note>
+    #
+    # @option params [Types::SchedulingConfig] :scheduling_config
+    #   The configuration that allows you to schedule a job for a future date
+    #   and time in addition to specifying the end behavior for each job
+    #   execution.
+    #
+    # @option params [Array<String>] :destination_package_versions
+    #   The package version Amazon Resource Names (ARNs) that are installed on
+    #   the device when the job successfully completes. The package version
+    #   must be in either the Published or Deprecated state when the job
+    #   deploys. For more information, see [Package version lifecycle][1].
+    #
+    #   **Note:**The following Length Constraints relates to a single ARN. Up
+    #   to 25 package version ARNs are allowed.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/developerguide/preparing-to-use-software-package-catalog.html#package-version-lifecycle
     #
     # @return [Types::CreateJobResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1505,6 +2186,30 @@ module Aws::IoT
     #       },
     #     ],
     #     namespace_id: "NamespaceId",
+    #     job_template_arn: "JobTemplateArn",
+    #     job_executions_retry_config: {
+    #       criteria_list: [ # required
+    #         {
+    #           failure_type: "FAILED", # required, accepts FAILED, TIMED_OUT, ALL
+    #           number_of_retries: 1, # required
+    #         },
+    #       ],
+    #     },
+    #     document_parameters: {
+    #       "ParameterKey" => "ParameterValue",
+    #     },
+    #     scheduling_config: {
+    #       start_time: "StringDateTime",
+    #       end_time: "StringDateTime",
+    #       end_behavior: "STOP_ROLLOUT", # accepts STOP_ROLLOUT, CANCEL, FORCE_CANCEL
+    #       maintenance_windows: [
+    #         {
+    #           start_time: "CronExpression", # required
+    #           duration_in_minutes: 1, # required
+    #         },
+    #       ],
+    #     },
+    #     destination_package_versions: ["PackageVersionArn"],
     #   })
     #
     # @example Response structure
@@ -1520,17 +2225,172 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Creates a job template.
+    #
+    # Requires permission to access the [CreateJobTemplate][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :job_template_id
+    #   A unique identifier for the job template. We recommend using a UUID.
+    #   Alpha-numeric characters, "-", and "\_" are valid for use here.
+    #
+    # @option params [String] :job_arn
+    #   The ARN of the job to use as the basis for the job template.
+    #
+    # @option params [String] :document_source
+    #   An S3 link, or S3 object URL, to the job document. The link is an
+    #   Amazon S3 object URL and is required if you don't specify a value for
+    #   `document`.
+    #
+    #   For example, `--document-source
+    #   https://s3.region-code.amazonaws.com/example-firmware/device-firmware.1.0`
+    #
+    #   For more information, see [Methods for accessing a bucket][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html
+    #
+    # @option params [String] :document
+    #   The job document. Required if you don't specify a value for
+    #   `documentSource`.
+    #
+    # @option params [required, String] :description
+    #   A description of the job document.
+    #
+    # @option params [Types::PresignedUrlConfig] :presigned_url_config
+    #   Configuration for pre-signed S3 URLs.
+    #
+    # @option params [Types::JobExecutionsRolloutConfig] :job_executions_rollout_config
+    #   Allows you to create a staged rollout of a job.
+    #
+    # @option params [Types::AbortConfig] :abort_config
+    #   The criteria that determine when and how a job abort takes place.
+    #
+    # @option params [Types::TimeoutConfig] :timeout_config
+    #   Specifies the amount of time each device has to finish its execution
+    #   of the job. A timer is started when the job execution status is set to
+    #   `IN_PROGRESS`. If the job execution status is not set to another
+    #   terminal state before the timer expires, it will be automatically set
+    #   to `TIMED_OUT`.
+    #
+    # @option params [Array<Types::Tag>] :tags
+    #   Metadata that can be used to manage the job template.
+    #
+    # @option params [Types::JobExecutionsRetryConfig] :job_executions_retry_config
+    #   Allows you to create the criteria to retry a job.
+    #
+    # @option params [Array<Types::MaintenanceWindow>] :maintenance_windows
+    #   Allows you to configure an optional maintenance window for the rollout
+    #   of a job document to all devices in the target group for a job.
+    #
+    # @option params [Array<String>] :destination_package_versions
+    #   The package version Amazon Resource Names (ARNs) that are installed on
+    #   the device when the job successfully completes. The package version
+    #   must be in either the Published or Deprecated state when the job
+    #   deploys. For more information, see [Package version lifecycle][1].
+    #
+    #   **Note:**The following Length Constraints relates to a single ARN. Up
+    #   to 25 package version ARNs are allowed.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/developerguide/preparing-to-use-software-package-catalog.html#package-version-lifecycle
+    #
+    # @return [Types::CreateJobTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateJobTemplateResponse#job_template_arn #job_template_arn} => String
+    #   * {Types::CreateJobTemplateResponse#job_template_id #job_template_id} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_job_template({
+    #     job_template_id: "JobTemplateId", # required
+    #     job_arn: "JobArn",
+    #     document_source: "JobDocumentSource",
+    #     document: "JobDocument",
+    #     description: "JobDescription", # required
+    #     presigned_url_config: {
+    #       role_arn: "RoleArn",
+    #       expires_in_sec: 1,
+    #     },
+    #     job_executions_rollout_config: {
+    #       maximum_per_minute: 1,
+    #       exponential_rate: {
+    #         base_rate_per_minute: 1, # required
+    #         increment_factor: 1.0, # required
+    #         rate_increase_criteria: { # required
+    #           number_of_notified_things: 1,
+    #           number_of_succeeded_things: 1,
+    #         },
+    #       },
+    #     },
+    #     abort_config: {
+    #       criteria_list: [ # required
+    #         {
+    #           failure_type: "FAILED", # required, accepts FAILED, REJECTED, TIMED_OUT, ALL
+    #           action: "CANCEL", # required, accepts CANCEL
+    #           threshold_percentage: 1.0, # required
+    #           min_number_of_executed_things: 1, # required
+    #         },
+    #       ],
+    #     },
+    #     timeout_config: {
+    #       in_progress_timeout_in_minutes: 1,
+    #     },
+    #     tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue",
+    #       },
+    #     ],
+    #     job_executions_retry_config: {
+    #       criteria_list: [ # required
+    #         {
+    #           failure_type: "FAILED", # required, accepts FAILED, TIMED_OUT, ALL
+    #           number_of_retries: 1, # required
+    #         },
+    #       ],
+    #     },
+    #     maintenance_windows: [
+    #       {
+    #         start_time: "CronExpression", # required
+    #         duration_in_minutes: 1, # required
+    #       },
+    #     ],
+    #     destination_package_versions: ["PackageVersionArn"],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.job_template_arn #=> String
+    #   resp.job_template_id #=> String
+    #
+    # @overload create_job_template(params = {})
+    # @param [Hash] params ({})
+    def create_job_template(params = {}, options = {})
+      req = build_request(:create_job_template, params)
+      req.send_request(options)
+    end
+
     # Creates a 2048-bit RSA key pair and issues an X.509 certificate using
     # the issued public key. You can also call `CreateKeysAndCertificate`
     # over MQTT from a device, for more information, see [Provisioning MQTT
     # API][1].
     #
-    # **Note** This is the only time AWS IoT issues the private key for this
+    # **Note** This is the only time IoT issues the private key for this
     # certificate, so it is important to keep it in a secure location.
+    #
+    # Requires permission to access the [CreateKeysAndCertificate][2]
+    # action.
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/iot/latest/developerguide/provision-wo-cert.html#provision-mqtt-api
+    # [2]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [Boolean] :set_as_active
     #   Specifies whether the certificate is active.
@@ -1569,9 +2429,12 @@ module Aws::IoT
     # see [Mitigation actions][1]. Each mitigation action can apply only one
     # type of change.
     #
+    # Requires permission to access the [CreateMitigationAction][2] action.
+    #
     #
     #
     # [1]: https://docs.aws.amazon.com/iot/latest/developerguide/device-defender-mitigation-actions.html
+    # [2]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :action_name
     #   A friendly name for the action. Choose a friendly name that accurately
@@ -1638,7 +2501,13 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Creates an AWS IoT OTAUpdate on a target group of things or groups.
+    # Creates an IoT OTA update on a target group of things or groups.
+    #
+    # Requires permission to access the [CreateOTAUpdate][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :ota_update_id
     #   The ID of the OTA update to be created.
@@ -1683,11 +2552,13 @@ module Aws::IoT
     #   The files to be streamed by the OTA update.
     #
     # @option params [required, String] :role_arn
-    #   The IAM role that grants AWS IoT access to the Amazon S3, AWS IoT jobs
-    #   and AWS Code Signing resources to create an OTA update job.
+    #   The IAM role that grants Amazon Web Services IoT Core access to the
+    #   Amazon S3, IoT jobs and Amazon Web Services Code Signing resources to
+    #   create an OTA update job.
     #
     # @option params [Hash<String,String>] :additional_parameters
-    #   A list of additional OTA update parameters which are name-value pairs.
+    #   A list of additional OTA update parameters, which are name-value
+    #   pairs. They won't be sent to devices as a part of the Job document.
     #
     # @option params [Array<Types::Tag>] :tags
     #   Metadata which can be used to manage updates.
@@ -1802,7 +2673,7 @@ module Aws::IoT
     #   resp.aws_iot_job_id #=> String
     #   resp.ota_update_arn #=> String
     #   resp.aws_iot_job_arn #=> String
-    #   resp.ota_update_status #=> String, one of "CREATE_PENDING", "CREATE_IN_PROGRESS", "CREATE_COMPLETE", "CREATE_FAILED"
+    #   resp.ota_update_status #=> String, one of "CREATE_PENDING", "CREATE_IN_PROGRESS", "CREATE_COMPLETE", "CREATE_FAILED", "DELETE_IN_PROGRESS", "DELETE_FAILED"
     #
     # @overload create_ota_update(params = {})
     # @param [Hash] params ({})
@@ -1811,11 +2682,172 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Creates an AWS IoT policy.
+    # Creates an IoT software package that can be deployed to your fleet.
+    #
+    # Requires permission to access the [CreatePackage][1] and
+    # [GetIndexingConfiguration][1] actions.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the new software package.
+    #
+    # @option params [String] :description
+    #   A summary of the package being created. This can be used to outline
+    #   the package's contents or purpose.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Metadata that can be used to manage the package.
+    #
+    # @option params [String] :client_token
+    #   A unique case-sensitive identifier that you can provide to ensure the
+    #   idempotency of the request. Don't reuse this client token if a new
+    #   idempotent request is required.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Types::CreatePackageResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreatePackageResponse#package_name #package_name} => String
+    #   * {Types::CreatePackageResponse#package_arn #package_arn} => String
+    #   * {Types::CreatePackageResponse#description #description} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_package({
+    #     package_name: "PackageName", # required
+    #     description: "ResourceDescription",
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.package_name #=> String
+    #   resp.package_arn #=> String
+    #   resp.description #=> String
+    #
+    # @overload create_package(params = {})
+    # @param [Hash] params ({})
+    def create_package(params = {}, options = {})
+      req = build_request(:create_package, params)
+      req.send_request(options)
+    end
+
+    # Creates a new version for an existing IoT software package.
+    #
+    # Requires permission to access the [CreatePackageVersion][1] and
+    # [GetIndexingConfiguration][1] actions.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the associated software package.
+    #
+    # @option params [required, String] :version_name
+    #   The name of the new package version.
+    #
+    # @option params [String] :description
+    #   A summary of the package version being created. This can be used to
+    #   outline the package's contents or purpose.
+    #
+    # @option params [Hash<String,String>] :attributes
+    #   Metadata that can be used to define a package version’s configuration.
+    #   For example, the S3 file location, configuration options that are
+    #   being sent to the device or fleet.
+    #
+    #   The combined size of all the attributes on a package version is
+    #   limited to 3KB.
+    #
+    # @option params [Types::PackageVersionArtifact] :artifact
+    #   The various build components created during the build process such as
+    #   libraries and configuration files that make up a software package
+    #   version.
+    #
+    # @option params [String] :recipe
+    #   The inline job document associated with a software package version
+    #   used for a quick job deployment.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Metadata that can be used to manage the package version.
+    #
+    # @option params [String] :client_token
+    #   A unique case-sensitive identifier that you can provide to ensure the
+    #   idempotency of the request. Don't reuse this client token if a new
+    #   idempotent request is required.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Types::CreatePackageVersionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreatePackageVersionResponse#package_version_arn #package_version_arn} => String
+    #   * {Types::CreatePackageVersionResponse#package_name #package_name} => String
+    #   * {Types::CreatePackageVersionResponse#version_name #version_name} => String
+    #   * {Types::CreatePackageVersionResponse#description #description} => String
+    #   * {Types::CreatePackageVersionResponse#attributes #attributes} => Hash&lt;String,String&gt;
+    #   * {Types::CreatePackageVersionResponse#status #status} => String
+    #   * {Types::CreatePackageVersionResponse#error_reason #error_reason} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_package_version({
+    #     package_name: "PackageName", # required
+    #     version_name: "VersionName", # required
+    #     description: "ResourceDescription",
+    #     attributes: {
+    #       "ResourceAttributeKey" => "ResourceAttributeValue",
+    #     },
+    #     artifact: {
+    #       s3_location: {
+    #         bucket: "S3Bucket",
+    #         key: "S3Key",
+    #         version: "S3Version",
+    #       },
+    #     },
+    #     recipe: "PackageVersionRecipe",
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.package_version_arn #=> String
+    #   resp.package_name #=> String
+    #   resp.version_name #=> String
+    #   resp.description #=> String
+    #   resp.attributes #=> Hash
+    #   resp.attributes["ResourceAttributeKey"] #=> String
+    #   resp.status #=> String, one of "DRAFT", "PUBLISHED", "DEPRECATED"
+    #   resp.error_reason #=> String
+    #
+    # @overload create_package_version(params = {})
+    # @param [Hash] params ({})
+    def create_package_version(params = {}, options = {})
+      req = build_request(:create_package_version, params)
+      req.send_request(options)
+    end
+
+    # Creates an IoT policy.
     #
     # The created policy is the default version for the policy. This
     # operation creates a policy version with a version identifier of **1**
     # and sets **1** as the policy's default version.
+    #
+    # Requires permission to access the [CreatePolicy][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The policy name.
@@ -1873,9 +2905,9 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Creates a new version of the specified AWS IoT policy. To update a
-    # policy, create a new policy version. A managed policy can have up to
-    # five versions. If the policy has five versions, you must use
+    # Creates a new version of the specified IoT policy. To update a policy,
+    # create a new policy version. A managed policy can have up to five
+    # versions. If the policy has five versions, you must use
     # DeletePolicyVersion to delete an existing version before you create a
     # new one.
     #
@@ -1883,6 +2915,12 @@ module Aws::IoT
     # version. The default version is the operative version (that is, the
     # version that is in effect for the certificates to which the policy is
     # attached).
+    #
+    # Requires permission to access the [CreatePolicyVersion][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The policy name.
@@ -1928,6 +2966,12 @@ module Aws::IoT
 
     # Creates a provisioning claim.
     #
+    # Requires permission to access the [CreateProvisioningClaim][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :template_name
     #   The name of the provisioning template to use.
     #
@@ -1959,29 +3003,42 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Creates a fleet provisioning template.
+    # Creates a provisioning template.
+    #
+    # Requires permission to access the [CreateProvisioningTemplate][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :template_name
-    #   The name of the fleet provisioning template.
+    #   The name of the provisioning template.
     #
     # @option params [String] :description
-    #   The description of the fleet provisioning template.
+    #   The description of the provisioning template.
     #
     # @option params [required, String] :template_body
-    #   The JSON formatted contents of the fleet provisioning template.
+    #   The JSON formatted contents of the provisioning template.
     #
     # @option params [Boolean] :enabled
-    #   True to enable the fleet provisioning template, otherwise false.
+    #   True to enable the provisioning template, otherwise false.
     #
     # @option params [required, String] :provisioning_role_arn
-    #   The role ARN for the role associated with the fleet provisioning
-    #   template. This IoT role grants permission to provision a device.
+    #   The role ARN for the role associated with the provisioning template.
+    #   This IoT role grants permission to provision a device.
     #
     # @option params [Types::ProvisioningHook] :pre_provisioning_hook
-    #   Creates a pre-provisioning hook template.
+    #   Creates a pre-provisioning hook template. Only supports template of
+    #   type `FLEET_PROVISIONING`. For more information about provisioning
+    #   template types, see [type][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/apireference/API_CreateProvisioningTemplate.html#iot-CreateProvisioningTemplate-request-type
     #
     # @option params [Array<Types::Tag>] :tags
-    #   Metadata which can be used to manage the fleet provisioning template.
+    #   Metadata which can be used to manage the provisioning template.
     #
     #   <note markdown="1"> For URI Request parameters use format:
     #   ...key1=value1&amp;key2=value2...
@@ -1993,6 +3050,17 @@ module Aws::IoT
     #   "key1=value1&amp;key2=value2..."
     #
     #    </note>
+    #
+    # @option params [String] :type
+    #   The type you define in a provisioning template. You can create a
+    #   template with only one type. You can't change the template type after
+    #   its creation. The default value is `FLEET_PROVISIONING`. For more
+    #   information about provisioning template, see: [Provisioning
+    #   template][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/developerguide/provision-template.html
     #
     # @return [Types::CreateProvisioningTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2018,6 +3086,7 @@ module Aws::IoT
     #         value: "TagValue",
     #       },
     #     ],
+    #     type: "FLEET_PROVISIONING", # accepts FLEET_PROVISIONING, JITP
     #   })
     #
     # @example Response structure
@@ -2033,13 +3102,20 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Creates a new version of a fleet provisioning template.
+    # Creates a new version of a provisioning template.
+    #
+    # Requires permission to access the
+    # [CreateProvisioningTemplateVersion][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :template_name
-    #   The name of the fleet provisioning template.
+    #   The name of the provisioning template.
     #
     # @option params [required, String] :template_body
-    #   The JSON formatted contents of the fleet provisioning template.
+    #   The JSON formatted contents of the provisioning template.
     #
     # @option params [Boolean] :set_as_default
     #   Sets a fleet provision template version as the default version.
@@ -2075,6 +3151,20 @@ module Aws::IoT
 
     # Creates a role alias.
     #
+    # Requires permission to access the [CreateRoleAlias][1] action.
+    #
+    # The value of [ `credentialDurationSeconds` ][2] must be less than or
+    # equal to the maximum session duration of the IAM role that the role
+    # alias references. For more information, see [ Modifying a role maximum
+    # session duration (Amazon Web Services API)][3] from the Amazon Web
+    # Services Identity and Access Management User Guide.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    # [2]: https://docs.aws.amazon.com/iot/latest/apireference/API_CreateRoleAlias.html#iot-CreateRoleAlias-request-credentialDurationSeconds
+    # [3]: https://docs.aws.amazon.com/IAM/latest/UserGuide/roles-managingrole-editing-api.html#roles-modify_max-session-duration-api
+    #
     # @option params [required, String] :role_alias
     #   The role alias that points to a role ARN. This allows you to change
     #   the role without having to update the device.
@@ -2083,7 +3173,11 @@ module Aws::IoT
     #   The role ARN.
     #
     # @option params [Integer] :credential_duration_seconds
-    #   How long (in seconds) the credentials will be valid.
+    #   How long (in seconds) the credentials will be valid. The default value
+    #   is 3,600 seconds.
+    #
+    #   This value must be less than or equal to the maximum session duration
+    #   of the IAM role that the role alias references.
     #
     # @option params [Array<Types::Tag>] :tags
     #   Metadata which can be used to manage the role alias.
@@ -2131,6 +3225,12 @@ module Aws::IoT
     end
 
     # Creates a scheduled audit that is run at a specified time interval.
+    #
+    # Requires permission to access the [CreateScheduledAudit][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :frequency
     #   How often the scheduled audit takes place, either `DAILY`, `WEEKLY`,
@@ -2195,6 +3295,12 @@ module Aws::IoT
 
     # Creates a Device Defender security profile.
     #
+    # Requires permission to access the [CreateSecurityProfile][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :security_profile_name
     #   The name you are giving to the security profile.
     #
@@ -2227,6 +3333,9 @@ module Aws::IoT
     #
     # @option params [Array<Types::Tag>] :tags
     #   Metadata that can be used to manage the security profile.
+    #
+    # @option params [Types::MetricsExportConfig] :metrics_export_config
+    #   Specifies the MQTT topic and role ARN required for metric export.
     #
     # @return [Types::CreateSecurityProfileResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2267,6 +3376,7 @@ module Aws::IoT
     #           },
     #         },
     #         suppress_alerts: false,
+    #         export_metric: false,
     #       },
     #     ],
     #     alert_targets: {
@@ -2283,6 +3393,7 @@ module Aws::IoT
     #           dimension_name: "DimensionName", # required
     #           operator: "IN", # accepts IN, NOT_IN
     #         },
+    #         export_metric: false,
     #       },
     #     ],
     #     tags: [
@@ -2291,6 +3402,10 @@ module Aws::IoT
     #         value: "TagValue",
     #       },
     #     ],
+    #     metrics_export_config: {
+    #       mqtt_topic: "MqttTopic", # required
+    #       role_arn: "RoleArn", # required
+    #     },
     #   })
     #
     # @example Response structure
@@ -2310,6 +3425,12 @@ module Aws::IoT
     # MQTT messages from a source like S3. You can have one or more files
     # associated with a stream.
     #
+    # Requires permission to access the [CreateStream][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :stream_id
     #   The stream ID.
     #
@@ -2320,8 +3441,8 @@ module Aws::IoT
     #   The files to stream.
     #
     # @option params [required, String] :role_arn
-    #   An IAM role that allows the IoT service principal assumes to access
-    #   your S3 files.
+    #   An IAM role that allows the IoT service principal to access your S3
+    #   files.
     #
     # @option params [Array<Types::Tag>] :tags
     #   Metadata which can be used to manage streams.
@@ -2381,9 +3502,12 @@ module Aws::IoT
     #
     #  </note>
     #
+    # Requires permission to access the [CreateThing][2] action.
+    #
     #
     #
     # [1]: https://docs.aws.amazon.com/iot/latest/developerguide/iot-authorization.html
+    # [2]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_name
     #   The name of the thing to create.
@@ -2442,11 +3566,17 @@ module Aws::IoT
     # <note markdown="1"> This is a control plane operation. See [Authorization][1] for
     # information about authorizing control plane actions.
     #
+    #  If the `ThingGroup` that you create has the exact same attributes as
+    # an existing `ThingGroup`, you will get a 200 success response.
+    #
     #  </note>
+    #
+    # Requires permission to access the [CreateThingGroup][2] action.
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/iot/latest/developerguide/iot-authorization.html
+    # [2]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_group_name
     #   The thing group name to create.
@@ -2501,7 +3631,16 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Creates a new thing type.
+    # Creates a new thing type. If this call is made multiple times using
+    # the same thing type name and configuration, the call will succeed. If
+    # this call is made with the same thing type name but different
+    # configuration a `ResourceAlreadyExistsException` is thrown.
+    #
+    # Requires permission to access the [CreateThingType][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_type_name
     #   The name of the thing type.
@@ -2552,6 +3691,12 @@ module Aws::IoT
     # Creates a rule. Creating rules is an administrator-level action. Any
     # user who has permission to create rules will be able to access data
     # processed by the rule.
+    #
+    # Requires permission to access the [CreateTopicRule][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :rule_name
     #   The name of the rule.
@@ -2624,6 +3769,19 @@ module Aws::IoT
     #             role_arn: "AwsArn", # required
     #             topic: "TopicPattern", # required
     #             qos: 1,
+    #             headers: {
+    #               payload_format_indicator: "PayloadFormatIndicator",
+    #               content_type: "ContentType",
+    #               response_topic: "ResponseTopic",
+    #               correlation_data: "CorrelationData",
+    #               message_expiry: "MessageExpiry",
+    #               user_properties: [
+    #                 {
+    #                   key: "UserPropertyKey", # required
+    #                   value: "UserPropertyValue", # required
+    #                 },
+    #               ],
+    #             },
     #           },
     #           s3: {
     #             role_arn: "AwsArn", # required
@@ -2654,6 +3812,7 @@ module Aws::IoT
     #           cloudwatch_logs: {
     #             role_arn: "AwsArn", # required
     #             log_group_name: "LogGroupName", # required
+    #             batch_mode: false,
     #           },
     #           elasticsearch: {
     #             role_arn: "AwsArn", # required
@@ -2749,6 +3908,30 @@ module Aws::IoT
     #             client_properties: { # required
     #               "String" => "String",
     #             },
+    #             headers: [
+    #               {
+    #                 key: "KafkaHeaderKey", # required
+    #                 value: "KafkaHeaderValue", # required
+    #               },
+    #             ],
+    #           },
+    #           open_search: {
+    #             role_arn: "AwsArn", # required
+    #             endpoint: "ElasticsearchEndpoint", # required
+    #             index: "ElasticsearchIndex", # required
+    #             type: "ElasticsearchType", # required
+    #             id: "ElasticsearchId", # required
+    #           },
+    #           location: {
+    #             role_arn: "AwsArn", # required
+    #             tracker_name: "String", # required
+    #             device_id: "String", # required
+    #             timestamp: {
+    #               value: "String", # required
+    #               unit: "String",
+    #             },
+    #             latitude: "String", # required
+    #             longitude: "String", # required
     #           },
     #         },
     #       ],
@@ -2795,6 +3978,19 @@ module Aws::IoT
     #           role_arn: "AwsArn", # required
     #           topic: "TopicPattern", # required
     #           qos: 1,
+    #           headers: {
+    #             payload_format_indicator: "PayloadFormatIndicator",
+    #             content_type: "ContentType",
+    #             response_topic: "ResponseTopic",
+    #             correlation_data: "CorrelationData",
+    #             message_expiry: "MessageExpiry",
+    #             user_properties: [
+    #               {
+    #                 key: "UserPropertyKey", # required
+    #                 value: "UserPropertyValue", # required
+    #               },
+    #             ],
+    #           },
     #         },
     #         s3: {
     #           role_arn: "AwsArn", # required
@@ -2825,6 +4021,7 @@ module Aws::IoT
     #         cloudwatch_logs: {
     #           role_arn: "AwsArn", # required
     #           log_group_name: "LogGroupName", # required
+    #           batch_mode: false,
     #         },
     #         elasticsearch: {
     #           role_arn: "AwsArn", # required
@@ -2920,6 +4117,30 @@ module Aws::IoT
     #           client_properties: { # required
     #             "String" => "String",
     #           },
+    #           headers: [
+    #             {
+    #               key: "KafkaHeaderKey", # required
+    #               value: "KafkaHeaderValue", # required
+    #             },
+    #           ],
+    #         },
+    #         open_search: {
+    #           role_arn: "AwsArn", # required
+    #           endpoint: "ElasticsearchEndpoint", # required
+    #           index: "ElasticsearchIndex", # required
+    #           type: "ElasticsearchType", # required
+    #           id: "ElasticsearchId", # required
+    #         },
+    #         location: {
+    #           role_arn: "AwsArn", # required
+    #           tracker_name: "String", # required
+    #           device_id: "String", # required
+    #           timestamp: {
+    #             value: "String", # required
+    #             unit: "String",
+    #           },
+    #           latitude: "String", # required
+    #           longitude: "String", # required
     #         },
     #       },
     #     },
@@ -2935,6 +4156,13 @@ module Aws::IoT
 
     # Creates a topic rule destination. The destination must be confirmed
     # prior to use.
+    #
+    # Requires permission to access the [CreateTopicRuleDestination][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, Types::TopicRuleDestinationConfiguration] :destination_configuration
     #   The topic rule destination configuration.
@@ -2985,6 +4213,13 @@ module Aws::IoT
     # account. Any configuration data you entered is deleted and all audit
     # checks are reset to disabled.
     #
+    # Requires permission to access the [DeleteAccountAuditConfiguration][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [Boolean] :delete_scheduled_audits
     #   If true, all scheduled audits are deleted.
     #
@@ -3004,6 +4239,12 @@ module Aws::IoT
     end
 
     # Deletes a Device Defender audit suppression.
+    #
+    # Requires permission to access the [DeleteAuditSuppression][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :check_name
     #   An audit check name. Checks must be enabled for your account. (Use
@@ -3032,6 +4273,12 @@ module Aws::IoT
     #       account: "AwsAccountId",
     #       iam_role_arn: "RoleArn",
     #       role_alias_arn: "RoleAliasArn",
+    #       issuer_certificate_identifier: {
+    #         issuer_certificate_subject: "IssuerCertificateSubject",
+    #         issuer_id: "IssuerId",
+    #         issuer_certificate_serial_number: "IssuerCertificateSerialNumber",
+    #       },
+    #       device_certificate_arn: "CertificateArn",
     #     },
     #   })
     #
@@ -3043,6 +4290,12 @@ module Aws::IoT
     end
 
     # Deletes an authorizer.
+    #
+    # Requires permission to access the [DeleteAuthorizer][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :authorizer_name
     #   The name of the authorizer to delete.
@@ -3063,6 +4316,12 @@ module Aws::IoT
     end
 
     # Deletes the billing group.
+    #
+    # Requires permission to access the [DeleteBillingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :billing_group_name
     #   The name of the billing group.
@@ -3091,6 +4350,12 @@ module Aws::IoT
 
     # Deletes a registered CA certificate.
     #
+    # Requires permission to access the [DeleteCACertificate][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :certificate_id
     #   The ID of the certificate to delete. (The last part of the certificate
     #   ARN contains the certificate ID.)
@@ -3114,9 +4379,15 @@ module Aws::IoT
     #
     # A certificate cannot be deleted if it has a policy or IoT thing
     # attached to it or if its status is set to ACTIVE. To delete a
-    # certificate, first use the DetachPrincipalPolicy API to detach all
-    # policies. Next, use the UpdateCertificate API to set the certificate
-    # to the INACTIVE status.
+    # certificate, first use the DetachPolicy action to detach all policies.
+    # Next, use the UpdateCertificate action to set the certificate to the
+    # INACTIVE status.
+    #
+    # Requires permission to access the [DeleteCertificate][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :certificate_id
     #   The ID of the certificate. (The last part of the certificate ARN
@@ -3142,19 +4413,53 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Deletes a certificate provider.
+    #
+    # Requires permission to access the [DeleteCertificateProvider][1]
+    # action.
+    #
+    # If you delete the certificate provider resource, the behavior of
+    # `CreateCertificateFromCsr` will resume, and IoT will create
+    # certificates signed by IoT from a certificate signing request (CSR).
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :certificate_provider_name
+    #   The name of the certificate provider.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_certificate_provider({
+    #     certificate_provider_name: "CertificateProviderName", # required
+    #   })
+    #
+    # @overload delete_certificate_provider(params = {})
+    # @param [Hash] params ({})
+    def delete_certificate_provider(params = {}, options = {})
+      req = build_request(:delete_certificate_provider, params)
+      req.send_request(options)
+    end
+
+    # Deletes a Device Defender detect custom metric.
+    #
+    # Requires permission to access the [DeleteCustomMetric][1] action.
+    #
     # <note markdown="1"> Before you can delete a custom metric, you must first remove the
     # custom metric from all security profiles it's a part of. The security
     # profile associated with the custom metric can be found using the
-    # [ListSecurityProfiles][1] API with `metricName` set to your custom
+    # [ListSecurityProfiles][2] API with `metricName` set to your custom
     # metric name.
     #
     #  </note>
     #
-    # Deletes a Device Defender detect custom metric.
     #
     #
-    #
-    # [1]: https://docs.aws.amazon.com/iot/latest/apireference/API_ListSecurityProfiles.html
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    # [2]: https://docs.aws.amazon.com/iot/latest/apireference/API_ListSecurityProfiles.html
     #
     # @option params [required, String] :metric_name
     #   The name of the custom metric.
@@ -3174,7 +4479,14 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Removes the specified dimension from your AWS account.
+    # Removes the specified dimension from your Amazon Web Services
+    # accounts.
+    #
+    # Requires permission to access the [DeleteDimension][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :name
     #   The unique identifier for the dimension that you want to delete.
@@ -3196,10 +4508,12 @@ module Aws::IoT
 
     # Deletes the specified domain configuration.
     #
-    # <note markdown="1"> The domain configuration feature is in public preview and is subject
-    # to change.
+    # Requires permission to access the [DeleteDomainConfiguration][1]
+    # action.
     #
-    #  </note>
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :domain_configuration_name
     #   The name of the domain configuration to be deleted.
@@ -3220,6 +4534,12 @@ module Aws::IoT
     end
 
     # Deletes a dynamic thing group.
+    #
+    # Requires permission to access the [DeleteDynamicThingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_group_name
     #   The name of the dynamic thing group to delete.
@@ -3243,6 +4563,38 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Deletes the specified fleet metric. Returns successfully with no error
+    # if the deletion is successful or you specify a fleet metric that
+    # doesn't exist.
+    #
+    # Requires permission to access the [DeleteFleetMetric][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :metric_name
+    #   The name of the fleet metric to delete.
+    #
+    # @option params [Integer] :expected_version
+    #   The expected version of the fleet metric to delete.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_fleet_metric({
+    #     metric_name: "FleetMetricName", # required
+    #     expected_version: 1,
+    #   })
+    #
+    # @overload delete_fleet_metric(params = {})
+    # @param [Hash] params ({})
+    def delete_fleet_metric(params = {}, options = {})
+      req = build_request(:delete_fleet_metric, params)
+      req.send_request(options)
+    end
+
     # Deletes a job and its related job executions.
     #
     # Deleting a job may take time, depending on the number of job
@@ -3253,6 +4605,12 @@ module Aws::IoT
     #
     # Only 10 jobs may have status "DELETION\_IN\_PROGRESS" at the same
     # time, or a LimitExceededException will occur.
+    #
+    # Requires permission to access the [DeleteJob][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :job_id
     #   The ID of the job to be deleted.
@@ -3278,15 +4636,21 @@ module Aws::IoT
     # @option params [String] :namespace_id
     #   The namespace used to indicate that a job is a customer-managed job.
     #
-    #   When you specify a value for this parameter, AWS IoT Core sends jobs
-    #   notifications to MQTT topics that contain the value in the following
-    #   format.
+    #   When you specify a value for this parameter, Amazon Web Services IoT
+    #   Core sends jobs notifications to MQTT topics that contain the value in
+    #   the following format.
     #
     #   `$aws/things/THING_NAME/jobs/JOB_ID/notify-namespace-NAMESPACE_ID/`
     #
-    #   <note markdown="1"> The `namespaceId` feature is in public preview.
+    #   <note markdown="1"> The `namespaceId` feature is only supported by IoT Greengrass at this
+    #   time. For more information, see [Setting up IoT Greengrass core
+    #   devices.][1]
     #
     #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/greengrass/v2/developerguide/setting-up.html
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -3306,6 +4670,12 @@ module Aws::IoT
     end
 
     # Deletes a job execution.
+    #
+    # Requires permission to access the [DeleteJobExecution][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :job_id
     #   The ID of the job whose execution on a particular device will be
@@ -3338,15 +4708,21 @@ module Aws::IoT
     # @option params [String] :namespace_id
     #   The namespace used to indicate that a job is a customer-managed job.
     #
-    #   When you specify a value for this parameter, AWS IoT Core sends jobs
-    #   notifications to MQTT topics that contain the value in the following
-    #   format.
+    #   When you specify a value for this parameter, Amazon Web Services IoT
+    #   Core sends jobs notifications to MQTT topics that contain the value in
+    #   the following format.
     #
     #   `$aws/things/THING_NAME/jobs/JOB_ID/notify-namespace-NAMESPACE_ID/`
     #
-    #   <note markdown="1"> The `namespaceId` feature is in public preview.
+    #   <note markdown="1"> The `namespaceId` feature is only supported by IoT Greengrass at this
+    #   time. For more information, see [Setting up IoT Greengrass core
+    #   devices.][1]
     #
     #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/greengrass/v2/developerguide/setting-up.html
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -3367,7 +4743,34 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Deletes a defined mitigation action from your AWS account.
+    # Deletes the specified job template.
+    #
+    # @option params [required, String] :job_template_id
+    #   The unique identifier of the job template to delete.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_job_template({
+    #     job_template_id: "JobTemplateId", # required
+    #   })
+    #
+    # @overload delete_job_template(params = {})
+    # @param [Hash] params ({})
+    def delete_job_template(params = {}, options = {})
+      req = build_request(:delete_job_template, params)
+      req.send_request(options)
+    end
+
+    # Deletes a defined mitigation action from your Amazon Web Services
+    # accounts.
+    #
+    # Requires permission to access the [DeleteMitigationAction][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :action_name
     #   The name of the mitigation action that you want to delete.
@@ -3389,16 +4792,25 @@ module Aws::IoT
 
     # Delete an OTA update.
     #
+    # Requires permission to access the [DeleteOTAUpdate][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :ota_update_id
     #   The ID of the OTA update to delete.
     #
     # @option params [Boolean] :delete_stream
-    #   Specifies if the stream associated with an OTA update should be
-    #   deleted when the OTA update is deleted.
+    #   When true, the stream created by the OTAUpdate process is deleted when
+    #   the OTA update is deleted. Ignored if the stream specified in the
+    #   OTAUpdate is supplied by the user.
     #
     # @option params [Boolean] :force_delete_aws_job
-    #   Specifies if the AWS Job associated with the OTA update should be
-    #   deleted when the OTA update is deleted.
+    #   When true, deletes the IoT job created by the OTAUpdate process even
+    #   if it is "IN\_PROGRESS". Otherwise, if the job is not in a terminal
+    #   state ("COMPLETED" or "CANCELED") an exception will occur. The
+    #   default is false.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -3417,18 +4829,105 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Deletes a specific version from a software package.
+    #
+    # **Note:** All package versions must be deleted before deleting the
+    # software package.
+    #
+    # Requires permission to access the [DeletePackageVersion][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the target software package.
+    #
+    # @option params [String] :client_token
+    #   A unique case-sensitive identifier that you can provide to ensure the
+    #   idempotency of the request. Don't reuse this client token if a new
+    #   idempotent request is required.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_package({
+    #     package_name: "PackageName", # required
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @overload delete_package(params = {})
+    # @param [Hash] params ({})
+    def delete_package(params = {}, options = {})
+      req = build_request(:delete_package, params)
+      req.send_request(options)
+    end
+
+    # Deletes a specific version from a software package.
+    #
+    # **Note:** If a package version is designated as default, you must
+    # remove the designation from the software package using the
+    # UpdatePackage action.
+    #
+    # @option params [required, String] :package_name
+    #   The name of the associated software package.
+    #
+    # @option params [required, String] :version_name
+    #   The name of the target package version.
+    #
+    # @option params [String] :client_token
+    #   A unique case-sensitive identifier that you can provide to ensure the
+    #   idempotency of the request. Don't reuse this client token if a new
+    #   idempotent request is required.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_package_version({
+    #     package_name: "PackageName", # required
+    #     version_name: "VersionName", # required
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @overload delete_package_version(params = {})
+    # @param [Hash] params ({})
+    def delete_package_version(params = {}, options = {})
+      req = build_request(:delete_package_version, params)
+      req.send_request(options)
+    end
+
     # Deletes the specified policy.
     #
     # A policy cannot be deleted if it has non-default versions or it is
     # attached to any certificate.
     #
-    # To delete a policy, use the DeletePolicyVersion API to delete all
-    # non-default versions of the policy; use the DetachPrincipalPolicy API
-    # to detach the policy from any certificate; and then use the
-    # DeletePolicy API to delete the policy.
+    # To delete a policy, use the DeletePolicyVersion action to delete all
+    # non-default versions of the policy; use the DetachPolicy action to
+    # detach the policy from any certificate; and then use the DeletePolicy
+    # action to delete the policy.
     #
     # When a policy is deleted using DeletePolicy, its default version is
     # deleted with it.
+    #
+    # <note markdown="1"> Because of the distributed nature of Amazon Web Services, it can take
+    # up to five minutes after a policy is detached before it's ready to be
+    # deleted.
+    #
+    #  </note>
+    #
+    # Requires permission to access the [DeletePolicy][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The name of the policy to delete.
@@ -3449,10 +4948,16 @@ module Aws::IoT
     end
 
     # Deletes the specified version of the specified policy. You cannot
-    # delete the default version of a policy using this API. To delete the
-    # default version of a policy, use DeletePolicy. To find out which
+    # delete the default version of a policy using this action. To delete
+    # the default version of a policy, use DeletePolicy. To find out which
     # version of a policy is marked as the default version, use
     # ListPolicyVersions.
+    #
+    # Requires permission to access the [DeletePolicyVersion][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The name of the policy.
@@ -3476,7 +4981,14 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Deletes a fleet provisioning template.
+    # Deletes a provisioning template.
+    #
+    # Requires permission to access the [DeleteProvisioningTemplate][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :template_name
     #   The name of the fleet provision template to delete.
@@ -3496,13 +5008,20 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Deletes a fleet provisioning template version.
+    # Deletes a provisioning template version.
+    #
+    # Requires permission to access the
+    # [DeleteProvisioningTemplateVersion][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :template_name
-    #   The name of the fleet provisioning template version to delete.
+    #   The name of the provisioning template version to delete.
     #
     # @option params [required, Integer] :version_id
-    #   The fleet provisioning template version ID to delete.
+    #   The provisioning template version ID to delete.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -3522,6 +5041,12 @@ module Aws::IoT
 
     # Deletes a CA certificate registration code.
     #
+    # Requires permission to access the [DeleteRegistrationCode][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
     # @overload delete_registration_code(params = {})
@@ -3532,6 +5057,12 @@ module Aws::IoT
     end
 
     # Deletes a role alias
+    #
+    # Requires permission to access the [DeleteRoleAlias][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :role_alias
     #   The role alias to delete.
@@ -3553,6 +5084,12 @@ module Aws::IoT
 
     # Deletes a scheduled audit.
     #
+    # Requires permission to access the [DeleteScheduledAudit][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :scheduled_audit_name
     #   The name of the scheduled audit you want to delete.
     #
@@ -3572,6 +5109,12 @@ module Aws::IoT
     end
 
     # Deletes a Device Defender security profile.
+    #
+    # Requires permission to access the [DeleteSecurityProfile][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :security_profile_name
     #   The name of the security profile to be deleted.
@@ -3600,6 +5143,12 @@ module Aws::IoT
 
     # Deletes a stream.
     #
+    # Requires permission to access the [DeleteStream][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :stream_id
     #   The stream ID.
     #
@@ -3620,6 +5169,12 @@ module Aws::IoT
 
     # Deletes the specified thing. Returns successfully with no error if the
     # deletion is successful or you specify a thing that doesn't exist.
+    #
+    # Requires permission to access the [DeleteThing][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_name
     #   The name of the thing to delete.
@@ -3647,6 +5202,12 @@ module Aws::IoT
     end
 
     # Deletes a thing group.
+    #
+    # Requires permission to access the [DeleteThingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_group_name
     #   The name of the thing group to delete.
@@ -3677,6 +5238,12 @@ module Aws::IoT
     # any associated thing, and finally use DeleteThingType to delete the
     # thing type.
     #
+    # Requires permission to access the [DeleteThingType][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :thing_type_name
     #   The name of the thing type.
     #
@@ -3696,6 +5263,12 @@ module Aws::IoT
     end
 
     # Deletes the rule.
+    #
+    # Requires permission to access the [DeleteTopicRule][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :rule_name
     #   The name of the rule.
@@ -3717,6 +5290,13 @@ module Aws::IoT
 
     # Deletes a topic rule destination.
     #
+    # Requires permission to access the [DeleteTopicRuleDestination][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :arn
     #   The ARN of the topic rule destination to delete.
     #
@@ -3737,6 +5317,12 @@ module Aws::IoT
 
     # Deletes a logging level.
     #
+    # Requires permission to access the [DeleteV2LoggingLevel][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :target_type
     #   The type of resource for which you are configuring logging. Must be
     #   `THING_Group`.
@@ -3749,7 +5335,7 @@ module Aws::IoT
     # @example Request syntax with placeholder values
     #
     #   resp = client.delete_v2_logging_level({
-    #     target_type: "DEFAULT", # required, accepts DEFAULT, THING_GROUP
+    #     target_type: "DEFAULT", # required, accepts DEFAULT, THING_GROUP, CLIENT_ID, SOURCE_IP, PRINCIPAL_ID
     #     target_name: "LogTargetName", # required
     #   })
     #
@@ -3762,6 +5348,12 @@ module Aws::IoT
 
     # Deprecates a thing type. You can not associate new things with
     # deprecated thing type.
+    #
+    # Requires permission to access the [DeprecateThingType][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_type_name
     #   The name of the thing type to deprecate.
@@ -3791,6 +5383,13 @@ module Aws::IoT
     # account. Settings include how audit notifications are sent and which
     # audit checks are enabled or disabled.
     #
+    # Requires permission to access the
+    # [DescribeAccountAuditConfiguration][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @return [Types::DescribeAccountAuditConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DescribeAccountAuditConfigurationResponse#role_arn #role_arn} => String
@@ -3818,6 +5417,12 @@ module Aws::IoT
     # reason for noncompliance, the severity of the issue, and the start
     # time when the audit that returned the finding.
     #
+    # Requires permission to access the [DescribeAuditFinding][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :finding_id
     #   A unique identifier for a single audit finding. You can use this
     #   identifier to apply mitigation actions to the finding.
@@ -3840,7 +5445,7 @@ module Aws::IoT
     #   resp.finding.task_start_time #=> Time
     #   resp.finding.finding_time #=> Time
     #   resp.finding.severity #=> String, one of "CRITICAL", "HIGH", "MEDIUM", "LOW"
-    #   resp.finding.non_compliant_resource.resource_type #=> String, one of "DEVICE_CERTIFICATE", "CA_CERTIFICATE", "IOT_POLICY", "COGNITO_IDENTITY_POOL", "CLIENT_ID", "ACCOUNT_SETTINGS", "ROLE_ALIAS", "IAM_ROLE"
+    #   resp.finding.non_compliant_resource.resource_type #=> String, one of "DEVICE_CERTIFICATE", "CA_CERTIFICATE", "IOT_POLICY", "COGNITO_IDENTITY_POOL", "CLIENT_ID", "ACCOUNT_SETTINGS", "ROLE_ALIAS", "IAM_ROLE", "ISSUER_CERTIFICATE"
     #   resp.finding.non_compliant_resource.resource_identifier.device_certificate_id #=> String
     #   resp.finding.non_compliant_resource.resource_identifier.ca_certificate_id #=> String
     #   resp.finding.non_compliant_resource.resource_identifier.cognito_identity_pool_id #=> String
@@ -3850,10 +5455,14 @@ module Aws::IoT
     #   resp.finding.non_compliant_resource.resource_identifier.account #=> String
     #   resp.finding.non_compliant_resource.resource_identifier.iam_role_arn #=> String
     #   resp.finding.non_compliant_resource.resource_identifier.role_alias_arn #=> String
+    #   resp.finding.non_compliant_resource.resource_identifier.issuer_certificate_identifier.issuer_certificate_subject #=> String
+    #   resp.finding.non_compliant_resource.resource_identifier.issuer_certificate_identifier.issuer_id #=> String
+    #   resp.finding.non_compliant_resource.resource_identifier.issuer_certificate_identifier.issuer_certificate_serial_number #=> String
+    #   resp.finding.non_compliant_resource.resource_identifier.device_certificate_arn #=> String
     #   resp.finding.non_compliant_resource.additional_info #=> Hash
     #   resp.finding.non_compliant_resource.additional_info["String"] #=> String
     #   resp.finding.related_resources #=> Array
-    #   resp.finding.related_resources[0].resource_type #=> String, one of "DEVICE_CERTIFICATE", "CA_CERTIFICATE", "IOT_POLICY", "COGNITO_IDENTITY_POOL", "CLIENT_ID", "ACCOUNT_SETTINGS", "ROLE_ALIAS", "IAM_ROLE"
+    #   resp.finding.related_resources[0].resource_type #=> String, one of "DEVICE_CERTIFICATE", "CA_CERTIFICATE", "IOT_POLICY", "COGNITO_IDENTITY_POOL", "CLIENT_ID", "ACCOUNT_SETTINGS", "ROLE_ALIAS", "IAM_ROLE", "ISSUER_CERTIFICATE"
     #   resp.finding.related_resources[0].resource_identifier.device_certificate_id #=> String
     #   resp.finding.related_resources[0].resource_identifier.ca_certificate_id #=> String
     #   resp.finding.related_resources[0].resource_identifier.cognito_identity_pool_id #=> String
@@ -3863,6 +5472,10 @@ module Aws::IoT
     #   resp.finding.related_resources[0].resource_identifier.account #=> String
     #   resp.finding.related_resources[0].resource_identifier.iam_role_arn #=> String
     #   resp.finding.related_resources[0].resource_identifier.role_alias_arn #=> String
+    #   resp.finding.related_resources[0].resource_identifier.issuer_certificate_identifier.issuer_certificate_subject #=> String
+    #   resp.finding.related_resources[0].resource_identifier.issuer_certificate_identifier.issuer_id #=> String
+    #   resp.finding.related_resources[0].resource_identifier.issuer_certificate_identifier.issuer_certificate_serial_number #=> String
+    #   resp.finding.related_resources[0].resource_identifier.device_certificate_arn #=> String
     #   resp.finding.related_resources[0].additional_info #=> Hash
     #   resp.finding.related_resources[0].additional_info["String"] #=> String
     #   resp.finding.reason_for_non_compliance #=> String
@@ -3976,6 +5589,12 @@ module Aws::IoT
     #       account: "AwsAccountId",
     #       iam_role_arn: "RoleArn",
     #       role_alias_arn: "RoleAliasArn",
+    #       issuer_certificate_identifier: {
+    #         issuer_certificate_subject: "IssuerCertificateSubject",
+    #         issuer_id: "IssuerId",
+    #         issuer_certificate_serial_number: "IssuerCertificateSerialNumber",
+    #       },
+    #       device_certificate_arn: "CertificateArn",
     #     },
     #   })
     #
@@ -3991,6 +5610,10 @@ module Aws::IoT
     #   resp.resource_identifier.account #=> String
     #   resp.resource_identifier.iam_role_arn #=> String
     #   resp.resource_identifier.role_alias_arn #=> String
+    #   resp.resource_identifier.issuer_certificate_identifier.issuer_certificate_subject #=> String
+    #   resp.resource_identifier.issuer_certificate_identifier.issuer_id #=> String
+    #   resp.resource_identifier.issuer_certificate_identifier.issuer_certificate_serial_number #=> String
+    #   resp.resource_identifier.device_certificate_arn #=> String
     #   resp.expiration_date #=> Time
     #   resp.suppress_indefinitely #=> Boolean
     #   resp.description #=> String
@@ -4003,6 +5626,12 @@ module Aws::IoT
     end
 
     # Gets information about a Device Defender audit.
+    #
+    # Requires permission to access the [DescribeAuditTask][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :task_id
     #   The ID of the audit whose information you want to get.
@@ -4053,6 +5682,12 @@ module Aws::IoT
 
     # Describes an authorizer.
     #
+    # Requires permission to access the [DescribeAuthorizer][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :authorizer_name
     #   The name of the authorizer to describe.
     #
@@ -4078,6 +5713,7 @@ module Aws::IoT
     #   resp.authorizer_description.creation_date #=> Time
     #   resp.authorizer_description.last_modified_date #=> Time
     #   resp.authorizer_description.signing_disabled #=> Boolean
+    #   resp.authorizer_description.enable_caching_for_http #=> Boolean
     #
     # @overload describe_authorizer(params = {})
     # @param [Hash] params ({})
@@ -4087,6 +5723,12 @@ module Aws::IoT
     end
 
     # Returns information about a billing group.
+    #
+    # Requires permission to access the [DescribeBillingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :billing_group_name
     #   The name of the billing group.
@@ -4124,6 +5766,12 @@ module Aws::IoT
 
     # Describes a registered CA certificate.
     #
+    # Requires permission to access the [DescribeCACertificate][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :certificate_id
     #   The CA certificate identifier.
     #
@@ -4152,8 +5800,10 @@ module Aws::IoT
     #   resp.certificate_description.generation_id #=> String
     #   resp.certificate_description.validity.not_before #=> Time
     #   resp.certificate_description.validity.not_after #=> Time
+    #   resp.certificate_description.certificate_mode #=> String, one of "DEFAULT", "SNI_ONLY"
     #   resp.registration_config.template_body #=> String
     #   resp.registration_config.role_arn #=> String
+    #   resp.registration_config.template_name #=> String
     #
     # @overload describe_ca_certificate(params = {})
     # @param [Hash] params ({})
@@ -4163,6 +5813,12 @@ module Aws::IoT
     end
 
     # Gets information about the specified certificate.
+    #
+    # Requires permission to access the [DescribeCertificate][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :certificate_id
     #   The ID of the certificate. (The last part of the certificate ARN
@@ -4207,7 +5863,57 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Describes a certificate provider.
+    #
+    # Requires permission to access the [DescribeCertificateProvider][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :certificate_provider_name
+    #   The name of the certificate provider.
+    #
+    # @return [Types::DescribeCertificateProviderResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeCertificateProviderResponse#certificate_provider_name #certificate_provider_name} => String
+    #   * {Types::DescribeCertificateProviderResponse#certificate_provider_arn #certificate_provider_arn} => String
+    #   * {Types::DescribeCertificateProviderResponse#lambda_function_arn #lambda_function_arn} => String
+    #   * {Types::DescribeCertificateProviderResponse#account_default_for_operations #account_default_for_operations} => Array&lt;String&gt;
+    #   * {Types::DescribeCertificateProviderResponse#creation_date #creation_date} => Time
+    #   * {Types::DescribeCertificateProviderResponse#last_modified_date #last_modified_date} => Time
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_certificate_provider({
+    #     certificate_provider_name: "CertificateProviderName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.certificate_provider_name #=> String
+    #   resp.certificate_provider_arn #=> String
+    #   resp.lambda_function_arn #=> String
+    #   resp.account_default_for_operations #=> Array
+    #   resp.account_default_for_operations[0] #=> String, one of "CreateCertificateFromCsr"
+    #   resp.creation_date #=> Time
+    #   resp.last_modified_date #=> Time
+    #
+    # @overload describe_certificate_provider(params = {})
+    # @param [Hash] params ({})
+    def describe_certificate_provider(params = {}, options = {})
+      req = build_request(:describe_certificate_provider, params)
+      req.send_request(options)
+    end
+
     # Gets information about a Device Defender detect custom metric.
+    #
+    # Requires permission to access the [DescribeCustomMetric][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :metric_name
     #   The name of the custom metric.
@@ -4245,6 +5951,13 @@ module Aws::IoT
 
     # Describes the default authorizer.
     #
+    # Requires permission to access the [DescribeDefaultAuthorizer][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @return [Types::DescribeDefaultAuthorizerResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DescribeDefaultAuthorizerResponse#authorizer_description #authorizer_description} => Types::AuthorizerDescription
@@ -4261,6 +5974,7 @@ module Aws::IoT
     #   resp.authorizer_description.creation_date #=> Time
     #   resp.authorizer_description.last_modified_date #=> Time
     #   resp.authorizer_description.signing_disabled #=> Boolean
+    #   resp.authorizer_description.enable_caching_for_http #=> Boolean
     #
     # @overload describe_default_authorizer(params = {})
     # @param [Hash] params ({})
@@ -4270,6 +5984,13 @@ module Aws::IoT
     end
 
     # Gets information about a Device Defender ML Detect mitigation action.
+    #
+    # Requires permission to access the
+    # [DescribeDetectMitigationActionsTask][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :task_id
     #   The unique identifier of the task.
@@ -4322,8 +6043,14 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Provides details about a dimension that is defined in your AWS
-    # account.
+    # Provides details about a dimension that is defined in your Amazon Web
+    # Services accounts.
+    #
+    # Requires permission to access the [DescribeDimension][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :name
     #   The unique identifier for the dimension.
@@ -4362,10 +6089,12 @@ module Aws::IoT
 
     # Gets summary information about a domain configuration.
     #
-    # <note markdown="1"> The domain configuration feature is in public preview and is subject
-    # to change.
+    # Requires permission to access the [DescribeDomainConfiguration][1]
+    # action.
     #
-    #  </note>
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :domain_configuration_name
     #   The name of the domain configuration.
@@ -4381,6 +6110,11 @@ module Aws::IoT
     #   * {Types::DescribeDomainConfigurationResponse#service_type #service_type} => String
     #   * {Types::DescribeDomainConfigurationResponse#domain_type #domain_type} => String
     #   * {Types::DescribeDomainConfigurationResponse#last_status_change_date #last_status_change_date} => Time
+    #   * {Types::DescribeDomainConfigurationResponse#tls_config #tls_config} => Types::TlsConfig
+    #   * {Types::DescribeDomainConfigurationResponse#server_certificate_config #server_certificate_config} => Types::ServerCertificateConfig
+    #   * {Types::DescribeDomainConfigurationResponse#authentication_type #authentication_type} => String
+    #   * {Types::DescribeDomainConfigurationResponse#application_protocol #application_protocol} => String
+    #   * {Types::DescribeDomainConfigurationResponse#client_certificate_config #client_certificate_config} => Types::ClientCertificateConfig
     #
     # @example Request syntax with placeholder values
     #
@@ -4403,6 +6137,11 @@ module Aws::IoT
     #   resp.service_type #=> String, one of "DATA", "CREDENTIAL_PROVIDER", "JOBS"
     #   resp.domain_type #=> String, one of "ENDPOINT", "AWS_MANAGED", "CUSTOMER_MANAGED"
     #   resp.last_status_change_date #=> Time
+    #   resp.tls_config.security_policy #=> String
+    #   resp.server_certificate_config.enable_ocsp_check #=> Boolean
+    #   resp.authentication_type #=> String, one of "CUSTOM_AUTH_X509", "CUSTOM_AUTH", "AWS_X509", "AWS_SIGV4", "DEFAULT"
+    #   resp.application_protocol #=> String, one of "SECURE_MQTT", "MQTT_WSS", "HTTPS", "DEFAULT"
+    #   resp.client_certificate_config.client_certificate_callback_arn #=> String
     #
     # @overload describe_domain_configuration(params = {})
     # @param [Hash] params ({})
@@ -4411,7 +6150,19 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Returns a unique endpoint specific to the AWS account making the call.
+    # Returns or creates a unique endpoint specific to the Amazon Web
+    # Services account making the call.
+    #
+    # <note markdown="1"> The first time `DescribeEndpoint` is called, an endpoint is created.
+    # All subsequent calls to `DescribeEndpoint` return the same endpoint.
+    #
+    #  </note>
+    #
+    # Requires permission to access the [DescribeEndpoint][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :endpoint_type
     #   The endpoint type. Valid endpoint types include:
@@ -4426,19 +6177,20 @@ module Aws::IoT
     #   ^
     #   ^
     #
-    #   * `iot:CredentialProvider` - Returns an AWS IoT credentials provider
-    #     API endpoint.
+    #   * `iot:CredentialProvider` - Returns an IoT credentials provider API
+    #     endpoint.
     #
     #   ^
     #   ^
     #
-    #   * `iot:Jobs` - Returns an AWS IoT device management Jobs API endpoint.
+    #   * `iot:Jobs` - Returns an IoT device management Jobs API endpoint.
     #
     #   ^
     #
     #   We strongly recommend that customers use the newer `iot:Data-ATS`
     #   endpoint type to avoid issues related to the widespread distrust of
-    #   Symantec certificate authorities.
+    #   Symantec certificate authorities. ATS Signed Certificates are more
+    #   secure and are trusted by most popular browsers.
     #
     # @return [Types::DescribeEndpointResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4463,6 +6215,13 @@ module Aws::IoT
 
     # Describes event configurations.
     #
+    # Requires permission to access the [DescribeEventConfigurations][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @return [Types::DescribeEventConfigurationsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DescribeEventConfigurationsResponse#event_configurations #event_configurations} => Hash&lt;String,Types::Configuration&gt;
@@ -4483,7 +6242,71 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Gets information about the specified fleet metric.
+    #
+    # Requires permission to access the [DescribeFleetMetric][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :metric_name
+    #   The name of the fleet metric to describe.
+    #
+    # @return [Types::DescribeFleetMetricResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeFleetMetricResponse#metric_name #metric_name} => String
+    #   * {Types::DescribeFleetMetricResponse#query_string #query_string} => String
+    #   * {Types::DescribeFleetMetricResponse#aggregation_type #aggregation_type} => Types::AggregationType
+    #   * {Types::DescribeFleetMetricResponse#period #period} => Integer
+    #   * {Types::DescribeFleetMetricResponse#aggregation_field #aggregation_field} => String
+    #   * {Types::DescribeFleetMetricResponse#description #description} => String
+    #   * {Types::DescribeFleetMetricResponse#query_version #query_version} => String
+    #   * {Types::DescribeFleetMetricResponse#index_name #index_name} => String
+    #   * {Types::DescribeFleetMetricResponse#creation_date #creation_date} => Time
+    #   * {Types::DescribeFleetMetricResponse#last_modified_date #last_modified_date} => Time
+    #   * {Types::DescribeFleetMetricResponse#unit #unit} => String
+    #   * {Types::DescribeFleetMetricResponse#version #version} => Integer
+    #   * {Types::DescribeFleetMetricResponse#metric_arn #metric_arn} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_fleet_metric({
+    #     metric_name: "FleetMetricName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.metric_name #=> String
+    #   resp.query_string #=> String
+    #   resp.aggregation_type.name #=> String, one of "Statistics", "Percentiles", "Cardinality"
+    #   resp.aggregation_type.values #=> Array
+    #   resp.aggregation_type.values[0] #=> String
+    #   resp.period #=> Integer
+    #   resp.aggregation_field #=> String
+    #   resp.description #=> String
+    #   resp.query_version #=> String
+    #   resp.index_name #=> String
+    #   resp.creation_date #=> Time
+    #   resp.last_modified_date #=> Time
+    #   resp.unit #=> String, one of "Seconds", "Microseconds", "Milliseconds", "Bytes", "Kilobytes", "Megabytes", "Gigabytes", "Terabytes", "Bits", "Kilobits", "Megabits", "Gigabits", "Terabits", "Percent", "Count", "Bytes/Second", "Kilobytes/Second", "Megabytes/Second", "Gigabytes/Second", "Terabytes/Second", "Bits/Second", "Kilobits/Second", "Megabits/Second", "Gigabits/Second", "Terabits/Second", "Count/Second", "None"
+    #   resp.version #=> Integer
+    #   resp.metric_arn #=> String
+    #
+    # @overload describe_fleet_metric(params = {})
+    # @param [Hash] params ({})
+    def describe_fleet_metric(params = {}, options = {})
+      req = build_request(:describe_fleet_metric, params)
+      req.send_request(options)
+    end
+
     # Describes a search index.
+    #
+    # Requires permission to access the [DescribeIndex][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :index_name
     #   The index name.
@@ -4515,8 +6338,18 @@ module Aws::IoT
 
     # Describes a job.
     #
+    # Requires permission to access the [DescribeJob][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :job_id
     #   The unique identifier you assigned to this job when it was created.
+    #
+    # @option params [Boolean] :before_substitution
+    #   A flag that provides a view of the job document before and after the
+    #   substitution parameters have been resolved with their exact values.
     #
     # @return [Types::DescribeJobResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4527,6 +6360,7 @@ module Aws::IoT
     #
     #   resp = client.describe_job({
     #     job_id: "JobId", # required
+    #     before_substitution: false,
     #   })
     #
     # @example Response structure
@@ -4535,7 +6369,7 @@ module Aws::IoT
     #   resp.job.job_arn #=> String
     #   resp.job.job_id #=> String
     #   resp.job.target_selection #=> String, one of "CONTINUOUS", "SNAPSHOT"
-    #   resp.job.status #=> String, one of "IN_PROGRESS", "CANCELED", "COMPLETED", "DELETION_IN_PROGRESS"
+    #   resp.job.status #=> String, one of "IN_PROGRESS", "CANCELED", "COMPLETED", "DELETION_IN_PROGRESS", "SCHEDULED"
     #   resp.job.force_canceled #=> Boolean
     #   resp.job.reason_code #=> String
     #   resp.job.comment #=> String
@@ -4569,6 +6403,23 @@ module Aws::IoT
     #   resp.job.job_process_details.number_of_timed_out_things #=> Integer
     #   resp.job.timeout_config.in_progress_timeout_in_minutes #=> Integer
     #   resp.job.namespace_id #=> String
+    #   resp.job.job_template_arn #=> String
+    #   resp.job.job_executions_retry_config.criteria_list #=> Array
+    #   resp.job.job_executions_retry_config.criteria_list[0].failure_type #=> String, one of "FAILED", "TIMED_OUT", "ALL"
+    #   resp.job.job_executions_retry_config.criteria_list[0].number_of_retries #=> Integer
+    #   resp.job.document_parameters #=> Hash
+    #   resp.job.document_parameters["ParameterKey"] #=> String
+    #   resp.job.is_concurrent #=> Boolean
+    #   resp.job.scheduling_config.start_time #=> String
+    #   resp.job.scheduling_config.end_time #=> String
+    #   resp.job.scheduling_config.end_behavior #=> String, one of "STOP_ROLLOUT", "CANCEL", "FORCE_CANCEL"
+    #   resp.job.scheduling_config.maintenance_windows #=> Array
+    #   resp.job.scheduling_config.maintenance_windows[0].start_time #=> String
+    #   resp.job.scheduling_config.maintenance_windows[0].duration_in_minutes #=> Integer
+    #   resp.job.scheduled_job_rollouts #=> Array
+    #   resp.job.scheduled_job_rollouts[0].start_time #=> String
+    #   resp.job.destination_package_versions #=> Array
+    #   resp.job.destination_package_versions[0] #=> String
     #
     # @overload describe_job(params = {})
     # @param [Hash] params ({})
@@ -4578,6 +6429,12 @@ module Aws::IoT
     end
 
     # Describes a job execution.
+    #
+    # Requires permission to access the [DescribeJobExecution][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :job_id
     #   The unique identifier you assigned to this job when it was created.
@@ -4623,7 +6480,127 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Returns information about a job template.
+    #
+    # @option params [required, String] :job_template_id
+    #   The unique identifier of the job template.
+    #
+    # @return [Types::DescribeJobTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeJobTemplateResponse#job_template_arn #job_template_arn} => String
+    #   * {Types::DescribeJobTemplateResponse#job_template_id #job_template_id} => String
+    #   * {Types::DescribeJobTemplateResponse#description #description} => String
+    #   * {Types::DescribeJobTemplateResponse#document_source #document_source} => String
+    #   * {Types::DescribeJobTemplateResponse#document #document} => String
+    #   * {Types::DescribeJobTemplateResponse#created_at #created_at} => Time
+    #   * {Types::DescribeJobTemplateResponse#presigned_url_config #presigned_url_config} => Types::PresignedUrlConfig
+    #   * {Types::DescribeJobTemplateResponse#job_executions_rollout_config #job_executions_rollout_config} => Types::JobExecutionsRolloutConfig
+    #   * {Types::DescribeJobTemplateResponse#abort_config #abort_config} => Types::AbortConfig
+    #   * {Types::DescribeJobTemplateResponse#timeout_config #timeout_config} => Types::TimeoutConfig
+    #   * {Types::DescribeJobTemplateResponse#job_executions_retry_config #job_executions_retry_config} => Types::JobExecutionsRetryConfig
+    #   * {Types::DescribeJobTemplateResponse#maintenance_windows #maintenance_windows} => Array&lt;Types::MaintenanceWindow&gt;
+    #   * {Types::DescribeJobTemplateResponse#destination_package_versions #destination_package_versions} => Array&lt;String&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_job_template({
+    #     job_template_id: "JobTemplateId", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.job_template_arn #=> String
+    #   resp.job_template_id #=> String
+    #   resp.description #=> String
+    #   resp.document_source #=> String
+    #   resp.document #=> String
+    #   resp.created_at #=> Time
+    #   resp.presigned_url_config.role_arn #=> String
+    #   resp.presigned_url_config.expires_in_sec #=> Integer
+    #   resp.job_executions_rollout_config.maximum_per_minute #=> Integer
+    #   resp.job_executions_rollout_config.exponential_rate.base_rate_per_minute #=> Integer
+    #   resp.job_executions_rollout_config.exponential_rate.increment_factor #=> Float
+    #   resp.job_executions_rollout_config.exponential_rate.rate_increase_criteria.number_of_notified_things #=> Integer
+    #   resp.job_executions_rollout_config.exponential_rate.rate_increase_criteria.number_of_succeeded_things #=> Integer
+    #   resp.abort_config.criteria_list #=> Array
+    #   resp.abort_config.criteria_list[0].failure_type #=> String, one of "FAILED", "REJECTED", "TIMED_OUT", "ALL"
+    #   resp.abort_config.criteria_list[0].action #=> String, one of "CANCEL"
+    #   resp.abort_config.criteria_list[0].threshold_percentage #=> Float
+    #   resp.abort_config.criteria_list[0].min_number_of_executed_things #=> Integer
+    #   resp.timeout_config.in_progress_timeout_in_minutes #=> Integer
+    #   resp.job_executions_retry_config.criteria_list #=> Array
+    #   resp.job_executions_retry_config.criteria_list[0].failure_type #=> String, one of "FAILED", "TIMED_OUT", "ALL"
+    #   resp.job_executions_retry_config.criteria_list[0].number_of_retries #=> Integer
+    #   resp.maintenance_windows #=> Array
+    #   resp.maintenance_windows[0].start_time #=> String
+    #   resp.maintenance_windows[0].duration_in_minutes #=> Integer
+    #   resp.destination_package_versions #=> Array
+    #   resp.destination_package_versions[0] #=> String
+    #
+    # @overload describe_job_template(params = {})
+    # @param [Hash] params ({})
+    def describe_job_template(params = {}, options = {})
+      req = build_request(:describe_job_template, params)
+      req.send_request(options)
+    end
+
+    # View details of a managed job template.
+    #
+    # @option params [required, String] :template_name
+    #   The unique name of a managed job template, which is required.
+    #
+    # @option params [String] :template_version
+    #   An optional parameter to specify version of a managed template. If not
+    #   specified, the pre-defined default version is returned.
+    #
+    # @return [Types::DescribeManagedJobTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeManagedJobTemplateResponse#template_name #template_name} => String
+    #   * {Types::DescribeManagedJobTemplateResponse#template_arn #template_arn} => String
+    #   * {Types::DescribeManagedJobTemplateResponse#description #description} => String
+    #   * {Types::DescribeManagedJobTemplateResponse#template_version #template_version} => String
+    #   * {Types::DescribeManagedJobTemplateResponse#environments #environments} => Array&lt;String&gt;
+    #   * {Types::DescribeManagedJobTemplateResponse#document_parameters #document_parameters} => Array&lt;Types::DocumentParameter&gt;
+    #   * {Types::DescribeManagedJobTemplateResponse#document #document} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_managed_job_template({
+    #     template_name: "ManagedJobTemplateName", # required
+    #     template_version: "ManagedTemplateVersion",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.template_name #=> String
+    #   resp.template_arn #=> String
+    #   resp.description #=> String
+    #   resp.template_version #=> String
+    #   resp.environments #=> Array
+    #   resp.environments[0] #=> String
+    #   resp.document_parameters #=> Array
+    #   resp.document_parameters[0].key #=> String
+    #   resp.document_parameters[0].description #=> String
+    #   resp.document_parameters[0].regex #=> String
+    #   resp.document_parameters[0].example #=> String
+    #   resp.document_parameters[0].optional #=> Boolean
+    #   resp.document #=> String
+    #
+    # @overload describe_managed_job_template(params = {})
+    # @param [Hash] params ({})
+    def describe_managed_job_template(params = {}, options = {})
+      req = build_request(:describe_managed_job_template, params)
+      req.send_request(options)
+    end
+
     # Gets information about a mitigation action.
+    #
+    # Requires permission to access the [DescribeMitigationAction][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :action_name
     #   The friendly name that uniquely identifies the mitigation action.
@@ -4671,10 +6648,17 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Returns information about a fleet provisioning template.
+    # Returns information about a provisioning template.
+    #
+    # Requires permission to access the [DescribeProvisioningTemplate][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :template_name
-    #   The name of the fleet provisioning template.
+    #   The name of the provisioning template.
     #
     # @return [Types::DescribeProvisioningTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4688,6 +6672,7 @@ module Aws::IoT
     #   * {Types::DescribeProvisioningTemplateResponse#enabled #enabled} => Boolean
     #   * {Types::DescribeProvisioningTemplateResponse#provisioning_role_arn #provisioning_role_arn} => String
     #   * {Types::DescribeProvisioningTemplateResponse#pre_provisioning_hook #pre_provisioning_hook} => Types::ProvisioningHook
+    #   * {Types::DescribeProvisioningTemplateResponse#type #type} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -4708,6 +6693,7 @@ module Aws::IoT
     #   resp.provisioning_role_arn #=> String
     #   resp.pre_provisioning_hook.payload_version #=> String
     #   resp.pre_provisioning_hook.target_arn #=> String
+    #   resp.type #=> String, one of "FLEET_PROVISIONING", "JITP"
     #
     # @overload describe_provisioning_template(params = {})
     # @param [Hash] params ({})
@@ -4716,13 +6702,20 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Returns information about a fleet provisioning template version.
+    # Returns information about a provisioning template version.
+    #
+    # Requires permission to access the
+    # [DescribeProvisioningTemplateVersion][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :template_name
     #   The template name.
     #
     # @option params [required, Integer] :version_id
-    #   The fleet provisioning template version ID.
+    #   The provisioning template version ID.
     #
     # @return [Types::DescribeProvisioningTemplateVersionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -4753,6 +6746,12 @@ module Aws::IoT
     end
 
     # Describes a role alias.
+    #
+    # Requires permission to access the [DescribeRoleAlias][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :role_alias
     #   The role alias to describe.
@@ -4785,6 +6784,12 @@ module Aws::IoT
     end
 
     # Gets information about a scheduled audit.
+    #
+    # Requires permission to access the [DescribeScheduledAudit][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :scheduled_audit_name
     #   The name of the scheduled audit whose information you want to get.
@@ -4823,6 +6828,12 @@ module Aws::IoT
 
     # Gets information about a Device Defender security profile.
     #
+    # Requires permission to access the [DescribeSecurityProfile][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :security_profile_name
     #   The name of the security profile whose information you want to get.
     #
@@ -4838,6 +6849,7 @@ module Aws::IoT
     #   * {Types::DescribeSecurityProfileResponse#version #version} => Integer
     #   * {Types::DescribeSecurityProfileResponse#creation_date #creation_date} => Time
     #   * {Types::DescribeSecurityProfileResponse#last_modified_date #last_modified_date} => Time
+    #   * {Types::DescribeSecurityProfileResponse#metrics_export_config #metrics_export_config} => Types::MetricsExportConfig
     #
     # @example Request syntax with placeholder values
     #
@@ -4872,6 +6884,7 @@ module Aws::IoT
     #   resp.behaviors[0].criteria.statistical_threshold.statistic #=> String
     #   resp.behaviors[0].criteria.ml_detection_config.confidence_level #=> String, one of "LOW", "MEDIUM", "HIGH"
     #   resp.behaviors[0].suppress_alerts #=> Boolean
+    #   resp.behaviors[0].export_metric #=> Boolean
     #   resp.alert_targets #=> Hash
     #   resp.alert_targets["AlertTargetType"].alert_target_arn #=> String
     #   resp.alert_targets["AlertTargetType"].role_arn #=> String
@@ -4881,9 +6894,12 @@ module Aws::IoT
     #   resp.additional_metrics_to_retain_v2[0].metric #=> String
     #   resp.additional_metrics_to_retain_v2[0].metric_dimension.dimension_name #=> String
     #   resp.additional_metrics_to_retain_v2[0].metric_dimension.operator #=> String, one of "IN", "NOT_IN"
+    #   resp.additional_metrics_to_retain_v2[0].export_metric #=> Boolean
     #   resp.version #=> Integer
     #   resp.creation_date #=> Time
     #   resp.last_modified_date #=> Time
+    #   resp.metrics_export_config.mqtt_topic #=> String
+    #   resp.metrics_export_config.role_arn #=> String
     #
     # @overload describe_security_profile(params = {})
     # @param [Hash] params ({})
@@ -4893,6 +6909,12 @@ module Aws::IoT
     end
 
     # Gets information about a stream.
+    #
+    # Requires permission to access the [DescribeStream][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :stream_id
     #   The stream ID.
@@ -4930,6 +6952,12 @@ module Aws::IoT
     end
 
     # Gets information about the specified thing.
+    #
+    # Requires permission to access the [DescribeThing][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_name
     #   The name of the thing.
@@ -4971,6 +6999,12 @@ module Aws::IoT
     end
 
     # Describe a thing group.
+    #
+    # Requires permission to access the [DescribeThingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_group_name
     #   The name of the thing group.
@@ -5023,6 +7057,13 @@ module Aws::IoT
 
     # Describes a bulk thing provisioning task.
     #
+    # Requires permission to access the [DescribeThingRegistrationTask][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :task_id
     #   The task ID.
     #
@@ -5071,6 +7112,12 @@ module Aws::IoT
 
     # Gets information about the specified thing type.
     #
+    # Requires permission to access the [DescribeThingType][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :thing_type_name
     #   The name of the thing type.
     #
@@ -5109,6 +7156,18 @@ module Aws::IoT
 
     # Detaches a policy from the specified target.
     #
+    # <note markdown="1"> Because of the distributed nature of Amazon Web Services, it can take
+    # up to five minutes after a policy is detached before it's ready to be
+    # deleted.
+    #
+    #  </note>
+    #
+    # Requires permission to access the [DetachPolicy][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :policy_name
     #   The policy to detach.
     #
@@ -5133,7 +7192,15 @@ module Aws::IoT
 
     # Removes the specified policy from the specified certificate.
     #
-    # **Note:** This API is deprecated. Please use DetachPolicy instead.
+    # **Note:** This action is deprecated and works as expected for backward
+    # compatibility, but we won't add enhancements. Use DetachPolicy
+    # instead.
+    #
+    # Requires permission to access the [DetachPrincipalPolicy][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The name of the policy to detach.
@@ -5142,10 +7209,9 @@ module Aws::IoT
     #   The principal.
     #
     #   Valid principals are CertificateArn
-    #   (arn:aws:iot:*region*\:*accountId*\:cert/*certificateId*),
-    #   thingGroupArn
-    #   (arn:aws:iot:*region*\:*accountId*\:thinggroup/*groupName*) and
-    #   CognitoId (*region*\:*id*).
+    #   (arn:aws:iot:*region*:*accountId*:cert/*certificateId*), thingGroupArn
+    #   (arn:aws:iot:*region*:*accountId*:thinggroup/*groupName*) and
+    #   CognitoId (*region*:*id*).
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -5165,6 +7231,12 @@ module Aws::IoT
 
     # Disassociates a Device Defender security profile from a thing group or
     # from this account.
+    #
+    # Requires permission to access the [DetachSecurityProfile][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :security_profile_name
     #   The security profile that is detached.
@@ -5198,6 +7270,12 @@ module Aws::IoT
     #
     #  </note>
     #
+    # Requires permission to access the [DetachThingPrincipal][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :thing_name
     #   The name of the thing.
     #
@@ -5224,6 +7302,12 @@ module Aws::IoT
 
     # Disables the rule.
     #
+    # Requires permission to access the [DisableTopicRule][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :rule_name
     #   The name of the rule to disable.
     #
@@ -5242,7 +7326,54 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Disassociates the selected software bill of materials (SBOM) from a
+    # specific software package version.
+    #
+    # Requires permission to access the
+    # [DisassociateSbomWithPackageVersion][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the new software package.
+    #
+    # @option params [required, String] :version_name
+    #   The name of the new package version.
+    #
+    # @option params [String] :client_token
+    #   A unique case-sensitive identifier that you can provide to ensure the
+    #   idempotency of the request. Don't reuse this client token if a new
+    #   idempotent request is required.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.disassociate_sbom_from_package_version({
+    #     package_name: "PackageName", # required
+    #     version_name: "VersionName", # required
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @overload disassociate_sbom_from_package_version(params = {})
+    # @param [Hash] params ({})
+    def disassociate_sbom_from_package_version(params = {}, options = {})
+      req = build_request(:disassociate_sbom_from_package_version, params)
+      req.send_request(options)
+    end
+
     # Enables the rule.
+    #
+    # Requires permission to access the [EnableTopicRule][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :rule_name
     #   The name of the topic rule to enable.
@@ -5265,12 +7396,19 @@ module Aws::IoT
     # Returns a Device Defender's ML Detect Security Profile training
     # model's status.
     #
+    # Requires permission to access the
+    # [GetBehaviorModelTrainingSummaries][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :security_profile_name
     #   The name of the security profile.
     #
     # @option params [Integer] :max_results
     #   The maximum number of results to return at one time. The default is
-    #   25.
+    #   10.
     #
     # @option params [String] :next_token
     #   The token for the next set of results.
@@ -5308,13 +7446,77 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Returns the approximate count of unique values that match the query.
+    # Aggregates on indexed data with search queries pertaining to
+    # particular fields.
+    #
+    # Requires permission to access the [GetBucketsAggregation][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :index_name
     #   The name of the index to search.
     #
     # @option params [required, String] :query_string
-    #   The search query.
+    #   The search query string.
+    #
+    # @option params [required, String] :aggregation_field
+    #   The aggregation field.
+    #
+    # @option params [String] :query_version
+    #   The version of the query.
+    #
+    # @option params [required, Types::BucketsAggregationType] :buckets_aggregation_type
+    #   The basic control of the response shape and the bucket aggregation
+    #   type to perform.
+    #
+    # @return [Types::GetBucketsAggregationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetBucketsAggregationResponse#total_count #total_count} => Integer
+    #   * {Types::GetBucketsAggregationResponse#buckets #buckets} => Array&lt;Types::Bucket&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_buckets_aggregation({
+    #     index_name: "IndexName",
+    #     query_string: "QueryString", # required
+    #     aggregation_field: "AggregationField", # required
+    #     query_version: "QueryVersion",
+    #     buckets_aggregation_type: { # required
+    #       terms_aggregation: {
+    #         max_buckets: 1,
+    #       },
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.total_count #=> Integer
+    #   resp.buckets #=> Array
+    #   resp.buckets[0].key_value #=> String
+    #   resp.buckets[0].count #=> Integer
+    #
+    # @overload get_buckets_aggregation(params = {})
+    # @param [Hash] params ({})
+    def get_buckets_aggregation(params = {}, options = {})
+      req = build_request(:get_buckets_aggregation, params)
+      req.send_request(options)
+    end
+
+    # Returns the approximate count of unique values that match the query.
+    #
+    # Requires permission to access the [GetCardinality][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [String] :index_name
+    #   The name of the index to search.
+    #
+    # @option params [required, String] :query_string
+    #   The search query string.
     #
     # @option params [String] :aggregation_field
     #   The field to aggregate.
@@ -5347,15 +7549,20 @@ module Aws::IoT
     end
 
     # Gets a list of the policies that have an effect on the authorization
-    # behavior of the specified device when it connects to the AWS IoT
-    # device gateway.
+    # behavior of the specified device when it connects to the IoT device
+    # gateway.
+    #
+    # Requires permission to access the [GetEffectivePolicies][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :principal
     #   The principal. Valid principals are CertificateArn
-    #   (arn:aws:iot:*region*\:*accountId*\:cert/*certificateId*),
-    #   thingGroupArn
-    #   (arn:aws:iot:*region*\:*accountId*\:thinggroup/*groupName*) and
-    #   CognitoId (*region*\:*id*).
+    #   (arn:aws:iot:*region*:*accountId*:cert/*certificateId*), thingGroupArn
+    #   (arn:aws:iot:*region*:*accountId*:thinggroup/*groupName*) and
+    #   CognitoId (*region*:*id*).
     #
     # @option params [String] :cognito_identity_pool_id
     #   The Cognito identity pool ID.
@@ -5391,6 +7598,13 @@ module Aws::IoT
 
     # Gets the indexing configuration.
     #
+    # Requires permission to access the [GetIndexingConfiguration][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @return [Types::GetIndexingConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::GetIndexingConfigurationResponse#thing_indexing_configuration #thing_indexing_configuration} => Types::ThingIndexingConfiguration
@@ -5400,12 +7614,19 @@ module Aws::IoT
     #
     #   resp.thing_indexing_configuration.thing_indexing_mode #=> String, one of "OFF", "REGISTRY", "REGISTRY_AND_SHADOW"
     #   resp.thing_indexing_configuration.thing_connectivity_indexing_mode #=> String, one of "OFF", "STATUS"
+    #   resp.thing_indexing_configuration.device_defender_indexing_mode #=> String, one of "OFF", "VIOLATIONS"
+    #   resp.thing_indexing_configuration.named_shadow_indexing_mode #=> String, one of "OFF", "ON"
     #   resp.thing_indexing_configuration.managed_fields #=> Array
     #   resp.thing_indexing_configuration.managed_fields[0].name #=> String
     #   resp.thing_indexing_configuration.managed_fields[0].type #=> String, one of "Number", "String", "Boolean"
     #   resp.thing_indexing_configuration.custom_fields #=> Array
     #   resp.thing_indexing_configuration.custom_fields[0].name #=> String
     #   resp.thing_indexing_configuration.custom_fields[0].type #=> String, one of "Number", "String", "Boolean"
+    #   resp.thing_indexing_configuration.filter.named_shadow_names #=> Array
+    #   resp.thing_indexing_configuration.filter.named_shadow_names[0] #=> String
+    #   resp.thing_indexing_configuration.filter.geo_locations #=> Array
+    #   resp.thing_indexing_configuration.filter.geo_locations[0].name #=> String
+    #   resp.thing_indexing_configuration.filter.geo_locations[0].order #=> String, one of "LatLon", "LonLat"
     #   resp.thing_group_indexing_configuration.thing_group_indexing_mode #=> String, one of "OFF", "ON"
     #   resp.thing_group_indexing_configuration.managed_fields #=> Array
     #   resp.thing_group_indexing_configuration.managed_fields[0].name #=> String
@@ -5423,8 +7644,18 @@ module Aws::IoT
 
     # Gets a job document.
     #
+    # Requires permission to access the [GetJobDocument][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :job_id
     #   The unique identifier you assigned to this job when it was created.
+    #
+    # @option params [Boolean] :before_substitution
+    #   A flag that provides a view of the job document before and after the
+    #   substitution parameters have been resolved with their exact values.
     #
     # @return [Types::GetJobDocumentResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -5434,6 +7665,7 @@ module Aws::IoT
     #
     #   resp = client.get_job_document({
     #     job_id: "JobId", # required
+    #     before_substitution: false,
     #   })
     #
     # @example Response structure
@@ -5451,6 +7683,12 @@ module Aws::IoT
     #
     # NOTE: use of this command is not recommended. Use
     # `GetV2LoggingOptions` instead.
+    #
+    # Requires permission to access the [GetLoggingOptions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @return [Types::GetLoggingOptionsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -5470,6 +7708,12 @@ module Aws::IoT
     end
 
     # Gets an OTA update.
+    #
+    # Requires permission to access the [GetOTAUpdate][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :ota_update_id
     #   The OTA update ID.
@@ -5525,7 +7769,7 @@ module Aws::IoT
     #   resp.ota_update_info.ota_update_files[0].code_signing.custom_code_signing.signature_algorithm #=> String
     #   resp.ota_update_info.ota_update_files[0].attributes #=> Hash
     #   resp.ota_update_info.ota_update_files[0].attributes["AttributeKey"] #=> String
-    #   resp.ota_update_info.ota_update_status #=> String, one of "CREATE_PENDING", "CREATE_IN_PROGRESS", "CREATE_COMPLETE", "CREATE_FAILED"
+    #   resp.ota_update_info.ota_update_status #=> String, one of "CREATE_PENDING", "CREATE_IN_PROGRESS", "CREATE_COMPLETE", "CREATE_FAILED", "DELETE_IN_PROGRESS", "DELETE_FAILED"
     #   resp.ota_update_info.aws_iot_job_id #=> String
     #   resp.ota_update_info.aws_iot_job_arn #=> String
     #   resp.ota_update_info.error_info.code #=> String
@@ -5537,6 +7781,138 @@ module Aws::IoT
     # @param [Hash] params ({})
     def get_ota_update(params = {}, options = {})
       req = build_request(:get_ota_update, params)
+      req.send_request(options)
+    end
+
+    # Gets information about the specified software package.
+    #
+    # Requires permission to access the [GetPackage][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the target software package.
+    #
+    # @return [Types::GetPackageResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetPackageResponse#package_name #package_name} => String
+    #   * {Types::GetPackageResponse#package_arn #package_arn} => String
+    #   * {Types::GetPackageResponse#description #description} => String
+    #   * {Types::GetPackageResponse#default_version_name #default_version_name} => String
+    #   * {Types::GetPackageResponse#creation_date #creation_date} => Time
+    #   * {Types::GetPackageResponse#last_modified_date #last_modified_date} => Time
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_package({
+    #     package_name: "PackageName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.package_name #=> String
+    #   resp.package_arn #=> String
+    #   resp.description #=> String
+    #   resp.default_version_name #=> String
+    #   resp.creation_date #=> Time
+    #   resp.last_modified_date #=> Time
+    #
+    # @overload get_package(params = {})
+    # @param [Hash] params ({})
+    def get_package(params = {}, options = {})
+      req = build_request(:get_package, params)
+      req.send_request(options)
+    end
+
+    # Gets information about the specified software package's
+    # configuration.
+    #
+    # Requires permission to access the [GetPackageConfiguration][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @return [Types::GetPackageConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetPackageConfigurationResponse#version_update_by_jobs_config #version_update_by_jobs_config} => Types::VersionUpdateByJobsConfig
+    #
+    # @example Response structure
+    #
+    #   resp.version_update_by_jobs_config.enabled #=> Boolean
+    #   resp.version_update_by_jobs_config.role_arn #=> String
+    #
+    # @overload get_package_configuration(params = {})
+    # @param [Hash] params ({})
+    def get_package_configuration(params = {}, options = {})
+      req = build_request(:get_package_configuration, params)
+      req.send_request(options)
+    end
+
+    # Gets information about the specified package version.
+    #
+    # Requires permission to access the [GetPackageVersion][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the associated package.
+    #
+    # @option params [required, String] :version_name
+    #   The name of the target package version.
+    #
+    # @return [Types::GetPackageVersionResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetPackageVersionResponse#package_version_arn #package_version_arn} => String
+    #   * {Types::GetPackageVersionResponse#package_name #package_name} => String
+    #   * {Types::GetPackageVersionResponse#version_name #version_name} => String
+    #   * {Types::GetPackageVersionResponse#description #description} => String
+    #   * {Types::GetPackageVersionResponse#attributes #attributes} => Hash&lt;String,String&gt;
+    #   * {Types::GetPackageVersionResponse#artifact #artifact} => Types::PackageVersionArtifact
+    #   * {Types::GetPackageVersionResponse#status #status} => String
+    #   * {Types::GetPackageVersionResponse#error_reason #error_reason} => String
+    #   * {Types::GetPackageVersionResponse#creation_date #creation_date} => Time
+    #   * {Types::GetPackageVersionResponse#last_modified_date #last_modified_date} => Time
+    #   * {Types::GetPackageVersionResponse#sbom #sbom} => Types::Sbom
+    #   * {Types::GetPackageVersionResponse#sbom_validation_status #sbom_validation_status} => String
+    #   * {Types::GetPackageVersionResponse#recipe #recipe} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_package_version({
+    #     package_name: "PackageName", # required
+    #     version_name: "VersionName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.package_version_arn #=> String
+    #   resp.package_name #=> String
+    #   resp.version_name #=> String
+    #   resp.description #=> String
+    #   resp.attributes #=> Hash
+    #   resp.attributes["ResourceAttributeKey"] #=> String
+    #   resp.artifact.s3_location.bucket #=> String
+    #   resp.artifact.s3_location.key #=> String
+    #   resp.artifact.s3_location.version #=> String
+    #   resp.status #=> String, one of "DRAFT", "PUBLISHED", "DEPRECATED"
+    #   resp.error_reason #=> String
+    #   resp.creation_date #=> Time
+    #   resp.last_modified_date #=> Time
+    #   resp.sbom.s3_location.bucket #=> String
+    #   resp.sbom.s3_location.key #=> String
+    #   resp.sbom.s3_location.version #=> String
+    #   resp.sbom_validation_status #=> String, one of "IN_PROGRESS", "FAILED", "SUCCEEDED"
+    #   resp.recipe #=> String
+    #
+    # @overload get_package_version(params = {})
+    # @param [Hash] params ({})
+    def get_package_version(params = {}, options = {})
+      req = build_request(:get_package_version, params)
       req.send_request(options)
     end
 
@@ -5552,11 +7928,17 @@ module Aws::IoT
     # approximation, the more values that match the query, the more accurate
     # the percentile values.
     #
+    # Requires permission to access the [GetPercentiles][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :index_name
     #   The name of the index to search.
     #
     # @option params [required, String] :query_string
-    #   The query string.
+    #   The search query string.
     #
     # @option params [String] :aggregation_field
     #   The field to aggregate.
@@ -5597,6 +7979,12 @@ module Aws::IoT
     # Gets information about the specified policy with the policy document
     # of the default version.
     #
+    # Requires permission to access the [GetPolicy][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :policy_name
     #   The name of the policy.
     #
@@ -5634,6 +8022,12 @@ module Aws::IoT
     end
 
     # Gets information about the specified policy version.
+    #
+    # Requires permission to access the [GetPolicyVersion][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The name of the policy.
@@ -5677,8 +8071,18 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Gets a registration code used to register a CA certificate with AWS
-    # IoT.
+    # Gets a registration code used to register a CA certificate with IoT.
+    #
+    # IoT will create a registration code as part of this API call if the
+    # registration code doesn't exist or has been deleted. If you already
+    # have a registration code, this API call will return the same
+    # registration code.
+    #
+    # Requires permission to access the [GetRegistrationCode][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @return [Types::GetRegistrationCodeResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -5700,12 +8104,19 @@ module Aws::IoT
     # If the aggregation field is of type `String`, only the count statistic
     # is returned.
     #
+    # Requires permission to access the [GetStatistics][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :index_name
     #   The name of the index to search. The default value is `AWS_Things`.
     #
     # @option params [required, String] :query_string
     #   The query used to search. You can specify "*" for the query string
-    #   to get the count of all indexed things in your AWS account.
+    #   to get the count of all indexed things in your Amazon Web Services
+    #   account.
     #
     # @option params [String] :aggregation_field
     #   The aggregation field name.
@@ -5745,6 +8156,12 @@ module Aws::IoT
     end
 
     # Gets information about the rule.
+    #
+    # Requires permission to access the [GetTopicRule][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :rule_name
     #   The name of the rule.
@@ -5793,6 +8210,14 @@ module Aws::IoT
     #   resp.rule.actions[0].republish.role_arn #=> String
     #   resp.rule.actions[0].republish.topic #=> String
     #   resp.rule.actions[0].republish.qos #=> Integer
+    #   resp.rule.actions[0].republish.headers.payload_format_indicator #=> String
+    #   resp.rule.actions[0].republish.headers.content_type #=> String
+    #   resp.rule.actions[0].republish.headers.response_topic #=> String
+    #   resp.rule.actions[0].republish.headers.correlation_data #=> String
+    #   resp.rule.actions[0].republish.headers.message_expiry #=> String
+    #   resp.rule.actions[0].republish.headers.user_properties #=> Array
+    #   resp.rule.actions[0].republish.headers.user_properties[0].key #=> String
+    #   resp.rule.actions[0].republish.headers.user_properties[0].value #=> String
     #   resp.rule.actions[0].s3.role_arn #=> String
     #   resp.rule.actions[0].s3.bucket_name #=> String
     #   resp.rule.actions[0].s3.key #=> String
@@ -5813,6 +8238,7 @@ module Aws::IoT
     #   resp.rule.actions[0].cloudwatch_alarm.state_value #=> String
     #   resp.rule.actions[0].cloudwatch_logs.role_arn #=> String
     #   resp.rule.actions[0].cloudwatch_logs.log_group_name #=> String
+    #   resp.rule.actions[0].cloudwatch_logs.batch_mode #=> Boolean
     #   resp.rule.actions[0].elasticsearch.role_arn #=> String
     #   resp.rule.actions[0].elasticsearch.endpoint #=> String
     #   resp.rule.actions[0].elasticsearch.index #=> String
@@ -5867,6 +8293,21 @@ module Aws::IoT
     #   resp.rule.actions[0].kafka.partition #=> String
     #   resp.rule.actions[0].kafka.client_properties #=> Hash
     #   resp.rule.actions[0].kafka.client_properties["String"] #=> String
+    #   resp.rule.actions[0].kafka.headers #=> Array
+    #   resp.rule.actions[0].kafka.headers[0].key #=> String
+    #   resp.rule.actions[0].kafka.headers[0].value #=> String
+    #   resp.rule.actions[0].open_search.role_arn #=> String
+    #   resp.rule.actions[0].open_search.endpoint #=> String
+    #   resp.rule.actions[0].open_search.index #=> String
+    #   resp.rule.actions[0].open_search.type #=> String
+    #   resp.rule.actions[0].open_search.id #=> String
+    #   resp.rule.actions[0].location.role_arn #=> String
+    #   resp.rule.actions[0].location.tracker_name #=> String
+    #   resp.rule.actions[0].location.device_id #=> String
+    #   resp.rule.actions[0].location.timestamp.value #=> String
+    #   resp.rule.actions[0].location.timestamp.unit #=> String
+    #   resp.rule.actions[0].location.latitude #=> String
+    #   resp.rule.actions[0].location.longitude #=> String
     #   resp.rule.rule_disabled #=> Boolean
     #   resp.rule.aws_iot_sql_version #=> String
     #   resp.rule.error_action.dynamo_db.table_name #=> String
@@ -5894,6 +8335,14 @@ module Aws::IoT
     #   resp.rule.error_action.republish.role_arn #=> String
     #   resp.rule.error_action.republish.topic #=> String
     #   resp.rule.error_action.republish.qos #=> Integer
+    #   resp.rule.error_action.republish.headers.payload_format_indicator #=> String
+    #   resp.rule.error_action.republish.headers.content_type #=> String
+    #   resp.rule.error_action.republish.headers.response_topic #=> String
+    #   resp.rule.error_action.republish.headers.correlation_data #=> String
+    #   resp.rule.error_action.republish.headers.message_expiry #=> String
+    #   resp.rule.error_action.republish.headers.user_properties #=> Array
+    #   resp.rule.error_action.republish.headers.user_properties[0].key #=> String
+    #   resp.rule.error_action.republish.headers.user_properties[0].value #=> String
     #   resp.rule.error_action.s3.role_arn #=> String
     #   resp.rule.error_action.s3.bucket_name #=> String
     #   resp.rule.error_action.s3.key #=> String
@@ -5914,6 +8363,7 @@ module Aws::IoT
     #   resp.rule.error_action.cloudwatch_alarm.state_value #=> String
     #   resp.rule.error_action.cloudwatch_logs.role_arn #=> String
     #   resp.rule.error_action.cloudwatch_logs.log_group_name #=> String
+    #   resp.rule.error_action.cloudwatch_logs.batch_mode #=> Boolean
     #   resp.rule.error_action.elasticsearch.role_arn #=> String
     #   resp.rule.error_action.elasticsearch.endpoint #=> String
     #   resp.rule.error_action.elasticsearch.index #=> String
@@ -5968,6 +8418,21 @@ module Aws::IoT
     #   resp.rule.error_action.kafka.partition #=> String
     #   resp.rule.error_action.kafka.client_properties #=> Hash
     #   resp.rule.error_action.kafka.client_properties["String"] #=> String
+    #   resp.rule.error_action.kafka.headers #=> Array
+    #   resp.rule.error_action.kafka.headers[0].key #=> String
+    #   resp.rule.error_action.kafka.headers[0].value #=> String
+    #   resp.rule.error_action.open_search.role_arn #=> String
+    #   resp.rule.error_action.open_search.endpoint #=> String
+    #   resp.rule.error_action.open_search.index #=> String
+    #   resp.rule.error_action.open_search.type #=> String
+    #   resp.rule.error_action.open_search.id #=> String
+    #   resp.rule.error_action.location.role_arn #=> String
+    #   resp.rule.error_action.location.tracker_name #=> String
+    #   resp.rule.error_action.location.device_id #=> String
+    #   resp.rule.error_action.location.timestamp.value #=> String
+    #   resp.rule.error_action.location.timestamp.unit #=> String
+    #   resp.rule.error_action.location.latitude #=> String
+    #   resp.rule.error_action.location.longitude #=> String
     #
     # @overload get_topic_rule(params = {})
     # @param [Hash] params ({})
@@ -5977,6 +8442,12 @@ module Aws::IoT
     end
 
     # Gets information about a topic rule destination.
+    #
+    # Requires permission to access the [GetTopicRuleDestination][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :arn
     #   The ARN of the topic rule destination.
@@ -6015,6 +8486,12 @@ module Aws::IoT
 
     # Gets the fine grained logging options.
     #
+    # Requires permission to access the [GetV2LoggingOptions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @return [Types::GetV2LoggingOptionsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::GetV2LoggingOptionsResponse#role_arn #role_arn} => String
@@ -6037,6 +8514,12 @@ module Aws::IoT
     # Lists the active violations for a given Device Defender security
     # profile.
     #
+    # Requires permission to access the [ListActiveViolations][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :thing_name
     #   The name of the thing whose active violations are listed.
     #
@@ -6049,6 +8532,9 @@ module Aws::IoT
     #
     # @option params [Boolean] :list_suppressed_alerts
     #   A list of all suppressed alerts.
+    #
+    # @option params [String] :verification_state
+    #   The verification state of the violation (detect alarm).
     #
     # @option params [String] :next_token
     #   The token for the next set of results.
@@ -6070,6 +8556,7 @@ module Aws::IoT
     #     security_profile_name: "SecurityProfileName",
     #     behavior_criteria_type: "STATIC", # accepts STATIC, STATISTICAL, MACHINE_LEARNING
     #     list_suppressed_alerts: false,
+    #     verification_state: "FALSE_POSITIVE", # accepts FALSE_POSITIVE, BENIGN_POSITIVE, TRUE_POSITIVE, UNKNOWN
     #     next_token: "NextToken",
     #     max_results: 1,
     #   })
@@ -6101,6 +8588,7 @@ module Aws::IoT
     #   resp.active_violations[0].behavior.criteria.statistical_threshold.statistic #=> String
     #   resp.active_violations[0].behavior.criteria.ml_detection_config.confidence_level #=> String, one of "LOW", "MEDIUM", "HIGH"
     #   resp.active_violations[0].behavior.suppress_alerts #=> Boolean
+    #   resp.active_violations[0].behavior.export_metric #=> Boolean
     #   resp.active_violations[0].last_violation_value.count #=> Integer
     #   resp.active_violations[0].last_violation_value.cidrs #=> Array
     #   resp.active_violations[0].last_violation_value.cidrs[0] #=> String
@@ -6112,6 +8600,8 @@ module Aws::IoT
     #   resp.active_violations[0].last_violation_value.strings #=> Array
     #   resp.active_violations[0].last_violation_value.strings[0] #=> String
     #   resp.active_violations[0].violation_event_additional_info.confidence_level #=> String, one of "LOW", "MEDIUM", "HIGH"
+    #   resp.active_violations[0].verification_state #=> String, one of "FALSE_POSITIVE", "BENIGN_POSITIVE", "TRUE_POSITIVE", "UNKNOWN"
+    #   resp.active_violations[0].verification_state_description #=> String
     #   resp.active_violations[0].last_violation_time #=> Time
     #   resp.active_violations[0].violation_start_time #=> Time
     #   resp.next_token #=> String
@@ -6125,13 +8615,18 @@ module Aws::IoT
 
     # Lists the policies attached to the specified thing group.
     #
+    # Requires permission to access the [ListAttachedPolicies][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :target
     #   The group or principal for which the policies will be listed. Valid
     #   principals are CertificateArn
-    #   (arn:aws:iot:*region*\:*accountId*\:cert/*certificateId*),
-    #   thingGroupArn
-    #   (arn:aws:iot:*region*\:*accountId*\:thinggroup/*groupName*) and
-    #   CognitoId (*region*\:*id*).
+    #   (arn:aws:iot:*region*:*accountId*:cert/*certificateId*), thingGroupArn
+    #   (arn:aws:iot:*region*:*accountId*:thinggroup/*groupName*) and
+    #   CognitoId (*region*:*id*).
     #
     # @option params [Boolean] :recursive
     #   When true, recursively list attached policies.
@@ -6175,6 +8670,12 @@ module Aws::IoT
     # Lists the findings (results) of a Device Defender audit or of the
     # audits performed during a specified time period. (Findings are
     # retained for 90 days.)
+    #
+    # Requires permission to access the [ListAuditFindings][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :task_id
     #   A filter to limit results to the audit with the specified ID. You must
@@ -6234,6 +8735,12 @@ module Aws::IoT
     #       account: "AwsAccountId",
     #       iam_role_arn: "RoleArn",
     #       role_alias_arn: "RoleAliasArn",
+    #       issuer_certificate_identifier: {
+    #         issuer_certificate_subject: "IssuerCertificateSubject",
+    #         issuer_id: "IssuerId",
+    #         issuer_certificate_serial_number: "IssuerCertificateSerialNumber",
+    #       },
+    #       device_certificate_arn: "CertificateArn",
     #     },
     #     max_results: 1,
     #     next_token: "NextToken",
@@ -6251,7 +8758,7 @@ module Aws::IoT
     #   resp.findings[0].task_start_time #=> Time
     #   resp.findings[0].finding_time #=> Time
     #   resp.findings[0].severity #=> String, one of "CRITICAL", "HIGH", "MEDIUM", "LOW"
-    #   resp.findings[0].non_compliant_resource.resource_type #=> String, one of "DEVICE_CERTIFICATE", "CA_CERTIFICATE", "IOT_POLICY", "COGNITO_IDENTITY_POOL", "CLIENT_ID", "ACCOUNT_SETTINGS", "ROLE_ALIAS", "IAM_ROLE"
+    #   resp.findings[0].non_compliant_resource.resource_type #=> String, one of "DEVICE_CERTIFICATE", "CA_CERTIFICATE", "IOT_POLICY", "COGNITO_IDENTITY_POOL", "CLIENT_ID", "ACCOUNT_SETTINGS", "ROLE_ALIAS", "IAM_ROLE", "ISSUER_CERTIFICATE"
     #   resp.findings[0].non_compliant_resource.resource_identifier.device_certificate_id #=> String
     #   resp.findings[0].non_compliant_resource.resource_identifier.ca_certificate_id #=> String
     #   resp.findings[0].non_compliant_resource.resource_identifier.cognito_identity_pool_id #=> String
@@ -6261,10 +8768,14 @@ module Aws::IoT
     #   resp.findings[0].non_compliant_resource.resource_identifier.account #=> String
     #   resp.findings[0].non_compliant_resource.resource_identifier.iam_role_arn #=> String
     #   resp.findings[0].non_compliant_resource.resource_identifier.role_alias_arn #=> String
+    #   resp.findings[0].non_compliant_resource.resource_identifier.issuer_certificate_identifier.issuer_certificate_subject #=> String
+    #   resp.findings[0].non_compliant_resource.resource_identifier.issuer_certificate_identifier.issuer_id #=> String
+    #   resp.findings[0].non_compliant_resource.resource_identifier.issuer_certificate_identifier.issuer_certificate_serial_number #=> String
+    #   resp.findings[0].non_compliant_resource.resource_identifier.device_certificate_arn #=> String
     #   resp.findings[0].non_compliant_resource.additional_info #=> Hash
     #   resp.findings[0].non_compliant_resource.additional_info["String"] #=> String
     #   resp.findings[0].related_resources #=> Array
-    #   resp.findings[0].related_resources[0].resource_type #=> String, one of "DEVICE_CERTIFICATE", "CA_CERTIFICATE", "IOT_POLICY", "COGNITO_IDENTITY_POOL", "CLIENT_ID", "ACCOUNT_SETTINGS", "ROLE_ALIAS", "IAM_ROLE"
+    #   resp.findings[0].related_resources[0].resource_type #=> String, one of "DEVICE_CERTIFICATE", "CA_CERTIFICATE", "IOT_POLICY", "COGNITO_IDENTITY_POOL", "CLIENT_ID", "ACCOUNT_SETTINGS", "ROLE_ALIAS", "IAM_ROLE", "ISSUER_CERTIFICATE"
     #   resp.findings[0].related_resources[0].resource_identifier.device_certificate_id #=> String
     #   resp.findings[0].related_resources[0].resource_identifier.ca_certificate_id #=> String
     #   resp.findings[0].related_resources[0].resource_identifier.cognito_identity_pool_id #=> String
@@ -6274,6 +8785,10 @@ module Aws::IoT
     #   resp.findings[0].related_resources[0].resource_identifier.account #=> String
     #   resp.findings[0].related_resources[0].resource_identifier.iam_role_arn #=> String
     #   resp.findings[0].related_resources[0].resource_identifier.role_alias_arn #=> String
+    #   resp.findings[0].related_resources[0].resource_identifier.issuer_certificate_identifier.issuer_certificate_subject #=> String
+    #   resp.findings[0].related_resources[0].resource_identifier.issuer_certificate_identifier.issuer_id #=> String
+    #   resp.findings[0].related_resources[0].resource_identifier.issuer_certificate_identifier.issuer_certificate_serial_number #=> String
+    #   resp.findings[0].related_resources[0].resource_identifier.device_certificate_arn #=> String
     #   resp.findings[0].related_resources[0].additional_info #=> Hash
     #   resp.findings[0].related_resources[0].additional_info["String"] #=> String
     #   resp.findings[0].reason_for_non_compliance #=> String
@@ -6289,6 +8804,13 @@ module Aws::IoT
     end
 
     # Gets the status of audit mitigation action tasks that were executed.
+    #
+    # Requires permission to access the
+    # [ListAuditMitigationActionsExecutions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :task_id
     #   Specify this filter to limit results to actions for a specific audit
@@ -6348,6 +8870,13 @@ module Aws::IoT
 
     # Gets a list of audit mitigation action tasks that match the specified
     # filters.
+    #
+    # Requires permission to access the [ListAuditMitigationActionsTasks][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :audit_task_id
     #   Specify this filter to limit results to tasks that were applied to
@@ -6412,6 +8941,12 @@ module Aws::IoT
 
     # Lists your Device Defender audit listings.
     #
+    # Requires permission to access the [ListAuditSuppressions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :check_name
     #   An audit check name. Checks must be enabled for your account. (Use
     #   `DescribeAccountAuditConfiguration` to see the list of all checks,
@@ -6456,6 +8991,12 @@ module Aws::IoT
     #       account: "AwsAccountId",
     #       iam_role_arn: "RoleArn",
     #       role_alias_arn: "RoleAliasArn",
+    #       issuer_certificate_identifier: {
+    #         issuer_certificate_subject: "IssuerCertificateSubject",
+    #         issuer_id: "IssuerId",
+    #         issuer_certificate_serial_number: "IssuerCertificateSerialNumber",
+    #       },
+    #       device_certificate_arn: "CertificateArn",
     #     },
     #     ascending_order: false,
     #     next_token: "NextToken",
@@ -6475,6 +9016,10 @@ module Aws::IoT
     #   resp.suppressions[0].resource_identifier.account #=> String
     #   resp.suppressions[0].resource_identifier.iam_role_arn #=> String
     #   resp.suppressions[0].resource_identifier.role_alias_arn #=> String
+    #   resp.suppressions[0].resource_identifier.issuer_certificate_identifier.issuer_certificate_subject #=> String
+    #   resp.suppressions[0].resource_identifier.issuer_certificate_identifier.issuer_id #=> String
+    #   resp.suppressions[0].resource_identifier.issuer_certificate_identifier.issuer_certificate_serial_number #=> String
+    #   resp.suppressions[0].resource_identifier.device_certificate_arn #=> String
     #   resp.suppressions[0].expiration_date #=> Time
     #   resp.suppressions[0].suppress_indefinitely #=> Boolean
     #   resp.suppressions[0].description #=> String
@@ -6489,6 +9034,12 @@ module Aws::IoT
 
     # Lists the Device Defender audits that have been performed during a
     # given time period.
+    #
+    # Requires permission to access the [ListAuditTasks][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, Time,DateTime,Date,Integer,String] :start_time
     #   The beginning of the time period. Audit information is retained for a
@@ -6549,6 +9100,12 @@ module Aws::IoT
 
     # Lists the authorizers registered in your account.
     #
+    # Requires permission to access the [ListAuthorizers][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [Integer] :page_size
     #   The maximum number of results to return at one time.
     #
@@ -6593,6 +9150,12 @@ module Aws::IoT
 
     # Lists the billing groups you have created.
     #
+    # Requires permission to access the [ListBillingGroups][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :next_token
     #   To retrieve the next set of results, the `nextToken` value from a
     #   previous response; otherwise **null** to receive the first set of
@@ -6633,10 +9196,17 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Lists the CA certificates registered for your AWS account.
+    # Lists the CA certificates registered for your Amazon Web Services
+    # account.
     #
     # The results are paginated with a default page size of 25. You can use
     # the returned marker to retrieve additional results.
+    #
+    # Requires permission to access the [ListCACertificates][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [Integer] :page_size
     #   The result page size.
@@ -6646,6 +9216,9 @@ module Aws::IoT
     #
     # @option params [Boolean] :ascending_order
     #   Determines the order of the results.
+    #
+    # @option params [String] :template_name
+    #   The name of the provisioning template.
     #
     # @return [Types::ListCACertificatesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -6660,6 +9233,7 @@ module Aws::IoT
     #     page_size: 1,
     #     marker: "Marker",
     #     ascending_order: false,
+    #     template_name: "TemplateName",
     #   })
     #
     # @example Response structure
@@ -6678,10 +9252,60 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Lists the certificates registered in your AWS account.
+    # Lists all your certificate providers in your Amazon Web Services
+    # account.
+    #
+    # Requires permission to access the [ListCertificateProviders][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [String] :next_token
+    #   The token for the next set of results, or `null` if there are no more
+    #   results.
+    #
+    # @option params [Boolean] :ascending_order
+    #   Returns the list of certificate providers in ascending alphabetical
+    #   order.
+    #
+    # @return [Types::ListCertificateProvidersResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListCertificateProvidersResponse#certificate_providers #certificate_providers} => Array&lt;Types::CertificateProviderSummary&gt;
+    #   * {Types::ListCertificateProvidersResponse#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_certificate_providers({
+    #     next_token: "Marker",
+    #     ascending_order: false,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.certificate_providers #=> Array
+    #   resp.certificate_providers[0].certificate_provider_name #=> String
+    #   resp.certificate_providers[0].certificate_provider_arn #=> String
+    #   resp.next_token #=> String
+    #
+    # @overload list_certificate_providers(params = {})
+    # @param [Hash] params ({})
+    def list_certificate_providers(params = {}, options = {})
+      req = build_request(:list_certificate_providers, params)
+      req.send_request(options)
+    end
+
+    # Lists the certificates registered in your Amazon Web Services account.
     #
     # The results are paginated with a default page size of 25. You can use
     # the returned marker to retrieve additional results.
+    #
+    # Requires permission to access the [ListCertificates][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [Integer] :page_size
     #   The result page size.
@@ -6726,6 +9350,12 @@ module Aws::IoT
     end
 
     # List the device certificates signed by the specified CA certificate.
+    #
+    # Requires permission to access the [ListCertificatesByCA][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :ca_certificate_id
     #   The ID of the CA certificate. This operation will list all registered
@@ -6776,6 +9406,12 @@ module Aws::IoT
 
     # Lists your Device Defender detect custom metrics.
     #
+    # Requires permission to access the [ListCustomMetrics][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :next_token
     #   The token for the next set of results.
     #
@@ -6812,6 +9448,13 @@ module Aws::IoT
 
     # Lists mitigation actions executions for a Device Defender ML Detect
     # Security Profile.
+    #
+    # Requires permission to access the
+    # [ListDetectMitigationActionsExecutions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :task_id
     #   The unique identifier of the task.
@@ -6879,6 +9522,13 @@ module Aws::IoT
     end
 
     # List of Device Defender ML Detect mitigation actions tasks.
+    #
+    # Requires permission to access the
+    # [ListDetectMitigationActionsTasks][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [Integer] :max_results
     #   The maximum number of results to return at one time. The default is
@@ -6952,7 +9602,14 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # List the set of dimensions that are defined for your AWS account.
+    # List the set of dimensions that are defined for your Amazon Web
+    # Services accounts.
+    #
+    # Requires permission to access the [ListDimensions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :next_token
     #   The token for the next set of results.
@@ -6990,10 +9647,12 @@ module Aws::IoT
     # Gets a list of domain configurations for the user. This list is sorted
     # alphabetically by domain configuration name.
     #
-    # <note markdown="1"> The domain configuration feature is in public preview and is subject
-    # to change.
+    # Requires permission to access the [ListDomainConfigurations][1]
+    # action.
     #
-    #  </note>
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :marker
     #   The marker for the next set of results.
@@ -7034,7 +9693,57 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Lists all your fleet metrics.
+    #
+    # Requires permission to access the [ListFleetMetrics][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [String] :next_token
+    #   To retrieve the next set of results, the `nextToken` value from a
+    #   previous response; otherwise `null` to receive the first set of
+    #   results.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return in this operation.
+    #
+    # @return [Types::ListFleetMetricsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListFleetMetricsResponse#fleet_metrics #fleet_metrics} => Array&lt;Types::FleetMetricNameAndArn&gt;
+    #   * {Types::ListFleetMetricsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_fleet_metrics({
+    #     next_token: "NextToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.fleet_metrics #=> Array
+    #   resp.fleet_metrics[0].metric_name #=> String
+    #   resp.fleet_metrics[0].metric_arn #=> String
+    #   resp.next_token #=> String
+    #
+    # @overload list_fleet_metrics(params = {})
+    # @param [Hash] params ({})
+    def list_fleet_metrics(params = {}, options = {})
+      req = build_request(:list_fleet_metrics, params)
+      req.send_request(options)
+    end
+
     # Lists the search indices.
+    #
+    # Requires permission to access the [ListIndices][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :next_token
     #   The token used to get the next set of results, or `null` if there are
@@ -7071,6 +9780,12 @@ module Aws::IoT
     end
 
     # Lists the job executions for a job.
+    #
+    # Requires permission to access the [ListJobExecutionsForJob][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :job_id
     #   The unique identifier you assigned to this job when it was created.
@@ -7109,6 +9824,7 @@ module Aws::IoT
     #   resp.execution_summaries[0].job_execution_summary.started_at #=> Time
     #   resp.execution_summaries[0].job_execution_summary.last_updated_at #=> Time
     #   resp.execution_summaries[0].job_execution_summary.execution_number #=> Integer
+    #   resp.execution_summaries[0].job_execution_summary.retry_attempt #=> Integer
     #   resp.next_token #=> String
     #
     # @overload list_job_executions_for_job(params = {})
@@ -7120,6 +9836,13 @@ module Aws::IoT
 
     # Lists the job executions for the specified thing.
     #
+    # Requires permission to access the [ListJobExecutionsForThing][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :thing_name
     #   The thing name.
     #
@@ -7130,21 +9853,30 @@ module Aws::IoT
     # @option params [String] :namespace_id
     #   The namespace used to indicate that a job is a customer-managed job.
     #
-    #   When you specify a value for this parameter, AWS IoT Core sends jobs
-    #   notifications to MQTT topics that contain the value in the following
-    #   format.
+    #   When you specify a value for this parameter, Amazon Web Services IoT
+    #   Core sends jobs notifications to MQTT topics that contain the value in
+    #   the following format.
     #
     #   `$aws/things/THING_NAME/jobs/JOB_ID/notify-namespace-NAMESPACE_ID/`
     #
-    #   <note markdown="1"> The `namespaceId` feature is in public preview.
+    #   <note markdown="1"> The `namespaceId` feature is only supported by IoT Greengrass at this
+    #   time. For more information, see [Setting up IoT Greengrass core
+    #   devices.][1]
     #
     #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/greengrass/v2/developerguide/setting-up.html
     #
     # @option params [Integer] :max_results
     #   The maximum number of results to be returned per request.
     #
     # @option params [String] :next_token
     #   The token to retrieve the next set of results.
+    #
+    # @option params [String] :job_id
+    #   The unique identifier you assigned to this job when it was created.
     #
     # @return [Types::ListJobExecutionsForThingResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -7161,6 +9893,7 @@ module Aws::IoT
     #     namespace_id: "NamespaceId",
     #     max_results: 1,
     #     next_token: "NextToken",
+    #     job_id: "JobId",
     #   })
     #
     # @example Response structure
@@ -7172,6 +9905,7 @@ module Aws::IoT
     #   resp.execution_summaries[0].job_execution_summary.started_at #=> Time
     #   resp.execution_summaries[0].job_execution_summary.last_updated_at #=> Time
     #   resp.execution_summaries[0].job_execution_summary.execution_number #=> Integer
+    #   resp.execution_summaries[0].job_execution_summary.retry_attempt #=> Integer
     #   resp.next_token #=> String
     #
     # @overload list_job_executions_for_thing(params = {})
@@ -7181,7 +9915,57 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Returns a list of job templates.
+    #
+    # Requires permission to access the [ListJobTemplates][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return in the list.
+    #
+    # @option params [String] :next_token
+    #   The token to use to return the next set of results in the list.
+    #
+    # @return [Types::ListJobTemplatesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListJobTemplatesResponse#job_templates #job_templates} => Array&lt;Types::JobTemplateSummary&gt;
+    #   * {Types::ListJobTemplatesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_job_templates({
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.job_templates #=> Array
+    #   resp.job_templates[0].job_template_arn #=> String
+    #   resp.job_templates[0].job_template_id #=> String
+    #   resp.job_templates[0].description #=> String
+    #   resp.job_templates[0].created_at #=> Time
+    #   resp.next_token #=> String
+    #
+    # @overload list_job_templates(params = {})
+    # @param [Hash] params ({})
+    def list_job_templates(params = {}, options = {})
+      req = build_request(:list_job_templates, params)
+      req.send_request(options)
+    end
+
     # Lists jobs.
+    #
+    # Requires permission to access the [ListJobs][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :status
     #   An optional filter that lets you search for jobs that have the
@@ -7194,6 +9978,13 @@ module Aws::IoT
     #   when a change is detected in a target. For example, a job will run on
     #   a thing when the thing is added to a target group, even after the job
     #   was completed by all things originally in the group.
+    #
+    #   <note markdown="1"> We recommend that you use continuous jobs instead of snapshot jobs for
+    #   dynamic thing group targets. By using continuous jobs, devices that
+    #   join the group receive the job execution even after the job has been
+    #   created.
+    #
+    #    </note>
     #
     # @option params [Integer] :max_results
     #   The maximum number of results to return per request.
@@ -7212,15 +10003,21 @@ module Aws::IoT
     # @option params [String] :namespace_id
     #   The namespace used to indicate that a job is a customer-managed job.
     #
-    #   When you specify a value for this parameter, AWS IoT Core sends jobs
-    #   notifications to MQTT topics that contain the value in the following
-    #   format.
+    #   When you specify a value for this parameter, Amazon Web Services IoT
+    #   Core sends jobs notifications to MQTT topics that contain the value in
+    #   the following format.
     #
     #   `$aws/things/THING_NAME/jobs/JOB_ID/notify-namespace-NAMESPACE_ID/`
     #
-    #   <note markdown="1"> The `namespaceId` feature is in public preview.
+    #   <note markdown="1"> The `namespaceId` feature is only supported by IoT Greengrass at this
+    #   time. For more information, see [Setting up IoT Greengrass core
+    #   devices.][1]
     #
     #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/greengrass/v2/developerguide/setting-up.html
     #
     # @return [Types::ListJobsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -7232,7 +10029,7 @@ module Aws::IoT
     # @example Request syntax with placeholder values
     #
     #   resp = client.list_jobs({
-    #     status: "IN_PROGRESS", # accepts IN_PROGRESS, CANCELED, COMPLETED, DELETION_IN_PROGRESS
+    #     status: "IN_PROGRESS", # accepts IN_PROGRESS, CANCELED, COMPLETED, DELETION_IN_PROGRESS, SCHEDULED
     #     target_selection: "CONTINUOUS", # accepts CONTINUOUS, SNAPSHOT
     #     max_results: 1,
     #     next_token: "NextToken",
@@ -7248,10 +10045,11 @@ module Aws::IoT
     #   resp.jobs[0].job_id #=> String
     #   resp.jobs[0].thing_group_id #=> String
     #   resp.jobs[0].target_selection #=> String, one of "CONTINUOUS", "SNAPSHOT"
-    #   resp.jobs[0].status #=> String, one of "IN_PROGRESS", "CANCELED", "COMPLETED", "DELETION_IN_PROGRESS"
+    #   resp.jobs[0].status #=> String, one of "IN_PROGRESS", "CANCELED", "COMPLETED", "DELETION_IN_PROGRESS", "SCHEDULED"
     #   resp.jobs[0].created_at #=> Time
     #   resp.jobs[0].last_updated_at #=> Time
     #   resp.jobs[0].completed_at #=> Time
+    #   resp.jobs[0].is_concurrent #=> Boolean
     #   resp.next_token #=> String
     #
     # @overload list_jobs(params = {})
@@ -7261,8 +10059,132 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Returns a list of managed job templates.
+    #
+    # @option params [String] :template_name
+    #   An optional parameter for template name. If specified, only the
+    #   versions of the managed job templates that have the specified template
+    #   name will be returned.
+    #
+    # @option params [Integer] :max_results
+    #   Maximum number of entries that can be returned.
+    #
+    # @option params [String] :next_token
+    #   The token to retrieve the next set of results.
+    #
+    # @return [Types::ListManagedJobTemplatesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListManagedJobTemplatesResponse#managed_job_templates #managed_job_templates} => Array&lt;Types::ManagedJobTemplateSummary&gt;
+    #   * {Types::ListManagedJobTemplatesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_managed_job_templates({
+    #     template_name: "ManagedJobTemplateName",
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.managed_job_templates #=> Array
+    #   resp.managed_job_templates[0].template_arn #=> String
+    #   resp.managed_job_templates[0].template_name #=> String
+    #   resp.managed_job_templates[0].description #=> String
+    #   resp.managed_job_templates[0].environments #=> Array
+    #   resp.managed_job_templates[0].environments[0] #=> String
+    #   resp.managed_job_templates[0].template_version #=> String
+    #   resp.next_token #=> String
+    #
+    # @overload list_managed_job_templates(params = {})
+    # @param [Hash] params ({})
+    def list_managed_job_templates(params = {}, options = {})
+      req = build_request(:list_managed_job_templates, params)
+      req.send_request(options)
+    end
+
+    # Lists the values reported for an IoT Device Defender metric
+    # (device-side metric, cloud-side metric, or custom metric) by the given
+    # thing during the specified time period.
+    #
+    # @option params [required, String] :thing_name
+    #   The name of the thing for which security profile metric values are
+    #   returned.
+    #
+    # @option params [required, String] :metric_name
+    #   The name of the security profile metric for which values are returned.
+    #
+    # @option params [String] :dimension_name
+    #   The dimension name.
+    #
+    # @option params [String] :dimension_value_operator
+    #   The dimension value operator.
+    #
+    # @option params [required, Time,DateTime,Date,Integer,String] :start_time
+    #   The start of the time period for which metric values are returned.
+    #
+    # @option params [required, Time,DateTime,Date,Integer,String] :end_time
+    #   The end of the time period for which metric values are returned.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return at one time.
+    #
+    # @option params [String] :next_token
+    #   The token for the next set of results.
+    #
+    # @return [Types::ListMetricValuesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListMetricValuesResponse#metric_datum_list #metric_datum_list} => Array&lt;Types::MetricDatum&gt;
+    #   * {Types::ListMetricValuesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_metric_values({
+    #     thing_name: "DeviceDefenderThingName", # required
+    #     metric_name: "BehaviorMetric", # required
+    #     dimension_name: "DimensionName",
+    #     dimension_value_operator: "IN", # accepts IN, NOT_IN
+    #     start_time: Time.now, # required
+    #     end_time: Time.now, # required
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.metric_datum_list #=> Array
+    #   resp.metric_datum_list[0].timestamp #=> Time
+    #   resp.metric_datum_list[0].value.count #=> Integer
+    #   resp.metric_datum_list[0].value.cidrs #=> Array
+    #   resp.metric_datum_list[0].value.cidrs[0] #=> String
+    #   resp.metric_datum_list[0].value.ports #=> Array
+    #   resp.metric_datum_list[0].value.ports[0] #=> Integer
+    #   resp.metric_datum_list[0].value.number #=> Float
+    #   resp.metric_datum_list[0].value.numbers #=> Array
+    #   resp.metric_datum_list[0].value.numbers[0] #=> Float
+    #   resp.metric_datum_list[0].value.strings #=> Array
+    #   resp.metric_datum_list[0].value.strings[0] #=> String
+    #   resp.next_token #=> String
+    #
+    # @overload list_metric_values(params = {})
+    # @param [Hash] params ({})
+    def list_metric_values(params = {}, options = {})
+      req = build_request(:list_metric_values, params)
+      req.send_request(options)
+    end
+
     # Gets a list of all mitigation actions that match the specified filter
     # criteria.
+    #
+    # Requires permission to access the [ListMitigationActions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :action_type
     #   Specify a value to limit the result to mitigation actions with a
@@ -7307,6 +10229,12 @@ module Aws::IoT
 
     # Lists OTA updates.
     #
+    # Requires permission to access the [ListOTAUpdates][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [Integer] :max_results
     #   The maximum number of results to return at one time.
     #
@@ -7328,7 +10256,7 @@ module Aws::IoT
     #   resp = client.list_ota_updates({
     #     max_results: 1,
     #     next_token: "NextToken",
-    #     ota_update_status: "CREATE_PENDING", # accepts CREATE_PENDING, CREATE_IN_PROGRESS, CREATE_COMPLETE, CREATE_FAILED
+    #     ota_update_status: "CREATE_PENDING", # accepts CREATE_PENDING, CREATE_IN_PROGRESS, CREATE_COMPLETE, CREATE_FAILED, DELETE_IN_PROGRESS, DELETE_FAILED
     #   })
     #
     # @example Response structure
@@ -7347,6 +10275,13 @@ module Aws::IoT
     end
 
     # Lists certificates that are being transferred but not yet accepted.
+    #
+    # Requires permission to access the [ListOutgoingCertificates][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [Integer] :page_size
     #   The result page size.
@@ -7391,7 +10326,115 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Lists the software package versions associated to the account.
+    #
+    # Requires permission to access the [ListPackageVersions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the target software package.
+    #
+    # @option params [String] :status
+    #   The status of the package version. For more information, see [Package
+    #   version lifecycle][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/developerguide/preparing-to-use-software-package-catalog.html#package-version-lifecycle
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return at one time.
+    #
+    # @option params [String] :next_token
+    #   The token for the next set of results.
+    #
+    # @return [Types::ListPackageVersionsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListPackageVersionsResponse#package_version_summaries #package_version_summaries} => Array&lt;Types::PackageVersionSummary&gt;
+    #   * {Types::ListPackageVersionsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_package_versions({
+    #     package_name: "PackageName", # required
+    #     status: "DRAFT", # accepts DRAFT, PUBLISHED, DEPRECATED
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.package_version_summaries #=> Array
+    #   resp.package_version_summaries[0].package_name #=> String
+    #   resp.package_version_summaries[0].version_name #=> String
+    #   resp.package_version_summaries[0].status #=> String, one of "DRAFT", "PUBLISHED", "DEPRECATED"
+    #   resp.package_version_summaries[0].creation_date #=> Time
+    #   resp.package_version_summaries[0].last_modified_date #=> Time
+    #   resp.next_token #=> String
+    #
+    # @overload list_package_versions(params = {})
+    # @param [Hash] params ({})
+    def list_package_versions(params = {}, options = {})
+      req = build_request(:list_package_versions, params)
+      req.send_request(options)
+    end
+
+    # Lists the software packages associated to the account.
+    #
+    # Requires permission to access the [ListPackages][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results returned at one time.
+    #
+    # @option params [String] :next_token
+    #   The token for the next set of results.
+    #
+    # @return [Types::ListPackagesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListPackagesResponse#package_summaries #package_summaries} => Array&lt;Types::PackageSummary&gt;
+    #   * {Types::ListPackagesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_packages({
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.package_summaries #=> Array
+    #   resp.package_summaries[0].package_name #=> String
+    #   resp.package_summaries[0].default_version_name #=> String
+    #   resp.package_summaries[0].creation_date #=> Time
+    #   resp.package_summaries[0].last_modified_date #=> Time
+    #   resp.next_token #=> String
+    #
+    # @overload list_packages(params = {})
+    # @param [Hash] params ({})
+    def list_packages(params = {}, options = {})
+      req = build_request(:list_packages, params)
+      req.send_request(options)
+    end
+
     # Lists your policies.
+    #
+    # Requires permission to access the [ListPolicies][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :marker
     #   The marker for the next set of results.
@@ -7434,8 +10477,15 @@ module Aws::IoT
 
     # Lists the principals associated with the specified policy.
     #
-    # **Note:** This API is deprecated. Please use ListTargetsForPolicy
-    # instead.
+    # **Note:** This action is deprecated and works as expected for backward
+    # compatibility, but we won't add enhancements. Use
+    # ListTargetsForPolicy instead.
+    #
+    # Requires permission to access the [ListPolicyPrincipals][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The policy name.
@@ -7482,6 +10532,12 @@ module Aws::IoT
     # Lists the versions of the specified policy and identifies the default
     # version.
     #
+    # Requires permission to access the [ListPolicyVersions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :policy_name
     #   The policy name.
     #
@@ -7513,19 +10569,22 @@ module Aws::IoT
     # Cognito identity, the ID must be in [AmazonCognito Identity
     # format][1].
     #
-    # **Note:** This API is deprecated. Please use ListAttachedPolicies
-    # instead.
+    # **Note:** This action is deprecated and works as expected for backward
+    # compatibility, but we won't add enhancements. Use
+    # ListAttachedPolicies instead.
+    #
+    # Requires permission to access the [ListPrincipalPolicies][2] action.
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/cognitoidentity/latest/APIReference/API_GetCredentialsForIdentity.html#API_GetCredentialsForIdentity_RequestSyntax
+    # [2]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :principal
     #   The principal. Valid principals are CertificateArn
-    #   (arn:aws:iot:*region*\:*accountId*\:cert/*certificateId*),
-    #   thingGroupArn
-    #   (arn:aws:iot:*region*\:*accountId*\:thinggroup/*groupName*) and
-    #   CognitoId (*region*\:*id*).
+    #   (arn:aws:iot:*region*:*accountId*:cert/*certificateId*), thingGroupArn
+    #   (arn:aws:iot:*region*:*accountId*:thinggroup/*groupName*) and
+    #   CognitoId (*region*:*id*).
     #
     # @option params [String] :marker
     #   The marker for the next set of results.
@@ -7571,6 +10630,12 @@ module Aws::IoT
     # can be X.509 certificates, IAM users, groups, and roles, Amazon
     # Cognito identities or federated identities.
     #
+    # Requires permission to access the [ListPrincipalThings][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :next_token
     #   To retrieve the next set of results, the `nextToken` value from a
     #   previous response; otherwise **null** to receive the first set of
@@ -7610,10 +10675,17 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # A list of fleet provisioning template versions.
+    # A list of provisioning template versions.
+    #
+    # Requires permission to access the
+    # [ListProvisioningTemplateVersions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :template_name
-    #   The name of the fleet provisioning template.
+    #   The name of the provisioning template.
     #
     # @option params [Integer] :max_results
     #   The maximum number of results to return at one time.
@@ -7651,7 +10723,14 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Lists the fleet provisioning templates in your AWS account.
+    # Lists the provisioning templates in your Amazon Web Services account.
+    #
+    # Requires permission to access the [ListProvisioningTemplates][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [Integer] :max_results
     #   The maximum number of results to return at one time.
@@ -7682,6 +10761,7 @@ module Aws::IoT
     #   resp.templates[0].creation_date #=> Time
     #   resp.templates[0].last_modified_date #=> Time
     #   resp.templates[0].enabled #=> Boolean
+    #   resp.templates[0].type #=> String, one of "FLEET_PROVISIONING", "JITP"
     #   resp.next_token #=> String
     #
     # @overload list_provisioning_templates(params = {})
@@ -7691,7 +10771,100 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # The related resources of an Audit finding. The following resources can
+    # be returned from calling this API:
+    #
+    # * DEVICE\_CERTIFICATE
+    #
+    # * CA\_CERTIFICATE
+    #
+    # * IOT\_POLICY
+    #
+    # * COGNITO\_IDENTITY\_POOL
+    #
+    # * CLIENT\_ID
+    #
+    # * ACCOUNT\_SETTINGS
+    #
+    # * ROLE\_ALIAS
+    #
+    # * IAM\_ROLE
+    #
+    # * ISSUER\_CERTIFICATE
+    #
+    # <note markdown="1"> This API is similar to DescribeAuditFinding's [RelatedResources][1]
+    # but provides pagination and is not limited to 10 resources. When
+    # calling [DescribeAuditFinding][1] for the intermediate CA revoked for
+    # active device certificates check, RelatedResources will not be
+    # populated. You must use this API, ListRelatedResourcesForAuditFinding,
+    # to list the certificates.
+    #
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/iot/latest/apireference/API_DescribeAuditFinding.html
+    #
+    # @option params [required, String] :finding_id
+    #   The finding Id.
+    #
+    # @option params [String] :next_token
+    #   A token that can be used to retrieve the next set of results, or
+    #   `null` if there are no additional results.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return at one time.
+    #
+    # @return [Types::ListRelatedResourcesForAuditFindingResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListRelatedResourcesForAuditFindingResponse#related_resources #related_resources} => Array&lt;Types::RelatedResource&gt;
+    #   * {Types::ListRelatedResourcesForAuditFindingResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_related_resources_for_audit_finding({
+    #     finding_id: "FindingId", # required
+    #     next_token: "NextToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.related_resources #=> Array
+    #   resp.related_resources[0].resource_type #=> String, one of "DEVICE_CERTIFICATE", "CA_CERTIFICATE", "IOT_POLICY", "COGNITO_IDENTITY_POOL", "CLIENT_ID", "ACCOUNT_SETTINGS", "ROLE_ALIAS", "IAM_ROLE", "ISSUER_CERTIFICATE"
+    #   resp.related_resources[0].resource_identifier.device_certificate_id #=> String
+    #   resp.related_resources[0].resource_identifier.ca_certificate_id #=> String
+    #   resp.related_resources[0].resource_identifier.cognito_identity_pool_id #=> String
+    #   resp.related_resources[0].resource_identifier.client_id #=> String
+    #   resp.related_resources[0].resource_identifier.policy_version_identifier.policy_name #=> String
+    #   resp.related_resources[0].resource_identifier.policy_version_identifier.policy_version_id #=> String
+    #   resp.related_resources[0].resource_identifier.account #=> String
+    #   resp.related_resources[0].resource_identifier.iam_role_arn #=> String
+    #   resp.related_resources[0].resource_identifier.role_alias_arn #=> String
+    #   resp.related_resources[0].resource_identifier.issuer_certificate_identifier.issuer_certificate_subject #=> String
+    #   resp.related_resources[0].resource_identifier.issuer_certificate_identifier.issuer_id #=> String
+    #   resp.related_resources[0].resource_identifier.issuer_certificate_identifier.issuer_certificate_serial_number #=> String
+    #   resp.related_resources[0].resource_identifier.device_certificate_arn #=> String
+    #   resp.related_resources[0].additional_info #=> Hash
+    #   resp.related_resources[0].additional_info["String"] #=> String
+    #   resp.next_token #=> String
+    #
+    # @overload list_related_resources_for_audit_finding(params = {})
+    # @param [Hash] params ({})
+    def list_related_resources_for_audit_finding(params = {}, options = {})
+      req = build_request(:list_related_resources_for_audit_finding, params)
+      req.send_request(options)
+    end
+
     # Lists the role aliases registered in your account.
+    #
+    # Requires permission to access the [ListRoleAliases][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [Integer] :page_size
     #   The maximum number of results to return at one time.
@@ -7730,7 +10903,72 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # The validation results for all software bill of materials (SBOM)
+    # attached to a specific software package version.
+    #
+    # Requires permission to access the [ListSbomValidationResults][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the new software package.
+    #
+    # @option params [required, String] :version_name
+    #   The name of the new package version.
+    #
+    # @option params [String] :validation_result
+    #   The end result of the
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return at one time.
+    #
+    # @option params [String] :next_token
+    #   A token that can be used to retrieve the next set of results, or null
+    #   if there are no additional results.
+    #
+    # @return [Types::ListSbomValidationResultsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListSbomValidationResultsResponse#validation_result_summaries #validation_result_summaries} => Array&lt;Types::SbomValidationResultSummary&gt;
+    #   * {Types::ListSbomValidationResultsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_sbom_validation_results({
+    #     package_name: "PackageName", # required
+    #     version_name: "VersionName", # required
+    #     validation_result: "FAILED", # accepts FAILED, SUCCEEDED
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.validation_result_summaries #=> Array
+    #   resp.validation_result_summaries[0].file_name #=> String
+    #   resp.validation_result_summaries[0].validation_result #=> String, one of "FAILED", "SUCCEEDED"
+    #   resp.validation_result_summaries[0].error_code #=> String, one of "INCOMPATIBLE_FORMAT", "FILE_SIZE_LIMIT_EXCEEDED"
+    #   resp.validation_result_summaries[0].error_message #=> String
+    #   resp.next_token #=> String
+    #
+    # @overload list_sbom_validation_results(params = {})
+    # @param [Hash] params ({})
+    def list_sbom_validation_results(params = {}, options = {})
+      req = build_request(:list_sbom_validation_results, params)
+      req.send_request(options)
+    end
+
     # Lists all of your scheduled audits.
+    #
+    # Requires permission to access the [ListScheduledAudits][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :next_token
     #   The token for the next set of results.
@@ -7773,9 +11011,15 @@ module Aws::IoT
     # Lists the Device Defender security profiles you've created. You can
     # filter security profiles by dimension or custom metric.
     #
+    # Requires permission to access the [ListSecurityProfiles][1] action.
+    #
     # <note markdown="1"> `dimensionName` and `metricName` cannot be used in the same request.
     #
     #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :next_token
     #   The token for the next set of results.
@@ -7823,6 +11067,13 @@ module Aws::IoT
     # Lists the Device Defender security profiles attached to a target
     # (thing group).
     #
+    # Requires permission to access the [ListSecurityProfilesForTarget][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :next_token
     #   The token for the next set of results.
     #
@@ -7867,7 +11118,13 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Lists all of the streams in your AWS account.
+    # Lists all of the streams in your Amazon Web Services account.
+    #
+    # Requires permission to access the [ListStreams][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [Integer] :max_results
     #   The maximum number of results to return at a time.
@@ -7911,6 +11168,12 @@ module Aws::IoT
 
     # Lists the tags (metadata) you have assigned to the resource.
     #
+    # Requires permission to access the [ListTagsForResource][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :resource_arn
     #   The ARN of the resource.
     #
@@ -7948,6 +11211,12 @@ module Aws::IoT
     end
 
     # List targets for the specified policy.
+    #
+    # Requires permission to access the [ListTargetsForPolicy][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The policy name.
@@ -7989,6 +11258,13 @@ module Aws::IoT
     # Lists the targets (thing groups) associated with a given Device
     # Defender security profile.
     #
+    # Requires permission to access the [ListTargetsForSecurityProfile][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :security_profile_name
     #   The security profile.
     #
@@ -8027,6 +11303,12 @@ module Aws::IoT
     end
 
     # List the thing groups in your account.
+    #
+    # Requires permission to access the [ListThingGroups][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :next_token
     #   To retrieve the next set of results, the `nextToken` value from a
@@ -8080,6 +11362,12 @@ module Aws::IoT
 
     # List the thing groups to which the specified thing belongs.
     #
+    # Requires permission to access the [ListThingGroupsForThing][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :thing_name
     #   The thing name.
     #
@@ -8123,6 +11411,12 @@ module Aws::IoT
     # Lists the principals associated with the specified thing. A principal
     # can be X.509 certificates, IAM users, groups, and roles, Amazon
     # Cognito identities or federated identities.
+    #
+    # Requires permission to access the [ListThingPrincipals][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :next_token
     #   To retrieve the next set of results, the `nextToken` value from a
@@ -8212,6 +11506,13 @@ module Aws::IoT
 
     # List bulk thing provisioning tasks.
     #
+    # Requires permission to access the [ListThingRegistrationTasks][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :next_token
     #   To retrieve the next set of results, the `nextToken` value from a
     #   previous response; otherwise **null** to receive the first set of
@@ -8252,6 +11553,12 @@ module Aws::IoT
     end
 
     # Lists the existing thing types.
+    #
+    # Requires permission to access the [ListThingTypes][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :next_token
     #   To retrieve the next set of results, the `nextToken` value from a
@@ -8303,7 +11610,10 @@ module Aws::IoT
     # parameters to filter your things. For example, calling `ListThings`
     # with attributeName=Color and attributeValue=Red retrieves all things
     # in the registry that contain an attribute **Color** with the value
-    # **Red**.
+    # **Red**. For more information, see [List Things][1] from the *Amazon
+    # Web Services IoT Core Developer Guide*.
+    #
+    # Requires permission to access the [ListThings][2] action.
     #
     # <note markdown="1"> You will not be charged for calling this API if an `Access denied`
     # error is returned. You will also not be charged if no attributes or
@@ -8311,6 +11621,11 @@ module Aws::IoT
     # no results were returned.
     #
     #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/iot/latest/developerguide/thing-registry.html#list-things
+    # [2]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :next_token
     #   To retrieve the next set of results, the `nextToken` value from a
@@ -8329,6 +11644,14 @@ module Aws::IoT
     # @option params [String] :thing_type_name
     #   The name of the thing type used to search for things.
     #
+    # @option params [Boolean] :use_prefix_attribute_value
+    #   When `true`, the action returns the thing resources with attribute
+    #   values that start with the `attributeValue` provided.
+    #
+    #   When `false`, or not present, the action returns only the thing
+    #   resources with attribute values that match the entire `attributeValue`
+    #   provided.
+    #
     # @return [Types::ListThingsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ListThingsResponse#things #things} => Array&lt;Types::ThingAttribute&gt;
@@ -8344,6 +11667,7 @@ module Aws::IoT
     #     attribute_name: "AttributeName",
     #     attribute_value: "AttributeValue",
     #     thing_type_name: "ThingTypeName",
+    #     use_prefix_attribute_value: false,
     #   })
     #
     # @example Response structure
@@ -8365,6 +11689,13 @@ module Aws::IoT
     end
 
     # Lists the things you have added to the given billing group.
+    #
+    # Requires permission to access the [ListThingsInBillingGroup][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :billing_group_name
     #   The name of the billing group.
@@ -8406,6 +11737,12 @@ module Aws::IoT
     end
 
     # Lists the things in the specified group.
+    #
+    # Requires permission to access the [ListThingsInThingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :thing_group_name
     #   The thing group name.
@@ -8451,7 +11788,15 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Lists all the topic rule destinations in your AWS account.
+    # Lists all the topic rule destinations in your Amazon Web Services
+    # account.
+    #
+    # Requires permission to access the [ListTopicRuleDestinations][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [Integer] :max_results
     #   The maximum number of results to return at one time.
@@ -8500,6 +11845,12 @@ module Aws::IoT
     end
 
     # Lists the rules for the specific topic.
+    #
+    # Requires permission to access the [ListTopicRules][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :topic
     #   The topic.
@@ -8550,6 +11901,12 @@ module Aws::IoT
 
     # Lists logging levels.
     #
+    # Requires permission to access the [ListV2LoggingLevels][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :target_type
     #   The type of resource for which you are configuring logging. Must be
     #   `THING_Group`.
@@ -8572,7 +11929,7 @@ module Aws::IoT
     # @example Request syntax with placeholder values
     #
     #   resp = client.list_v2_logging_levels({
-    #     target_type: "DEFAULT", # accepts DEFAULT, THING_GROUP
+    #     target_type: "DEFAULT", # accepts DEFAULT, THING_GROUP, CLIENT_ID, SOURCE_IP, PRINCIPAL_ID
     #     next_token: "NextToken",
     #     max_results: 1,
     #   })
@@ -8580,7 +11937,7 @@ module Aws::IoT
     # @example Response structure
     #
     #   resp.log_target_configurations #=> Array
-    #   resp.log_target_configurations[0].log_target.target_type #=> String, one of "DEFAULT", "THING_GROUP"
+    #   resp.log_target_configurations[0].log_target.target_type #=> String, one of "DEFAULT", "THING_GROUP", "CLIENT_ID", "SOURCE_IP", "PRINCIPAL_ID"
     #   resp.log_target_configurations[0].log_target.target_name #=> String
     #   resp.log_target_configurations[0].log_level #=> String, one of "DEBUG", "INFO", "ERROR", "WARN", "DISABLED"
     #   resp.next_token #=> String
@@ -8596,6 +11953,12 @@ module Aws::IoT
     # during the given time period. You can use filters to limit the results
     # to those alerts issued for a particular security profile, behavior, or
     # thing (device).
+    #
+    # Requires permission to access the [ListViolationEvents][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, Time,DateTime,Date,Integer,String] :start_time
     #   The start time for the alerts to be listed.
@@ -8616,6 +11979,9 @@ module Aws::IoT
     #
     # @option params [Boolean] :list_suppressed_alerts
     #   A list of all suppressed alerts.
+    #
+    # @option params [String] :verification_state
+    #   The verification state of the violation (detect alarm).
     #
     # @option params [String] :next_token
     #   The token for the next set of results.
@@ -8639,6 +12005,7 @@ module Aws::IoT
     #     security_profile_name: "SecurityProfileName",
     #     behavior_criteria_type: "STATIC", # accepts STATIC, STATISTICAL, MACHINE_LEARNING
     #     list_suppressed_alerts: false,
+    #     verification_state: "FALSE_POSITIVE", # accepts FALSE_POSITIVE, BENIGN_POSITIVE, TRUE_POSITIVE, UNKNOWN
     #     next_token: "NextToken",
     #     max_results: 1,
     #   })
@@ -8670,6 +12037,7 @@ module Aws::IoT
     #   resp.violation_events[0].behavior.criteria.statistical_threshold.statistic #=> String
     #   resp.violation_events[0].behavior.criteria.ml_detection_config.confidence_level #=> String, one of "LOW", "MEDIUM", "HIGH"
     #   resp.violation_events[0].behavior.suppress_alerts #=> Boolean
+    #   resp.violation_events[0].behavior.export_metric #=> Boolean
     #   resp.violation_events[0].metric_value.count #=> Integer
     #   resp.violation_events[0].metric_value.cidrs #=> Array
     #   resp.violation_events[0].metric_value.cidrs[0] #=> String
@@ -8682,6 +12050,8 @@ module Aws::IoT
     #   resp.violation_events[0].metric_value.strings[0] #=> String
     #   resp.violation_events[0].violation_event_additional_info.confidence_level #=> String, one of "LOW", "MEDIUM", "HIGH"
     #   resp.violation_events[0].violation_event_type #=> String, one of "in-alarm", "alarm-cleared", "alarm-invalidated"
+    #   resp.violation_events[0].verification_state #=> String, one of "FALSE_POSITIVE", "BENIGN_POSITIVE", "TRUE_POSITIVE", "UNKNOWN"
+    #   resp.violation_events[0].verification_state_description #=> String
     #   resp.violation_events[0].violation_event_time #=> Time
     #   resp.next_token #=> String
     #
@@ -8692,23 +12062,60 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Registers a CA certificate with AWS IoT. This CA certificate can then
-    # be used to sign device certificates, which can be then registered with
-    # AWS IoT. You can register up to 10 CA certificates per AWS account
-    # that have the same subject field. This enables you to have up to 10
-    # certificate authorities sign your device certificates. If you have
-    # more than one CA certificate registered, make sure you pass the CA
-    # certificate when you register your device certificates with the
-    # RegisterCertificate API.
+    # Set a verification state and provide a description of that
+    # verification state on a violation (detect alarm).
+    #
+    # @option params [required, String] :violation_id
+    #   The violation ID.
+    #
+    # @option params [required, String] :verification_state
+    #   The verification state of the violation.
+    #
+    # @option params [String] :verification_state_description
+    #   The description of the verification state of the violation (detect
+    #   alarm).
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.put_verification_state_on_violation({
+    #     violation_id: "ViolationId", # required
+    #     verification_state: "FALSE_POSITIVE", # required, accepts FALSE_POSITIVE, BENIGN_POSITIVE, TRUE_POSITIVE, UNKNOWN
+    #     verification_state_description: "VerificationStateDescription",
+    #   })
+    #
+    # @overload put_verification_state_on_violation(params = {})
+    # @param [Hash] params ({})
+    def put_verification_state_on_violation(params = {}, options = {})
+      req = build_request(:put_verification_state_on_violation, params)
+      req.send_request(options)
+    end
+
+    # Registers a CA certificate with Amazon Web Services IoT Core. There is
+    # no limit to the number of CA certificates you can register in your
+    # Amazon Web Services account. You can register up to 10 CA certificates
+    # with the same `CA subject field` per Amazon Web Services account.
+    #
+    # Requires permission to access the [RegisterCACertificate][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :ca_certificate
     #   The CA certificate.
     #
-    # @option params [required, String] :verification_certificate
-    #   The private key verification certificate.
+    # @option params [String] :verification_certificate
+    #   The private key verification certificate. If `certificateMode` is
+    #   `SNI_ONLY`, the `verificationCertificate` field must be empty. If
+    #   `certificateMode` is `DEFAULT` or not provided, the
+    #   `verificationCertificate` field must not be empty.
     #
     # @option params [Boolean] :set_as_active
     #   A boolean value that specifies if the CA certificate is set to active.
+    #
+    #   Valid values: `ACTIVE | INACTIVE`
     #
     # @option params [Boolean] :allow_auto_registration
     #   Allows this CA certificate to be used for auto registration of device
@@ -8731,6 +12138,21 @@ module Aws::IoT
     #
     #    </note>
     #
+    # @option params [String] :certificate_mode
+    #   Describes the certificate mode in which the Certificate Authority (CA)
+    #   will be registered. If the `verificationCertificate` field is not
+    #   provided, set `certificateMode` to be `SNI_ONLY`. If the
+    #   `verificationCertificate` field is provided, set `certificateMode` to
+    #   be `DEFAULT`. When `certificateMode` is not provided, it defaults to
+    #   `DEFAULT`. All the device certificates that are registered using this
+    #   CA will be registered in the same certificate mode as the CA. For more
+    #   information about certificate mode for device certificates, see [
+    #   certificate mode][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/apireference/API_CertificateDescription.html#iot-Type-CertificateDescription-certificateMode
+    #
     # @return [Types::RegisterCACertificateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::RegisterCACertificateResponse#certificate_arn #certificate_arn} => String
@@ -8740,12 +12162,13 @@ module Aws::IoT
     #
     #   resp = client.register_ca_certificate({
     #     ca_certificate: "CertificatePem", # required
-    #     verification_certificate: "CertificatePem", # required
+    #     verification_certificate: "CertificatePem",
     #     set_as_active: false,
     #     allow_auto_registration: false,
     #     registration_config: {
     #       template_body: "TemplateBody",
     #       role_arn: "RoleArn",
+    #       template_name: "TemplateName",
     #     },
     #     tags: [
     #       {
@@ -8753,6 +12176,7 @@ module Aws::IoT
     #         value: "TagValue",
     #       },
     #     ],
+    #     certificate_mode: "DEFAULT", # accepts DEFAULT, SNI_ONLY
     #   })
     #
     # @example Response structure
@@ -8767,10 +12191,17 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Registers a device certificate with AWS IoT. If you have more than one
-    # CA certificate that has the same subject field, you must specify the
-    # CA certificate that was used to sign the device certificate being
-    # registered.
+    # Registers a device certificate with IoT in the same [certificate
+    # mode][1] as the signing CA. If you have more than one CA certificate
+    # that has the same subject field, you must specify the CA certificate
+    # that was used to sign the device certificate being registered.
+    #
+    # Requires permission to access the [RegisterCertificate][2] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/iot/latest/apireference/API_CertificateDescription.html#iot-Type-CertificateDescription-certificateMode
+    # [2]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :certificate_pem
     #   The certificate data, in PEM format.
@@ -8782,8 +12213,11 @@ module Aws::IoT
     # @option params [Boolean] :set_as_active
     #   A boolean value that specifies if the certificate is set to active.
     #
+    #   Valid values: `ACTIVE | INACTIVE`
+    #
     # @option params [String] :status
-    #   The status of the register certificate request.
+    #   The status of the register certificate request. Valid values that you
+    #   can use include `ACTIVE`, `INACTIVE`, and `REVOKED`.
     #
     # @return [Types::RegisterCertificateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -8812,7 +12246,12 @@ module Aws::IoT
     end
 
     # Register a certificate that does not have a certificate authority
-    # (CA).
+    # (CA). For supported certificates, consult [ Certificate signing
+    # algorithms supported by IoT][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/iot/latest/developerguide/x509-client-certs.html#x509-cert-algorithms
     #
     # @option params [required, String] :certificate_pem
     #   The certificate data, in PEM format.
@@ -8845,15 +12284,18 @@ module Aws::IoT
     end
 
     # Provisions a thing in the device registry. RegisterThing calls other
-    # AWS IoT control plane APIs. These calls might exceed your account
-    # level [ AWS IoT Throttling Limits][1] and cause throttle errors.
-    # Please contact [AWS Customer Support][2] to raise your throttling
+    # IoT control plane APIs. These calls might exceed your account level [
+    # IoT Throttling Limits][1] and cause throttle errors. Please contact
+    # [Amazon Web Services Customer Support][2] to raise your throttling
     # limits if necessary.
+    #
+    # Requires permission to access the [RegisterThing][3] action.
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html#limits_iot
     # [2]: https://console.aws.amazon.com/support/home
+    # [3]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :template_body
     #   The provisioning template. See [Provisioning Devices That Have Device
@@ -8898,7 +12340,7 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Rejects a pending certificate transfer. After AWS IoT rejects a
+    # Rejects a pending certificate transfer. After IoT rejects a
     # certificate transfer, the certificate status changes from
     # **PENDING\_TRANSFER** to **INACTIVE**.
     #
@@ -8908,6 +12350,13 @@ module Aws::IoT
     # This operation can only be called by the transfer destination. After
     # it is called, the certificate will be returned to the source's
     # account in the INACTIVE state.
+    #
+    # Requires permission to access the [RejectCertificateTransfer][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :certificate_id
     #   The ID of the certificate. (The last part of the certificate ARN
@@ -8933,6 +12382,18 @@ module Aws::IoT
     end
 
     # Removes the given thing from the billing group.
+    #
+    # Requires permission to access the [RemoveThingFromBillingGroup][1]
+    # action.
+    #
+    # <note markdown="1"> This call is asynchronous. It might take several seconds for the
+    # detachment to propagate.
+    #
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :billing_group_name
     #   The name of the billing group.
@@ -8970,6 +12431,13 @@ module Aws::IoT
     # identify the thing group and either a `thingArn` or a `thingName` to
     # identify the thing to remove from the thing group.
     #
+    # Requires permission to access the [RemoveThingFromThingGroup][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :thing_group_name
     #   The group name.
     #
@@ -9004,6 +12472,12 @@ module Aws::IoT
     # Creating rules is an administrator-level action. Any user who has
     # permission to create rules will be able to access data processed by
     # the rule.
+    #
+    # Requires permission to access the [ReplaceTopicRule][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :rule_name
     #   The name of the rule.
@@ -9062,6 +12536,19 @@ module Aws::IoT
     #             role_arn: "AwsArn", # required
     #             topic: "TopicPattern", # required
     #             qos: 1,
+    #             headers: {
+    #               payload_format_indicator: "PayloadFormatIndicator",
+    #               content_type: "ContentType",
+    #               response_topic: "ResponseTopic",
+    #               correlation_data: "CorrelationData",
+    #               message_expiry: "MessageExpiry",
+    #               user_properties: [
+    #                 {
+    #                   key: "UserPropertyKey", # required
+    #                   value: "UserPropertyValue", # required
+    #                 },
+    #               ],
+    #             },
     #           },
     #           s3: {
     #             role_arn: "AwsArn", # required
@@ -9092,6 +12579,7 @@ module Aws::IoT
     #           cloudwatch_logs: {
     #             role_arn: "AwsArn", # required
     #             log_group_name: "LogGroupName", # required
+    #             batch_mode: false,
     #           },
     #           elasticsearch: {
     #             role_arn: "AwsArn", # required
@@ -9187,6 +12675,30 @@ module Aws::IoT
     #             client_properties: { # required
     #               "String" => "String",
     #             },
+    #             headers: [
+    #               {
+    #                 key: "KafkaHeaderKey", # required
+    #                 value: "KafkaHeaderValue", # required
+    #               },
+    #             ],
+    #           },
+    #           open_search: {
+    #             role_arn: "AwsArn", # required
+    #             endpoint: "ElasticsearchEndpoint", # required
+    #             index: "ElasticsearchIndex", # required
+    #             type: "ElasticsearchType", # required
+    #             id: "ElasticsearchId", # required
+    #           },
+    #           location: {
+    #             role_arn: "AwsArn", # required
+    #             tracker_name: "String", # required
+    #             device_id: "String", # required
+    #             timestamp: {
+    #               value: "String", # required
+    #               unit: "String",
+    #             },
+    #             latitude: "String", # required
+    #             longitude: "String", # required
     #           },
     #         },
     #       ],
@@ -9233,6 +12745,19 @@ module Aws::IoT
     #           role_arn: "AwsArn", # required
     #           topic: "TopicPattern", # required
     #           qos: 1,
+    #           headers: {
+    #             payload_format_indicator: "PayloadFormatIndicator",
+    #             content_type: "ContentType",
+    #             response_topic: "ResponseTopic",
+    #             correlation_data: "CorrelationData",
+    #             message_expiry: "MessageExpiry",
+    #             user_properties: [
+    #               {
+    #                 key: "UserPropertyKey", # required
+    #                 value: "UserPropertyValue", # required
+    #               },
+    #             ],
+    #           },
     #         },
     #         s3: {
     #           role_arn: "AwsArn", # required
@@ -9263,6 +12788,7 @@ module Aws::IoT
     #         cloudwatch_logs: {
     #           role_arn: "AwsArn", # required
     #           log_group_name: "LogGroupName", # required
+    #           batch_mode: false,
     #         },
     #         elasticsearch: {
     #           role_arn: "AwsArn", # required
@@ -9358,6 +12884,30 @@ module Aws::IoT
     #           client_properties: { # required
     #             "String" => "String",
     #           },
+    #           headers: [
+    #             {
+    #               key: "KafkaHeaderKey", # required
+    #               value: "KafkaHeaderValue", # required
+    #             },
+    #           ],
+    #         },
+    #         open_search: {
+    #           role_arn: "AwsArn", # required
+    #           endpoint: "ElasticsearchEndpoint", # required
+    #           index: "ElasticsearchIndex", # required
+    #           type: "ElasticsearchType", # required
+    #           id: "ElasticsearchId", # required
+    #         },
+    #         location: {
+    #           role_arn: "AwsArn", # required
+    #           tracker_name: "String", # required
+    #           device_id: "String", # required
+    #           timestamp: {
+    #             value: "String", # required
+    #             unit: "String",
+    #           },
+    #           latitude: "String", # required
+    #           longitude: "String", # required
     #         },
     #       },
     #     },
@@ -9372,18 +12922,36 @@ module Aws::IoT
 
     # The query search index.
     #
+    # Requires permission to access the [SearchIndex][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :index_name
     #   The search index name.
     #
     # @option params [required, String] :query_string
-    #   The search query string.
+    #   The search query string. For more information about the search query
+    #   syntax, see [Query syntax][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/developerguide/query-syntax.html
     #
     # @option params [String] :next_token
     #   The token used to get the next set of results, or `null` if there are
     #   no additional results.
     #
     # @option params [Integer] :max_results
-    #   The maximum number of results to return at one time.
+    #   The maximum number of results to return per page at one time. This
+    #   maximum number cannot exceed 100. The response might contain fewer
+    #   results but will never contain more. You can use [ `nextToken` ][1] to
+    #   retrieve the next set of results until `nextToken` returns `NULL`.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/apireference/API_SearchIndex.html#iot-SearchIndex-request-nextToken
     #
     # @option params [String] :query_version
     #   The query version.
@@ -9416,8 +12984,10 @@ module Aws::IoT
     #   resp.things[0].attributes #=> Hash
     #   resp.things[0].attributes["AttributeName"] #=> <Hash,Array,String,Numeric,Boolean,IO,Set,nil>
     #   resp.things[0].shadow #=> String
+    #   resp.things[0].device_defender #=> String
     #   resp.things[0].connectivity.connected #=> Boolean
     #   resp.things[0].connectivity.timestamp #=> Integer
+    #   resp.things[0].connectivity.disconnect_reason #=> String
     #   resp.thing_groups #=> Array
     #   resp.thing_groups[0].thing_group_name #=> String
     #   resp.thing_groups[0].thing_group_id #=> String
@@ -9436,6 +13006,12 @@ module Aws::IoT
 
     # Sets the default authorizer. This will be used if a websocket
     # connection is made without specifying an authorizer.
+    #
+    # Requires permission to access the [SetDefaultAuthorizer][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :authorizer_name
     #   The authorizer name.
@@ -9466,7 +13042,13 @@ module Aws::IoT
     # Sets the specified version of the specified policy as the policy's
     # default (operative) version. This action affects all certificates to
     # which the policy is attached. To list the principals the policy is
-    # attached to, use the ListPrincipalPolicy API.
+    # attached to, use the ListPrincipalPolicies action.
+    #
+    # Requires permission to access the [SetDefaultPolicyVersion][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :policy_name
     #   The policy name.
@@ -9495,6 +13077,12 @@ module Aws::IoT
     # NOTE: use of this command is not recommended. Use
     # `SetV2LoggingOptions` instead.
     #
+    # Requires permission to access the [SetLoggingOptions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, Types::LoggingOptionsPayload] :logging_options_payload
     #   The logging options payload.
     #
@@ -9518,6 +13106,12 @@ module Aws::IoT
 
     # Sets the logging level.
     #
+    # Requires permission to access the [SetV2LoggingLevel][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, Types::LogTarget] :log_target
     #   The log target.
     #
@@ -9530,7 +13124,7 @@ module Aws::IoT
     #
     #   resp = client.set_v2_logging_level({
     #     log_target: { # required
-    #       target_type: "DEFAULT", # required, accepts DEFAULT, THING_GROUP
+    #       target_type: "DEFAULT", # required, accepts DEFAULT, THING_GROUP, CLIENT_ID, SOURCE_IP, PRINCIPAL_ID
     #       target_name: "LogTargetName",
     #     },
     #     log_level: "DEBUG", # required, accepts DEBUG, INFO, ERROR, WARN, DISABLED
@@ -9544,6 +13138,12 @@ module Aws::IoT
     end
 
     # Sets the logging options for the V2 logging service.
+    #
+    # Requires permission to access the [SetV2LoggingOptions][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :role_arn
     #   The ARN of the role that allows IoT to write to Cloudwatch logs.
@@ -9574,6 +13174,13 @@ module Aws::IoT
     # Starts a task that applies a set of mitigation actions to the
     # specified target.
     #
+    # Requires permission to access the [StartAuditMitigationActionsTask][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :task_id
     #   A unique identifier for the task. You can use this identifier to check
     #   the status of the task or to cancel it.
@@ -9585,7 +13192,7 @@ module Aws::IoT
     #
     # @option params [required, Hash<String,Array>] :audit_check_to_actions_mapping
     #   For an audit check, specifies which mitigation actions to apply. Those
-    #   actions must be defined in your AWS account.
+    #   actions must be defined in your Amazon Web Services accounts.
     #
     # @option params [required, String] :client_request_token
     #   Each audit mitigation task must have a unique client request token. If
@@ -9630,6 +13237,13 @@ module Aws::IoT
 
     # Starts a Device Defender ML Detect mitigation actions task.
     #
+    # Requires permission to access the
+    # [StartDetectMitigationActionsTask][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :task_id
     #   The unique identifier of the task.
     #
@@ -9652,8 +13266,8 @@ module Aws::IoT
     # @option params [required, String] :client_request_token
     #   Each mitigation action task must have a unique client request token.
     #   If you try to create a new task with the same token as a task that
-    #   already exists, an exception occurs. If you omit this value, AWS SDKs
-    #   will automatically generate a unique client request.
+    #   already exists, an exception occurs. If you omit this value, Amazon
+    #   Web Services SDKs will automatically generate a unique client request.
     #
     #   **A suitable default value is auto-generated.** You should normally
     #   not need to pass this option.**
@@ -9694,6 +13308,12 @@ module Aws::IoT
 
     # Starts an on-demand Device Defender audit.
     #
+    # Requires permission to access the [StartOnDemandAuditTask][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, Array<String>] :target_check_names
     #   Which checks are performed during the audit. The checks you specify
     #   must be enabled for your account or an exception occurs. Use
@@ -9723,6 +13343,13 @@ module Aws::IoT
     end
 
     # Creates a bulk thing provisioning task.
+    #
+    # Requires permission to access the [StartThingRegistrationTask][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :template_body
     #   The provisioning template.
@@ -9764,6 +13391,13 @@ module Aws::IoT
 
     # Cancels a bulk thing provisioning task.
     #
+    # Requires permission to access the [StopThingRegistrationTask][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :task_id
     #   The bulk thing provisioning task ID.
     #
@@ -9784,6 +13418,12 @@ module Aws::IoT
 
     # Adds to or modifies the tags of the given resource. Tags are metadata
     # which can be used to manage a resource.
+    #
+    # Requires permission to access the [TagResource][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :resource_arn
     #   The ARN of the resource.
@@ -9812,17 +13452,21 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Tests if a specified principal is authorized to perform an AWS IoT
-    # action on a specified resource. Use this to test and debug the
-    # authorization behavior of devices that connect to the AWS IoT device
-    # gateway.
+    # Tests if a specified principal is authorized to perform an IoT action
+    # on a specified resource. Use this to test and debug the authorization
+    # behavior of devices that connect to the IoT device gateway.
+    #
+    # Requires permission to access the [TestAuthorization][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :principal
     #   The principal. Valid principals are CertificateArn
-    #   (arn:aws:iot:*region*\:*accountId*\:cert/*certificateId*),
-    #   thingGroupArn
-    #   (arn:aws:iot:*region*\:*accountId*\:thinggroup/*groupName*) and
-    #   CognitoId (*region*\:*id*).
+    #   (arn:aws:iot:*region*:*accountId*:cert/*certificateId*), thingGroupArn
+    #   (arn:aws:iot:*region*:*accountId*:thinggroup/*groupName*) and
+    #   CognitoId (*region*:*id*).
     #
     # @option params [String] :cognito_identity_pool_id
     #   The Cognito identity pool ID.
@@ -9890,7 +13534,13 @@ module Aws::IoT
 
     # Tests a custom authorization behavior by invoking a specified custom
     # authorizer. Use this to test and debug the custom authorization
-    # behavior of devices that connect to the AWS IoT device gateway.
+    # behavior of devices that connect to the IoT device gateway.
+    #
+    # Requires permission to access the [TestInvokeAuthorizer][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :authorizer_name
     #   The custom authorizer name.
@@ -9957,7 +13607,10 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Transfers the specified certificate to the specified AWS account.
+    # Transfers the specified certificate to the specified Amazon Web
+    # Services account.
+    #
+    # Requires permission to access the [TransferCertificate][1] action.
     #
     # You can cancel the transfer until it is acknowledged by the recipient.
     #
@@ -9965,17 +13618,21 @@ module Aws::IoT
     # up to the caller to notify the transfer target.
     #
     # The certificate being transferred must not be in the ACTIVE state. You
-    # can use the UpdateCertificate API to deactivate it.
+    # can use the UpdateCertificate action to deactivate it.
     #
     # The certificate must not have any policies attached to it. You can use
-    # the DetachPrincipalPolicy API to detach them.
+    # the DetachPolicy action to detach them.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :certificate_id
     #   The ID of the certificate. (The last part of the certificate ARN
     #   contains the certificate ID.)
     #
     # @option params [required, String] :target_aws_account
-    #   The AWS account.
+    #   The Amazon Web Services account.
     #
     # @option params [String] :transfer_message
     #   The transfer message.
@@ -10005,6 +13662,12 @@ module Aws::IoT
 
     # Removes the given tags (metadata) from the resource.
     #
+    # Requires permission to access the [UntagResource][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :resource_arn
     #   The ARN of the resource.
     #
@@ -10031,10 +13694,17 @@ module Aws::IoT
     # account. Settings include how audit notifications are sent and which
     # audit checks are enabled or disabled.
     #
+    # Requires permission to access the [UpdateAccountAuditConfiguration][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :role_arn
     #   The Amazon Resource Name (ARN) of the role that grants permission to
-    #   AWS IoT to access information about your devices, policies,
-    #   certificates, and other items as required when performing an audit.
+    #   IoT to access information about your devices, policies, certificates,
+    #   and other items as required when performing an audit.
     #
     # @option params [Hash<String,Types::AuditNotificationTarget>] :audit_notification_target_configurations
     #   Information about the targets to which audit notifications are sent.
@@ -10121,6 +13791,12 @@ module Aws::IoT
     #       account: "AwsAccountId",
     #       iam_role_arn: "RoleArn",
     #       role_alias_arn: "RoleAliasArn",
+    #       issuer_certificate_identifier: {
+    #         issuer_certificate_subject: "IssuerCertificateSubject",
+    #         issuer_id: "IssuerId",
+    #         issuer_certificate_serial_number: "IssuerCertificateSerialNumber",
+    #       },
+    #       device_certificate_arn: "CertificateArn",
     #     },
     #     expiration_date: Time.now,
     #     suppress_indefinitely: false,
@@ -10135,6 +13811,12 @@ module Aws::IoT
     end
 
     # Updates an authorizer.
+    #
+    # Requires permission to access the [UpdateAuthorizer][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :authorizer_name
     #   The authorizer name.
@@ -10151,6 +13833,11 @@ module Aws::IoT
     # @option params [String] :status
     #   The status of the update authorizer request.
     #
+    # @option params [Boolean] :enable_caching_for_http
+    #   When `true`, the result from the authorizer’s Lambda function is
+    #   cached for the time specified in `refreshAfterInSeconds`. The cached
+    #   result is used while the device reuses the same HTTP connection.
+    #
     # @return [Types::UpdateAuthorizerResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateAuthorizerResponse#authorizer_name #authorizer_name} => String
@@ -10166,6 +13853,7 @@ module Aws::IoT
     #       "KeyName" => "KeyValue",
     #     },
     #     status: "ACTIVE", # accepts ACTIVE, INACTIVE
+    #     enable_caching_for_http: false,
     #   })
     #
     # @example Response structure
@@ -10181,6 +13869,12 @@ module Aws::IoT
     end
 
     # Updates information about the billing group.
+    #
+    # Requires permission to access the [UpdateBillingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :billing_group_name
     #   The name of the billing group.
@@ -10221,6 +13915,12 @@ module Aws::IoT
 
     # Updates a registered CA certificate.
     #
+    # Requires permission to access the [UpdateCACertificate][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :certificate_id
     #   The CA certificate identifier.
     #
@@ -10251,6 +13951,7 @@ module Aws::IoT
     #     registration_config: {
     #       template_body: "TemplateBody",
     #       role_arn: "RoleArn",
+    #       template_name: "TemplateName",
     #     },
     #     remove_auto_registration: false,
     #   })
@@ -10265,13 +13966,19 @@ module Aws::IoT
     # Updates the status of the specified certificate. This operation is
     # idempotent.
     #
+    # Requires permission to access the [UpdateCertificate][1] action.
+    #
     # Certificates must be in the ACTIVE state to authenticate devices that
-    # use a certificate to connect to AWS IoT.
+    # use a certificate to connect to IoT.
     #
     # Within a few minutes of updating a certificate from the ACTIVE state
-    # to any other state, AWS IoT disconnects all devices that used that
+    # to any other state, IoT disconnects all devices that used that
     # certificate to connect. Devices cannot use a certificate that is not
     # in the ACTIVE state to reconnect.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :certificate_id
     #   The ID of the certificate. (The last part of the certificate ARN
@@ -10283,7 +13990,7 @@ module Aws::IoT
     #   **Note:** Setting the status to PENDING\_TRANSFER or
     #   PENDING\_ACTIVATION will result in an exception being thrown.
     #   PENDING\_TRANSFER and PENDING\_ACTIVATION are statuses used internally
-    #   by AWS IoT. They are not intended for developer use.
+    #   by IoT. They are not intended for developer use.
     #
     #   **Note:** The status value REGISTER\_INACTIVE is deprecated and should
     #   not be used.
@@ -10304,7 +14011,58 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Updates a certificate provider.
+    #
+    # Requires permission to access the [UpdateCertificateProvider][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :certificate_provider_name
+    #   The name of the certificate provider.
+    #
+    # @option params [String] :lambda_function_arn
+    #   The Lambda function ARN that's associated with the certificate
+    #   provider.
+    #
+    # @option params [Array<String>] :account_default_for_operations
+    #   A list of the operations that the certificate provider will use to
+    #   generate certificates. Valid value: `CreateCertificateFromCsr`.
+    #
+    # @return [Types::UpdateCertificateProviderResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateCertificateProviderResponse#certificate_provider_name #certificate_provider_name} => String
+    #   * {Types::UpdateCertificateProviderResponse#certificate_provider_arn #certificate_provider_arn} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_certificate_provider({
+    #     certificate_provider_name: "CertificateProviderName", # required
+    #     lambda_function_arn: "CertificateProviderFunctionArn",
+    #     account_default_for_operations: ["CreateCertificateFromCsr"], # accepts CreateCertificateFromCsr
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.certificate_provider_name #=> String
+    #   resp.certificate_provider_arn #=> String
+    #
+    # @overload update_certificate_provider(params = {})
+    # @param [Hash] params ({})
+    def update_certificate_provider(params = {}, options = {})
+      req = build_request(:update_certificate_provider, params)
+      req.send_request(options)
+    end
+
     # Updates a Device Defender detect custom metric.
+    #
+    # Requires permission to access the [UpdateCustomMetric][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :metric_name
     #   The name of the custom metric. Cannot be updated.
@@ -10348,6 +14106,12 @@ module Aws::IoT
 
     # Updates the definition for a dimension. You cannot change the type of
     # a dimension after it is created (you can delete it and recreate it).
+    #
+    # Requires permission to access the [UpdateDimension][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :name
     #   A unique identifier for the dimension. Choose something that describes
@@ -10394,10 +14158,12 @@ module Aws::IoT
     # Updates values stored in the domain configuration. Domain
     # configurations for default endpoints can't be updated.
     #
-    # <note markdown="1"> The domain configuration feature is in public preview and is subject
-    # to change.
+    # Requires permission to access the [UpdateDomainConfiguration][1]
+    # action.
     #
-    #  </note>
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :domain_configuration_name
     #   The name of the domain configuration to be updated.
@@ -10410,6 +14176,84 @@ module Aws::IoT
     #
     # @option params [Boolean] :remove_authorizer_config
     #   Removes the authorization configuration from a domain.
+    #
+    # @option params [Types::TlsConfig] :tls_config
+    #   An object that specifies the TLS configuration for a domain.
+    #
+    # @option params [Types::ServerCertificateConfig] :server_certificate_config
+    #   The server certificate configuration.
+    #
+    # @option params [String] :authentication_type
+    #   An enumerated string that speciﬁes the authentication type.
+    #
+    #   * `CUSTOM_AUTH_X509` - Use custom authentication and authorization
+    #     with additional details from the X.509 client certificate.
+    #
+    #   ^
+    #   ^
+    #
+    #   * `CUSTOM_AUTH` - Use custom authentication and authorization. For
+    #     more information, see [Custom authentication and authorization][1].
+    #
+    #   ^
+    #   ^
+    #
+    #   * `AWS_X509` - Use X.509 client certificates without custom
+    #     authentication and authorization. For more information, see [X.509
+    #     client certificates][2].
+    #
+    #   ^
+    #   ^
+    #
+    #   * `AWS_SIGV4` - Use Amazon Web Services Signature Version 4. For more
+    #     information, see [IAM users, groups, and roles][1].
+    #
+    #   ^
+    #   ^
+    #
+    #   * `DEFAULT ` - Use a combination of port and Application Layer
+    #     Protocol Negotiation (ALPN) to specify authentication type. For more
+    #     information, see [Device communication protocols][3].
+    #
+    #   ^
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/developerguide/custom-authentication.html
+    #   [2]: https://docs.aws.amazon.com/iot/latest/developerguide/x509-client-certs.html
+    #   [3]: https://docs.aws.amazon.com/iot/latest/developerguide/protocols.html
+    #
+    # @option params [String] :application_protocol
+    #   An enumerated string that speciﬁes the application-layer protocol.
+    #
+    #   * `SECURE_MQTT` - MQTT over TLS.
+    #
+    #   ^
+    #   ^
+    #
+    #   * `MQTT_WSS` - MQTT over WebSocket.
+    #
+    #   ^
+    #   ^
+    #
+    #   * `HTTPS` - HTTP over TLS.
+    #
+    #   ^
+    #   ^
+    #
+    #   * `DEFAULT` - Use a combination of port and Application Layer Protocol
+    #     Negotiation (ALPN) to specify application\_layer protocol. For more
+    #     information, see [Device communication protocols][1].
+    #
+    #   ^
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/developerguide/protocols.html
+    #
+    # @option params [Types::ClientCertificateConfig] :client_certificate_config
+    #   An object that speciﬁes the client certificate conﬁguration for a
+    #   domain.
     #
     # @return [Types::UpdateDomainConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -10426,6 +14270,17 @@ module Aws::IoT
     #     },
     #     domain_configuration_status: "ENABLED", # accepts ENABLED, DISABLED
     #     remove_authorizer_config: false,
+    #     tls_config: {
+    #       security_policy: "SecurityPolicy",
+    #     },
+    #     server_certificate_config: {
+    #       enable_ocsp_check: false,
+    #     },
+    #     authentication_type: "CUSTOM_AUTH_X509", # accepts CUSTOM_AUTH_X509, CUSTOM_AUTH, AWS_X509, AWS_SIGV4, DEFAULT
+    #     application_protocol: "SECURE_MQTT", # accepts SECURE_MQTT, MQTT_WSS, HTTPS, DEFAULT
+    #     client_certificate_config: {
+    #       client_certificate_callback_arn: "ClientCertificateCallbackArn",
+    #     },
     #   })
     #
     # @example Response structure
@@ -10442,6 +14297,12 @@ module Aws::IoT
 
     # Updates a dynamic thing group.
     #
+    # Requires permission to access the [UpdateDynamicThingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :thing_group_name
     #   The name of the dynamic thing group to update.
     #
@@ -10454,7 +14315,7 @@ module Aws::IoT
     # @option params [String] :index_name
     #   The dynamic thing group index to update.
     #
-    #   <note markdown="1"> Currently one index is supported: 'AWS\_Things'.
+    #   <note markdown="1"> Currently one index is supported: `AWS_Things`.
     #
     #    </note>
     #
@@ -10505,6 +14366,13 @@ module Aws::IoT
 
     # Updates the event configurations.
     #
+    # Requires permission to access the [UpdateEventConfigurations][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [Hash<String,Types::Configuration>] :event_configurations
     #   The new event configuration values.
     #
@@ -10527,7 +14395,85 @@ module Aws::IoT
       req.send_request(options)
     end
 
+    # Updates the data for a fleet metric.
+    #
+    # Requires permission to access the [UpdateFleetMetric][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :metric_name
+    #   The name of the fleet metric to update.
+    #
+    # @option params [String] :query_string
+    #   The search query string.
+    #
+    # @option params [Types::AggregationType] :aggregation_type
+    #   The type of the aggregation query.
+    #
+    # @option params [Integer] :period
+    #   The time in seconds between fleet metric emissions. Range \[60(1 min),
+    #   86400(1 day)\] and must be multiple of 60.
+    #
+    # @option params [String] :aggregation_field
+    #   The field to aggregate.
+    #
+    # @option params [String] :description
+    #   The description of the fleet metric.
+    #
+    # @option params [String] :query_version
+    #   The version of the query.
+    #
+    # @option params [required, String] :index_name
+    #   The name of the index to search.
+    #
+    # @option params [String] :unit
+    #   Used to support unit transformation such as milliseconds to seconds.
+    #   The unit must be supported by [CW metric][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDatum.html
+    #
+    # @option params [Integer] :expected_version
+    #   The expected version of the fleet metric record in the registry.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_fleet_metric({
+    #     metric_name: "FleetMetricName", # required
+    #     query_string: "QueryString",
+    #     aggregation_type: {
+    #       name: "Statistics", # required, accepts Statistics, Percentiles, Cardinality
+    #       values: ["AggregationTypeValue"],
+    #     },
+    #     period: 1,
+    #     aggregation_field: "AggregationField",
+    #     description: "FleetMetricDescription",
+    #     query_version: "QueryVersion",
+    #     index_name: "IndexName", # required
+    #     unit: "Seconds", # accepts Seconds, Microseconds, Milliseconds, Bytes, Kilobytes, Megabytes, Gigabytes, Terabytes, Bits, Kilobits, Megabits, Gigabits, Terabits, Percent, Count, Bytes/Second, Kilobytes/Second, Megabytes/Second, Gigabytes/Second, Terabytes/Second, Bits/Second, Kilobits/Second, Megabits/Second, Gigabits/Second, Terabits/Second, Count/Second, None
+    #     expected_version: 1,
+    #   })
+    #
+    # @overload update_fleet_metric(params = {})
+    # @param [Hash] params ({})
+    def update_fleet_metric(params = {}, options = {})
+      req = build_request(:update_fleet_metric, params)
+      req.send_request(options)
+    end
+
     # Updates the search configuration.
+    #
+    # Requires permission to access the [UpdateIndexingConfiguration][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [Types::ThingIndexingConfiguration] :thing_indexing_configuration
     #   Thing indexing configuration.
@@ -10543,6 +14489,8 @@ module Aws::IoT
     #     thing_indexing_configuration: {
     #       thing_indexing_mode: "OFF", # required, accepts OFF, REGISTRY, REGISTRY_AND_SHADOW
     #       thing_connectivity_indexing_mode: "OFF", # accepts OFF, STATUS
+    #       device_defender_indexing_mode: "OFF", # accepts OFF, VIOLATIONS
+    #       named_shadow_indexing_mode: "OFF", # accepts OFF, ON
     #       managed_fields: [
     #         {
     #           name: "FieldName",
@@ -10555,6 +14503,15 @@ module Aws::IoT
     #           type: "Number", # accepts Number, String, Boolean
     #         },
     #       ],
+    #       filter: {
+    #         named_shadow_names: ["ShadowName"],
+    #         geo_locations: [
+    #           {
+    #             name: "TargetFieldName",
+    #             order: "LatLon", # accepts LatLon, LonLat
+    #           },
+    #         ],
+    #       },
     #     },
     #     thing_group_indexing_configuration: {
     #       thing_group_indexing_mode: "OFF", # required, accepts OFF, ON
@@ -10582,6 +14539,12 @@ module Aws::IoT
 
     # Updates supported fields of the specified job.
     #
+    # Requires permission to access the [UpdateJob][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :job_id
     #   The ID of the job to be updated.
     #
@@ -10607,15 +14570,24 @@ module Aws::IoT
     # @option params [String] :namespace_id
     #   The namespace used to indicate that a job is a customer-managed job.
     #
-    #   When you specify a value for this parameter, AWS IoT Core sends jobs
-    #   notifications to MQTT topics that contain the value in the following
-    #   format.
+    #   When you specify a value for this parameter, Amazon Web Services IoT
+    #   Core sends jobs notifications to MQTT topics that contain the value in
+    #   the following format.
     #
     #   `$aws/things/THING_NAME/jobs/JOB_ID/notify-namespace-NAMESPACE_ID/`
     #
-    #   <note markdown="1"> The `namespaceId` feature is in public preview.
+    #   <note markdown="1"> The `namespaceId` feature is only supported by IoT Greengrass at this
+    #   time. For more information, see [Setting up IoT Greengrass core
+    #   devices.][1]
     #
     #    </note>
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/greengrass/v2/developerguide/setting-up.html
+    #
+    # @option params [Types::JobExecutionsRetryConfig] :job_executions_retry_config
+    #   Allows you to create the criteria to retry a job.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -10653,6 +14625,14 @@ module Aws::IoT
     #       in_progress_timeout_in_minutes: 1,
     #     },
     #     namespace_id: "NamespaceId",
+    #     job_executions_retry_config: {
+    #       criteria_list: [ # required
+    #         {
+    #           failure_type: "FAILED", # required, accepts FAILED, TIMED_OUT, ALL
+    #           number_of_retries: 1, # required
+    #         },
+    #       ],
+    #     },
     #   })
     #
     # @overload update_job(params = {})
@@ -10663,6 +14643,12 @@ module Aws::IoT
     end
 
     # Updates the definition for the specified mitigation action.
+    #
+    # Requires permission to access the [UpdateMitigationAction][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :action_name
     #   The friendly name for the mitigation action. You cannot change the
@@ -10721,16 +14707,202 @@ module Aws::IoT
       req.send_request(options)
     end
 
-    # Updates a fleet provisioning template.
+    # Updates the supported fields for a specific software package.
     #
-    # @option params [required, String] :template_name
-    #   The name of the fleet provisioning template.
+    # Requires permission to access the [UpdatePackage][1] and
+    # [GetIndexingConfiguration][1] actions.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the target software package.
     #
     # @option params [String] :description
-    #   The description of the fleet provisioning template.
+    #   The package description.
+    #
+    # @option params [String] :default_version_name
+    #   The name of the default package version.
+    #
+    #   **Note:** You cannot name a `defaultVersion` and set
+    #   `unsetDefaultVersion` equal to `true` at the same time.
+    #
+    # @option params [Boolean] :unset_default_version
+    #   Indicates whether you want to remove the named default package version
+    #   from the software package. Set as `true` to remove the default package
+    #   version.
+    #
+    #   **Note:** You cannot name a `defaultVersion` and set
+    #   `unsetDefaultVersion` equal to `true` at the same time.
+    #
+    # @option params [String] :client_token
+    #   A unique case-sensitive identifier that you can provide to ensure the
+    #   idempotency of the request. Don't reuse this client token if a new
+    #   idempotent request is required.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_package({
+    #     package_name: "PackageName", # required
+    #     description: "ResourceDescription",
+    #     default_version_name: "VersionName",
+    #     unset_default_version: false,
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @overload update_package(params = {})
+    # @param [Hash] params ({})
+    def update_package(params = {}, options = {})
+      req = build_request(:update_package, params)
+      req.send_request(options)
+    end
+
+    # Updates the software package configuration.
+    #
+    # Requires permission to access the [UpdatePackageConfiguration][1] and
+    # [iam:PassRole][2] actions.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    # [2]: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html
+    #
+    # @option params [Types::VersionUpdateByJobsConfig] :version_update_by_jobs_config
+    #   Configuration to manage job's package version reporting. This updates
+    #   the thing's reserved named shadow that the job targets.
+    #
+    # @option params [String] :client_token
+    #   A unique case-sensitive identifier that you can provide to ensure the
+    #   idempotency of the request. Don't reuse this client token if a new
+    #   idempotent request is required.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_package_configuration({
+    #     version_update_by_jobs_config: {
+    #       enabled: false,
+    #       role_arn: "RoleArn",
+    #     },
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @overload update_package_configuration(params = {})
+    # @param [Hash] params ({})
+    def update_package_configuration(params = {}, options = {})
+      req = build_request(:update_package_configuration, params)
+      req.send_request(options)
+    end
+
+    # Updates the supported fields for a specific package version.
+    #
+    # Requires permission to access the [UpdatePackageVersion][1] and
+    # [GetIndexingConfiguration][1] actions.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :package_name
+    #   The name of the associated software package.
+    #
+    # @option params [required, String] :version_name
+    #   The name of the target package version.
+    #
+    # @option params [String] :description
+    #   The package version description.
+    #
+    # @option params [Hash<String,String>] :attributes
+    #   Metadata that can be used to define a package version’s configuration.
+    #   For example, the Amazon S3 file location, configuration options that
+    #   are being sent to the device or fleet.
+    #
+    #   **Note:** Attributes can be updated only when the package version is
+    #   in a draft state.
+    #
+    #   The combined size of all the attributes on a package version is
+    #   limited to 3KB.
+    #
+    # @option params [Types::PackageVersionArtifact] :artifact
+    #   The various components that make up a software package version.
+    #
+    # @option params [String] :action
+    #   The status that the package version should be assigned. For more
+    #   information, see [Package version lifecycle][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/developerguide/preparing-to-use-software-package-catalog.html#package-version-lifecycle
+    #
+    # @option params [String] :recipe
+    #   The inline job document associated with a software package version
+    #   used for a quick job deployment.
+    #
+    # @option params [String] :client_token
+    #   A unique case-sensitive identifier that you can provide to ensure the
+    #   idempotency of the request. Don't reuse this client token if a new
+    #   idempotent request is required.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_package_version({
+    #     package_name: "PackageName", # required
+    #     version_name: "VersionName", # required
+    #     description: "ResourceDescription",
+    #     attributes: {
+    #       "ResourceAttributeKey" => "ResourceAttributeValue",
+    #     },
+    #     artifact: {
+    #       s3_location: {
+    #         bucket: "S3Bucket",
+    #         key: "S3Key",
+    #         version: "S3Version",
+    #       },
+    #     },
+    #     action: "PUBLISH", # accepts PUBLISH, DEPRECATE
+    #     recipe: "PackageVersionRecipe",
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @overload update_package_version(params = {})
+    # @param [Hash] params ({})
+    def update_package_version(params = {}, options = {})
+      req = build_request(:update_package_version, params)
+      req.send_request(options)
+    end
+
+    # Updates a provisioning template.
+    #
+    # Requires permission to access the [UpdateProvisioningTemplate][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
+    # @option params [required, String] :template_name
+    #   The name of the provisioning template.
+    #
+    # @option params [String] :description
+    #   The description of the provisioning template.
     #
     # @option params [Boolean] :enabled
-    #   True to enable the fleet provisioning template, otherwise false.
+    #   True to enable the provisioning template, otherwise false.
     #
     # @option params [Integer] :default_version_id
     #   The ID of the default provisioning template version.
@@ -10740,7 +14912,13 @@ module Aws::IoT
     #   IoT role grants permission to provision a device.
     #
     # @option params [Types::ProvisioningHook] :pre_provisioning_hook
-    #   Updates the pre-provisioning hook template.
+    #   Updates the pre-provisioning hook template. Only supports template of
+    #   type `FLEET_PROVISIONING`. For more information about provisioning
+    #   template types, see [type][1].
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/iot/latest/apireference/API_CreateProvisioningTemplate.html#iot-CreateProvisioningTemplate-request-type
     #
     # @option params [Boolean] :remove_pre_provisioning_hook
     #   Removes pre-provisioning hook template.
@@ -10771,6 +14949,20 @@ module Aws::IoT
 
     # Updates a role alias.
     #
+    # Requires permission to access the [UpdateRoleAlias][1] action.
+    #
+    # The value of [ `credentialDurationSeconds` ][2] must be less than or
+    # equal to the maximum session duration of the IAM role that the role
+    # alias references. For more information, see [ Modifying a role maximum
+    # session duration (Amazon Web Services API)][3] from the Amazon Web
+    # Services Identity and Access Management User Guide.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    # [2]: https://docs.aws.amazon.com/iot/latest/apireference/API_UpdateRoleAlias.html#iot-UpdateRoleAlias-request-credentialDurationSeconds
+    # [3]: https://docs.aws.amazon.com/IAM/latest/UserGuide/roles-managingrole-editing-api.html#roles-modify_max-session-duration-api
+    #
     # @option params [required, String] :role_alias
     #   The role alias to update.
     #
@@ -10779,6 +14971,9 @@ module Aws::IoT
     #
     # @option params [Integer] :credential_duration_seconds
     #   The number of seconds the credential will be valid.
+    #
+    #   This value must be less than or equal to the maximum session duration
+    #   of the IAM role that the role alias references.
     #
     # @return [Types::UpdateRoleAliasResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -10807,6 +15002,12 @@ module Aws::IoT
 
     # Updates a scheduled audit, including which checks are performed and
     # how often the audit takes place.
+    #
+    # Requires permission to access the [UpdateScheduledAudit][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [String] :frequency
     #   How often the scheduled audit takes place, either `DAILY`, `WEEKLY`,
@@ -10862,6 +15063,12 @@ module Aws::IoT
 
     # Updates a Device Defender security profile.
     #
+    # Requires permission to access the [UpdateSecurityProfile][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :security_profile_name
     #   The name of the security profile you want to update.
     #
@@ -10911,6 +15118,12 @@ module Aws::IoT
     #   value that is different from the actual version, a
     #   `VersionConflictException` is thrown.
     #
+    # @option params [Types::MetricsExportConfig] :metrics_export_config
+    #   Specifies the MQTT topic and role ARN required for metric export.
+    #
+    # @option params [Boolean] :delete_metrics_export_config
+    #   Set the value as true to delete metrics export related configurations.
+    #
     # @return [Types::UpdateSecurityProfileResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateSecurityProfileResponse#security_profile_name #security_profile_name} => String
@@ -10923,6 +15136,7 @@ module Aws::IoT
     #   * {Types::UpdateSecurityProfileResponse#version #version} => Integer
     #   * {Types::UpdateSecurityProfileResponse#creation_date #creation_date} => Time
     #   * {Types::UpdateSecurityProfileResponse#last_modified_date #last_modified_date} => Time
+    #   * {Types::UpdateSecurityProfileResponse#metrics_export_config #metrics_export_config} => Types::MetricsExportConfig
     #
     # @example Request syntax with placeholder values
     #
@@ -10958,6 +15172,7 @@ module Aws::IoT
     #           },
     #         },
     #         suppress_alerts: false,
+    #         export_metric: false,
     #       },
     #     ],
     #     alert_targets: {
@@ -10974,12 +15189,18 @@ module Aws::IoT
     #           dimension_name: "DimensionName", # required
     #           operator: "IN", # accepts IN, NOT_IN
     #         },
+    #         export_metric: false,
     #       },
     #     ],
     #     delete_behaviors: false,
     #     delete_alert_targets: false,
     #     delete_additional_metrics_to_retain: false,
     #     expected_version: 1,
+    #     metrics_export_config: {
+    #       mqtt_topic: "MqttTopic", # required
+    #       role_arn: "RoleArn", # required
+    #     },
+    #     delete_metrics_export_config: false,
     #   })
     #
     # @example Response structure
@@ -11009,6 +15230,7 @@ module Aws::IoT
     #   resp.behaviors[0].criteria.statistical_threshold.statistic #=> String
     #   resp.behaviors[0].criteria.ml_detection_config.confidence_level #=> String, one of "LOW", "MEDIUM", "HIGH"
     #   resp.behaviors[0].suppress_alerts #=> Boolean
+    #   resp.behaviors[0].export_metric #=> Boolean
     #   resp.alert_targets #=> Hash
     #   resp.alert_targets["AlertTargetType"].alert_target_arn #=> String
     #   resp.alert_targets["AlertTargetType"].role_arn #=> String
@@ -11018,9 +15240,12 @@ module Aws::IoT
     #   resp.additional_metrics_to_retain_v2[0].metric #=> String
     #   resp.additional_metrics_to_retain_v2[0].metric_dimension.dimension_name #=> String
     #   resp.additional_metrics_to_retain_v2[0].metric_dimension.operator #=> String, one of "IN", "NOT_IN"
+    #   resp.additional_metrics_to_retain_v2[0].export_metric #=> Boolean
     #   resp.version #=> Integer
     #   resp.creation_date #=> Time
     #   resp.last_modified_date #=> Time
+    #   resp.metrics_export_config.mqtt_topic #=> String
+    #   resp.metrics_export_config.role_arn #=> String
     #
     # @overload update_security_profile(params = {})
     # @param [Hash] params ({})
@@ -11031,6 +15256,12 @@ module Aws::IoT
 
     # Updates an existing stream. The stream version will be incremented by
     # one.
+    #
+    # Requires permission to access the [UpdateStream][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :stream_id
     #   The stream ID.
@@ -11086,6 +15317,12 @@ module Aws::IoT
 
     # Updates the data for a thing.
     #
+    # Requires permission to access the [UpdateThing][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :thing_name
     #   The name of the thing to update.
     #
@@ -11140,6 +15377,12 @@ module Aws::IoT
 
     # Update a thing group.
     #
+    # Requires permission to access the [UpdateThingGroup][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, String] :thing_group_name
     #   The thing group to update.
     #
@@ -11183,6 +15426,13 @@ module Aws::IoT
 
     # Updates the groups to which the thing belongs.
     #
+    # Requires permission to access the [UpdateThingGroupsForThing][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [String] :thing_name
     #   The thing whose group memberships will be updated.
     #
@@ -11218,6 +15468,13 @@ module Aws::IoT
 
     # Updates a topic rule destination. You use this to change the status,
     # endpoint URL, or confirmation URL of the destination.
+    #
+    # Requires permission to access the [UpdateTopicRuleDestination][1]
+    # action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
     #
     # @option params [required, String] :arn
     #   The ARN of the topic rule destination.
@@ -11272,6 +15529,13 @@ module Aws::IoT
 
     # Validates a Device Defender security profile behaviors specification.
     #
+    # Requires permission to access the
+    # [ValidateSecurityProfileBehaviors][1] action.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiot.html#awsiot-actions-as-permissions
+    #
     # @option params [required, Array<Types::Behavior>] :behaviors
     #   Specifies the behaviors that, when violated by a device (thing), cause
     #   an alert.
@@ -11313,6 +15577,7 @@ module Aws::IoT
     #           },
     #         },
     #         suppress_alerts: false,
+    #         export_metric: false,
     #       },
     #     ],
     #   })
@@ -11336,14 +15601,19 @@ module Aws::IoT
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::IoT')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-iot'
-      context[:gem_version] = '1.64.0'
+      context[:gem_version] = '1.136.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-ivs/types'
-require_relative 'aws-sdk-ivs/client_api'
-require_relative 'aws-sdk-ivs/client'
-require_relative 'aws-sdk-ivs/errors'
-require_relative 'aws-sdk-ivs/resource'
-require_relative 'aws-sdk-ivs/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:ivs)
 
 # This module provides support for Amazon Interactive Video Service. This module is available in the
 # `aws-sdk-ivs` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-ivs/customizations'
 #
 # @!group service
 module Aws::IVS
+  autoload :Types, 'aws-sdk-ivs/types'
+  autoload :ClientApi, 'aws-sdk-ivs/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-ivs/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-ivs/client'
+  autoload :Errors, 'aws-sdk-ivs/errors'
+  autoload :Resource, 'aws-sdk-ivs/resource'
+  autoload :EndpointParameters, 'aws-sdk-ivs/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-ivs/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-ivs/endpoints'
 
-  GEM_VERSION = '1.5.0'
+  GEM_VERSION = '1.61.0'
 
 end
+
+require_relative 'aws-sdk-ivs/customizations'

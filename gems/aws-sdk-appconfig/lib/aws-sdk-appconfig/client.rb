@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:appconfig)
 
 module Aws::AppConfig
   # An API client for AppConfig.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::AppConfig
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::AppConfig::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::AppConfig
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::AppConfig
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::AppConfig
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::AppConfig
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::AppConfig
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::AppConfig
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::AppConfig
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::AppConfig::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::AppConfig::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -327,11 +447,11 @@ module Aws::AppConfig
 
     # @!group API Operations
 
-    # An application in AppConfig is a logical unit of code that provides
-    # capabilities for your customers. For example, an application can be a
-    # microservice that runs on Amazon EC2 instances, a mobile application
-    # installed by your users, a serverless application using Amazon API
-    # Gateway and AWS Lambda, or any system you run on behalf of others.
+    # Creates an application. In AppConfig, an application is simply an
+    # organizational construct like a folder. This organizational construct
+    # has a relationship with some unit of executable code. For example, you
+    # could create an application called MyMobileApp to organize and manage
+    # configuration data for a mobile application installed by your users.
     #
     # @option params [required, String] :name
     #   A name for the application.
@@ -349,6 +469,23 @@ module Aws::AppConfig
     #   * {Types::Application#id #id} => String
     #   * {Types::Application#name #name} => String
     #   * {Types::Application#description #description} => String
+    #
+    #
+    # @example Example: To create an application
+    #
+    #   # The following create-application example creates an application in AWS AppConfig.
+    #
+    #   resp = client.create_application({
+    #     description: "An application used for creating an example.", 
+    #     name: "example-application", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     description: "An application used for creating an example.", 
+    #     id: "339ohji", 
+    #     name: "example-application", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -375,25 +512,42 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Information that enables AppConfig to access the configuration source.
-    # Valid configuration sources include Systems Manager (SSM) documents,
-    # SSM Parameter Store parameters, and Amazon S3 objects. A configuration
-    # profile includes the following information.
+    # Creates a configuration profile, which is information that enables
+    # AppConfig to access the configuration source. Valid configuration
+    # sources include the following:
     #
-    # * The Uri location of the configuration data.
+    # * Configuration data in YAML, JSON, and other formats stored in the
+    #   AppConfig hosted configuration store
     #
-    # * The AWS Identity and Access Management (IAM) role that provides
-    #   access to the configuration data.
+    # * Configuration data stored as objects in an Amazon Simple Storage
+    #   Service (Amazon S3) bucket
+    #
+    # * Pipelines stored in CodePipeline
+    #
+    # * Secrets stored in Secrets Manager
+    #
+    # * Standard and secure string parameters stored in Amazon Web Services
+    #   Systems Manager Parameter Store
+    #
+    # * Configuration data in SSM documents stored in the Systems Manager
+    #   document store
+    #
+    # A configuration profile includes the following information:
+    #
+    # * The URI location of the configuration data.
+    #
+    # * The Identity and Access Management (IAM) role that provides access
+    #   to the configuration data.
     #
     # * A validator for the configuration data. Available validators include
-    #   either a JSON Schema or an AWS Lambda function.
+    #   either a JSON Schema or an Amazon Web Services Lambda function.
     #
     # For more information, see [Create a Configuration and a Configuration
-    # Profile][1] in the *AWS AppConfig User Guide*.
+    # Profile][1] in the *AppConfig User Guide*.
     #
     #
     #
-    # [1]: http://docs.aws.amazon.com/systems-manager/latest/userguide/appconfig-creating-configuration-and-profile.html
+    # [1]: http://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-creating-configuration-and-profile.html
     #
     # @option params [required, String] :application_id
     #   The application ID.
@@ -405,19 +559,35 @@ module Aws::AppConfig
     #   A description of the configuration profile.
     #
     # @option params [required, String] :location_uri
-    #   A URI to locate the configuration. You can specify a Systems Manager
-    #   (SSM) document, an SSM Parameter Store parameter, or an Amazon S3
-    #   object. For an SSM document, specify either the document name in the
-    #   format `ssm-document://<Document_name>` or the Amazon Resource Name
-    #   (ARN). For a parameter, specify either the parameter name in the
-    #   format `ssm-parameter://<Parameter_name>` or the ARN. For an Amazon S3
-    #   object, specify the URI in the following format:
-    #   `s3://<bucket>/<objectKey> `. Here is an example:
-    #   s3://my-bucket/my-app/us-east-1/my-config.json
+    #   A URI to locate the configuration. You can specify the following:
+    #
+    #   * For the AppConfig hosted configuration store and for feature flags,
+    #     specify `hosted`.
+    #
+    #   * For an Amazon Web Services Systems Manager Parameter Store
+    #     parameter, specify either the parameter name in the format
+    #     `ssm-parameter://<parameter name>` or the ARN.
+    #
+    #   * For an Amazon Web Services CodePipeline pipeline, specify the URI in
+    #     the following format: `codepipeline`://&lt;pipeline name&gt;.
+    #
+    #   * For an Secrets Manager secret, specify the URI in the following
+    #     format: `secretsmanager`://&lt;secret name&gt;.
+    #
+    #   * For an Amazon S3 object, specify the URI in the following format:
+    #     `s3://<bucket>/<objectKey> `. Here is an example:
+    #     `s3://my-bucket/my-app/us-east-1/my-config.json`
+    #
+    #   * For an SSM document, specify either the document name in the format
+    #     `ssm-document://<document name>` or the Amazon Resource Name (ARN).
     #
     # @option params [String] :retrieval_role_arn
     #   The ARN of an IAM role with permission to access the configuration at
-    #   the specified LocationUri.
+    #   the specified `LocationUri`.
+    #
+    #   A retrieval role ARN is not required for configurations stored in the
+    #   AppConfig hosted configuration store. It is required for all other
+    #   sources that store your configuration.
     #
     # @option params [Array<Types::Validator>] :validators
     #   A list of methods for validating the configuration.
@@ -426,6 +596,27 @@ module Aws::AppConfig
     #   Metadata to assign to the configuration profile. Tags help organize
     #   and categorize your AppConfig resources. Each tag consists of a key
     #   and an optional value, both of which you define.
+    #
+    # @option params [String] :type
+    #   The type of configurations contained in the profile. AppConfig
+    #   supports `feature flags` and `freeform` configurations. We recommend
+    #   you create feature flag configurations to enable or disable new
+    #   features and freeform configurations to distribute configurations to
+    #   an application. When calling this API, enter one of the following
+    #   values for `Type`:
+    #
+    #   `AWS.AppConfig.FeatureFlags`
+    #
+    #   `AWS.Freeform`
+    #
+    # @option params [String] :kms_key_identifier
+    #   The identifier for an Key Management Service key to encrypt new
+    #   configuration data versions in the AppConfig hosted configuration
+    #   store. This attribute is only used for `hosted` configuration types.
+    #   The identifier can be an KMS key ID, alias, or the Amazon Resource
+    #   Name (ARN) of the key ID or alias. To encrypt data managed in other
+    #   configuration stores, see the documentation for how to specify an KMS
+    #   key for that particular service.
     #
     # @return [Types::ConfigurationProfile] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -436,12 +627,37 @@ module Aws::AppConfig
     #   * {Types::ConfigurationProfile#location_uri #location_uri} => String
     #   * {Types::ConfigurationProfile#retrieval_role_arn #retrieval_role_arn} => String
     #   * {Types::ConfigurationProfile#validators #validators} => Array&lt;Types::Validator&gt;
+    #   * {Types::ConfigurationProfile#type #type} => String
+    #   * {Types::ConfigurationProfile#kms_key_arn #kms_key_arn} => String
+    #   * {Types::ConfigurationProfile#kms_key_identifier #kms_key_identifier} => String
+    #
+    #
+    # @example Example: To create a configuration profile
+    #
+    #   # The following create-configuration-profile example creates a configuration profile using a configuration stored in
+    #   # Parameter Store, a capability of Systems Manager.
+    #
+    #   resp = client.create_configuration_profile({
+    #     application_id: "339ohji", 
+    #     location_uri: "ssm-parameter://Example-Parameter", 
+    #     name: "Example-Configuration-Profile", 
+    #     retrieval_role_arn: "arn:aws:iam::111122223333:role/Example-App-Config-Role", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     application_id: "339ohji", 
+    #     id: "ur8hx2f", 
+    #     location_uri: "ssm-parameter://Example-Parameter", 
+    #     name: "Example-Configuration-Profile", 
+    #     retrieval_role_arn: "arn:aws:iam::111122223333:role/Example-App-Config-Role", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.create_configuration_profile({
     #     application_id: "Id", # required
-    #     name: "Name", # required
+    #     name: "LongName", # required
     #     description: "Description",
     #     location_uri: "Uri", # required
     #     retrieval_role_arn: "RoleArn",
@@ -454,6 +670,8 @@ module Aws::AppConfig
     #     tags: {
     #       "TagKey" => "TagValue",
     #     },
+    #     type: "ConfigurationProfileType",
+    #     kms_key_identifier: "KmsKeyIdentifier",
     #   })
     #
     # @example Response structure
@@ -467,6 +685,9 @@ module Aws::AppConfig
     #   resp.validators #=> Array
     #   resp.validators[0].type #=> String, one of "JSON_SCHEMA", "LAMBDA"
     #   resp.validators[0].content #=> String
+    #   resp.type #=> String
+    #   resp.kms_key_arn #=> String
+    #   resp.kms_key_identifier #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/CreateConfigurationProfile AWS API Documentation
     #
@@ -477,11 +698,11 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # A deployment strategy defines important criteria for rolling out your
-    # configuration to the designated targets. A deployment strategy
-    # includes: the overall duration required, a percentage of targets to
-    # receive the deployment during each interval, an algorithm that defines
-    # how percentage grows, and bake time.
+    # Creates a deployment strategy that defines important criteria for
+    # rolling out your configuration to the designated targets. A deployment
+    # strategy includes the overall duration required, a percentage of
+    # targets to receive the deployment during each interval, an algorithm
+    # that defines how percentage grows, and bake time.
     #
     # @option params [required, String] :name
     #   A name for the deployment strategy.
@@ -493,19 +714,28 @@ module Aws::AppConfig
     #   Total amount of time for a deployment to last.
     #
     # @option params [Integer] :final_bake_time_in_minutes
-    #   The amount of time AppConfig monitors for alarms before considering
-    #   the deployment to be complete and no longer eligible for automatic
-    #   roll back.
+    #   Specifies the amount of time AppConfig monitors for Amazon CloudWatch
+    #   alarms after the configuration has been deployed to 100% of its
+    #   targets, before considering the deployment to be complete. If an alarm
+    #   is triggered during this time, AppConfig rolls back the deployment.
+    #   You must configure permissions for AppConfig to roll back based on
+    #   CloudWatch alarms. For more information, see [Configuring permissions
+    #   for rollback based on Amazon CloudWatch alarms][1] in the *AppConfig
+    #   User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/getting-started-with-appconfig-cloudwatch-alarms-permissions.html
     #
     # @option params [required, Float] :growth_factor
     #   The percentage of targets to receive a deployed configuration during
     #   each interval.
     #
     # @option params [String] :growth_type
-    #   The algorithm used to define how percentage grows over time. AWS
-    #   AppConfig supports the following growth types:
+    #   The algorithm used to define how percentage grows over time. AppConfig
+    #   supports the following growth types:
     #
-    #   **Linear**\: For this type, AppConfig processes the deployment by
+    #   **Linear**: For this type, AppConfig processes the deployment by
     #   dividing the total number of targets by the value specified for `Step
     #   percentage`. For example, a linear deployment that uses a `Step
     #   percentage` of 10 deploys the configuration to 10 percent of the
@@ -513,7 +743,7 @@ module Aws::AppConfig
     #   configuration to the next 10 percent. This continues until 100% of the
     #   targets have successfully received the configuration.
     #
-    #   **Exponential**\: For this type, AppConfig processes the deployment
+    #   **Exponential**: For this type, AppConfig processes the deployment
     #   exponentially using the following formula: `G*(2^N)`. In this formula,
     #   `G` is the growth factor specified by the user and `N` is the number
     #   of steps until the configuration is deployed to all targets. For
@@ -530,7 +760,7 @@ module Aws::AppConfig
     #   targets, 4% of the targets, 8% of the targets, and continues until the
     #   configuration has been deployed to all targets.
     #
-    # @option params [required, String] :replicate_to
+    # @option params [String] :replicate_to
     #   Save the deployment strategy to a Systems Manager (SSM) document.
     #
     # @option params [Hash<String,String>] :tags
@@ -549,6 +779,31 @@ module Aws::AppConfig
     #   * {Types::DeploymentStrategy#final_bake_time_in_minutes #final_bake_time_in_minutes} => Integer
     #   * {Types::DeploymentStrategy#replicate_to #replicate_to} => String
     #
+    #
+    # @example Example: To create a deployment strategy
+    #
+    #   # The following create-deployment-strategy example creates a deployment strategy called Example-Deployment that takes 15
+    #   # minutes and deploys the configuration to 25% of the application at a time. The strategy is also copied to an SSM
+    #   # Document.
+    #
+    #   resp = client.create_deployment_strategy({
+    #     deployment_duration_in_minutes: 15, 
+    #     growth_factor: 25, 
+    #     name: "Example-Deployment", 
+    #     replicate_to: "SSM_DOCUMENT", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     deployment_duration_in_minutes: 15, 
+    #     final_bake_time_in_minutes: 0, 
+    #     growth_factor: 25, 
+    #     growth_type: "LINEAR", 
+    #     id: "1225qzk", 
+    #     name: "Example-Deployment", 
+    #     replicate_to: "SSM_DOCUMENT", 
+    #   }
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.create_deployment_strategy({
@@ -558,7 +813,7 @@ module Aws::AppConfig
     #     final_bake_time_in_minutes: 1,
     #     growth_factor: 1.0, # required
     #     growth_type: "LINEAR", # accepts LINEAR, EXPONENTIAL
-    #     replicate_to: "NONE", # required, accepts NONE, SSM_DOCUMENT
+    #     replicate_to: "NONE", # accepts NONE, SSM_DOCUMENT
     #     tags: {
     #       "TagKey" => "TagValue",
     #     },
@@ -584,14 +839,14 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # For each application, you define one or more environments. An
-    # environment is a logical deployment group of AppConfig targets, such
-    # as applications in a `Beta` or `Production` environment. You can also
-    # define environments for application subcomponents such as the `Web`,
-    # `Mobile` and `Back-end` components for your application. You can
-    # configure Amazon CloudWatch alarms for each environment. The system
-    # monitors alarms during a configuration deployment. If an alarm is
-    # triggered, the system rolls back the configuration.
+    # Creates an environment. For each application, you define one or more
+    # environments. An environment is a deployment group of AppConfig
+    # targets, such as applications in a `Beta` or `Production` environment.
+    # You can also define environments for application subcomponents such as
+    # the `Web`, `Mobile` and `Back-end` components for your application.
+    # You can configure Amazon CloudWatch alarms for each environment. The
+    # system monitors alarms during a configuration deployment. If an alarm
+    # is triggered, the system rolls back the configuration.
     #
     # @option params [required, String] :application_id
     #   The application ID.
@@ -619,6 +874,25 @@ module Aws::AppConfig
     #   * {Types::Environment#state #state} => String
     #   * {Types::Environment#monitors #monitors} => Array&lt;Types::Monitor&gt;
     #
+    #
+    # @example Example: To create an environment
+    #
+    #   # The following create-environment example creates an AWS AppConfig environment named Example-Environment using the
+    #   # application you created using create-application
+    #
+    #   resp = client.create_environment({
+    #     application_id: "339ohji", 
+    #     name: "Example-Environment", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     application_id: "339ohji", 
+    #     id: "54j1r29", 
+    #     name: "Example-Environment", 
+    #     state: "READY_FOR_DEPLOYMENT", 
+    #   }
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.create_environment({
@@ -627,7 +901,7 @@ module Aws::AppConfig
     #     description: "Description",
     #     monitors: [
     #       {
-    #         alarm_arn: "Arn",
+    #         alarm_arn: "StringWithLengthBetween1And2048", # required
     #         alarm_role_arn: "RoleArn",
     #       },
     #     ],
@@ -656,7 +930,214 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Create a new configuration in the AppConfig configuration store.
+    # Creates an AppConfig extension. An extension augments your ability to
+    # inject logic or behavior at different points during the AppConfig
+    # workflow of creating or deploying a configuration.
+    #
+    # You can create your own extensions or use the Amazon Web Services
+    # authored extensions provided by AppConfig. For an AppConfig extension
+    # that uses Lambda, you must create a Lambda function to perform any
+    # computation and processing defined in the extension. If you plan to
+    # create custom versions of the Amazon Web Services authored
+    # notification extensions, you only need to specify an Amazon Resource
+    # Name (ARN) in the `Uri` field for the new extension version.
+    #
+    # * For a custom EventBridge notification extension, enter the ARN of
+    #   the EventBridge default events in the `Uri` field.
+    #
+    # * For a custom Amazon SNS notification extension, enter the ARN of an
+    #   Amazon SNS topic in the `Uri` field.
+    #
+    # * For a custom Amazon SQS notification extension, enter the ARN of an
+    #   Amazon SQS message queue in the `Uri` field.
+    #
+    # For more information about extensions, see [Extending workflows][1] in
+    # the *AppConfig User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/working-with-appconfig-extensions.html
+    #
+    # @option params [required, String] :name
+    #   A name for the extension. Each extension name in your account must be
+    #   unique. Extension versions use the same name.
+    #
+    # @option params [String] :description
+    #   Information about the extension.
+    #
+    # @option params [required, Hash<String,Array>] :actions
+    #   The actions defined in the extension.
+    #
+    # @option params [Hash<String,Types::Parameter>] :parameters
+    #   The parameters accepted by the extension. You specify parameter values
+    #   when you associate the extension to an AppConfig resource by using the
+    #   `CreateExtensionAssociation` API action. For Lambda extension actions,
+    #   these parameters are included in the Lambda request object.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Adds one or more tags for the specified extension. Tags are metadata
+    #   that help you categorize resources in different ways, for example, by
+    #   purpose, owner, or environment. Each tag consists of a key and an
+    #   optional value, both of which you define.
+    #
+    # @option params [Integer] :latest_version_number
+    #   You can omit this field when you create an extension. When you create
+    #   a new version, specify the most recent current version number. For
+    #   example, you create version 3, enter 2 for this field.
+    #
+    # @return [Types::Extension] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::Extension#id #id} => String
+    #   * {Types::Extension#name #name} => String
+    #   * {Types::Extension#version_number #version_number} => Integer
+    #   * {Types::Extension#arn #arn} => String
+    #   * {Types::Extension#description #description} => String
+    #   * {Types::Extension#actions #actions} => Hash&lt;String,Array&lt;Types::Action&gt;&gt;
+    #   * {Types::Extension#parameters #parameters} => Hash&lt;String,Types::Parameter&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_extension({
+    #     name: "ExtensionOrParameterName", # required
+    #     description: "Description",
+    #     actions: { # required
+    #       "PRE_CREATE_HOSTED_CONFIGURATION_VERSION" => [
+    #         {
+    #           name: "Name",
+    #           description: "Description",
+    #           uri: "Uri",
+    #           role_arn: "Arn",
+    #         },
+    #       ],
+    #     },
+    #     parameters: {
+    #       "ExtensionOrParameterName" => {
+    #         description: "Description",
+    #         required: false,
+    #         dynamic: false,
+    #       },
+    #     },
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #     latest_version_number: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #   resp.name #=> String
+    #   resp.version_number #=> Integer
+    #   resp.arn #=> String
+    #   resp.description #=> String
+    #   resp.actions #=> Hash
+    #   resp.actions["ActionPoint"] #=> Array
+    #   resp.actions["ActionPoint"][0].name #=> String
+    #   resp.actions["ActionPoint"][0].description #=> String
+    #   resp.actions["ActionPoint"][0].uri #=> String
+    #   resp.actions["ActionPoint"][0].role_arn #=> String
+    #   resp.parameters #=> Hash
+    #   resp.parameters["ExtensionOrParameterName"].description #=> String
+    #   resp.parameters["ExtensionOrParameterName"].required #=> Boolean
+    #   resp.parameters["ExtensionOrParameterName"].dynamic #=> Boolean
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/CreateExtension AWS API Documentation
+    #
+    # @overload create_extension(params = {})
+    # @param [Hash] params ({})
+    def create_extension(params = {}, options = {})
+      req = build_request(:create_extension, params)
+      req.send_request(options)
+    end
+
+    # When you create an extension or configure an Amazon Web Services
+    # authored extension, you associate the extension with an AppConfig
+    # application, environment, or configuration profile. For example, you
+    # can choose to run the `AppConfig deployment events to Amazon SNS`
+    # Amazon Web Services authored extension and receive notifications on an
+    # Amazon SNS topic anytime a configuration deployment is started for a
+    # specific application. Defining which extension to associate with an
+    # AppConfig resource is called an *extension association*. An extension
+    # association is a specified relationship between an extension and an
+    # AppConfig resource, such as an application or a configuration profile.
+    # For more information about extensions and associations, see [Extending
+    # workflows][1] in the *AppConfig User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/working-with-appconfig-extensions.html
+    #
+    # @option params [required, String] :extension_identifier
+    #   The name, the ID, or the Amazon Resource Name (ARN) of the extension.
+    #
+    # @option params [Integer] :extension_version_number
+    #   The version number of the extension. If not specified, AppConfig uses
+    #   the maximum version of the extension.
+    #
+    # @option params [required, String] :resource_identifier
+    #   The ARN of an application, configuration profile, or environment.
+    #
+    # @option params [Hash<String,String>] :parameters
+    #   The parameter names and values defined in the extensions. Extension
+    #   parameters marked `Required` must be entered for this field.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   Adds one or more tags for the specified extension association. Tags
+    #   are metadata that help you categorize resources in different ways, for
+    #   example, by purpose, owner, or environment. Each tag consists of a key
+    #   and an optional value, both of which you define.
+    #
+    # @return [Types::ExtensionAssociation] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ExtensionAssociation#id #id} => String
+    #   * {Types::ExtensionAssociation#extension_arn #extension_arn} => String
+    #   * {Types::ExtensionAssociation#resource_arn #resource_arn} => String
+    #   * {Types::ExtensionAssociation#arn #arn} => String
+    #   * {Types::ExtensionAssociation#parameters #parameters} => Hash&lt;String,String&gt;
+    #   * {Types::ExtensionAssociation#extension_version_number #extension_version_number} => Integer
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_extension_association({
+    #     extension_identifier: "Identifier", # required
+    #     extension_version_number: 1,
+    #     resource_identifier: "Identifier", # required
+    #     parameters: {
+    #       "ExtensionOrParameterName" => "StringWithLengthBetween1And2048",
+    #     },
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #   resp.extension_arn #=> String
+    #   resp.resource_arn #=> String
+    #   resp.arn #=> String
+    #   resp.parameters #=> Hash
+    #   resp.parameters["ExtensionOrParameterName"] #=> String
+    #   resp.extension_version_number #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/CreateExtensionAssociation AWS API Documentation
+    #
+    # @overload create_extension_association(params = {})
+    # @param [Hash] params ({})
+    def create_extension_association(params = {}, options = {})
+      req = build_request(:create_extension_association, params)
+      req.send_request(options)
+    end
+
+    # Creates a new configuration in the AppConfig hosted configuration
+    # store. If you're creating a feature flag, we recommend you
+    # familiarize yourself with the JSON schema for feature flag data. For
+    # more information, see [Type reference for
+    # AWS.AppConfig.FeatureFlags][1] in the *AppConfig User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-creating-configuration-and-profile-feature-flags.html#appconfig-type-reference-feature-flags
     #
     # @option params [required, String] :application_id
     #   The application ID.
@@ -668,7 +1149,12 @@ module Aws::AppConfig
     #   A description of the configuration.
     #
     # @option params [required, String, StringIO, File] :content
-    #   The content of the configuration or the configuration data.
+    #   The configuration data, as bytes.
+    #
+    #   <note markdown="1"> AppConfig accepts any type of data, including text formats like JSON
+    #   or TOML, or binary formats like protocol buffers or compressed data.
+    #
+    #    </note>
     #
     # @option params [required, String] :content_type
     #   A standard MIME type describing the format of the configuration
@@ -676,14 +1162,19 @@ module Aws::AppConfig
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/https:/www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17
+    #   [1]: https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17
     #
     # @option params [Integer] :latest_version_number
     #   An optional locking token used to prevent race conditions from
     #   overwriting configuration updates when creating a new version. To
     #   ensure your data is not overwritten when creating multiple hosted
-    #   configuration versions in rapid succession, specify the version of the
-    #   latest hosted configuration version.
+    #   configuration versions in rapid succession, specify the version number
+    #   of the latest hosted configuration version.
+    #
+    # @option params [String] :version_label
+    #   An optional, user-defined label for the AppConfig hosted configuration
+    #   version. This value must contain at least one non-numeric character.
+    #   For example, "v2.2.0".
     #
     # @return [Types::HostedConfigurationVersion] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -693,6 +1184,30 @@ module Aws::AppConfig
     #   * {Types::HostedConfigurationVersion#description #description} => String
     #   * {Types::HostedConfigurationVersion#content #content} => String
     #   * {Types::HostedConfigurationVersion#content_type #content_type} => String
+    #   * {Types::HostedConfigurationVersion#version_label #version_label} => String
+    #   * {Types::HostedConfigurationVersion#kms_key_arn #kms_key_arn} => String
+    #
+    #
+    # @example Example: To create a hosted configuration version
+    #
+    #   # The following create-hosted-configuration-version example creates a new configuration in the AWS AppConfig configuration
+    #   # store.
+    #
+    #   resp = client.create_hosted_configuration_version({
+    #     application_id: "339ohji", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #     content: "eyAiTmFtZSI6ICJFeGFtcGxlQXBwbGljYXRpb24iLCAiSWQiOiBFeGFtcGxlSUQsICJSYW5rIjogNyB9", 
+    #     content_type: "text", 
+    #     latest_version_number: 1, 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     application_id: "339ohji", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #     content_type: "text", 
+    #     version_number: 1, 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -703,6 +1218,7 @@ module Aws::AppConfig
     #     content: "data", # required
     #     content_type: "StringWithLengthBetween1And255", # required
     #     latest_version_number: 1,
+    #     version_label: "VersionLabel",
     #   })
     #
     # @example Response structure
@@ -713,6 +1229,8 @@ module Aws::AppConfig
     #   resp.description #=> String
     #   resp.content #=> String
     #   resp.content_type #=> String
+    #   resp.version_label #=> String
+    #   resp.kms_key_arn #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/CreateHostedConfigurationVersion AWS API Documentation
     #
@@ -723,13 +1241,21 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Delete an application. Deleting an application does not delete a
-    # configuration from a host.
+    # Deletes an application.
     #
     # @option params [required, String] :application_id
     #   The ID of the application to delete.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    #
+    # @example Example: To delete an application
+    #
+    #   # The following delete-application example deletes the specified application. 
+    #
+    #   resp = client.delete_application({
+    #     application_id: "339ohji", 
+    #   })
     #
     # @example Request syntax with placeholder values
     #
@@ -746,8 +1272,14 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Delete a configuration profile. Deleting a configuration profile does
-    # not delete a configuration from a host.
+    # Deletes a configuration profile.
+    #
+    # To prevent users from unintentionally deleting actively-used
+    # configuration profiles, enable [deletion protection][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/deletion-protection.html
     #
     # @option params [required, String] :application_id
     #   The application ID that includes the configuration profile you want to
@@ -756,13 +1288,50 @@ module Aws::AppConfig
     # @option params [required, String] :configuration_profile_id
     #   The ID of the configuration profile you want to delete.
     #
+    # @option params [String] :deletion_protection_check
+    #   A parameter to configure deletion protection. If enabled, deletion
+    #   protection prevents a user from deleting a configuration profile if
+    #   your application has called either [GetLatestConfiguration][1] or for
+    #   the configuration profile during the specified interval.
+    #
+    #   This parameter supports the following values:
+    #
+    #   * `BYPASS`: Instructs AppConfig to bypass the deletion protection
+    #     check and delete a configuration profile even if deletion protection
+    #     would have otherwise prevented it.
+    #
+    #   * `APPLY`: Instructs the deletion protection check to run, even if
+    #     deletion protection is disabled at the account level. `APPLY` also
+    #     forces the deletion protection check to run against resources
+    #     created in the past hour, which are normally excluded from deletion
+    #     protection checks.
+    #
+    #   * `ACCOUNT_DEFAULT`: The default setting, which instructs AppConfig to
+    #     implement the deletion protection value specified in the
+    #     `UpdateAccountSettings` API.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/appconfig/2019-10-09/APIReference/API_appconfigdata_GetLatestConfiguration.html
+    #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    #
+    # @example Example: To delete a configuration profile
+    #
+    #   # The following delete-configuration-profile example deletes the specified configuration profile.
+    #
+    #   resp = client.delete_configuration_profile({
+    #     application_id: "339ohji", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #   })
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.delete_configuration_profile({
     #     application_id: "Id", # required
     #     configuration_profile_id: "Id", # required
+    #     deletion_protection_check: "ACCOUNT_DEFAULT", # accepts ACCOUNT_DEFAULT, APPLY, BYPASS
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/DeleteConfigurationProfile AWS API Documentation
@@ -774,13 +1343,21 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Delete a deployment strategy. Deleting a deployment strategy does not
-    # delete a configuration from a host.
+    # Deletes a deployment strategy.
     #
     # @option params [required, String] :deployment_strategy_id
     #   The ID of the deployment strategy you want to delete.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    #
+    # @example Example: To delete a deployment strategy
+    #
+    #   # The following delete-deployment-strategy example deletes the specified deployment strategy.
+    #
+    #   resp = client.delete_deployment_strategy({
+    #     deployment_strategy_id: "1225qzk", 
+    #   })
     #
     # @example Request syntax with placeholder values
     #
@@ -797,22 +1374,66 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Delete an environment. Deleting an environment does not delete a
-    # configuration from a host.
+    # Deletes an environment.
     #
-    # @option params [required, String] :application_id
-    #   The application ID that includes the environment you want to delete.
+    # To prevent users from unintentionally deleting actively-used
+    # environments, enable [deletion protection][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/deletion-protection.html
     #
     # @option params [required, String] :environment_id
-    #   The ID of the environment you want to delete.
+    #   The ID of the environment that you want to delete.
+    #
+    # @option params [required, String] :application_id
+    #   The application ID that includes the environment that you want to
+    #   delete.
+    #
+    # @option params [String] :deletion_protection_check
+    #   A parameter to configure deletion protection. If enabled, deletion
+    #   protection prevents a user from deleting an environment if your
+    #   application called either [GetLatestConfiguration][1] or in the
+    #   environment during the specified interval.
+    #
+    #   This parameter supports the following values:
+    #
+    #   * `BYPASS`: Instructs AppConfig to bypass the deletion protection
+    #     check and delete a configuration profile even if deletion protection
+    #     would have otherwise prevented it.
+    #
+    #   * `APPLY`: Instructs the deletion protection check to run, even if
+    #     deletion protection is disabled at the account level. `APPLY` also
+    #     forces the deletion protection check to run against resources
+    #     created in the past hour, which are normally excluded from deletion
+    #     protection checks.
+    #
+    #   * `ACCOUNT_DEFAULT`: The default setting, which instructs AppConfig to
+    #     implement the deletion protection value specified in the
+    #     `UpdateAccountSettings` API.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/appconfig/2019-10-09/APIReference/API_appconfigdata_GetLatestConfiguration.html
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    #
+    # @example Example: To delete an environment
+    #
+    #   # The following delete-environment example deletes the specified application environment.
+    #
+    #   resp = client.delete_environment({
+    #     application_id: "339ohji", 
+    #     environment_id: "54j1r29", 
+    #   })
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.delete_environment({
-    #     application_id: "Id", # required
     #     environment_id: "Id", # required
+    #     application_id: "Id", # required
+    #     deletion_protection_check: "ACCOUNT_DEFAULT", # accepts ACCOUNT_DEFAULT, APPLY, BYPASS
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/DeleteEnvironment AWS API Documentation
@@ -824,8 +1445,60 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Delete a version of a configuration from the AppConfig configuration
-    # store.
+    # Deletes an AppConfig extension. You must delete all associations to an
+    # extension before you delete the extension.
+    #
+    # @option params [required, String] :extension_identifier
+    #   The name, ID, or Amazon Resource Name (ARN) of the extension you want
+    #   to delete.
+    #
+    # @option params [Integer] :version_number
+    #   A specific version of an extension to delete. If omitted, the highest
+    #   version is deleted.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_extension({
+    #     extension_identifier: "Identifier", # required
+    #     version_number: 1,
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/DeleteExtension AWS API Documentation
+    #
+    # @overload delete_extension(params = {})
+    # @param [Hash] params ({})
+    def delete_extension(params = {}, options = {})
+      req = build_request(:delete_extension, params)
+      req.send_request(options)
+    end
+
+    # Deletes an extension association. This action doesn't delete
+    # extensions defined in the association.
+    #
+    # @option params [required, String] :extension_association_id
+    #   The ID of the extension association to delete.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_extension_association({
+    #     extension_association_id: "Id", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/DeleteExtensionAssociation AWS API Documentation
+    #
+    # @overload delete_extension_association(params = {})
+    # @param [Hash] params ({})
+    def delete_extension_association(params = {}, options = {})
+      req = build_request(:delete_extension_association, params)
+      req.send_request(options)
+    end
+
+    # Deletes a version of a configuration from the AppConfig hosted
+    # configuration store.
     #
     # @option params [required, String] :application_id
     #   The application ID.
@@ -837,6 +1510,18 @@ module Aws::AppConfig
     #   The versions number to delete.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    #
+    # @example Example: To delete a hosted configuration version
+    #
+    #   # The following delete-hosted-configuration-version example deletes a configuration version hosted in the AWS AppConfig
+    #   # configuration store.
+    #
+    #   resp = client.delete_hosted_configuration_version({
+    #     application_id: "339ohji", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #     version_number: 1, 
+    #   })
     #
     # @example Request syntax with placeholder values
     #
@@ -855,7 +1540,28 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Retrieve information about an application.
+    # Returns information about the status of the `DeletionProtection`
+    # parameter.
+    #
+    # @return [Types::AccountSettings] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::AccountSettings#deletion_protection #deletion_protection} => Types::DeletionProtectionSettings
+    #
+    # @example Response structure
+    #
+    #   resp.deletion_protection.enabled #=> Boolean
+    #   resp.deletion_protection.protection_period_in_minutes #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/GetAccountSettings AWS API Documentation
+    #
+    # @overload get_account_settings(params = {})
+    # @param [Hash] params ({})
+    def get_account_settings(params = {}, options = {})
+      req = build_request(:get_account_settings, params)
+      req.send_request(options)
+    end
+
+    # Retrieves information about an application.
     #
     # @option params [required, String] :application_id
     #   The ID of the application you want to get.
@@ -865,6 +1571,21 @@ module Aws::AppConfig
     #   * {Types::Application#id #id} => String
     #   * {Types::Application#name #name} => String
     #   * {Types::Application#description #description} => String
+    #
+    #
+    # @example Example: To list details of an application
+    #
+    #   # The following get-application example lists the details of the specified application.
+    #
+    #   resp = client.get_application({
+    #     application_id: "339ohji", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     id: "339ohji", 
+    #     name: "example-application", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -887,19 +1608,22 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Receive information about a configuration.
+    # (Deprecated) Retrieves the latest deployed configuration.
     #
-    # AWS AppConfig uses the value of the `ClientConfigurationVersion`
-    # parameter to identify the configuration version on your clients. If
-    # you don’t send `ClientConfigurationVersion` with each call to
-    # `GetConfiguration`, your clients receive the current configuration.
-    # You are charged each time your clients receive a configuration.
+    # Note the following important information.
     #
-    #  To avoid excess charges, we recommend that you include the
-    # `ClientConfigurationVersion` value with every call to
-    # `GetConfiguration`. This value must be saved on your client.
-    # Subsequent calls to `GetConfiguration` must pass this value by using
-    # the `ClientConfigurationVersion` parameter.
+    #  * This API action is deprecated. Calls to receive configuration data
+    #   should use the [StartConfigurationSession][1] and
+    #   [GetLatestConfiguration][2] APIs instead.
+    #
+    # * GetConfiguration is a priced call. For more information, see
+    #   [Pricing][3].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/2019-10-09/APIReference/API_appconfigdata_StartConfigurationSession.html
+    # [2]: https://docs.aws.amazon.com/appconfig/2019-10-09/APIReference/API_appconfigdata_GetLatestConfiguration.html
+    # [3]: https://aws.amazon.com/systems-manager/pricing/
     #
     # @option params [required, String] :application
     #   The application to get. Specify either the application name or the
@@ -914,38 +1638,66 @@ module Aws::AppConfig
     #   configuration ID.
     #
     # @option params [required, String] :client_id
-    #   A unique ID to identify the client for the configuration. This ID
-    #   enables AppConfig to deploy the configuration in intervals, as defined
-    #   in the deployment strategy.
+    #   The clientId parameter in the following command is a unique,
+    #   user-specified ID to identify the client for the configuration. This
+    #   ID enables AppConfig to deploy the configuration in intervals, as
+    #   defined in the deployment strategy.
     #
     # @option params [String] :client_configuration_version
-    #   The configuration version returned in the most recent
-    #   `GetConfiguration` response.
+    #   The configuration version returned in the most recent GetConfiguration
+    #   response.
     #
-    #   AWS AppConfig uses the value of the `ClientConfigurationVersion`
-    #   parameter to identify the configuration version on your clients. If
-    #   you don’t send `ClientConfigurationVersion` with each call to
-    #   `GetConfiguration`, your clients receive the current configuration.
-    #   You are charged each time your clients receive a configuration.
+    #   AppConfig uses the value of the `ClientConfigurationVersion` parameter
+    #   to identify the configuration version on your clients. If you don’t
+    #   send `ClientConfigurationVersion` with each call to GetConfiguration,
+    #   your clients receive the current configuration. You are charged each
+    #   time your clients receive a configuration.
     #
-    #    To avoid excess charges, we recommend that you include the
-    #   `ClientConfigurationVersion` value with every call to
-    #   `GetConfiguration`. This value must be saved on your client.
-    #   Subsequent calls to `GetConfiguration` must pass this value by using
-    #   the `ClientConfigurationVersion` parameter.
+    #    To avoid excess charges, we recommend you use the
+    #   [StartConfigurationSession][1] and [GetLatestConfiguration][2] APIs,
+    #   which track the client configuration version on your behalf. If you
+    #   choose to continue using GetConfiguration, we recommend that you
+    #   include the `ClientConfigurationVersion` value with every call to
+    #   GetConfiguration. The value to use for `ClientConfigurationVersion`
+    #   comes from the `ConfigurationVersion` attribute returned by
+    #   GetConfiguration when there is new or updated data, and should be
+    #   saved for subsequent calls to GetConfiguration.
     #
     #   For more information about working with configurations, see
-    #   [Retrieving the Configuration][1] in the *AWS AppConfig User Guide*.
+    #   [Retrieving the Configuration][3] in the *AppConfig User Guide*.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/systems-manager/latest/userguide/appconfig-retrieving-the-configuration.html
+    #   [1]: https://docs.aws.amazon.com/appconfig/2019-10-09/APIReference/StartConfigurationSession.html
+    #   [2]: https://docs.aws.amazon.com/appconfig/2019-10-09/APIReference/GetLatestConfiguration.html
+    #   [3]: http://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-retrieving-the-configuration.html
     #
     # @return [Types::Configuration] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::Configuration#content #content} => String
     #   * {Types::Configuration#configuration_version #configuration_version} => String
     #   * {Types::Configuration#content_type #content_type} => String
+    #
+    #
+    # @example Example: To retrieve configuration details
+    #
+    #   # The following get-configuration example returns the configuration details of the example application. On subsequent
+    #   # calls to get-configuration, use the client-configuration-version parameter to only update the configuration of your
+    #   # application if the version has changed. Only updating the configuration when the version has changed avoids excess
+    #   # charges incurred by calling get-configuration.
+    #
+    #   resp = client.get_configuration({
+    #     application: "example-application", 
+    #     client_id: "example-id", 
+    #     configuration: "Example-Configuration-Profile", 
+    #     environment: "Example-Environment", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     configuration_version: "1", 
+    #     content_type: "application/octet-stream", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -972,14 +1724,14 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Retrieve information about a configuration profile.
+    # Retrieves information about a configuration profile.
     #
     # @option params [required, String] :application_id
     #   The ID of the application that includes the configuration profile you
     #   want to get.
     #
     # @option params [required, String] :configuration_profile_id
-    #   The ID of the configuration profile you want to get.
+    #   The ID of the configuration profile that you want to get.
     #
     # @return [Types::ConfigurationProfile] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -990,6 +1742,28 @@ module Aws::AppConfig
     #   * {Types::ConfigurationProfile#location_uri #location_uri} => String
     #   * {Types::ConfigurationProfile#retrieval_role_arn #retrieval_role_arn} => String
     #   * {Types::ConfigurationProfile#validators #validators} => Array&lt;Types::Validator&gt;
+    #   * {Types::ConfigurationProfile#type #type} => String
+    #   * {Types::ConfigurationProfile#kms_key_arn #kms_key_arn} => String
+    #   * {Types::ConfigurationProfile#kms_key_identifier #kms_key_identifier} => String
+    #
+    #
+    # @example Example: To retrieve configuration profile details
+    #
+    #   # The following get-configuration-profile example returns the details of the specified configuration profile.
+    #
+    #   resp = client.get_configuration_profile({
+    #     application_id: "339ohji", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     application_id: "339ohji", 
+    #     id: "ur8hx2f", 
+    #     location_uri: "ssm-parameter://Example-Parameter", 
+    #     name: "Example-Configuration-Profile", 
+    #     retrieval_role_arn: "arn:aws:iam::111122223333:role/Example-App-Config-Role", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1009,6 +1783,9 @@ module Aws::AppConfig
     #   resp.validators #=> Array
     #   resp.validators[0].type #=> String, one of "JSON_SCHEMA", "LAMBDA"
     #   resp.validators[0].content #=> String
+    #   resp.type #=> String
+    #   resp.kms_key_arn #=> String
+    #   resp.kms_key_identifier #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/GetConfigurationProfile AWS API Documentation
     #
@@ -1019,7 +1796,7 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Retrieve information about a configuration deployment.
+    # Retrieves information about a configuration deployment.
     #
     # @option params [required, String] :application_id
     #   The ID of the application that includes the deployment you want to
@@ -1052,6 +1829,86 @@ module Aws::AppConfig
     #   * {Types::Deployment#percentage_complete #percentage_complete} => Float
     #   * {Types::Deployment#started_at #started_at} => Time
     #   * {Types::Deployment#completed_at #completed_at} => Time
+    #   * {Types::Deployment#applied_extensions #applied_extensions} => Array&lt;Types::AppliedExtension&gt;
+    #   * {Types::Deployment#kms_key_arn #kms_key_arn} => String
+    #   * {Types::Deployment#kms_key_identifier #kms_key_identifier} => String
+    #   * {Types::Deployment#version_label #version_label} => String
+    #
+    #
+    # @example Example: To retrieve deployment details
+    #
+    #   # The following get-deployment example lists details of the deployment to the application in the specified environment and
+    #   # deployment.
+    #
+    #   resp = client.get_deployment({
+    #     application_id: "339ohji", 
+    #     deployment_number: 1, 
+    #     environment_id: "54j1r29", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     application_id: "339ohji", 
+    #     completed_at: Time.parse("2021-09-17T21:59:03.888000+00:00"), 
+    #     configuration_location_uri: "ssm-parameter://Example-Parameter", 
+    #     configuration_name: "Example-Configuration-Profile", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #     configuration_version: "1", 
+    #     deployment_duration_in_minutes: 15, 
+    #     deployment_number: 1, 
+    #     deployment_strategy_id: "1225qzk", 
+    #     environment_id: "54j1r29", 
+    #     event_log: [
+    #       {
+    #         description: "Deployment completed", 
+    #         event_type: "DEPLOYMENT_COMPLETED", 
+    #         occurred_at: Time.parse("2021-09-17T21:59:03.888000+00:00"), 
+    #         triggered_by: "APPCONFIG", 
+    #       }, 
+    #       {
+    #         description: "Deployment bake time started", 
+    #         event_type: "BAKE_TIME_STARTED", 
+    #         occurred_at: Time.parse("2021-09-17T21:58:57.722000+00:00"), 
+    #         triggered_by: "APPCONFIG", 
+    #       }, 
+    #       {
+    #         description: "Configuration available to 100.00% of clients", 
+    #         event_type: "PERCENTAGE_UPDATED", 
+    #         occurred_at: Time.parse("2021-09-17T21:55:56.816000+00:00"), 
+    #         triggered_by: "APPCONFIG", 
+    #       }, 
+    #       {
+    #         description: "Configuration available to 75.00% of clients", 
+    #         event_type: "PERCENTAGE_UPDATED", 
+    #         occurred_at: Time.parse("2021-09-17T21:52:56.567000+00:00"), 
+    #         triggered_by: "APPCONFIG", 
+    #       }, 
+    #       {
+    #         description: "Configuration available to 50.00% of clients", 
+    #         event_type: "PERCENTAGE_UPDATED", 
+    #         occurred_at: Time.parse("2021-09-17T21:49:55.737000+00:00"), 
+    #         triggered_by: "APPCONFIG", 
+    #       }, 
+    #       {
+    #         description: "Configuration available to 25.00% of clients", 
+    #         event_type: "PERCENTAGE_UPDATED", 
+    #         occurred_at: Time.parse("2021-09-17T21:46:55.187000+00:00"), 
+    #         triggered_by: "APPCONFIG", 
+    #       }, 
+    #       {
+    #         description: "Deployment started", 
+    #         event_type: "DEPLOYMENT_STARTED", 
+    #         occurred_at: Time.parse("2021-09-17T21:43:54.205000+00:00"), 
+    #         triggered_by: "USER", 
+    #       }, 
+    #     ], 
+    #     final_bake_time_in_minutes: 0, 
+    #     growth_factor: 25, 
+    #     growth_type: "LINEAR", 
+    #     percentage_complete: 100, 
+    #     started_at: Time.parse("2021-09-17T21:43:54.205000+00:00"), 
+    #     state: "COMPLETE", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1081,10 +1938,27 @@ module Aws::AppConfig
     #   resp.event_log[0].event_type #=> String, one of "PERCENTAGE_UPDATED", "ROLLBACK_STARTED", "ROLLBACK_COMPLETED", "BAKE_TIME_STARTED", "DEPLOYMENT_STARTED", "DEPLOYMENT_COMPLETED"
     #   resp.event_log[0].triggered_by #=> String, one of "USER", "APPCONFIG", "CLOUDWATCH_ALARM", "INTERNAL_ERROR"
     #   resp.event_log[0].description #=> String
+    #   resp.event_log[0].action_invocations #=> Array
+    #   resp.event_log[0].action_invocations[0].extension_identifier #=> String
+    #   resp.event_log[0].action_invocations[0].action_name #=> String
+    #   resp.event_log[0].action_invocations[0].uri #=> String
+    #   resp.event_log[0].action_invocations[0].role_arn #=> String
+    #   resp.event_log[0].action_invocations[0].error_message #=> String
+    #   resp.event_log[0].action_invocations[0].error_code #=> String
+    #   resp.event_log[0].action_invocations[0].invocation_id #=> String
     #   resp.event_log[0].occurred_at #=> Time
     #   resp.percentage_complete #=> Float
     #   resp.started_at #=> Time
     #   resp.completed_at #=> Time
+    #   resp.applied_extensions #=> Array
+    #   resp.applied_extensions[0].extension_id #=> String
+    #   resp.applied_extensions[0].extension_association_id #=> String
+    #   resp.applied_extensions[0].version_number #=> Integer
+    #   resp.applied_extensions[0].parameters #=> Hash
+    #   resp.applied_extensions[0].parameters["ExtensionOrParameterName"] #=> String
+    #   resp.kms_key_arn #=> String
+    #   resp.kms_key_identifier #=> String
+    #   resp.version_label #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/GetDeployment AWS API Documentation
     #
@@ -1095,9 +1969,9 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Retrieve information about a deployment strategy. A deployment
+    # Retrieves information about a deployment strategy. A deployment
     # strategy defines important criteria for rolling out your configuration
-    # to the designated targets. A deployment strategy includes: the overall
+    # to the designated targets. A deployment strategy includes the overall
     # duration required, a percentage of targets to receive the deployment
     # during each interval, an algorithm that defines how percentage grows,
     # and bake time.
@@ -1115,6 +1989,26 @@ module Aws::AppConfig
     #   * {Types::DeploymentStrategy#growth_factor #growth_factor} => Float
     #   * {Types::DeploymentStrategy#final_bake_time_in_minutes #final_bake_time_in_minutes} => Integer
     #   * {Types::DeploymentStrategy#replicate_to #replicate_to} => String
+    #
+    #
+    # @example Example: To retrieve details of a deployment strategy
+    #
+    #   # The following get-deployment-strategy example lists the details of the specified deployment strategy.
+    #
+    #   resp = client.get_deployment_strategy({
+    #     deployment_strategy_id: "1225qzk", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     deployment_duration_in_minutes: 15, 
+    #     final_bake_time_in_minutes: 0, 
+    #     growth_factor: 25, 
+    #     growth_type: "LINEAR", 
+    #     id: "1225qzk", 
+    #     name: "Example-Deployment", 
+    #     replicate_to: "SSM_DOCUMENT", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1142,7 +2036,7 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Retrieve information about an environment. An environment is a logical
+    # Retrieves information about an environment. An environment is a
     # deployment group of AppConfig applications, such as applications in a
     # `Production` environment or in an `EU_Region` environment. Each
     # configuration deployment targets an environment. You can enable one or
@@ -1154,7 +2048,7 @@ module Aws::AppConfig
     #   get.
     #
     # @option params [required, String] :environment_id
-    #   The ID of the environment you wnat to get.
+    #   The ID of the environment that you want to get.
     #
     # @return [Types::Environment] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1164,6 +2058,24 @@ module Aws::AppConfig
     #   * {Types::Environment#description #description} => String
     #   * {Types::Environment#state #state} => String
     #   * {Types::Environment#monitors #monitors} => Array&lt;Types::Monitor&gt;
+    #
+    #
+    # @example Example: To retrieve environment details
+    #
+    #   # The following get-environment example returns the details and state of the specified environment.
+    #
+    #   resp = client.get_environment({
+    #     application_id: "339ohji", 
+    #     environment_id: "54j1r29", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     application_id: "339ohji", 
+    #     id: "54j1r29", 
+    #     name: "Example-Environment", 
+    #     state: "READY_FOR_DEPLOYMENT", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1192,7 +2104,105 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Get information about a specific configuration version.
+    # Returns information about an AppConfig extension.
+    #
+    # @option params [required, String] :extension_identifier
+    #   The name, the ID, or the Amazon Resource Name (ARN) of the extension.
+    #
+    # @option params [Integer] :version_number
+    #   The extension version number. If no version number was defined,
+    #   AppConfig uses the highest version.
+    #
+    # @return [Types::Extension] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::Extension#id #id} => String
+    #   * {Types::Extension#name #name} => String
+    #   * {Types::Extension#version_number #version_number} => Integer
+    #   * {Types::Extension#arn #arn} => String
+    #   * {Types::Extension#description #description} => String
+    #   * {Types::Extension#actions #actions} => Hash&lt;String,Array&lt;Types::Action&gt;&gt;
+    #   * {Types::Extension#parameters #parameters} => Hash&lt;String,Types::Parameter&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_extension({
+    #     extension_identifier: "Identifier", # required
+    #     version_number: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #   resp.name #=> String
+    #   resp.version_number #=> Integer
+    #   resp.arn #=> String
+    #   resp.description #=> String
+    #   resp.actions #=> Hash
+    #   resp.actions["ActionPoint"] #=> Array
+    #   resp.actions["ActionPoint"][0].name #=> String
+    #   resp.actions["ActionPoint"][0].description #=> String
+    #   resp.actions["ActionPoint"][0].uri #=> String
+    #   resp.actions["ActionPoint"][0].role_arn #=> String
+    #   resp.parameters #=> Hash
+    #   resp.parameters["ExtensionOrParameterName"].description #=> String
+    #   resp.parameters["ExtensionOrParameterName"].required #=> Boolean
+    #   resp.parameters["ExtensionOrParameterName"].dynamic #=> Boolean
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/GetExtension AWS API Documentation
+    #
+    # @overload get_extension(params = {})
+    # @param [Hash] params ({})
+    def get_extension(params = {}, options = {})
+      req = build_request(:get_extension, params)
+      req.send_request(options)
+    end
+
+    # Returns information about an AppConfig extension association. For more
+    # information about extensions and associations, see [Extending
+    # workflows][1] in the *AppConfig User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/working-with-appconfig-extensions.html
+    #
+    # @option params [required, String] :extension_association_id
+    #   The extension association ID to get.
+    #
+    # @return [Types::ExtensionAssociation] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ExtensionAssociation#id #id} => String
+    #   * {Types::ExtensionAssociation#extension_arn #extension_arn} => String
+    #   * {Types::ExtensionAssociation#resource_arn #resource_arn} => String
+    #   * {Types::ExtensionAssociation#arn #arn} => String
+    #   * {Types::ExtensionAssociation#parameters #parameters} => Hash&lt;String,String&gt;
+    #   * {Types::ExtensionAssociation#extension_version_number #extension_version_number} => Integer
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_extension_association({
+    #     extension_association_id: "Id", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #   resp.extension_arn #=> String
+    #   resp.resource_arn #=> String
+    #   resp.arn #=> String
+    #   resp.parameters #=> Hash
+    #   resp.parameters["ExtensionOrParameterName"] #=> String
+    #   resp.extension_version_number #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/GetExtensionAssociation AWS API Documentation
+    #
+    # @overload get_extension_association(params = {})
+    # @param [Hash] params ({})
+    def get_extension_association(params = {}, options = {})
+      req = build_request(:get_extension_association, params)
+      req.send_request(options)
+    end
+
+    # Retrieves information about a specific configuration version.
     #
     # @option params [required, String] :application_id
     #   The application ID.
@@ -1211,6 +2221,28 @@ module Aws::AppConfig
     #   * {Types::HostedConfigurationVersion#description #description} => String
     #   * {Types::HostedConfigurationVersion#content #content} => String
     #   * {Types::HostedConfigurationVersion#content_type #content_type} => String
+    #   * {Types::HostedConfigurationVersion#version_label #version_label} => String
+    #   * {Types::HostedConfigurationVersion#kms_key_arn #kms_key_arn} => String
+    #
+    #
+    # @example Example: To retrieve hosted configuration details
+    #
+    #   # The following get-hosted-configuration-version example retrieves the configuration details of the AWS AppConfig hosted
+    #   # configuration.
+    #
+    #   resp = client.get_hosted_configuration_version({
+    #     application_id: "339ohji", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #     version_number: 1, 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     application_id: "339ohji", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #     content_type: "application/json", 
+    #     version_number: 1, 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1228,6 +2260,8 @@ module Aws::AppConfig
     #   resp.description #=> String
     #   resp.content #=> String
     #   resp.content_type #=> String
+    #   resp.version_label #=> String
+    #   resp.kms_key_arn #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/GetHostedConfigurationVersion AWS API Documentation
     #
@@ -1238,7 +2272,7 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # List all applications in your AWS account.
+    # Lists all applications in your Amazon Web Services account.
     #
     # @option params [Integer] :max_results
     #   The maximum number of items to return for this call. The call also
@@ -1246,8 +2280,12 @@ module Aws::AppConfig
     #   next set of results.
     #
     # @option params [String] :next_token
-    #   A token to start the list. Use this token to get the next set of
-    #   results.
+    #   A token to start the list. Next token is a pagination token generated
+    #   by AppConfig to describe what page the previous List call ended on.
+    #   For the first List request, the nextToken should not be set. On
+    #   subsequent calls, the nextToken parameter should be set to the
+    #   previous responses nextToken value. Use this token to get the next set
+    #   of results.
     #
     # @return [Types::Applications] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1255,6 +2293,29 @@ module Aws::AppConfig
     #   * {Types::Applications#next_token #next_token} => String
     #
     # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    #
+    # @example Example: To list the available applications
+    #
+    #   # The following list-applications example lists the available applications in your AWS account.
+    #
+    #   resp = client.list_applications({
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     items: [
+    #       {
+    #         description: "An application used for creating an example.", 
+    #         id: "339ohji", 
+    #         name: "test-application", 
+    #       }, 
+    #       {
+    #         id: "rwalwu7", 
+    #         name: "Test-Application", 
+    #       }, 
+    #     ], 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1294,6 +2355,11 @@ module Aws::AppConfig
     #   A token to start the list. Use this token to get the next set of
     #   results.
     #
+    # @option params [String] :type
+    #   A filter based on the type of configurations that the configuration
+    #   profile contains. A configuration can be a feature flag or a freeform
+    #   configuration.
+    #
     # @return [Types::ConfigurationProfiles] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ConfigurationProfiles#items #items} => Array&lt;Types::ConfigurationProfileSummary&gt;
@@ -1301,12 +2367,35 @@ module Aws::AppConfig
     #
     # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
+    #
+    # @example Example: To list the available configuration profiles
+    #
+    #   # The following list-configuration-profiles example lists the available configuration profiles for the specified
+    #   # application.
+    #
+    #   resp = client.list_configuration_profiles({
+    #     application_id: "339ohji", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     items: [
+    #       {
+    #         application_id: "339ohji", 
+    #         id: "ur8hx2f", 
+    #         location_uri: "ssm-parameter://Example-Parameter", 
+    #         name: "Example-Configuration-Profile", 
+    #       }, 
+    #     ], 
+    #   }
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.list_configuration_profiles({
     #     application_id: "Id", # required
     #     max_results: 1,
     #     next_token: "NextToken",
+    #     type: "ConfigurationProfileType",
     #   })
     #
     # @example Response structure
@@ -1318,6 +2407,7 @@ module Aws::AppConfig
     #   resp.items[0].location_uri #=> String
     #   resp.items[0].validator_types #=> Array
     #   resp.items[0].validator_types[0] #=> String, one of "JSON_SCHEMA", "LAMBDA"
+    #   resp.items[0].type #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/ListConfigurationProfiles AWS API Documentation
@@ -1329,7 +2419,7 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # List deployment strategies.
+    # Lists deployment strategies.
     #
     # @option params [Integer] :max_results
     #   The maximum number of items to return for this call. The call also
@@ -1346,6 +2436,29 @@ module Aws::AppConfig
     #   * {Types::DeploymentStrategies#next_token #next_token} => String
     #
     # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    #
+    # @example Example: To list the available deployment strategies
+    #
+    #   # The following list-deployment-strategies example lists the available deployment strategies in your AWS account.
+    #
+    #   resp = client.list_deployment_strategies({
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     items: [
+    #       {
+    #         deployment_duration_in_minutes: 15, 
+    #         final_bake_time_in_minutes: 0, 
+    #         growth_factor: 25, 
+    #         growth_type: "LINEAR", 
+    #         id: "1225qzk", 
+    #         name: "Example-Deployment", 
+    #         replicate_to: "SSM_DOCUMENT", 
+    #       }, 
+    #     ], 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1376,7 +2489,8 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Lists the deployments for an environment.
+    # Lists the deployments for an environment in descending deployment
+    # number order.
     #
     # @option params [required, String] :application_id
     #   The application ID.
@@ -1385,13 +2499,15 @@ module Aws::AppConfig
     #   The environment ID.
     #
     # @option params [Integer] :max_results
-    #   The maximum number of items to return for this call. The call also
-    #   returns a token that you can specify in a subsequent call to get the
-    #   next set of results.
+    #   The maximum number of items that may be returned for this call. If
+    #   there are items that have not yet been returned, the response will
+    #   include a non-null `NextToken` that you can provide in a subsequent
+    #   call to get the next set of results.
     #
     # @option params [String] :next_token
-    #   A token to start the list. Use this token to get the next set of
-    #   results.
+    #   The token returned by a prior call to this operation indicating the
+    #   next set of results to be returned. If not specified, the operation
+    #   will return the first set of results.
     #
     # @return [Types::Deployments] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1399,6 +2515,36 @@ module Aws::AppConfig
     #   * {Types::Deployments#next_token #next_token} => String
     #
     # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    #
+    # @example Example: To list the available deployments
+    #
+    #   # The following list-deployments example lists the available deployments in your AWS account for the specified application
+    #   # and environment.
+    #
+    #   resp = client.list_deployments({
+    #     application_id: "339ohji", 
+    #     environment_id: "54j1r29", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     items: [
+    #       {
+    #         completed_at: Time.parse("2021-09-17T21:59:03.888000+00:00"), 
+    #         configuration_name: "Example-Configuration-Profile", 
+    #         configuration_version: "1", 
+    #         deployment_duration_in_minutes: 15, 
+    #         deployment_number: 1, 
+    #         final_bake_time_in_minutes: 0, 
+    #         growth_factor: 25, 
+    #         growth_type: "LINEAR", 
+    #         percentage_complete: 100, 
+    #         started_at: Time.parse("2021-09-17T21:43:54.205000+00:00"), 
+    #         state: "COMPLETE", 
+    #       }, 
+    #     ], 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1423,6 +2569,7 @@ module Aws::AppConfig
     #   resp.items[0].percentage_complete #=> Float
     #   resp.items[0].started_at #=> Time
     #   resp.items[0].completed_at #=> Time
+    #   resp.items[0].version_label #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/ListDeployments AWS API Documentation
@@ -1434,7 +2581,7 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # List the environments for an application.
+    # Lists the environments for an application.
     #
     # @option params [required, String] :application_id
     #   The application ID.
@@ -1454,6 +2601,28 @@ module Aws::AppConfig
     #   * {Types::Environments#next_token #next_token} => String
     #
     # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    #
+    # @example Example: To list the available environments
+    #
+    #   # The following list-environments example lists the available environments in your AWS account for the specified
+    #   # application.
+    #
+    #   resp = client.list_environments({
+    #     application_id: "339ohji", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     items: [
+    #       {
+    #         application_id: "339ohji", 
+    #         id: "54j1r29", 
+    #         name: "Example-Environment", 
+    #         state: "READY_FOR_DEPLOYMENT", 
+    #       }, 
+    #     ], 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1485,7 +2654,121 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # View a list of configurations stored in the AppConfig configuration
+    # Lists all AppConfig extension associations in the account. For more
+    # information about extensions and associations, see [Extending
+    # workflows][1] in the *AppConfig User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/working-with-appconfig-extensions.html
+    #
+    # @option params [String] :resource_identifier
+    #   The ARN of an application, configuration profile, or environment.
+    #
+    # @option params [String] :extension_identifier
+    #   The name, the ID, or the Amazon Resource Name (ARN) of the extension.
+    #
+    # @option params [Integer] :extension_version_number
+    #   The version number for the extension defined in the association.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of items to return for this call. The call also
+    #   returns a token that you can specify in a subsequent call to get the
+    #   next set of results.
+    #
+    # @option params [String] :next_token
+    #   A token to start the list. Use this token to get the next set of
+    #   results or pass null to get the first set of results.
+    #
+    # @return [Types::ExtensionAssociations] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ExtensionAssociations#items #items} => Array&lt;Types::ExtensionAssociationSummary&gt;
+    #   * {Types::ExtensionAssociations#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_extension_associations({
+    #     resource_identifier: "Arn",
+    #     extension_identifier: "Identifier",
+    #     extension_version_number: 1,
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.items #=> Array
+    #   resp.items[0].id #=> String
+    #   resp.items[0].extension_arn #=> String
+    #   resp.items[0].resource_arn #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/ListExtensionAssociations AWS API Documentation
+    #
+    # @overload list_extension_associations(params = {})
+    # @param [Hash] params ({})
+    def list_extension_associations(params = {}, options = {})
+      req = build_request(:list_extension_associations, params)
+      req.send_request(options)
+    end
+
+    # Lists all custom and Amazon Web Services authored AppConfig extensions
+    # in the account. For more information about extensions, see [Extending
+    # workflows][1] in the *AppConfig User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/working-with-appconfig-extensions.html
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of items to return for this call. The call also
+    #   returns a token that you can specify in a subsequent call to get the
+    #   next set of results.
+    #
+    # @option params [String] :next_token
+    #   A token to start the list. Use this token to get the next set of
+    #   results.
+    #
+    # @option params [String] :name
+    #   The extension name.
+    #
+    # @return [Types::Extensions] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::Extensions#items #items} => Array&lt;Types::ExtensionSummary&gt;
+    #   * {Types::Extensions#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_extensions({
+    #     max_results: 1,
+    #     next_token: "NextToken",
+    #     name: "QueryName",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.items #=> Array
+    #   resp.items[0].id #=> String
+    #   resp.items[0].name #=> String
+    #   resp.items[0].version_number #=> Integer
+    #   resp.items[0].arn #=> String
+    #   resp.items[0].description #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/ListExtensions AWS API Documentation
+    #
+    # @overload list_extensions(params = {})
+    # @param [Hash] params ({})
+    def list_extensions(params = {}, options = {})
+      req = build_request(:list_extensions, params)
+      req.send_request(options)
+    end
+
+    # Lists configurations stored in the AppConfig hosted configuration
     # store by version.
     #
     # @option params [required, String] :application_id
@@ -1503,12 +2786,42 @@ module Aws::AppConfig
     #   A token to start the list. Use this token to get the next set of
     #   results.
     #
+    # @option params [String] :version_label
+    #   An optional filter that can be used to specify the version label of an
+    #   AppConfig hosted configuration version. This parameter supports
+    #   filtering by prefix using a wildcard, for example "v2*". If you
+    #   don't specify an asterisk at the end of the value, only an exact
+    #   match is returned.
+    #
     # @return [Types::HostedConfigurationVersions] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::HostedConfigurationVersions#items #items} => Array&lt;Types::HostedConfigurationVersionSummary&gt;
     #   * {Types::HostedConfigurationVersions#next_token #next_token} => String
     #
     # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    #
+    # @example Example: To list the available hosted configuration versions
+    #
+    #   # The following list-hosted-configuration-versions example lists the configurations versions hosted in the AWS AppConfig
+    #   # hosted configuration store for the specified application and configuration profile.
+    #
+    #   resp = client.list_hosted_configuration_versions({
+    #     application_id: "339ohji", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     items: [
+    #       {
+    #         application_id: "339ohji", 
+    #         configuration_profile_id: "ur8hx2f", 
+    #         content_type: "application/json", 
+    #         version_number: 1, 
+    #       }, 
+    #     ], 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1517,6 +2830,7 @@ module Aws::AppConfig
     #     configuration_profile_id: "Id", # required
     #     max_results: 1,
     #     next_token: "NextToken",
+    #     version_label: "QueryName",
     #   })
     #
     # @example Response structure
@@ -1527,6 +2841,8 @@ module Aws::AppConfig
     #   resp.items[0].version_number #=> Integer
     #   resp.items[0].description #=> String
     #   resp.items[0].content_type #=> String
+    #   resp.items[0].version_label #=> String
+    #   resp.items[0].kms_key_arn #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/ListHostedConfigurationVersions AWS API Documentation
@@ -1546,6 +2862,22 @@ module Aws::AppConfig
     # @return [Types::ResourceTags] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ResourceTags#tags #tags} => Hash&lt;String,String&gt;
+    #
+    #
+    # @example Example: To list the tags of an application
+    #
+    #   # The following list-tags-for-resource example lists the tags of a specified application.
+    #
+    #   resp = client.list_tags_for_resource({
+    #     resource_arn: "arn:aws:appconfig:us-east-1:111122223333:application/339ohji", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     tags: {
+    #       "group1" => "1", 
+    #     }, 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1582,7 +2914,10 @@ module Aws::AppConfig
     #   The configuration profile ID.
     #
     # @option params [required, String] :configuration_version
-    #   The configuration version to deploy.
+    #   The configuration version to deploy. If deploying an AppConfig hosted
+    #   configuration version, you can specify either the version number or
+    #   version label. For all other configurations, you must specify the
+    #   version number.
     #
     # @option params [String] :description
     #   A description of the deployment.
@@ -1591,6 +2926,15 @@ module Aws::AppConfig
     #   Metadata to assign to the deployment. Tags help organize and
     #   categorize your AppConfig resources. Each tag consists of a key and an
     #   optional value, both of which you define.
+    #
+    # @option params [String] :kms_key_identifier
+    #   The KMS key identifier (key ID, key alias, or key ARN). AppConfig uses
+    #   this ID to encrypt the configuration data using a customer managed
+    #   key.
+    #
+    # @option params [Hash<String,String>] :dynamic_extension_parameters
+    #   A map of dynamic extension parameter names to values to pass to
+    #   associated extensions with `PRE_START_DEPLOYMENT` actions.
     #
     # @return [Types::Deployment] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1612,6 +2956,54 @@ module Aws::AppConfig
     #   * {Types::Deployment#percentage_complete #percentage_complete} => Float
     #   * {Types::Deployment#started_at #started_at} => Time
     #   * {Types::Deployment#completed_at #completed_at} => Time
+    #   * {Types::Deployment#applied_extensions #applied_extensions} => Array&lt;Types::AppliedExtension&gt;
+    #   * {Types::Deployment#kms_key_arn #kms_key_arn} => String
+    #   * {Types::Deployment#kms_key_identifier #kms_key_identifier} => String
+    #   * {Types::Deployment#version_label #version_label} => String
+    #
+    #
+    # @example Example: To start a configuration deployment
+    #
+    #   # The following start-deployment example starts a deployment to the application using the specified environment,
+    #   # deployment strategy, and configuration profile.
+    #
+    #   resp = client.start_deployment({
+    #     application_id: "339ohji", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #     configuration_version: "1", 
+    #     deployment_strategy_id: "1225qzk", 
+    #     description: "", 
+    #     environment_id: "54j1r29", 
+    #     tags: {
+    #     }, 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     application_id: "339ohji", 
+    #     configuration_location_uri: "ssm-parameter://Example-Parameter", 
+    #     configuration_name: "Example-Configuration-Profile", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #     configuration_version: "1", 
+    #     deployment_duration_in_minutes: 15, 
+    #     deployment_number: 1, 
+    #     deployment_strategy_id: "1225qzk", 
+    #     environment_id: "54j1r29", 
+    #     event_log: [
+    #       {
+    #         description: "Deployment started", 
+    #         event_type: "DEPLOYMENT_STARTED", 
+    #         occurred_at: Time.parse("2021-09-17T21:43:54.205000+00:00"), 
+    #         triggered_by: "USER", 
+    #       }, 
+    #     ], 
+    #     final_bake_time_in_minutes: 0, 
+    #     growth_factor: 25, 
+    #     growth_type: "LINEAR", 
+    #     percentage_complete: 1.0, 
+    #     started_at: Time.parse("2021-09-17T21:43:54.205000+00:00"), 
+    #     state: "DEPLOYING", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1624,6 +3016,10 @@ module Aws::AppConfig
     #     description: "Description",
     #     tags: {
     #       "TagKey" => "TagValue",
+    #     },
+    #     kms_key_identifier: "KmsKeyIdentifier",
+    #     dynamic_extension_parameters: {
+    #       "DynamicParameterKey" => "StringWithLengthBetween1And2048",
     #     },
     #   })
     #
@@ -1647,10 +3043,27 @@ module Aws::AppConfig
     #   resp.event_log[0].event_type #=> String, one of "PERCENTAGE_UPDATED", "ROLLBACK_STARTED", "ROLLBACK_COMPLETED", "BAKE_TIME_STARTED", "DEPLOYMENT_STARTED", "DEPLOYMENT_COMPLETED"
     #   resp.event_log[0].triggered_by #=> String, one of "USER", "APPCONFIG", "CLOUDWATCH_ALARM", "INTERNAL_ERROR"
     #   resp.event_log[0].description #=> String
+    #   resp.event_log[0].action_invocations #=> Array
+    #   resp.event_log[0].action_invocations[0].extension_identifier #=> String
+    #   resp.event_log[0].action_invocations[0].action_name #=> String
+    #   resp.event_log[0].action_invocations[0].uri #=> String
+    #   resp.event_log[0].action_invocations[0].role_arn #=> String
+    #   resp.event_log[0].action_invocations[0].error_message #=> String
+    #   resp.event_log[0].action_invocations[0].error_code #=> String
+    #   resp.event_log[0].action_invocations[0].invocation_id #=> String
     #   resp.event_log[0].occurred_at #=> Time
     #   resp.percentage_complete #=> Float
     #   resp.started_at #=> Time
     #   resp.completed_at #=> Time
+    #   resp.applied_extensions #=> Array
+    #   resp.applied_extensions[0].extension_id #=> String
+    #   resp.applied_extensions[0].extension_association_id #=> String
+    #   resp.applied_extensions[0].version_number #=> Integer
+    #   resp.applied_extensions[0].parameters #=> Hash
+    #   resp.applied_extensions[0].parameters["ExtensionOrParameterName"] #=> String
+    #   resp.kms_key_arn #=> String
+    #   resp.kms_key_identifier #=> String
+    #   resp.version_label #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/StartDeployment AWS API Documentation
     #
@@ -1694,6 +3107,30 @@ module Aws::AppConfig
     #   * {Types::Deployment#percentage_complete #percentage_complete} => Float
     #   * {Types::Deployment#started_at #started_at} => Time
     #   * {Types::Deployment#completed_at #completed_at} => Time
+    #   * {Types::Deployment#applied_extensions #applied_extensions} => Array&lt;Types::AppliedExtension&gt;
+    #   * {Types::Deployment#kms_key_arn #kms_key_arn} => String
+    #   * {Types::Deployment#kms_key_identifier #kms_key_identifier} => String
+    #   * {Types::Deployment#version_label #version_label} => String
+    #
+    #
+    # @example Example: To stop configuration deployment
+    #
+    #   # The following stop-deployment example stops the deployment of an application configuration to the specified environment.
+    #
+    #   resp = client.stop_deployment({
+    #     application_id: "339ohji", 
+    #     deployment_number: 2, 
+    #     environment_id: "54j1r29", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     deployment_duration_in_minutes: 15, 
+    #     deployment_number: 2, 
+    #     final_bake_time_in_minutes: 0, 
+    #     growth_factor: 25.0, 
+    #     percentage_complete: 1.0, 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1723,10 +3160,27 @@ module Aws::AppConfig
     #   resp.event_log[0].event_type #=> String, one of "PERCENTAGE_UPDATED", "ROLLBACK_STARTED", "ROLLBACK_COMPLETED", "BAKE_TIME_STARTED", "DEPLOYMENT_STARTED", "DEPLOYMENT_COMPLETED"
     #   resp.event_log[0].triggered_by #=> String, one of "USER", "APPCONFIG", "CLOUDWATCH_ALARM", "INTERNAL_ERROR"
     #   resp.event_log[0].description #=> String
+    #   resp.event_log[0].action_invocations #=> Array
+    #   resp.event_log[0].action_invocations[0].extension_identifier #=> String
+    #   resp.event_log[0].action_invocations[0].action_name #=> String
+    #   resp.event_log[0].action_invocations[0].uri #=> String
+    #   resp.event_log[0].action_invocations[0].role_arn #=> String
+    #   resp.event_log[0].action_invocations[0].error_message #=> String
+    #   resp.event_log[0].action_invocations[0].error_code #=> String
+    #   resp.event_log[0].action_invocations[0].invocation_id #=> String
     #   resp.event_log[0].occurred_at #=> Time
     #   resp.percentage_complete #=> Float
     #   resp.started_at #=> Time
     #   resp.completed_at #=> Time
+    #   resp.applied_extensions #=> Array
+    #   resp.applied_extensions[0].extension_id #=> String
+    #   resp.applied_extensions[0].extension_association_id #=> String
+    #   resp.applied_extensions[0].version_number #=> Integer
+    #   resp.applied_extensions[0].parameters #=> Hash
+    #   resp.applied_extensions[0].parameters["ExtensionOrParameterName"] #=> String
+    #   resp.kms_key_arn #=> String
+    #   resp.kms_key_identifier #=> String
+    #   resp.version_label #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/StopDeployment AWS API Documentation
     #
@@ -1737,7 +3191,7 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
-    # Metadata to assign to an AppConfig resource. Tags help organize and
+    # Assigns metadata to an AppConfig resource. Tags help organize and
     # categorize your AppConfig resources. Each tag consists of a key and an
     # optional value, both of which you define. You can specify a maximum of
     # 50 tags for a resource.
@@ -1751,6 +3205,18 @@ module Aws::AppConfig
     #   not start with `aws:`. The tag value can be up to 256 characters.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    #
+    # @example Example: To tag an application
+    #
+    #   # The following tag-resource example tags an application resource.
+    #
+    #   resp = client.tag_resource({
+    #     resource_arn: "arn:aws:appconfig:us-east-1:111122223333:application/339ohji", 
+    #     tags: {
+    #       "group1" => "1", 
+    #     }, 
+    #   })
     #
     # @example Request syntax with placeholder values
     #
@@ -1780,6 +3246,18 @@ module Aws::AppConfig
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
+    #
+    # @example Example: To remove a tag from an application
+    #
+    #   # The following untag-resource example removes the group1 tag from the specified application.
+    #
+    #   resp = client.untag_resource({
+    #     resource_arn: "arn:aws:appconfig:us-east-1:111122223333:application/339ohji", 
+    #     tag_keys: [
+    #       "group1", 
+    #     ], 
+    #   })
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.untag_resource({
@@ -1793,6 +3271,47 @@ module Aws::AppConfig
     # @param [Hash] params ({})
     def untag_resource(params = {}, options = {})
       req = build_request(:untag_resource, params)
+      req.send_request(options)
+    end
+
+    # Updates the value of the `DeletionProtection` parameter.
+    #
+    # @option params [Types::DeletionProtectionSettings] :deletion_protection
+    #   A parameter to configure deletion protection. If enabled, deletion
+    #   protection prevents a user from deleting a configuration profile or an
+    #   environment if AppConfig has called either [GetLatestConfiguration][1]
+    #   or for the configuration profile or from the environment during the
+    #   specified interval. Deletion protection is disabled by default. The
+    #   default interval for `ProtectionPeriodInMinutes` is 60.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/appconfig/2019-10-09/APIReference/API_appconfigdata_GetLatestConfiguration.html
+    #
+    # @return [Types::AccountSettings] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::AccountSettings#deletion_protection #deletion_protection} => Types::DeletionProtectionSettings
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_account_settings({
+    #     deletion_protection: {
+    #       enabled: false,
+    #       protection_period_in_minutes: 1,
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.deletion_protection.enabled #=> Boolean
+    #   resp.deletion_protection.protection_period_in_minutes #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/UpdateAccountSettings AWS API Documentation
+    #
+    # @overload update_account_settings(params = {})
+    # @param [Hash] params ({})
+    def update_account_settings(params = {}, options = {})
+      req = build_request(:update_account_settings, params)
       req.send_request(options)
     end
 
@@ -1812,6 +3331,24 @@ module Aws::AppConfig
     #   * {Types::Application#id #id} => String
     #   * {Types::Application#name #name} => String
     #   * {Types::Application#description #description} => String
+    #
+    #
+    # @example Example: To update an application
+    #
+    #   # The following update-application example updates the name of the specified application.
+    #
+    #   resp = client.update_application({
+    #     application_id: "339ohji", 
+    #     description: "", 
+    #     name: "Example-Application", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     description: "An application used for creating an example.", 
+    #     id: "339ohji", 
+    #     name: "Example-Application", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -1852,10 +3389,19 @@ module Aws::AppConfig
     #
     # @option params [String] :retrieval_role_arn
     #   The ARN of an IAM role with permission to access the configuration at
-    #   the specified LocationUri.
+    #   the specified `LocationUri`.
     #
     # @option params [Array<Types::Validator>] :validators
     #   A list of methods for validating the configuration.
+    #
+    # @option params [String] :kms_key_identifier
+    #   The identifier for a Key Management Service key to encrypt new
+    #   configuration data versions in the AppConfig hosted configuration
+    #   store. This attribute is only used for `hosted` configuration types.
+    #   The identifier can be an KMS key ID, alias, or the Amazon Resource
+    #   Name (ARN) of the key ID or alias. To encrypt data managed in other
+    #   configuration stores, see the documentation for how to specify an KMS
+    #   key for that particular service.
     #
     # @return [Types::ConfigurationProfile] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1866,13 +3412,37 @@ module Aws::AppConfig
     #   * {Types::ConfigurationProfile#location_uri #location_uri} => String
     #   * {Types::ConfigurationProfile#retrieval_role_arn #retrieval_role_arn} => String
     #   * {Types::ConfigurationProfile#validators #validators} => Array&lt;Types::Validator&gt;
+    #   * {Types::ConfigurationProfile#type #type} => String
+    #   * {Types::ConfigurationProfile#kms_key_arn #kms_key_arn} => String
+    #   * {Types::ConfigurationProfile#kms_key_identifier #kms_key_identifier} => String
+    #
+    #
+    # @example Example: To update a configuration profile
+    #
+    #   # The following update-configuration-profile example updates the description of the specified configuration profile.
+    #
+    #   resp = client.update_configuration_profile({
+    #     application_id: "339ohji", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #     description: "Configuration profile used for examples.", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     application_id: "339ohji", 
+    #     description: "Configuration profile used for examples.", 
+    #     id: "ur8hx2f", 
+    #     location_uri: "ssm-parameter://Example-Parameter", 
+    #     name: "Example-Configuration-Profile", 
+    #     retrieval_role_arn: "arn:aws:iam::111122223333:role/Example-App-Config-Role", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.update_configuration_profile({
     #     application_id: "Id", # required
     #     configuration_profile_id: "Id", # required
-    #     name: "Name",
+    #     name: "LongName",
     #     description: "Description",
     #     retrieval_role_arn: "RoleArn",
     #     validators: [
@@ -1881,6 +3451,7 @@ module Aws::AppConfig
     #         content: "StringWithLengthBetween0And32768", # required
     #       },
     #     ],
+    #     kms_key_identifier: "KmsKeyIdentifierOrEmpty",
     #   })
     #
     # @example Response structure
@@ -1894,6 +3465,9 @@ module Aws::AppConfig
     #   resp.validators #=> Array
     #   resp.validators[0].type #=> String, one of "JSON_SCHEMA", "LAMBDA"
     #   resp.validators[0].content #=> String
+    #   resp.type #=> String
+    #   resp.kms_key_arn #=> String
+    #   resp.kms_key_identifier #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/UpdateConfigurationProfile AWS API Documentation
     #
@@ -1916,19 +3490,19 @@ module Aws::AppConfig
     #   Total amount of time for a deployment to last.
     #
     # @option params [Integer] :final_bake_time_in_minutes
-    #   The amount of time AppConfig monitors for alarms before considering
-    #   the deployment to be complete and no longer eligible for automatic
-    #   roll back.
+    #   The amount of time that AppConfig monitors for alarms before
+    #   considering the deployment to be complete and no longer eligible for
+    #   automatic rollback.
     #
     # @option params [Float] :growth_factor
     #   The percentage of targets to receive a deployed configuration during
     #   each interval.
     #
     # @option params [String] :growth_type
-    #   The algorithm used to define how percentage grows over time. AWS
-    #   AppConfig supports the following growth types:
+    #   The algorithm used to define how percentage grows over time. AppConfig
+    #   supports the following growth types:
     #
-    #   **Linear**\: For this type, AppConfig processes the deployment by
+    #   **Linear**: For this type, AppConfig processes the deployment by
     #   increments of the growth factor evenly distributed over the deployment
     #   time. For example, a linear deployment that uses a growth factor of 20
     #   initially makes the configuration available to 20 percent of the
@@ -1936,7 +3510,7 @@ module Aws::AppConfig
     #   updates the percentage to 40 percent. This continues until 100% of the
     #   targets are set to receive the deployed configuration.
     #
-    #   **Exponential**\: For this type, AppConfig processes the deployment
+    #   **Exponential**: For this type, AppConfig processes the deployment
     #   exponentially using the following formula: `G*(2^N)`. In this formula,
     #   `G` is the growth factor specified by the user and `N` is the number
     #   of steps until the configuration is deployed to all targets. For
@@ -1963,6 +3537,28 @@ module Aws::AppConfig
     #   * {Types::DeploymentStrategy#growth_factor #growth_factor} => Float
     #   * {Types::DeploymentStrategy#final_bake_time_in_minutes #final_bake_time_in_minutes} => Integer
     #   * {Types::DeploymentStrategy#replicate_to #replicate_to} => String
+    #
+    #
+    # @example Example: To update a deployment strategy
+    #
+    #   # The following update-deployment-strategy example updates final bake time to 20 minutes in the specified deployment
+    #   # strategy. ::
+    #
+    #   resp = client.update_deployment_strategy({
+    #     deployment_strategy_id: "1225qzk", 
+    #     final_bake_time_in_minutes: 20, 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     deployment_duration_in_minutes: 15, 
+    #     final_bake_time_in_minutes: 20, 
+    #     growth_factor: 25, 
+    #     growth_type: "LINEAR", 
+    #     id: "1225qzk", 
+    #     name: "Example-Deployment", 
+    #     replicate_to: "SSM_DOCUMENT", 
+    #   }
     #
     # @example Request syntax with placeholder values
     #
@@ -2021,6 +3617,26 @@ module Aws::AppConfig
     #   * {Types::Environment#state #state} => String
     #   * {Types::Environment#monitors #monitors} => Array&lt;Types::Monitor&gt;
     #
+    #
+    # @example Example: To update an environment
+    #
+    #   # The following update-environment example updates an environment's description.
+    #
+    #   resp = client.update_environment({
+    #     application_id: "339ohji", 
+    #     description: "An environment for examples.", 
+    #     environment_id: "54j1r29", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     application_id: "339ohji", 
+    #     description: "An environment for examples.", 
+    #     id: "54j1r29", 
+    #     name: "Example-Environment", 
+    #     state: "ROLLED_BACK", 
+    #   }
+    #
     # @example Request syntax with placeholder values
     #
     #   resp = client.update_environment({
@@ -2030,7 +3646,7 @@ module Aws::AppConfig
     #     description: "Description",
     #     monitors: [
     #       {
-    #         alarm_arn: "Arn",
+    #         alarm_arn: "StringWithLengthBetween1And2048", # required
     #         alarm_role_arn: "RoleArn",
     #       },
     #     ],
@@ -2056,6 +3672,141 @@ module Aws::AppConfig
       req.send_request(options)
     end
 
+    # Updates an AppConfig extension. For more information about extensions,
+    # see [Extending workflows][1] in the *AppConfig User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/working-with-appconfig-extensions.html
+    #
+    # @option params [required, String] :extension_identifier
+    #   The name, the ID, or the Amazon Resource Name (ARN) of the extension.
+    #
+    # @option params [String] :description
+    #   Information about the extension.
+    #
+    # @option params [Hash<String,Array>] :actions
+    #   The actions defined in the extension.
+    #
+    # @option params [Hash<String,Types::Parameter>] :parameters
+    #   One or more parameters for the actions called by the extension.
+    #
+    # @option params [Integer] :version_number
+    #   The extension version number.
+    #
+    # @return [Types::Extension] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::Extension#id #id} => String
+    #   * {Types::Extension#name #name} => String
+    #   * {Types::Extension#version_number #version_number} => Integer
+    #   * {Types::Extension#arn #arn} => String
+    #   * {Types::Extension#description #description} => String
+    #   * {Types::Extension#actions #actions} => Hash&lt;String,Array&lt;Types::Action&gt;&gt;
+    #   * {Types::Extension#parameters #parameters} => Hash&lt;String,Types::Parameter&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_extension({
+    #     extension_identifier: "Identifier", # required
+    #     description: "Description",
+    #     actions: {
+    #       "PRE_CREATE_HOSTED_CONFIGURATION_VERSION" => [
+    #         {
+    #           name: "Name",
+    #           description: "Description",
+    #           uri: "Uri",
+    #           role_arn: "Arn",
+    #         },
+    #       ],
+    #     },
+    #     parameters: {
+    #       "ExtensionOrParameterName" => {
+    #         description: "Description",
+    #         required: false,
+    #         dynamic: false,
+    #       },
+    #     },
+    #     version_number: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #   resp.name #=> String
+    #   resp.version_number #=> Integer
+    #   resp.arn #=> String
+    #   resp.description #=> String
+    #   resp.actions #=> Hash
+    #   resp.actions["ActionPoint"] #=> Array
+    #   resp.actions["ActionPoint"][0].name #=> String
+    #   resp.actions["ActionPoint"][0].description #=> String
+    #   resp.actions["ActionPoint"][0].uri #=> String
+    #   resp.actions["ActionPoint"][0].role_arn #=> String
+    #   resp.parameters #=> Hash
+    #   resp.parameters["ExtensionOrParameterName"].description #=> String
+    #   resp.parameters["ExtensionOrParameterName"].required #=> Boolean
+    #   resp.parameters["ExtensionOrParameterName"].dynamic #=> Boolean
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/UpdateExtension AWS API Documentation
+    #
+    # @overload update_extension(params = {})
+    # @param [Hash] params ({})
+    def update_extension(params = {}, options = {})
+      req = build_request(:update_extension, params)
+      req.send_request(options)
+    end
+
+    # Updates an association. For more information about extensions and
+    # associations, see [Extending workflows][1] in the *AppConfig User
+    # Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appconfig/latest/userguide/working-with-appconfig-extensions.html
+    #
+    # @option params [required, String] :extension_association_id
+    #   The system-generated ID for the association.
+    #
+    # @option params [Hash<String,String>] :parameters
+    #   The parameter names and values defined in the extension.
+    #
+    # @return [Types::ExtensionAssociation] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ExtensionAssociation#id #id} => String
+    #   * {Types::ExtensionAssociation#extension_arn #extension_arn} => String
+    #   * {Types::ExtensionAssociation#resource_arn #resource_arn} => String
+    #   * {Types::ExtensionAssociation#arn #arn} => String
+    #   * {Types::ExtensionAssociation#parameters #parameters} => Hash&lt;String,String&gt;
+    #   * {Types::ExtensionAssociation#extension_version_number #extension_version_number} => Integer
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_extension_association({
+    #     extension_association_id: "Id", # required
+    #     parameters: {
+    #       "ExtensionOrParameterName" => "StringWithLengthBetween1And2048",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.id #=> String
+    #   resp.extension_arn #=> String
+    #   resp.resource_arn #=> String
+    #   resp.arn #=> String
+    #   resp.parameters #=> Hash
+    #   resp.parameters["ExtensionOrParameterName"] #=> String
+    #   resp.extension_version_number #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appconfig-2019-10-09/UpdateExtensionAssociation AWS API Documentation
+    #
+    # @overload update_extension_association(params = {})
+    # @param [Hash] params ({})
+    def update_extension_association(params = {}, options = {})
+      req = build_request(:update_extension_association, params)
+      req.send_request(options)
+    end
+
     # Uses the validators in a configuration profile to validate a
     # configuration.
     #
@@ -2069,6 +3820,17 @@ module Aws::AppConfig
     #   The version of the configuration to validate.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    #
+    # @example Example: To validate a configuration
+    #
+    #   # The following validate-configuration example uses the validators in a configuration profile to validate a configuration.
+    #
+    #   resp = client.validate_configuration({
+    #     application_id: "abc1234", 
+    #     configuration_profile_id: "ur8hx2f", 
+    #     configuration_version: "1", 
+    #   })
     #
     # @example Request syntax with placeholder values
     #
@@ -2093,14 +3855,19 @@ module Aws::AppConfig
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::AppConfig')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-appconfig'
-      context[:gem_version] = '1.12.0'
+      context[:gem_version] = '1.58.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

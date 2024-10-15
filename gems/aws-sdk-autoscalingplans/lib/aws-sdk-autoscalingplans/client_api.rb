@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::AutoScalingPlans
   # @api private
@@ -283,9 +284,11 @@ module Aws::AutoScalingPlans
 
       api.metadata = {
         "apiVersion" => "2018-01-06",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "autoscaling-plans",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceFullName" => "AWS Auto Scaling Plans",
         "serviceId" => "Auto Scaling Plans",
         "signatureVersion" => "v4",

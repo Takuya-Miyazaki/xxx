@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -86,17 +86,18 @@ module Aws::DynamoDB
     #
     # * `CREATING` - The table is being created.
     #
-    # * `UPDATING` - The table is being updated.
+    # * `UPDATING` - The table/index configuration is being updated. The
+    #   table/index remains available for data operations when `UPDATING`.
     #
     # * `DELETING` - The table is being deleted.
     #
     # * `ACTIVE` - The table is ready for use.
     #
-    # * `INACCESSIBLE_ENCRYPTION_CREDENTIALS` - The AWS KMS key used to
-    #   encrypt the table in inaccessible. Table operations may fail due to
-    #   failure to use the AWS KMS key. DynamoDB will initiate the table
-    #   archival process when a table's AWS KMS key remains inaccessible
-    #   for more than seven days.
+    # * `INACCESSIBLE_ENCRYPTION_CREDENTIALS` - The KMS key used to encrypt
+    #   the table in inaccessible. Table operations may fail due to failure
+    #   to use the KMS key. DynamoDB will initiate the table archival
+    #   process when a table's KMS key remains inaccessible for more than
+    #   seven days.
     #
     # * `ARCHIVING` - The table is being archived. Operations are not
     #   allowed until archival is complete.
@@ -194,9 +195,9 @@ module Aws::DynamoDB
     #   * `NonKeyAttributes` - A list of one or more non-key attribute names
     #     that are projected into the secondary index. The total count of
     #     attributes provided in `NonKeyAttributes`, summed across all of
-    #     the secondary indexes, must not exceed 20. If you project the same
-    #     attribute into two different indexes, this counts as two distinct
-    #     attributes when determining the total.
+    #     the secondary indexes, must not exceed 100. If you project the
+    #     same attribute into two different indexes, this counts as two
+    #     distinct attributes when determining the total.
     #
     # * `IndexSizeBytes` - Represents the total size of the index, in bytes.
     #   DynamoDB updates this value approximately every six hours. Recent
@@ -275,9 +276,9 @@ module Aws::DynamoDB
     #   * `NonKeyAttributes` - A list of one or more non-key attribute names
     #     that are projected into the secondary index. The total count of
     #     attributes provided in `NonKeyAttributes`, summed across all of
-    #     the secondary indexes, must not exceed 20. If you project the same
-    #     attribute into two different indexes, this counts as two distinct
-    #     attributes when determining the total.
+    #     the secondary indexes, must not exceed 100. If you project the
+    #     same attribute into two different indexes, this counts as two
+    #     distinct attributes when determining the total.
     #
     # * `ProvisionedThroughput` - The provisioned throughput settings for
     #   the global secondary index, consisting of read and write capacity
@@ -303,7 +304,7 @@ module Aws::DynamoDB
     # have the same timestamp. However, the combination of the following
     # three elements is guaranteed to be unique:
     #
-    # * AWS customer ID
+    # * Amazon Web Services customer ID
     #
     # * Table name
     #
@@ -321,7 +322,7 @@ module Aws::DynamoDB
     end
 
     # Represents the version of [global tables][1] in use, if the table is
-    # replicated across AWS Regions.
+    # replicated across Amazon Web Services Regions.
     #
     #
     #
@@ -356,6 +357,27 @@ module Aws::DynamoDB
       data[:archival_summary]
     end
 
+    # Contains details of the table class.
+    # @return [Types::TableClassSummary]
+    def table_class_summary
+      data[:table_class_summary]
+    end
+
+    # Indicates whether deletion protection is enabled (true) or disabled
+    # (false) on the table.
+    # @return [Boolean]
+    def deletion_protection_enabled
+      data[:deletion_protection_enabled]
+    end
+
+    # The maximum number of read and write units for the specified on-demand
+    # table. If you use this parameter, you must specify
+    # `MaxReadRequestUnits`, `MaxWriteRequestUnits`, or both.
+    # @return [Types::OnDemandThroughput]
+    def on_demand_throughput
+      data[:on_demand_throughput]
+    end
+
     # @!endgroup
 
     # @return [Client]
@@ -370,7 +392,9 @@ module Aws::DynamoDB
     #
     # @return [self]
     def load
-      resp = @client.describe_table(table_name: @name)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.describe_table(table_name: @name)
+      end
       @data = resp.table
       self
     end
@@ -485,7 +509,9 @@ module Aws::DynamoDB
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -497,7 +523,9 @@ module Aws::DynamoDB
     # @return [Types::DeleteTableOutput]
     def delete(options = {})
       options = options.merge(table_name: @name)
-      resp = @client.delete_table(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_table(options)
+      end
       resp.data
     end
 
@@ -526,13 +554,14 @@ module Aws::DynamoDB
     #     expression_attribute_values: {
     #       "ExpressionAttributeValueVariable" => "value", # value <Hash,Array,String,Numeric,Boolean,IO,Set,nil>
     #     },
+    #     return_values_on_condition_check_failure: "ALL_OLD", # accepts ALL_OLD, NONE
     #   })
     # @param [Hash] options ({})
     # @option options [required, Hash<String,Types::AttributeValue>] :key
     #   A map of attribute names to `AttributeValue` objects, representing the
     #   primary key of the item to delete.
     #
-    #   For the primary key, you must provide all of the attributes. For
+    #   For the primary key, you must provide all of the key attributes. For
     #   example, with a simple primary key, you only need to provide a value
     #   for the partition key. For a composite primary key, you must provide
     #   values for both the partition key and the sort key.
@@ -563,14 +592,18 @@ module Aws::DynamoDB
     #
     #   * `ALL_OLD` - The content of the old item is returned.
     #
+    #   There is no additional cost associated with requesting a return value
+    #   aside from the small network and processing overhead of receiving a
+    #   larger response. No read capacity units are consumed.
+    #
     #   <note markdown="1"> The `ReturnValues` parameter is used by several DynamoDB operations;
     #   however, `DeleteItem` does not recognize any values other than `NONE`
     #   or `ALL_OLD`.
     #
     #    </note>
     # @option options [String] :return_consumed_capacity
-    #   Determines the level of detail about provisioned throughput
-    #   consumption that is returned in the response:
+    #   Determines the level of detail about either provisioned or on-demand
+    #   throughput consumption that is returned in the response:
     #
     #   * `INDEXES` - The response includes the aggregate `ConsumedCapacity`
     #     for the operation, together with `ConsumedCapacity` for each table
@@ -612,8 +645,7 @@ module Aws::DynamoDB
     #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.SpecifyingConditions.html
     # @option options [Hash<String,String>] :expression_attribute_names
     #   One or more substitution tokens for attribute names in an expression.
-    #   The following are some use cases for using
-    #   `ExpressionAttributeNames`\:
+    #   The following are some use cases for using `ExpressionAttributeNames`:
     #
     #   * To access an attribute whose name conflicts with a DynamoDB reserved
     #     word.
@@ -635,7 +667,7 @@ module Aws::DynamoDB
     #   cannot be used directly in an expression. (For the complete list of
     #   reserved words, see [Reserved Words][1] in the *Amazon DynamoDB
     #   Developer Guide*). To work around this, you could specify the
-    #   following for `ExpressionAttributeNames`\:
+    #   following for `ExpressionAttributeNames`:
     #
     #   * `\{"#P":"Percentile"\}`
     #
@@ -685,10 +717,19 @@ module Aws::DynamoDB
     #
     #
     #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.SpecifyingConditions.html
+    # @option options [String] :return_values_on_condition_check_failure
+    #   An optional parameter that returns the item attributes for a
+    #   `DeleteItem` operation that failed a condition check.
+    #
+    #   There is no additional cost associated with requesting a return value
+    #   aside from the small network and processing overhead of receiving a
+    #   larger response. No read capacity units are consumed.
     # @return [Types::DeleteItemOutput]
     def delete_item(options = {})
       options = options.merge(table_name: @name)
-      resp = @client.delete_item(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_item(options)
+      end
       resp.data
     end
 
@@ -728,8 +769,8 @@ module Aws::DynamoDB
     #   operation uses strongly consistent reads; otherwise, the operation
     #   uses eventually consistent reads.
     # @option options [String] :return_consumed_capacity
-    #   Determines the level of detail about provisioned throughput
-    #   consumption that is returned in the response:
+    #   Determines the level of detail about either provisioned or on-demand
+    #   throughput consumption that is returned in the response:
     #
     #   * `INDEXES` - The response includes the aggregate `ConsumedCapacity`
     #     for the operation, together with `ConsumedCapacity` for each table
@@ -761,8 +802,7 @@ module Aws::DynamoDB
     #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.AccessingItemAttributes.html
     # @option options [Hash<String,String>] :expression_attribute_names
     #   One or more substitution tokens for attribute names in an expression.
-    #   The following are some use cases for using
-    #   `ExpressionAttributeNames`\:
+    #   The following are some use cases for using `ExpressionAttributeNames`:
     #
     #   * To access an attribute whose name conflicts with a DynamoDB reserved
     #     word.
@@ -784,7 +824,7 @@ module Aws::DynamoDB
     #   cannot be used directly in an expression. (For the complete list of
     #   reserved words, see [Reserved Words][1] in the *Amazon DynamoDB
     #   Developer Guide*). To work around this, you could specify the
-    #   following for `ExpressionAttributeNames`\:
+    #   following for `ExpressionAttributeNames`:
     #
     #   * `\{"#P":"Percentile"\}`
     #
@@ -812,7 +852,9 @@ module Aws::DynamoDB
     # @return [Types::GetItemOutput]
     def get_item(options = {})
       options = options.merge(table_name: @name)
-      resp = @client.get_item(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_item(options)
+      end
       resp.data
     end
 
@@ -841,6 +883,7 @@ module Aws::DynamoDB
     #     expression_attribute_values: {
     #       "ExpressionAttributeValueVariable" => "value", # value <Hash,Array,String,Numeric,Boolean,IO,Set,nil>
     #     },
+    #     return_values_on_condition_check_failure: "ALL_OLD", # accepts ALL_OLD, NONE
     #   })
     # @param [Hash] options ({})
     # @option options [required, Hash<String,Types::AttributeValue>] :item
@@ -889,14 +932,20 @@ module Aws::DynamoDB
     #   * `ALL_OLD` - If `PutItem` overwrote an attribute name-value pair,
     #     then the content of the old item is returned.
     #
+    #   The values returned are strongly consistent.
+    #
+    #   There is no additional cost associated with requesting a return value
+    #   aside from the small network and processing overhead of receiving a
+    #   larger response. No read capacity units are consumed.
+    #
     #   <note markdown="1"> The `ReturnValues` parameter is used by several DynamoDB operations;
     #   however, `PutItem` does not recognize any values other than `NONE` or
     #   `ALL_OLD`.
     #
     #    </note>
     # @option options [String] :return_consumed_capacity
-    #   Determines the level of detail about provisioned throughput
-    #   consumption that is returned in the response:
+    #   Determines the level of detail about either provisioned or on-demand
+    #   throughput consumption that is returned in the response:
     #
     #   * `INDEXES` - The response includes the aggregate `ConsumedCapacity`
     #     for the operation, together with `ConsumedCapacity` for each table
@@ -946,8 +995,7 @@ module Aws::DynamoDB
     #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.SpecifyingConditions.html
     # @option options [Hash<String,String>] :expression_attribute_names
     #   One or more substitution tokens for attribute names in an expression.
-    #   The following are some use cases for using
-    #   `ExpressionAttributeNames`\:
+    #   The following are some use cases for using `ExpressionAttributeNames`:
     #
     #   * To access an attribute whose name conflicts with a DynamoDB reserved
     #     word.
@@ -969,7 +1017,7 @@ module Aws::DynamoDB
     #   cannot be used directly in an expression. (For the complete list of
     #   reserved words, see [Reserved Words][1] in the *Amazon DynamoDB
     #   Developer Guide*). To work around this, you could specify the
-    #   following for `ExpressionAttributeNames`\:
+    #   following for `ExpressionAttributeNames`:
     #
     #   * `\{"#P":"Percentile"\}`
     #
@@ -1019,10 +1067,19 @@ module Aws::DynamoDB
     #
     #
     #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.SpecifyingConditions.html
+    # @option options [String] :return_values_on_condition_check_failure
+    #   An optional parameter that returns the item attributes for a `PutItem`
+    #   operation that failed a condition check.
+    #
+    #   There is no additional cost associated with requesting a return value
+    #   aside from the small network and processing overhead of receiving a
+    #   larger response. No read capacity units are consumed.
     # @return [Types::PutItemOutput]
     def put_item(options = {})
       options = options.merge(table_name: @name)
-      resp = @client.put_item(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.put_item(options)
+      end
       resp.data
     end
 
@@ -1086,11 +1143,14 @@ module Aws::DynamoDB
     #     is equivalent to specifying `ALL_ATTRIBUTES`.
     #
     #   * `COUNT` - Returns the number of matching items, rather than the
-    #     matching items themselves.
+    #     matching items themselves. Note that this uses the same quantity of
+    #     read capacity units as getting the items, and is subject to the same
+    #     item size calculations.
     #
     #   * `SPECIFIC_ATTRIBUTES` - Returns only the attributes listed in
-    #     `AttributesToGet`. This return value is equivalent to specifying
-    #     `AttributesToGet` without specifying any value for `Select`.
+    #     `ProjectionExpression`. This return value is equivalent to
+    #     specifying `ProjectionExpression` without specifying any value for
+    #     `Select`.
     #
     #     If you query or scan a local secondary index and request only
     #     attributes that are projected into that index, the operation will
@@ -1103,12 +1163,12 @@ module Aws::DynamoDB
     #     attributes that are projected into the index. Global secondary index
     #     queries cannot fetch attributes from the parent table.
     #
-    #   If neither `Select` nor `AttributesToGet` are specified, DynamoDB
+    #   If neither `Select` nor `ProjectionExpression` are specified, DynamoDB
     #   defaults to `ALL_ATTRIBUTES` when accessing a table, and
     #   `ALL_PROJECTED_ATTRIBUTES` when accessing an index. You cannot use
-    #   both `Select` and `AttributesToGet` together in a single request,
+    #   both `Select` and `ProjectionExpression` together in a single request,
     #   unless the value for `Select` is `SPECIFIC_ATTRIBUTES`. (This usage is
-    #   equivalent to specifying `AttributesToGet` without any value for
+    #   equivalent to specifying `ProjectionExpression` without any value for
     #   `Select`.)
     #
     #   <note markdown="1"> If you use the `ProjectionExpression` parameter, then the value for
@@ -1196,8 +1256,8 @@ module Aws::DynamoDB
     #   The data type for `ExclusiveStartKey` must be String, Number, or
     #   Binary. No set data types are allowed.
     # @option options [String] :return_consumed_capacity
-    #   Determines the level of detail about provisioned throughput
-    #   consumption that is returned in the response:
+    #   Determines the level of detail about either provisioned or on-demand
+    #   throughput consumption that is returned in the response:
     #
     #   * `INDEXES` - The response includes the aggregate `ConsumedCapacity`
     #     for the operation, together with `ConsumedCapacity` for each table
@@ -1246,7 +1306,7 @@ module Aws::DynamoDB
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#FilteringResults
+    #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.FilterExpression.html
     # @option options [String] :key_condition_expression
     #   The condition that specifies the key values for items to be retrieved
     #   by the `Query` action.
@@ -1332,8 +1392,7 @@ module Aws::DynamoDB
     #   [2]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ExpressionPlaceholders.html
     # @option options [Hash<String,String>] :expression_attribute_names
     #   One or more substitution tokens for attribute names in an expression.
-    #   The following are some use cases for using
-    #   `ExpressionAttributeNames`\:
+    #   The following are some use cases for using `ExpressionAttributeNames`:
     #
     #   * To access an attribute whose name conflicts with a DynamoDB reserved
     #     word.
@@ -1355,7 +1414,7 @@ module Aws::DynamoDB
     #   cannot be used directly in an expression. (For the complete list of
     #   reserved words, see [Reserved Words][1] in the *Amazon DynamoDB
     #   Developer Guide*). To work around this, you could specify the
-    #   following for `ExpressionAttributeNames`\:
+    #   following for `ExpressionAttributeNames`:
     #
     #   * `\{"#P":"Percentile"\}`
     #
@@ -1408,7 +1467,9 @@ module Aws::DynamoDB
     # @return [Types::QueryOutput]
     def query(options = {})
       options = options.merge(table_name: @name)
-      resp = @client.query(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.query(options)
+      end
       resp.data
     end
 
@@ -1490,11 +1551,14 @@ module Aws::DynamoDB
     #     is equivalent to specifying `ALL_ATTRIBUTES`.
     #
     #   * `COUNT` - Returns the number of matching items, rather than the
-    #     matching items themselves.
+    #     matching items themselves. Note that this uses the same quantity of
+    #     read capacity units as getting the items, and is subject to the same
+    #     item size calculations.
     #
     #   * `SPECIFIC_ATTRIBUTES` - Returns only the attributes listed in
-    #     `AttributesToGet`. This return value is equivalent to specifying
-    #     `AttributesToGet` without specifying any value for `Select`.
+    #     `ProjectionExpression`. This return value is equivalent to
+    #     specifying `ProjectionExpression` without specifying any value for
+    #     `Select`.
     #
     #     If you query or scan a local secondary index and request only
     #     attributes that are projected into that index, the operation reads
@@ -1507,12 +1571,12 @@ module Aws::DynamoDB
     #     attributes that are projected into the index. Global secondary index
     #     queries cannot fetch attributes from the parent table.
     #
-    #   If neither `Select` nor `AttributesToGet` are specified, DynamoDB
+    #   If neither `Select` nor `ProjectionExpression` are specified, DynamoDB
     #   defaults to `ALL_ATTRIBUTES` when accessing a table, and
     #   `ALL_PROJECTED_ATTRIBUTES` when accessing an index. You cannot use
-    #   both `Select` and `AttributesToGet` together in a single request,
+    #   both `Select` and `ProjectionExpression` together in a single request,
     #   unless the value for `Select` is `SPECIFIC_ATTRIBUTES`. (This usage is
-    #   equivalent to specifying `AttributesToGet` without any value for
+    #   equivalent to specifying `ProjectionExpression` without any value for
     #   `Select`.)
     #
     #   <note markdown="1"> If you use the `ProjectionExpression` parameter, then the value for
@@ -1548,8 +1612,8 @@ module Aws::DynamoDB
     #   must specify the same segment whose previous `Scan` returned the
     #   corresponding value of `LastEvaluatedKey`.
     # @option options [String] :return_consumed_capacity
-    #   Determines the level of detail about provisioned throughput
-    #   consumption that is returned in the response:
+    #   Determines the level of detail about either provisioned or on-demand
+    #   throughput consumption that is returned in the response:
     #
     #   * `INDEXES` - The response includes the aggregate `ConsumedCapacity`
     #     for the operation, together with `ConsumedCapacity` for each table
@@ -1625,11 +1689,10 @@ module Aws::DynamoDB
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#FilteringResults
+    #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html#Scan.FilterExpression
     # @option options [Hash<String,String>] :expression_attribute_names
     #   One or more substitution tokens for attribute names in an expression.
-    #   The following are some use cases for using
-    #   `ExpressionAttributeNames`\:
+    #   The following are some use cases for using `ExpressionAttributeNames`:
     #
     #   * To access an attribute whose name conflicts with a DynamoDB reserved
     #     word.
@@ -1651,7 +1714,7 @@ module Aws::DynamoDB
     #   cannot be used directly in an expression. (For the complete list of
     #   reserved words, see [Reserved Words][1] in the *Amazon DynamoDB
     #   Developer Guide*). To work around this, you could specify the
-    #   following for `ExpressionAttributeNames`\:
+    #   following for `ExpressionAttributeNames`:
     #
     #   * `\{"#P":"Percentile"\}`
     #
@@ -1721,7 +1784,9 @@ module Aws::DynamoDB
     # @return [Types::ScanOutput]
     def scan(options = {})
       options = options.merge(table_name: @name)
-      resp = @client.scan(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.scan(options)
+      end
       resp.data
     end
 
@@ -1743,9 +1808,13 @@ module Aws::DynamoDB
     #       {
     #         update: {
     #           index_name: "IndexName", # required
-    #           provisioned_throughput: { # required
+    #           provisioned_throughput: {
     #             read_capacity_units: 1, # required
     #             write_capacity_units: 1, # required
+    #           },
+    #           on_demand_throughput: {
+    #             max_read_request_units: 1,
+    #             max_write_request_units: 1,
     #           },
     #         },
     #         create: {
@@ -1763,6 +1832,10 @@ module Aws::DynamoDB
     #           provisioned_throughput: {
     #             read_capacity_units: 1, # required
     #             write_capacity_units: 1, # required
+    #           },
+    #           on_demand_throughput: {
+    #             max_read_request_units: 1,
+    #             max_write_request_units: 1,
     #           },
     #         },
     #         delete: {
@@ -1787,20 +1860,8 @@ module Aws::DynamoDB
     #           provisioned_throughput_override: {
     #             read_capacity_units: 1,
     #           },
-    #           global_secondary_indexes: [
-    #             {
-    #               index_name: "IndexName", # required
-    #               provisioned_throughput_override: {
-    #                 read_capacity_units: 1,
-    #               },
-    #             },
-    #           ],
-    #         },
-    #         update: {
-    #           region_name: "RegionName", # required
-    #           kms_master_key_id: "KMSMasterKeyId",
-    #           provisioned_throughput_override: {
-    #             read_capacity_units: 1,
+    #           on_demand_throughput_override: {
+    #             max_read_request_units: 1,
     #           },
     #           global_secondary_indexes: [
     #             {
@@ -1808,14 +1869,46 @@ module Aws::DynamoDB
     #               provisioned_throughput_override: {
     #                 read_capacity_units: 1,
     #               },
+    #               on_demand_throughput_override: {
+    #                 max_read_request_units: 1,
+    #               },
     #             },
     #           ],
+    #           table_class_override: "STANDARD", # accepts STANDARD, STANDARD_INFREQUENT_ACCESS
+    #         },
+    #         update: {
+    #           region_name: "RegionName", # required
+    #           kms_master_key_id: "KMSMasterKeyId",
+    #           provisioned_throughput_override: {
+    #             read_capacity_units: 1,
+    #           },
+    #           on_demand_throughput_override: {
+    #             max_read_request_units: 1,
+    #           },
+    #           global_secondary_indexes: [
+    #             {
+    #               index_name: "IndexName", # required
+    #               provisioned_throughput_override: {
+    #                 read_capacity_units: 1,
+    #               },
+    #               on_demand_throughput_override: {
+    #                 max_read_request_units: 1,
+    #               },
+    #             },
+    #           ],
+    #           table_class_override: "STANDARD", # accepts STANDARD, STANDARD_INFREQUENT_ACCESS
     #         },
     #         delete: {
     #           region_name: "RegionName", # required
     #         },
     #       },
     #     ],
+    #     table_class: "STANDARD", # accepts STANDARD, STANDARD_INFREQUENT_ACCESS
+    #     deletion_protection_enabled: false,
+    #     on_demand_throughput: {
+    #       max_read_request_units: 1,
+    #       max_write_request_units: 1,
+    #     },
     #   })
     # @param [Hash] options ({})
     # @option options [Array<Types::AttributeDefinition>] :attribute_definitions
@@ -1833,16 +1926,16 @@ module Aws::DynamoDB
     #
     #   * `PROVISIONED` - We recommend using `PROVISIONED` for predictable
     #     workloads. `PROVISIONED` sets the billing mode to [Provisioned
-    #     Mode][1].
+    #     capacity mode][1].
     #
     #   * `PAY_PER_REQUEST` - We recommend using `PAY_PER_REQUEST` for
     #     unpredictable workloads. `PAY_PER_REQUEST` sets the billing mode to
-    #     [On-Demand Mode][2].
+    #     [On-demand capacity mode][2].
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadWriteCapacityMode.html#HowItWorks.ProvisionedThroughput.Manual
-    #   [2]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadWriteCapacityMode.html#HowItWorks.OnDemand
+    #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/provisioned-capacity-mode.html
+    #   [2]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/on-demand-capacity-mode.html
     # @option options [Types::ProvisionedThroughput] :provisioned_throughput
     #   The new provisioned throughput settings for the specified table or
     #   index.
@@ -1869,9 +1962,9 @@ module Aws::DynamoDB
     # @option options [Types::StreamSpecification] :stream_specification
     #   Represents the DynamoDB Streams configuration for the table.
     #
-    #   <note markdown="1"> You receive a `ResourceInUseException` if you try to enable a stream
-    #   on a table that already has a stream, or if you try to disable a
-    #   stream on a table that doesn't have a stream.
+    #   <note markdown="1"> You receive a `ValidationException` if you try to enable a stream on a
+    #   table that already has a stream, or if you try to disable a stream on
+    #   a table that doesn't have a stream.
     #
     #    </note>
     # @option options [Types::SSESpecification] :sse_specification
@@ -1880,18 +1973,26 @@ module Aws::DynamoDB
     #   A list of replica update actions (create, delete, or update) for the
     #   table.
     #
-    #   <note markdown="1"> This property only applies to [Version 2019.11.21][1] of global
-    #   tables.
+    #   <note markdown="1"> For global tables, this property only applies to global tables using
+    #   Version 2019.11.21 (Current version).
     #
     #    </note>
-    #
-    #
-    #
-    #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables.V2.html
+    # @option options [String] :table_class
+    #   The table class of the table to be updated. Valid values are
+    #   `STANDARD` and `STANDARD_INFREQUENT_ACCESS`.
+    # @option options [Boolean] :deletion_protection_enabled
+    #   Indicates whether deletion protection is to be enabled (true) or
+    #   disabled (false) on the table.
+    # @option options [Types::OnDemandThroughput] :on_demand_throughput
+    #   Updates the maximum number of read and write units for the specified
+    #   table in on-demand capacity mode. If you use this parameter, you must
+    #   specify `MaxReadRequestUnits`, `MaxWriteRequestUnits`, or both.
     # @return [Table]
     def update(options = {})
       options = options.merge(table_name: @name)
-      resp = @client.update_table(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.update_table(options)
+      end
       Table.new(
         name: @name,
         data: resp.data.table_description,
@@ -1931,6 +2032,7 @@ module Aws::DynamoDB
     #     expression_attribute_values: {
     #       "ExpressionAttributeValueVariable" => "value", # value <Hash,Array,String,Numeric,Boolean,IO,Set,nil>
     #     },
+    #     return_values_on_condition_check_failure: "ALL_OLD", # accepts ALL_OLD, NONE
     #   })
     # @param [Hash] options ({})
     # @option options [required, Hash<String,Types::AttributeValue>] :key
@@ -1967,8 +2069,8 @@ module Aws::DynamoDB
     #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LegacyConditionalParameters.ConditionalOperator.html
     # @option options [String] :return_values
     #   Use `ReturnValues` if you want to get the item attributes as they
-    #   appear before or after they are updated. For `UpdateItem`, the valid
-    #   values are:
+    #   appear before or after they are successfully updated. For
+    #   `UpdateItem`, the valid values are:
     #
     #   * `NONE` - If `ReturnValues` is not specified, or if its value is
     #     `NONE`, then nothing is returned. (This setting is the default for
@@ -1992,8 +2094,8 @@ module Aws::DynamoDB
     #
     #   The values returned are strongly consistent.
     # @option options [String] :return_consumed_capacity
-    #   Determines the level of detail about provisioned throughput
-    #   consumption that is returned in the response:
+    #   Determines the level of detail about either provisioned or on-demand
+    #   throughput consumption that is returned in the response:
     #
     #   * `INDEXES` - The response includes the aggregate `ConsumedCapacity`
     #     for the operation, together with `ConsumedCapacity` for each table
@@ -2122,8 +2224,7 @@ module Aws::DynamoDB
     #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.SpecifyingConditions.html
     # @option options [Hash<String,String>] :expression_attribute_names
     #   One or more substitution tokens for attribute names in an expression.
-    #   The following are some use cases for using
-    #   `ExpressionAttributeNames`\:
+    #   The following are some use cases for using `ExpressionAttributeNames`:
     #
     #   * To access an attribute whose name conflicts with a DynamoDB reserved
     #     word.
@@ -2145,7 +2246,7 @@ module Aws::DynamoDB
     #   cannot be used directly in an expression. (For the complete list of
     #   reserved words, see [Reserved Words][1] in the *Amazon DynamoDB
     #   Developer Guide*.) To work around this, you could specify the
-    #   following for `ExpressionAttributeNames`\:
+    #   following for `ExpressionAttributeNames`:
     #
     #   * `\{"#P":"Percentile"\}`
     #
@@ -2195,10 +2296,19 @@ module Aws::DynamoDB
     #
     #
     #   [1]: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.SpecifyingConditions.html
+    # @option options [String] :return_values_on_condition_check_failure
+    #   An optional parameter that returns the item attributes for an
+    #   `UpdateItem` operation that failed a condition check.
+    #
+    #   There is no additional cost associated with requesting a return value
+    #   aside from the small network and processing overhead of receiving a
+    #   larger response. No read capacity units are consumed.
     # @return [Types::UpdateItemOutput]
     def update_item(options = {})
       options = options.merge(table_name: @name)
-      resp = @client.update_item(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.update_item(options)
+      end
       resp.data
     end
 

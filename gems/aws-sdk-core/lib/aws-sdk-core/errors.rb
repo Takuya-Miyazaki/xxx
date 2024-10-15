@@ -12,13 +12,13 @@ module Aws
     class ServiceError < RuntimeError
 
       # @param [Seahorse::Client::RequestContext] context
-      # @param [String] message
+      # @param [String, nil] message
       # @param [Aws::Structure] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         @code = self.class.code
         @context = context
         @data = data
-        @message = message && !message.empty? ? message : self.class
+        @message = message && !message.empty? ? message : self.class.to_s
         super(@message)
       end
 
@@ -30,11 +30,11 @@ module Aws
       attr_reader :context
 
       # @return [Aws::Structure]
-      attr_reader :data
+      attr_accessor :data
 
       class << self
 
-        # @return [String]
+        # @return [String, nil]
         attr_accessor :code
 
       end
@@ -210,11 +210,37 @@ module Aws
     # Raised when SSO Credentials are invalid
     class InvalidSSOCredentials < RuntimeError; end
 
+    # Raised when SSO Token is invalid
+    class InvalidSSOToken < RuntimeError; end
+
+    # Raised when a client is unable to sign a request because
+    # the bearer token is not configured or available
+    class MissingBearerTokenError < RuntimeError
+      def initialize(*args)
+        msg = 'unable to sign request without token set'
+        super(msg)
+      end
+    end
+
+
+    # Raised when there is a circular reference in chained
+    # source_profiles
+    class SourceProfileCircularReferenceError < RuntimeError; end
+
     # Raised when a client is constructed and region is not specified.
     class MissingRegionError < ArgumentError
       def initialize(*args)
         msg = 'No region was provided. Configure the `:region` option or '\
           "export the region name to ENV['AWS_REGION']"
+        super(msg)
+      end
+    end
+
+    # Raised when a client is constructed and the sigv4a region set is invalid.
+    # It is invalid when it is empty and/or contains empty strings.
+    class InvalidRegionSetError < ArgumentError
+      def initialize(*args)
+        msg = 'The provided sigv4a region set was empty or invalid.'
         super(msg)
       end
     end

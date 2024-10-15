@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:ebs)
 
 module Aws::EBS
   # An API client for EBS.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::EBS
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::EBS::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::EBS
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::EBS
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::EBS
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::EBS
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::EBS
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::EBS
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::EBS
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::EBS::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::EBS::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -331,6 +451,17 @@ module Aws::EBS
     # data have been written to it. Completing the snapshot changes the
     # status to `completed`. You cannot write new blocks to a snapshot after
     # it has been completed.
+    #
+    # <note markdown="1"> You should always retry requests that receive server (`5xx`) error
+    # responses, and `ThrottlingException` and `RequestThrottledException`
+    # client error responses. For more information see [Error retries][1] in
+    # the *Amazon Elastic Compute Cloud User Guide*.
+    #
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html
     #
     # @option params [required, String] :snapshot_id
     #   The ID of the snapshot.
@@ -385,19 +516,39 @@ module Aws::EBS
 
     # Returns the data in a block in an Amazon Elastic Block Store snapshot.
     #
+    # <note markdown="1"> You should always retry requests that receive server (`5xx`) error
+    # responses, and `ThrottlingException` and `RequestThrottledException`
+    # client error responses. For more information see [Error retries][1] in
+    # the *Amazon Elastic Compute Cloud User Guide*.
+    #
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html
+    #
     # @option params [required, String] :snapshot_id
     #   The ID of the snapshot containing the block from which to get data.
     #
-    # @option params [required, Integer] :block_index
-    #   The block index of the block from which to get data.
+    #   If the specified snapshot is encrypted, you must have permission to
+    #   use the KMS key that was used to encrypt the snapshot. For more
+    #   information, see [ Using encryption][1] in the *Amazon Elastic Compute
+    #   Cloud User Guide*.
     #
-    #   Obtain the `BlockIndex` by running the `ListChangedBlocks` or
-    #   `ListSnapshotBlocks` operations.
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapis-using-encryption.html
+    #
+    # @option params [required, Integer] :block_index
+    #   The block index of the block in which to read the data. A block index
+    #   is a logical index in units of `512` KiB blocks. To identify the block
+    #   index, divide the logical offset of the data in the logical volume by
+    #   the block size (logical offset of data/`524288`). The logical offset
+    #   of the data must be `512` KiB aligned.
     #
     # @option params [required, String] :block_token
-    #   The block token of the block from which to get data.
-    #
-    #   Obtain the `BlockToken` by running the `ListChangedBlocks` or
+    #   The block token of the block from which to get data. You can obtain
+    #   the `BlockToken` by running the `ListChangedBlocks` or
     #   `ListSnapshotBlocks` operations.
     #
     # @return [Types::GetSnapshotBlockResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -435,6 +586,17 @@ module Aws::EBS
     # Amazon Elastic Block Store snapshots of the same volume/snapshot
     # lineage.
     #
+    # <note markdown="1"> You should always retry requests that receive server (`5xx`) error
+    # responses, and `ThrottlingException` and `RequestThrottledException`
+    # client error responses. For more information see [Error retries][1] in
+    # the *Amazon Elastic Compute Cloud User Guide*.
+    #
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html
+    #
     # @option params [String] :first_snapshot_id
     #   The ID of the first snapshot to use for the comparison.
     #
@@ -450,14 +612,26 @@ module Aws::EBS
     # @option params [String] :next_token
     #   The token to request the next page of results.
     #
+    #   If you specify **NextToken**, then **StartingBlockIndex** is ignored.
+    #
     # @option params [Integer] :max_results
-    #   The number of results to return.
+    #   The maximum number of blocks to be returned by the request.
+    #
+    #   Even if additional blocks can be retrieved from the snapshot, the
+    #   request can return less blocks than **MaxResults** or an empty array
+    #   of blocks.
+    #
+    #   To retrieve the next set of blocks from the snapshot, make another
+    #   request with the returned **NextToken** value. The value of
+    #   **NextToken** is `null` when there are no more blocks to return.
     #
     # @option params [Integer] :starting_block_index
     #   The block index from which the comparison should start.
     #
     #   The list in the response will start from this block index or the next
     #   valid block index in the snapshots.
+    #
+    #   If you specify **NextToken**, then **StartingBlockIndex** is ignored.
     #
     # @return [Types::ListChangedBlocksResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -502,6 +676,17 @@ module Aws::EBS
     # Returns information about the blocks in an Amazon Elastic Block Store
     # snapshot.
     #
+    # <note markdown="1"> You should always retry requests that receive server (`5xx`) error
+    # responses, and `ThrottlingException` and `RequestThrottledException`
+    # client error responses. For more information see [Error retries][1] in
+    # the *Amazon Elastic Compute Cloud User Guide*.
+    #
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html
+    #
     # @option params [required, String] :snapshot_id
     #   The ID of the snapshot from which to get block indexes and block
     #   tokens.
@@ -509,13 +694,25 @@ module Aws::EBS
     # @option params [String] :next_token
     #   The token to request the next page of results.
     #
+    #   If you specify **NextToken**, then **StartingBlockIndex** is ignored.
+    #
     # @option params [Integer] :max_results
-    #   The number of results to return.
+    #   The maximum number of blocks to be returned by the request.
+    #
+    #   Even if additional blocks can be retrieved from the snapshot, the
+    #   request can return less blocks than **MaxResults** or an empty array
+    #   of blocks.
+    #
+    #   To retrieve the next set of blocks from the snapshot, make another
+    #   request with the returned **NextToken** value. The value of
+    #   **NextToken** is `null` when there are no more blocks to return.
     #
     # @option params [Integer] :starting_block_index
     #   The block index from which the list should start. The list in the
     #   response will start from this block index or the next valid block
     #   index in the snapshot.
+    #
+    #   If you specify **NextToken**, then **StartingBlockIndex** is ignored.
     #
     # @return [Types::ListSnapshotBlocksResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -559,10 +756,30 @@ module Aws::EBS
     # data, the existing data is overwritten. The target snapshot must be in
     # the `pending` state.
     #
-    # Data written to a snapshot must be aligned with 512-byte sectors.
+    # Data written to a snapshot must be aligned with 512-KiB sectors.
+    #
+    # <note markdown="1"> You should always retry requests that receive server (`5xx`) error
+    # responses, and `ThrottlingException` and `RequestThrottledException`
+    # client error responses. For more information see [Error retries][1] in
+    # the *Amazon Elastic Compute Cloud User Guide*.
+    #
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html
     #
     # @option params [required, String] :snapshot_id
     #   The ID of the snapshot.
+    #
+    #   If the specified snapshot is encrypted, you must have permission to
+    #   use the KMS key that was used to encrypt the snapshot. For more
+    #   information, see [ Using encryption][1] in the *Amazon Elastic Compute
+    #   Cloud User Guide*..
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapis-using-encryption.html
     #
     # @option params [required, Integer] :block_index
     #   The block index of the block in which to write the data. A block index
@@ -592,7 +809,7 @@ module Aws::EBS
     #
     # @option params [required, Integer] :data_length
     #   The size of the data to write to the block, in bytes. Currently, the
-    #   only supported size is `524288`.
+    #   only supported size is `524288` bytes.
     #
     #   Valid values: `524288`
     #
@@ -644,12 +861,20 @@ module Aws::EBS
     # After creating the snapshot, use [ PutSnapshotBlock][1] to write
     # blocks of data to the snapshot.
     #
+    # <note markdown="1"> You should always retry requests that receive server (`5xx`) error
+    # responses, and `ThrottlingException` and `RequestThrottledException`
+    # client error responses. For more information see [Error retries][2] in
+    # the *Amazon Elastic Compute Cloud User Guide*.
+    #
+    #  </note>
+    #
     #
     #
     # [1]: https://docs.aws.amazon.com/ebs/latest/APIReference/API_PutSnapshotBlock.html
+    # [2]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html
     #
     # @option params [required, Integer] :volume_size
-    #   The size of the volume, in GiB. The maximum size is `16384` GiB (16
+    #   The size of the volume, in GiB. The maximum size is `65536` GiB (64
     #   TiB).
     #
     # @option params [String] :parent_snapshot_id
@@ -657,13 +882,26 @@ module Aws::EBS
     #   you are creating the first snapshot for an on-premises volume, omit
     #   this parameter.
     #
-    #   If your account is enabled for encryption by default, you cannot use
-    #   an unencrypted snapshot as a parent snapshot. You must first create an
-    #   encrypted copy of the parent snapshot using [CopySnapshot][1].
+    #   You can't specify **ParentSnapshotId** and **Encrypted** in the same
+    #   request. If you specify both parameters, the request fails with
+    #   `ValidationException`.
+    #
+    #   The encryption status of the snapshot depends on the values that you
+    #   specify for **Encrypted**, **KmsKeyArn**, and **ParentSnapshotId**,
+    #   and whether your Amazon Web Services account is enabled for [
+    #   encryption by default][1]. For more information, see [ Using
+    #   encryption][2] in the *Amazon Elastic Compute Cloud User Guide*.
+    #
+    #   If you specify an encrypted parent snapshot, you must have permission
+    #   to use the KMS key that was used to encrypt the parent snapshot. For
+    #   more information, see [ Permissions to use Key Management Service
+    #   keys][3] in the *Amazon Elastic Compute Cloud User Guide*.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CopySnapshot.html
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html#encryption-by-default
+    #   [2]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapis-using-encryption.html
+    #   [3]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapi-permissions.html#ebsapi-kms-permissions
     #
     # @option params [Array<Types::Tag>] :tags
     #   The tags to apply to the snapshot.
@@ -680,7 +918,7 @@ module Aws::EBS
     #   and they have no additional effect.
     #
     #   If you do not specify a client token, one is automatically generated
-    #   by the AWS SDK.
+    #   by the Amazon Web Services SDK.
     #
     #   For more information, see [ Idempotency for StartSnapshot API][1] in
     #   the *Amazon Elastic Compute Cloud User Guide*.
@@ -693,40 +931,47 @@ module Aws::EBS
     #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-direct-api-idempotency.html
     #
     # @option params [Boolean] :encrypted
-    #   Indicates whether to encrypt the snapshot. To create an encrypted
-    #   snapshot, specify `true`. To create an unencrypted snapshot, omit this
-    #   parameter.
+    #   Indicates whether to encrypt the snapshot.
     #
-    #   If you specify a value for **ParentSnapshotId**, omit this parameter.
+    #   You can't specify **Encrypted** and <b> ParentSnapshotId</b> in the
+    #   same request. If you specify both parameters, the request fails with
+    #   `ValidationException`.
     #
-    #   If you specify `true`, the snapshot is encrypted using the CMK
-    #   specified using the **KmsKeyArn** parameter. If no value is specified
-    #   for **KmsKeyArn**, the default CMK for your account is used. If no
-    #   default CMK has been specified for your account, the AWS managed CMK
-    #   is used. To set a default CMK for your account, use [
-    #   ModifyEbsDefaultKmsKeyId][1].
+    #   The encryption status of the snapshot depends on the values that you
+    #   specify for **Encrypted**, **KmsKeyArn**, and **ParentSnapshotId**,
+    #   and whether your Amazon Web Services account is enabled for [
+    #   encryption by default][1]. For more information, see [ Using
+    #   encryption][2] in the *Amazon Elastic Compute Cloud User Guide*.
     #
-    #   If your account is enabled for encryption by default, you cannot set
-    #   this parameter to `false`. In this case, you can omit this parameter.
-    #
-    #   For more information, see [ Using encryption][2] in the *Amazon
-    #   Elastic Compute Cloud User Guide*.
+    #   To create an encrypted snapshot, you must have permission to use the
+    #   KMS key. For more information, see [ Permissions to use Key Management
+    #   Service keys][3] in the *Amazon Elastic Compute Cloud User Guide*.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ModifyEbsDefaultKmsKeyId.html
-    #   [2]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-accessing-snapshot.html#ebsapis-using-encryption
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html#encryption-by-default
+    #   [2]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapis-using-encryption.html
+    #   [3]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapi-permissions.html#ebsapi-kms-permissions
     #
     # @option params [String] :kms_key_arn
-    #   The Amazon Resource Name (ARN) of the AWS Key Management Service (AWS
-    #   KMS) customer master key (CMK) to be used to encrypt the snapshot. If
-    #   you do not specify a CMK, the default AWS managed CMK is used.
+    #   The Amazon Resource Name (ARN) of the Key Management Service (KMS) key
+    #   to be used to encrypt the snapshot.
     #
-    #   If you specify a **ParentSnapshotId**, omit this parameter; the
-    #   snapshot will be encrypted using the same CMK that was used to encrypt
-    #   the parent snapshot.
+    #   The encryption status of the snapshot depends on the values that you
+    #   specify for **Encrypted**, **KmsKeyArn**, and **ParentSnapshotId**,
+    #   and whether your Amazon Web Services account is enabled for [
+    #   encryption by default][1]. For more information, see [ Using
+    #   encryption][2] in the *Amazon Elastic Compute Cloud User Guide*.
     #
-    #   If **Encrypted** is set to `true`, you must specify a CMK ARN.
+    #   To create an encrypted snapshot, you must have permission to use the
+    #   KMS key. For more information, see [ Permissions to use Key Management
+    #   Service keys][3] in the *Amazon Elastic Compute Cloud User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html#encryption-by-default
+    #   [2]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapis-using-encryption.html
+    #   [3]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapi-permissions.html#ebsapi-kms-permissions
     #
     # @option params [Integer] :timeout
     #   The amount of time (in minutes) after which the snapshot is
@@ -750,6 +995,7 @@ module Aws::EBS
     #   * {Types::StartSnapshotResponse#tags #tags} => Array&lt;Types::Tag&gt;
     #   * {Types::StartSnapshotResponse#parent_snapshot_id #parent_snapshot_id} => String
     #   * {Types::StartSnapshotResponse#kms_key_arn #kms_key_arn} => String
+    #   * {Types::StartSnapshotResponse#sse_type #sse_type} => String
     #
     # @example Request syntax with placeholder values
     #
@@ -783,6 +1029,7 @@ module Aws::EBS
     #   resp.tags[0].value #=> String
     #   resp.parent_snapshot_id #=> String
     #   resp.kms_key_arn #=> String
+    #   resp.sse_type #=> String, one of "sse-ebs", "sse-kms", "none"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ebs-2019-11-02/StartSnapshot AWS API Documentation
     #
@@ -799,14 +1046,19 @@ module Aws::EBS
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::EBS')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-ebs'
-      context[:gem_version] = '1.11.0'
+      context[:gem_version] = '1.52.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

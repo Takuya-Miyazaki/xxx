@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-braket/types'
-require_relative 'aws-sdk-braket/client_api'
-require_relative 'aws-sdk-braket/client'
-require_relative 'aws-sdk-braket/errors'
-require_relative 'aws-sdk-braket/resource'
-require_relative 'aws-sdk-braket/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:braket)
 
 # This module provides support for Braket. This module is available in the
 # `aws-sdk-braket` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-braket/customizations'
 # structure.
 #
 #     braket = Aws::Braket::Client.new
-#     resp = braket.cancel_quantum_task(params)
+#     resp = braket.cancel_job(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-braket/customizations'
 #
 # @!group service
 module Aws::Braket
+  autoload :Types, 'aws-sdk-braket/types'
+  autoload :ClientApi, 'aws-sdk-braket/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-braket/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-braket/client'
+  autoload :Errors, 'aws-sdk-braket/errors'
+  autoload :Resource, 'aws-sdk-braket/resource'
+  autoload :EndpointParameters, 'aws-sdk-braket/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-braket/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-braket/endpoints'
 
-  GEM_VERSION = '1.5.0'
+  GEM_VERSION = '1.46.0'
 
 end
+
+require_relative 'aws-sdk-braket/customizations'

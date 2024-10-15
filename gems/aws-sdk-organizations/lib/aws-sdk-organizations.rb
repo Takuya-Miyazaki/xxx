@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-organizations/types'
-require_relative 'aws-sdk-organizations/client_api'
-require_relative 'aws-sdk-organizations/client'
-require_relative 'aws-sdk-organizations/errors'
-require_relative 'aws-sdk-organizations/resource'
-require_relative 'aws-sdk-organizations/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:organizations)
 
 # This module provides support for AWS Organizations. This module is available in the
 # `aws-sdk-organizations` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-organizations/customizations'
 #
 # @!group service
 module Aws::Organizations
+  autoload :Types, 'aws-sdk-organizations/types'
+  autoload :ClientApi, 'aws-sdk-organizations/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-organizations/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-organizations/client'
+  autoload :Errors, 'aws-sdk-organizations/errors'
+  autoload :Resource, 'aws-sdk-organizations/resource'
+  autoload :EndpointParameters, 'aws-sdk-organizations/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-organizations/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-organizations/endpoints'
 
-  GEM_VERSION = '1.55.0'
+  GEM_VERSION = '1.104.0'
 
 end
+
+require_relative 'aws-sdk-organizations/customizations'

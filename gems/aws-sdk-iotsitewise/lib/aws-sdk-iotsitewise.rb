@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,13 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-iotsitewise/types'
-require_relative 'aws-sdk-iotsitewise/client_api'
-require_relative 'aws-sdk-iotsitewise/client'
-require_relative 'aws-sdk-iotsitewise/errors'
-require_relative 'aws-sdk-iotsitewise/waiters'
-require_relative 'aws-sdk-iotsitewise/resource'
-require_relative 'aws-sdk-iotsitewise/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:iotsitewise)
 
 # This module provides support for AWS IoT SiteWise. This module is available in the
 # `aws-sdk-iotsitewise` gem.
@@ -48,7 +42,21 @@ require_relative 'aws-sdk-iotsitewise/customizations'
 #
 # @!group service
 module Aws::IoTSiteWise
+  autoload :Types, 'aws-sdk-iotsitewise/types'
+  autoload :ClientApi, 'aws-sdk-iotsitewise/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-iotsitewise/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-iotsitewise/client'
+  autoload :Errors, 'aws-sdk-iotsitewise/errors'
+  autoload :Waiters, 'aws-sdk-iotsitewise/waiters'
+  autoload :Resource, 'aws-sdk-iotsitewise/resource'
+  autoload :EndpointParameters, 'aws-sdk-iotsitewise/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-iotsitewise/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-iotsitewise/endpoints'
 
-  GEM_VERSION = '1.16.0'
+  GEM_VERSION = '1.75.0'
 
 end
+
+require_relative 'aws-sdk-iotsitewise/customizations'

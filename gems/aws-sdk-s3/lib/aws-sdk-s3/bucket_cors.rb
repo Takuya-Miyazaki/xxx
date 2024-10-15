@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -55,7 +55,9 @@ module Aws::S3
     #
     # @return [self]
     def load
-      resp = @client.get_bucket_cors(bucket: @bucket_name)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_bucket_cors(bucket: @bucket_name)
+      end
       @data = resp.data
       self
     end
@@ -170,7 +172,9 @@ module Aws::S3
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -182,13 +186,15 @@ module Aws::S3
     #   })
     # @param [Hash] options ({})
     # @option options [String] :expected_bucket_owner
-    #   The account id of the expected bucket owner. If the bucket is owned by
-    #   a different account, the request will fail with an HTTP `403 (Access
-    #   Denied)` error.
+    #   The account ID of the expected bucket owner. If the account ID that
+    #   you provide does not match the actual owner of the bucket, the request
+    #   fails with the HTTP status code `403 Forbidden` (access denied).
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(bucket: @bucket_name)
-      resp = @client.delete_bucket_cors(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_bucket_cors(options)
+      end
       resp.data
     end
 
@@ -198,6 +204,7 @@ module Aws::S3
     #     cors_configuration: { # required
     #       cors_rules: [ # required
     #         {
+    #           id: "ID",
     #           allowed_headers: ["AllowedHeader"],
     #           allowed_methods: ["AllowedMethod"], # required
     #           allowed_origins: ["AllowedOrigin"], # required
@@ -207,14 +214,14 @@ module Aws::S3
     #       ],
     #     },
     #     content_md5: "ContentMD5",
+    #     checksum_algorithm: "CRC32", # accepts CRC32, CRC32C, SHA1, SHA256
     #     expected_bucket_owner: "AccountId",
     #   })
     # @param [Hash] options ({})
     # @option options [required, Types::CORSConfiguration] :cors_configuration
     #   Describes the cross-origin access configuration for objects in an
     #   Amazon S3 bucket. For more information, see [Enabling Cross-Origin
-    #   Resource Sharing][1] in the *Amazon Simple Storage Service Developer
-    #   Guide*.
+    #   Resource Sharing][1] in the *Amazon S3 User Guide*.
     #
     #
     #
@@ -224,20 +231,38 @@ module Aws::S3
     #   used as a message integrity check to verify that the request body was
     #   not corrupted in transit. For more information, go to [RFC 1864.][1]
     #
-    #   For requests made using the AWS Command Line Interface (CLI) or AWS
-    #   SDKs, this field is calculated automatically.
+    #   For requests made using the Amazon Web Services Command Line Interface
+    #   (CLI) or Amazon Web Services SDKs, this field is calculated
+    #   automatically.
     #
     #
     #
     #   [1]: http://www.ietf.org/rfc/rfc1864.txt
+    # @option options [String] :checksum_algorithm
+    #   Indicates the algorithm used to create the checksum for the object
+    #   when you use the SDK. This header will not provide any additional
+    #   functionality if you don't use the SDK. When you send this header,
+    #   there must be a corresponding `x-amz-checksum` or `x-amz-trailer`
+    #   header sent. Otherwise, Amazon S3 fails the request with the HTTP
+    #   status code `400 Bad Request`. For more information, see [Checking
+    #   object integrity][1] in the *Amazon S3 User Guide*.
+    #
+    #   If you provide an individual checksum, Amazon S3 ignores any provided
+    #   `ChecksumAlgorithm` parameter.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html
     # @option options [String] :expected_bucket_owner
-    #   The account id of the expected bucket owner. If the bucket is owned by
-    #   a different account, the request will fail with an HTTP `403 (Access
-    #   Denied)` error.
+    #   The account ID of the expected bucket owner. If the account ID that
+    #   you provide does not match the actual owner of the bucket, the request
+    #   fails with the HTTP status code `403 Forbidden` (access denied).
     # @return [EmptyStructure]
     def put(options = {})
       options = options.merge(bucket: @bucket_name)
-      resp = @client.put_bucket_cors(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.put_bucket_cors(options)
+      end
       resp.data
     end
 

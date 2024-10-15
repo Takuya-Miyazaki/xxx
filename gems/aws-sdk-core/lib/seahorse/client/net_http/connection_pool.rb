@@ -34,6 +34,9 @@ module Seahorse
           ssl_ca_bundle: nil,
           ssl_ca_directory: nil,
           ssl_ca_store: nil,
+          ssl_timeout: nil,
+          ssl_cert: nil,
+          ssl_key: nil
         }
 
         # @api private
@@ -118,11 +121,7 @@ module Seahorse
         #   pool, not counting those currently in use.
         def size
           @pool_mutex.synchronize do
-            size = 0
-            @pool.each_pair do |endpoint,sessions|
-              size += sessions.size
-            end
-            size
+            @pool.values.flatten.size
           end
         end
 
@@ -141,9 +140,7 @@ module Seahorse
         # @return [nil]
         def empty!
           @pool_mutex.synchronize do
-            @pool.each_pair do |endpoint,sessions|
-              sessions.each(&:finish)
-            end
+            @pool.values.flatten.map(&:finish)
             @pool.clear
           end
           nil
@@ -186,6 +183,9 @@ module Seahorse
           #   "Expect" header set to "100-continue".  Defaults to `nil` which
           #   disables this behaviour.  This value can safely be set per
           #   request on the session yielded by {#session_for}.
+          #
+          # @option options [Float] :ssl_timeout (nil) Sets the SSL timeout
+          #   in seconds.
           #
           # @option options [Boolean] :http_wire_trace (false) When `true`,
           #   HTTP debug output will be sent to the `:logger`.
@@ -248,6 +248,9 @@ module Seahorse
               :ssl_ca_bundle => options[:ssl_ca_bundle],
               :ssl_ca_directory => options[:ssl_ca_directory],
               :ssl_ca_store => options[:ssl_ca_store],
+              :ssl_timeout => options[:ssl_timeout],
+              :ssl_cert => options[:ssl_cert],
+              :ssl_key => options[:ssl_key]
             }
           end
 
@@ -285,11 +288,15 @@ module Seahorse
 
           if endpoint.scheme == 'https'
             http.use_ssl = true
+            http.ssl_timeout = ssl_timeout
+
             if ssl_verify_peer?
               http.verify_mode = OpenSSL::SSL::VERIFY_PEER
               http.ca_file = ssl_ca_bundle if ssl_ca_bundle
               http.ca_path = ssl_ca_directory if ssl_ca_directory
               http.cert_store = ssl_ca_store if ssl_ca_store
+              http.cert = ssl_cert if ssl_cert
+              http.key = ssl_key if ssl_key
             else
               http.verify_mode = OpenSSL::SSL::VERIFY_NONE
             end
@@ -305,7 +312,7 @@ module Seahorse
         # @note **Must** be called behind a `@pool_mutex` synchronize block.
         def _clean
           now = Aws::Util.monotonic_milliseconds
-          @pool.each_pair do |endpoint,sessions|
+          @pool.values.each do |sessions|
             sessions.delete_if do |session|
               if session.last_used.nil? or now - session.last_used > http_idle_timeout * 1000
                 session.finish

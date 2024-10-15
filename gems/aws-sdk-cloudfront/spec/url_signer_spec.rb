@@ -9,7 +9,7 @@ module Aws
       let(:options) {
         {
           :key_pair_id => 'CF_KEYPAIR_ID',
-          :private_key_path =>"#{File.dirname(__FILE__)}/cf_private_key.pem"
+          :private_key_path =>"#{File.dirname(__FILE__)}/unit_test_dummy_key"
         }
       }
       let(:signer) { Aws::CloudFront::UrlSigner.new(options) }
@@ -19,7 +19,7 @@ module Aws
         it 'requires key pair id' do
           expect {
             Aws::CloudFront::UrlSigner.new(
-              :private_key_path =>"#{File.dirname(__FILE__)}/cf_private_key.pem"
+              :private_key_path =>"#{File.dirname(__FILE__)}/unit_test_dummy_key"
             )
           }.to raise_error(ArgumentError)
         end
@@ -33,9 +33,9 @@ module Aws
       end
 
       describe '#signed_url' do
-        it 'raises error if url is invaild' do
+        it 'raises error if url is invalid' do
           expect {
-            signer.signed_url('what_ever_ilegal/url')
+            signer.signed_url('what_ever_illegal/url')
           }.to raise_error(ArgumentError)
         end
         it 'can generate signed urls with custom policy' do

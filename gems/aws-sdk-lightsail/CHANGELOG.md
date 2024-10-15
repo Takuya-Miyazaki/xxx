@@ -1,6 +1,313 @@
 Unreleased Changes
 ------------------
 
+1.102.0 (2024-09-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.101.0 (2024-09-23)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.100.0 (2024-09-20)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.99.0 (2024-09-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.98.0 (2024-09-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.97.0 (2024-09-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.96.0 (2024-07-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.95.0 (2024-06-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.94.0 (2024-06-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.93.0 (2024-06-18)
+------------------
+
+* Feature - Add v2 smoke tests and smithy smokeTests trait for SDK testing.
+
+1.92.0 (2024-06-05)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.91.0 (2024-05-21)
+------------------
+
+* Feature - This release adds support for Amazon Lightsail instances to switch between dual-stack or IPv4 only and IPv6-only public IP address types.
+
+1.90.0 (2024-05-13)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.89.0 (2024-04-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.88.0 (2024-02-13)
+------------------
+
+* Feature - This release adds support to upgrade the major version of a database.
+
+1.87.0 (2024-01-26)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.86.0 (2024-01-25)
+------------------
+
+* Feature - This release adds support for IPv6-only instance plans.
+
+1.85.0 (2024-01-04)
+------------------
+
+* Feature - This release adds support to set up an HTTPS endpoint on an instance.
+
+1.84.0 (2023-11-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.83.0 (2023-11-22)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.82.0 (2023-09-27)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.81.0 (2023-07-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.80.0 (2023-07-06)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.79.0 (2023-06-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.78.0 (2023-06-15)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.77.0 (2023-06-13)
+------------------
+
+* Feature - This release adds pagination for the Get Certificates API operation.
+
+1.76.0 (2023-05-31)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.75.0 (2023-02-28)
+------------------
+
+* Feature - This release adds Lightsail for Research feature support, such as GUI session access, cost estimates, stop instance on idle, and disk auto mount.
+
+1.74.0 (2023-02-09)
+------------------
+
+* Feature - Documentation updates for Lightsail
+
+1.73.0 (2023-01-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+* Issue - Replace runtime endpoint resolution approach with generated ruby code.
+
+1.72.0 (2023-01-05)
+------------------
+
+* Feature - Documentation updates for Amazon Lightsail.
+
+1.71.0 (2022-11-08)
+------------------
+
+* Feature - This release adds support for Amazon Lightsail to automate the delegation of domains registered through Amazon Route 53 to Lightsail DNS management and to automate record creation for DNS validation of Lightsail SSL/TLS certificates.
+
+1.70.0 (2022-10-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.69.0 (2022-09-23)
+------------------
+
+* Feature - This release adds Instance Metadata Service (IMDS) support for Lightsail instances.
+
+1.68.0 (2022-05-26)
+------------------
+
+* Feature - Amazon Lightsail now supports the ability to configure a Lightsail Container Service to pull images from Amazon ECR private repositories in your account.
+
+1.67.0 (2022-05-12)
+------------------
+
+* Feature - This release adds support to include inactive database bundles in the response of the GetRelationalDatabaseBundles request.
+
+1.66.0 (2022-05-04)
+------------------
+
+* Feature - Documentation updates for Lightsail
+
+1.65.0 (2022-04-26)
+------------------
+
+* Feature - This release adds support for Lightsail load balancer HTTP to HTTPS redirect and TLS policy configuration.
+
+1.64.0 (2022-04-15)
+------------------
+
+* Feature - This release adds support to describe the synchronization status of the account-level block public access feature for your Amazon Lightsail buckets.
+
+1.63.0 (2022-02-24)
+------------------
+
+* Feature - This release adds support to delete and create Lightsail default key pairs that you can use with Lightsail instances.
+
+1.62.0 (2022-02-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.61.0 (2021-12-21)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.60.0 (2021-11-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.59.0 (2021-11-04)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.58.0 (2021-11-01)
+------------------
+
+* Feature - This release adds support to enable access logging for buckets in the Lightsail object storage service.
+
+1.57.0 (2021-10-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.56.0 (2021-09-01)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.55.0 (2021-08-06)
+------------------
+
+* Feature - This release adds support to track when a bucket access key was last used.
+
+1.54.0 (2021-07-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.53.0 (2021-07-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.52.0 (2021-07-14)
+------------------
+
+* Feature - This release adds support for the Amazon Lightsail object storage service, which allows you to create buckets and store objects.
+
+1.51.0 (2021-06-02)
+------------------
+
+* Feature - Documentation updates for Lightsail
+
+1.50.0 (2021-05-27)
+------------------
+
+* Feature - Documentation updates for Lightsail
+
+1.49.0 (2021-05-19)
+------------------
+
+* Feature - Documentation updates for Amazon Lightsail.
+
+1.48.0 (2021-04-13)
+------------------
+
+* Feature - Documentation updates for Amazon Lightsail.
+
+1.47.0 (2021-04-01)
+------------------
+
+* Feature - This release adds support for state detail for Amazon Lightsail container services.
+
+1.46.0 (2021-03-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.45.0 (2021-02-25)
+------------------
+
+* Feature - Documentation updates for Lightsail
+
+1.44.0 (2021-02-15)
+------------------
+
+* Feature - Documentation updates for Lightsail
+
+1.43.0 (2021-02-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.42.0 (2021-01-27)
+------------------
+
+* Feature - Documentation updates for Lightsail
+
 1.41.0 (2021-01-12)
 ------------------
 

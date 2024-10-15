@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-ram/types'
-require_relative 'aws-sdk-ram/client_api'
-require_relative 'aws-sdk-ram/client'
-require_relative 'aws-sdk-ram/errors'
-require_relative 'aws-sdk-ram/resource'
-require_relative 'aws-sdk-ram/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:ram)
 
 # This module provides support for AWS Resource Access Manager. This module is available in the
 # `aws-sdk-ram` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-ram/customizations'
 #
 # @!group service
 module Aws::RAM
+  autoload :Types, 'aws-sdk-ram/types'
+  autoload :ClientApi, 'aws-sdk-ram/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-ram/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-ram/client'
+  autoload :Errors, 'aws-sdk-ram/errors'
+  autoload :Resource, 'aws-sdk-ram/resource'
+  autoload :EndpointParameters, 'aws-sdk-ram/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-ram/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-ram/endpoints'
 
-  GEM_VERSION = '1.22.0'
+  GEM_VERSION = '1.66.0'
 
 end
+
+require_relative 'aws-sdk-ram/customizations'

@@ -1,6 +1,318 @@
 Unreleased Changes
 ------------------
 
+1.118.0 (2024-10-11)
+------------------
+
+* Feature - Add zonal_shift.config.enabled attribute. Add new AdministrativeOverride construct in the describe-target-health API response to include information about the override status applied to a target.
+
+1.117.0 (2024-09-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.116.0 (2024-09-23)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.115.0 (2024-09-20)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.114.0 (2024-09-12)
+------------------
+
+* Feature - Correct incorrectly mapped error in ELBv2 waiters
+
+1.113.0 (2024-09-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.112.0 (2024-09-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.111.0 (2024-09-09)
+------------------
+
+* Feature - Add paginators for the ELBv2 DescribeListenerCertificates and DescribeRules APIs. Fix broken waiter for the ELBv2 DescribeLoadBalancers API.
+
+1.110.0 (2024-09-03)
+------------------
+
+* Feature - This release adds support for configuring TCP idle timeout on NLB and GWLB listeners.
+
+1.109.0 (2024-07-25)
+------------------
+
+* Feature - This release adds support for sharing trust stores across accounts and organizations through integration with AWS Resource Access Manager.
+
+1.108.0 (2024-07-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.107.0 (2024-06-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.106.0 (2024-06-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.105.0 (2024-06-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.104.0 (2024-06-05)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.103.0 (2024-05-17)
+------------------
+
+* Feature - This release adds dualstack-without-public-ipv4 IP address type for ALB.
+
+1.102.0 (2024-05-13)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.101.0 (2024-04-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.100.0 (2024-04-16)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.99.0 (2024-03-14)
+------------------
+
+* Feature - This release allows you to configure HTTP client keep-alive duration for communication between clients and Application Load Balancers.
+
+1.98.0 (2024-01-31)
+------------------
+
+* Feature - This release enables unhealthy target draining intervals for Network Load Balancers.
+
+1.97.0 (2024-01-26)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.96.0 (2023-11-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.95.0 (2023-11-27)
+------------------
+
+* Feature - This release enables both mutual authentication (mTLS), and Automatic Target Weights (ATW) for Application Load Balancers.
+
+1.94.0 (2023-11-22)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.93.0 (2023-10-12)
+------------------
+
+* Feature - This release enables routing policies with Availability Zone affinity for Network Load Balancers.
+
+1.92.0 (2023-09-27)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.91.0 (2023-09-06)
+------------------
+
+* Feature - This release enables default UDP connection termination and disabling unhealthy target connection termination for Network Load Balancers.
+
+1.90.0 (2023-08-10)
+------------------
+
+* Feature - This release enables configuring security groups for Network Load Balancers
+
+1.89.0 (2023-07-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.88.0 (2023-07-06)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.87.0 (2023-06-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.86.0 (2023-06-15)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.85.0 (2023-05-31)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.84.0 (2023-02-02)
+------------------
+
+* Feature - The GWLB Flex Health Check project updates the default values of healthy-threshold-count from 3 to 5 and unhealthy-threshold-count from 3 to 2
+
+1.83.0 (2023-01-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+* Issue - Replace runtime endpoint resolution approach with generated ruby code.
+
+1.82.0 (2022-11-17)
+------------------
+
+* Feature - Provides new target group attributes to turn on/off cross zone load balancing and configure target group health for Network Load Balancers and Application Load Balancers. Provides improvements to health check configuration for Network Load Balancers.
+
+1.81.0 (2022-10-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.80.0 (2022-10-07)
+------------------
+
+* Feature - Gateway Load Balancer adds a new feature (target_failover) for customers to rebalance existing flows to a healthy target after marked unhealthy or deregistered. This allows graceful patching/upgrades of target appliances during maintenance windows, and helps reduce unhealthy target failover time.
+
+1.79.0 (2022-08-25)
+------------------
+
+* Feature - Documentation updates for ELBv2.  Gateway Load Balancer now supports Configurable Flow Stickiness, enabling you to configure the hashing used to maintain stickiness of flows to a specific target appliance.
+
+1.78.0 (2022-06-29)
+------------------
+
+* Feature - This release adds two attributes for ALB. One, helps to preserve the host header and the other helps to modify, preserve, or remove the X-Forwarded-For header in the HTTP request.
+
+1.77.0 (2022-02-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.76.0 (2022-02-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.75.0 (2021-12-21)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.74.0 (2021-11-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.73.0 (2021-11-23)
+------------------
+
+* Feature - This release allows you to create internal Application and Network Load Balancers in dualstack mode. This release also adds an attribute to block internet gateway (IGW) access to the load balancer, preventing unintended access to your internal load balancers through an internet gateway.
+
+1.72.0 (2021-11-04)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.71.0 (2021-10-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.70.0 (2021-10-14)
+------------------
+
+* Feature - Adds new option to filter by availability on each type of load balancer when describing ssl policies.
+
+1.69.0 (2021-10-11)
+------------------
+
+* Feature - Enable support for ALB IPv6 Target Groups (IP Address Type)
+
+1.68.0 (2021-09-27)
+------------------
+
+* Feature - Adds new ALB-type target group to facilitate forwarding traffic from NLB to ALB
+
+1.67.0 (2021-09-01)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.66.0 (2021-07-30)
+------------------
+
+* Feature - Client Port Preservation ALB Attribute Launch
+
+1.65.0 (2021-07-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.64.0 (2021-07-22)
+------------------
+
+* Feature - Adds support for enabling TLS protocol version and cipher suite headers to be sent to backend targets for Application Load Balancers.
+
+1.63.0 (2021-07-21)
+------------------
+
+* Feature - Adds support for enabling TLS protocol version and cipher suite headers to be sent to backend targets for Application Load Balancers.
+
+1.62.0 (2021-07-02)
+------------------
+
+* Feature - Documentation updates for elasticloadbalancingv2
+
+1.61.0 (2021-03-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.60.0 (2021-02-12)
+------------------
+
+* Feature - Adds a target group attribute for application-based stickiness for Application Load Balancers and an update to the client IP preservation attribute for Network Load Balancers.
+
+1.59.0 (2021-02-08)
+------------------
+
+* Feature - Adds a target group attribute for application-based stickiness for Application Load Balancers.
+
+1.58.0 (2021-02-05)
+------------------
+
+* Feature - Adds a target group attribute for client IP preservation for Network Load Balancers.
+
+1.57.0 (2021-02-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
 1.56.0 (2020-11-13)
 ------------------
 

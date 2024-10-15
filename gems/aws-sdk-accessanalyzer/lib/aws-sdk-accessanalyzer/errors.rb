@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -30,9 +30,11 @@ module Aws::AccessAnalyzer
   # * {AccessDeniedException}
   # * {ConflictException}
   # * {InternalServerException}
+  # * {InvalidParameterException}
   # * {ResourceNotFoundException}
   # * {ServiceQuotaExceededException}
   # * {ThrottlingException}
+  # * {UnprocessableEntityException}
   # * {ValidationException}
   #
   # Additionally, error classes are dynamically generated for service errors based on the error code
@@ -102,6 +104,21 @@ module Aws::AccessAnalyzer
 
       def retryable?
         true
+      end
+    end
+
+    class InvalidParameterException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::AccessAnalyzer::Types::InvalidParameterException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
       end
     end
 
@@ -183,6 +200,25 @@ module Aws::AccessAnalyzer
       end
     end
 
+    class UnprocessableEntityException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::AccessAnalyzer::Types::UnprocessableEntityException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+
+      def retryable?
+        true
+      end
+    end
+
     class ValidationException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -193,11 +229,6 @@ module Aws::AccessAnalyzer
       end
 
       # @return [String]
-      def field_list
-        @data[:field_list]
-      end
-
-      # @return [String]
       def message
         @message || @data[:message]
       end
@@ -205,6 +236,11 @@ module Aws::AccessAnalyzer
       # @return [String]
       def reason
         @data[:reason]
+      end
+
+      # @return [String]
+      def field_list
+        @data[:field_list]
       end
     end
 

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -40,6 +40,26 @@ module Aws::S3
       data[:rules]
     end
 
+    # Indicates which default minimum object size behavior is applied to the
+    # lifecycle configuration.
+    #
+    # * `all_storage_classes_128K` - Objects smaller than 128 KB will not
+    #   transition to any storage class by default.
+    #
+    # * `varies_by_storage_class` - Objects smaller than 128 KB will
+    #   transition to Glacier Flexible Retrieval or Glacier Deep Archive
+    #   storage classes. By default, all other storage classes will prevent
+    #   transitions smaller than 128 KB.
+    #
+    # To customize the minimum object size for any transition you can add a
+    # filter that specifies a custom `ObjectSizeGreaterThan` or
+    # `ObjectSizeLessThan` in the body of your transition rule. Custom
+    # filters always take precedence over the default transition behavior.
+    # @return [String]
+    def transition_default_minimum_object_size
+      data[:transition_default_minimum_object_size]
+    end
+
     # @!endgroup
 
     # @return [Client]
@@ -54,7 +74,9 @@ module Aws::S3
     #
     # @return [self]
     def load
-      resp = @client.get_bucket_lifecycle_configuration(bucket: @bucket_name)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_bucket_lifecycle_configuration(bucket: @bucket_name)
+      end
       @data = resp.data
       self
     end
@@ -169,7 +191,9 @@ module Aws::S3
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -181,19 +205,22 @@ module Aws::S3
     #   })
     # @param [Hash] options ({})
     # @option options [String] :expected_bucket_owner
-    #   The account id of the expected bucket owner. If the bucket is owned by
-    #   a different account, the request will fail with an HTTP `403 (Access
-    #   Denied)` error.
+    #   The account ID of the expected bucket owner. If the account ID that
+    #   you provide does not match the actual owner of the bucket, the request
+    #   fails with the HTTP status code `403 Forbidden` (access denied).
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(bucket: @bucket_name)
-      resp = @client.delete_bucket_lifecycle(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_bucket_lifecycle(options)
+      end
       resp.data
     end
 
     # @example Request syntax with placeholder values
     #
     #   bucket_lifecycle_configuration.put({
+    #     checksum_algorithm: "CRC32", # accepts CRC32, CRC32C, SHA1, SHA256
     #     lifecycle_configuration: {
     #       rules: [ # required
     #         {
@@ -210,6 +237,8 @@ module Aws::S3
     #               key: "ObjectKey", # required
     #               value: "Value", # required
     #             },
+    #             object_size_greater_than: 1,
+    #             object_size_less_than: 1,
     #             and: {
     #               prefix: "Prefix",
     #               tags: [
@@ -218,6 +247,8 @@ module Aws::S3
     #                   value: "Value", # required
     #                 },
     #               ],
+    #               object_size_greater_than: 1,
+    #               object_size_less_than: 1,
     #             },
     #           },
     #           status: "Enabled", # required, accepts Enabled, Disabled
@@ -225,17 +256,19 @@ module Aws::S3
     #             {
     #               date: Time.now,
     #               days: 1,
-    #               storage_class: "GLACIER", # accepts GLACIER, STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING, DEEP_ARCHIVE
+    #               storage_class: "GLACIER", # accepts GLACIER, STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING, DEEP_ARCHIVE, GLACIER_IR
     #             },
     #           ],
     #           noncurrent_version_transitions: [
     #             {
     #               noncurrent_days: 1,
-    #               storage_class: "GLACIER", # accepts GLACIER, STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING, DEEP_ARCHIVE
+    #               storage_class: "GLACIER", # accepts GLACIER, STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING, DEEP_ARCHIVE, GLACIER_IR
+    #               newer_noncurrent_versions: 1,
     #             },
     #           ],
     #           noncurrent_version_expiration: {
     #             noncurrent_days: 1,
+    #             newer_noncurrent_versions: 1,
     #           },
     #           abort_incomplete_multipart_upload: {
     #             days_after_initiation: 1,
@@ -244,18 +277,52 @@ module Aws::S3
     #       ],
     #     },
     #     expected_bucket_owner: "AccountId",
+    #     transition_default_minimum_object_size: "varies_by_storage_class", # accepts varies_by_storage_class, all_storage_classes_128K
     #   })
     # @param [Hash] options ({})
+    # @option options [String] :checksum_algorithm
+    #   Indicates the algorithm used to create the checksum for the object
+    #   when you use the SDK. This header will not provide any additional
+    #   functionality if you don't use the SDK. When you send this header,
+    #   there must be a corresponding `x-amz-checksum` or `x-amz-trailer`
+    #   header sent. Otherwise, Amazon S3 fails the request with the HTTP
+    #   status code `400 Bad Request`. For more information, see [Checking
+    #   object integrity][1] in the *Amazon S3 User Guide*.
+    #
+    #   If you provide an individual checksum, Amazon S3 ignores any provided
+    #   `ChecksumAlgorithm` parameter.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html
     # @option options [Types::BucketLifecycleConfiguration] :lifecycle_configuration
     #   Container for lifecycle rules. You can add as many as 1,000 rules.
     # @option options [String] :expected_bucket_owner
-    #   The account id of the expected bucket owner. If the bucket is owned by
-    #   a different account, the request will fail with an HTTP `403 (Access
-    #   Denied)` error.
-    # @return [EmptyStructure]
+    #   The account ID of the expected bucket owner. If the account ID that
+    #   you provide does not match the actual owner of the bucket, the request
+    #   fails with the HTTP status code `403 Forbidden` (access denied).
+    # @option options [String] :transition_default_minimum_object_size
+    #   Indicates which default minimum object size behavior is applied to the
+    #   lifecycle configuration.
+    #
+    #   * `all_storage_classes_128K` - Objects smaller than 128 KB will not
+    #     transition to any storage class by default.
+    #
+    #   * `varies_by_storage_class` - Objects smaller than 128 KB will
+    #     transition to Glacier Flexible Retrieval or Glacier Deep Archive
+    #     storage classes. By default, all other storage classes will prevent
+    #     transitions smaller than 128 KB.
+    #
+    #   To customize the minimum object size for any transition you can add a
+    #   filter that specifies a custom `ObjectSizeGreaterThan` or
+    #   `ObjectSizeLessThan` in the body of your transition rule. Custom
+    #   filters always take precedence over the default transition behavior.
+    # @return [Types::PutBucketLifecycleConfigurationOutput]
     def put(options = {})
       options = options.merge(bucket: @bucket_name)
-      resp = @client.put_bucket_lifecycle_configuration(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.put_bucket_lifecycle_configuration(options)
+      end
       resp.data
     end
 

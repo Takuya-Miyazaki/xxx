@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -35,13 +35,8 @@ module Aws::EC2
     end
     alias :dhcp_options_id :id
 
-    # One or more DHCP options in the set.
-    # @return [Array<Types::DhcpConfiguration>]
-    def dhcp_configurations
-      data[:dhcp_configurations]
-    end
-
-    # The ID of the AWS account that owns the DHCP options set.
+    # The ID of the Amazon Web Services account that owns the DHCP options
+    # set.
     # @return [String]
     def owner_id
       data[:owner_id]
@@ -51,6 +46,12 @@ module Aws::EC2
     # @return [Array<Types::Tag>]
     def tags
       data[:tags]
+    end
+
+    # The DHCP options in the set.
+    # @return [Array<Types::DhcpConfiguration>]
+    def dhcp_configurations
+      data[:dhcp_configurations]
     end
 
     # @!endgroup
@@ -67,7 +68,9 @@ module Aws::EC2
     #
     # @return [self]
     def load
-      resp = @client.describe_dhcp_options(dhcp_options_ids: [@id])
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.describe_dhcp_options(dhcp_options_ids: [@id])
+      end
       @data = resp.dhcp_options[0]
       self
     end
@@ -182,7 +185,9 @@ module Aws::EC2
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -204,7 +209,9 @@ module Aws::EC2
     # @return [EmptyStructure]
     def associate_with_vpc(options = {})
       options = options.merge(dhcp_options_id: @id)
-      resp = @client.associate_dhcp_options(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.associate_dhcp_options(options)
+      end
       resp.data
     end
 
@@ -233,7 +240,9 @@ module Aws::EC2
     def create_tags(options = {})
       batch = []
       options = Aws::Util.deep_merge(options, resources: [@id])
-      resp = @client.create_tags(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.create_tags(options)
+      end
       options[:tags].each do |t|
         batch << Tag.new(
           resource_id: @id,
@@ -270,13 +279,17 @@ module Aws::EC2
     #   if its value is an empty string.
     #
     #   If you omit this parameter, we delete all user-defined tags for the
-    #   specified resources. We do not delete AWS-generated tags (tags that
-    #   have the `aws:` prefix).
+    #   specified resources. We do not delete Amazon Web Services-generated
+    #   tags (tags that have the `aws:` prefix).
+    #
+    #   Constraints: Up to 1000 tags.
     # @return [Tag::Collection]
     def delete_tags(options = {})
       batch = []
       options = Aws::Util.deep_merge(options, resources: [@id])
-      resp = @client.delete_tags(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_tags(options)
+      end
       options[:tags].each do |t|
         batch << Tag.new(
           resource_id: @id,
@@ -302,7 +315,9 @@ module Aws::EC2
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(dhcp_options_id: @id)
-      resp = @client.delete_dhcp_options(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_dhcp_options(options)
+      end
       resp.data
     end
 

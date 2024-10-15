@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -54,14 +54,17 @@ module Aws::SNS
     #   APNS (Apple Push Notification Service), APNS\_SANDBOX, and GCM
     #   (Firebase Cloud Messaging).
     # @option options [required, Hash<String,String>] :attributes
-    #   For a list of attributes, see [SetPlatformApplicationAttributes][1]
+    #   For a list of attributes, see [ `SetPlatformApplicationAttributes`
+    #   ][1].
     #
     #
     #
     #   [1]: https://docs.aws.amazon.com/sns/latest/api/API_SetPlatformApplicationAttributes.html
     # @return [PlatformApplication]
     def create_platform_application(options = {})
-      resp = @client.create_platform_application(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.create_platform_application(options)
+      end
       PlatformApplication.new(
         arn: resp.data.platform_application_arn,
         client: @client
@@ -81,6 +84,7 @@ module Aws::SNS
     #         value: "TagValue", # required
     #       },
     #     ],
+    #     data_protection_policy: "attributeValue",
     #   })
     # @param [Hash] options ({})
     # @option options [required, String] :name
@@ -95,7 +99,7 @@ module Aws::SNS
     # @option options [Hash<String,String>] :attributes
     #   A map of attributes with their corresponding values.
     #
-    #   The following lists the names, descriptions, and values of the special
+    #   The following lists names, descriptions, and values of the special
     #   request parameters that the `CreateTopic` action uses:
     #
     #   * `DeliveryPolicy` – The policy that defines how Amazon SNS retries
@@ -109,18 +113,37 @@ module Aws::SNS
     #   * `Policy` – The policy that defines who can access your topic. By
     #     default, only the topic owner can publish or subscribe to the topic.
     #
-    #   The following attribute applies only to [server-side-encryption][1]\:
+    #   * `SignatureVersion` – The signature version corresponds to the
+    #     hashing algorithm used while creating the signature of the
+    #     notifications, subscription confirmations, or unsubscribe
+    #     confirmation messages sent by Amazon SNS. By default,
+    #     `SignatureVersion` is set to `1`.
     #
-    #   * `KmsMasterKeyId` – The ID of an AWS-managed customer master key
-    #     (CMK) for Amazon SNS or a custom CMK. For more information, see [Key
-    #     Terms][2]. For more examples, see [KeyId][3] in the *AWS Key
-    #     Management Service API Reference*.
+    #   * `TracingConfig` – Tracing mode of an Amazon SNS topic. By default
+    #     `TracingConfig` is set to `PassThrough`, and the topic passes
+    #     through the tracing header it receives from an Amazon SNS publisher
+    #     to its subscriptions. If set to `Active`, Amazon SNS will vend X-Ray
+    #     segment data to topic owner account if the sampled flag in the
+    #     tracing header is true. This is only supported on standard topics.
+    #
+    #   The following attribute applies only to [server-side encryption][1]:
+    #
+    #   * `KmsMasterKeyId` – The ID of an Amazon Web Services managed customer
+    #     master key (CMK) for Amazon SNS or a custom CMK. For more
+    #     information, see [Key Terms][2]. For more examples, see [KeyId][3]
+    #     in the *Key Management Service API Reference*.
     #
     #   ^
     #
-    #   The following attributes apply only to [FIFO topics][4]\:
+    #   The following attributes apply only to [FIFO topics][4]:
     #
-    #   * `FifoTopic` – When this is set to `true`, a FIFO topic is created.
+    #   * `ArchivePolicy` – Adds or updates an inline policy document to
+    #     archive messages stored in the specified Amazon SNS topic.
+    #
+    #   * `BeginningArchiveTime` – The earliest starting point at which a
+    #     message in the topic’s archive can be replayed from. This point in
+    #     time is based on the configured message retention period set by the
+    #     topic’s message archiving policy.
     #
     #   * `ContentBasedDeduplication` – Enables content-based deduplication
     #     for FIFO topics.
@@ -135,8 +158,8 @@ module Aws::SNS
     #       the body of the message (but not the attributes of the message).
     #
     #       (Optional) To override the generated value, you can specify a
-    #       value for the the `MessageDeduplicationId` parameter for the
-    #       `Publish` action.
+    #       value for the `MessageDeduplicationId` parameter for the `Publish`
+    #       action.
     #
     #
     #
@@ -152,9 +175,19 @@ module Aws::SNS
     #   `sns:CreateTopic` and `sns:TagResource` permissions.
     #
     #    </note>
+    # @option options [String] :data_protection_policy
+    #   The body of the policy document you want to use for this topic.
+    #
+    #   You can only add one policy per topic.
+    #
+    #   The policy must be in JSON string format.
+    #
+    #   Length Constraints: Maximum length of 30,720.
     # @return [Topic]
     def create_topic(options = {})
-      resp = @client.create_topic(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.create_topic(options)
+      end
       Topic.new(
         arn: resp.data.topic_arn,
         client: @client
@@ -179,7 +212,9 @@ module Aws::SNS
     # @return [PlatformApplication::Collection]
     def platform_applications(options = {})
       batches = Enumerator.new do |y|
-        resp = @client.list_platform_applications(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_platform_applications(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.platform_applications.each do |p|
@@ -219,7 +254,9 @@ module Aws::SNS
     # @return [Subscription::Collection]
     def subscriptions(options = {})
       batches = Enumerator.new do |y|
-        resp = @client.list_subscriptions(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_subscriptions(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.subscriptions.each do |s|
@@ -250,7 +287,9 @@ module Aws::SNS
     # @return [Topic::Collection]
     def topics(options = {})
       batches = Enumerator.new do |y|
-        resp = @client.list_topics(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_topics(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.topics.each do |t|

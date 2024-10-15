@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -60,8 +60,8 @@ module Aws::CloudFormation
       data[:physical_resource_id]
     end
 
-    # Type of resource. (For more information, go to [ AWS Resource Types
-    # Reference][1] in the AWS CloudFormation User Guide.)
+    # Type of resource. (For more information, go to [Amazon Web Services
+    # Resource Types Reference][1] in the *CloudFormation User Guide*.)
     #
     #
     #
@@ -113,6 +113,66 @@ module Aws::CloudFormation
     # @return [String]
     def client_request_token
       data[:client_request_token]
+    end
+
+    # The name of the hook.
+    # @return [String]
+    def hook_type
+      data[:hook_type]
+    end
+
+    # Provides the status of the change set hook.
+    # @return [String]
+    def hook_status
+      data[:hook_status]
+    end
+
+    # Provides the reason for the hook status.
+    # @return [String]
+    def hook_status_reason
+      data[:hook_status_reason]
+    end
+
+    # Invocation points are points in provisioning logic where hooks are
+    # initiated.
+    # @return [String]
+    def hook_invocation_point
+      data[:hook_invocation_point]
+    end
+
+    # Specify the hook failure mode for non-compliant resources in the
+    # followings ways.
+    #
+    # * `FAIL` Stops provisioning resources.
+    #
+    # * `WARN` Allows provisioning to continue with a warning message.
+    # @return [String]
+    def hook_failure_mode
+      data[:hook_failure_mode]
+    end
+
+    # An optional field containing information about the detailed status of
+    # the stack event.
+    #
+    # * `CONFIGURATION_COMPLETE` - all of the resources in the stack have
+    #   reached that event. For more information, see [CloudFormation stack
+    #   deployment][1] in the *CloudFormation User Guide*.
+    #
+    # ^
+    # ^
+    #
+    # * `VALIDATION_FAILED` - template validation failed because of invalid
+    #   properties in the template. The `ResourceStatusReason` field shows
+    #   what properties are defined incorrectly.
+    #
+    # ^
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stack-resource-configuration-complete.html
+    # @return [String]
+    def detailed_status
+      data[:detailed_status]
     end
 
     # @!endgroup
@@ -239,7 +299,9 @@ module Aws::CloudFormation
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @deprecated

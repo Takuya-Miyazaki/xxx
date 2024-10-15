@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::OpsWorks
   # @api private
@@ -1265,9 +1266,11 @@ module Aws::OpsWorks
 
       api.metadata = {
         "apiVersion" => "2013-02-18",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "opsworks",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceFullName" => "AWS OpsWorks",
         "serviceId" => "OpsWorks",
         "signatureVersion" => "v4",

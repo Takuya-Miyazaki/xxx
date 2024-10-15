@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::DirectoryService
   # @api private
@@ -52,6 +53,9 @@ module Aws::DirectoryService
     CertificatesInfo = Shapes::ListShape.new(name: 'CertificatesInfo')
     CidrIp = Shapes::StringShape.new(name: 'CidrIp')
     CidrIps = Shapes::ListShape.new(name: 'CidrIps')
+    ClientAuthenticationSettingInfo = Shapes::StructureShape.new(name: 'ClientAuthenticationSettingInfo')
+    ClientAuthenticationSettingsInfo = Shapes::ListShape.new(name: 'ClientAuthenticationSettingsInfo')
+    ClientAuthenticationStatus = Shapes::StringShape.new(name: 'ClientAuthenticationStatus')
     ClientAuthenticationType = Shapes::StringShape.new(name: 'ClientAuthenticationType')
     ClientCertAuthSettings = Shapes::StructureShape.new(name: 'ClientCertAuthSettings')
     ClientException = Shapes::StructureShape.new(name: 'ClientException')
@@ -78,6 +82,7 @@ module Aws::DirectoryService
     CreateMicrosoftADRequest = Shapes::StructureShape.new(name: 'CreateMicrosoftADRequest')
     CreateMicrosoftADResult = Shapes::StructureShape.new(name: 'CreateMicrosoftADResult')
     CreateSnapshotBeforeSchemaExtension = Shapes::BooleanShape.new(name: 'CreateSnapshotBeforeSchemaExtension')
+    CreateSnapshotBeforeUpdate = Shapes::BooleanShape.new(name: 'CreateSnapshotBeforeUpdate')
     CreateSnapshotRequest = Shapes::StructureShape.new(name: 'CreateSnapshotRequest')
     CreateSnapshotResult = Shapes::StructureShape.new(name: 'CreateSnapshotResult')
     CreateTrustRequest = Shapes::StructureShape.new(name: 'CreateTrustRequest')
@@ -85,6 +90,7 @@ module Aws::DirectoryService
     CreatedDateTime = Shapes::TimestampShape.new(name: 'CreatedDateTime')
     CustomerId = Shapes::StringShape.new(name: 'CustomerId')
     CustomerUserName = Shapes::StringShape.new(name: 'CustomerUserName')
+    DataAccessStatus = Shapes::StringShape.new(name: 'DataAccessStatus')
     DeleteAssociatedConditionalForwarder = Shapes::BooleanShape.new(name: 'DeleteAssociatedConditionalForwarder')
     DeleteConditionalForwarderRequest = Shapes::StructureShape.new(name: 'DeleteConditionalForwarderRequest')
     DeleteConditionalForwarderResult = Shapes::StructureShape.new(name: 'DeleteConditionalForwarderResult')
@@ -102,10 +108,14 @@ module Aws::DirectoryService
     DeregisterEventTopicResult = Shapes::StructureShape.new(name: 'DeregisterEventTopicResult')
     DescribeCertificateRequest = Shapes::StructureShape.new(name: 'DescribeCertificateRequest')
     DescribeCertificateResult = Shapes::StructureShape.new(name: 'DescribeCertificateResult')
+    DescribeClientAuthenticationSettingsRequest = Shapes::StructureShape.new(name: 'DescribeClientAuthenticationSettingsRequest')
+    DescribeClientAuthenticationSettingsResult = Shapes::StructureShape.new(name: 'DescribeClientAuthenticationSettingsResult')
     DescribeConditionalForwardersRequest = Shapes::StructureShape.new(name: 'DescribeConditionalForwardersRequest')
     DescribeConditionalForwardersResult = Shapes::StructureShape.new(name: 'DescribeConditionalForwardersResult')
     DescribeDirectoriesRequest = Shapes::StructureShape.new(name: 'DescribeDirectoriesRequest')
     DescribeDirectoriesResult = Shapes::StructureShape.new(name: 'DescribeDirectoriesResult')
+    DescribeDirectoryDataAccessRequest = Shapes::StructureShape.new(name: 'DescribeDirectoryDataAccessRequest')
+    DescribeDirectoryDataAccessResult = Shapes::StructureShape.new(name: 'DescribeDirectoryDataAccessResult')
     DescribeDomainControllersRequest = Shapes::StructureShape.new(name: 'DescribeDomainControllersRequest')
     DescribeDomainControllersResult = Shapes::StructureShape.new(name: 'DescribeDomainControllersResult')
     DescribeEventTopicsRequest = Shapes::StructureShape.new(name: 'DescribeEventTopicsRequest')
@@ -114,16 +124,30 @@ module Aws::DirectoryService
     DescribeLDAPSSettingsResult = Shapes::StructureShape.new(name: 'DescribeLDAPSSettingsResult')
     DescribeRegionsRequest = Shapes::StructureShape.new(name: 'DescribeRegionsRequest')
     DescribeRegionsResult = Shapes::StructureShape.new(name: 'DescribeRegionsResult')
+    DescribeSettingsRequest = Shapes::StructureShape.new(name: 'DescribeSettingsRequest')
+    DescribeSettingsResult = Shapes::StructureShape.new(name: 'DescribeSettingsResult')
     DescribeSharedDirectoriesRequest = Shapes::StructureShape.new(name: 'DescribeSharedDirectoriesRequest')
     DescribeSharedDirectoriesResult = Shapes::StructureShape.new(name: 'DescribeSharedDirectoriesResult')
     DescribeSnapshotsRequest = Shapes::StructureShape.new(name: 'DescribeSnapshotsRequest')
     DescribeSnapshotsResult = Shapes::StructureShape.new(name: 'DescribeSnapshotsResult')
     DescribeTrustsRequest = Shapes::StructureShape.new(name: 'DescribeTrustsRequest')
     DescribeTrustsResult = Shapes::StructureShape.new(name: 'DescribeTrustsResult')
+    DescribeUpdateDirectoryRequest = Shapes::StructureShape.new(name: 'DescribeUpdateDirectoryRequest')
+    DescribeUpdateDirectoryResult = Shapes::StructureShape.new(name: 'DescribeUpdateDirectoryResult')
     Description = Shapes::StringShape.new(name: 'Description')
     DesiredNumberOfDomainControllers = Shapes::IntegerShape.new(name: 'DesiredNumberOfDomainControllers')
     DirectoryAlreadyInRegionException = Shapes::StructureShape.new(name: 'DirectoryAlreadyInRegionException')
     DirectoryAlreadySharedException = Shapes::StructureShape.new(name: 'DirectoryAlreadySharedException')
+    DirectoryConfigurationSettingAllowedValues = Shapes::StringShape.new(name: 'DirectoryConfigurationSettingAllowedValues')
+    DirectoryConfigurationSettingDataType = Shapes::StringShape.new(name: 'DirectoryConfigurationSettingDataType')
+    DirectoryConfigurationSettingLastRequestedDateTime = Shapes::TimestampShape.new(name: 'DirectoryConfigurationSettingLastRequestedDateTime')
+    DirectoryConfigurationSettingLastUpdatedDateTime = Shapes::TimestampShape.new(name: 'DirectoryConfigurationSettingLastUpdatedDateTime')
+    DirectoryConfigurationSettingName = Shapes::StringShape.new(name: 'DirectoryConfigurationSettingName')
+    DirectoryConfigurationSettingRequestDetailedStatus = Shapes::MapShape.new(name: 'DirectoryConfigurationSettingRequestDetailedStatus')
+    DirectoryConfigurationSettingRequestStatusMessage = Shapes::StringShape.new(name: 'DirectoryConfigurationSettingRequestStatusMessage')
+    DirectoryConfigurationSettingType = Shapes::StringShape.new(name: 'DirectoryConfigurationSettingType')
+    DirectoryConfigurationSettingValue = Shapes::StringShape.new(name: 'DirectoryConfigurationSettingValue')
+    DirectoryConfigurationStatus = Shapes::StringShape.new(name: 'DirectoryConfigurationStatus')
     DirectoryConnectSettings = Shapes::StructureShape.new(name: 'DirectoryConnectSettings')
     DirectoryConnectSettingsDescription = Shapes::StructureShape.new(name: 'DirectoryConnectSettingsDescription')
     DirectoryDescription = Shapes::StructureShape.new(name: 'DirectoryDescription')
@@ -132,6 +156,7 @@ module Aws::DirectoryService
     DirectoryEdition = Shapes::StringShape.new(name: 'DirectoryEdition')
     DirectoryId = Shapes::StringShape.new(name: 'DirectoryId')
     DirectoryIds = Shapes::ListShape.new(name: 'DirectoryIds')
+    DirectoryInDesiredStateException = Shapes::StructureShape.new(name: 'DirectoryInDesiredStateException')
     DirectoryLimitExceededException = Shapes::StructureShape.new(name: 'DirectoryLimitExceededException')
     DirectoryLimits = Shapes::StructureShape.new(name: 'DirectoryLimits')
     DirectoryName = Shapes::StringShape.new(name: 'DirectoryName')
@@ -145,6 +170,8 @@ module Aws::DirectoryService
     DirectoryVpcSettingsDescription = Shapes::StructureShape.new(name: 'DirectoryVpcSettingsDescription')
     DisableClientAuthenticationRequest = Shapes::StructureShape.new(name: 'DisableClientAuthenticationRequest')
     DisableClientAuthenticationResult = Shapes::StructureShape.new(name: 'DisableClientAuthenticationResult')
+    DisableDirectoryDataAccessRequest = Shapes::StructureShape.new(name: 'DisableDirectoryDataAccessRequest')
+    DisableDirectoryDataAccessResult = Shapes::StructureShape.new(name: 'DisableDirectoryDataAccessResult')
     DisableLDAPSRequest = Shapes::StructureShape.new(name: 'DisableLDAPSRequest')
     DisableLDAPSResult = Shapes::StructureShape.new(name: 'DisableLDAPSResult')
     DisableRadiusRequest = Shapes::StructureShape.new(name: 'DisableRadiusRequest')
@@ -161,6 +188,8 @@ module Aws::DirectoryService
     DomainControllers = Shapes::ListShape.new(name: 'DomainControllers')
     EnableClientAuthenticationRequest = Shapes::StructureShape.new(name: 'EnableClientAuthenticationRequest')
     EnableClientAuthenticationResult = Shapes::StructureShape.new(name: 'EnableClientAuthenticationResult')
+    EnableDirectoryDataAccessRequest = Shapes::StructureShape.new(name: 'EnableDirectoryDataAccessRequest')
+    EnableDirectoryDataAccessResult = Shapes::StructureShape.new(name: 'EnableDirectoryDataAccessResult')
     EnableLDAPSRequest = Shapes::StructureShape.new(name: 'EnableLDAPSRequest')
     EnableLDAPSResult = Shapes::StructureShape.new(name: 'EnableLDAPSResult')
     EnableRadiusRequest = Shapes::StructureShape.new(name: 'EnableRadiusRequest')
@@ -177,6 +206,8 @@ module Aws::DirectoryService
     GetDirectoryLimitsResult = Shapes::StructureShape.new(name: 'GetDirectoryLimitsResult')
     GetSnapshotLimitsRequest = Shapes::StructureShape.new(name: 'GetSnapshotLimitsRequest')
     GetSnapshotLimitsResult = Shapes::StructureShape.new(name: 'GetSnapshotLimitsResult')
+    IncompatibleSettingsException = Shapes::StructureShape.new(name: 'IncompatibleSettingsException')
+    InitiatedBy = Shapes::StringShape.new(name: 'InitiatedBy')
     InsufficientPermissionsException = Shapes::StructureShape.new(name: 'InsufficientPermissionsException')
     InvalidCertificateException = Shapes::StructureShape.new(name: 'InvalidCertificateException')
     InvalidClientAuthStatusException = Shapes::StructureShape.new(name: 'InvalidClientAuthStatusException')
@@ -221,6 +252,8 @@ module Aws::DirectoryService
     NoAvailableCertificateException = Shapes::StructureShape.new(name: 'NoAvailableCertificateException')
     Notes = Shapes::StringShape.new(name: 'Notes')
     OCSPUrl = Shapes::StringShape.new(name: 'OCSPUrl')
+    OSUpdateSettings = Shapes::StructureShape.new(name: 'OSUpdateSettings')
+    OSVersion = Shapes::StringShape.new(name: 'OSVersion')
     OrganizationalUnitDN = Shapes::StringShape.new(name: 'OrganizationalUnitDN')
     OrganizationsException = Shapes::StructureShape.new(name: 'OrganizationsException')
     OwnerDirectoryDescription = Shapes::StructureShape.new(name: 'OwnerDirectoryDescription')
@@ -272,6 +305,10 @@ module Aws::DirectoryService
     Server = Shapes::StringShape.new(name: 'Server')
     Servers = Shapes::ListShape.new(name: 'Servers')
     ServiceException = Shapes::StructureShape.new(name: 'ServiceException')
+    Setting = Shapes::StructureShape.new(name: 'Setting')
+    SettingEntries = Shapes::ListShape.new(name: 'SettingEntries')
+    SettingEntry = Shapes::StructureShape.new(name: 'SettingEntry')
+    Settings = Shapes::ListShape.new(name: 'Settings')
     ShareDirectoryRequest = Shapes::StructureShape.new(name: 'ShareDirectoryRequest')
     ShareDirectoryResult = Shapes::StructureShape.new(name: 'ShareDirectoryResult')
     ShareLimitExceededException = Shapes::StructureShape.new(name: 'ShareLimitExceededException')
@@ -324,15 +361,26 @@ module Aws::DirectoryService
     UnshareDirectoryResult = Shapes::StructureShape.new(name: 'UnshareDirectoryResult')
     UnshareTarget = Shapes::StructureShape.new(name: 'UnshareTarget')
     UnsupportedOperationException = Shapes::StructureShape.new(name: 'UnsupportedOperationException')
+    UnsupportedSettingsException = Shapes::StructureShape.new(name: 'UnsupportedSettingsException')
+    UpdateActivities = Shapes::ListShape.new(name: 'UpdateActivities')
     UpdateConditionalForwarderRequest = Shapes::StructureShape.new(name: 'UpdateConditionalForwarderRequest')
     UpdateConditionalForwarderResult = Shapes::StructureShape.new(name: 'UpdateConditionalForwarderResult')
+    UpdateDirectorySetupRequest = Shapes::StructureShape.new(name: 'UpdateDirectorySetupRequest')
+    UpdateDirectorySetupResult = Shapes::StructureShape.new(name: 'UpdateDirectorySetupResult')
+    UpdateInfoEntry = Shapes::StructureShape.new(name: 'UpdateInfoEntry')
     UpdateNumberOfDomainControllersRequest = Shapes::StructureShape.new(name: 'UpdateNumberOfDomainControllersRequest')
     UpdateNumberOfDomainControllersResult = Shapes::StructureShape.new(name: 'UpdateNumberOfDomainControllersResult')
     UpdateRadiusRequest = Shapes::StructureShape.new(name: 'UpdateRadiusRequest')
     UpdateRadiusResult = Shapes::StructureShape.new(name: 'UpdateRadiusResult')
     UpdateSecurityGroupForDirectoryControllers = Shapes::BooleanShape.new(name: 'UpdateSecurityGroupForDirectoryControllers')
+    UpdateSettingsRequest = Shapes::StructureShape.new(name: 'UpdateSettingsRequest')
+    UpdateSettingsResult = Shapes::StructureShape.new(name: 'UpdateSettingsResult')
+    UpdateStatus = Shapes::StringShape.new(name: 'UpdateStatus')
+    UpdateStatusReason = Shapes::StringShape.new(name: 'UpdateStatusReason')
     UpdateTrustRequest = Shapes::StructureShape.new(name: 'UpdateTrustRequest')
     UpdateTrustResult = Shapes::StructureShape.new(name: 'UpdateTrustResult')
+    UpdateType = Shapes::StringShape.new(name: 'UpdateType')
+    UpdateValue = Shapes::StructureShape.new(name: 'UpdateValue')
     UseSameUsername = Shapes::BooleanShape.new(name: 'UseSameUsername')
     UserDoesNotExistException = Shapes::StructureShape.new(name: 'UserDoesNotExistException')
     UserName = Shapes::StringShape.new(name: 'UserName')
@@ -427,6 +475,13 @@ module Aws::DirectoryService
     CertificatesInfo.member = Shapes::ShapeRef.new(shape: CertificateInfo)
 
     CidrIps.member = Shapes::ShapeRef.new(shape: CidrIp)
+
+    ClientAuthenticationSettingInfo.add_member(:type, Shapes::ShapeRef.new(shape: ClientAuthenticationType, location_name: "Type"))
+    ClientAuthenticationSettingInfo.add_member(:status, Shapes::ShapeRef.new(shape: ClientAuthenticationStatus, location_name: "Status"))
+    ClientAuthenticationSettingInfo.add_member(:last_updated_date_time, Shapes::ShapeRef.new(shape: LastUpdatedDateTime, location_name: "LastUpdatedDateTime"))
+    ClientAuthenticationSettingInfo.struct_class = Types::ClientAuthenticationSettingInfo
+
+    ClientAuthenticationSettingsInfo.member = Shapes::ShapeRef.new(shape: ClientAuthenticationSettingInfo)
 
     ClientCertAuthSettings.add_member(:ocsp_url, Shapes::ShapeRef.new(shape: OCSPUrl, location_name: "OCSPUrl"))
     ClientCertAuthSettings.struct_class = Types::ClientCertAuthSettings
@@ -582,6 +637,16 @@ module Aws::DirectoryService
     DescribeCertificateResult.add_member(:certificate, Shapes::ShapeRef.new(shape: Certificate, location_name: "Certificate"))
     DescribeCertificateResult.struct_class = Types::DescribeCertificateResult
 
+    DescribeClientAuthenticationSettingsRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
+    DescribeClientAuthenticationSettingsRequest.add_member(:type, Shapes::ShapeRef.new(shape: ClientAuthenticationType, location_name: "Type"))
+    DescribeClientAuthenticationSettingsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    DescribeClientAuthenticationSettingsRequest.add_member(:limit, Shapes::ShapeRef.new(shape: PageLimit, location_name: "Limit"))
+    DescribeClientAuthenticationSettingsRequest.struct_class = Types::DescribeClientAuthenticationSettingsRequest
+
+    DescribeClientAuthenticationSettingsResult.add_member(:client_authentication_settings_info, Shapes::ShapeRef.new(shape: ClientAuthenticationSettingsInfo, location_name: "ClientAuthenticationSettingsInfo"))
+    DescribeClientAuthenticationSettingsResult.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    DescribeClientAuthenticationSettingsResult.struct_class = Types::DescribeClientAuthenticationSettingsResult
+
     DescribeConditionalForwardersRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
     DescribeConditionalForwardersRequest.add_member(:remote_domain_names, Shapes::ShapeRef.new(shape: RemoteDomainNames, location_name: "RemoteDomainNames"))
     DescribeConditionalForwardersRequest.struct_class = Types::DescribeConditionalForwardersRequest
@@ -597,6 +662,12 @@ module Aws::DirectoryService
     DescribeDirectoriesResult.add_member(:directory_descriptions, Shapes::ShapeRef.new(shape: DirectoryDescriptions, location_name: "DirectoryDescriptions"))
     DescribeDirectoriesResult.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
     DescribeDirectoriesResult.struct_class = Types::DescribeDirectoriesResult
+
+    DescribeDirectoryDataAccessRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
+    DescribeDirectoryDataAccessRequest.struct_class = Types::DescribeDirectoryDataAccessRequest
+
+    DescribeDirectoryDataAccessResult.add_member(:data_access_status, Shapes::ShapeRef.new(shape: DataAccessStatus, location_name: "DataAccessStatus"))
+    DescribeDirectoryDataAccessResult.struct_class = Types::DescribeDirectoryDataAccessResult
 
     DescribeDomainControllersRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
     DescribeDomainControllersRequest.add_member(:domain_controller_ids, Shapes::ShapeRef.new(shape: DomainControllerIds, location_name: "DomainControllerIds"))
@@ -634,6 +705,16 @@ module Aws::DirectoryService
     DescribeRegionsResult.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
     DescribeRegionsResult.struct_class = Types::DescribeRegionsResult
 
+    DescribeSettingsRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
+    DescribeSettingsRequest.add_member(:status, Shapes::ShapeRef.new(shape: DirectoryConfigurationStatus, location_name: "Status"))
+    DescribeSettingsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    DescribeSettingsRequest.struct_class = Types::DescribeSettingsRequest
+
+    DescribeSettingsResult.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, location_name: "DirectoryId"))
+    DescribeSettingsResult.add_member(:setting_entries, Shapes::ShapeRef.new(shape: SettingEntries, location_name: "SettingEntries"))
+    DescribeSettingsResult.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    DescribeSettingsResult.struct_class = Types::DescribeSettingsResult
+
     DescribeSharedDirectoriesRequest.add_member(:owner_directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "OwnerDirectoryId"))
     DescribeSharedDirectoriesRequest.add_member(:shared_directory_ids, Shapes::ShapeRef.new(shape: DirectoryIds, location_name: "SharedDirectoryIds"))
     DescribeSharedDirectoriesRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
@@ -664,6 +745,16 @@ module Aws::DirectoryService
     DescribeTrustsResult.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
     DescribeTrustsResult.struct_class = Types::DescribeTrustsResult
 
+    DescribeUpdateDirectoryRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
+    DescribeUpdateDirectoryRequest.add_member(:update_type, Shapes::ShapeRef.new(shape: UpdateType, required: true, location_name: "UpdateType"))
+    DescribeUpdateDirectoryRequest.add_member(:region_name, Shapes::ShapeRef.new(shape: RegionName, location_name: "RegionName"))
+    DescribeUpdateDirectoryRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    DescribeUpdateDirectoryRequest.struct_class = Types::DescribeUpdateDirectoryRequest
+
+    DescribeUpdateDirectoryResult.add_member(:update_activities, Shapes::ShapeRef.new(shape: UpdateActivities, location_name: "UpdateActivities"))
+    DescribeUpdateDirectoryResult.add_member(:next_token, Shapes::ShapeRef.new(shape: NextToken, location_name: "NextToken"))
+    DescribeUpdateDirectoryResult.struct_class = Types::DescribeUpdateDirectoryResult
+
     DirectoryAlreadyInRegionException.add_member(:message, Shapes::ShapeRef.new(shape: ExceptionMessage, location_name: "Message"))
     DirectoryAlreadyInRegionException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
     DirectoryAlreadyInRegionException.struct_class = Types::DirectoryAlreadyInRegionException
@@ -671,6 +762,9 @@ module Aws::DirectoryService
     DirectoryAlreadySharedException.add_member(:message, Shapes::ShapeRef.new(shape: ExceptionMessage, location_name: "Message"))
     DirectoryAlreadySharedException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
     DirectoryAlreadySharedException.struct_class = Types::DirectoryAlreadySharedException
+
+    DirectoryConfigurationSettingRequestDetailedStatus.key = Shapes::ShapeRef.new(shape: RegionName)
+    DirectoryConfigurationSettingRequestDetailedStatus.value = Shapes::ShapeRef.new(shape: DirectoryConfigurationStatus)
 
     DirectoryConnectSettings.add_member(:vpc_id, Shapes::ShapeRef.new(shape: VpcId, required: true, location_name: "VpcId"))
     DirectoryConnectSettings.add_member(:subnet_ids, Shapes::ShapeRef.new(shape: SubnetIds, required: true, location_name: "SubnetIds"))
@@ -711,6 +805,7 @@ module Aws::DirectoryService
     DirectoryDescription.add_member(:desired_number_of_domain_controllers, Shapes::ShapeRef.new(shape: DesiredNumberOfDomainControllers, location_name: "DesiredNumberOfDomainControllers"))
     DirectoryDescription.add_member(:owner_directory_description, Shapes::ShapeRef.new(shape: OwnerDirectoryDescription, location_name: "OwnerDirectoryDescription"))
     DirectoryDescription.add_member(:regions_info, Shapes::ShapeRef.new(shape: RegionsInfo, location_name: "RegionsInfo"))
+    DirectoryDescription.add_member(:os_version, Shapes::ShapeRef.new(shape: OSVersion, location_name: "OsVersion"))
     DirectoryDescription.struct_class = Types::DirectoryDescription
 
     DirectoryDescriptions.member = Shapes::ShapeRef.new(shape: DirectoryDescription)
@@ -720,6 +815,10 @@ module Aws::DirectoryService
     DirectoryDoesNotExistException.struct_class = Types::DirectoryDoesNotExistException
 
     DirectoryIds.member = Shapes::ShapeRef.new(shape: DirectoryId)
+
+    DirectoryInDesiredStateException.add_member(:message, Shapes::ShapeRef.new(shape: ExceptionMessage, location_name: "Message"))
+    DirectoryInDesiredStateException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
+    DirectoryInDesiredStateException.struct_class = Types::DirectoryInDesiredStateException
 
     DirectoryLimitExceededException.add_member(:message, Shapes::ShapeRef.new(shape: ExceptionMessage, location_name: "Message"))
     DirectoryLimitExceededException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
@@ -759,6 +858,11 @@ module Aws::DirectoryService
     DisableClientAuthenticationRequest.struct_class = Types::DisableClientAuthenticationRequest
 
     DisableClientAuthenticationResult.struct_class = Types::DisableClientAuthenticationResult
+
+    DisableDirectoryDataAccessRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
+    DisableDirectoryDataAccessRequest.struct_class = Types::DisableDirectoryDataAccessRequest
+
+    DisableDirectoryDataAccessResult.struct_class = Types::DisableDirectoryDataAccessResult
 
     DisableLDAPSRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
     DisableLDAPSRequest.add_member(:type, Shapes::ShapeRef.new(shape: LDAPSType, required: true, location_name: "Type"))
@@ -806,6 +910,11 @@ module Aws::DirectoryService
 
     EnableClientAuthenticationResult.struct_class = Types::EnableClientAuthenticationResult
 
+    EnableDirectoryDataAccessRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
+    EnableDirectoryDataAccessRequest.struct_class = Types::EnableDirectoryDataAccessRequest
+
+    EnableDirectoryDataAccessResult.struct_class = Types::EnableDirectoryDataAccessResult
+
     EnableLDAPSRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
     EnableLDAPSRequest.add_member(:type, Shapes::ShapeRef.new(shape: LDAPSType, required: true, location_name: "Type"))
     EnableLDAPSRequest.struct_class = Types::EnableLDAPSRequest
@@ -852,6 +961,10 @@ module Aws::DirectoryService
 
     GetSnapshotLimitsResult.add_member(:snapshot_limits, Shapes::ShapeRef.new(shape: SnapshotLimits, location_name: "SnapshotLimits"))
     GetSnapshotLimitsResult.struct_class = Types::GetSnapshotLimitsResult
+
+    IncompatibleSettingsException.add_member(:message, Shapes::ShapeRef.new(shape: ExceptionMessage, location_name: "Message"))
+    IncompatibleSettingsException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
+    IncompatibleSettingsException.struct_class = Types::IncompatibleSettingsException
 
     InsufficientPermissionsException.add_member(:message, Shapes::ShapeRef.new(shape: ExceptionMessage, location_name: "Message"))
     InsufficientPermissionsException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
@@ -970,6 +1083,9 @@ module Aws::DirectoryService
     NoAvailableCertificateException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
     NoAvailableCertificateException.struct_class = Types::NoAvailableCertificateException
 
+    OSUpdateSettings.add_member(:os_version, Shapes::ShapeRef.new(shape: OSVersion, location_name: "OSVersion"))
+    OSUpdateSettings.struct_class = Types::OSUpdateSettings
+
     OrganizationsException.add_member(:message, Shapes::ShapeRef.new(shape: ExceptionMessage, location_name: "Message"))
     OrganizationsException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
     OrganizationsException.struct_class = Types::OrganizationsException
@@ -1082,6 +1198,27 @@ module Aws::DirectoryService
     ServiceException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
     ServiceException.struct_class = Types::ServiceException
 
+    Setting.add_member(:name, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingName, required: true, location_name: "Name"))
+    Setting.add_member(:value, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingValue, required: true, location_name: "Value"))
+    Setting.struct_class = Types::Setting
+
+    SettingEntries.member = Shapes::ShapeRef.new(shape: SettingEntry)
+
+    SettingEntry.add_member(:type, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingType, location_name: "Type"))
+    SettingEntry.add_member(:name, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingName, location_name: "Name"))
+    SettingEntry.add_member(:allowed_values, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingAllowedValues, location_name: "AllowedValues"))
+    SettingEntry.add_member(:applied_value, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingValue, location_name: "AppliedValue"))
+    SettingEntry.add_member(:requested_value, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingValue, location_name: "RequestedValue"))
+    SettingEntry.add_member(:request_status, Shapes::ShapeRef.new(shape: DirectoryConfigurationStatus, location_name: "RequestStatus"))
+    SettingEntry.add_member(:request_detailed_status, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingRequestDetailedStatus, location_name: "RequestDetailedStatus"))
+    SettingEntry.add_member(:request_status_message, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingRequestStatusMessage, location_name: "RequestStatusMessage"))
+    SettingEntry.add_member(:last_updated_date_time, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingLastUpdatedDateTime, location_name: "LastUpdatedDateTime"))
+    SettingEntry.add_member(:last_requested_date_time, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingLastRequestedDateTime, location_name: "LastRequestedDateTime"))
+    SettingEntry.add_member(:data_type, Shapes::ShapeRef.new(shape: DirectoryConfigurationSettingDataType, location_name: "DataType"))
+    SettingEntry.struct_class = Types::SettingEntry
+
+    Settings.member = Shapes::ShapeRef.new(shape: Setting)
+
     ShareDirectoryRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
     ShareDirectoryRequest.add_member(:share_notes, Shapes::ShapeRef.new(shape: Notes, location_name: "ShareNotes"))
     ShareDirectoryRequest.add_member(:share_target, Shapes::ShapeRef.new(shape: ShareTarget, required: true, location_name: "ShareTarget"))
@@ -1190,12 +1327,36 @@ module Aws::DirectoryService
     UnsupportedOperationException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
     UnsupportedOperationException.struct_class = Types::UnsupportedOperationException
 
+    UnsupportedSettingsException.add_member(:message, Shapes::ShapeRef.new(shape: ExceptionMessage, location_name: "Message"))
+    UnsupportedSettingsException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
+    UnsupportedSettingsException.struct_class = Types::UnsupportedSettingsException
+
+    UpdateActivities.member = Shapes::ShapeRef.new(shape: UpdateInfoEntry)
+
     UpdateConditionalForwarderRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
     UpdateConditionalForwarderRequest.add_member(:remote_domain_name, Shapes::ShapeRef.new(shape: RemoteDomainName, required: true, location_name: "RemoteDomainName"))
     UpdateConditionalForwarderRequest.add_member(:dns_ip_addrs, Shapes::ShapeRef.new(shape: DnsIpAddrs, required: true, location_name: "DnsIpAddrs"))
     UpdateConditionalForwarderRequest.struct_class = Types::UpdateConditionalForwarderRequest
 
     UpdateConditionalForwarderResult.struct_class = Types::UpdateConditionalForwarderResult
+
+    UpdateDirectorySetupRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
+    UpdateDirectorySetupRequest.add_member(:update_type, Shapes::ShapeRef.new(shape: UpdateType, required: true, location_name: "UpdateType"))
+    UpdateDirectorySetupRequest.add_member(:os_update_settings, Shapes::ShapeRef.new(shape: OSUpdateSettings, location_name: "OSUpdateSettings"))
+    UpdateDirectorySetupRequest.add_member(:create_snapshot_before_update, Shapes::ShapeRef.new(shape: CreateSnapshotBeforeUpdate, location_name: "CreateSnapshotBeforeUpdate", metadata: {"box"=>true}))
+    UpdateDirectorySetupRequest.struct_class = Types::UpdateDirectorySetupRequest
+
+    UpdateDirectorySetupResult.struct_class = Types::UpdateDirectorySetupResult
+
+    UpdateInfoEntry.add_member(:region, Shapes::ShapeRef.new(shape: RegionName, location_name: "Region"))
+    UpdateInfoEntry.add_member(:status, Shapes::ShapeRef.new(shape: UpdateStatus, location_name: "Status"))
+    UpdateInfoEntry.add_member(:status_reason, Shapes::ShapeRef.new(shape: UpdateStatusReason, location_name: "StatusReason"))
+    UpdateInfoEntry.add_member(:initiated_by, Shapes::ShapeRef.new(shape: InitiatedBy, location_name: "InitiatedBy"))
+    UpdateInfoEntry.add_member(:new_value, Shapes::ShapeRef.new(shape: UpdateValue, location_name: "NewValue"))
+    UpdateInfoEntry.add_member(:previous_value, Shapes::ShapeRef.new(shape: UpdateValue, location_name: "PreviousValue"))
+    UpdateInfoEntry.add_member(:start_time, Shapes::ShapeRef.new(shape: StartDateTime, location_name: "StartTime"))
+    UpdateInfoEntry.add_member(:last_updated_date_time, Shapes::ShapeRef.new(shape: LastUpdatedDateTime, location_name: "LastUpdatedDateTime"))
+    UpdateInfoEntry.struct_class = Types::UpdateInfoEntry
 
     UpdateNumberOfDomainControllersRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
     UpdateNumberOfDomainControllersRequest.add_member(:desired_number, Shapes::ShapeRef.new(shape: DesiredNumberOfDomainControllers, required: true, location_name: "DesiredNumber"))
@@ -1209,6 +1370,13 @@ module Aws::DirectoryService
 
     UpdateRadiusResult.struct_class = Types::UpdateRadiusResult
 
+    UpdateSettingsRequest.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, required: true, location_name: "DirectoryId"))
+    UpdateSettingsRequest.add_member(:settings, Shapes::ShapeRef.new(shape: Settings, required: true, location_name: "Settings"))
+    UpdateSettingsRequest.struct_class = Types::UpdateSettingsRequest
+
+    UpdateSettingsResult.add_member(:directory_id, Shapes::ShapeRef.new(shape: DirectoryId, location_name: "DirectoryId"))
+    UpdateSettingsResult.struct_class = Types::UpdateSettingsResult
+
     UpdateTrustRequest.add_member(:trust_id, Shapes::ShapeRef.new(shape: TrustId, required: true, location_name: "TrustId"))
     UpdateTrustRequest.add_member(:selective_auth, Shapes::ShapeRef.new(shape: SelectiveAuth, location_name: "SelectiveAuth"))
     UpdateTrustRequest.struct_class = Types::UpdateTrustRequest
@@ -1216,6 +1384,9 @@ module Aws::DirectoryService
     UpdateTrustResult.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
     UpdateTrustResult.add_member(:trust_id, Shapes::ShapeRef.new(shape: TrustId, location_name: "TrustId"))
     UpdateTrustResult.struct_class = Types::UpdateTrustResult
+
+    UpdateValue.add_member(:os_update_settings, Shapes::ShapeRef.new(shape: OSUpdateSettings, location_name: "OSUpdateSettings"))
+    UpdateValue.struct_class = Types::UpdateValue
 
     UserDoesNotExistException.add_member(:message, Shapes::ShapeRef.new(shape: ExceptionMessage, location_name: "Message"))
     UserDoesNotExistException.add_member(:request_id, Shapes::ShapeRef.new(shape: RequestId, location_name: "RequestId"))
@@ -1235,9 +1406,11 @@ module Aws::DirectoryService
 
       api.metadata = {
         "apiVersion" => "2015-04-16",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "ds",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceAbbreviation" => "Directory Service",
         "serviceFullName" => "AWS Directory Service",
         "serviceId" => "Directory Service",
@@ -1542,6 +1715,26 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
       end)
 
+      api.add_operation(:describe_client_authentication_settings, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeClientAuthenticationSettings"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeClientAuthenticationSettingsRequest)
+        o.output = Shapes::ShapeRef.new(shape: DescribeClientAuthenticationSettingsResult)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryDoesNotExistException)
+        o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
+        o.errors << Shapes::ShapeRef.new(shape: ClientException)
+        o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
       api.add_operation(:describe_conditional_forwarders, Seahorse::Model::Operation.new.tap do |o|
         o.name = "DescribeConditionalForwarders"
         o.http_method = "POST"
@@ -1565,6 +1758,25 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: EntityDoesNotExistException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidNextTokenException)
+        o.errors << Shapes::ShapeRef.new(shape: ClientException)
+        o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
+      api.add_operation(:describe_directory_data_access, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeDirectoryDataAccess"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeDirectoryDataAccessRequest)
+        o.output = Shapes::ShapeRef.new(shape: DescribeDirectoryDataAccessResult)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryDoesNotExistException)
+        o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
       end)
@@ -1613,6 +1825,12 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:describe_regions, Seahorse::Model::Operation.new.tap do |o|
@@ -1626,6 +1844,25 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidNextTokenException)
         o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: ClientException)
+        o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
+      api.add_operation(:describe_settings, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeSettings"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeSettingsRequest)
+        o.output = Shapes::ShapeRef.new(shape: DescribeSettingsResult)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryDoesNotExistException)
+        o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidNextTokenException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
       end)
@@ -1642,6 +1879,12 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:describe_snapshots, Seahorse::Model::Operation.new.tap do |o|
@@ -1655,6 +1898,12 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidNextTokenException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:describe_trusts, Seahorse::Model::Operation.new.tap do |o|
@@ -1669,6 +1918,31 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
         o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
+      api.add_operation(:describe_update_directory, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeUpdateDirectory"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeUpdateDirectoryRequest)
+        o.output = Shapes::ShapeRef.new(shape: DescribeUpdateDirectoryResult)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryDoesNotExistException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: ClientException)
+        o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidNextTokenException)
+        o[:pager] = Aws::Pager.new(
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:disable_client_authentication, Seahorse::Model::Operation.new.tap do |o|
@@ -1680,6 +1954,21 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: DirectoryDoesNotExistException)
         o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidClientAuthStatusException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: ClientException)
+        o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+      end)
+
+      api.add_operation(:disable_directory_data_access, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DisableDirectoryDataAccess"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DisableDirectoryDataAccessRequest)
+        o.output = Shapes::ShapeRef.new(shape: DisableDirectoryDataAccessResult)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryDoesNotExistException)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryUnavailableException)
+        o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryInDesiredStateException)
         o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
@@ -1735,6 +2024,21 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidClientAuthStatusException)
         o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
         o.errors << Shapes::ShapeRef.new(shape: NoAvailableCertificateException)
+        o.errors << Shapes::ShapeRef.new(shape: ClientException)
+        o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+      end)
+
+      api.add_operation(:enable_directory_data_access, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "EnableDirectoryDataAccess"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: EnableDirectoryDataAccessRequest)
+        o.output = Shapes::ShapeRef.new(shape: EnableDirectoryDataAccessResult)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryDoesNotExistException)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryUnavailableException)
+        o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryInDesiredStateException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
       end)
@@ -1815,6 +2119,12 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidNextTokenException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:list_ip_routes, Seahorse::Model::Operation.new.tap do |o|
@@ -1828,6 +2138,12 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:list_log_subscriptions, Seahorse::Model::Operation.new.tap do |o|
@@ -1840,6 +2156,12 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidNextTokenException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:list_schema_extensions, Seahorse::Model::Operation.new.tap do |o|
@@ -1852,6 +2174,12 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: EntityDoesNotExistException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:list_tags_for_resource, Seahorse::Model::Operation.new.tap do |o|
@@ -1865,6 +2193,12 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "limit",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
       end)
 
       api.add_operation(:register_certificate, Seahorse::Model::Operation.new.tap do |o|
@@ -2034,6 +2368,23 @@ module Aws::DirectoryService
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
       end)
 
+      api.add_operation(:update_directory_setup, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "UpdateDirectorySetup"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: UpdateDirectorySetupRequest)
+        o.output = Shapes::ShapeRef.new(shape: UpdateDirectorySetupResult)
+        o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryInDesiredStateException)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryUnavailableException)
+        o.errors << Shapes::ShapeRef.new(shape: SnapshotLimitExceededException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryDoesNotExistException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: ClientException)
+        o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+      end)
+
       api.add_operation(:update_number_of_domain_controllers, Seahorse::Model::Operation.new.tap do |o|
         o.name = "UpdateNumberOfDomainControllers"
         o.http_method = "POST"
@@ -2057,6 +2408,22 @@ module Aws::DirectoryService
         o.output = Shapes::ShapeRef.new(shape: UpdateRadiusResult)
         o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
         o.errors << Shapes::ShapeRef.new(shape: EntityDoesNotExistException)
+        o.errors << Shapes::ShapeRef.new(shape: ClientException)
+        o.errors << Shapes::ShapeRef.new(shape: ServiceException)
+      end)
+
+      api.add_operation(:update_settings, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "UpdateSettings"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: UpdateSettingsRequest)
+        o.output = Shapes::ShapeRef.new(shape: UpdateSettingsResult)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryDoesNotExistException)
+        o.errors << Shapes::ShapeRef.new(shape: UnsupportedOperationException)
+        o.errors << Shapes::ShapeRef.new(shape: DirectoryUnavailableException)
+        o.errors << Shapes::ShapeRef.new(shape: IncompatibleSettingsException)
+        o.errors << Shapes::ShapeRef.new(shape: UnsupportedSettingsException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidParameterException)
         o.errors << Shapes::ShapeRef.new(shape: ClientException)
         o.errors << Shapes::ShapeRef.new(shape: ServiceException)
       end)

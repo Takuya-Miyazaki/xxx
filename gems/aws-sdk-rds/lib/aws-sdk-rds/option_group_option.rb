@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -58,7 +58,7 @@ module Aws::RDS
       data[:minimum_required_minor_engine_version]
     end
 
-    # Specifies whether the option requires a port.
+    # Indicates whether the option requires a port.
     # @return [Boolean]
     def port_required
       data[:port_required]
@@ -135,6 +135,13 @@ module Aws::RDS
     # @return [Array<Types::OptionVersion>]
     def option_group_option_versions
       data[:option_group_option_versions]
+    end
+
+    # Indicates whether the option can be copied across Amazon Web Services
+    # accounts.
+    # @return [Boolean]
+    def copyable_cross_account
+      data[:copyable_cross_account]
     end
 
     # @!endgroup
@@ -261,7 +268,9 @@ module Aws::RDS
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @deprecated

@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::WAFRegional
   # @api private
@@ -1360,9 +1361,11 @@ module Aws::WAFRegional
 
       api.metadata = {
         "apiVersion" => "2016-11-28",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "waf-regional",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceAbbreviation" => "WAF Regional",
         "serviceFullName" => "AWS WAF Regional",
         "serviceId" => "WAF Regional",

@@ -95,6 +95,8 @@ module Aws
         def child_frame(xml_name)
           if @member = @members[xml_name]
             Frame.new(xml_name, self, @member[:ref])
+          elsif @ref.shape.union
+            UnknownMemberFrame.new(xml_name, self, nil, @result)
           else
             NullFrame.new(xml_name, self)
           end
@@ -106,9 +108,23 @@ module Aws
             @result[@member[:name]][child.key.result] = child.value.result
           when FlatListFrame
             @result[@member[:name]] << child.result
+          when UnknownMemberFrame
+            @result[:unknown] = { 'name' => child.path.last, 'value' => child.result }
           when NullFrame
           else
             @result[@member[:name]] = child.result
+          end
+
+          if @ref.shape.union
+            # a union may only have one member set
+            # convert to the union subclass
+            # The default Struct created will have defaults set for all values
+            # This also sets only one of the values leaving everything else nil
+            # as required for unions
+            set_member_name = @member ? @member[:name] : :unknown
+            member_subclass = @ref.shape.member_subclass(set_member_name).new # shape.member_subclass(target.member).new
+            member_subclass[set_member_name] = @result[set_member_name]
+            @result = member_subclass
           end
         end
 
@@ -122,11 +138,7 @@ module Aws
         end
 
         def xml_name(ref)
-          if flattened_list?(ref)
-            ref.shape.member.location_name || ref.location_name
-          else
-            ref.location_name
-          end
+          ref.location_name
         end
 
         def flattened_list?(ref)
@@ -242,9 +254,15 @@ module Aws
         end
       end
 
+      class UnknownMemberFrame < Frame
+        def result
+          @text.join
+        end
+      end
+
       class BlobFrame < Frame
         def result
-          @text.empty? ? nil : Base64.decode64(@text.join)
+          @text.empty? ? '' : Base64.decode64(@text.join)
         end
       end
 
@@ -256,7 +274,7 @@ module Aws
 
       class FloatFrame < Frame
         def result
-          @text.empty? ? nil : @text.join.to_f
+          @text.empty? ? nil : Aws::Util.deserialize_number(@text.join)
         end
       end
 
@@ -274,19 +292,7 @@ module Aws
 
       class TimestampFrame < Frame
         def result
-          @text.empty? ? nil : parse(@text.join)
-        end
-        def parse(value)
-          case value
-          when nil then nil
-          when /^\d+$/ then Time.at(value.to_i)
-          else
-            begin
-              Time.parse(value).utc
-            rescue ArgumentError
-              raise "unhandled timestamp format `#{value}'"
-            end
-          end
+          @text.empty? ? nil : Aws::Util.deserialize_time(@text.join)
         end
       end
 
@@ -302,6 +308,7 @@ module Aws
         MapShape => MapFrame,
         StringShape => StringFrame,
         StructureShape => StructureFrame,
+        UnionShape => StructureFrame,
         TimestampShape => TimestampFrame,
       }
 

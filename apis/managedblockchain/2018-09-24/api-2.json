@@ -5,14 +5,34 @@
     "endpointPrefix":"managedblockchain",
     "jsonVersion":"1.1",
     "protocol":"rest-json",
+    "protocols":["rest-json"],
     "serviceAbbreviation":"ManagedBlockchain",
     "serviceFullName":"Amazon Managed Blockchain",
     "serviceId":"ManagedBlockchain",
     "signatureVersion":"v4",
     "signingName":"managedblockchain",
-    "uid":"managedblockchain-2018-09-24"
+    "uid":"managedblockchain-2018-09-24",
+    "auth":["aws.auth#sigv4"]
   },
   "operations":{
+    "CreateAccessor":{
+      "name":"CreateAccessor",
+      "http":{
+        "method":"POST",
+        "requestUri":"/accessors"
+      },
+      "input":{"shape":"CreateAccessorInput"},
+      "output":{"shape":"CreateAccessorOutput"},
+      "errors":[
+        {"shape":"InvalidRequestException"},
+        {"shape":"AccessDeniedException"},
+        {"shape":"ResourceAlreadyExistsException"},
+        {"shape":"ThrottlingException"},
+        {"shape":"ResourceLimitExceededException"},
+        {"shape":"InternalServiceErrorException"},
+        {"shape":"TooManyTagsException"}
+      ]
+    },
     "CreateMember":{
       "name":"CreateMember",
       "http":{
@@ -29,7 +49,8 @@
         {"shape":"ResourceNotReadyException"},
         {"shape":"ThrottlingException"},
         {"shape":"ResourceLimitExceededException"},
-        {"shape":"InternalServiceErrorException"}
+        {"shape":"InternalServiceErrorException"},
+        {"shape":"TooManyTagsException"}
       ]
     },
     "CreateNetwork":{
@@ -46,7 +67,8 @@
         {"shape":"ResourceAlreadyExistsException"},
         {"shape":"ThrottlingException"},
         {"shape":"ResourceLimitExceededException"},
-        {"shape":"InternalServiceErrorException"}
+        {"shape":"InternalServiceErrorException"},
+        {"shape":"TooManyTagsException"}
       ]
     },
     "CreateNode":{
@@ -65,7 +87,8 @@
         {"shape":"ResourceNotReadyException"},
         {"shape":"ThrottlingException"},
         {"shape":"ResourceLimitExceededException"},
-        {"shape":"InternalServiceErrorException"}
+        {"shape":"InternalServiceErrorException"},
+        {"shape":"TooManyTagsException"}
       ]
     },
     "CreateProposal":{
@@ -81,6 +104,23 @@
         {"shape":"AccessDeniedException"},
         {"shape":"ResourceNotFoundException"},
         {"shape":"ResourceNotReadyException"},
+        {"shape":"ThrottlingException"},
+        {"shape":"InternalServiceErrorException"},
+        {"shape":"TooManyTagsException"}
+      ]
+    },
+    "DeleteAccessor":{
+      "name":"DeleteAccessor",
+      "http":{
+        "method":"DELETE",
+        "requestUri":"/accessors/{AccessorId}"
+      },
+      "input":{"shape":"DeleteAccessorInput"},
+      "output":{"shape":"DeleteAccessorOutput"},
+      "errors":[
+        {"shape":"InvalidRequestException"},
+        {"shape":"AccessDeniedException"},
+        {"shape":"ResourceNotFoundException"},
         {"shape":"ThrottlingException"},
         {"shape":"InternalServiceErrorException"}
       ]
@@ -115,6 +155,22 @@
         {"shape":"AccessDeniedException"},
         {"shape":"ResourceNotFoundException"},
         {"shape":"ResourceNotReadyException"},
+        {"shape":"ThrottlingException"},
+        {"shape":"InternalServiceErrorException"}
+      ]
+    },
+    "GetAccessor":{
+      "name":"GetAccessor",
+      "http":{
+        "method":"GET",
+        "requestUri":"/accessors/{AccessorId}"
+      },
+      "input":{"shape":"GetAccessorInput"},
+      "output":{"shape":"GetAccessorOutput"},
+      "errors":[
+        {"shape":"InvalidRequestException"},
+        {"shape":"AccessDeniedException"},
+        {"shape":"ResourceNotFoundException"},
         {"shape":"ThrottlingException"},
         {"shape":"InternalServiceErrorException"}
       ]
@@ -179,6 +235,21 @@
         {"shape":"InvalidRequestException"},
         {"shape":"AccessDeniedException"},
         {"shape":"ResourceNotFoundException"},
+        {"shape":"ThrottlingException"},
+        {"shape":"InternalServiceErrorException"}
+      ]
+    },
+    "ListAccessors":{
+      "name":"ListAccessors",
+      "http":{
+        "method":"GET",
+        "requestUri":"/accessors"
+      },
+      "input":{"shape":"ListAccessorsInput"},
+      "output":{"shape":"ListAccessorsOutput"},
+      "errors":[
+        {"shape":"InvalidRequestException"},
+        {"shape":"AccessDeniedException"},
         {"shape":"ThrottlingException"},
         {"shape":"InternalServiceErrorException"}
       ]
@@ -276,6 +347,21 @@
         {"shape":"InternalServiceErrorException"}
       ]
     },
+    "ListTagsForResource":{
+      "name":"ListTagsForResource",
+      "http":{
+        "method":"GET",
+        "requestUri":"/tags/{resourceArn}"
+      },
+      "input":{"shape":"ListTagsForResourceRequest"},
+      "output":{"shape":"ListTagsForResourceResponse"},
+      "errors":[
+        {"shape":"InternalServiceErrorException"},
+        {"shape":"InvalidRequestException"},
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ResourceNotReadyException"}
+      ]
+    },
     "RejectInvitation":{
       "name":"RejectInvitation",
       "http":{
@@ -291,6 +377,37 @@
         {"shape":"ResourceNotFoundException"},
         {"shape":"ThrottlingException"},
         {"shape":"InternalServiceErrorException"}
+      ]
+    },
+    "TagResource":{
+      "name":"TagResource",
+      "http":{
+        "method":"POST",
+        "requestUri":"/tags/{resourceArn}"
+      },
+      "input":{"shape":"TagResourceRequest"},
+      "output":{"shape":"TagResourceResponse"},
+      "errors":[
+        {"shape":"InternalServiceErrorException"},
+        {"shape":"InvalidRequestException"},
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"TooManyTagsException"},
+        {"shape":"ResourceNotReadyException"}
+      ]
+    },
+    "UntagResource":{
+      "name":"UntagResource",
+      "http":{
+        "method":"DELETE",
+        "requestUri":"/tags/{resourceArn}"
+      },
+      "input":{"shape":"UntagResourceRequest"},
+      "output":{"shape":"UntagResourceResponse"},
+      "errors":[
+        {"shape":"InternalServiceErrorException"},
+        {"shape":"InvalidRequestException"},
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ResourceNotReadyException"}
       ]
     },
     "UpdateMember":{
@@ -352,6 +469,67 @@
       "error":{"httpStatusCode":403},
       "exception":true
     },
+    "Accessor":{
+      "type":"structure",
+      "members":{
+        "Id":{"shape":"ResourceIdString"},
+        "Type":{"shape":"AccessorType"},
+        "BillingToken":{"shape":"AccessorBillingTokenString"},
+        "Status":{"shape":"AccessorStatus"},
+        "CreationDate":{"shape":"Timestamp"},
+        "Arn":{"shape":"ArnString"},
+        "Tags":{"shape":"OutputTagMap"},
+        "NetworkType":{"shape":"AccessorNetworkType"}
+      }
+    },
+    "AccessorBillingTokenString":{
+      "type":"string",
+      "max":42,
+      "min":42
+    },
+    "AccessorListMaxResults":{
+      "type":"integer",
+      "box":true,
+      "max":50,
+      "min":1
+    },
+    "AccessorNetworkType":{
+      "type":"string",
+      "enum":[
+        "ETHEREUM_GOERLI",
+        "ETHEREUM_MAINNET",
+        "ETHEREUM_MAINNET_AND_GOERLI",
+        "POLYGON_MAINNET",
+        "POLYGON_MUMBAI"
+      ]
+    },
+    "AccessorStatus":{
+      "type":"string",
+      "enum":[
+        "AVAILABLE",
+        "PENDING_DELETION",
+        "DELETED"
+      ]
+    },
+    "AccessorSummary":{
+      "type":"structure",
+      "members":{
+        "Id":{"shape":"ResourceIdString"},
+        "Type":{"shape":"AccessorType"},
+        "Status":{"shape":"AccessorStatus"},
+        "CreationDate":{"shape":"Timestamp"},
+        "Arn":{"shape":"ArnString"},
+        "NetworkType":{"shape":"AccessorNetworkType"}
+      }
+    },
+    "AccessorSummaryList":{
+      "type":"list",
+      "member":{"shape":"AccessorSummary"}
+    },
+    "AccessorType":{
+      "type":"string",
+      "enum":["BILLING_TOKEN"]
+    },
     "ApprovalThresholdPolicy":{
       "type":"structure",
       "members":{
@@ -360,11 +538,41 @@
         "ThresholdComparator":{"shape":"ThresholdComparator"}
       }
     },
+    "ArnString":{
+      "type":"string",
+      "max":1011,
+      "min":1,
+      "pattern":"^arn:.+:.+:.+:.+:.+"
+    },
     "AvailabilityZoneString":{"type":"string"},
     "ClientRequestTokenString":{
       "type":"string",
       "max":64,
       "min":1
+    },
+    "CreateAccessorInput":{
+      "type":"structure",
+      "required":[
+        "ClientRequestToken",
+        "AccessorType"
+      ],
+      "members":{
+        "ClientRequestToken":{
+          "shape":"ClientRequestTokenString",
+          "idempotencyToken":true
+        },
+        "AccessorType":{"shape":"AccessorType"},
+        "Tags":{"shape":"InputTagMap"},
+        "NetworkType":{"shape":"AccessorNetworkType"}
+      }
+    },
+    "CreateAccessorOutput":{
+      "type":"structure",
+      "members":{
+        "AccessorId":{"shape":"ResourceIdString"},
+        "BillingToken":{"shape":"AccessorBillingTokenString"},
+        "NetworkType":{"shape":"AccessorNetworkType"}
+      }
     },
     "CreateMemberInput":{
       "type":"structure",
@@ -415,7 +623,8 @@
         "FrameworkVersion":{"shape":"FrameworkVersionString"},
         "FrameworkConfiguration":{"shape":"NetworkFrameworkConfiguration"},
         "VotingPolicy":{"shape":"VotingPolicy"},
-        "MemberConfiguration":{"shape":"MemberConfiguration"}
+        "MemberConfiguration":{"shape":"MemberConfiguration"},
+        "Tags":{"shape":"InputTagMap"}
       }
     },
     "CreateNetworkOutput":{
@@ -443,7 +652,8 @@
           "locationName":"networkId"
         },
         "MemberId":{"shape":"ResourceIdString"},
-        "NodeConfiguration":{"shape":"NodeConfiguration"}
+        "NodeConfiguration":{"shape":"NodeConfiguration"},
+        "Tags":{"shape":"InputTagMap"}
       }
     },
     "CreateNodeOutput":{
@@ -472,13 +682,30 @@
         },
         "MemberId":{"shape":"ResourceIdString"},
         "Actions":{"shape":"ProposalActions"},
-        "Description":{"shape":"DescriptionString"}
+        "Description":{"shape":"DescriptionString"},
+        "Tags":{"shape":"InputTagMap"}
       }
     },
     "CreateProposalOutput":{
       "type":"structure",
       "members":{
         "ProposalId":{"shape":"ResourceIdString"}
+      }
+    },
+    "DeleteAccessorInput":{
+      "type":"structure",
+      "required":["AccessorId"],
+      "members":{
+        "AccessorId":{
+          "shape":"ResourceIdString",
+          "location":"uri",
+          "locationName":"AccessorId"
+        }
+      }
+    },
+    "DeleteAccessorOutput":{
+      "type":"structure",
+      "members":{
       }
     },
     "DeleteMemberInput":{
@@ -549,6 +776,7 @@
       "type":"boolean",
       "box":true
     },
+    "ExceptionMessage":{"type":"string"},
     "Framework":{
       "type":"string",
       "enum":[
@@ -560,6 +788,23 @@
       "type":"string",
       "max":8,
       "min":1
+    },
+    "GetAccessorInput":{
+      "type":"structure",
+      "required":["AccessorId"],
+      "members":{
+        "AccessorId":{
+          "shape":"ResourceIdString",
+          "location":"uri",
+          "locationName":"AccessorId"
+        }
+      }
+    },
+    "GetAccessorOutput":{
+      "type":"structure",
+      "members":{
+        "Accessor":{"shape":"Accessor"}
+      }
     },
     "GetMemberInput":{
       "type":"structure",
@@ -666,6 +911,13 @@
       "error":{"httpStatusCode":400},
       "exception":true
     },
+    "InputTagMap":{
+      "type":"map",
+      "key":{"shape":"TagKey"},
+      "value":{"shape":"TagValue"},
+      "max":50,
+      "min":0
+    },
     "InstanceTypeString":{"type":"string"},
     "InternalServiceErrorException":{
       "type":"structure",
@@ -689,7 +941,8 @@
         "CreationDate":{"shape":"Timestamp"},
         "ExpirationDate":{"shape":"Timestamp"},
         "Status":{"shape":"InvitationStatus"},
-        "NetworkSummary":{"shape":"NetworkSummary"}
+        "NetworkSummary":{"shape":"NetworkSummary"},
+        "Arn":{"shape":"ArnString"}
       }
     },
     "InvitationList":{
@@ -720,6 +973,33 @@
     "IsOwned":{
       "type":"boolean",
       "box":true
+    },
+    "ListAccessorsInput":{
+      "type":"structure",
+      "members":{
+        "MaxResults":{
+          "shape":"AccessorListMaxResults",
+          "location":"querystring",
+          "locationName":"maxResults"
+        },
+        "NextToken":{
+          "shape":"PaginationToken",
+          "location":"querystring",
+          "locationName":"nextToken"
+        },
+        "NetworkType":{
+          "shape":"AccessorNetworkType",
+          "location":"querystring",
+          "locationName":"networkType"
+        }
+      }
+    },
+    "ListAccessorsOutput":{
+      "type":"structure",
+      "members":{
+        "Accessors":{"shape":"AccessorSummaryList"},
+        "NextToken":{"shape":"PaginationToken"}
+      }
     },
     "ListInvitationsInput":{
       "type":"structure",
@@ -925,6 +1205,23 @@
         "NextToken":{"shape":"PaginationToken"}
       }
     },
+    "ListTagsForResourceRequest":{
+      "type":"structure",
+      "required":["ResourceArn"],
+      "members":{
+        "ResourceArn":{
+          "shape":"ArnString",
+          "location":"uri",
+          "locationName":"resourceArn"
+        }
+      }
+    },
+    "ListTagsForResourceResponse":{
+      "type":"structure",
+      "members":{
+        "Tags":{"shape":"OutputTagMap"}
+      }
+    },
     "LogConfiguration":{
       "type":"structure",
       "members":{
@@ -947,7 +1244,10 @@
         "FrameworkAttributes":{"shape":"MemberFrameworkAttributes"},
         "LogPublishingConfiguration":{"shape":"MemberLogPublishingConfiguration"},
         "Status":{"shape":"MemberStatus"},
-        "CreationDate":{"shape":"Timestamp"}
+        "CreationDate":{"shape":"Timestamp"},
+        "Tags":{"shape":"OutputTagMap"},
+        "Arn":{"shape":"ArnString"},
+        "KmsKeyArn":{"shape":"String"}
       }
     },
     "MemberConfiguration":{
@@ -960,7 +1260,9 @@
         "Name":{"shape":"NetworkMemberNameString"},
         "Description":{"shape":"DescriptionString"},
         "FrameworkConfiguration":{"shape":"MemberFrameworkConfiguration"},
-        "LogPublishingConfiguration":{"shape":"MemberLogPublishingConfiguration"}
+        "LogPublishingConfiguration":{"shape":"MemberLogPublishingConfiguration"},
+        "Tags":{"shape":"InputTagMap"},
+        "KmsKeyArn":{"shape":"ArnString"}
       }
     },
     "MemberFabricAttributes":{
@@ -1019,7 +1321,8 @@
         "CREATE_FAILED",
         "UPDATING",
         "DELETING",
-        "DELETED"
+        "DELETED",
+        "INACCESSIBLE_ENCRYPTION_KEY"
       ]
     },
     "MemberSummary":{
@@ -1030,7 +1333,8 @@
         "Description":{"shape":"DescriptionString"},
         "Status":{"shape":"MemberStatus"},
         "CreationDate":{"shape":"Timestamp"},
-        "IsOwned":{"shape":"IsOwned"}
+        "IsOwned":{"shape":"IsOwned"},
+        "Arn":{"shape":"ArnString"}
       }
     },
     "MemberSummaryList":{
@@ -1055,7 +1359,9 @@
         "VpcEndpointServiceName":{"shape":"String"},
         "VotingPolicy":{"shape":"VotingPolicy"},
         "Status":{"shape":"NetworkStatus"},
-        "CreationDate":{"shape":"Timestamp"}
+        "CreationDate":{"shape":"Timestamp"},
+        "Tags":{"shape":"OutputTagMap"},
+        "Arn":{"shape":"ArnString"}
       }
     },
     "NetworkEthereumAttributes":{
@@ -1122,7 +1428,8 @@
         "Framework":{"shape":"Framework"},
         "FrameworkVersion":{"shape":"FrameworkVersionString"},
         "Status":{"shape":"NetworkStatus"},
-        "CreationDate":{"shape":"Timestamp"}
+        "CreationDate":{"shape":"Timestamp"},
+        "Arn":{"shape":"ArnString"}
       }
     },
     "NetworkSummaryList":{
@@ -1141,7 +1448,10 @@
         "LogPublishingConfiguration":{"shape":"NodeLogPublishingConfiguration"},
         "StateDB":{"shape":"StateDBType"},
         "Status":{"shape":"NodeStatus"},
-        "CreationDate":{"shape":"Timestamp"}
+        "CreationDate":{"shape":"Timestamp"},
+        "Tags":{"shape":"OutputTagMap"},
+        "Arn":{"shape":"ArnString"},
+        "KmsKeyArn":{"shape":"String"}
       }
     },
     "NodeConfiguration":{
@@ -1204,7 +1514,8 @@
         "UPDATING",
         "DELETING",
         "DELETED",
-        "FAILED"
+        "FAILED",
+        "INACCESSIBLE_ENCRYPTION_KEY"
       ]
     },
     "NodeSummary":{
@@ -1214,12 +1525,20 @@
         "Status":{"shape":"NodeStatus"},
         "CreationDate":{"shape":"Timestamp"},
         "AvailabilityZone":{"shape":"AvailabilityZoneString"},
-        "InstanceType":{"shape":"InstanceTypeString"}
+        "InstanceType":{"shape":"InstanceTypeString"},
+        "Arn":{"shape":"ArnString"}
       }
     },
     "NodeSummaryList":{
       "type":"list",
       "member":{"shape":"NodeSummary"}
+    },
+    "OutputTagMap":{
+      "type":"map",
+      "key":{"shape":"TagKey"},
+      "value":{"shape":"TagValue"},
+      "max":200,
+      "min":0
     },
     "PaginationToken":{
       "type":"string",
@@ -1247,7 +1566,9 @@
         "ExpirationDate":{"shape":"Timestamp"},
         "YesVoteCount":{"shape":"VoteCount"},
         "NoVoteCount":{"shape":"VoteCount"},
-        "OutstandingVoteCount":{"shape":"VoteCount"}
+        "OutstandingVoteCount":{"shape":"VoteCount"},
+        "Tags":{"shape":"OutputTagMap"},
+        "Arn":{"shape":"ArnString"}
       }
     },
     "ProposalActions":{
@@ -1288,7 +1609,8 @@
         "ProposedByMemberName":{"shape":"NetworkMemberNameString"},
         "Status":{"shape":"ProposalStatus"},
         "CreationDate":{"shape":"Timestamp"},
-        "ExpirationDate":{"shape":"Timestamp"}
+        "ExpirationDate":{"shape":"Timestamp"},
+        "Arn":{"shape":"ArnString"}
       }
     },
     "ProposalSummaryList":{
@@ -1350,7 +1672,8 @@
     "ResourceNotFoundException":{
       "type":"structure",
       "members":{
-        "Message":{"shape":"String"}
+        "Message":{"shape":"String"},
+        "ResourceName":{"shape":"ArnString"}
       },
       "error":{"httpStatusCode":404},
       "exception":true
@@ -1371,6 +1694,42 @@
       ]
     },
     "String":{"type":"string"},
+    "TagKey":{
+      "type":"string",
+      "max":128,
+      "min":1
+    },
+    "TagKeyList":{
+      "type":"list",
+      "member":{"shape":"TagKey"},
+      "max":200,
+      "min":0
+    },
+    "TagResourceRequest":{
+      "type":"structure",
+      "required":[
+        "ResourceArn",
+        "Tags"
+      ],
+      "members":{
+        "ResourceArn":{
+          "shape":"ArnString",
+          "location":"uri",
+          "locationName":"resourceArn"
+        },
+        "Tags":{"shape":"InputTagMap"}
+      }
+    },
+    "TagResourceResponse":{
+      "type":"structure",
+      "members":{
+      }
+    },
+    "TagValue":{
+      "type":"string",
+      "max":256,
+      "min":0
+    },
     "ThresholdComparator":{
       "type":"string",
       "enum":[
@@ -1394,6 +1753,39 @@
     "Timestamp":{
       "type":"timestamp",
       "timestampFormat":"iso8601"
+    },
+    "TooManyTagsException":{
+      "type":"structure",
+      "members":{
+        "Message":{"shape":"ExceptionMessage"},
+        "ResourceName":{"shape":"ArnString"}
+      },
+      "error":{"httpStatusCode":400},
+      "exception":true
+    },
+    "UntagResourceRequest":{
+      "type":"structure",
+      "required":[
+        "ResourceArn",
+        "TagKeys"
+      ],
+      "members":{
+        "ResourceArn":{
+          "shape":"ArnString",
+          "location":"uri",
+          "locationName":"resourceArn"
+        },
+        "TagKeys":{
+          "shape":"TagKeyList",
+          "location":"querystring",
+          "locationName":"tagKeys"
+        }
+      }
+    },
+    "UntagResourceResponse":{
+      "type":"structure",
+      "members":{
+      }
     },
     "UpdateMemberInput":{
       "type":"structure",

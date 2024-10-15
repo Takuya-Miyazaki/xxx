@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:appstream)
 
 module Aws::AppStream
   # An API client for AppStream.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::AppStream
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::AppStream::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::AppStream
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::AppStream
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::AppStream
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::AppStream
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::AppStream
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::AppStream
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,57 +341,216 @@ module Aws::AppStream
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::AppStream::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::AppStream::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
     end
 
     # @!group API Operations
+
+    # Associates the specified app block builder with the specified app
+    # block.
+    #
+    # @option params [required, String] :app_block_arn
+    #   The ARN of the app block.
+    #
+    # @option params [required, String] :app_block_builder_name
+    #   The name of the app block builder.
+    #
+    # @return [Types::AssociateAppBlockBuilderAppBlockResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::AssociateAppBlockBuilderAppBlockResult#app_block_builder_app_block_association #app_block_builder_app_block_association} => Types::AppBlockBuilderAppBlockAssociation
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.associate_app_block_builder_app_block({
+    #     app_block_arn: "Arn", # required
+    #     app_block_builder_name: "Name", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.app_block_builder_app_block_association.app_block_arn #=> String
+    #   resp.app_block_builder_app_block_association.app_block_builder_name #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/AssociateAppBlockBuilderAppBlock AWS API Documentation
+    #
+    # @overload associate_app_block_builder_app_block(params = {})
+    # @param [Hash] params ({})
+    def associate_app_block_builder_app_block(params = {}, options = {})
+      req = build_request(:associate_app_block_builder_app_block, params)
+      req.send_request(options)
+    end
+
+    # Associates the specified application with the specified fleet. This is
+    # only supported for Elastic fleets.
+    #
+    # @option params [required, String] :fleet_name
+    #   The name of the fleet.
+    #
+    # @option params [required, String] :application_arn
+    #   The ARN of the application.
+    #
+    # @return [Types::AssociateApplicationFleetResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::AssociateApplicationFleetResult#application_fleet_association #application_fleet_association} => Types::ApplicationFleetAssociation
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.associate_application_fleet({
+    #     fleet_name: "Name", # required
+    #     application_arn: "Arn", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.application_fleet_association.fleet_name #=> String
+    #   resp.application_fleet_association.application_arn #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/AssociateApplicationFleet AWS API Documentation
+    #
+    # @overload associate_application_fleet(params = {})
+    # @param [Hash] params ({})
+    def associate_application_fleet(params = {}, options = {})
+      req = build_request(:associate_application_fleet, params)
+      req.send_request(options)
+    end
+
+    # Associates an application to entitle.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack.
+    #
+    # @option params [required, String] :entitlement_name
+    #   The name of the entitlement.
+    #
+    # @option params [required, String] :application_identifier
+    #   The identifier of the application.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.associate_application_to_entitlement({
+    #     stack_name: "Name", # required
+    #     entitlement_name: "Name", # required
+    #     application_identifier: "String", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/AssociateApplicationToEntitlement AWS API Documentation
+    #
+    # @overload associate_application_to_entitlement(params = {})
+    # @param [Hash] params ({})
+    def associate_application_to_entitlement(params = {}, options = {})
+      req = build_request(:associate_application_to_entitlement, params)
+      req.send_request(options)
+    end
 
     # Associates the specified fleet with the specified stack.
     #
@@ -381,7 +596,7 @@ module Aws::AppStream
     #       {
     #         stack_name: "String", # required
     #         user_name: "Username", # required
-    #         authentication_type: "API", # required, accepts API, SAML, USERPOOL
+    #         authentication_type: "API", # required, accepts API, SAML, USERPOOL, AWS_AD
     #         send_email_notification: false,
     #       },
     #     ],
@@ -392,7 +607,7 @@ module Aws::AppStream
     #   resp.errors #=> Array
     #   resp.errors[0].user_stack_association.stack_name #=> String
     #   resp.errors[0].user_stack_association.user_name #=> String
-    #   resp.errors[0].user_stack_association.authentication_type #=> String, one of "API", "SAML", "USERPOOL"
+    #   resp.errors[0].user_stack_association.authentication_type #=> String, one of "API", "SAML", "USERPOOL", "AWS_AD"
     #   resp.errors[0].user_stack_association.send_email_notification #=> Boolean
     #   resp.errors[0].error_code #=> String, one of "STACK_NOT_FOUND", "USER_NAME_NOT_FOUND", "DIRECTORY_NOT_FOUND", "INTERNAL_ERROR"
     #   resp.errors[0].error_message #=> String
@@ -422,7 +637,7 @@ module Aws::AppStream
     #       {
     #         stack_name: "String", # required
     #         user_name: "Username", # required
-    #         authentication_type: "API", # required, accepts API, SAML, USERPOOL
+    #         authentication_type: "API", # required, accepts API, SAML, USERPOOL, AWS_AD
     #         send_email_notification: false,
     #       },
     #     ],
@@ -433,7 +648,7 @@ module Aws::AppStream
     #   resp.errors #=> Array
     #   resp.errors[0].user_stack_association.stack_name #=> String
     #   resp.errors[0].user_stack_association.user_name #=> String
-    #   resp.errors[0].user_stack_association.authentication_type #=> String, one of "API", "SAML", "USERPOOL"
+    #   resp.errors[0].user_stack_association.authentication_type #=> String, one of "API", "SAML", "USERPOOL", "AWS_AD"
     #   resp.errors[0].user_stack_association.send_email_notification #=> Boolean
     #   resp.errors[0].error_code #=> String, one of "STACK_NOT_FOUND", "USER_NAME_NOT_FOUND", "DIRECTORY_NOT_FOUND", "INTERNAL_ERROR"
     #   resp.errors[0].error_message #=> String
@@ -493,6 +708,398 @@ module Aws::AppStream
       req.send_request(options)
     end
 
+    # Creates an app block.
+    #
+    # App blocks are an Amazon AppStream 2.0 resource that stores the
+    # details about the virtual hard disk in an S3 bucket. It also stores
+    # the setup script with details about how to mount the virtual hard
+    # disk. The virtual hard disk includes the application binaries and
+    # other files necessary to launch your applications. Multiple
+    # applications can be assigned to a single app block.
+    #
+    # This is only supported for Elastic fleets.
+    #
+    # @option params [required, String] :name
+    #   The name of the app block.
+    #
+    # @option params [String] :description
+    #   The description of the app block.
+    #
+    # @option params [String] :display_name
+    #   The display name of the app block. This is not displayed to the user.
+    #
+    # @option params [required, Types::S3Location] :source_s3_location
+    #   The source S3 location of the app block.
+    #
+    # @option params [Types::ScriptDetails] :setup_script_details
+    #   The setup script details of the app block. This must be provided for
+    #   the `CUSTOM` PackagingType.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   The tags assigned to the app block.
+    #
+    # @option params [Types::ScriptDetails] :post_setup_script_details
+    #   The post setup script details of the app block. This can only be
+    #   provided for the `APPSTREAM2` PackagingType.
+    #
+    # @option params [String] :packaging_type
+    #   The packaging type of the app block.
+    #
+    # @return [Types::CreateAppBlockResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateAppBlockResult#app_block #app_block} => Types::AppBlock
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_app_block({
+    #     name: "Name", # required
+    #     description: "Description",
+    #     display_name: "DisplayName",
+    #     source_s3_location: { # required
+    #       s3_bucket: "S3Bucket", # required
+    #       s3_key: "S3Key",
+    #     },
+    #     setup_script_details: {
+    #       script_s3_location: { # required
+    #         s3_bucket: "S3Bucket", # required
+    #         s3_key: "S3Key",
+    #       },
+    #       executable_path: "String", # required
+    #       executable_parameters: "String",
+    #       timeout_in_seconds: 1, # required
+    #     },
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #     post_setup_script_details: {
+    #       script_s3_location: { # required
+    #         s3_bucket: "S3Bucket", # required
+    #         s3_key: "S3Key",
+    #       },
+    #       executable_path: "String", # required
+    #       executable_parameters: "String",
+    #       timeout_in_seconds: 1, # required
+    #     },
+    #     packaging_type: "CUSTOM", # accepts CUSTOM, APPSTREAM2
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.app_block.name #=> String
+    #   resp.app_block.arn #=> String
+    #   resp.app_block.description #=> String
+    #   resp.app_block.display_name #=> String
+    #   resp.app_block.source_s3_location.s3_bucket #=> String
+    #   resp.app_block.source_s3_location.s3_key #=> String
+    #   resp.app_block.setup_script_details.script_s3_location.s3_bucket #=> String
+    #   resp.app_block.setup_script_details.script_s3_location.s3_key #=> String
+    #   resp.app_block.setup_script_details.executable_path #=> String
+    #   resp.app_block.setup_script_details.executable_parameters #=> String
+    #   resp.app_block.setup_script_details.timeout_in_seconds #=> Integer
+    #   resp.app_block.created_time #=> Time
+    #   resp.app_block.post_setup_script_details.script_s3_location.s3_bucket #=> String
+    #   resp.app_block.post_setup_script_details.script_s3_location.s3_key #=> String
+    #   resp.app_block.post_setup_script_details.executable_path #=> String
+    #   resp.app_block.post_setup_script_details.executable_parameters #=> String
+    #   resp.app_block.post_setup_script_details.timeout_in_seconds #=> Integer
+    #   resp.app_block.packaging_type #=> String, one of "CUSTOM", "APPSTREAM2"
+    #   resp.app_block.state #=> String, one of "INACTIVE", "ACTIVE"
+    #   resp.app_block.app_block_errors #=> Array
+    #   resp.app_block.app_block_errors[0].error_code #=> String
+    #   resp.app_block.app_block_errors[0].error_message #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateAppBlock AWS API Documentation
+    #
+    # @overload create_app_block(params = {})
+    # @param [Hash] params ({})
+    def create_app_block(params = {}, options = {})
+      req = build_request(:create_app_block, params)
+      req.send_request(options)
+    end
+
+    # Creates an app block builder.
+    #
+    # @option params [required, String] :name
+    #   The unique name for the app block builder.
+    #
+    # @option params [String] :description
+    #   The description of the app block builder.
+    #
+    # @option params [String] :display_name
+    #   The display name of the app block builder.
+    #
+    # @option params [Hash<String,String>] :tags
+    #   The tags to associate with the app block builder. A tag is a key-value
+    #   pair, and the value is optional. For example, Environment=Test. If you
+    #   do not specify a value, Environment=.
+    #
+    #   If you do not specify a value, the value is set to an empty string.
+    #
+    #   Generally allowed characters are: letters, numbers, and spaces
+    #   representable in UTF-8, and the following special characters:
+    #
+    #   \_ . : / = + \\ - @
+    #
+    #   For more information, see [Tagging Your Resources][1] in the *Amazon
+    #   AppStream 2.0 Administration Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/appstream2/latest/developerguide/tagging-basic.html
+    #
+    # @option params [required, String] :platform
+    #   The platform of the app block builder.
+    #
+    #   `WINDOWS_SERVER_2019` is the only valid value.
+    #
+    # @option params [required, String] :instance_type
+    #   The instance type to use when launching the app block builder. The
+    #   following instance types are available:
+    #
+    #   * stream.standard.small
+    #
+    #   * stream.standard.medium
+    #
+    #   * stream.standard.large
+    #
+    #   * stream.standard.xlarge
+    #
+    #   * stream.standard.2xlarge
+    #
+    # @option params [required, Types::VpcConfig] :vpc_config
+    #   The VPC configuration for the app block builder.
+    #
+    #   App block builders require that you specify at least two subnets in
+    #   different availability zones.
+    #
+    # @option params [Boolean] :enable_default_internet_access
+    #   Enables or disables default internet access for the app block builder.
+    #
+    # @option params [String] :iam_role_arn
+    #   The Amazon Resource Name (ARN) of the IAM role to apply to the app
+    #   block builder. To assume a role, the app block builder calls the AWS
+    #   Security Token Service (STS) `AssumeRole` API operation and passes the
+    #   ARN of the role to use. The operation creates a new session with
+    #   temporary credentials. AppStream 2.0 retrieves the temporary
+    #   credentials and creates the **appstream\_machine\_role** credential
+    #   profile on the instance.
+    #
+    #   For more information, see [Using an IAM Role to Grant Permissions to
+    #   Applications and Scripts Running on AppStream 2.0 Streaming
+    #   Instances][1] in the *Amazon AppStream 2.0 Administration Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/appstream2/latest/developerguide/using-iam-roles-to-grant-permissions-to-applications-scripts-streaming-instances.html
+    #
+    # @option params [Array<Types::AccessEndpoint>] :access_endpoints
+    #   The list of interface VPC endpoint (interface endpoint) objects.
+    #   Administrators can connect to the app block builder only through the
+    #   specified endpoints.
+    #
+    # @return [Types::CreateAppBlockBuilderResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateAppBlockBuilderResult#app_block_builder #app_block_builder} => Types::AppBlockBuilder
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_app_block_builder({
+    #     name: "Name", # required
+    #     description: "Description",
+    #     display_name: "DisplayName",
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #     platform: "WINDOWS_SERVER_2019", # required, accepts WINDOWS_SERVER_2019
+    #     instance_type: "String", # required
+    #     vpc_config: { # required
+    #       subnet_ids: ["String"],
+    #       security_group_ids: ["String"],
+    #     },
+    #     enable_default_internet_access: false,
+    #     iam_role_arn: "Arn",
+    #     access_endpoints: [
+    #       {
+    #         endpoint_type: "STREAMING", # required, accepts STREAMING
+    #         vpce_id: "String",
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.app_block_builder.arn #=> String
+    #   resp.app_block_builder.name #=> String
+    #   resp.app_block_builder.display_name #=> String
+    #   resp.app_block_builder.description #=> String
+    #   resp.app_block_builder.platform #=> String, one of "WINDOWS_SERVER_2019"
+    #   resp.app_block_builder.instance_type #=> String
+    #   resp.app_block_builder.enable_default_internet_access #=> Boolean
+    #   resp.app_block_builder.iam_role_arn #=> String
+    #   resp.app_block_builder.vpc_config.subnet_ids #=> Array
+    #   resp.app_block_builder.vpc_config.subnet_ids[0] #=> String
+    #   resp.app_block_builder.vpc_config.security_group_ids #=> Array
+    #   resp.app_block_builder.vpc_config.security_group_ids[0] #=> String
+    #   resp.app_block_builder.state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED"
+    #   resp.app_block_builder.created_time #=> Time
+    #   resp.app_block_builder.app_block_builder_errors #=> Array
+    #   resp.app_block_builder.app_block_builder_errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "IAM_SERVICE_ROLE_IS_MISSING", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "FLEET_STOPPED", "FLEET_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR"
+    #   resp.app_block_builder.app_block_builder_errors[0].error_message #=> String
+    #   resp.app_block_builder.app_block_builder_errors[0].error_timestamp #=> Time
+    #   resp.app_block_builder.state_change_reason.code #=> String, one of "INTERNAL_ERROR"
+    #   resp.app_block_builder.state_change_reason.message #=> String
+    #   resp.app_block_builder.access_endpoints #=> Array
+    #   resp.app_block_builder.access_endpoints[0].endpoint_type #=> String, one of "STREAMING"
+    #   resp.app_block_builder.access_endpoints[0].vpce_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateAppBlockBuilder AWS API Documentation
+    #
+    # @overload create_app_block_builder(params = {})
+    # @param [Hash] params ({})
+    def create_app_block_builder(params = {}, options = {})
+      req = build_request(:create_app_block_builder, params)
+      req.send_request(options)
+    end
+
+    # Creates a URL to start a create app block builder streaming session.
+    #
+    # @option params [required, String] :app_block_builder_name
+    #   The name of the app block builder.
+    #
+    # @option params [Integer] :validity
+    #   The time that the streaming URL will be valid, in seconds. Specify a
+    #   value between 1 and 604800 seconds. The default is 3600 seconds.
+    #
+    # @return [Types::CreateAppBlockBuilderStreamingURLResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateAppBlockBuilderStreamingURLResult#streaming_url #streaming_url} => String
+    #   * {Types::CreateAppBlockBuilderStreamingURLResult#expires #expires} => Time
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_app_block_builder_streaming_url({
+    #     app_block_builder_name: "Name", # required
+    #     validity: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.streaming_url #=> String
+    #   resp.expires #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateAppBlockBuilderStreamingURL AWS API Documentation
+    #
+    # @overload create_app_block_builder_streaming_url(params = {})
+    # @param [Hash] params ({})
+    def create_app_block_builder_streaming_url(params = {}, options = {})
+      req = build_request(:create_app_block_builder_streaming_url, params)
+      req.send_request(options)
+    end
+
+    # Creates an application.
+    #
+    # Applications are an Amazon AppStream 2.0 resource that stores the
+    # details about how to launch applications on Elastic fleet streaming
+    # instances. An application consists of the launch details, icon, and
+    # display name. Applications are associated with an app block that
+    # contains the application binaries and other files. The applications
+    # assigned to an Elastic fleet are the applications users can launch.
+    #
+    # This is only supported for Elastic fleets.
+    #
+    # @option params [required, String] :name
+    #   The name of the application. This name is visible to users when
+    #   display name is not specified.
+    #
+    # @option params [String] :display_name
+    #   The display name of the application. This name is visible to users in
+    #   the application catalog.
+    #
+    # @option params [String] :description
+    #   The description of the application.
+    #
+    # @option params [required, Types::S3Location] :icon_s3_location
+    #   The location in S3 of the application icon.
+    #
+    # @option params [required, String] :launch_path
+    #   The launch path of the application.
+    #
+    # @option params [String] :working_directory
+    #   The working directory of the application.
+    #
+    # @option params [String] :launch_parameters
+    #   The launch parameters of the application.
+    #
+    # @option params [required, Array<String>] :platforms
+    #   The platforms the application supports. WINDOWS\_SERVER\_2019 and
+    #   AMAZON\_LINUX2 are supported for Elastic fleets.
+    #
+    # @option params [required, Array<String>] :instance_families
+    #   The instance families the application supports. Valid values are
+    #   GENERAL\_PURPOSE and GRAPHICS\_G4.
+    #
+    # @option params [required, String] :app_block_arn
+    #   The app block ARN to which the application should be associated
+    #
+    # @option params [Hash<String,String>] :tags
+    #   The tags assigned to the application.
+    #
+    # @return [Types::CreateApplicationResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateApplicationResult#application #application} => Types::Application
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_application({
+    #     name: "Name", # required
+    #     display_name: "DisplayName",
+    #     description: "Description",
+    #     icon_s3_location: { # required
+    #       s3_bucket: "S3Bucket", # required
+    #       s3_key: "S3Key",
+    #     },
+    #     launch_path: "String", # required
+    #     working_directory: "String",
+    #     launch_parameters: "String",
+    #     platforms: ["WINDOWS"], # required, accepts WINDOWS, WINDOWS_SERVER_2016, WINDOWS_SERVER_2019, WINDOWS_SERVER_2022, AMAZON_LINUX2, RHEL8
+    #     instance_families: ["String"], # required
+    #     app_block_arn: "Arn", # required
+    #     tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.application.name #=> String
+    #   resp.application.display_name #=> String
+    #   resp.application.icon_url #=> String
+    #   resp.application.launch_path #=> String
+    #   resp.application.launch_parameters #=> String
+    #   resp.application.enabled #=> Boolean
+    #   resp.application.metadata #=> Hash
+    #   resp.application.metadata["String"] #=> String
+    #   resp.application.working_directory #=> String
+    #   resp.application.description #=> String
+    #   resp.application.arn #=> String
+    #   resp.application.app_block_arn #=> String
+    #   resp.application.icon_s3_location.s3_bucket #=> String
+    #   resp.application.icon_s3_location.s3_key #=> String
+    #   resp.application.platforms #=> Array
+    #   resp.application.platforms[0] #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
+    #   resp.application.instance_families #=> Array
+    #   resp.application.instance_families[0] #=> String
+    #   resp.application.created_time #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateApplication AWS API Documentation
+    #
+    # @overload create_application(params = {})
+    # @param [Hash] params ({})
+    def create_application(params = {}, options = {})
+      req = build_request(:create_application, params)
+      req.send_request(options)
+    end
+
     # Creates a Directory Config object in AppStream 2.0. This object
     # includes the configuration information required to join fleets and
     # image builders to Microsoft Active Directory domains.
@@ -509,6 +1116,18 @@ module Aws::AppStream
     #   The credentials for the service account used by the fleet or image
     #   builder to connect to the directory.
     #
+    # @option params [Types::CertificateBasedAuthProperties] :certificate_based_auth_properties
+    #   The certificate-based authentication properties used to authenticate
+    #   SAML 2.0 Identity Provider (IdP) user identities to Active Directory
+    #   domain-joined streaming instances. Fallback is turned on by default
+    #   when certificate-based authentication is **Enabled** . Fallback allows
+    #   users to log in using their AD domain password if certificate-based
+    #   authentication is unsuccessful, or to unlock a desktop lock screen.
+    #   **Enabled\_no\_directory\_login\_fallback** enables certificate-based
+    #   authentication, but does not allow users to log in using their AD
+    #   domain password. Users will be disconnected to re-authenticate using
+    #   certificates.
+    #
     # @return [Types::CreateDirectoryConfigResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateDirectoryConfigResult#directory_config #directory_config} => Types::DirectoryConfig
@@ -522,6 +1141,10 @@ module Aws::AppStream
     #       account_name: "AccountName", # required
     #       account_password: "AccountPassword", # required
     #     },
+    #     certificate_based_auth_properties: {
+    #       status: "DISABLED", # accepts DISABLED, ENABLED, ENABLED_NO_DIRECTORY_LOGIN_FALLBACK
+    #       certificate_authority_arn: "Arn",
+    #     },
     #   })
     #
     # @example Response structure
@@ -532,6 +1155,8 @@ module Aws::AppStream
     #   resp.directory_config.service_account_credentials.account_name #=> String
     #   resp.directory_config.service_account_credentials.account_password #=> String
     #   resp.directory_config.created_time #=> Time
+    #   resp.directory_config.certificate_based_auth_properties.status #=> String, one of "DISABLED", "ENABLED", "ENABLED_NO_DIRECTORY_LOGIN_FALLBACK"
+    #   resp.directory_config.certificate_based_auth_properties.certificate_authority_arn #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateDirectoryConfig AWS API Documentation
     #
@@ -542,8 +1167,71 @@ module Aws::AppStream
       req.send_request(options)
     end
 
-    # Creates a fleet. A fleet consists of streaming instances that run a
-    # specified image.
+    # Creates a new entitlement. Entitlements control access to specific
+    # applications within a stack, based on user attributes. Entitlements
+    # apply to SAML 2.0 federated user identities. Amazon AppStream 2.0 user
+    # pool and streaming URL users are entitled to all applications in a
+    # stack. Entitlements don't apply to the desktop stream view
+    # application, or to applications managed by a dynamic app provider
+    # using the Dynamic Application Framework.
+    #
+    # @option params [required, String] :name
+    #   The name of the entitlement.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack with which the entitlement is associated.
+    #
+    # @option params [String] :description
+    #   The description of the entitlement.
+    #
+    # @option params [required, String] :app_visibility
+    #   Specifies whether all or selected apps are entitled.
+    #
+    # @option params [required, Array<Types::EntitlementAttribute>] :attributes
+    #   The attributes of the entitlement.
+    #
+    # @return [Types::CreateEntitlementResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateEntitlementResult#entitlement #entitlement} => Types::Entitlement
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_entitlement({
+    #     name: "Name", # required
+    #     stack_name: "Name", # required
+    #     description: "Description",
+    #     app_visibility: "ALL", # required, accepts ALL, ASSOCIATED
+    #     attributes: [ # required
+    #       {
+    #         name: "String", # required
+    #         value: "String", # required
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.entitlement.name #=> String
+    #   resp.entitlement.stack_name #=> String
+    #   resp.entitlement.description #=> String
+    #   resp.entitlement.app_visibility #=> String, one of "ALL", "ASSOCIATED"
+    #   resp.entitlement.attributes #=> Array
+    #   resp.entitlement.attributes[0].name #=> String
+    #   resp.entitlement.attributes[0].value #=> String
+    #   resp.entitlement.created_time #=> Time
+    #   resp.entitlement.last_modified_time #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateEntitlement AWS API Documentation
+    #
+    # @overload create_entitlement(params = {})
+    # @param [Hash] params ({})
+    def create_entitlement(params = {}, options = {})
+      req = build_request(:create_entitlement, params)
+      req.send_request(options)
+    end
+
+    # Creates a fleet. A fleet consists of streaming instances that your
+    # users access for their applications and desktops.
     #
     # @option params [required, String] :name
     #   A unique name for the fleet.
@@ -563,6 +1251,10 @@ module Aws::AppStream
     #   * stream.standard.medium
     #
     #   * stream.standard.large
+    #
+    #   * stream.standard.xlarge
+    #
+    #   * stream.standard.2xlarge
     #
     #   * stream.compute.large
     #
@@ -618,11 +1310,37 @@ module Aws::AppStream
     #
     #   * stream.graphics.g4dn.16xlarge
     #
+    #   * stream.graphics.g5.xlarge
+    #
+    #   * stream.graphics.g5.2xlarge
+    #
+    #   * stream.graphics.g5.4xlarge
+    #
+    #   * stream.graphics.g5.8xlarge
+    #
+    #   * stream.graphics.g5.12xlarge
+    #
+    #   * stream.graphics.g5.16xlarge
+    #
+    #   * stream.graphics.g5.24xlarge
+    #
     #   * stream.graphics-pro.4xlarge
     #
     #   * stream.graphics-pro.8xlarge
     #
     #   * stream.graphics-pro.16xlarge
+    #
+    #   The following instance types are available for Elastic fleets:
+    #
+    #   * stream.standard.small
+    #
+    #   * stream.standard.medium
+    #
+    #   * stream.standard.large
+    #
+    #   * stream.standard.xlarge
+    #
+    #   * stream.standard.2xlarge
     #
     # @option params [String] :fleet_type
     #   The fleet type.
@@ -640,11 +1358,14 @@ module Aws::AppStream
     #     when users are connected and a small hourly fee for instances that
     #     are not streaming apps.
     #
-    # @option params [required, Types::ComputeCapacity] :compute_capacity
-    #   The desired capacity for the fleet.
+    # @option params [Types::ComputeCapacity] :compute_capacity
+    #   The desired capacity for the fleet. This is not allowed for Elastic
+    #   fleets. For Elastic fleets, specify MaxConcurrentSessions instead.
     #
     # @option params [Types::VpcConfig] :vpc_config
-    #   The VPC configuration for the fleet.
+    #   The VPC configuration for the fleet. This is required for Elastic
+    #   fleets, but not required for other fleet types. Elastic fleets require
+    #   that you specify at least two subnets in different availability zones.
     #
     # @option params [Integer] :max_user_duration_in_seconds
     #   The maximum amount of time that a streaming session can remain active,
@@ -653,7 +1374,7 @@ module Aws::AppStream
     #   open documents before being disconnected. After this time elapses, the
     #   instance is terminated and replaced by a new instance.
     #
-    #   Specify a value between 600 and 360000.
+    #   Specify a value between 600 and 432000.
     #
     # @option params [Integer] :disconnect_timeout_in_seconds
     #   The amount of time that a streaming session remains active after users
@@ -662,7 +1383,7 @@ module Aws::AppStream
     #   are connected to their previous session. Otherwise, they are connected
     #   to a new session with a new streaming instance.
     #
-    #   Specify a value between 60 and 360000.
+    #   Specify a value between 60 and 36000.
     #
     # @option params [String] :description
     #   The description to display.
@@ -675,7 +1396,8 @@ module Aws::AppStream
     #
     # @option params [Types::DomainJoinInfo] :domain_join_info
     #   The name of the directory and organizational unit (OU) to use to join
-    #   the fleet to a Microsoft Active Directory domain.
+    #   the fleet to a Microsoft Active Directory domain. This is not allowed
+    #   for Elastic fleets.
     #
     # @option params [Hash<String,String>] :tags
     #   The tags to associate with the fleet. A tag is a key-value pair, and
@@ -710,7 +1432,7 @@ module Aws::AppStream
     #   in `IdleDisconnectTimeoutInSeconds` elapses, they are disconnected.
     #
     #   To prevent users from being disconnected due to inactivity, specify a
-    #   value of 0. Otherwise, specify a value between 60 and 3600. The
+    #   value of 0. Otherwise, specify a value between 60 and 36000. The
     #   default value is 0.
     #
     #   <note markdown="1"> If you enable this feature, we recommend that you specify a value that
@@ -749,6 +1471,27 @@ module Aws::AppStream
     #
     #   The default value is `APP`.
     #
+    # @option params [String] :platform
+    #   The fleet platform. WINDOWS\_SERVER\_2019 and AMAZON\_LINUX2 are
+    #   supported for Elastic fleets.
+    #
+    # @option params [Integer] :max_concurrent_sessions
+    #   The maximum concurrent sessions of the Elastic fleet. This is required
+    #   for Elastic fleets, and not allowed for other fleet types.
+    #
+    # @option params [Array<String>] :usb_device_filter_strings
+    #   The USB device filter strings that specify which USB devices a user
+    #   can redirect to the fleet streaming session, when using the Windows
+    #   native client. This is allowed but not required for Elastic fleets.
+    #
+    # @option params [Types::S3Location] :session_script_s3_location
+    #   The S3 location of the session scripts configuration zip file. This
+    #   only applies to Elastic fleets.
+    #
+    # @option params [Integer] :max_sessions_per_instance
+    #   The maximum number of user sessions on an instance. This only applies
+    #   to multi-session fleets.
+    #
     # @return [Types::CreateFleetResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateFleetResult#fleet #fleet} => Types::Fleet
@@ -757,12 +1500,13 @@ module Aws::AppStream
     #
     #   resp = client.create_fleet({
     #     name: "Name", # required
-    #     image_name: "String",
+    #     image_name: "Name",
     #     image_arn: "Arn",
     #     instance_type: "String", # required
-    #     fleet_type: "ALWAYS_ON", # accepts ALWAYS_ON, ON_DEMAND
-    #     compute_capacity: { # required
-    #       desired_instances: 1, # required
+    #     fleet_type: "ALWAYS_ON", # accepts ALWAYS_ON, ON_DEMAND, ELASTIC
+    #     compute_capacity: {
+    #       desired_instances: 1,
+    #       desired_sessions: 1,
     #     },
     #     vpc_config: {
     #       subnet_ids: ["String"],
@@ -783,6 +1527,14 @@ module Aws::AppStream
     #     idle_disconnect_timeout_in_seconds: 1,
     #     iam_role_arn: "Arn",
     #     stream_view: "APP", # accepts APP, DESKTOP
+    #     platform: "WINDOWS", # accepts WINDOWS, WINDOWS_SERVER_2016, WINDOWS_SERVER_2019, WINDOWS_SERVER_2022, AMAZON_LINUX2, RHEL8
+    #     max_concurrent_sessions: 1,
+    #     usb_device_filter_strings: ["UsbDeviceFilterString"],
+    #     session_script_s3_location: {
+    #       s3_bucket: "S3Bucket", # required
+    #       s3_key: "S3Key",
+    #     },
+    #     max_sessions_per_instance: 1,
     #   })
     #
     # @example Response structure
@@ -794,11 +1546,15 @@ module Aws::AppStream
     #   resp.fleet.image_name #=> String
     #   resp.fleet.image_arn #=> String
     #   resp.fleet.instance_type #=> String
-    #   resp.fleet.fleet_type #=> String, one of "ALWAYS_ON", "ON_DEMAND"
+    #   resp.fleet.fleet_type #=> String, one of "ALWAYS_ON", "ON_DEMAND", "ELASTIC"
     #   resp.fleet.compute_capacity_status.desired #=> Integer
     #   resp.fleet.compute_capacity_status.running #=> Integer
     #   resp.fleet.compute_capacity_status.in_use #=> Integer
     #   resp.fleet.compute_capacity_status.available #=> Integer
+    #   resp.fleet.compute_capacity_status.desired_user_sessions #=> Integer
+    #   resp.fleet.compute_capacity_status.available_user_sessions #=> Integer
+    #   resp.fleet.compute_capacity_status.active_user_sessions #=> Integer
+    #   resp.fleet.compute_capacity_status.actual_user_sessions #=> Integer
     #   resp.fleet.max_user_duration_in_seconds #=> Integer
     #   resp.fleet.disconnect_timeout_in_seconds #=> Integer
     #   resp.fleet.state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED"
@@ -816,6 +1572,13 @@ module Aws::AppStream
     #   resp.fleet.idle_disconnect_timeout_in_seconds #=> Integer
     #   resp.fleet.iam_role_arn #=> String
     #   resp.fleet.stream_view #=> String, one of "APP", "DESKTOP"
+    #   resp.fleet.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
+    #   resp.fleet.max_concurrent_sessions #=> Integer
+    #   resp.fleet.usb_device_filter_strings #=> Array
+    #   resp.fleet.usb_device_filter_strings[0] #=> String
+    #   resp.fleet.session_script_s3_location.s3_bucket #=> String
+    #   resp.fleet.session_script_s3_location.s3_key #=> String
+    #   resp.fleet.max_sessions_per_instance #=> Integer
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateFleet AWS API Documentation
     #
@@ -1021,9 +1784,9 @@ module Aws::AppStream
     #   resp.image_builder.vpc_config.security_group_ids #=> Array
     #   resp.image_builder.vpc_config.security_group_ids[0] #=> String
     #   resp.image_builder.instance_type #=> String
-    #   resp.image_builder.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019"
+    #   resp.image_builder.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
     #   resp.image_builder.iam_role_arn #=> String
-    #   resp.image_builder.state #=> String, one of "PENDING", "UPDATING_AGENT", "RUNNING", "STOPPING", "STOPPED", "REBOOTING", "SNAPSHOTTING", "DELETING", "FAILED"
+    #   resp.image_builder.state #=> String, one of "PENDING", "UPDATING_AGENT", "RUNNING", "STOPPING", "STOPPED", "REBOOTING", "SNAPSHOTTING", "DELETING", "FAILED", "UPDATING", "PENDING_QUALIFICATION"
     #   resp.image_builder.state_change_reason.code #=> String, one of "INTERNAL_ERROR", "IMAGE_UNAVAILABLE"
     #   resp.image_builder.state_change_reason.message #=> String
     #   resp.image_builder.created_time #=> Time
@@ -1040,6 +1803,7 @@ module Aws::AppStream
     #   resp.image_builder.access_endpoints #=> Array
     #   resp.image_builder.access_endpoints[0].endpoint_type #=> String, one of "STREAMING"
     #   resp.image_builder.access_endpoints[0].vpce_id #=> String
+    #   resp.image_builder.latest_appstream_agent_version #=> String, one of "TRUE", "FALSE"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateImageBuilder AWS API Documentation
     #
@@ -1149,6 +1913,10 @@ module Aws::AppStream
     #   an iframe. You must approve the domains that you want to host embedded
     #   AppStream 2.0 streaming sessions.
     #
+    # @option params [Types::StreamingExperienceSettings] :streaming_experience_settings
+    #   The streaming protocol you want your stack to prefer. This can be UDP
+    #   or TCP. Currently, UDP is only supported in the Windows native client.
+    #
     # @return [Types::CreateStackResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateStackResult#stack #stack} => Types::Stack
@@ -1170,8 +1938,9 @@ module Aws::AppStream
     #     feedback_url: "FeedbackURL",
     #     user_settings: [
     #       {
-    #         action: "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", # required, accepts CLIPBOARD_COPY_FROM_LOCAL_DEVICE, CLIPBOARD_COPY_TO_LOCAL_DEVICE, FILE_UPLOAD, FILE_DOWNLOAD, PRINTING_TO_LOCAL_DEVICE, DOMAIN_PASSWORD_SIGNIN, DOMAIN_SMART_CARD_SIGNIN
+    #         action: "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", # required, accepts CLIPBOARD_COPY_FROM_LOCAL_DEVICE, CLIPBOARD_COPY_TO_LOCAL_DEVICE, FILE_UPLOAD, FILE_DOWNLOAD, PRINTING_TO_LOCAL_DEVICE, DOMAIN_PASSWORD_SIGNIN, DOMAIN_SMART_CARD_SIGNIN, AUTO_TIME_ZONE_REDIRECTION
     #         permission: "ENABLED", # required, accepts ENABLED, DISABLED
+    #         maximum_length: 1,
     #       },
     #     ],
     #     application_settings: {
@@ -1188,6 +1957,9 @@ module Aws::AppStream
     #       },
     #     ],
     #     embed_host_domains: ["EmbedHostDomain"],
+    #     streaming_experience_settings: {
+    #       preferred_protocol: "TCP", # accepts TCP, UDP
+    #     },
     #   })
     #
     # @example Response structure
@@ -1208,8 +1980,9 @@ module Aws::AppStream
     #   resp.stack.stack_errors[0].error_code #=> String, one of "STORAGE_CONNECTOR_ERROR", "INTERNAL_SERVICE_ERROR"
     #   resp.stack.stack_errors[0].error_message #=> String
     #   resp.stack.user_settings #=> Array
-    #   resp.stack.user_settings[0].action #=> String, one of "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", "CLIPBOARD_COPY_TO_LOCAL_DEVICE", "FILE_UPLOAD", "FILE_DOWNLOAD", "PRINTING_TO_LOCAL_DEVICE", "DOMAIN_PASSWORD_SIGNIN", "DOMAIN_SMART_CARD_SIGNIN"
+    #   resp.stack.user_settings[0].action #=> String, one of "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", "CLIPBOARD_COPY_TO_LOCAL_DEVICE", "FILE_UPLOAD", "FILE_DOWNLOAD", "PRINTING_TO_LOCAL_DEVICE", "DOMAIN_PASSWORD_SIGNIN", "DOMAIN_SMART_CARD_SIGNIN", "AUTO_TIME_ZONE_REDIRECTION"
     #   resp.stack.user_settings[0].permission #=> String, one of "ENABLED", "DISABLED"
+    #   resp.stack.user_settings[0].maximum_length #=> Integer
     #   resp.stack.application_settings.enabled #=> Boolean
     #   resp.stack.application_settings.settings_group #=> String
     #   resp.stack.application_settings.s3_bucket_name #=> String
@@ -1218,6 +1991,7 @@ module Aws::AppStream
     #   resp.stack.access_endpoints[0].vpce_id #=> String
     #   resp.stack.embed_host_domains #=> Array
     #   resp.stack.embed_host_domains[0] #=> String
+    #   resp.stack.streaming_experience_settings.preferred_protocol #=> String, one of "TCP", "UDP"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateStack AWS API Documentation
     #
@@ -1290,6 +2064,212 @@ module Aws::AppStream
       req.send_request(options)
     end
 
+    # Creates custom branding that customizes the appearance of the
+    # streaming application catalog page.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack for the theme.
+    #
+    # @option params [Array<Types::ThemeFooterLink>] :footer_links
+    #   The links that are displayed in the footer of the streaming
+    #   application catalog page. These links are helpful resources for users,
+    #   such as the organization's IT support and product marketing sites.
+    #
+    # @option params [required, String] :title_text
+    #   The title that is displayed at the top of the browser tab during
+    #   users' application streaming sessions.
+    #
+    # @option params [required, String] :theme_styling
+    #   The color theme that is applied to website links, text, and buttons.
+    #   These colors are also applied as accents in the background for the
+    #   streaming application catalog page.
+    #
+    # @option params [required, Types::S3Location] :organization_logo_s3_location
+    #   The organization logo that appears on the streaming application
+    #   catalog page.
+    #
+    # @option params [required, Types::S3Location] :favicon_s3_location
+    #   The S3 location of the favicon. The favicon enables users to recognize
+    #   their application streaming site in a browser full of tabs or
+    #   bookmarks. It is displayed at the top of the browser tab for the
+    #   application streaming site during users' streaming sessions.
+    #
+    # @return [Types::CreateThemeForStackResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateThemeForStackResult#theme #theme} => Types::Theme
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_theme_for_stack({
+    #     stack_name: "Name", # required
+    #     footer_links: [
+    #       {
+    #         display_name: "ThemeFooterLinkDisplayName",
+    #         footer_link_url: "ThemeFooterLinkURL",
+    #       },
+    #     ],
+    #     title_text: "ThemeTitleText", # required
+    #     theme_styling: "LIGHT_BLUE", # required, accepts LIGHT_BLUE, BLUE, PINK, RED
+    #     organization_logo_s3_location: { # required
+    #       s3_bucket: "S3Bucket", # required
+    #       s3_key: "S3Key",
+    #     },
+    #     favicon_s3_location: { # required
+    #       s3_bucket: "S3Bucket", # required
+    #       s3_key: "S3Key",
+    #     },
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.theme.stack_name #=> String
+    #   resp.theme.state #=> String, one of "ENABLED", "DISABLED"
+    #   resp.theme.theme_title_text #=> String
+    #   resp.theme.theme_styling #=> String, one of "LIGHT_BLUE", "BLUE", "PINK", "RED"
+    #   resp.theme.theme_footer_links #=> Array
+    #   resp.theme.theme_footer_links[0].display_name #=> String
+    #   resp.theme.theme_footer_links[0].footer_link_url #=> String
+    #   resp.theme.theme_organization_logo_url #=> String
+    #   resp.theme.theme_favicon_url #=> String
+    #   resp.theme.created_time #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateThemeForStack AWS API Documentation
+    #
+    # @overload create_theme_for_stack(params = {})
+    # @param [Hash] params ({})
+    def create_theme_for_stack(params = {}, options = {})
+      req = build_request(:create_theme_for_stack, params)
+      req.send_request(options)
+    end
+
+    # Creates a new image with the latest Windows operating system updates,
+    # driver updates, and AppStream 2.0 agent software.
+    #
+    # For more information, see the "Update an Image by Using Managed
+    # AppStream 2.0 Image Updates" section in [Administer Your AppStream
+    # 2.0 Images][1], in the *Amazon AppStream 2.0 Administration Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/appstream2/latest/developerguide/administer-images.html
+    #
+    # @option params [required, String] :existing_image_name
+    #   The name of the image to update.
+    #
+    # @option params [required, String] :new_image_name
+    #   The name of the new image. The name must be unique within the AWS
+    #   account and Region.
+    #
+    # @option params [String] :new_image_description
+    #   The description to display for the new image.
+    #
+    # @option params [String] :new_image_display_name
+    #   The name to display for the new image.
+    #
+    # @option params [Hash<String,String>] :new_image_tags
+    #   The tags to associate with the new image. A tag is a key-value pair,
+    #   and the value is optional. For example, Environment=Test. If you do
+    #   not specify a value, Environment=.
+    #
+    #   Generally allowed characters are: letters, numbers, and spaces
+    #   representable in UTF-8, and the following special characters:
+    #
+    #   \_ . : / = + \\ - @
+    #
+    #   If you do not specify a value, the value is set to an empty string.
+    #
+    #   For more information about tags, see [Tagging Your Resources][1] in
+    #   the *Amazon AppStream 2.0 Administration Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/appstream2/latest/developerguide/tagging-basic.html
+    #
+    # @option params [Boolean] :dry_run
+    #   Indicates whether to display the status of image update availability
+    #   before AppStream 2.0 initiates the process of creating a new updated
+    #   image. If this value is set to `true`, AppStream 2.0 displays whether
+    #   image updates are available. If this value is set to `false`,
+    #   AppStream 2.0 initiates the process of creating a new updated image
+    #   without displaying whether image updates are available.
+    #
+    # @return [Types::CreateUpdatedImageResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateUpdatedImageResult#image #image} => Types::Image
+    #   * {Types::CreateUpdatedImageResult#can_update_image #can_update_image} => Boolean
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_updated_image({
+    #     existing_image_name: "Name", # required
+    #     new_image_name: "Name", # required
+    #     new_image_description: "Description",
+    #     new_image_display_name: "DisplayName",
+    #     new_image_tags: {
+    #       "TagKey" => "TagValue",
+    #     },
+    #     dry_run: false,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.image.name #=> String
+    #   resp.image.arn #=> String
+    #   resp.image.base_image_arn #=> String
+    #   resp.image.display_name #=> String
+    #   resp.image.state #=> String, one of "PENDING", "AVAILABLE", "FAILED", "COPYING", "DELETING", "CREATING", "IMPORTING"
+    #   resp.image.visibility #=> String, one of "PUBLIC", "PRIVATE", "SHARED"
+    #   resp.image.image_builder_supported #=> Boolean
+    #   resp.image.image_builder_name #=> String
+    #   resp.image.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
+    #   resp.image.description #=> String
+    #   resp.image.state_change_reason.code #=> String, one of "INTERNAL_ERROR", "IMAGE_BUILDER_NOT_AVAILABLE", "IMAGE_COPY_FAILURE"
+    #   resp.image.state_change_reason.message #=> String
+    #   resp.image.applications #=> Array
+    #   resp.image.applications[0].name #=> String
+    #   resp.image.applications[0].display_name #=> String
+    #   resp.image.applications[0].icon_url #=> String
+    #   resp.image.applications[0].launch_path #=> String
+    #   resp.image.applications[0].launch_parameters #=> String
+    #   resp.image.applications[0].enabled #=> Boolean
+    #   resp.image.applications[0].metadata #=> Hash
+    #   resp.image.applications[0].metadata["String"] #=> String
+    #   resp.image.applications[0].working_directory #=> String
+    #   resp.image.applications[0].description #=> String
+    #   resp.image.applications[0].arn #=> String
+    #   resp.image.applications[0].app_block_arn #=> String
+    #   resp.image.applications[0].icon_s3_location.s3_bucket #=> String
+    #   resp.image.applications[0].icon_s3_location.s3_key #=> String
+    #   resp.image.applications[0].platforms #=> Array
+    #   resp.image.applications[0].platforms[0] #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
+    #   resp.image.applications[0].instance_families #=> Array
+    #   resp.image.applications[0].instance_families[0] #=> String
+    #   resp.image.applications[0].created_time #=> Time
+    #   resp.image.created_time #=> Time
+    #   resp.image.public_base_image_released_date #=> Time
+    #   resp.image.appstream_agent_version #=> String
+    #   resp.image.image_permissions.allow_fleet #=> Boolean
+    #   resp.image.image_permissions.allow_image_builder #=> Boolean
+    #   resp.image.image_errors #=> Array
+    #   resp.image.image_errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "IAM_SERVICE_ROLE_IS_MISSING", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "FLEET_STOPPED", "FLEET_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR"
+    #   resp.image.image_errors[0].error_message #=> String
+    #   resp.image.image_errors[0].error_timestamp #=> Time
+    #   resp.image.latest_appstream_agent_version #=> String, one of "TRUE", "FALSE"
+    #   resp.image.supported_instance_families #=> Array
+    #   resp.image.supported_instance_families[0] #=> String
+    #   resp.image.dynamic_app_providers_enabled #=> String, one of "ENABLED", "DISABLED"
+    #   resp.image.image_shared_with_others #=> String, one of "TRUE", "FALSE"
+    #   resp.can_update_image #=> Boolean
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateUpdatedImage AWS API Documentation
+    #
+    # @overload create_updated_image(params = {})
+    # @param [Hash] params ({})
+    def create_updated_image(params = {}, options = {})
+      req = build_request(:create_updated_image, params)
+      req.send_request(options)
+    end
+
     # Creates a usage report subscription. Usage reports are generated
     # daily.
     #
@@ -1354,7 +2334,7 @@ module Aws::AppStream
     #     message_action: "SUPPRESS", # accepts SUPPRESS, RESEND
     #     first_name: "UserAttributeValue",
     #     last_name: "UserAttributeValue",
-    #     authentication_type: "API", # required, accepts API, SAML, USERPOOL
+    #     authentication_type: "API", # required, accepts API, SAML, USERPOOL, AWS_AD
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/CreateUser AWS API Documentation
@@ -1363,6 +2343,75 @@ module Aws::AppStream
     # @param [Hash] params ({})
     def create_user(params = {}, options = {})
       req = build_request(:create_user, params)
+      req.send_request(options)
+    end
+
+    # Deletes an app block.
+    #
+    # @option params [required, String] :name
+    #   The name of the app block.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_app_block({
+    #     name: "Name", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DeleteAppBlock AWS API Documentation
+    #
+    # @overload delete_app_block(params = {})
+    # @param [Hash] params ({})
+    def delete_app_block(params = {}, options = {})
+      req = build_request(:delete_app_block, params)
+      req.send_request(options)
+    end
+
+    # Deletes an app block builder.
+    #
+    # An app block builder can only be deleted when it has no association
+    # with an app block.
+    #
+    # @option params [required, String] :name
+    #   The name of the app block builder.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_app_block_builder({
+    #     name: "Name", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DeleteAppBlockBuilder AWS API Documentation
+    #
+    # @overload delete_app_block_builder(params = {})
+    # @param [Hash] params ({})
+    def delete_app_block_builder(params = {}, options = {})
+      req = build_request(:delete_app_block_builder, params)
+      req.send_request(options)
+    end
+
+    # Deletes an application.
+    #
+    # @option params [required, String] :name
+    #   The name of the application.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_application({
+    #     name: "Name", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DeleteApplication AWS API Documentation
+    #
+    # @overload delete_application(params = {})
+    # @param [Hash] params ({})
+    def delete_application(params = {}, options = {})
+      req = build_request(:delete_application, params)
       req.send_request(options)
     end
 
@@ -1387,6 +2436,32 @@ module Aws::AppStream
     # @param [Hash] params ({})
     def delete_directory_config(params = {}, options = {})
       req = build_request(:delete_directory_config, params)
+      req.send_request(options)
+    end
+
+    # Deletes the specified entitlement.
+    #
+    # @option params [required, String] :name
+    #   The name of the entitlement.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack with which the entitlement is associated.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_entitlement({
+    #     name: "Name", # required
+    #     stack_name: "Name", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DeleteEntitlement AWS API Documentation
+    #
+    # @overload delete_entitlement(params = {})
+    # @param [Hash] params ({})
+    def delete_entitlement(params = {}, options = {})
+      req = build_request(:delete_entitlement, params)
       req.send_request(options)
     end
 
@@ -1439,7 +2514,7 @@ module Aws::AppStream
     #   resp.image.visibility #=> String, one of "PUBLIC", "PRIVATE", "SHARED"
     #   resp.image.image_builder_supported #=> Boolean
     #   resp.image.image_builder_name #=> String
-    #   resp.image.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019"
+    #   resp.image.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
     #   resp.image.description #=> String
     #   resp.image.state_change_reason.code #=> String, one of "INTERNAL_ERROR", "IMAGE_BUILDER_NOT_AVAILABLE", "IMAGE_COPY_FAILURE"
     #   resp.image.state_change_reason.message #=> String
@@ -1452,11 +2527,31 @@ module Aws::AppStream
     #   resp.image.applications[0].enabled #=> Boolean
     #   resp.image.applications[0].metadata #=> Hash
     #   resp.image.applications[0].metadata["String"] #=> String
+    #   resp.image.applications[0].working_directory #=> String
+    #   resp.image.applications[0].description #=> String
+    #   resp.image.applications[0].arn #=> String
+    #   resp.image.applications[0].app_block_arn #=> String
+    #   resp.image.applications[0].icon_s3_location.s3_bucket #=> String
+    #   resp.image.applications[0].icon_s3_location.s3_key #=> String
+    #   resp.image.applications[0].platforms #=> Array
+    #   resp.image.applications[0].platforms[0] #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
+    #   resp.image.applications[0].instance_families #=> Array
+    #   resp.image.applications[0].instance_families[0] #=> String
+    #   resp.image.applications[0].created_time #=> Time
     #   resp.image.created_time #=> Time
     #   resp.image.public_base_image_released_date #=> Time
     #   resp.image.appstream_agent_version #=> String
     #   resp.image.image_permissions.allow_fleet #=> Boolean
     #   resp.image.image_permissions.allow_image_builder #=> Boolean
+    #   resp.image.image_errors #=> Array
+    #   resp.image.image_errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "IAM_SERVICE_ROLE_IS_MISSING", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "FLEET_STOPPED", "FLEET_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR"
+    #   resp.image.image_errors[0].error_message #=> String
+    #   resp.image.image_errors[0].error_timestamp #=> Time
+    #   resp.image.latest_appstream_agent_version #=> String, one of "TRUE", "FALSE"
+    #   resp.image.supported_instance_families #=> Array
+    #   resp.image.supported_instance_families[0] #=> String
+    #   resp.image.dynamic_app_providers_enabled #=> String, one of "ENABLED", "DISABLED"
+    #   resp.image.image_shared_with_others #=> String, one of "TRUE", "FALSE"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DeleteImage AWS API Documentation
     #
@@ -1494,9 +2589,9 @@ module Aws::AppStream
     #   resp.image_builder.vpc_config.security_group_ids #=> Array
     #   resp.image_builder.vpc_config.security_group_ids[0] #=> String
     #   resp.image_builder.instance_type #=> String
-    #   resp.image_builder.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019"
+    #   resp.image_builder.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
     #   resp.image_builder.iam_role_arn #=> String
-    #   resp.image_builder.state #=> String, one of "PENDING", "UPDATING_AGENT", "RUNNING", "STOPPING", "STOPPED", "REBOOTING", "SNAPSHOTTING", "DELETING", "FAILED"
+    #   resp.image_builder.state #=> String, one of "PENDING", "UPDATING_AGENT", "RUNNING", "STOPPING", "STOPPED", "REBOOTING", "SNAPSHOTTING", "DELETING", "FAILED", "UPDATING", "PENDING_QUALIFICATION"
     #   resp.image_builder.state_change_reason.code #=> String, one of "INTERNAL_ERROR", "IMAGE_UNAVAILABLE"
     #   resp.image_builder.state_change_reason.message #=> String
     #   resp.image_builder.created_time #=> Time
@@ -1513,6 +2608,7 @@ module Aws::AppStream
     #   resp.image_builder.access_endpoints #=> Array
     #   resp.image_builder.access_endpoints[0].endpoint_type #=> String, one of "STREAMING"
     #   resp.image_builder.access_endpoints[0].vpce_id #=> String
+    #   resp.image_builder.latest_appstream_agent_version #=> String, one of "TRUE", "FALSE"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DeleteImageBuilder AWS API Documentation
     #
@@ -1577,6 +2673,29 @@ module Aws::AppStream
       req.send_request(options)
     end
 
+    # Deletes custom branding that customizes the appearance of the
+    # streaming application catalog page.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack for the theme.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_theme_for_stack({
+    #     stack_name: "Name", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DeleteThemeForStack AWS API Documentation
+    #
+    # @overload delete_theme_for_stack(params = {})
+    # @param [Hash] params ({})
+    def delete_theme_for_stack(params = {}, options = {})
+      req = build_request(:delete_theme_for_stack, params)
+      req.send_request(options)
+    end
+
     # Disables usage report generation.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
@@ -1608,7 +2727,7 @@ module Aws::AppStream
     #
     #   resp = client.delete_user({
     #     user_name: "Username", # required
-    #     authentication_type: "API", # required, accepts API, SAML, USERPOOL
+    #     authentication_type: "API", # required, accepts API, SAML, USERPOOL, AWS_AD
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DeleteUser AWS API Documentation
@@ -1617,6 +2736,283 @@ module Aws::AppStream
     # @param [Hash] params ({})
     def delete_user(params = {}, options = {})
       req = build_request(:delete_user, params)
+      req.send_request(options)
+    end
+
+    # Retrieves a list that describes one or more app block builder
+    # associations.
+    #
+    # @option params [String] :app_block_arn
+    #   The ARN of the app block.
+    #
+    # @option params [String] :app_block_builder_name
+    #   The name of the app block builder.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of each page of results.
+    #
+    # @option params [String] :next_token
+    #   The pagination token used to retrieve the next page of results for
+    #   this operation.
+    #
+    # @return [Types::DescribeAppBlockBuilderAppBlockAssociationsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeAppBlockBuilderAppBlockAssociationsResult#app_block_builder_app_block_associations #app_block_builder_app_block_associations} => Array&lt;Types::AppBlockBuilderAppBlockAssociation&gt;
+    #   * {Types::DescribeAppBlockBuilderAppBlockAssociationsResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_app_block_builder_app_block_associations({
+    #     app_block_arn: "Arn",
+    #     app_block_builder_name: "Name",
+    #     max_results: 1,
+    #     next_token: "String",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.app_block_builder_app_block_associations #=> Array
+    #   resp.app_block_builder_app_block_associations[0].app_block_arn #=> String
+    #   resp.app_block_builder_app_block_associations[0].app_block_builder_name #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeAppBlockBuilderAppBlockAssociations AWS API Documentation
+    #
+    # @overload describe_app_block_builder_app_block_associations(params = {})
+    # @param [Hash] params ({})
+    def describe_app_block_builder_app_block_associations(params = {}, options = {})
+      req = build_request(:describe_app_block_builder_app_block_associations, params)
+      req.send_request(options)
+    end
+
+    # Retrieves a list that describes one or more app block builders.
+    #
+    # @option params [Array<String>] :names
+    #   The names of the app block builders.
+    #
+    # @option params [String] :next_token
+    #   The pagination token used to retrieve the next page of results for
+    #   this operation.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of each page of results. The maximum value is 25.
+    #
+    # @return [Types::DescribeAppBlockBuildersResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeAppBlockBuildersResult#app_block_builders #app_block_builders} => Array&lt;Types::AppBlockBuilder&gt;
+    #   * {Types::DescribeAppBlockBuildersResult#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_app_block_builders({
+    #     names: ["String"],
+    #     next_token: "String",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.app_block_builders #=> Array
+    #   resp.app_block_builders[0].arn #=> String
+    #   resp.app_block_builders[0].name #=> String
+    #   resp.app_block_builders[0].display_name #=> String
+    #   resp.app_block_builders[0].description #=> String
+    #   resp.app_block_builders[0].platform #=> String, one of "WINDOWS_SERVER_2019"
+    #   resp.app_block_builders[0].instance_type #=> String
+    #   resp.app_block_builders[0].enable_default_internet_access #=> Boolean
+    #   resp.app_block_builders[0].iam_role_arn #=> String
+    #   resp.app_block_builders[0].vpc_config.subnet_ids #=> Array
+    #   resp.app_block_builders[0].vpc_config.subnet_ids[0] #=> String
+    #   resp.app_block_builders[0].vpc_config.security_group_ids #=> Array
+    #   resp.app_block_builders[0].vpc_config.security_group_ids[0] #=> String
+    #   resp.app_block_builders[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED"
+    #   resp.app_block_builders[0].created_time #=> Time
+    #   resp.app_block_builders[0].app_block_builder_errors #=> Array
+    #   resp.app_block_builders[0].app_block_builder_errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "IAM_SERVICE_ROLE_IS_MISSING", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "FLEET_STOPPED", "FLEET_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR"
+    #   resp.app_block_builders[0].app_block_builder_errors[0].error_message #=> String
+    #   resp.app_block_builders[0].app_block_builder_errors[0].error_timestamp #=> Time
+    #   resp.app_block_builders[0].state_change_reason.code #=> String, one of "INTERNAL_ERROR"
+    #   resp.app_block_builders[0].state_change_reason.message #=> String
+    #   resp.app_block_builders[0].access_endpoints #=> Array
+    #   resp.app_block_builders[0].access_endpoints[0].endpoint_type #=> String, one of "STREAMING"
+    #   resp.app_block_builders[0].access_endpoints[0].vpce_id #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeAppBlockBuilders AWS API Documentation
+    #
+    # @overload describe_app_block_builders(params = {})
+    # @param [Hash] params ({})
+    def describe_app_block_builders(params = {}, options = {})
+      req = build_request(:describe_app_block_builders, params)
+      req.send_request(options)
+    end
+
+    # Retrieves a list that describes one or more app blocks.
+    #
+    # @option params [Array<String>] :arns
+    #   The ARNs of the app blocks.
+    #
+    # @option params [String] :next_token
+    #   The pagination token used to retrieve the next page of results for
+    #   this operation.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of each page of results.
+    #
+    # @return [Types::DescribeAppBlocksResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeAppBlocksResult#app_blocks #app_blocks} => Array&lt;Types::AppBlock&gt;
+    #   * {Types::DescribeAppBlocksResult#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_app_blocks({
+    #     arns: ["Arn"],
+    #     next_token: "String",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.app_blocks #=> Array
+    #   resp.app_blocks[0].name #=> String
+    #   resp.app_blocks[0].arn #=> String
+    #   resp.app_blocks[0].description #=> String
+    #   resp.app_blocks[0].display_name #=> String
+    #   resp.app_blocks[0].source_s3_location.s3_bucket #=> String
+    #   resp.app_blocks[0].source_s3_location.s3_key #=> String
+    #   resp.app_blocks[0].setup_script_details.script_s3_location.s3_bucket #=> String
+    #   resp.app_blocks[0].setup_script_details.script_s3_location.s3_key #=> String
+    #   resp.app_blocks[0].setup_script_details.executable_path #=> String
+    #   resp.app_blocks[0].setup_script_details.executable_parameters #=> String
+    #   resp.app_blocks[0].setup_script_details.timeout_in_seconds #=> Integer
+    #   resp.app_blocks[0].created_time #=> Time
+    #   resp.app_blocks[0].post_setup_script_details.script_s3_location.s3_bucket #=> String
+    #   resp.app_blocks[0].post_setup_script_details.script_s3_location.s3_key #=> String
+    #   resp.app_blocks[0].post_setup_script_details.executable_path #=> String
+    #   resp.app_blocks[0].post_setup_script_details.executable_parameters #=> String
+    #   resp.app_blocks[0].post_setup_script_details.timeout_in_seconds #=> Integer
+    #   resp.app_blocks[0].packaging_type #=> String, one of "CUSTOM", "APPSTREAM2"
+    #   resp.app_blocks[0].state #=> String, one of "INACTIVE", "ACTIVE"
+    #   resp.app_blocks[0].app_block_errors #=> Array
+    #   resp.app_blocks[0].app_block_errors[0].error_code #=> String
+    #   resp.app_blocks[0].app_block_errors[0].error_message #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeAppBlocks AWS API Documentation
+    #
+    # @overload describe_app_blocks(params = {})
+    # @param [Hash] params ({})
+    def describe_app_blocks(params = {}, options = {})
+      req = build_request(:describe_app_blocks, params)
+      req.send_request(options)
+    end
+
+    # Retrieves a list that describes one or more application fleet
+    # associations. Either ApplicationArn or FleetName must be specified.
+    #
+    # @option params [String] :fleet_name
+    #   The name of the fleet.
+    #
+    # @option params [String] :application_arn
+    #   The ARN of the application.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of each page of results.
+    #
+    # @option params [String] :next_token
+    #   The pagination token used to retrieve the next page of results for
+    #   this operation.
+    #
+    # @return [Types::DescribeApplicationFleetAssociationsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeApplicationFleetAssociationsResult#application_fleet_associations #application_fleet_associations} => Array&lt;Types::ApplicationFleetAssociation&gt;
+    #   * {Types::DescribeApplicationFleetAssociationsResult#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_application_fleet_associations({
+    #     fleet_name: "Name",
+    #     application_arn: "Arn",
+    #     max_results: 1,
+    #     next_token: "String",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.application_fleet_associations #=> Array
+    #   resp.application_fleet_associations[0].fleet_name #=> String
+    #   resp.application_fleet_associations[0].application_arn #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeApplicationFleetAssociations AWS API Documentation
+    #
+    # @overload describe_application_fleet_associations(params = {})
+    # @param [Hash] params ({})
+    def describe_application_fleet_associations(params = {}, options = {})
+      req = build_request(:describe_application_fleet_associations, params)
+      req.send_request(options)
+    end
+
+    # Retrieves a list that describes one or more applications.
+    #
+    # @option params [Array<String>] :arns
+    #   The ARNs for the applications.
+    #
+    # @option params [String] :next_token
+    #   The pagination token used to retrieve the next page of results for
+    #   this operation.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of each page of results.
+    #
+    # @return [Types::DescribeApplicationsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeApplicationsResult#applications #applications} => Array&lt;Types::Application&gt;
+    #   * {Types::DescribeApplicationsResult#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_applications({
+    #     arns: ["Arn"],
+    #     next_token: "String",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.applications #=> Array
+    #   resp.applications[0].name #=> String
+    #   resp.applications[0].display_name #=> String
+    #   resp.applications[0].icon_url #=> String
+    #   resp.applications[0].launch_path #=> String
+    #   resp.applications[0].launch_parameters #=> String
+    #   resp.applications[0].enabled #=> Boolean
+    #   resp.applications[0].metadata #=> Hash
+    #   resp.applications[0].metadata["String"] #=> String
+    #   resp.applications[0].working_directory #=> String
+    #   resp.applications[0].description #=> String
+    #   resp.applications[0].arn #=> String
+    #   resp.applications[0].app_block_arn #=> String
+    #   resp.applications[0].icon_s3_location.s3_bucket #=> String
+    #   resp.applications[0].icon_s3_location.s3_key #=> String
+    #   resp.applications[0].platforms #=> Array
+    #   resp.applications[0].platforms[0] #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
+    #   resp.applications[0].instance_families #=> Array
+    #   resp.applications[0].instance_families[0] #=> String
+    #   resp.applications[0].created_time #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeApplications AWS API Documentation
+    #
+    # @overload describe_applications(params = {})
+    # @param [Hash] params ({})
+    def describe_applications(params = {}, options = {})
+      req = build_request(:describe_applications, params)
       req.send_request(options)
     end
 
@@ -1662,6 +3058,8 @@ module Aws::AppStream
     #   resp.directory_configs[0].service_account_credentials.account_name #=> String
     #   resp.directory_configs[0].service_account_credentials.account_password #=> String
     #   resp.directory_configs[0].created_time #=> Time
+    #   resp.directory_configs[0].certificate_based_auth_properties.status #=> String, one of "DISABLED", "ENABLED", "ENABLED_NO_DIRECTORY_LOGIN_FALLBACK"
+    #   resp.directory_configs[0].certificate_based_auth_properties.certificate_authority_arn #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeDirectoryConfigs AWS API Documentation
@@ -1670,6 +3068,58 @@ module Aws::AppStream
     # @param [Hash] params ({})
     def describe_directory_configs(params = {}, options = {})
       req = build_request(:describe_directory_configs, params)
+      req.send_request(options)
+    end
+
+    # Retrieves a list that describes one of more entitlements.
+    #
+    # @option params [String] :name
+    #   The name of the entitlement.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack with which the entitlement is associated.
+    #
+    # @option params [String] :next_token
+    #   The pagination token used to retrieve the next page of results for
+    #   this operation.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of each page of results.
+    #
+    # @return [Types::DescribeEntitlementsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeEntitlementsResult#entitlements #entitlements} => Array&lt;Types::Entitlement&gt;
+    #   * {Types::DescribeEntitlementsResult#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_entitlements({
+    #     name: "Name",
+    #     stack_name: "Name", # required
+    #     next_token: "String",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.entitlements #=> Array
+    #   resp.entitlements[0].name #=> String
+    #   resp.entitlements[0].stack_name #=> String
+    #   resp.entitlements[0].description #=> String
+    #   resp.entitlements[0].app_visibility #=> String, one of "ALL", "ASSOCIATED"
+    #   resp.entitlements[0].attributes #=> Array
+    #   resp.entitlements[0].attributes[0].name #=> String
+    #   resp.entitlements[0].attributes[0].value #=> String
+    #   resp.entitlements[0].created_time #=> Time
+    #   resp.entitlements[0].last_modified_time #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeEntitlements AWS API Documentation
+    #
+    # @overload describe_entitlements(params = {})
+    # @param [Hash] params ({})
+    def describe_entitlements(params = {}, options = {})
+      req = build_request(:describe_entitlements, params)
       req.send_request(options)
     end
 
@@ -1706,11 +3156,15 @@ module Aws::AppStream
     #   resp.fleets[0].image_name #=> String
     #   resp.fleets[0].image_arn #=> String
     #   resp.fleets[0].instance_type #=> String
-    #   resp.fleets[0].fleet_type #=> String, one of "ALWAYS_ON", "ON_DEMAND"
+    #   resp.fleets[0].fleet_type #=> String, one of "ALWAYS_ON", "ON_DEMAND", "ELASTIC"
     #   resp.fleets[0].compute_capacity_status.desired #=> Integer
     #   resp.fleets[0].compute_capacity_status.running #=> Integer
     #   resp.fleets[0].compute_capacity_status.in_use #=> Integer
     #   resp.fleets[0].compute_capacity_status.available #=> Integer
+    #   resp.fleets[0].compute_capacity_status.desired_user_sessions #=> Integer
+    #   resp.fleets[0].compute_capacity_status.available_user_sessions #=> Integer
+    #   resp.fleets[0].compute_capacity_status.active_user_sessions #=> Integer
+    #   resp.fleets[0].compute_capacity_status.actual_user_sessions #=> Integer
     #   resp.fleets[0].max_user_duration_in_seconds #=> Integer
     #   resp.fleets[0].disconnect_timeout_in_seconds #=> Integer
     #   resp.fleets[0].state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED"
@@ -1728,6 +3182,13 @@ module Aws::AppStream
     #   resp.fleets[0].idle_disconnect_timeout_in_seconds #=> Integer
     #   resp.fleets[0].iam_role_arn #=> String
     #   resp.fleets[0].stream_view #=> String, one of "APP", "DESKTOP"
+    #   resp.fleets[0].platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
+    #   resp.fleets[0].max_concurrent_sessions #=> Integer
+    #   resp.fleets[0].usb_device_filter_strings #=> Array
+    #   resp.fleets[0].usb_device_filter_strings[0] #=> String
+    #   resp.fleets[0].session_script_s3_location.s3_bucket #=> String
+    #   resp.fleets[0].session_script_s3_location.s3_key #=> String
+    #   resp.fleets[0].max_sessions_per_instance #=> Integer
     #   resp.next_token #=> String
     #
     #
@@ -1785,9 +3246,9 @@ module Aws::AppStream
     #   resp.image_builders[0].vpc_config.security_group_ids #=> Array
     #   resp.image_builders[0].vpc_config.security_group_ids[0] #=> String
     #   resp.image_builders[0].instance_type #=> String
-    #   resp.image_builders[0].platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019"
+    #   resp.image_builders[0].platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
     #   resp.image_builders[0].iam_role_arn #=> String
-    #   resp.image_builders[0].state #=> String, one of "PENDING", "UPDATING_AGENT", "RUNNING", "STOPPING", "STOPPED", "REBOOTING", "SNAPSHOTTING", "DELETING", "FAILED"
+    #   resp.image_builders[0].state #=> String, one of "PENDING", "UPDATING_AGENT", "RUNNING", "STOPPING", "STOPPED", "REBOOTING", "SNAPSHOTTING", "DELETING", "FAILED", "UPDATING", "PENDING_QUALIFICATION"
     #   resp.image_builders[0].state_change_reason.code #=> String, one of "INTERNAL_ERROR", "IMAGE_UNAVAILABLE"
     #   resp.image_builders[0].state_change_reason.message #=> String
     #   resp.image_builders[0].created_time #=> Time
@@ -1804,6 +3265,7 @@ module Aws::AppStream
     #   resp.image_builders[0].access_endpoints #=> Array
     #   resp.image_builders[0].access_endpoints[0].endpoint_type #=> String, one of "STREAMING"
     #   resp.image_builders[0].access_endpoints[0].vpce_id #=> String
+    #   resp.image_builders[0].latest_appstream_agent_version #=> String, one of "TRUE", "FALSE"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeImageBuilders AWS API Documentation
@@ -1916,7 +3378,7 @@ module Aws::AppStream
     #   resp.images[0].visibility #=> String, one of "PUBLIC", "PRIVATE", "SHARED"
     #   resp.images[0].image_builder_supported #=> Boolean
     #   resp.images[0].image_builder_name #=> String
-    #   resp.images[0].platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019"
+    #   resp.images[0].platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
     #   resp.images[0].description #=> String
     #   resp.images[0].state_change_reason.code #=> String, one of "INTERNAL_ERROR", "IMAGE_BUILDER_NOT_AVAILABLE", "IMAGE_COPY_FAILURE"
     #   resp.images[0].state_change_reason.message #=> String
@@ -1929,11 +3391,31 @@ module Aws::AppStream
     #   resp.images[0].applications[0].enabled #=> Boolean
     #   resp.images[0].applications[0].metadata #=> Hash
     #   resp.images[0].applications[0].metadata["String"] #=> String
+    #   resp.images[0].applications[0].working_directory #=> String
+    #   resp.images[0].applications[0].description #=> String
+    #   resp.images[0].applications[0].arn #=> String
+    #   resp.images[0].applications[0].app_block_arn #=> String
+    #   resp.images[0].applications[0].icon_s3_location.s3_bucket #=> String
+    #   resp.images[0].applications[0].icon_s3_location.s3_key #=> String
+    #   resp.images[0].applications[0].platforms #=> Array
+    #   resp.images[0].applications[0].platforms[0] #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
+    #   resp.images[0].applications[0].instance_families #=> Array
+    #   resp.images[0].applications[0].instance_families[0] #=> String
+    #   resp.images[0].applications[0].created_time #=> Time
     #   resp.images[0].created_time #=> Time
     #   resp.images[0].public_base_image_released_date #=> Time
     #   resp.images[0].appstream_agent_version #=> String
     #   resp.images[0].image_permissions.allow_fleet #=> Boolean
     #   resp.images[0].image_permissions.allow_image_builder #=> Boolean
+    #   resp.images[0].image_errors #=> Array
+    #   resp.images[0].image_errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "IAM_SERVICE_ROLE_IS_MISSING", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "FLEET_STOPPED", "FLEET_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR"
+    #   resp.images[0].image_errors[0].error_message #=> String
+    #   resp.images[0].image_errors[0].error_timestamp #=> Time
+    #   resp.images[0].latest_appstream_agent_version #=> String, one of "TRUE", "FALSE"
+    #   resp.images[0].supported_instance_families #=> Array
+    #   resp.images[0].supported_instance_families[0] #=> String
+    #   resp.images[0].dynamic_app_providers_enabled #=> String, one of "ENABLED", "DISABLED"
+    #   resp.images[0].image_shared_with_others #=> String, one of "TRUE", "FALSE"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeImages AWS API Documentation
@@ -1974,6 +3456,9 @@ module Aws::AppStream
     #   using a streaming URL or `SAML` for a SAML federated user. The default
     #   is to authenticate users using a streaming URL.
     #
+    # @option params [String] :instance_id
+    #   The identifier for the instance hosting the session.
+    #
     # @return [Types::DescribeSessionsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DescribeSessionsResult#sessions #sessions} => Array&lt;Types::Session&gt;
@@ -1982,12 +3467,13 @@ module Aws::AppStream
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_sessions({
-    #     stack_name: "String", # required
-    #     fleet_name: "String", # required
+    #     stack_name: "Name", # required
+    #     fleet_name: "Name", # required
     #     user_id: "UserId",
     #     next_token: "String",
     #     limit: 1,
-    #     authentication_type: "API", # accepts API, SAML, USERPOOL
+    #     authentication_type: "API", # accepts API, SAML, USERPOOL, AWS_AD
+    #     instance_id: "String",
     #   })
     #
     # @example Response structure
@@ -2001,9 +3487,10 @@ module Aws::AppStream
     #   resp.sessions[0].connection_state #=> String, one of "CONNECTED", "NOT_CONNECTED"
     #   resp.sessions[0].start_time #=> Time
     #   resp.sessions[0].max_expiration_time #=> Time
-    #   resp.sessions[0].authentication_type #=> String, one of "API", "SAML", "USERPOOL"
+    #   resp.sessions[0].authentication_type #=> String, one of "API", "SAML", "USERPOOL", "AWS_AD"
     #   resp.sessions[0].network_access_configuration.eni_private_ip_address #=> String
     #   resp.sessions[0].network_access_configuration.eni_id #=> String
+    #   resp.sessions[0].instance_id #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeSessions AWS API Documentation
@@ -2057,8 +3544,9 @@ module Aws::AppStream
     #   resp.stacks[0].stack_errors[0].error_code #=> String, one of "STORAGE_CONNECTOR_ERROR", "INTERNAL_SERVICE_ERROR"
     #   resp.stacks[0].stack_errors[0].error_message #=> String
     #   resp.stacks[0].user_settings #=> Array
-    #   resp.stacks[0].user_settings[0].action #=> String, one of "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", "CLIPBOARD_COPY_TO_LOCAL_DEVICE", "FILE_UPLOAD", "FILE_DOWNLOAD", "PRINTING_TO_LOCAL_DEVICE", "DOMAIN_PASSWORD_SIGNIN", "DOMAIN_SMART_CARD_SIGNIN"
+    #   resp.stacks[0].user_settings[0].action #=> String, one of "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", "CLIPBOARD_COPY_TO_LOCAL_DEVICE", "FILE_UPLOAD", "FILE_DOWNLOAD", "PRINTING_TO_LOCAL_DEVICE", "DOMAIN_PASSWORD_SIGNIN", "DOMAIN_SMART_CARD_SIGNIN", "AUTO_TIME_ZONE_REDIRECTION"
     #   resp.stacks[0].user_settings[0].permission #=> String, one of "ENABLED", "DISABLED"
+    #   resp.stacks[0].user_settings[0].maximum_length #=> Integer
     #   resp.stacks[0].application_settings.enabled #=> Boolean
     #   resp.stacks[0].application_settings.settings_group #=> String
     #   resp.stacks[0].application_settings.s3_bucket_name #=> String
@@ -2067,6 +3555,7 @@ module Aws::AppStream
     #   resp.stacks[0].access_endpoints[0].vpce_id #=> String
     #   resp.stacks[0].embed_host_domains #=> Array
     #   resp.stacks[0].embed_host_domains[0] #=> String
+    #   resp.stacks[0].streaming_experience_settings.preferred_protocol #=> String, one of "TCP", "UDP"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeStacks AWS API Documentation
@@ -2075,6 +3564,45 @@ module Aws::AppStream
     # @param [Hash] params ({})
     def describe_stacks(params = {}, options = {})
       req = build_request(:describe_stacks, params)
+      req.send_request(options)
+    end
+
+    # Retrieves a list that describes the theme for a specified stack. A
+    # theme is custom branding that customizes the appearance of the
+    # streaming application catalog page.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack for the theme.
+    #
+    # @return [Types::DescribeThemeForStackResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeThemeForStackResult#theme #theme} => Types::Theme
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_theme_for_stack({
+    #     stack_name: "Name", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.theme.stack_name #=> String
+    #   resp.theme.state #=> String, one of "ENABLED", "DISABLED"
+    #   resp.theme.theme_title_text #=> String
+    #   resp.theme.theme_styling #=> String, one of "LIGHT_BLUE", "BLUE", "PINK", "RED"
+    #   resp.theme.theme_footer_links #=> Array
+    #   resp.theme.theme_footer_links[0].display_name #=> String
+    #   resp.theme.theme_footer_links[0].footer_link_url #=> String
+    #   resp.theme.theme_organization_logo_url #=> String
+    #   resp.theme.theme_favicon_url #=> String
+    #   resp.theme.created_time #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeThemeForStack AWS API Documentation
+    #
+    # @overload describe_theme_for_stack(params = {})
+    # @param [Hash] params ({})
+    def describe_theme_for_stack(params = {}, options = {})
+      req = build_request(:describe_theme_for_stack, params)
       req.send_request(options)
     end
 
@@ -2159,7 +3687,7 @@ module Aws::AppStream
     #   resp = client.describe_user_stack_associations({
     #     stack_name: "String",
     #     user_name: "Username",
-    #     authentication_type: "API", # accepts API, SAML, USERPOOL
+    #     authentication_type: "API", # accepts API, SAML, USERPOOL, AWS_AD
     #     max_results: 1,
     #     next_token: "String",
     #   })
@@ -2169,7 +3697,7 @@ module Aws::AppStream
     #   resp.user_stack_associations #=> Array
     #   resp.user_stack_associations[0].stack_name #=> String
     #   resp.user_stack_associations[0].user_name #=> String
-    #   resp.user_stack_associations[0].authentication_type #=> String, one of "API", "SAML", "USERPOOL"
+    #   resp.user_stack_associations[0].authentication_type #=> String, one of "API", "SAML", "USERPOOL", "AWS_AD"
     #   resp.user_stack_associations[0].send_email_notification #=> Boolean
     #   resp.next_token #=> String
     #
@@ -2204,7 +3732,7 @@ module Aws::AppStream
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_users({
-    #     authentication_type: "API", # required, accepts API, SAML, USERPOOL
+    #     authentication_type: "API", # required, accepts API, SAML, USERPOOL, AWS_AD
     #     max_results: 1,
     #     next_token: "String",
     #   })
@@ -2219,7 +3747,7 @@ module Aws::AppStream
     #   resp.users[0].first_name #=> String
     #   resp.users[0].last_name #=> String
     #   resp.users[0].created_time #=> Time
-    #   resp.users[0].authentication_type #=> String, one of "API", "SAML", "USERPOOL"
+    #   resp.users[0].authentication_type #=> String, one of "API", "SAML", "USERPOOL", "AWS_AD"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DescribeUsers AWS API Documentation
@@ -2251,7 +3779,7 @@ module Aws::AppStream
     #
     #   resp = client.disable_user({
     #     user_name: "Username", # required
-    #     authentication_type: "API", # required, accepts API, SAML, USERPOOL
+    #     authentication_type: "API", # required, accepts API, SAML, USERPOOL, AWS_AD
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DisableUser AWS API Documentation
@@ -2260,6 +3788,89 @@ module Aws::AppStream
     # @param [Hash] params ({})
     def disable_user(params = {}, options = {})
       req = build_request(:disable_user, params)
+      req.send_request(options)
+    end
+
+    # Disassociates a specified app block builder from a specified app
+    # block.
+    #
+    # @option params [required, String] :app_block_arn
+    #   The ARN of the app block.
+    #
+    # @option params [required, String] :app_block_builder_name
+    #   The name of the app block builder.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.disassociate_app_block_builder_app_block({
+    #     app_block_arn: "Arn", # required
+    #     app_block_builder_name: "Name", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DisassociateAppBlockBuilderAppBlock AWS API Documentation
+    #
+    # @overload disassociate_app_block_builder_app_block(params = {})
+    # @param [Hash] params ({})
+    def disassociate_app_block_builder_app_block(params = {}, options = {})
+      req = build_request(:disassociate_app_block_builder_app_block, params)
+      req.send_request(options)
+    end
+
+    # Disassociates the specified application from the fleet.
+    #
+    # @option params [required, String] :fleet_name
+    #   The name of the fleet.
+    #
+    # @option params [required, String] :application_arn
+    #   The ARN of the application.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.disassociate_application_fleet({
+    #     fleet_name: "Name", # required
+    #     application_arn: "Arn", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DisassociateApplicationFleet AWS API Documentation
+    #
+    # @overload disassociate_application_fleet(params = {})
+    # @param [Hash] params ({})
+    def disassociate_application_fleet(params = {}, options = {})
+      req = build_request(:disassociate_application_fleet, params)
+      req.send_request(options)
+    end
+
+    # Deletes the specified application from the specified entitlement.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack with which the entitlement is associated.
+    #
+    # @option params [required, String] :entitlement_name
+    #   The name of the entitlement.
+    #
+    # @option params [required, String] :application_identifier
+    #   The identifier of the application to remove from the entitlement.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.disassociate_application_from_entitlement({
+    #     stack_name: "Name", # required
+    #     entitlement_name: "Name", # required
+    #     application_identifier: "String", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/DisassociateApplicationFromEntitlement AWS API Documentation
+    #
+    # @overload disassociate_application_from_entitlement(params = {})
+    # @param [Hash] params ({})
+    def disassociate_application_from_entitlement(params = {}, options = {})
+      req = build_request(:disassociate_application_from_entitlement, params)
       req.send_request(options)
     end
 
@@ -2312,7 +3923,7 @@ module Aws::AppStream
     #
     #   resp = client.enable_user({
     #     user_name: "Username", # required
-    #     authentication_type: "API", # required, accepts API, SAML, USERPOOL
+    #     authentication_type: "API", # required, accepts API, SAML, USERPOOL, AWS_AD
     #   })
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/EnableUser AWS API Documentation
@@ -2420,6 +4031,50 @@ module Aws::AppStream
       req.send_request(options)
     end
 
+    # Retrieves a list of entitled applications.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack with which the entitlement is associated.
+    #
+    # @option params [required, String] :entitlement_name
+    #   The name of the entitlement.
+    #
+    # @option params [String] :next_token
+    #   The pagination token used to retrieve the next page of results for
+    #   this operation.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum size of each page of results.
+    #
+    # @return [Types::ListEntitledApplicationsResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListEntitledApplicationsResult#entitled_applications #entitled_applications} => Array&lt;Types::EntitledApplication&gt;
+    #   * {Types::ListEntitledApplicationsResult#next_token #next_token} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_entitled_applications({
+    #     stack_name: "Name", # required
+    #     entitlement_name: "Name", # required
+    #     next_token: "String",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.entitled_applications #=> Array
+    #   resp.entitled_applications[0].application_identifier #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/ListEntitledApplications AWS API Documentation
+    #
+    # @overload list_entitled_applications(params = {})
+    # @param [Hash] params ({})
+    def list_entitled_applications(params = {}, options = {})
+      req = build_request(:list_entitled_applications, params)
+      req.send_request(options)
+    end
+
     # Retrieves a list of all tags for the specified AppStream 2.0 resource.
     # You can tag AppStream 2.0 image builders, images, fleets, and stacks.
     #
@@ -2454,6 +4109,63 @@ module Aws::AppStream
     # @param [Hash] params ({})
     def list_tags_for_resource(params = {}, options = {})
       req = build_request(:list_tags_for_resource, params)
+      req.send_request(options)
+    end
+
+    # Starts an app block builder.
+    #
+    # An app block builder can only be started when it's associated with an
+    # app block.
+    #
+    # Starting an app block builder starts a new instance, which is
+    # equivalent to an elastic fleet instance with application builder
+    # assistance functionality.
+    #
+    # @option params [required, String] :name
+    #   The name of the app block builder.
+    #
+    # @return [Types::StartAppBlockBuilderResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StartAppBlockBuilderResult#app_block_builder #app_block_builder} => Types::AppBlockBuilder
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_app_block_builder({
+    #     name: "Name", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.app_block_builder.arn #=> String
+    #   resp.app_block_builder.name #=> String
+    #   resp.app_block_builder.display_name #=> String
+    #   resp.app_block_builder.description #=> String
+    #   resp.app_block_builder.platform #=> String, one of "WINDOWS_SERVER_2019"
+    #   resp.app_block_builder.instance_type #=> String
+    #   resp.app_block_builder.enable_default_internet_access #=> Boolean
+    #   resp.app_block_builder.iam_role_arn #=> String
+    #   resp.app_block_builder.vpc_config.subnet_ids #=> Array
+    #   resp.app_block_builder.vpc_config.subnet_ids[0] #=> String
+    #   resp.app_block_builder.vpc_config.security_group_ids #=> Array
+    #   resp.app_block_builder.vpc_config.security_group_ids[0] #=> String
+    #   resp.app_block_builder.state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED"
+    #   resp.app_block_builder.created_time #=> Time
+    #   resp.app_block_builder.app_block_builder_errors #=> Array
+    #   resp.app_block_builder.app_block_builder_errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "IAM_SERVICE_ROLE_IS_MISSING", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "FLEET_STOPPED", "FLEET_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR"
+    #   resp.app_block_builder.app_block_builder_errors[0].error_message #=> String
+    #   resp.app_block_builder.app_block_builder_errors[0].error_timestamp #=> Time
+    #   resp.app_block_builder.state_change_reason.code #=> String, one of "INTERNAL_ERROR"
+    #   resp.app_block_builder.state_change_reason.message #=> String
+    #   resp.app_block_builder.access_endpoints #=> Array
+    #   resp.app_block_builder.access_endpoints[0].endpoint_type #=> String, one of "STREAMING"
+    #   resp.app_block_builder.access_endpoints[0].vpce_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/StartAppBlockBuilder AWS API Documentation
+    #
+    # @overload start_app_block_builder(params = {})
+    # @param [Hash] params ({})
+    def start_app_block_builder(params = {}, options = {})
+      req = build_request(:start_app_block_builder, params)
       req.send_request(options)
     end
 
@@ -2512,9 +4224,9 @@ module Aws::AppStream
     #   resp.image_builder.vpc_config.security_group_ids #=> Array
     #   resp.image_builder.vpc_config.security_group_ids[0] #=> String
     #   resp.image_builder.instance_type #=> String
-    #   resp.image_builder.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019"
+    #   resp.image_builder.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
     #   resp.image_builder.iam_role_arn #=> String
-    #   resp.image_builder.state #=> String, one of "PENDING", "UPDATING_AGENT", "RUNNING", "STOPPING", "STOPPED", "REBOOTING", "SNAPSHOTTING", "DELETING", "FAILED"
+    #   resp.image_builder.state #=> String, one of "PENDING", "UPDATING_AGENT", "RUNNING", "STOPPING", "STOPPED", "REBOOTING", "SNAPSHOTTING", "DELETING", "FAILED", "UPDATING", "PENDING_QUALIFICATION"
     #   resp.image_builder.state_change_reason.code #=> String, one of "INTERNAL_ERROR", "IMAGE_UNAVAILABLE"
     #   resp.image_builder.state_change_reason.message #=> String
     #   resp.image_builder.created_time #=> Time
@@ -2531,6 +4243,7 @@ module Aws::AppStream
     #   resp.image_builder.access_endpoints #=> Array
     #   resp.image_builder.access_endpoints[0].endpoint_type #=> String, one of "STREAMING"
     #   resp.image_builder.access_endpoints[0].vpce_id #=> String
+    #   resp.image_builder.latest_appstream_agent_version #=> String, one of "TRUE", "FALSE"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/StartImageBuilder AWS API Documentation
     #
@@ -2538,6 +4251,59 @@ module Aws::AppStream
     # @param [Hash] params ({})
     def start_image_builder(params = {}, options = {})
       req = build_request(:start_image_builder, params)
+      req.send_request(options)
+    end
+
+    # Stops an app block builder.
+    #
+    # Stopping an app block builder terminates the instance, and the
+    # instance state is not persisted.
+    #
+    # @option params [required, String] :name
+    #   The name of the app block builder.
+    #
+    # @return [Types::StopAppBlockBuilderResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::StopAppBlockBuilderResult#app_block_builder #app_block_builder} => Types::AppBlockBuilder
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.stop_app_block_builder({
+    #     name: "Name", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.app_block_builder.arn #=> String
+    #   resp.app_block_builder.name #=> String
+    #   resp.app_block_builder.display_name #=> String
+    #   resp.app_block_builder.description #=> String
+    #   resp.app_block_builder.platform #=> String, one of "WINDOWS_SERVER_2019"
+    #   resp.app_block_builder.instance_type #=> String
+    #   resp.app_block_builder.enable_default_internet_access #=> Boolean
+    #   resp.app_block_builder.iam_role_arn #=> String
+    #   resp.app_block_builder.vpc_config.subnet_ids #=> Array
+    #   resp.app_block_builder.vpc_config.subnet_ids[0] #=> String
+    #   resp.app_block_builder.vpc_config.security_group_ids #=> Array
+    #   resp.app_block_builder.vpc_config.security_group_ids[0] #=> String
+    #   resp.app_block_builder.state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED"
+    #   resp.app_block_builder.created_time #=> Time
+    #   resp.app_block_builder.app_block_builder_errors #=> Array
+    #   resp.app_block_builder.app_block_builder_errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "IAM_SERVICE_ROLE_IS_MISSING", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "FLEET_STOPPED", "FLEET_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR"
+    #   resp.app_block_builder.app_block_builder_errors[0].error_message #=> String
+    #   resp.app_block_builder.app_block_builder_errors[0].error_timestamp #=> Time
+    #   resp.app_block_builder.state_change_reason.code #=> String, one of "INTERNAL_ERROR"
+    #   resp.app_block_builder.state_change_reason.message #=> String
+    #   resp.app_block_builder.access_endpoints #=> Array
+    #   resp.app_block_builder.access_endpoints[0].endpoint_type #=> String, one of "STREAMING"
+    #   resp.app_block_builder.access_endpoints[0].vpce_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/StopAppBlockBuilder AWS API Documentation
+    #
+    # @overload stop_app_block_builder(params = {})
+    # @param [Hash] params ({})
+    def stop_app_block_builder(params = {}, options = {})
+      req = build_request(:stop_app_block_builder, params)
       req.send_request(options)
     end
 
@@ -2590,9 +4356,9 @@ module Aws::AppStream
     #   resp.image_builder.vpc_config.security_group_ids #=> Array
     #   resp.image_builder.vpc_config.security_group_ids[0] #=> String
     #   resp.image_builder.instance_type #=> String
-    #   resp.image_builder.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019"
+    #   resp.image_builder.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
     #   resp.image_builder.iam_role_arn #=> String
-    #   resp.image_builder.state #=> String, one of "PENDING", "UPDATING_AGENT", "RUNNING", "STOPPING", "STOPPED", "REBOOTING", "SNAPSHOTTING", "DELETING", "FAILED"
+    #   resp.image_builder.state #=> String, one of "PENDING", "UPDATING_AGENT", "RUNNING", "STOPPING", "STOPPED", "REBOOTING", "SNAPSHOTTING", "DELETING", "FAILED", "UPDATING", "PENDING_QUALIFICATION"
     #   resp.image_builder.state_change_reason.code #=> String, one of "INTERNAL_ERROR", "IMAGE_UNAVAILABLE"
     #   resp.image_builder.state_change_reason.message #=> String
     #   resp.image_builder.created_time #=> Time
@@ -2609,6 +4375,7 @@ module Aws::AppStream
     #   resp.image_builder.access_endpoints #=> Array
     #   resp.image_builder.access_endpoints[0].endpoint_type #=> String, one of "STREAMING"
     #   resp.image_builder.access_endpoints[0].vpce_id #=> String
+    #   resp.image_builder.latest_appstream_agent_version #=> String, one of "TRUE", "FALSE"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/StopImageBuilder AWS API Documentation
     #
@@ -2707,6 +4474,221 @@ module Aws::AppStream
       req.send_request(options)
     end
 
+    # Updates an app block builder.
+    #
+    # If the app block builder is in the `STARTING` or `STOPPING` state, you
+    # can't update it. If the app block builder is in the `RUNNING` state,
+    # you can only update the DisplayName and Description. If the app block
+    # builder is in the `STOPPED` state, you can update any attribute except
+    # the Name.
+    #
+    # @option params [required, String] :name
+    #   The unique name for the app block builder.
+    #
+    # @option params [String] :description
+    #   The description of the app block builder.
+    #
+    # @option params [String] :display_name
+    #   The display name of the app block builder.
+    #
+    # @option params [String] :platform
+    #   The platform of the app block builder.
+    #
+    #   `WINDOWS_SERVER_2019` is the only valid value.
+    #
+    # @option params [String] :instance_type
+    #   The instance type to use when launching the app block builder. The
+    #   following instance types are available:
+    #
+    #   * stream.standard.small
+    #
+    #   * stream.standard.medium
+    #
+    #   * stream.standard.large
+    #
+    #   * stream.standard.xlarge
+    #
+    #   * stream.standard.2xlarge
+    #
+    # @option params [Types::VpcConfig] :vpc_config
+    #   The VPC configuration for the app block builder.
+    #
+    #   App block builders require that you specify at least two subnets in
+    #   different availability zones.
+    #
+    # @option params [Boolean] :enable_default_internet_access
+    #   Enables or disables default internet access for the app block builder.
+    #
+    # @option params [String] :iam_role_arn
+    #   The Amazon Resource Name (ARN) of the IAM role to apply to the app
+    #   block builder. To assume a role, the app block builder calls the AWS
+    #   Security Token Service (STS) `AssumeRole` API operation and passes the
+    #   ARN of the role to use. The operation creates a new session with
+    #   temporary credentials. AppStream 2.0 retrieves the temporary
+    #   credentials and creates the **appstream\_machine\_role** credential
+    #   profile on the instance.
+    #
+    #   For more information, see [Using an IAM Role to Grant Permissions to
+    #   Applications and Scripts Running on AppStream 2.0 Streaming
+    #   Instances][1] in the *Amazon AppStream 2.0 Administration Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/appstream2/latest/developerguide/using-iam-roles-to-grant-permissions-to-applications-scripts-streaming-instances.html
+    #
+    # @option params [Array<Types::AccessEndpoint>] :access_endpoints
+    #   The list of interface VPC endpoint (interface endpoint) objects.
+    #   Administrators can connect to the app block builder only through the
+    #   specified endpoints.
+    #
+    # @option params [Array<String>] :attributes_to_delete
+    #   The attributes to delete from the app block builder.
+    #
+    # @return [Types::UpdateAppBlockBuilderResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateAppBlockBuilderResult#app_block_builder #app_block_builder} => Types::AppBlockBuilder
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_app_block_builder({
+    #     name: "Name", # required
+    #     description: "Description",
+    #     display_name: "DisplayName",
+    #     platform: "WINDOWS", # accepts WINDOWS, WINDOWS_SERVER_2016, WINDOWS_SERVER_2019, WINDOWS_SERVER_2022, AMAZON_LINUX2, RHEL8
+    #     instance_type: "String",
+    #     vpc_config: {
+    #       subnet_ids: ["String"],
+    #       security_group_ids: ["String"],
+    #     },
+    #     enable_default_internet_access: false,
+    #     iam_role_arn: "Arn",
+    #     access_endpoints: [
+    #       {
+    #         endpoint_type: "STREAMING", # required, accepts STREAMING
+    #         vpce_id: "String",
+    #       },
+    #     ],
+    #     attributes_to_delete: ["IAM_ROLE_ARN"], # accepts IAM_ROLE_ARN, ACCESS_ENDPOINTS, VPC_CONFIGURATION_SECURITY_GROUP_IDS
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.app_block_builder.arn #=> String
+    #   resp.app_block_builder.name #=> String
+    #   resp.app_block_builder.display_name #=> String
+    #   resp.app_block_builder.description #=> String
+    #   resp.app_block_builder.platform #=> String, one of "WINDOWS_SERVER_2019"
+    #   resp.app_block_builder.instance_type #=> String
+    #   resp.app_block_builder.enable_default_internet_access #=> Boolean
+    #   resp.app_block_builder.iam_role_arn #=> String
+    #   resp.app_block_builder.vpc_config.subnet_ids #=> Array
+    #   resp.app_block_builder.vpc_config.subnet_ids[0] #=> String
+    #   resp.app_block_builder.vpc_config.security_group_ids #=> Array
+    #   resp.app_block_builder.vpc_config.security_group_ids[0] #=> String
+    #   resp.app_block_builder.state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED"
+    #   resp.app_block_builder.created_time #=> Time
+    #   resp.app_block_builder.app_block_builder_errors #=> Array
+    #   resp.app_block_builder.app_block_builder_errors[0].error_code #=> String, one of "IAM_SERVICE_ROLE_MISSING_ENI_DESCRIBE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_CREATE_ACTION", "IAM_SERVICE_ROLE_MISSING_ENI_DELETE_ACTION", "NETWORK_INTERFACE_LIMIT_EXCEEDED", "INTERNAL_SERVICE_ERROR", "IAM_SERVICE_ROLE_IS_MISSING", "MACHINE_ROLE_IS_MISSING", "STS_DISABLED_IN_REGION", "SUBNET_HAS_INSUFFICIENT_IP_ADDRESSES", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SUBNET_ACTION", "SUBNET_NOT_FOUND", "IMAGE_NOT_FOUND", "INVALID_SUBNET_CONFIGURATION", "SECURITY_GROUPS_NOT_FOUND", "IGW_NOT_ATTACHED", "IAM_SERVICE_ROLE_MISSING_DESCRIBE_SECURITY_GROUPS_ACTION", "FLEET_STOPPED", "FLEET_INSTANCE_PROVISIONING_FAILURE", "DOMAIN_JOIN_ERROR_FILE_NOT_FOUND", "DOMAIN_JOIN_ERROR_ACCESS_DENIED", "DOMAIN_JOIN_ERROR_LOGON_FAILURE", "DOMAIN_JOIN_ERROR_INVALID_PARAMETER", "DOMAIN_JOIN_ERROR_MORE_DATA", "DOMAIN_JOIN_ERROR_NO_SUCH_DOMAIN", "DOMAIN_JOIN_ERROR_NOT_SUPPORTED", "DOMAIN_JOIN_NERR_INVALID_WORKGROUP_NAME", "DOMAIN_JOIN_NERR_WORKSTATION_NOT_STARTED", "DOMAIN_JOIN_ERROR_DS_MACHINE_ACCOUNT_QUOTA_EXCEEDED", "DOMAIN_JOIN_NERR_PASSWORD_EXPIRED", "DOMAIN_JOIN_INTERNAL_SERVICE_ERROR"
+    #   resp.app_block_builder.app_block_builder_errors[0].error_message #=> String
+    #   resp.app_block_builder.app_block_builder_errors[0].error_timestamp #=> Time
+    #   resp.app_block_builder.state_change_reason.code #=> String, one of "INTERNAL_ERROR"
+    #   resp.app_block_builder.state_change_reason.message #=> String
+    #   resp.app_block_builder.access_endpoints #=> Array
+    #   resp.app_block_builder.access_endpoints[0].endpoint_type #=> String, one of "STREAMING"
+    #   resp.app_block_builder.access_endpoints[0].vpce_id #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/UpdateAppBlockBuilder AWS API Documentation
+    #
+    # @overload update_app_block_builder(params = {})
+    # @param [Hash] params ({})
+    def update_app_block_builder(params = {}, options = {})
+      req = build_request(:update_app_block_builder, params)
+      req.send_request(options)
+    end
+
+    # Updates the specified application.
+    #
+    # @option params [required, String] :name
+    #   The name of the application. This name is visible to users when
+    #   display name is not specified.
+    #
+    # @option params [String] :display_name
+    #   The display name of the application. This name is visible to users in
+    #   the application catalog.
+    #
+    # @option params [String] :description
+    #   The description of the application.
+    #
+    # @option params [Types::S3Location] :icon_s3_location
+    #   The icon S3 location of the application.
+    #
+    # @option params [String] :launch_path
+    #   The launch path of the application.
+    #
+    # @option params [String] :working_directory
+    #   The working directory of the application.
+    #
+    # @option params [String] :launch_parameters
+    #   The launch parameters of the application.
+    #
+    # @option params [String] :app_block_arn
+    #   The ARN of the app block.
+    #
+    # @option params [Array<String>] :attributes_to_delete
+    #   The attributes to delete for an application.
+    #
+    # @return [Types::UpdateApplicationResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateApplicationResult#application #application} => Types::Application
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_application({
+    #     name: "Name", # required
+    #     display_name: "DisplayName",
+    #     description: "Description",
+    #     icon_s3_location: {
+    #       s3_bucket: "S3Bucket", # required
+    #       s3_key: "S3Key",
+    #     },
+    #     launch_path: "String",
+    #     working_directory: "String",
+    #     launch_parameters: "String",
+    #     app_block_arn: "Arn",
+    #     attributes_to_delete: ["LAUNCH_PARAMETERS"], # accepts LAUNCH_PARAMETERS, WORKING_DIRECTORY
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.application.name #=> String
+    #   resp.application.display_name #=> String
+    #   resp.application.icon_url #=> String
+    #   resp.application.launch_path #=> String
+    #   resp.application.launch_parameters #=> String
+    #   resp.application.enabled #=> Boolean
+    #   resp.application.metadata #=> Hash
+    #   resp.application.metadata["String"] #=> String
+    #   resp.application.working_directory #=> String
+    #   resp.application.description #=> String
+    #   resp.application.arn #=> String
+    #   resp.application.app_block_arn #=> String
+    #   resp.application.icon_s3_location.s3_bucket #=> String
+    #   resp.application.icon_s3_location.s3_key #=> String
+    #   resp.application.platforms #=> Array
+    #   resp.application.platforms[0] #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
+    #   resp.application.instance_families #=> Array
+    #   resp.application.instance_families[0] #=> String
+    #   resp.application.created_time #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/UpdateApplication AWS API Documentation
+    #
+    # @overload update_application(params = {})
+    # @param [Hash] params ({})
+    def update_application(params = {}, options = {})
+      req = build_request(:update_application, params)
+      req.send_request(options)
+    end
+
     # Updates the specified Directory Config object in AppStream 2.0. This
     # object includes the configuration information required to join fleets
     # and image builders to Microsoft Active Directory domains.
@@ -2722,6 +4704,18 @@ module Aws::AppStream
     #   The credentials for the service account used by the fleet or image
     #   builder to connect to the directory.
     #
+    # @option params [Types::CertificateBasedAuthProperties] :certificate_based_auth_properties
+    #   The certificate-based authentication properties used to authenticate
+    #   SAML 2.0 Identity Provider (IdP) user identities to Active Directory
+    #   domain-joined streaming instances. Fallback is turned on by default
+    #   when certificate-based authentication is **Enabled** . Fallback allows
+    #   users to log in using their AD domain password if certificate-based
+    #   authentication is unsuccessful, or to unlock a desktop lock screen.
+    #   **Enabled\_no\_directory\_login\_fallback** enables certificate-based
+    #   authentication, but does not allow users to log in using their AD
+    #   domain password. Users will be disconnected to re-authenticate using
+    #   certificates.
+    #
     # @return [Types::UpdateDirectoryConfigResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateDirectoryConfigResult#directory_config #directory_config} => Types::DirectoryConfig
@@ -2735,6 +4729,10 @@ module Aws::AppStream
     #       account_name: "AccountName", # required
     #       account_password: "AccountPassword", # required
     #     },
+    #     certificate_based_auth_properties: {
+    #       status: "DISABLED", # accepts DISABLED, ENABLED, ENABLED_NO_DIRECTORY_LOGIN_FALLBACK
+    #       certificate_authority_arn: "Arn",
+    #     },
     #   })
     #
     # @example Response structure
@@ -2745,6 +4743,8 @@ module Aws::AppStream
     #   resp.directory_config.service_account_credentials.account_name #=> String
     #   resp.directory_config.service_account_credentials.account_password #=> String
     #   resp.directory_config.created_time #=> Time
+    #   resp.directory_config.certificate_based_auth_properties.status #=> String, one of "DISABLED", "ENABLED", "ENABLED_NO_DIRECTORY_LOGIN_FALLBACK"
+    #   resp.directory_config.certificate_based_auth_properties.certificate_authority_arn #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/UpdateDirectoryConfig AWS API Documentation
     #
@@ -2755,14 +4755,85 @@ module Aws::AppStream
       req.send_request(options)
     end
 
+    # Updates the specified entitlement.
+    #
+    # @option params [required, String] :name
+    #   The name of the entitlement.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack with which the entitlement is associated.
+    #
+    # @option params [String] :description
+    #   The description of the entitlement.
+    #
+    # @option params [String] :app_visibility
+    #   Specifies whether all or only selected apps are entitled.
+    #
+    # @option params [Array<Types::EntitlementAttribute>] :attributes
+    #   The attributes of the entitlement.
+    #
+    # @return [Types::UpdateEntitlementResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateEntitlementResult#entitlement #entitlement} => Types::Entitlement
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_entitlement({
+    #     name: "Name", # required
+    #     stack_name: "Name", # required
+    #     description: "Description",
+    #     app_visibility: "ALL", # accepts ALL, ASSOCIATED
+    #     attributes: [
+    #       {
+    #         name: "String", # required
+    #         value: "String", # required
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.entitlement.name #=> String
+    #   resp.entitlement.stack_name #=> String
+    #   resp.entitlement.description #=> String
+    #   resp.entitlement.app_visibility #=> String, one of "ALL", "ASSOCIATED"
+    #   resp.entitlement.attributes #=> Array
+    #   resp.entitlement.attributes[0].name #=> String
+    #   resp.entitlement.attributes[0].value #=> String
+    #   resp.entitlement.created_time #=> Time
+    #   resp.entitlement.last_modified_time #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/UpdateEntitlement AWS API Documentation
+    #
+    # @overload update_entitlement(params = {})
+    # @param [Hash] params ({})
+    def update_entitlement(params = {}, options = {})
+      req = build_request(:update_entitlement, params)
+      req.send_request(options)
+    end
+
     # Updates the specified fleet.
     #
     # If the fleet is in the `STOPPED` state, you can update any attribute
-    # except the fleet name. If the fleet is in the `RUNNING` state, you can
-    # update the `DisplayName`, `ComputeCapacity`, `ImageARN`, `ImageName`,
-    # `IdleDisconnectTimeoutInSeconds`, and `DisconnectTimeoutInSeconds`
-    # attributes. If the fleet is in the `STARTING` or `STOPPING` state, you
-    # can't update it.
+    # except the fleet name.
+    #
+    # If the fleet is in the `RUNNING` state, you can update the following
+    # based on the fleet type:
+    #
+    # * Always-On and On-Demand fleet types
+    #
+    #   You can update the `DisplayName`, `ComputeCapacity`, `ImageARN`,
+    #   `ImageName`, `IdleDisconnectTimeoutInSeconds`, and
+    #   `DisconnectTimeoutInSeconds` attributes.
+    #
+    # * Elastic fleet type
+    #
+    #   You can update the `DisplayName`, `IdleDisconnectTimeoutInSeconds`,
+    #   `DisconnectTimeoutInSeconds`, `MaxConcurrentSessions`,
+    #   `SessionScriptS3Location` and `UsbDeviceFilterStrings` attributes.
+    #
+    # If the fleet is in the `STARTING` or `STOPPED` state, you can't
+    # update it.
     #
     # @option params [String] :image_name
     #   The name of the image used to create the fleet.
@@ -2782,6 +4853,10 @@ module Aws::AppStream
     #   * stream.standard.medium
     #
     #   * stream.standard.large
+    #
+    #   * stream.standard.xlarge
+    #
+    #   * stream.standard.2xlarge
     #
     #   * stream.compute.large
     #
@@ -2843,11 +4918,26 @@ module Aws::AppStream
     #
     #   * stream.graphics-pro.16xlarge
     #
+    #   The following instance types are available for Elastic fleets:
+    #
+    #   * stream.standard.small
+    #
+    #   * stream.standard.medium
+    #
+    #   * stream.standard.large
+    #
+    #   * stream.standard.xlarge
+    #
+    #   * stream.standard.2xlarge
+    #
     # @option params [Types::ComputeCapacity] :compute_capacity
-    #   The desired capacity for the fleet.
+    #   The desired capacity for the fleet. This is not allowed for Elastic
+    #   fleets.
     #
     # @option params [Types::VpcConfig] :vpc_config
-    #   The VPC configuration for the fleet.
+    #   The VPC configuration for the fleet. This is required for Elastic
+    #   fleets, but not required for other fleet types. Elastic fleets require
+    #   that you specify at least two subnets in different availability zones.
     #
     # @option params [Integer] :max_user_duration_in_seconds
     #   The maximum amount of time that a streaming session can remain active,
@@ -2856,7 +4946,7 @@ module Aws::AppStream
     #   open documents before being disconnected. After this time elapses, the
     #   instance is terminated and replaced by a new instance.
     #
-    #   Specify a value between 600 and 360000.
+    #   Specify a value between 600 and 432000.
     #
     # @option params [Integer] :disconnect_timeout_in_seconds
     #   The amount of time that a streaming session remains active after users
@@ -2865,7 +4955,7 @@ module Aws::AppStream
     #   are connected to their previous session. Otherwise, they are connected
     #   to a new session with a new streaming instance.
     #
-    #   Specify a value between 60 and 360000.
+    #   Specify a value between 60 and 36000.
     #
     # @option params [Boolean] :delete_vpc_config
     #   Deletes the VPC association for the specified fleet.
@@ -2897,7 +4987,7 @@ module Aws::AppStream
     #   in `IdleDisconnectTimeoutInSeconds` elapses, they are disconnected.
     #
     #   To prevent users from being disconnected due to inactivity, specify a
-    #   value of 0. Otherwise, specify a value between 60 and 3600. The
+    #   value of 0. Otherwise, specify a value between 60 and 36000. The
     #   default value is 0.
     #
     #   <note markdown="1"> If you enable this feature, we recommend that you specify a value that
@@ -2939,6 +5029,26 @@ module Aws::AppStream
     #
     #   The default value is `APP`.
     #
+    # @option params [String] :platform
+    #   The platform of the fleet. WINDOWS\_SERVER\_2019 and AMAZON\_LINUX2
+    #   are supported for Elastic fleets.
+    #
+    # @option params [Integer] :max_concurrent_sessions
+    #   The maximum number of concurrent sessions for a fleet.
+    #
+    # @option params [Array<String>] :usb_device_filter_strings
+    #   The USB device filter strings that specify which USB devices a user
+    #   can redirect to the fleet streaming session, when using the Windows
+    #   native client. This is allowed but not required for Elastic fleets.
+    #
+    # @option params [Types::S3Location] :session_script_s3_location
+    #   The S3 location of the session scripts configuration zip file. This
+    #   only applies to Elastic fleets.
+    #
+    # @option params [Integer] :max_sessions_per_instance
+    #   The maximum number of user sessions on an instance. This only applies
+    #   to multi-session fleets.
+    #
     # @return [Types::UpdateFleetResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateFleetResult#fleet #fleet} => Types::Fleet
@@ -2948,10 +5058,11 @@ module Aws::AppStream
     #   resp = client.update_fleet({
     #     image_name: "String",
     #     image_arn: "Arn",
-    #     name: "String",
+    #     name: "Name",
     #     instance_type: "String",
     #     compute_capacity: {
-    #       desired_instances: 1, # required
+    #       desired_instances: 1,
+    #       desired_sessions: 1,
     #     },
     #     vpc_config: {
     #       subnet_ids: ["String"],
@@ -2968,9 +5079,17 @@ module Aws::AppStream
     #       organizational_unit_distinguished_name: "OrganizationalUnitDistinguishedName",
     #     },
     #     idle_disconnect_timeout_in_seconds: 1,
-    #     attributes_to_delete: ["VPC_CONFIGURATION"], # accepts VPC_CONFIGURATION, VPC_CONFIGURATION_SECURITY_GROUP_IDS, DOMAIN_JOIN_INFO, IAM_ROLE_ARN
+    #     attributes_to_delete: ["VPC_CONFIGURATION"], # accepts VPC_CONFIGURATION, VPC_CONFIGURATION_SECURITY_GROUP_IDS, DOMAIN_JOIN_INFO, IAM_ROLE_ARN, USB_DEVICE_FILTER_STRINGS, SESSION_SCRIPT_S3_LOCATION, MAX_SESSIONS_PER_INSTANCE
     #     iam_role_arn: "Arn",
     #     stream_view: "APP", # accepts APP, DESKTOP
+    #     platform: "WINDOWS", # accepts WINDOWS, WINDOWS_SERVER_2016, WINDOWS_SERVER_2019, WINDOWS_SERVER_2022, AMAZON_LINUX2, RHEL8
+    #     max_concurrent_sessions: 1,
+    #     usb_device_filter_strings: ["UsbDeviceFilterString"],
+    #     session_script_s3_location: {
+    #       s3_bucket: "S3Bucket", # required
+    #       s3_key: "S3Key",
+    #     },
+    #     max_sessions_per_instance: 1,
     #   })
     #
     # @example Response structure
@@ -2982,11 +5101,15 @@ module Aws::AppStream
     #   resp.fleet.image_name #=> String
     #   resp.fleet.image_arn #=> String
     #   resp.fleet.instance_type #=> String
-    #   resp.fleet.fleet_type #=> String, one of "ALWAYS_ON", "ON_DEMAND"
+    #   resp.fleet.fleet_type #=> String, one of "ALWAYS_ON", "ON_DEMAND", "ELASTIC"
     #   resp.fleet.compute_capacity_status.desired #=> Integer
     #   resp.fleet.compute_capacity_status.running #=> Integer
     #   resp.fleet.compute_capacity_status.in_use #=> Integer
     #   resp.fleet.compute_capacity_status.available #=> Integer
+    #   resp.fleet.compute_capacity_status.desired_user_sessions #=> Integer
+    #   resp.fleet.compute_capacity_status.available_user_sessions #=> Integer
+    #   resp.fleet.compute_capacity_status.active_user_sessions #=> Integer
+    #   resp.fleet.compute_capacity_status.actual_user_sessions #=> Integer
     #   resp.fleet.max_user_duration_in_seconds #=> Integer
     #   resp.fleet.disconnect_timeout_in_seconds #=> Integer
     #   resp.fleet.state #=> String, one of "STARTING", "RUNNING", "STOPPING", "STOPPED"
@@ -3004,6 +5127,13 @@ module Aws::AppStream
     #   resp.fleet.idle_disconnect_timeout_in_seconds #=> Integer
     #   resp.fleet.iam_role_arn #=> String
     #   resp.fleet.stream_view #=> String, one of "APP", "DESKTOP"
+    #   resp.fleet.platform #=> String, one of "WINDOWS", "WINDOWS_SERVER_2016", "WINDOWS_SERVER_2019", "WINDOWS_SERVER_2022", "AMAZON_LINUX2", "RHEL8"
+    #   resp.fleet.max_concurrent_sessions #=> Integer
+    #   resp.fleet.usb_device_filter_strings #=> Array
+    #   resp.fleet.usb_device_filter_strings[0] #=> String
+    #   resp.fleet.session_script_s3_location.s3_bucket #=> String
+    #   resp.fleet.session_script_s3_location.s3_key #=> String
+    #   resp.fleet.max_sessions_per_instance #=> Integer
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/UpdateFleet AWS API Documentation
     #
@@ -3097,6 +5227,10 @@ module Aws::AppStream
     #   an iframe. You must approve the domains that you want to host embedded
     #   AppStream 2.0 streaming sessions.
     #
+    # @option params [Types::StreamingExperienceSettings] :streaming_experience_settings
+    #   The streaming protocol you want your stack to prefer. This can be UDP
+    #   or TCP. Currently, UDP is only supported in the Windows native client.
+    #
     # @return [Types::UpdateStackResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateStackResult#stack #stack} => Types::Stack
@@ -3117,11 +5251,12 @@ module Aws::AppStream
     #     delete_storage_connectors: false,
     #     redirect_url: "RedirectURL",
     #     feedback_url: "FeedbackURL",
-    #     attributes_to_delete: ["STORAGE_CONNECTORS"], # accepts STORAGE_CONNECTORS, STORAGE_CONNECTOR_HOMEFOLDERS, STORAGE_CONNECTOR_GOOGLE_DRIVE, STORAGE_CONNECTOR_ONE_DRIVE, REDIRECT_URL, FEEDBACK_URL, THEME_NAME, USER_SETTINGS, EMBED_HOST_DOMAINS, IAM_ROLE_ARN, ACCESS_ENDPOINTS
+    #     attributes_to_delete: ["STORAGE_CONNECTORS"], # accepts STORAGE_CONNECTORS, STORAGE_CONNECTOR_HOMEFOLDERS, STORAGE_CONNECTOR_GOOGLE_DRIVE, STORAGE_CONNECTOR_ONE_DRIVE, REDIRECT_URL, FEEDBACK_URL, THEME_NAME, USER_SETTINGS, EMBED_HOST_DOMAINS, IAM_ROLE_ARN, ACCESS_ENDPOINTS, STREAMING_EXPERIENCE_SETTINGS
     #     user_settings: [
     #       {
-    #         action: "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", # required, accepts CLIPBOARD_COPY_FROM_LOCAL_DEVICE, CLIPBOARD_COPY_TO_LOCAL_DEVICE, FILE_UPLOAD, FILE_DOWNLOAD, PRINTING_TO_LOCAL_DEVICE, DOMAIN_PASSWORD_SIGNIN, DOMAIN_SMART_CARD_SIGNIN
+    #         action: "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", # required, accepts CLIPBOARD_COPY_FROM_LOCAL_DEVICE, CLIPBOARD_COPY_TO_LOCAL_DEVICE, FILE_UPLOAD, FILE_DOWNLOAD, PRINTING_TO_LOCAL_DEVICE, DOMAIN_PASSWORD_SIGNIN, DOMAIN_SMART_CARD_SIGNIN, AUTO_TIME_ZONE_REDIRECTION
     #         permission: "ENABLED", # required, accepts ENABLED, DISABLED
+    #         maximum_length: 1,
     #       },
     #     ],
     #     application_settings: {
@@ -3135,6 +5270,9 @@ module Aws::AppStream
     #       },
     #     ],
     #     embed_host_domains: ["EmbedHostDomain"],
+    #     streaming_experience_settings: {
+    #       preferred_protocol: "TCP", # accepts TCP, UDP
+    #     },
     #   })
     #
     # @example Response structure
@@ -3155,8 +5293,9 @@ module Aws::AppStream
     #   resp.stack.stack_errors[0].error_code #=> String, one of "STORAGE_CONNECTOR_ERROR", "INTERNAL_SERVICE_ERROR"
     #   resp.stack.stack_errors[0].error_message #=> String
     #   resp.stack.user_settings #=> Array
-    #   resp.stack.user_settings[0].action #=> String, one of "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", "CLIPBOARD_COPY_TO_LOCAL_DEVICE", "FILE_UPLOAD", "FILE_DOWNLOAD", "PRINTING_TO_LOCAL_DEVICE", "DOMAIN_PASSWORD_SIGNIN", "DOMAIN_SMART_CARD_SIGNIN"
+    #   resp.stack.user_settings[0].action #=> String, one of "CLIPBOARD_COPY_FROM_LOCAL_DEVICE", "CLIPBOARD_COPY_TO_LOCAL_DEVICE", "FILE_UPLOAD", "FILE_DOWNLOAD", "PRINTING_TO_LOCAL_DEVICE", "DOMAIN_PASSWORD_SIGNIN", "DOMAIN_SMART_CARD_SIGNIN", "AUTO_TIME_ZONE_REDIRECTION"
     #   resp.stack.user_settings[0].permission #=> String, one of "ENABLED", "DISABLED"
+    #   resp.stack.user_settings[0].maximum_length #=> Integer
     #   resp.stack.application_settings.enabled #=> Boolean
     #   resp.stack.application_settings.settings_group #=> String
     #   resp.stack.application_settings.s3_bucket_name #=> String
@@ -3165,6 +5304,7 @@ module Aws::AppStream
     #   resp.stack.access_endpoints[0].vpce_id #=> String
     #   resp.stack.embed_host_domains #=> Array
     #   resp.stack.embed_host_domains[0] #=> String
+    #   resp.stack.streaming_experience_settings.preferred_protocol #=> String, one of "TCP", "UDP"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/UpdateStack AWS API Documentation
     #
@@ -3175,20 +5315,112 @@ module Aws::AppStream
       req.send_request(options)
     end
 
+    # Updates custom branding that customizes the appearance of the
+    # streaming application catalog page.
+    #
+    # @option params [required, String] :stack_name
+    #   The name of the stack for the theme.
+    #
+    # @option params [Array<Types::ThemeFooterLink>] :footer_links
+    #   The links that are displayed in the footer of the streaming
+    #   application catalog page. These links are helpful resources for users,
+    #   such as the organization's IT support and product marketing sites.
+    #
+    # @option params [String] :title_text
+    #   The title that is displayed at the top of the browser tab during
+    #   users' application streaming sessions.
+    #
+    # @option params [String] :theme_styling
+    #   The color theme that is applied to website links, text, and buttons.
+    #   These colors are also applied as accents in the background for the
+    #   streaming application catalog page.
+    #
+    # @option params [Types::S3Location] :organization_logo_s3_location
+    #   The organization logo that appears on the streaming application
+    #   catalog page.
+    #
+    # @option params [Types::S3Location] :favicon_s3_location
+    #   The S3 location of the favicon. The favicon enables users to recognize
+    #   their application streaming site in a browser full of tabs or
+    #   bookmarks. It is displayed at the top of the browser tab for the
+    #   application streaming site during users' streaming sessions.
+    #
+    # @option params [String] :state
+    #   Specifies whether custom branding should be applied to catalog page or
+    #   not.
+    #
+    # @option params [Array<String>] :attributes_to_delete
+    #   The attributes to delete.
+    #
+    # @return [Types::UpdateThemeForStackResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateThemeForStackResult#theme #theme} => Types::Theme
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_theme_for_stack({
+    #     stack_name: "Name", # required
+    #     footer_links: [
+    #       {
+    #         display_name: "ThemeFooterLinkDisplayName",
+    #         footer_link_url: "ThemeFooterLinkURL",
+    #       },
+    #     ],
+    #     title_text: "ThemeTitleText",
+    #     theme_styling: "LIGHT_BLUE", # accepts LIGHT_BLUE, BLUE, PINK, RED
+    #     organization_logo_s3_location: {
+    #       s3_bucket: "S3Bucket", # required
+    #       s3_key: "S3Key",
+    #     },
+    #     favicon_s3_location: {
+    #       s3_bucket: "S3Bucket", # required
+    #       s3_key: "S3Key",
+    #     },
+    #     state: "ENABLED", # accepts ENABLED, DISABLED
+    #     attributes_to_delete: ["FOOTER_LINKS"], # accepts FOOTER_LINKS
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.theme.stack_name #=> String
+    #   resp.theme.state #=> String, one of "ENABLED", "DISABLED"
+    #   resp.theme.theme_title_text #=> String
+    #   resp.theme.theme_styling #=> String, one of "LIGHT_BLUE", "BLUE", "PINK", "RED"
+    #   resp.theme.theme_footer_links #=> Array
+    #   resp.theme.theme_footer_links[0].display_name #=> String
+    #   resp.theme.theme_footer_links[0].footer_link_url #=> String
+    #   resp.theme.theme_organization_logo_url #=> String
+    #   resp.theme.theme_favicon_url #=> String
+    #   resp.theme.created_time #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/appstream-2016-12-01/UpdateThemeForStack AWS API Documentation
+    #
+    # @overload update_theme_for_stack(params = {})
+    # @param [Hash] params ({})
+    def update_theme_for_stack(params = {}, options = {})
+      req = build_request(:update_theme_for_stack, params)
+      req.send_request(options)
+    end
+
     # @!endgroup
 
     # @param params ({})
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::AppStream')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-appstream'
-      context[:gem_version] = '1.49.0'
+      context[:gem_version] = '1.101.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

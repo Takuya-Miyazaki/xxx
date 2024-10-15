@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -57,26 +57,30 @@ module Aws::AutoScaling
     end
 
     # The lifecycle state for the instance. The `Quarantined` state is not
-    # used. For information about lifecycle states, see [Instance
+    # used. For more information, see [Amazon EC2 Auto Scaling instance
     # lifecycle][1] in the *Amazon EC2 Auto Scaling User Guide*.
     #
-    # Valid Values: `Pending` \| `Pending:Wait` \| `Pending:Proceed` \|
+    # Valid values: `Pending` \| `Pending:Wait` \| `Pending:Proceed` \|
     # `Quarantined` \| `InService` \| `Terminating` \| `Terminating:Wait` \|
     # `Terminating:Proceed` \| `Terminated` \| `Detaching` \| `Detached` \|
-    # `EnteringStandby` \| `Standby`
+    # `EnteringStandby` \| `Standby` \| `Warmed:Pending` \|
+    # `Warmed:Pending:Wait` \| `Warmed:Pending:Proceed` \|
+    # `Warmed:Terminating` \| `Warmed:Terminating:Wait` \|
+    # `Warmed:Terminating:Proceed` \| `Warmed:Terminated` \|
+    # `Warmed:Stopped` \| `Warmed:Running`
     #
     #
     #
-    # [1]: https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroupLifecycle.html
+    # [1]: https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-lifecycle.html
     # @return [String]
     def lifecycle_state
       data[:lifecycle_state]
     end
 
-    # The last reported health status of this instance. "Healthy" means
-    # that the instance is healthy and should remain in service.
-    # "Unhealthy" means that the instance is unhealthy and Amazon EC2 Auto
-    # Scaling should terminate and replace it.
+    # The last reported health status of this instance. `Healthy` means that
+    # the instance is healthy and should remain in service. `Unhealthy`
+    # means that the instance is unhealthy and Amazon EC2 Auto Scaling
+    # should terminate and replace it.
     # @return [String]
     def health_status
       data[:health_status]
@@ -125,7 +129,9 @@ module Aws::AutoScaling
     #
     # @return [self]
     def load
-      resp = @client.describe_auto_scaling_instances(instance_ids: [@id])
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.describe_auto_scaling_instances(instance_ids: [@id])
+      end
       @data = resp.auto_scaling_instances[0]
       self
     end
@@ -240,7 +246,9 @@ module Aws::AutoScaling
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -255,7 +263,9 @@ module Aws::AutoScaling
         auto_scaling_group_name: @group_name,
         instance_ids: [@id]
       )
-      resp = @client.attach_instances(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.attach_instances(options)
+      end
       resp.data
     end
 
@@ -275,7 +285,9 @@ module Aws::AutoScaling
         auto_scaling_group_name: @group_name,
         instance_ids: [@id]
       )
-      resp = @client.detach_instances(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.detach_instances(options)
+      end
       resp.data.activities.each do |a|
         batch << Activity.new(
           id: a.activity_id,
@@ -302,7 +314,9 @@ module Aws::AutoScaling
         auto_scaling_group_name: @group_name,
         instance_ids: [@id]
       )
-      resp = @client.enter_standby(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.enter_standby(options)
+      end
       resp.data.activities.each do |a|
         batch << Activity.new(
           id: a.activity_id,
@@ -324,7 +338,9 @@ module Aws::AutoScaling
         auto_scaling_group_name: @group_name,
         instance_ids: [@id]
       )
-      resp = @client.exit_standby(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.exit_standby(options)
+      end
       resp.data.activities.each do |a|
         batch << Activity.new(
           id: a.activity_id,
@@ -353,17 +369,19 @@ module Aws::AutoScaling
     #   call respects the grace period. Set this to `False`, to have the call
     #   not respect the grace period associated with the group.
     #
-    #   For more information about the health check grace period, see
-    #   [CreateAutoScalingGroup][1] in the *Amazon EC2 Auto Scaling API
-    #   Reference*.
+    #   For more information about the health check grace period, see [Set the
+    #   health check grace period for an Auto Scaling group][1] in the *Amazon
+    #   EC2 Auto Scaling User Guide*.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/autoscaling/ec2/APIReference/API_CreateAutoScalingGroup.html
+    #   [1]: https://docs.aws.amazon.com/autoscaling/ec2/userguide/health-check-grace-period.html
     # @return [EmptyStructure]
     def set_health(options = {})
       options = options.merge(instance_id: @id)
-      resp = @client.set_instance_health(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.set_instance_health(options)
+      end
       resp.data
     end
 
@@ -379,7 +397,9 @@ module Aws::AutoScaling
     # @return [Activity]
     def terminate(options = {})
       options = options.merge(instance_id: @id)
-      resp = @client.terminate_instance_in_auto_scaling_group(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.terminate_instance_in_auto_scaling_group(options)
+      end
       Activity.new(
         id: resp.data.activity.activity_id,
         data: resp.data.activity,
@@ -457,7 +477,9 @@ module Aws::AutoScaling
           batch.each do |item|
             params[:instance_ids] << item.id
           end
-          batch[0].client.attach_instances(params)
+          Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+            batch[0].client.attach_instances(params)
+          end
         end
         nil
       end
@@ -480,7 +502,9 @@ module Aws::AutoScaling
           batch.each do |item|
             params[:instance_ids] << item.id
           end
-          batch[0].client.detach_instances(params)
+          Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+            batch[0].client.detach_instances(params)
+          end
         end
         nil
       end
@@ -503,7 +527,9 @@ module Aws::AutoScaling
           batch.each do |item|
             params[:instance_ids] << item.id
           end
-          batch[0].client.enter_standby(params)
+          Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+            batch[0].client.enter_standby(params)
+          end
         end
         nil
       end
@@ -518,7 +544,9 @@ module Aws::AutoScaling
           batch.each do |item|
             params[:instance_ids] << item.id
           end
-          batch[0].client.exit_standby(params)
+          Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+            batch[0].client.exit_standby(params)
+          end
         end
         nil
       end

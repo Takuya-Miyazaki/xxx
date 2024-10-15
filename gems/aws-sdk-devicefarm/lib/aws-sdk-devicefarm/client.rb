@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:devicefarm)
 
 module Aws::DeviceFarm
   # An API client for DeviceFarm.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::DeviceFarm
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::DeviceFarm::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::DeviceFarm
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::DeviceFarm
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::DeviceFarm
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::DeviceFarm
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::DeviceFarm
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::DeviceFarm
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +341,112 @@ module Aws::DeviceFarm
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::DeviceFarm::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::DeviceFarm::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -580,6 +697,9 @@ module Aws::DeviceFarm
     #   runs in this project use the specified execution timeout value unless
     #   overridden when scheduling a run.
     #
+    # @option params [Types::VpcConfig] :vpc_config
+    #   The VPC security groups and subnets that are attached to a project.
+    #
     # @return [Types::CreateProjectResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateProjectResult#project #project} => Types::Project
@@ -607,6 +727,11 @@ module Aws::DeviceFarm
     #   resp = client.create_project({
     #     name: "Name", # required
     #     default_job_timeout_minutes: 1,
+    #     vpc_config: {
+    #       security_group_ids: ["SecurityGroupId"], # required
+    #       subnet_ids: ["SubnetId"], # required
+    #       vpc_id: "NonEmptyString", # required
+    #     },
     #   })
     #
     # @example Response structure
@@ -615,6 +740,11 @@ module Aws::DeviceFarm
     #   resp.project.name #=> String
     #   resp.project.default_job_timeout_minutes #=> Integer
     #   resp.project.created #=> Time
+    #   resp.project.vpc_config.security_group_ids #=> Array
+    #   resp.project.vpc_config.security_group_ids[0] #=> String
+    #   resp.project.vpc_config.subnet_ids #=> Array
+    #   resp.project.vpc_config.subnet_ids[0] #=> String
+    #   resp.project.vpc_config.vpc_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/CreateProject AWS API Documentation
     #
@@ -711,7 +841,7 @@ module Aws::DeviceFarm
     #
     #
     #
-    #   [1]: https://aws.amazon.com/device-farm/faq/
+    #   [1]: http://aws.amazon.com/device-farm/faqs/
     #
     # @return [Types::CreateRemoteAccessSessionResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -818,6 +948,11 @@ module Aws::DeviceFarm
     #   resp.remote_access_session.device_udid #=> String
     #   resp.remote_access_session.interaction_mode #=> String, one of "INTERACTIVE", "NO_VIDEO", "VIDEO_ONLY"
     #   resp.remote_access_session.skip_app_resign #=> Boolean
+    #   resp.remote_access_session.vpc_config.security_group_ids #=> Array
+    #   resp.remote_access_session.vpc_config.security_group_ids[0] #=> String
+    #   resp.remote_access_session.vpc_config.subnet_ids #=> Array
+    #   resp.remote_access_session.vpc_config.subnet_ids[0] #=> String
+    #   resp.remote_access_session.vpc_config.vpc_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/CreateRemoteAccessSession AWS API Documentation
     #
@@ -837,6 +972,9 @@ module Aws::DeviceFarm
     # @option params [String] :description
     #   Human-readable description of the project.
     #
+    # @option params [Types::TestGridVpcConfig] :vpc_config
+    #   The VPC security groups and subnets that are attached to a project.
+    #
     # @return [Types::CreateTestGridProjectResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::CreateTestGridProjectResult#test_grid_project #test_grid_project} => Types::TestGridProject
@@ -846,6 +984,11 @@ module Aws::DeviceFarm
     #   resp = client.create_test_grid_project({
     #     name: "ResourceName", # required
     #     description: "ResourceDescription",
+    #     vpc_config: {
+    #       security_group_ids: ["NonEmptyString"], # required
+    #       subnet_ids: ["NonEmptyString"], # required
+    #       vpc_id: "NonEmptyString", # required
+    #     },
     #   })
     #
     # @example Response structure
@@ -853,6 +996,11 @@ module Aws::DeviceFarm
     #   resp.test_grid_project.arn #=> String
     #   resp.test_grid_project.name #=> String
     #   resp.test_grid_project.description #=> String
+    #   resp.test_grid_project.vpc_config.security_group_ids #=> Array
+    #   resp.test_grid_project.vpc_config.security_group_ids[0] #=> String
+    #   resp.test_grid_project.vpc_config.subnet_ids #=> Array
+    #   resp.test_grid_project.vpc_config.subnet_ids[0] #=> String
+    #   resp.test_grid_project.vpc_config.vpc_id #=> String
     #   resp.test_grid_project.created #=> Time
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/CreateTestGridProject AWS API Documentation
@@ -945,13 +1093,7 @@ module Aws::DeviceFarm
     #
     #   * APPIUM\_WEB\_RUBY\_TEST\_PACKAGE
     #
-    #   * CALABASH\_TEST\_PACKAGE
-    #
     #   * INSTRUMENTATION\_TEST\_PACKAGE
-    #
-    #   * UIAUTOMATION\_TEST\_PACKAGE
-    #
-    #   * UIAUTOMATOR\_TEST\_PACKAGE
     #
     #   * XCTEST\_TEST\_PACKAGE
     #
@@ -1633,10 +1775,6 @@ module Aws::DeviceFarm
     #
     #   * BUILTIN\_FUZZ.
     #
-    #   * BUILTIN\_EXPLORER. For Android, an app explorer that traverses an
-    #     Android app, interacting with it and capturing screenshots at the
-    #     same time.
-    #
     #   * APPIUM\_JAVA\_JUNIT.
     #
     #   * APPIUM\_JAVA\_TESTNG.
@@ -1657,13 +1795,7 @@ module Aws::DeviceFarm
     #
     #   * APPIUM\_WEB\_RUBY.
     #
-    #   * CALABASH.
-    #
     #   * INSTRUMENTATION.
-    #
-    #   * UIAUTOMATION.
-    #
-    #   * UIAUTOMATOR.
     #
     #   * XCTEST.
     #
@@ -1704,9 +1836,9 @@ module Aws::DeviceFarm
     #   resp = client.get_device_pool_compatibility({
     #     device_pool_arn: "AmazonResourceName", # required
     #     app_arn: "AmazonResourceName",
-    #     test_type: "BUILTIN_FUZZ", # accepts BUILTIN_FUZZ, BUILTIN_EXPLORER, WEB_PERFORMANCE_PROFILE, APPIUM_JAVA_JUNIT, APPIUM_JAVA_TESTNG, APPIUM_PYTHON, APPIUM_NODE, APPIUM_RUBY, APPIUM_WEB_JAVA_JUNIT, APPIUM_WEB_JAVA_TESTNG, APPIUM_WEB_PYTHON, APPIUM_WEB_NODE, APPIUM_WEB_RUBY, CALABASH, INSTRUMENTATION, UIAUTOMATION, UIAUTOMATOR, XCTEST, XCTEST_UI, REMOTE_ACCESS_RECORD, REMOTE_ACCESS_REPLAY
+    #     test_type: "BUILTIN_FUZZ", # accepts BUILTIN_FUZZ, APPIUM_JAVA_JUNIT, APPIUM_JAVA_TESTNG, APPIUM_PYTHON, APPIUM_NODE, APPIUM_RUBY, APPIUM_WEB_JAVA_JUNIT, APPIUM_WEB_JAVA_TESTNG, APPIUM_WEB_PYTHON, APPIUM_WEB_NODE, APPIUM_WEB_RUBY, INSTRUMENTATION, XCTEST, XCTEST_UI
     #     test: {
-    #       type: "BUILTIN_FUZZ", # required, accepts BUILTIN_FUZZ, BUILTIN_EXPLORER, WEB_PERFORMANCE_PROFILE, APPIUM_JAVA_JUNIT, APPIUM_JAVA_TESTNG, APPIUM_PYTHON, APPIUM_NODE, APPIUM_RUBY, APPIUM_WEB_JAVA_JUNIT, APPIUM_WEB_JAVA_TESTNG, APPIUM_WEB_PYTHON, APPIUM_WEB_NODE, APPIUM_WEB_RUBY, CALABASH, INSTRUMENTATION, UIAUTOMATION, UIAUTOMATOR, XCTEST, XCTEST_UI, REMOTE_ACCESS_RECORD, REMOTE_ACCESS_REPLAY
+    #       type: "BUILTIN_FUZZ", # required, accepts BUILTIN_FUZZ, APPIUM_JAVA_JUNIT, APPIUM_JAVA_TESTNG, APPIUM_PYTHON, APPIUM_NODE, APPIUM_RUBY, APPIUM_WEB_JAVA_JUNIT, APPIUM_WEB_JAVA_TESTNG, APPIUM_WEB_PYTHON, APPIUM_WEB_NODE, APPIUM_WEB_RUBY, INSTRUMENTATION, XCTEST, XCTEST_UI
     #       test_package_arn: "AmazonResourceName",
     #       test_spec_arn: "AmazonResourceName",
     #       filter: "Filter",
@@ -1903,7 +2035,7 @@ module Aws::DeviceFarm
     #
     #   resp.job.arn #=> String
     #   resp.job.name #=> String
-    #   resp.job.type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.job.type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.job.created #=> Time
     #   resp.job.status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
     #   resp.job.result #=> String, one of "PENDING", "PASSED", "WARNED", "FAILED", "SKIPPED", "ERRORED", "STOPPED"
@@ -2148,6 +2280,11 @@ module Aws::DeviceFarm
     #   resp.project.name #=> String
     #   resp.project.default_job_timeout_minutes #=> Integer
     #   resp.project.created #=> Time
+    #   resp.project.vpc_config.security_group_ids #=> Array
+    #   resp.project.vpc_config.security_group_ids[0] #=> String
+    #   resp.project.vpc_config.subnet_ids #=> Array
+    #   resp.project.vpc_config.subnet_ids[0] #=> String
+    #   resp.project.vpc_config.vpc_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/GetProject AWS API Documentation
     #
@@ -2250,6 +2387,11 @@ module Aws::DeviceFarm
     #   resp.remote_access_session.device_udid #=> String
     #   resp.remote_access_session.interaction_mode #=> String, one of "INTERACTIVE", "NO_VIDEO", "VIDEO_ONLY"
     #   resp.remote_access_session.skip_app_resign #=> Boolean
+    #   resp.remote_access_session.vpc_config.security_group_ids #=> Array
+    #   resp.remote_access_session.vpc_config.security_group_ids[0] #=> String
+    #   resp.remote_access_session.vpc_config.subnet_ids #=> Array
+    #   resp.remote_access_session.vpc_config.subnet_ids[0] #=> String
+    #   resp.remote_access_session.vpc_config.vpc_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/GetRemoteAccessSession AWS API Documentation
     #
@@ -2282,7 +2424,6 @@ module Aws::DeviceFarm
     #   {
     #     run: {
     #       name: "My Test Run", 
-    #       type: "BUILTIN_EXPLORER", 
     #       arn: "arn:aws:devicefarm:us-west-2:123456789101:run:5e01a8c7-c861-4c0a-b1d5-5ec6e6c6dd23/0fcac17b-6122-44d7-ae5a-12345EXAMPLE", 
     #       billing_method: "METERED", 
     #       completed_jobs: 0, 
@@ -2318,7 +2459,7 @@ module Aws::DeviceFarm
     #
     #   resp.run.arn #=> String
     #   resp.run.name #=> String
-    #   resp.run.type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.run.type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.run.platform #=> String, one of "ANDROID", "IOS"
     #   resp.run.created #=> Time
     #   resp.run.status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
@@ -2381,6 +2522,11 @@ module Aws::DeviceFarm
     #   resp.run.device_selection_result.filters[0].values[0] #=> String
     #   resp.run.device_selection_result.matched_devices_count #=> Integer
     #   resp.run.device_selection_result.max_devices #=> Integer
+    #   resp.run.vpc_config.security_group_ids #=> Array
+    #   resp.run.vpc_config.security_group_ids[0] #=> String
+    #   resp.run.vpc_config.subnet_ids #=> Array
+    #   resp.run.vpc_config.subnet_ids[0] #=> String
+    #   resp.run.vpc_config.vpc_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/GetRun AWS API Documentation
     #
@@ -2425,7 +2571,7 @@ module Aws::DeviceFarm
     #
     #   resp.suite.arn #=> String
     #   resp.suite.name #=> String
-    #   resp.suite.type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.suite.type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.suite.created #=> Time
     #   resp.suite.status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
     #   resp.suite.result #=> String, one of "PENDING", "PASSED", "WARNED", "FAILED", "SKIPPED", "ERRORED", "STOPPED"
@@ -2486,7 +2632,7 @@ module Aws::DeviceFarm
     #
     #   resp.test.arn #=> String
     #   resp.test.name #=> String
-    #   resp.test.type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.test.type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.test.created #=> Time
     #   resp.test.status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
     #   resp.test.result #=> String, one of "PENDING", "PASSED", "WARNED", "FAILED", "SKIPPED", "ERRORED", "STOPPED"
@@ -2534,6 +2680,11 @@ module Aws::DeviceFarm
     #   resp.test_grid_project.arn #=> String
     #   resp.test_grid_project.name #=> String
     #   resp.test_grid_project.description #=> String
+    #   resp.test_grid_project.vpc_config.security_group_ids #=> Array
+    #   resp.test_grid_project.vpc_config.security_group_ids[0] #=> String
+    #   resp.test_grid_project.vpc_config.subnet_ids #=> Array
+    #   resp.test_grid_project.vpc_config.subnet_ids[0] #=> String
+    #   resp.test_grid_project.vpc_config.vpc_id #=> String
     #   resp.test_grid_project.created #=> Time
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/GetTestGridProject AWS API Documentation
@@ -3064,9 +3215,9 @@ module Aws::DeviceFarm
     #     next_token: "PaginationToken",
     #     filters: [
     #       {
-    #         attribute: "ARN", # accepts ARN, PLATFORM, OS_VERSION, MODEL, AVAILABILITY, FORM_FACTOR, MANUFACTURER, REMOTE_ACCESS_ENABLED, REMOTE_DEBUG_ENABLED, INSTANCE_ARN, INSTANCE_LABELS, FLEET_TYPE
-    #         operator: "EQUALS", # accepts EQUALS, LESS_THAN, LESS_THAN_OR_EQUALS, GREATER_THAN, GREATER_THAN_OR_EQUALS, IN, NOT_IN, CONTAINS
-    #         values: ["String"],
+    #         attribute: "ARN", # required, accepts ARN, PLATFORM, OS_VERSION, MODEL, AVAILABILITY, FORM_FACTOR, MANUFACTURER, REMOTE_ACCESS_ENABLED, REMOTE_DEBUG_ENABLED, INSTANCE_ARN, INSTANCE_LABELS, FLEET_TYPE
+    #         operator: "EQUALS", # required, accepts EQUALS, LESS_THAN, LESS_THAN_OR_EQUALS, GREATER_THAN, GREATER_THAN_OR_EQUALS, IN, NOT_IN, CONTAINS
+    #         values: ["String"], # required
     #       },
     #     ],
     #   })
@@ -3204,7 +3355,7 @@ module Aws::DeviceFarm
     #   resp.jobs #=> Array
     #   resp.jobs[0].arn #=> String
     #   resp.jobs[0].name #=> String
-    #   resp.jobs[0].type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.jobs[0].type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.jobs[0].created #=> Time
     #   resp.jobs[0].status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
     #   resp.jobs[0].result #=> String, one of "PENDING", "PASSED", "WARNED", "FAILED", "SKIPPED", "ERRORED", "STOPPED"
@@ -3693,6 +3844,11 @@ module Aws::DeviceFarm
     #   resp.projects[0].name #=> String
     #   resp.projects[0].default_job_timeout_minutes #=> Integer
     #   resp.projects[0].created #=> Time
+    #   resp.projects[0].vpc_config.security_group_ids #=> Array
+    #   resp.projects[0].vpc_config.security_group_ids[0] #=> String
+    #   resp.projects[0].vpc_config.subnet_ids #=> Array
+    #   resp.projects[0].vpc_config.subnet_ids[0] #=> String
+    #   resp.projects[0].vpc_config.vpc_id #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/ListProjects AWS API Documentation
@@ -3805,6 +3961,11 @@ module Aws::DeviceFarm
     #   resp.remote_access_sessions[0].device_udid #=> String
     #   resp.remote_access_sessions[0].interaction_mode #=> String, one of "INTERACTIVE", "NO_VIDEO", "VIDEO_ONLY"
     #   resp.remote_access_sessions[0].skip_app_resign #=> Boolean
+    #   resp.remote_access_sessions[0].vpc_config.security_group_ids #=> Array
+    #   resp.remote_access_sessions[0].vpc_config.security_group_ids[0] #=> String
+    #   resp.remote_access_sessions[0].vpc_config.subnet_ids #=> Array
+    #   resp.remote_access_sessions[0].vpc_config.subnet_ids[0] #=> String
+    #   resp.remote_access_sessions[0].vpc_config.vpc_id #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/ListRemoteAccessSessions AWS API Documentation
@@ -3849,7 +4010,6 @@ module Aws::DeviceFarm
     #     runs: [
     #       {
     #         name: "My Test Run", 
-    #         type: "BUILTIN_EXPLORER", 
     #         arn: "arn:aws:devicefarm:us-west-2:123456789101:run:5e01a8c7-c861-4c0a-b1d5-5ec6e6c6dd23/0fcac17b-6122-44d7-ae5a-12345EXAMPLE", 
     #         billing_method: "METERED", 
     #         completed_jobs: 0, 
@@ -3888,7 +4048,7 @@ module Aws::DeviceFarm
     #   resp.runs #=> Array
     #   resp.runs[0].arn #=> String
     #   resp.runs[0].name #=> String
-    #   resp.runs[0].type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.runs[0].type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.runs[0].platform #=> String, one of "ANDROID", "IOS"
     #   resp.runs[0].created #=> Time
     #   resp.runs[0].status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
@@ -3951,6 +4111,11 @@ module Aws::DeviceFarm
     #   resp.runs[0].device_selection_result.filters[0].values[0] #=> String
     #   resp.runs[0].device_selection_result.matched_devices_count #=> Integer
     #   resp.runs[0].device_selection_result.max_devices #=> Integer
+    #   resp.runs[0].vpc_config.security_group_ids #=> Array
+    #   resp.runs[0].vpc_config.security_group_ids[0] #=> String
+    #   resp.runs[0].vpc_config.subnet_ids #=> Array
+    #   resp.runs[0].vpc_config.subnet_ids[0] #=> String
+    #   resp.runs[0].vpc_config.vpc_id #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/ListRuns AWS API Documentation
@@ -4064,7 +4229,7 @@ module Aws::DeviceFarm
     #   resp.suites #=> Array
     #   resp.suites[0].arn #=> String
     #   resp.suites[0].name #=> String
-    #   resp.suites[0].type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.suites[0].type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.suites[0].created #=> Time
     #   resp.suites[0].status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
     #   resp.suites[0].result #=> String, one of "PENDING", "PASSED", "WARNED", "FAILED", "SKIPPED", "ERRORED", "STOPPED"
@@ -4154,6 +4319,11 @@ module Aws::DeviceFarm
     #   resp.test_grid_projects[0].arn #=> String
     #   resp.test_grid_projects[0].name #=> String
     #   resp.test_grid_projects[0].description #=> String
+    #   resp.test_grid_projects[0].vpc_config.security_group_ids #=> Array
+    #   resp.test_grid_projects[0].vpc_config.security_group_ids[0] #=> String
+    #   resp.test_grid_projects[0].vpc_config.subnet_ids #=> Array
+    #   resp.test_grid_projects[0].vpc_config.subnet_ids[0] #=> String
+    #   resp.test_grid_projects[0].vpc_config.vpc_id #=> String
     #   resp.test_grid_projects[0].created #=> Time
     #   resp.next_token #=> String
     #
@@ -4369,7 +4539,7 @@ module Aws::DeviceFarm
     #   resp.tests #=> Array
     #   resp.tests[0].arn #=> String
     #   resp.tests[0].name #=> String
-    #   resp.tests[0].type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.tests[0].type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.tests[0].created #=> Time
     #   resp.tests[0].status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
     #   resp.tests[0].result #=> String, one of "PENDING", "PASSED", "WARNED", "FAILED", "SKIPPED", "ERRORED", "STOPPED"
@@ -4546,13 +4716,7 @@ module Aws::DeviceFarm
     #
     #   * APPIUM\_WEB\_RUBY\_TEST\_PACKAGE
     #
-    #   * CALABASH\_TEST\_PACKAGE
-    #
     #   * INSTRUMENTATION\_TEST\_PACKAGE
-    #
-    #   * UIAUTOMATION\_TEST\_PACKAGE
-    #
-    #   * UIAUTOMATOR\_TEST\_PACKAGE
     #
     #   * XCTEST\_TEST\_PACKAGE
     #
@@ -4692,10 +4856,10 @@ module Aws::DeviceFarm
     # invoke this operation, contact
     # [aws-devicefarm-support@amazon.com](mailto:aws-devicefarm-support@amazon.com).
     #
-    # @option params [String] :offering_id
+    # @option params [required, String] :offering_id
     #   The ID of the offering.
     #
-    # @option params [Integer] :quantity
+    # @option params [required, Integer] :quantity
     #   The number of device slots to purchase in an offering request.
     #
     # @option params [String] :offering_promotion_id
@@ -4741,8 +4905,8 @@ module Aws::DeviceFarm
     # @example Request syntax with placeholder values
     #
     #   resp = client.purchase_offering({
-    #     offering_id: "OfferingIdentifier",
-    #     quantity: 1,
+    #     offering_id: "OfferingIdentifier", # required
+    #     quantity: 1, # required
     #     offering_promotion_id: "OfferingPromotionIdentifier",
     #   })
     #
@@ -4780,10 +4944,10 @@ module Aws::DeviceFarm
     # operation. If you must be able to invoke this operation, contact
     # [aws-devicefarm-support@amazon.com](mailto:aws-devicefarm-support@amazon.com).
     #
-    # @option params [String] :offering_id
+    # @option params [required, String] :offering_id
     #   The ID of a request to renew an offering.
     #
-    # @option params [Integer] :quantity
+    # @option params [required, Integer] :quantity
     #   The quantity requested in an offering renewal.
     #
     # @return [Types::RenewOfferingResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -4826,8 +4990,8 @@ module Aws::DeviceFarm
     # @example Request syntax with placeholder values
     #
     #   resp = client.renew_offering({
-    #     offering_id: "OfferingIdentifier",
-    #     quantity: 1,
+    #     offering_id: "OfferingIdentifier", # required
+    #     quantity: 1, # required
     #   })
     #
     # @example Response structure
@@ -4925,16 +5089,16 @@ module Aws::DeviceFarm
     #     device_selection_configuration: {
     #       filters: [ # required
     #         {
-    #           attribute: "ARN", # accepts ARN, PLATFORM, OS_VERSION, MODEL, AVAILABILITY, FORM_FACTOR, MANUFACTURER, REMOTE_ACCESS_ENABLED, REMOTE_DEBUG_ENABLED, INSTANCE_ARN, INSTANCE_LABELS, FLEET_TYPE
-    #           operator: "EQUALS", # accepts EQUALS, LESS_THAN, LESS_THAN_OR_EQUALS, GREATER_THAN, GREATER_THAN_OR_EQUALS, IN, NOT_IN, CONTAINS
-    #           values: ["String"],
+    #           attribute: "ARN", # required, accepts ARN, PLATFORM, OS_VERSION, MODEL, AVAILABILITY, FORM_FACTOR, MANUFACTURER, REMOTE_ACCESS_ENABLED, REMOTE_DEBUG_ENABLED, INSTANCE_ARN, INSTANCE_LABELS, FLEET_TYPE
+    #           operator: "EQUALS", # required, accepts EQUALS, LESS_THAN, LESS_THAN_OR_EQUALS, GREATER_THAN, GREATER_THAN_OR_EQUALS, IN, NOT_IN, CONTAINS
+    #           values: ["String"], # required
     #         },
     #       ],
     #       max_devices: 1, # required
     #     },
     #     name: "Name",
     #     test: { # required
-    #       type: "BUILTIN_FUZZ", # required, accepts BUILTIN_FUZZ, BUILTIN_EXPLORER, WEB_PERFORMANCE_PROFILE, APPIUM_JAVA_JUNIT, APPIUM_JAVA_TESTNG, APPIUM_PYTHON, APPIUM_NODE, APPIUM_RUBY, APPIUM_WEB_JAVA_JUNIT, APPIUM_WEB_JAVA_TESTNG, APPIUM_WEB_PYTHON, APPIUM_WEB_NODE, APPIUM_WEB_RUBY, CALABASH, INSTRUMENTATION, UIAUTOMATION, UIAUTOMATOR, XCTEST, XCTEST_UI, REMOTE_ACCESS_RECORD, REMOTE_ACCESS_REPLAY
+    #       type: "BUILTIN_FUZZ", # required, accepts BUILTIN_FUZZ, APPIUM_JAVA_JUNIT, APPIUM_JAVA_TESTNG, APPIUM_PYTHON, APPIUM_NODE, APPIUM_RUBY, APPIUM_WEB_JAVA_JUNIT, APPIUM_WEB_JAVA_TESTNG, APPIUM_WEB_PYTHON, APPIUM_WEB_NODE, APPIUM_WEB_RUBY, INSTRUMENTATION, XCTEST, XCTEST_UI
     #       test_package_arn: "AmazonResourceName",
     #       test_spec_arn: "AmazonResourceName",
     #       filter: "Filter",
@@ -4978,7 +5142,7 @@ module Aws::DeviceFarm
     #
     #   resp.run.arn #=> String
     #   resp.run.name #=> String
-    #   resp.run.type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.run.type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.run.platform #=> String, one of "ANDROID", "IOS"
     #   resp.run.created #=> Time
     #   resp.run.status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
@@ -5041,6 +5205,11 @@ module Aws::DeviceFarm
     #   resp.run.device_selection_result.filters[0].values[0] #=> String
     #   resp.run.device_selection_result.matched_devices_count #=> Integer
     #   resp.run.device_selection_result.max_devices #=> Integer
+    #   resp.run.vpc_config.security_group_ids #=> Array
+    #   resp.run.vpc_config.security_group_ids[0] #=> String
+    #   resp.run.vpc_config.subnet_ids #=> Array
+    #   resp.run.vpc_config.subnet_ids[0] #=> String
+    #   resp.run.vpc_config.vpc_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/ScheduleRun AWS API Documentation
     #
@@ -5076,7 +5245,7 @@ module Aws::DeviceFarm
     #
     #   resp.job.arn #=> String
     #   resp.job.name #=> String
-    #   resp.job.type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.job.type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.job.created #=> Time
     #   resp.job.status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
     #   resp.job.result #=> String, one of "PENDING", "PASSED", "WARNED", "FAILED", "SKIPPED", "ERRORED", "STOPPED"
@@ -5219,6 +5388,11 @@ module Aws::DeviceFarm
     #   resp.remote_access_session.device_udid #=> String
     #   resp.remote_access_session.interaction_mode #=> String, one of "INTERACTIVE", "NO_VIDEO", "VIDEO_ONLY"
     #   resp.remote_access_session.skip_app_resign #=> Boolean
+    #   resp.remote_access_session.vpc_config.security_group_ids #=> Array
+    #   resp.remote_access_session.vpc_config.security_group_ids[0] #=> String
+    #   resp.remote_access_session.vpc_config.subnet_ids #=> Array
+    #   resp.remote_access_session.vpc_config.subnet_ids[0] #=> String
+    #   resp.remote_access_session.vpc_config.vpc_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/StopRemoteAccessSession AWS API Documentation
     #
@@ -5269,7 +5443,7 @@ module Aws::DeviceFarm
     #
     #   resp.run.arn #=> String
     #   resp.run.name #=> String
-    #   resp.run.type #=> String, one of "BUILTIN_FUZZ", "BUILTIN_EXPLORER", "WEB_PERFORMANCE_PROFILE", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "CALABASH", "INSTRUMENTATION", "UIAUTOMATION", "UIAUTOMATOR", "XCTEST", "XCTEST_UI", "REMOTE_ACCESS_RECORD", "REMOTE_ACCESS_REPLAY"
+    #   resp.run.type #=> String, one of "BUILTIN_FUZZ", "APPIUM_JAVA_JUNIT", "APPIUM_JAVA_TESTNG", "APPIUM_PYTHON", "APPIUM_NODE", "APPIUM_RUBY", "APPIUM_WEB_JAVA_JUNIT", "APPIUM_WEB_JAVA_TESTNG", "APPIUM_WEB_PYTHON", "APPIUM_WEB_NODE", "APPIUM_WEB_RUBY", "INSTRUMENTATION", "XCTEST", "XCTEST_UI"
     #   resp.run.platform #=> String, one of "ANDROID", "IOS"
     #   resp.run.created #=> Time
     #   resp.run.status #=> String, one of "PENDING", "PENDING_CONCURRENCY", "PENDING_DEVICE", "PROCESSING", "SCHEDULING", "PREPARING", "RUNNING", "COMPLETED", "STOPPING"
@@ -5332,6 +5506,11 @@ module Aws::DeviceFarm
     #   resp.run.device_selection_result.filters[0].values[0] #=> String
     #   resp.run.device_selection_result.matched_devices_count #=> Integer
     #   resp.run.device_selection_result.max_devices #=> Integer
+    #   resp.run.vpc_config.security_group_ids #=> Array
+    #   resp.run.vpc_config.security_group_ids[0] #=> String
+    #   resp.run.vpc_config.subnet_ids #=> Array
+    #   resp.run.vpc_config.subnet_ids[0] #=> String
+    #   resp.run.vpc_config.vpc_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/StopRun AWS API Documentation
     #
@@ -5741,6 +5920,9 @@ module Aws::DeviceFarm
     #   The number of minutes a test run in the project executes before it
     #   times out.
     #
+    # @option params [Types::VpcConfig] :vpc_config
+    #   The VPC security groups and subnets that are attached to a project.
+    #
     # @return [Types::UpdateProjectResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateProjectResult#project #project} => Types::Project
@@ -5770,6 +5952,11 @@ module Aws::DeviceFarm
     #     arn: "AmazonResourceName", # required
     #     name: "Name",
     #     default_job_timeout_minutes: 1,
+    #     vpc_config: {
+    #       security_group_ids: ["SecurityGroupId"], # required
+    #       subnet_ids: ["SubnetId"], # required
+    #       vpc_id: "NonEmptyString", # required
+    #     },
     #   })
     #
     # @example Response structure
@@ -5778,6 +5965,11 @@ module Aws::DeviceFarm
     #   resp.project.name #=> String
     #   resp.project.default_job_timeout_minutes #=> Integer
     #   resp.project.created #=> Time
+    #   resp.project.vpc_config.security_group_ids #=> Array
+    #   resp.project.vpc_config.security_group_ids[0] #=> String
+    #   resp.project.vpc_config.subnet_ids #=> Array
+    #   resp.project.vpc_config.subnet_ids[0] #=> String
+    #   resp.project.vpc_config.vpc_id #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/UpdateProject AWS API Documentation
     #
@@ -5799,6 +5991,9 @@ module Aws::DeviceFarm
     # @option params [String] :description
     #   Human-readable description for the project.
     #
+    # @option params [Types::TestGridVpcConfig] :vpc_config
+    #   The VPC security groups and subnets that are attached to a project.
+    #
     # @return [Types::UpdateTestGridProjectResult] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::UpdateTestGridProjectResult#test_grid_project #test_grid_project} => Types::TestGridProject
@@ -5809,6 +6004,11 @@ module Aws::DeviceFarm
     #     project_arn: "DeviceFarmArn", # required
     #     name: "ResourceName",
     #     description: "ResourceDescription",
+    #     vpc_config: {
+    #       security_group_ids: ["NonEmptyString"], # required
+    #       subnet_ids: ["NonEmptyString"], # required
+    #       vpc_id: "NonEmptyString", # required
+    #     },
     #   })
     #
     # @example Response structure
@@ -5816,6 +6016,11 @@ module Aws::DeviceFarm
     #   resp.test_grid_project.arn #=> String
     #   resp.test_grid_project.name #=> String
     #   resp.test_grid_project.description #=> String
+    #   resp.test_grid_project.vpc_config.security_group_ids #=> Array
+    #   resp.test_grid_project.vpc_config.security_group_ids[0] #=> String
+    #   resp.test_grid_project.vpc_config.subnet_ids #=> Array
+    #   resp.test_grid_project.vpc_config.subnet_ids[0] #=> String
+    #   resp.test_grid_project.vpc_config.vpc_id #=> String
     #   resp.test_grid_project.created #=> Time
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devicefarm-2015-06-23/UpdateTestGridProject AWS API Documentation
@@ -5939,14 +6144,19 @@ module Aws::DeviceFarm
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::DeviceFarm')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-devicefarm'
-      context[:gem_version] = '1.39.0'
+      context[:gem_version] = '1.79.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

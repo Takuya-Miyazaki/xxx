@@ -4,13 +4,15 @@
     "apiVersion":"2010-12-01",
     "endpointPrefix":"email",
     "protocol":"query",
+    "protocols":["query"],
     "serviceAbbreviation":"Amazon SES",
     "serviceFullName":"Amazon Simple Email Service",
     "serviceId":"SES",
     "signatureVersion":"v4",
     "signingName":"ses",
     "uid":"email-2010-12-01",
-    "xmlNamespace":"http://ses.amazonaws.com/doc/2010-12-01/"
+    "xmlNamespace":"http://ses.amazonaws.com/doc/2010-12-01/",
+    "auth":["aws.auth#sigv4"]
   },
   "operations":{
     "CloneReceiptRuleSet":{
@@ -1916,6 +1918,12 @@
     "HeaderName":{"type":"string"},
     "HeaderValue":{"type":"string"},
     "HtmlPart":{"type":"string"},
+    "IAMRoleARN":{
+      "type":"string",
+      "max":2048,
+      "min":20,
+      "pattern":"arn:[\\w-]+:iam::[0-9]+:role/[\\w-]+"
+    },
     "Identity":{"type":"string"},
     "IdentityDkimAttributes":{
       "type":"structure",
@@ -2598,7 +2606,8 @@
         "TopicArn":{"shape":"AmazonResourceName"},
         "BucketName":{"shape":"S3BucketName"},
         "ObjectKeyPrefix":{"shape":"S3KeyPrefix"},
-        "KmsKeyArn":{"shape":"AmazonResourceName"}
+        "KmsKeyArn":{"shape":"AmazonResourceName"},
+        "IamRoleArn":{"shape":"IAMRoleARN"}
       }
     },
     "S3BucketName":{"type":"string"},
@@ -2652,6 +2661,7 @@
       "required":[
         "Source",
         "Template",
+        "DefaultTemplateData",
         "Destinations"
       ],
       "members":{

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,13 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-ssm/types'
-require_relative 'aws-sdk-ssm/client_api'
-require_relative 'aws-sdk-ssm/client'
-require_relative 'aws-sdk-ssm/errors'
-require_relative 'aws-sdk-ssm/waiters'
-require_relative 'aws-sdk-ssm/resource'
-require_relative 'aws-sdk-ssm/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:ssm)
 
 # This module provides support for Amazon Simple Systems Manager (SSM). This module is available in the
 # `aws-sdk-ssm` gem.
@@ -48,7 +42,21 @@ require_relative 'aws-sdk-ssm/customizations'
 #
 # @!group service
 module Aws::SSM
+  autoload :Types, 'aws-sdk-ssm/types'
+  autoload :ClientApi, 'aws-sdk-ssm/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-ssm/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-ssm/client'
+  autoload :Errors, 'aws-sdk-ssm/errors'
+  autoload :Waiters, 'aws-sdk-ssm/waiters'
+  autoload :Resource, 'aws-sdk-ssm/resource'
+  autoload :EndpointParameters, 'aws-sdk-ssm/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-ssm/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-ssm/endpoints'
 
-  GEM_VERSION = '1.102.0'
+  GEM_VERSION = '1.182.0'
 
 end
+
+require_relative 'aws-sdk-ssm/customizations'

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-elasticinference/types'
-require_relative 'aws-sdk-elasticinference/client_api'
-require_relative 'aws-sdk-elasticinference/client'
-require_relative 'aws-sdk-elasticinference/errors'
-require_relative 'aws-sdk-elasticinference/resource'
-require_relative 'aws-sdk-elasticinference/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:elasticinference)
 
 # This module provides support for Amazon Elastic  Inference. This module is available in the
 # `aws-sdk-elasticinference` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-elasticinference/customizations'
 #
 # @!group service
 module Aws::ElasticInference
+  autoload :Types, 'aws-sdk-elasticinference/types'
+  autoload :ClientApi, 'aws-sdk-elasticinference/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-elasticinference/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-elasticinference/client'
+  autoload :Errors, 'aws-sdk-elasticinference/errors'
+  autoload :Resource, 'aws-sdk-elasticinference/resource'
+  autoload :EndpointParameters, 'aws-sdk-elasticinference/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-elasticinference/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-elasticinference/endpoints'
 
-  GEM_VERSION = '1.10.0'
+  GEM_VERSION = '1.48.0'
 
 end
+
+require_relative 'aws-sdk-elasticinference/customizations'

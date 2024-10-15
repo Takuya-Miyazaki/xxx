@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,13 +11,6 @@ module Aws::CostandUsageReportService
   module Types
 
     # Deletes the specified report.
-    #
-    # @note When making an API call, you may pass DeleteReportDefinitionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         report_name: "ReportName",
-    #       }
     #
     # @!attribute [rw] report_name
     #   The name of the report that you want to delete. The name must be
@@ -47,18 +40,12 @@ module Aws::CostandUsageReportService
       include Aws::Structure
     end
 
-    # Requests a list of AWS Cost and Usage reports owned by the account.
-    #
-    # @note When making an API call, you may pass DescribeReportDefinitionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         max_results: 1,
-    #         next_token: "GenericString",
-    #       }
+    # Requests a Amazon Web Services Cost and Usage Report list owned by the
+    # account.
     #
     # @!attribute [rw] max_results
-    #   The maximum number of results that AWS returns for the operation.
+    #   The maximum number of results that Amazon Web Services returns for
+    #   the operation.
     #   @return [Integer]
     #
     # @!attribute [rw] next_token
@@ -78,7 +65,8 @@ module Aws::CostandUsageReportService
     # response.
     #
     # @!attribute [rw] report_definitions
-    #   A list of AWS Cost and Usage reports owned by the account.
+    #   An Amazon Web Services Cost and Usage Report list owned by the
+    #   account.
     #   @return [Array<Types::ReportDefinition>]
     #
     # @!attribute [rw] next_token
@@ -124,35 +112,41 @@ module Aws::CostandUsageReportService
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ModifyReportDefinitionRequest
-    #   data as a hash:
+    # @!attribute [rw] report_name
+    #   The report name of the report definition that tags are to be
+    #   returned for.
+    #   @return [String]
     #
-    #       {
-    #         report_name: "ReportName", # required
-    #         report_definition: { # required
-    #           report_name: "ReportName", # required
-    #           time_unit: "HOURLY", # required, accepts HOURLY, DAILY, MONTHLY
-    #           format: "textORcsv", # required, accepts textORcsv, Parquet
-    #           compression: "ZIP", # required, accepts ZIP, GZIP, Parquet
-    #           additional_schema_elements: ["RESOURCES"], # required, accepts RESOURCES
-    #           s3_bucket: "S3Bucket", # required
-    #           s3_prefix: "S3Prefix", # required
-    #           s3_region: "af-south-1", # required, accepts af-south-1, ap-east-1, ap-south-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, ap-northeast-2, ap-northeast-3, ca-central-1, eu-central-1, eu-west-1, eu-west-2, eu-west-3, eu-north-1, eu-south-1, me-south-1, sa-east-1, us-east-1, us-east-2, us-west-1, us-west-2, cn-north-1, cn-northwest-1
-    #           additional_artifacts: ["REDSHIFT"], # accepts REDSHIFT, QUICKSIGHT, ATHENA
-    #           refresh_closed_reports: false,
-    #           report_versioning: "CREATE_NEW_REPORT", # accepts CREATE_NEW_REPORT, OVERWRITE_REPORT
-    #         },
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/ListTagsForResourceRequest AWS API Documentation
     #
+    class ListTagsForResourceRequest < Struct.new(
+      :report_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] tags
+    #   The tags assigned to the report definition resource.
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/ListTagsForResourceResponse AWS API Documentation
+    #
+    class ListTagsForResourceResponse < Struct.new(
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] report_name
     #   The name of the report that you want to create. The name must be
     #   unique, is case sensitive, and can't include spaces.
     #   @return [String]
     #
     # @!attribute [rw] report_definition
-    #   The definition of AWS Cost and Usage Report. You can specify the
-    #   report name, time unit, report format, compression format, S3
-    #   bucket, additional artifacts, and schema elements in the definition.
+    #   The definition of Amazon Web Services Cost and Usage Report. You can
+    #   specify the report name, time unit, report format, compression
+    #   format, S3 bucket, additional artifacts, and schema elements in the
+    #   definition.
     #   @return [Types::ReportDefinition]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/ModifyReportDefinitionRequest AWS API Documentation
@@ -170,34 +164,20 @@ module Aws::CostandUsageReportService
 
     # Creates a Cost and Usage Report.
     #
-    # @note When making an API call, you may pass PutReportDefinitionRequest
-    #   data as a hash:
-    #
-    #       {
-    #         report_definition: { # required
-    #           report_name: "ReportName", # required
-    #           time_unit: "HOURLY", # required, accepts HOURLY, DAILY, MONTHLY
-    #           format: "textORcsv", # required, accepts textORcsv, Parquet
-    #           compression: "ZIP", # required, accepts ZIP, GZIP, Parquet
-    #           additional_schema_elements: ["RESOURCES"], # required, accepts RESOURCES
-    #           s3_bucket: "S3Bucket", # required
-    #           s3_prefix: "S3Prefix", # required
-    #           s3_region: "af-south-1", # required, accepts af-south-1, ap-east-1, ap-south-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, ap-northeast-2, ap-northeast-3, ca-central-1, eu-central-1, eu-west-1, eu-west-2, eu-west-3, eu-north-1, eu-south-1, me-south-1, sa-east-1, us-east-1, us-east-2, us-west-1, us-west-2, cn-north-1, cn-northwest-1
-    #           additional_artifacts: ["REDSHIFT"], # accepts REDSHIFT, QUICKSIGHT, ATHENA
-    #           refresh_closed_reports: false,
-    #           report_versioning: "CREATE_NEW_REPORT", # accepts CREATE_NEW_REPORT, OVERWRITE_REPORT
-    #         },
-    #       }
-    #
     # @!attribute [rw] report_definition
     #   Represents the output of the PutReportDefinition operation. The
     #   content consists of the detailed metadata and data file information.
     #   @return [Types::ReportDefinition]
     #
+    # @!attribute [rw] tags
+    #   The tags to be assigned to the report definition resource.
+    #   @return [Array<Types::Tag>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/PutReportDefinitionRequest AWS API Documentation
     #
     class PutReportDefinitionRequest < Struct.new(
-      :report_definition)
+      :report_definition,
+      :tags)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -209,26 +189,10 @@ module Aws::CostandUsageReportService
     #
     class PutReportDefinitionResponse < Aws::EmptyStructure; end
 
-    # The definition of AWS Cost and Usage Report. You can specify the
-    # report name, time unit, report format, compression format, S3 bucket,
-    # additional artifacts, and schema elements in the definition.
-    #
-    # @note When making an API call, you may pass ReportDefinition
-    #   data as a hash:
-    #
-    #       {
-    #         report_name: "ReportName", # required
-    #         time_unit: "HOURLY", # required, accepts HOURLY, DAILY, MONTHLY
-    #         format: "textORcsv", # required, accepts textORcsv, Parquet
-    #         compression: "ZIP", # required, accepts ZIP, GZIP, Parquet
-    #         additional_schema_elements: ["RESOURCES"], # required, accepts RESOURCES
-    #         s3_bucket: "S3Bucket", # required
-    #         s3_prefix: "S3Prefix", # required
-    #         s3_region: "af-south-1", # required, accepts af-south-1, ap-east-1, ap-south-1, ap-southeast-1, ap-southeast-2, ap-northeast-1, ap-northeast-2, ap-northeast-3, ca-central-1, eu-central-1, eu-west-1, eu-west-2, eu-west-3, eu-north-1, eu-south-1, me-south-1, sa-east-1, us-east-1, us-east-2, us-west-1, us-west-2, cn-north-1, cn-northwest-1
-    #         additional_artifacts: ["REDSHIFT"], # accepts REDSHIFT, QUICKSIGHT, ATHENA
-    #         refresh_closed_reports: false,
-    #         report_versioning: "CREATE_NEW_REPORT", # accepts CREATE_NEW_REPORT, OVERWRITE_REPORT
-    #       }
+    # The definition of Amazon Web Services Cost and Usage Report. You can
+    # specify the report name, time unit, report format, compression format,
+    # S3 bucket, additional artifacts, and schema elements in the
+    # definition.
     #
     # @!attribute [rw] report_name
     #   The name of the report that you want to create. The name must be
@@ -240,11 +204,11 @@ module Aws::CostandUsageReportService
     #   @return [String]
     #
     # @!attribute [rw] format
-    #   The format that AWS saves the report in.
+    #   The format that Amazon Web Services saves the report in.
     #   @return [String]
     #
     # @!attribute [rw] compression
-    #   The compression format that AWS uses for the report.
+    #   The compression format that Amazon Web Services uses for the report.
     #   @return [String]
     #
     # @!attribute [rw] additional_schema_elements
@@ -253,16 +217,18 @@ module Aws::CostandUsageReportService
     #   @return [Array<String>]
     #
     # @!attribute [rw] s3_bucket
-    #   The S3 bucket where AWS delivers the report.
+    #   The S3 bucket where Amazon Web Services delivers the report.
     #   @return [String]
     #
     # @!attribute [rw] s3_prefix
-    #   The prefix that AWS adds to the report name when AWS delivers the
-    #   report. Your prefix can't include spaces.
+    #   The prefix that Amazon Web Services adds to the report name when
+    #   Amazon Web Services delivers the report. Your prefix can't include
+    #   spaces.
     #   @return [String]
     #
     # @!attribute [rw] s3_region
-    #   The region of the S3 bucket that AWS delivers the report into.
+    #   The region of the S3 bucket that Amazon Web Services delivers the
+    #   report into.
     #   @return [String]
     #
     # @!attribute [rw] additional_artifacts
@@ -283,6 +249,19 @@ module Aws::CostandUsageReportService
     #   previous versions.
     #   @return [String]
     #
+    # @!attribute [rw] billing_view_arn
+    #   The Amazon resource name of the billing view. The `BillingViewArn`
+    #   is needed to create Amazon Web Services Cost and Usage Report for
+    #   each billing group maintained in the Amazon Web Services Billing
+    #   Conductor service. The `BillingViewArn` for a billing group can be
+    #   constructed as:
+    #   `arn:aws:billing::payer-account-id:billingview/billing-group-primary-account-id`
+    #   @return [String]
+    #
+    # @!attribute [rw] report_status
+    #   The status of the report.
+    #   @return [Types::ReportStatus]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/ReportDefinition AWS API Documentation
     #
     class ReportDefinition < Struct.new(
@@ -296,7 +275,9 @@ module Aws::CostandUsageReportService
       :s3_region,
       :additional_artifacts,
       :refresh_closed_reports,
-      :report_versioning)
+      :report_versioning,
+      :billing_view_arn,
+      :report_status)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -316,8 +297,111 @@ module Aws::CostandUsageReportService
       include Aws::Structure
     end
 
-    # The input fails to satisfy the constraints specified by an AWS
-    # service.
+    # A two element dictionary with a `lastDelivery` and `lastStatus` key
+    # whose values describe the date and status of the last delivered report
+    # for a particular report definition.
+    #
+    # @!attribute [rw] last_delivery
+    #   A timestamp that gives the date of a report delivery.
+    #   @return [String]
+    #
+    # @!attribute [rw] last_status
+    #   An enum that gives the status of a report delivery.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/ReportStatus AWS API Documentation
+    #
+    class ReportStatus < Struct.new(
+      :last_delivery,
+      :last_status)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The specified report (`ReportName`) in the request doesn't exist.
+    #
+    # @!attribute [rw] message
+    #   A message to show the detail of the exception.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/ResourceNotFoundException AWS API Documentation
+    #
+    class ResourceNotFoundException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes a tag. A tag is a key-value pair. You can add up to 50 tags
+    # to a report definition.
+    #
+    # @!attribute [rw] key
+    #   The key of the tag. Tag keys are case sensitive. Each report
+    #   definition can only have up to one tag with the same key. If you try
+    #   to add an existing tag with the same key, the existing tag value
+    #   will be updated to the new value.
+    #   @return [String]
+    #
+    # @!attribute [rw] value
+    #   The value of the tag. Tag values are case-sensitive. This can be an
+    #   empty string.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/Tag AWS API Documentation
+    #
+    class Tag < Struct.new(
+      :key,
+      :value)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] report_name
+    #   The report name of the report definition that tags are to be
+    #   associated with.
+    #   @return [String]
+    #
+    # @!attribute [rw] tags
+    #   The tags to be assigned to the report definition resource.
+    #   @return [Array<Types::Tag>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/TagResourceRequest AWS API Documentation
+    #
+    class TagResourceRequest < Struct.new(
+      :report_name,
+      :tags)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/TagResourceResponse AWS API Documentation
+    #
+    class TagResourceResponse < Aws::EmptyStructure; end
+
+    # @!attribute [rw] report_name
+    #   The report name of the report definition that tags are to be
+    #   disassociated from.
+    #   @return [String]
+    #
+    # @!attribute [rw] tag_keys
+    #   The tags to be disassociated from the report definition resource.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/UntagResourceRequest AWS API Documentation
+    #
+    class UntagResourceRequest < Struct.new(
+      :report_name,
+      :tag_keys)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @see http://docs.aws.amazon.com/goto/WebAPI/cur-2017-01-06/UntagResourceResponse AWS API Documentation
+    #
+    class UntagResourceResponse < Aws::EmptyStructure; end
+
+    # The input fails to satisfy the constraints specified by an Amazon Web
+    # Services service.
     #
     # @!attribute [rw] message
     #   A message to show the detail of the exception.
@@ -333,3 +417,4 @@ module Aws::CostandUsageReportService
 
   end
 end
+

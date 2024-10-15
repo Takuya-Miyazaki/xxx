@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::IoTFleetHub
   # @api private
@@ -164,9 +165,11 @@ module Aws::IoTFleetHub
 
       api.metadata = {
         "apiVersion" => "2020-11-03",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "api.fleethub.iot",
         "jsonVersion" => "1.1",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceFullName" => "AWS IoT Fleet Hub",
         "serviceId" => "IoTFleetHub",
         "signatureVersion" => "v4",

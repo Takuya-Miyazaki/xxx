@@ -1,6 +1,76 @@
 Unreleased Changes
 ------------------
 
+1.10.0 (2024-09-17)
+------------------
+
+* Feature - Remove CRT `sigv4a` signing capability.
+
+1.9.1 (2024-07-29)
+------------------
+
+* Issue - Add missing require of `pathname` to `Signer`.
+
+1.9.0 (2024-07-23)
+------------------
+
+* Feature - Support `sigv4a` signing algorithm without `aws-crt`.
+
+1.8.0 (2023-11-28)
+------------------
+
+* Feature - Support `sigv4-s3express` signing algorithm.
+
+1.7.0 (2023-11-22)
+------------------
+
+* Feature - AWS SDK for Ruby no longer supports Ruby runtime versions 2.3 and 2.4.
+
+1.6.1 (2023-10-25)
+------------------
+
+* Issue - (Static Stability) use provided `expires_in` in presigned url when credentials are expired.
+
+1.6.0 (2023-06-28)
+------------------
+
+* Feature - Select the minimum expiration time for presigned urls between the expiration time option and the credential expiration time.
+
+1.5.2 (2022-09-30)
+------------------
+
+* Issue - Fix an issue where quoted strings with multiple spaces are not trimmed. (#2758)
+
+1.5.1 (2022-07-19)
+------------------
+
+* Issue - Fix performance regression when checking if `aws-crt` is available. (#2729)
+
+1.5.0 (2022-04-20)
+------------------
+
+* Feature - Use CRT based signers if `aws-crt` is available - provides support for `sigv4a`.
+
+1.4.0 (2021-09-02)
+------------------
+
+* Feature - add `signing_algorithm` option with `sigv4` default.
+
+1.3.0 (2021-09-01)
+------------------
+
+* Feature - AWS SDK for Ruby no longer supports Ruby runtime versions 1.9, 2.0, 2.1, and 2.2.
+
+1.2.4 (2021-07-08)
+------------------
+
+* Issue - Fix usage of `:uri_escape_path` and `:apply_checksum_header` in `Signer`.
+
+1.2.3 (2021-03-04)
+------------------
+
+* Issue - Include LICENSE, CHANGELOG, and VERSION files with this gem.
+
 1.2.2 (2020-08-13)
 ------------------
 

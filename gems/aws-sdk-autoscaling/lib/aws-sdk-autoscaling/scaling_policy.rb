@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -54,6 +54,8 @@ module Aws::AutoScaling
     # * `StepScaling`
     #
     # * `SimpleScaling` (default)
+    #
+    # * `PredictiveScaling`
     #
     # For more information, see [Target tracking scaling policies][1] and
     # [Step and simple scaling policies][2] in the *Amazon EC2 Auto Scaling
@@ -144,6 +146,12 @@ module Aws::AutoScaling
       data[:enabled]
     end
 
+    # A predictive scaling policy.
+    # @return [Types::PredictiveScalingConfiguration]
+    def predictive_scaling_configuration
+      data[:predictive_scaling_configuration]
+    end
+
     # @!endgroup
 
     # @return [Client]
@@ -158,7 +166,9 @@ module Aws::AutoScaling
     #
     # @return [self]
     def load
-      resp = @client.describe_policies(policy_names: [@name])
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.describe_policies(policy_names: [@name])
+      end
       @data = resp.scaling_policies[0]
       self
     end
@@ -273,7 +283,9 @@ module Aws::AutoScaling
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -289,7 +301,9 @@ module Aws::AutoScaling
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(policy_name: @name)
-      resp = @client.delete_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_policy(options)
+      end
       resp.data
     end
 
@@ -314,7 +328,7 @@ module Aws::AutoScaling
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/autoscaling/ec2/userguide/Cooldown.html
+    #   [1]: https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-scaling-cooldowns.html
     # @option options [Float] :metric_value
     #   The metric value to compare to `BreachThreshold`. This enables you to
     #   execute a policy of type `StepScaling` and determine which step
@@ -335,7 +349,9 @@ module Aws::AutoScaling
     # @return [EmptyStructure]
     def execute(options = {})
       options = options.merge(policy_name: @name)
-      resp = @client.execute_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.execute_policy(options)
+      end
       resp.data
     end
 

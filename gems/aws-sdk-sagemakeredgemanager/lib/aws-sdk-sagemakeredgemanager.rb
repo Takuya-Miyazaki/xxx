@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-sagemakeredgemanager/types'
-require_relative 'aws-sdk-sagemakeredgemanager/client_api'
-require_relative 'aws-sdk-sagemakeredgemanager/client'
-require_relative 'aws-sdk-sagemakeredgemanager/errors'
-require_relative 'aws-sdk-sagemakeredgemanager/resource'
-require_relative 'aws-sdk-sagemakeredgemanager/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:sagemakeredgemanager)
 
 # This module provides support for Amazon Sagemaker Edge Manager. This module is available in the
 # `aws-sdk-sagemakeredgemanager` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-sagemakeredgemanager/customizations'
 # structure.
 #
 #     sagemaker_edge_manager = Aws::SagemakerEdgeManager::Client.new
-#     resp = sagemaker_edge_manager.get_device_registration(params)
+#     resp = sagemaker_edge_manager.get_deployments(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-sagemakeredgemanager/customizations'
 #
 # @!group service
 module Aws::SagemakerEdgeManager
+  autoload :Types, 'aws-sdk-sagemakeredgemanager/types'
+  autoload :ClientApi, 'aws-sdk-sagemakeredgemanager/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-sagemakeredgemanager/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-sagemakeredgemanager/client'
+  autoload :Errors, 'aws-sdk-sagemakeredgemanager/errors'
+  autoload :Resource, 'aws-sdk-sagemakeredgemanager/resource'
+  autoload :EndpointParameters, 'aws-sdk-sagemakeredgemanager/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-sagemakeredgemanager/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-sagemakeredgemanager/endpoints'
 
-  GEM_VERSION = '1.0.0'
+  GEM_VERSION = '1.37.0'
 
 end
+
+require_relative 'aws-sdk-sagemakeredgemanager/customizations'

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -34,27 +34,13 @@ module Aws::EC2
       @allocation_id
     end
 
-    # The ID of the instance that the address is associated with (if any).
-    # @return [String]
-    def instance_id
-      data[:instance_id]
-    end
-
-    # The Elastic IP address.
-    # @return [String]
-    def public_ip
-      data[:public_ip]
-    end
-
-    # The ID representing the association of the address with an instance in
-    # a VPC.
+    # The ID representing the association of the address with an instance.
     # @return [String]
     def association_id
       data[:association_id]
     end
 
-    # Indicates whether this Elastic IP address is for use with instances in
-    # EC2-Classic (`standard`) or instances in a VPC (`vpc`).
+    # The network (`vpc`).
     # @return [String]
     def domain
       data[:domain]
@@ -66,7 +52,8 @@ module Aws::EC2
       data[:network_interface_id]
     end
 
-    # The ID of the AWS account that owns the network interface.
+    # The ID of the Amazon Web Services account that owns the network
+    # interface.
     # @return [String]
     def network_interface_owner_id
       data[:network_interface_owner_id]
@@ -91,7 +78,8 @@ module Aws::EC2
     end
 
     # The name of the unique set of Availability Zones, Local Zones, or
-    # Wavelength Zones from which AWS advertises IP addresses.
+    # Wavelength Zones from which Amazon Web Services advertises IP
+    # addresses.
     # @return [String]
     def network_border_group
       data[:network_border_group]
@@ -117,6 +105,18 @@ module Aws::EC2
       data[:carrier_ip]
     end
 
+    # The ID of the instance that the address is associated with (if any).
+    # @return [String]
+    def instance_id
+      data[:instance_id]
+    end
+
+    # The Elastic IP address.
+    # @return [String]
+    def public_ip
+      data[:public_ip]
+    end
+
     # @!endgroup
 
     # @return [Client]
@@ -131,7 +131,9 @@ module Aws::EC2
     #
     # @return [self]
     def load
-      resp = @client.describe_addresses(allocation_ids: [@allocation_id])
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.describe_addresses(allocation_ids: [@allocation_id])
+      end
       @data = resp.addresses[0]
       self
     end
@@ -246,7 +248,9 @@ module Aws::EC2
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -255,49 +259,44 @@ module Aws::EC2
     #
     #   vpc_address.associate({
     #     instance_id: "InstanceId",
-    #     public_ip: "String",
-    #     allow_reassociation: false,
+    #     public_ip: "EipAllocationPublicIp",
     #     dry_run: false,
     #     network_interface_id: "NetworkInterfaceId",
     #     private_ip_address: "String",
+    #     allow_reassociation: false,
     #   })
     # @param [Hash] options ({})
     # @option options [String] :instance_id
-    #   The ID of the instance. This is required for EC2-Classic. For EC2-VPC,
-    #   you can specify either the instance ID or the network interface ID,
-    #   but not both. The operation fails if you specify an instance ID unless
-    #   exactly one network interface is attached.
+    #   The ID of the instance. The instance must have exactly one attached
+    #   network interface. You can specify either the instance ID or the
+    #   network interface ID, but not both.
     # @option options [String] :public_ip
-    #   The Elastic IP address to associate with the instance. This is
-    #   required for EC2-Classic.
-    # @option options [Boolean] :allow_reassociation
-    #   \[EC2-VPC\] For a VPC in an EC2-Classic account, specify true to allow
-    #   an Elastic IP address that is already associated with an instance or
-    #   network interface to be reassociated with the specified instance or
-    #   network interface. Otherwise, the operation fails. In a VPC in an
-    #   EC2-VPC-only account, reassociation is automatic, therefore you can
-    #   specify false to ensure the operation fails if the Elastic IP address
-    #   is already associated with another resource.
+    #   Deprecated.
     # @option options [Boolean] :dry_run
     #   Checks whether you have the required permissions for the action,
     #   without actually making the request, and provides an error response.
     #   If you have the required permissions, the error response is
     #   `DryRunOperation`. Otherwise, it is `UnauthorizedOperation`.
     # @option options [String] :network_interface_id
-    #   \[EC2-VPC\] The ID of the network interface. If the instance has more
-    #   than one network interface, you must specify a network interface ID.
+    #   The ID of the network interface. If the instance has more than one
+    #   network interface, you must specify a network interface ID.
     #
-    #   For EC2-VPC, you can specify either the instance ID or the network
-    #   interface ID, but not both.
+    #   You can specify either the instance ID or the network interface ID,
+    #   but not both.
     # @option options [String] :private_ip_address
-    #   \[EC2-VPC\] The primary or secondary private IP address to associate
-    #   with the Elastic IP address. If no private IP address is specified,
-    #   the Elastic IP address is associated with the primary private IP
-    #   address.
+    #   The primary or secondary private IP address to associate with the
+    #   Elastic IP address. If no private IP address is specified, the Elastic
+    #   IP address is associated with the primary private IP address.
+    # @option options [Boolean] :allow_reassociation
+    #   Reassociation is automatic, but you can specify false to ensure the
+    #   operation fails if the Elastic IP address is already associated with
+    #   another resource.
     # @return [Types::AssociateAddressResult]
     def associate(options = {})
       options = options.merge(allocation_id: @allocation_id)
-      resp = @client.associate_address(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.associate_address(options)
+      end
       resp.data
     end
 
@@ -310,25 +309,13 @@ module Aws::EC2
     #   })
     # @param [Hash] options ({})
     # @option options [String] :public_ip
-    #   \[EC2-Classic\] The Elastic IP address. Required for EC2-Classic.
+    #   Deprecated.
     # @option options [String] :network_border_group
     #   The set of Availability Zones, Local Zones, or Wavelength Zones from
-    #   which AWS advertises IP addresses.
+    #   which Amazon Web Services advertises IP addresses.
     #
-    #   If you provide an incorrect network border group, you will receive an
-    #   `InvalidAddress.NotFound` error. For more information, see [Error
-    #   Codes][1].
-    #
-    #   <note markdown="1"> You cannot use a network border group with EC2 Classic. If you attempt
-    #   this operation on EC2 classic, you will receive an
-    #   `InvalidParameterCombination` error. For more information, see [Error
-    #   Codes][1].
-    #
-    #    </note>
-    #
-    #
-    #
-    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/errors-overview.html
+    #   If you provide an incorrect network border group, you receive an
+    #   `InvalidAddress.NotFound` error.
     # @option options [Boolean] :dry_run
     #   Checks whether you have the required permissions for the action,
     #   without actually making the request, and provides an error response.
@@ -337,7 +324,9 @@ module Aws::EC2
     # @return [EmptyStructure]
     def release(options = {})
       options = options.merge(allocation_id: data[:allocation_id])
-      resp = @client.release_address(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.release_address(options)
+      end
       resp.data
     end
 

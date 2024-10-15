@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::MarketplaceMetering
   # @api private
@@ -17,6 +18,7 @@ module Aws::MarketplaceMetering
     BatchMeterUsageRequest = Shapes::StructureShape.new(name: 'BatchMeterUsageRequest')
     BatchMeterUsageResult = Shapes::StructureShape.new(name: 'BatchMeterUsageResult')
     Boolean = Shapes::BooleanShape.new(name: 'Boolean')
+    CustomerAWSAccountId = Shapes::StringShape.new(name: 'CustomerAWSAccountId')
     CustomerIdentifier = Shapes::StringShape.new(name: 'CustomerIdentifier')
     CustomerNotEntitledException = Shapes::StructureShape.new(name: 'CustomerNotEntitledException')
     DisabledApiException = Shapes::StructureShape.new(name: 'DisabledApiException')
@@ -140,6 +142,7 @@ module Aws::MarketplaceMetering
 
     ResolveCustomerResult.add_member(:customer_identifier, Shapes::ShapeRef.new(shape: CustomerIdentifier, location_name: "CustomerIdentifier"))
     ResolveCustomerResult.add_member(:product_code, Shapes::ShapeRef.new(shape: ProductCode, location_name: "ProductCode"))
+    ResolveCustomerResult.add_member(:customer_aws_account_id, Shapes::ShapeRef.new(shape: CustomerAWSAccountId, location_name: "CustomerAWSAccountId"))
     ResolveCustomerResult.struct_class = Types::ResolveCustomerResult
 
     Tag.add_member(:key, Shapes::ShapeRef.new(shape: TagKey, required: true, location_name: "Key"))
@@ -184,9 +187,11 @@ module Aws::MarketplaceMetering
 
       api.metadata = {
         "apiVersion" => "2016-01-14",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "metering.marketplace",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceFullName" => "AWSMarketplace Metering",
         "serviceId" => "Marketplace Metering",
         "signatureVersion" => "v4",

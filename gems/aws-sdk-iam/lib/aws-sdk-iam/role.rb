@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -36,7 +36,7 @@ module Aws::IAM
     alias :role_name :name
 
     # The path to the role. For more information about paths, see [IAM
-    # Identifiers][1] in the *IAM User Guide*.
+    # identifiers][1] in the *IAM User Guide*.
     #
     #
     #
@@ -47,7 +47,7 @@ module Aws::IAM
     end
 
     # The stable and unique string identifying the role. For more
-    # information about IDs, see [IAM Identifiers][1] in the *IAM User
+    # information about IDs, see [IAM identifiers][1] in the *IAM User
     # Guide*.
     #
     #
@@ -60,7 +60,7 @@ module Aws::IAM
 
     # The Amazon Resource Name (ARN) specifying the role. For more
     # information about ARNs and how to use them in policies, see [IAM
-    # Identifiers][1] in the *IAM User Guide* guide.
+    # identifiers][1] in the *IAM User Guide* guide.
     #
     #
     #
@@ -94,7 +94,7 @@ module Aws::IAM
     end
 
     # The maximum session duration (in seconds) for the specified role.
-    # Anyone who uses the AWS CLI, or API to assume the role can specify the
+    # Anyone who uses the CLI, or API to assume the role can specify the
     # duration using the optional `DurationSeconds` API parameter or
     # `duration-seconds` CLI parameter.
     # @return [Integer]
@@ -106,7 +106,7 @@ module Aws::IAM
     # role.
     #
     # For more information about permissions boundaries, see [Permissions
-    # Boundaries for IAM Identities ][1] in the *IAM User Guide*.
+    # boundaries for IAM identities ][1] in the *IAM User Guide*.
     #
     #
     #
@@ -116,9 +116,8 @@ module Aws::IAM
       data[:permissions_boundary]
     end
 
-    # A list of tags that are attached to the specified role. For more
-    # information about tagging, see [Tagging IAM Identities][1] in the *IAM
-    # User Guide*.
+    # A list of tags that are attached to the role. For more information
+    # about tagging, see [Tagging IAM resources][1] in the *IAM User Guide*.
     #
     #
     #
@@ -133,8 +132,8 @@ module Aws::IAM
     # last used. Activity is only reported for the trailing 400 days. This
     # period can be shorter if your Region began supporting these features
     # within the last year. The role might have been used more than 400 days
-    # ago. For more information, see [Regions Where Data Is Tracked][1] in
-    # the *IAM User Guide*.
+    # ago. For more information, see [Regions where data is tracked][1] in
+    # the *IAM user Guide*.
     #
     #
     #
@@ -158,7 +157,9 @@ module Aws::IAM
     #
     # @return [self]
     def load
-      resp = @client.get_role(role_name: @name)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_role(role_name: @name)
+      end
       @data = resp.role
       self
     end
@@ -273,7 +274,9 @@ module Aws::IAM
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -287,8 +290,8 @@ module Aws::IAM
     # @option options [required, String] :policy_arn
     #   The Amazon Resource Name (ARN) of the IAM policy you want to attach.
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs) and
-    #   AWS Service Namespaces][1] in the *AWS General Reference*.
+    #   For more information about ARNs, see [Amazon Resource Names (ARNs)][1]
+    #   in the *Amazon Web Services General Reference*.
     #
     #
     #
@@ -296,7 +299,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def attach_policy(options = {})
       options = options.merge(role_name: @name)
-      resp = @client.attach_role_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.attach_role_policy(options)
+      end
       resp.data
     end
 
@@ -307,7 +312,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(role_name: @name)
-      resp = @client.delete_role(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_role(options)
+      end
       resp.data
     end
 
@@ -320,8 +327,8 @@ module Aws::IAM
     # @option options [required, String] :policy_arn
     #   The Amazon Resource Name (ARN) of the IAM policy you want to detach.
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs) and
-    #   AWS Service Namespaces][1] in the *AWS General Reference*.
+    #   For more information about ARNs, see [Amazon Resource Names (ARNs)][1]
+    #   in the *Amazon Web Services General Reference*.
     #
     #
     #
@@ -329,7 +336,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def detach_policy(options = {})
       options = options.merge(role_name: @name)
-      resp = @client.detach_role_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.detach_role_policy(options)
+      end
       resp.data
     end
 
@@ -368,7 +377,9 @@ module Aws::IAM
     def attached_policies(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(role_name: @name)
-        resp = @client.list_attached_role_policies(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_attached_role_policies(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.attached_policies.each do |a|
@@ -391,7 +402,9 @@ module Aws::IAM
     def instance_profiles(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(role_name: @name)
-        resp = @client.list_instance_profiles_for_role(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_instance_profiles_for_role(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.instance_profiles.each do |i|
@@ -415,7 +428,9 @@ module Aws::IAM
     def policies(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(role_name: @name)
-        resp = @client.list_role_policies(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_role_policies(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.policy_names.each do |p|

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -32,6 +32,8 @@ module Aws::TimestreamQuery
   # * {InternalServerException}
   # * {InvalidEndpointException}
   # * {QueryExecutionException}
+  # * {ResourceNotFoundException}
+  # * {ServiceQuotaExceededException}
   # * {ThrottlingException}
   # * {ValidationException}
   #
@@ -106,6 +108,41 @@ module Aws::TimestreamQuery
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::TimestreamQuery::Types::QueryExecutionException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class ResourceNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::TimestreamQuery::Types::ResourceNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+
+      # @return [String]
+      def scheduled_query_arn
+        @data[:scheduled_query_arn]
+      end
+    end
+
+    class ServiceQuotaExceededException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::TimestreamQuery::Types::ServiceQuotaExceededException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

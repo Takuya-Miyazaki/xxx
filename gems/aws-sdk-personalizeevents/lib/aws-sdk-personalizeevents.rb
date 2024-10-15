@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-personalizeevents/types'
-require_relative 'aws-sdk-personalizeevents/client_api'
-require_relative 'aws-sdk-personalizeevents/client'
-require_relative 'aws-sdk-personalizeevents/errors'
-require_relative 'aws-sdk-personalizeevents/resource'
-require_relative 'aws-sdk-personalizeevents/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:personalizeevents)
 
 # This module provides support for Amazon Personalize Events. This module is available in the
 # `aws-sdk-personalizeevents` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-personalizeevents/customizations'
 # structure.
 #
 #     personalize_events = Aws::PersonalizeEvents::Client.new
-#     resp = personalize_events.put_events(params)
+#     resp = personalize_events.put_action_interactions(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-personalizeevents/customizations'
 #
 # @!group service
 module Aws::PersonalizeEvents
+  autoload :Types, 'aws-sdk-personalizeevents/types'
+  autoload :ClientApi, 'aws-sdk-personalizeevents/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-personalizeevents/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-personalizeevents/client'
+  autoload :Errors, 'aws-sdk-personalizeevents/errors'
+  autoload :Resource, 'aws-sdk-personalizeevents/resource'
+  autoload :EndpointParameters, 'aws-sdk-personalizeevents/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-personalizeevents/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-personalizeevents/endpoints'
 
-  GEM_VERSION = '1.14.0'
+  GEM_VERSION = '1.55.0'
 
 end
+
+require_relative 'aws-sdk-personalizeevents/customizations'

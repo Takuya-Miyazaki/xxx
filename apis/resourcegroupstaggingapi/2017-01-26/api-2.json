@@ -5,11 +5,13 @@
     "endpointPrefix":"tagging",
     "jsonVersion":"1.1",
     "protocol":"json",
+    "protocols":["json"],
     "serviceFullName":"AWS Resource Groups Tagging API",
     "serviceId":"Resource Groups Tagging API",
     "signatureVersion":"v4",
     "targetPrefix":"ResourceGroupsTaggingAPI_20170126",
-    "uid":"resourcegroupstaggingapi-2017-01-26"
+    "uid":"resourcegroupstaggingapi-2017-01-26",
+    "auth":["aws.auth#sigv4"]
   },
   "operations":{
     "DescribeReportCreation":{
@@ -230,7 +232,8 @@
         "TagsPerPage":{"shape":"TagsPerPage"},
         "ResourceTypeFilters":{"shape":"ResourceTypeFilterList"},
         "IncludeComplianceDetails":{"shape":"IncludeComplianceDetails"},
-        "ExcludeCompliantResources":{"shape":"ExcludeCompliantResources"}
+        "ExcludeCompliantResources":{"shape":"ExcludeCompliantResources"},
+        "ResourceARNList":{"shape":"ResourceARNListForGet"}
       }
     },
     "GetResourcesOutput":{
@@ -334,7 +337,13 @@
       "min":1,
       "pattern":"[\\s\\S]*"
     },
-    "ResourceARNList":{
+    "ResourceARNListForGet":{
+      "type":"list",
+      "member":{"shape":"ResourceARN"},
+      "max":100,
+      "min":1
+    },
+    "ResourceARNListForTagUntag":{
       "type":"list",
       "member":{"shape":"ResourceARN"},
       "max":20,
@@ -457,7 +466,7 @@
         "Tags"
       ],
       "members":{
-        "ResourceARNList":{"shape":"ResourceARNList"},
+        "ResourceARNList":{"shape":"ResourceARNListForTagUntag"},
         "Tags":{"shape":"TagMap"}
       }
     },
@@ -518,7 +527,7 @@
         "TagKeys"
       ],
       "members":{
-        "ResourceARNList":{"shape":"ResourceARNList"},
+        "ResourceARNList":{"shape":"ResourceARNListForTagUntag"},
         "TagKeys":{"shape":"TagKeyListForUntag"}
       }
     },

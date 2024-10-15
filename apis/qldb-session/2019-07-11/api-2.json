@@ -5,13 +5,15 @@
     "endpointPrefix":"session.qldb",
     "jsonVersion":"1.0",
     "protocol":"json",
+    "protocols":["json"],
     "serviceAbbreviation":"QLDB Session",
     "serviceFullName":"Amazon QLDB Session",
     "serviceId":"QLDB Session",
     "signatureVersion":"v4",
     "signingName":"qldb",
     "targetPrefix":"QLDBSession",
-    "uid":"qldb-session-2019-07-11"
+    "uid":"qldb-session-2019-07-11",
+    "auth":["aws.auth#sigv4"]
   },
   "operations":{
     "SendCommand":{
@@ -27,7 +29,8 @@
         {"shape":"InvalidSessionException"},
         {"shape":"OccConflictException"},
         {"shape":"RateExceededException"},
-        {"shape":"LimitExceededException"}
+        {"shape":"LimitExceededException"},
+        {"shape":"CapacityExceededException"}
       ]
     }
   },
@@ -48,6 +51,13 @@
       "members":{
         "Message":{"shape":"ErrorMessage"},
         "Code":{"shape":"ErrorCode"}
+      },
+      "exception":true
+    },
+    "CapacityExceededException":{
+      "type":"structure",
+      "members":{
+        "Message":{"shape":"ErrorMessage"}
       },
       "exception":true
     },

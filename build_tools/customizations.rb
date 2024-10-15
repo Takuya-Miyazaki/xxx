@@ -6,6 +6,7 @@ module BuildTools
     @api_customizations = {}
     @doc_customizations = {}
     @example_customizations = {}
+    @smoke_customizations = {}
 
     class << self
 
@@ -21,6 +22,10 @@ module BuildTools
         @example_customizations[svc_name] = block
       end
 
+      def smoke(svc_name, &block)
+        @smoke_customizations[svc_name] = block
+      end
+
       def apply_api_customizations(svc_name, api)
         @api_customizations[svc_name].call(api) if @api_customizations[svc_name]
       end
@@ -31,6 +36,10 @@ module BuildTools
 
       def apply_example_customizations(svc_name, examples)
         @example_customizations[svc_name].call(examples) if @example_customizations[svc_name]
+      end
+
+      def apply_smoke_customizations(svc_name, smoke)
+        @smoke_customizations[svc_name].call(smoke) if @smoke_customizations[svc_name]
       end
 
       private
@@ -98,26 +107,19 @@ module BuildTools
     end
 
     api('ImportExport') do |api|
+      api['metadata']['serviceId'] ||= 'importexport'
+
       api['operations'].each do |_, operation|
         operation['http']['requestUri'] = '/'
       end
     end
 
-    api('IoTDataPlane') do |api|
-      api['metadata'].delete('endpointPrefix')
+    api('Lambda') do |api|
+      api['shapes']['Timestamp']['type'] = 'timestamp'
     end
 
-    %w(Lambda LambdaPreview).each do |svc_name|
-
-      api(svc_name) do |api|
-        api['shapes']['Timestamp']['type'] = 'timestamp'
-      end
-
-      doc('lambda') do |docs|
-        docs['shapes']['Blob']['refs']['UpdateFunctionCodeRequest$ZipFile'] =
-          "<p>.zip file containing your packaged source code.</p>"
-      end
-
+    smoke('MTurk') do |smoke|
+      smoke['testCases'] = []
     end
 
     # Cross Region Copying
@@ -156,6 +158,21 @@ module BuildTools
 
     api('S3') do |api|
       api['metadata'].delete('signatureVersion')
+
+      # handled by endpoints 2.0
+      api['operations'].each do |_key, operation|
+        # requestUri should always exist. Remove bucket from path
+        # and preserve request uri as /
+        if operation['http'] && operation['http']['requestUri']
+          operation['http']['requestUri'].gsub!('/{Bucket}', '/')
+          operation['http']['requestUri'].gsub!('//', '/')
+        end
+      end
+
+      # Ensure Expires is a timestamp regardless of model to be backwards
+      # compatible. Add ExpiresString in cases where Expires cannot be parsed
+      # as a Timestamp.
+      api['shapes']['Expires'] = { 'type' => 'timestamp' }
       api['shapes']['ExpiresString'] = { 'type' => 'string' }
       %w(HeadObjectOutput GetObjectOutput).each do |shape|
         members = api['shapes'][shape]['members']
@@ -174,6 +191,48 @@ module BuildTools
       end
     end
 
+    api('S3Control') do |api|
+      # handled by endpoints 2.0
+      api['operations'].each do |_key, operation|
+        # Removes the accountId host prefix trait and requiredness.
+        # Checks the hostPrefix labels and removes only those from the API.
+        next unless operation['endpoint'] &&
+                    (host_prefix = operation['endpoint']['hostPrefix']) &&
+                    host_prefix == '{AccountId}.'
+
+        operation['endpoint'].delete('hostPrefix')
+
+        host_prefix.gsub(/\{.+?\}/) do |label|
+          label = label.delete('{}')
+          input_shape = api['shapes'][operation['input']['shape']]
+          input_shape['members'][label].delete('hostLabel')
+          input_shape['required']&.delete(label)
+        end
+      end
+    end
+
+    # SimpleDB does not adhere to the query protocol guidelines because it
+    # uses both flattened and locationName. Query protocol is supposed to
+    # ignore location name (xmlName) when flattened (xmlFlattened) is used.
+    api('SimpleDB') do |api|
+      api['metadata']['serviceId'] ||= 'SimpleDB'
+
+      api['shapes'].each do |_, shape|
+        next unless shape['type'] == 'structure'
+
+        shape['members'].each do |_, member|
+          member_ref = api['shapes'][member['shape']]
+          next unless member_ref['flattened']
+
+          member['locationName'] = member_ref['member']['locationName']
+        end
+      end
+    end
+
+    smoke('SMS') do |smoke|
+      smoke['testCases'] = []
+    end
+
     api('SQS') do |api|
       api['metadata']['errorPrefix'] = 'AWS.SimpleQueueService.'
       api['shapes']['StringList']['flattened'] = true
@@ -185,7 +244,7 @@ module BuildTools
     api('STS') do |api|
       operations = %w(AssumeRoleWithSAML AssumeRoleWithWebIdentity)
       operations.each do |operation|
-        api['operations'][operation]['authtype'] = 'none'
+        api['operations'][operation]['auth'] = ['smithy.api#noAuth']
       end
     end
   end

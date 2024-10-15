@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::ImportExport
   # @api private
@@ -261,6 +262,7 @@ module Aws::ImportExport
         "globalEndpoint" => "importexport.amazonaws.com",
         "protocol" => "query",
         "serviceFullName" => "AWS Import/Export",
+        "serviceId" => "importexport",
         "signatureVersion" => "v2",
         "uid" => "importexport-2010-06-01",
         "xmlNamespace" => "http://importexport.amazonaws.com/doc/2010-06-01/",

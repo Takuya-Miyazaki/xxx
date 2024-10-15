@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
+require 'aws-sdk-core'
+
 require_relative 'aws-sdk-code-generator/api'
 require_relative 'aws-sdk-code-generator/apply_docs'
+require_relative 'aws-sdk-code-generator/codegenerated_plugin'
 require_relative 'aws-sdk-code-generator/client_constructor'
 require_relative 'aws-sdk-code-generator/client_operation_documentation'
 require_relative 'aws-sdk-code-generator/client_operation_list'
@@ -49,13 +52,17 @@ require_relative 'aws-sdk-code-generator/views/docstring'
 require_relative 'aws-sdk-code-generator/views/errors_module'
 require_relative 'aws-sdk-code-generator/views/features/env'
 require_relative 'aws-sdk-code-generator/views/features/step_definitions'
-require_relative 'aws-sdk-code-generator/views/features/smoke_step_definitions'
 require_relative 'aws-sdk-code-generator/views/features/smoke'
 require_relative 'aws-sdk-code-generator/views/gemspec'
 require_relative 'aws-sdk-code-generator/views/resource_class'
+require_relative 'aws-sdk-code-generator/views/endpoint_parameters_class'
+require_relative 'aws-sdk-code-generator/views/endpoint_provider_class'
+require_relative 'aws-sdk-code-generator/views/endpoints_module'
+require_relative 'aws-sdk-code-generator/views/endpoints_plugin'
 require_relative 'aws-sdk-code-generator/views/root_resource_class'
 require_relative 'aws-sdk-code-generator/views/service_module'
 require_relative 'aws-sdk-code-generator/views/spec/spec_helper'
+require_relative 'aws-sdk-code-generator/views/spec/endpoint_provider_spec_class'
 require_relative 'aws-sdk-code-generator/views/types_module'
 require_relative 'aws-sdk-code-generator/views/event_streams_module'
 require_relative 'aws-sdk-code-generator/views/authorizer_class'
@@ -70,15 +77,41 @@ require_relative 'aws-sdk-code-generator/yard_option_tag'
 require_relative 'aws-sdk-code-generator/code_builder'
 require_relative 'aws-sdk-code-generator/gem_builder'
 
+# RBS
+require_relative 'aws-sdk-code-generator/rbs'
+require_relative 'aws-sdk-code-generator/rbs/error_list'
+require_relative 'aws-sdk-code-generator/rbs/method_signature'
+require_relative 'aws-sdk-code-generator/rbs/keyword_argument_builder'
+require_relative 'aws-sdk-code-generator/rbs/resource_action'
+require_relative 'aws-sdk-code-generator/rbs/resource_association'
+require_relative 'aws-sdk-code-generator/rbs/resource_batch_action'
+require_relative 'aws-sdk-code-generator/rbs/resource_client_request'
+require_relative 'aws-sdk-code-generator/rbs/waiter'
+require_relative 'aws-sdk-code-generator/views/rbs/client_class'
+require_relative 'aws-sdk-code-generator/views/rbs/errors_module'
+require_relative 'aws-sdk-code-generator/views/rbs/resource_class'
+require_relative 'aws-sdk-code-generator/views/rbs/root_resource_class'
+require_relative 'aws-sdk-code-generator/views/rbs/types_module'
+require_relative 'aws-sdk-code-generator/views/rbs/waiters_module'
+
 module AwsSdkCodeGenerator
 
   GENERATED_SRC_WARNING = <<-WARNING_TXT
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
   WARNING_TXT
 
+  @warnings = []
+
+  class << self
+    attr_reader :warnings
+    def warn(service, type, message)
+      Kernel.warn(message)
+      @warnings << { service: service, type: type, message: message }
+    end
+  end
 end

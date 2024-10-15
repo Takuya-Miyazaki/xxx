@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -35,18 +35,6 @@ module Aws::EC2
     end
     alias :key_name :name
 
-    # The SHA-1 digest of the DER encoded private key.
-    # @return [String]
-    def key_fingerprint
-      data[:key_fingerprint]
-    end
-
-    # An unencrypted PEM encoded RSA private key.
-    # @return [String]
-    def key_material
-      data[:key_material]
-    end
-
     # The ID of the key pair.
     # @return [String]
     def key_pair_id
@@ -57,6 +45,23 @@ module Aws::EC2
     # @return [Array<Types::Tag>]
     def tags
       data[:tags]
+    end
+
+    # * For RSA key pairs, the key fingerprint is the SHA-1 digest of the
+    #   DER encoded private key.
+    #
+    # * For ED25519 key pairs, the key fingerprint is the base64-encoded
+    #   SHA-256 digest, which is the default for OpenSSH, starting with
+    #   OpenSSH 6.8.
+    # @return [String]
+    def key_fingerprint
+      data[:key_fingerprint]
+    end
+
+    # An unencrypted PEM encoded RSA or ED25519 private key.
+    # @return [String]
+    def key_material
+      data[:key_material]
     end
 
     # @!endgroup
@@ -183,7 +188,9 @@ module Aws::EC2
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -202,10 +209,12 @@ module Aws::EC2
     #   without actually making the request, and provides an error response.
     #   If you have the required permissions, the error response is
     #   `DryRunOperation`. Otherwise, it is `UnauthorizedOperation`.
-    # @return [EmptyStructure]
+    # @return [Types::DeleteKeyPairResult]
     def delete(options = {})
       options = options.merge(key_name: @name)
-      resp = @client.delete_key_pair(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_key_pair(options)
+      end
       resp.data
     end
 

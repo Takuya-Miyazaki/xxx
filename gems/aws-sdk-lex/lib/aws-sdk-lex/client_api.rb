@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::Lex
   # @api private
@@ -70,6 +71,8 @@ module Aws::Lex
     PutSessionResponse = Shapes::StructureShape.new(name: 'PutSessionResponse')
     RequestTimeoutException = Shapes::StructureShape.new(name: 'RequestTimeoutException')
     ResponseCard = Shapes::StructureShape.new(name: 'ResponseCard')
+    SensitiveString = Shapes::StringShape.new(name: 'SensitiveString')
+    SensitiveStringUnbounded = Shapes::StringShape.new(name: 'SensitiveStringUnbounded')
     SentimentLabel = Shapes::StringShape.new(name: 'SentimentLabel')
     SentimentResponse = Shapes::StructureShape.new(name: 'SentimentResponse')
     SentimentScore = Shapes::StringShape.new(name: 'SentimentScore')
@@ -205,11 +208,13 @@ module Aws::Lex
     PostContentResponse.add_member(:slots, Shapes::ShapeRef.new(shape: String, location: "header", location_name: "x-amz-lex-slots", metadata: {"jsonvalue"=>true}))
     PostContentResponse.add_member(:session_attributes, Shapes::ShapeRef.new(shape: String, location: "header", location_name: "x-amz-lex-session-attributes", metadata: {"jsonvalue"=>true}))
     PostContentResponse.add_member(:sentiment_response, Shapes::ShapeRef.new(shape: String, location: "header", location_name: "x-amz-lex-sentiment"))
-    PostContentResponse.add_member(:message, Shapes::ShapeRef.new(shape: Text, location: "header", location_name: "x-amz-lex-message"))
+    PostContentResponse.add_member(:message, Shapes::ShapeRef.new(shape: Text, deprecated: true, location: "header", location_name: "x-amz-lex-message", metadata: {"deprecatedMessage"=>"The message field is deprecated, use the encodedMessage field instead. The message field is available only in the de-DE, en-AU, en-GB, en-US, es-419, es-ES, es-US, fr-CA, fr-FR and it-IT locales."}))
+    PostContentResponse.add_member(:encoded_message, Shapes::ShapeRef.new(shape: SensitiveString, location: "header", location_name: "x-amz-lex-encoded-message"))
     PostContentResponse.add_member(:message_format, Shapes::ShapeRef.new(shape: MessageFormatType, location: "header", location_name: "x-amz-lex-message-format"))
     PostContentResponse.add_member(:dialog_state, Shapes::ShapeRef.new(shape: DialogState, location: "header", location_name: "x-amz-lex-dialog-state"))
     PostContentResponse.add_member(:slot_to_elicit, Shapes::ShapeRef.new(shape: String, location: "header", location_name: "x-amz-lex-slot-to-elicit"))
-    PostContentResponse.add_member(:input_transcript, Shapes::ShapeRef.new(shape: String, location: "header", location_name: "x-amz-lex-input-transcript"))
+    PostContentResponse.add_member(:input_transcript, Shapes::ShapeRef.new(shape: String, deprecated: true, location: "header", location_name: "x-amz-lex-input-transcript", metadata: {"deprecatedMessage"=>"The inputTranscript field is deprecated, use the encodedInputTranscript field instead. The inputTranscript field is available only in the de-DE, en-AU, en-GB, en-US, es-419, es-ES, es-US, fr-CA, fr-FR and it-IT locales."}))
+    PostContentResponse.add_member(:encoded_input_transcript, Shapes::ShapeRef.new(shape: SensitiveStringUnbounded, location: "header", location_name: "x-amz-lex-encoded-input-transcript"))
     PostContentResponse.add_member(:audio_stream, Shapes::ShapeRef.new(shape: BlobStream, location_name: "audioStream"))
     PostContentResponse.add_member(:bot_version, Shapes::ShapeRef.new(shape: BotVersion, location: "header", location_name: "x-amz-lex-bot-version"))
     PostContentResponse.add_member(:session_id, Shapes::ShapeRef.new(shape: String, location: "header", location_name: "x-amz-lex-session-id"))
@@ -262,7 +267,8 @@ module Aws::Lex
     PutSessionResponse.add_member(:intent_name, Shapes::ShapeRef.new(shape: IntentName, location: "header", location_name: "x-amz-lex-intent-name"))
     PutSessionResponse.add_member(:slots, Shapes::ShapeRef.new(shape: String, location: "header", location_name: "x-amz-lex-slots", metadata: {"jsonvalue"=>true}))
     PutSessionResponse.add_member(:session_attributes, Shapes::ShapeRef.new(shape: String, location: "header", location_name: "x-amz-lex-session-attributes", metadata: {"jsonvalue"=>true}))
-    PutSessionResponse.add_member(:message, Shapes::ShapeRef.new(shape: Text, location: "header", location_name: "x-amz-lex-message"))
+    PutSessionResponse.add_member(:message, Shapes::ShapeRef.new(shape: Text, deprecated: true, location: "header", location_name: "x-amz-lex-message", metadata: {"deprecatedMessage"=>"The message field is deprecated, use the encodedMessage field instead. The message field is available only in the de-DE, en-AU, en-GB, en-US, es-419, es-ES, es-US, fr-CA, fr-FR and it-IT locales."}))
+    PutSessionResponse.add_member(:encoded_message, Shapes::ShapeRef.new(shape: SensitiveString, location: "header", location_name: "x-amz-lex-encoded-message"))
     PutSessionResponse.add_member(:message_format, Shapes::ShapeRef.new(shape: MessageFormatType, location: "header", location_name: "x-amz-lex-message-format"))
     PutSessionResponse.add_member(:dialog_state, Shapes::ShapeRef.new(shape: DialogState, location: "header", location_name: "x-amz-lex-dialog-state"))
     PutSessionResponse.add_member(:slot_to_elicit, Shapes::ShapeRef.new(shape: String, location: "header", location_name: "x-amz-lex-slot-to-elicit"))
@@ -303,9 +309,11 @@ module Aws::Lex
 
       api.metadata = {
         "apiVersion" => "2016-11-28",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "runtime.lex",
         "jsonVersion" => "1.1",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceFullName" => "Amazon Lex Runtime Service",
         "serviceId" => "Lex Runtime Service",
         "signatureVersion" => "v4",
@@ -343,6 +351,7 @@ module Aws::Lex
         o.http_method = "POST"
         o.http_request_uri = "/bot/{botName}/alias/{botAlias}/user/{userId}/content"
         o['authtype'] = "v4-unsigned-body"
+        o['unsignedPayload'] = true
         o.input = Shapes::ShapeRef.new(shape: PostContentRequest)
         o.output = Shapes::ShapeRef.new(shape: PostContentResponse)
         o.errors << Shapes::ShapeRef.new(shape: NotFoundException)

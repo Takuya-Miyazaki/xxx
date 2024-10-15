@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-secretsmanager/types'
-require_relative 'aws-sdk-secretsmanager/client_api'
-require_relative 'aws-sdk-secretsmanager/client'
-require_relative 'aws-sdk-secretsmanager/errors'
-require_relative 'aws-sdk-secretsmanager/resource'
-require_relative 'aws-sdk-secretsmanager/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:secretsmanager)
 
 # This module provides support for AWS Secrets Manager. This module is available in the
 # `aws-sdk-secretsmanager` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-secretsmanager/customizations'
 # structure.
 #
 #     secrets_manager = Aws::SecretsManager::Client.new
-#     resp = secrets_manager.cancel_rotate_secret(params)
+#     resp = secrets_manager.batch_get_secret_value(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-secretsmanager/customizations'
 #
 # @!group service
 module Aws::SecretsManager
+  autoload :Types, 'aws-sdk-secretsmanager/types'
+  autoload :ClientApi, 'aws-sdk-secretsmanager/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-secretsmanager/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-secretsmanager/client'
+  autoload :Errors, 'aws-sdk-secretsmanager/errors'
+  autoload :Resource, 'aws-sdk-secretsmanager/resource'
+  autoload :EndpointParameters, 'aws-sdk-secretsmanager/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-secretsmanager/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-secretsmanager/endpoints'
 
-  GEM_VERSION = '1.43.0'
+  GEM_VERSION = '1.108.0'
 
 end
+
+require_relative 'aws-sdk-secretsmanager/customizations'

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-licensemanager/types'
-require_relative 'aws-sdk-licensemanager/client_api'
-require_relative 'aws-sdk-licensemanager/client'
-require_relative 'aws-sdk-licensemanager/errors'
-require_relative 'aws-sdk-licensemanager/resource'
-require_relative 'aws-sdk-licensemanager/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:licensemanager)
 
 # This module provides support for AWS License Manager. This module is available in the
 # `aws-sdk-licensemanager` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-licensemanager/customizations'
 #
 # @!group service
 module Aws::LicenseManager
+  autoload :Types, 'aws-sdk-licensemanager/types'
+  autoload :ClientApi, 'aws-sdk-licensemanager/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-licensemanager/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-licensemanager/client'
+  autoload :Errors, 'aws-sdk-licensemanager/errors'
+  autoload :Resource, 'aws-sdk-licensemanager/resource'
+  autoload :EndpointParameters, 'aws-sdk-licensemanager/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-licensemanager/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-licensemanager/endpoints'
 
-  GEM_VERSION = '1.23.0'
+  GEM_VERSION = '1.66.0'
 
 end
+
+require_relative 'aws-sdk-licensemanager/customizations'

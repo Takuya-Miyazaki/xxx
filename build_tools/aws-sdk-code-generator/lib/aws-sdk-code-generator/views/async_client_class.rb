@@ -23,7 +23,15 @@ module AwsSdkCodeGenerator
         @gem_name = options.fetch(:gem_name)
         @gem_version = options.fetch(:gem_version)
         @plugins = PluginList.new(options)
-        @client_constructor = ClientConstructor.new(plugins: @plugins)
+        @codegenerated_plugins = options.fetch(:codegenerated_plugins, [])
+        @default_plugins = Seahorse::Client::AsyncBase.plugins.map do |plugin|
+          PluginList::Plugin.new(class_name: plugin.name, options: plugin.options, path: '')
+        end
+        @client_constructor = ClientConstructor.new(
+          options.merge(
+            plugins: @plugins,
+            codegenerated_plugins: @codegenerated_plugins,
+            default_plugins: @default_plugins))
         @operations = ClientOperationList.new(options).to_a
       end
 
@@ -60,7 +68,7 @@ module AwsSdkCodeGenerator
 
       # @return [Array<String>]
       def plugin_class_names
-        @plugins.map(&:class_name)
+        @plugins.map(&:class_name) + @codegenerated_plugins.map(&:class_name)
       end
 
     end

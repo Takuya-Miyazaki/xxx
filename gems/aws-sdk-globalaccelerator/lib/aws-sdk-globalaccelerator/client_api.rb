@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::GlobalAccelerator
   # @api private
@@ -15,6 +16,8 @@ module Aws::GlobalAccelerator
 
     Accelerator = Shapes::StructureShape.new(name: 'Accelerator')
     AcceleratorAttributes = Shapes::StructureShape.new(name: 'AcceleratorAttributes')
+    AcceleratorEvent = Shapes::StructureShape.new(name: 'AcceleratorEvent')
+    AcceleratorEvents = Shapes::ListShape.new(name: 'AcceleratorEvents')
     AcceleratorNotDisabledException = Shapes::StructureShape.new(name: 'AcceleratorNotDisabledException')
     AcceleratorNotFoundException = Shapes::StructureShape.new(name: 'AcceleratorNotFoundException')
     AcceleratorStatus = Shapes::StringShape.new(name: 'AcceleratorStatus')
@@ -22,11 +25,19 @@ module Aws::GlobalAccelerator
     AccessDeniedException = Shapes::StructureShape.new(name: 'AccessDeniedException')
     AddCustomRoutingEndpointsRequest = Shapes::StructureShape.new(name: 'AddCustomRoutingEndpointsRequest')
     AddCustomRoutingEndpointsResponse = Shapes::StructureShape.new(name: 'AddCustomRoutingEndpointsResponse')
+    AddEndpointsRequest = Shapes::StructureShape.new(name: 'AddEndpointsRequest')
+    AddEndpointsResponse = Shapes::StructureShape.new(name: 'AddEndpointsResponse')
     AdvertiseByoipCidrRequest = Shapes::StructureShape.new(name: 'AdvertiseByoipCidrRequest')
     AdvertiseByoipCidrResponse = Shapes::StructureShape.new(name: 'AdvertiseByoipCidrResponse')
     AllowCustomRoutingTrafficRequest = Shapes::StructureShape.new(name: 'AllowCustomRoutingTrafficRequest')
     AssociatedEndpointGroupFoundException = Shapes::StructureShape.new(name: 'AssociatedEndpointGroupFoundException')
     AssociatedListenerFoundException = Shapes::StructureShape.new(name: 'AssociatedListenerFoundException')
+    Attachment = Shapes::StructureShape.new(name: 'Attachment')
+    AttachmentName = Shapes::StringShape.new(name: 'AttachmentName')
+    AttachmentNotFoundException = Shapes::StructureShape.new(name: 'AttachmentNotFoundException')
+    Attachments = Shapes::ListShape.new(name: 'Attachments')
+    AwsAccountId = Shapes::StringShape.new(name: 'AwsAccountId')
+    AwsAccountIds = Shapes::ListShape.new(name: 'AwsAccountIds')
     ByoipCidr = Shapes::StructureShape.new(name: 'ByoipCidr')
     ByoipCidrEvent = Shapes::StructureShape.new(name: 'ByoipCidrEvent')
     ByoipCidrEvents = Shapes::ListShape.new(name: 'ByoipCidrEvents')
@@ -38,6 +49,8 @@ module Aws::GlobalAccelerator
     ConflictException = Shapes::StructureShape.new(name: 'ConflictException')
     CreateAcceleratorRequest = Shapes::StructureShape.new(name: 'CreateAcceleratorRequest')
     CreateAcceleratorResponse = Shapes::StructureShape.new(name: 'CreateAcceleratorResponse')
+    CreateCrossAccountAttachmentRequest = Shapes::StructureShape.new(name: 'CreateCrossAccountAttachmentRequest')
+    CreateCrossAccountAttachmentResponse = Shapes::StructureShape.new(name: 'CreateCrossAccountAttachmentResponse')
     CreateCustomRoutingAcceleratorRequest = Shapes::StructureShape.new(name: 'CreateCustomRoutingAcceleratorRequest')
     CreateCustomRoutingAcceleratorResponse = Shapes::StructureShape.new(name: 'CreateCustomRoutingAcceleratorResponse')
     CreateCustomRoutingEndpointGroupRequest = Shapes::StructureShape.new(name: 'CreateCustomRoutingEndpointGroupRequest')
@@ -48,6 +61,8 @@ module Aws::GlobalAccelerator
     CreateEndpointGroupResponse = Shapes::StructureShape.new(name: 'CreateEndpointGroupResponse')
     CreateListenerRequest = Shapes::StructureShape.new(name: 'CreateListenerRequest')
     CreateListenerResponse = Shapes::StructureShape.new(name: 'CreateListenerResponse')
+    CrossAccountResource = Shapes::StructureShape.new(name: 'CrossAccountResource')
+    CrossAccountResources = Shapes::ListShape.new(name: 'CrossAccountResources')
     CustomRoutingAccelerator = Shapes::StructureShape.new(name: 'CustomRoutingAccelerator')
     CustomRoutingAcceleratorAttributes = Shapes::StructureShape.new(name: 'CustomRoutingAcceleratorAttributes')
     CustomRoutingAcceleratorStatus = Shapes::StringShape.new(name: 'CustomRoutingAcceleratorStatus')
@@ -68,6 +83,7 @@ module Aws::GlobalAccelerator
     CustomRoutingProtocol = Shapes::StringShape.new(name: 'CustomRoutingProtocol')
     CustomRoutingProtocols = Shapes::ListShape.new(name: 'CustomRoutingProtocols')
     DeleteAcceleratorRequest = Shapes::StructureShape.new(name: 'DeleteAcceleratorRequest')
+    DeleteCrossAccountAttachmentRequest = Shapes::StructureShape.new(name: 'DeleteCrossAccountAttachmentRequest')
     DeleteCustomRoutingAcceleratorRequest = Shapes::StructureShape.new(name: 'DeleteCustomRoutingAcceleratorRequest')
     DeleteCustomRoutingEndpointGroupRequest = Shapes::StructureShape.new(name: 'DeleteCustomRoutingEndpointGroupRequest')
     DeleteCustomRoutingListenerRequest = Shapes::StructureShape.new(name: 'DeleteCustomRoutingListenerRequest')
@@ -80,6 +96,8 @@ module Aws::GlobalAccelerator
     DescribeAcceleratorAttributesResponse = Shapes::StructureShape.new(name: 'DescribeAcceleratorAttributesResponse')
     DescribeAcceleratorRequest = Shapes::StructureShape.new(name: 'DescribeAcceleratorRequest')
     DescribeAcceleratorResponse = Shapes::StructureShape.new(name: 'DescribeAcceleratorResponse')
+    DescribeCrossAccountAttachmentRequest = Shapes::StructureShape.new(name: 'DescribeCrossAccountAttachmentRequest')
+    DescribeCrossAccountAttachmentResponse = Shapes::StructureShape.new(name: 'DescribeCrossAccountAttachmentResponse')
     DescribeCustomRoutingAcceleratorAttributesRequest = Shapes::StructureShape.new(name: 'DescribeCustomRoutingAcceleratorAttributesRequest')
     DescribeCustomRoutingAcceleratorAttributesResponse = Shapes::StructureShape.new(name: 'DescribeCustomRoutingAcceleratorAttributesResponse')
     DescribeCustomRoutingAcceleratorRequest = Shapes::StructureShape.new(name: 'DescribeCustomRoutingAcceleratorRequest')
@@ -105,6 +123,8 @@ module Aws::GlobalAccelerator
     EndpointGroupAlreadyExistsException = Shapes::StructureShape.new(name: 'EndpointGroupAlreadyExistsException')
     EndpointGroupNotFoundException = Shapes::StructureShape.new(name: 'EndpointGroupNotFoundException')
     EndpointGroups = Shapes::ListShape.new(name: 'EndpointGroups')
+    EndpointIdentifier = Shapes::StructureShape.new(name: 'EndpointIdentifier')
+    EndpointIdentifiers = Shapes::ListShape.new(name: 'EndpointIdentifiers')
     EndpointIds = Shapes::ListShape.new(name: 'EndpointIds')
     EndpointNotFoundException = Shapes::StructureShape.new(name: 'EndpointNotFoundException')
     EndpointWeight = Shapes::IntegerShape.new(name: 'EndpointWeight')
@@ -123,6 +143,7 @@ module Aws::GlobalAccelerator
     InvalidNextTokenException = Shapes::StructureShape.new(name: 'InvalidNextTokenException')
     InvalidPortRangeException = Shapes::StructureShape.new(name: 'InvalidPortRangeException')
     IpAddress = Shapes::StringShape.new(name: 'IpAddress')
+    IpAddressFamily = Shapes::StringShape.new(name: 'IpAddressFamily')
     IpAddressType = Shapes::StringShape.new(name: 'IpAddressType')
     IpAddresses = Shapes::ListShape.new(name: 'IpAddresses')
     IpSet = Shapes::StructureShape.new(name: 'IpSet')
@@ -132,6 +153,12 @@ module Aws::GlobalAccelerator
     ListAcceleratorsResponse = Shapes::StructureShape.new(name: 'ListAcceleratorsResponse')
     ListByoipCidrsRequest = Shapes::StructureShape.new(name: 'ListByoipCidrsRequest')
     ListByoipCidrsResponse = Shapes::StructureShape.new(name: 'ListByoipCidrsResponse')
+    ListCrossAccountAttachmentsRequest = Shapes::StructureShape.new(name: 'ListCrossAccountAttachmentsRequest')
+    ListCrossAccountAttachmentsResponse = Shapes::StructureShape.new(name: 'ListCrossAccountAttachmentsResponse')
+    ListCrossAccountResourceAccountsRequest = Shapes::StructureShape.new(name: 'ListCrossAccountResourceAccountsRequest')
+    ListCrossAccountResourceAccountsResponse = Shapes::StructureShape.new(name: 'ListCrossAccountResourceAccountsResponse')
+    ListCrossAccountResourcesRequest = Shapes::StructureShape.new(name: 'ListCrossAccountResourcesRequest')
+    ListCrossAccountResourcesResponse = Shapes::StructureShape.new(name: 'ListCrossAccountResourcesResponse')
     ListCustomRoutingAcceleratorsRequest = Shapes::StructureShape.new(name: 'ListCustomRoutingAcceleratorsRequest')
     ListCustomRoutingAcceleratorsResponse = Shapes::StructureShape.new(name: 'ListCustomRoutingAcceleratorsResponse')
     ListCustomRoutingEndpointGroupsRequest = Shapes::StructureShape.new(name: 'ListCustomRoutingEndpointGroupsRequest')
@@ -160,12 +187,17 @@ module Aws::GlobalAccelerator
     PortOverrides = Shapes::ListShape.new(name: 'PortOverrides')
     PortRange = Shapes::StructureShape.new(name: 'PortRange')
     PortRanges = Shapes::ListShape.new(name: 'PortRanges')
+    Principal = Shapes::StringShape.new(name: 'Principal')
+    Principals = Shapes::ListShape.new(name: 'Principals')
     Protocol = Shapes::StringShape.new(name: 'Protocol')
     Protocols = Shapes::ListShape.new(name: 'Protocols')
     ProvisionByoipCidrRequest = Shapes::StructureShape.new(name: 'ProvisionByoipCidrRequest')
     ProvisionByoipCidrResponse = Shapes::StructureShape.new(name: 'ProvisionByoipCidrResponse')
     RemoveCustomRoutingEndpointsRequest = Shapes::StructureShape.new(name: 'RemoveCustomRoutingEndpointsRequest')
+    RemoveEndpointsRequest = Shapes::StructureShape.new(name: 'RemoveEndpointsRequest')
+    Resource = Shapes::StructureShape.new(name: 'Resource')
     ResourceArn = Shapes::StringShape.new(name: 'ResourceArn')
+    Resources = Shapes::ListShape.new(name: 'Resources')
     SocketAddress = Shapes::StructureShape.new(name: 'SocketAddress')
     SocketAddresses = Shapes::ListShape.new(name: 'SocketAddresses')
     Tag = Shapes::StructureShape.new(name: 'Tag')
@@ -178,12 +210,15 @@ module Aws::GlobalAccelerator
     ThresholdCount = Shapes::IntegerShape.new(name: 'ThresholdCount')
     Timestamp = Shapes::TimestampShape.new(name: 'Timestamp')
     TrafficDialPercentage = Shapes::FloatShape.new(name: 'TrafficDialPercentage')
+    TransactionInProgressException = Shapes::StructureShape.new(name: 'TransactionInProgressException')
     UntagResourceRequest = Shapes::StructureShape.new(name: 'UntagResourceRequest')
     UntagResourceResponse = Shapes::StructureShape.new(name: 'UntagResourceResponse')
     UpdateAcceleratorAttributesRequest = Shapes::StructureShape.new(name: 'UpdateAcceleratorAttributesRequest')
     UpdateAcceleratorAttributesResponse = Shapes::StructureShape.new(name: 'UpdateAcceleratorAttributesResponse')
     UpdateAcceleratorRequest = Shapes::StructureShape.new(name: 'UpdateAcceleratorRequest')
     UpdateAcceleratorResponse = Shapes::StructureShape.new(name: 'UpdateAcceleratorResponse')
+    UpdateCrossAccountAttachmentRequest = Shapes::StructureShape.new(name: 'UpdateCrossAccountAttachmentRequest')
+    UpdateCrossAccountAttachmentResponse = Shapes::StructureShape.new(name: 'UpdateCrossAccountAttachmentResponse')
     UpdateCustomRoutingAcceleratorAttributesRequest = Shapes::StructureShape.new(name: 'UpdateCustomRoutingAcceleratorAttributesRequest')
     UpdateCustomRoutingAcceleratorAttributesResponse = Shapes::StructureShape.new(name: 'UpdateCustomRoutingAcceleratorAttributesResponse')
     UpdateCustomRoutingAcceleratorRequest = Shapes::StructureShape.new(name: 'UpdateCustomRoutingAcceleratorRequest')
@@ -206,12 +241,20 @@ module Aws::GlobalAccelerator
     Accelerator.add_member(:status, Shapes::ShapeRef.new(shape: AcceleratorStatus, location_name: "Status"))
     Accelerator.add_member(:created_time, Shapes::ShapeRef.new(shape: Timestamp, location_name: "CreatedTime"))
     Accelerator.add_member(:last_modified_time, Shapes::ShapeRef.new(shape: Timestamp, location_name: "LastModifiedTime"))
+    Accelerator.add_member(:dual_stack_dns_name, Shapes::ShapeRef.new(shape: GenericString, location_name: "DualStackDnsName"))
+    Accelerator.add_member(:events, Shapes::ShapeRef.new(shape: AcceleratorEvents, location_name: "Events"))
     Accelerator.struct_class = Types::Accelerator
 
     AcceleratorAttributes.add_member(:flow_logs_enabled, Shapes::ShapeRef.new(shape: GenericBoolean, location_name: "FlowLogsEnabled"))
     AcceleratorAttributes.add_member(:flow_logs_s3_bucket, Shapes::ShapeRef.new(shape: GenericString, location_name: "FlowLogsS3Bucket"))
     AcceleratorAttributes.add_member(:flow_logs_s3_prefix, Shapes::ShapeRef.new(shape: GenericString, location_name: "FlowLogsS3Prefix"))
     AcceleratorAttributes.struct_class = Types::AcceleratorAttributes
+
+    AcceleratorEvent.add_member(:message, Shapes::ShapeRef.new(shape: GenericString, location_name: "Message"))
+    AcceleratorEvent.add_member(:timestamp, Shapes::ShapeRef.new(shape: Timestamp, location_name: "Timestamp"))
+    AcceleratorEvent.struct_class = Types::AcceleratorEvent
+
+    AcceleratorEvents.member = Shapes::ShapeRef.new(shape: AcceleratorEvent)
 
     AcceleratorNotDisabledException.add_member(:message, Shapes::ShapeRef.new(shape: ErrorMessage, location_name: "Message"))
     AcceleratorNotDisabledException.struct_class = Types::AcceleratorNotDisabledException
@@ -232,6 +275,14 @@ module Aws::GlobalAccelerator
     AddCustomRoutingEndpointsResponse.add_member(:endpoint_group_arn, Shapes::ShapeRef.new(shape: GenericString, location_name: "EndpointGroupArn"))
     AddCustomRoutingEndpointsResponse.struct_class = Types::AddCustomRoutingEndpointsResponse
 
+    AddEndpointsRequest.add_member(:endpoint_configurations, Shapes::ShapeRef.new(shape: EndpointConfigurations, required: true, location_name: "EndpointConfigurations"))
+    AddEndpointsRequest.add_member(:endpoint_group_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "EndpointGroupArn"))
+    AddEndpointsRequest.struct_class = Types::AddEndpointsRequest
+
+    AddEndpointsResponse.add_member(:endpoint_descriptions, Shapes::ShapeRef.new(shape: EndpointDescriptions, location_name: "EndpointDescriptions"))
+    AddEndpointsResponse.add_member(:endpoint_group_arn, Shapes::ShapeRef.new(shape: GenericString, location_name: "EndpointGroupArn"))
+    AddEndpointsResponse.struct_class = Types::AddEndpointsResponse
+
     AdvertiseByoipCidrRequest.add_member(:cidr, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "Cidr"))
     AdvertiseByoipCidrRequest.struct_class = Types::AdvertiseByoipCidrRequest
 
@@ -250,6 +301,21 @@ module Aws::GlobalAccelerator
 
     AssociatedListenerFoundException.add_member(:message, Shapes::ShapeRef.new(shape: ErrorMessage, location_name: "Message"))
     AssociatedListenerFoundException.struct_class = Types::AssociatedListenerFoundException
+
+    Attachment.add_member(:attachment_arn, Shapes::ShapeRef.new(shape: GenericString, location_name: "AttachmentArn"))
+    Attachment.add_member(:name, Shapes::ShapeRef.new(shape: AttachmentName, location_name: "Name"))
+    Attachment.add_member(:principals, Shapes::ShapeRef.new(shape: Principals, location_name: "Principals"))
+    Attachment.add_member(:resources, Shapes::ShapeRef.new(shape: Resources, location_name: "Resources"))
+    Attachment.add_member(:last_modified_time, Shapes::ShapeRef.new(shape: Timestamp, location_name: "LastModifiedTime"))
+    Attachment.add_member(:created_time, Shapes::ShapeRef.new(shape: Timestamp, location_name: "CreatedTime"))
+    Attachment.struct_class = Types::Attachment
+
+    AttachmentNotFoundException.add_member(:message, Shapes::ShapeRef.new(shape: ErrorMessage, location_name: "Message"))
+    AttachmentNotFoundException.struct_class = Types::AttachmentNotFoundException
+
+    Attachments.member = Shapes::ShapeRef.new(shape: Attachment)
+
+    AwsAccountIds.member = Shapes::ShapeRef.new(shape: AwsAccountId)
 
     ByoipCidr.add_member(:cidr, Shapes::ShapeRef.new(shape: GenericString, location_name: "Cidr"))
     ByoipCidr.add_member(:state, Shapes::ShapeRef.new(shape: ByoipCidrState, location_name: "State"))
@@ -285,8 +351,19 @@ module Aws::GlobalAccelerator
     CreateAcceleratorResponse.add_member(:accelerator, Shapes::ShapeRef.new(shape: Accelerator, location_name: "Accelerator"))
     CreateAcceleratorResponse.struct_class = Types::CreateAcceleratorResponse
 
+    CreateCrossAccountAttachmentRequest.add_member(:name, Shapes::ShapeRef.new(shape: AttachmentName, required: true, location_name: "Name"))
+    CreateCrossAccountAttachmentRequest.add_member(:principals, Shapes::ShapeRef.new(shape: Principals, location_name: "Principals"))
+    CreateCrossAccountAttachmentRequest.add_member(:resources, Shapes::ShapeRef.new(shape: Resources, location_name: "Resources"))
+    CreateCrossAccountAttachmentRequest.add_member(:idempotency_token, Shapes::ShapeRef.new(shape: IdempotencyToken, required: true, location_name: "IdempotencyToken", metadata: {"idempotencyToken"=>true}))
+    CreateCrossAccountAttachmentRequest.add_member(:tags, Shapes::ShapeRef.new(shape: Tags, location_name: "Tags"))
+    CreateCrossAccountAttachmentRequest.struct_class = Types::CreateCrossAccountAttachmentRequest
+
+    CreateCrossAccountAttachmentResponse.add_member(:cross_account_attachment, Shapes::ShapeRef.new(shape: Attachment, location_name: "CrossAccountAttachment"))
+    CreateCrossAccountAttachmentResponse.struct_class = Types::CreateCrossAccountAttachmentResponse
+
     CreateCustomRoutingAcceleratorRequest.add_member(:name, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "Name"))
     CreateCustomRoutingAcceleratorRequest.add_member(:ip_address_type, Shapes::ShapeRef.new(shape: IpAddressType, location_name: "IpAddressType"))
+    CreateCustomRoutingAcceleratorRequest.add_member(:ip_addresses, Shapes::ShapeRef.new(shape: IpAddresses, location_name: "IpAddresses"))
     CreateCustomRoutingAcceleratorRequest.add_member(:enabled, Shapes::ShapeRef.new(shape: GenericBoolean, location_name: "Enabled"))
     CreateCustomRoutingAcceleratorRequest.add_member(:idempotency_token, Shapes::ShapeRef.new(shape: IdempotencyToken, required: true, location_name: "IdempotencyToken", metadata: {"idempotencyToken"=>true}))
     CreateCustomRoutingAcceleratorRequest.add_member(:tags, Shapes::ShapeRef.new(shape: Tags, location_name: "Tags"))
@@ -338,6 +415,13 @@ module Aws::GlobalAccelerator
     CreateListenerResponse.add_member(:listener, Shapes::ShapeRef.new(shape: Listener, location_name: "Listener"))
     CreateListenerResponse.struct_class = Types::CreateListenerResponse
 
+    CrossAccountResource.add_member(:endpoint_id, Shapes::ShapeRef.new(shape: GenericString, location_name: "EndpointId"))
+    CrossAccountResource.add_member(:cidr, Shapes::ShapeRef.new(shape: GenericString, location_name: "Cidr"))
+    CrossAccountResource.add_member(:attachment_arn, Shapes::ShapeRef.new(shape: GenericString, location_name: "AttachmentArn"))
+    CrossAccountResource.struct_class = Types::CrossAccountResource
+
+    CrossAccountResources.member = Shapes::ShapeRef.new(shape: CrossAccountResource)
+
     CustomRoutingAccelerator.add_member(:accelerator_arn, Shapes::ShapeRef.new(shape: GenericString, location_name: "AcceleratorArn"))
     CustomRoutingAccelerator.add_member(:name, Shapes::ShapeRef.new(shape: GenericString, location_name: "Name"))
     CustomRoutingAccelerator.add_member(:ip_address_type, Shapes::ShapeRef.new(shape: IpAddressType, location_name: "IpAddressType"))
@@ -371,6 +455,7 @@ module Aws::GlobalAccelerator
     CustomRoutingDestinationDescriptions.member = Shapes::ShapeRef.new(shape: CustomRoutingDestinationDescription)
 
     CustomRoutingEndpointConfiguration.add_member(:endpoint_id, Shapes::ShapeRef.new(shape: GenericString, location_name: "EndpointId"))
+    CustomRoutingEndpointConfiguration.add_member(:attachment_arn, Shapes::ShapeRef.new(shape: GenericString, location_name: "AttachmentArn"))
     CustomRoutingEndpointConfiguration.struct_class = Types::CustomRoutingEndpointConfiguration
 
     CustomRoutingEndpointConfigurations.member = Shapes::ShapeRef.new(shape: CustomRoutingEndpointConfiguration)
@@ -398,6 +483,9 @@ module Aws::GlobalAccelerator
 
     DeleteAcceleratorRequest.add_member(:accelerator_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "AcceleratorArn"))
     DeleteAcceleratorRequest.struct_class = Types::DeleteAcceleratorRequest
+
+    DeleteCrossAccountAttachmentRequest.add_member(:attachment_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "AttachmentArn"))
+    DeleteCrossAccountAttachmentRequest.struct_class = Types::DeleteCrossAccountAttachmentRequest
 
     DeleteCustomRoutingAcceleratorRequest.add_member(:accelerator_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "AcceleratorArn"))
     DeleteCustomRoutingAcceleratorRequest.struct_class = Types::DeleteCustomRoutingAcceleratorRequest
@@ -438,6 +526,12 @@ module Aws::GlobalAccelerator
 
     DescribeAcceleratorResponse.add_member(:accelerator, Shapes::ShapeRef.new(shape: Accelerator, location_name: "Accelerator"))
     DescribeAcceleratorResponse.struct_class = Types::DescribeAcceleratorResponse
+
+    DescribeCrossAccountAttachmentRequest.add_member(:attachment_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "AttachmentArn"))
+    DescribeCrossAccountAttachmentRequest.struct_class = Types::DescribeCrossAccountAttachmentRequest
+
+    DescribeCrossAccountAttachmentResponse.add_member(:cross_account_attachment, Shapes::ShapeRef.new(shape: Attachment, location_name: "CrossAccountAttachment"))
+    DescribeCrossAccountAttachmentResponse.struct_class = Types::DescribeCrossAccountAttachmentResponse
 
     DescribeCustomRoutingAcceleratorAttributesRequest.add_member(:accelerator_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "AcceleratorArn"))
     DescribeCustomRoutingAcceleratorAttributesRequest.struct_class = Types::DescribeCustomRoutingAcceleratorAttributesRequest
@@ -497,6 +591,7 @@ module Aws::GlobalAccelerator
     EndpointConfiguration.add_member(:endpoint_id, Shapes::ShapeRef.new(shape: GenericString, location_name: "EndpointId"))
     EndpointConfiguration.add_member(:weight, Shapes::ShapeRef.new(shape: EndpointWeight, location_name: "Weight"))
     EndpointConfiguration.add_member(:client_ip_preservation_enabled, Shapes::ShapeRef.new(shape: GenericBoolean, location_name: "ClientIPPreservationEnabled"))
+    EndpointConfiguration.add_member(:attachment_arn, Shapes::ShapeRef.new(shape: GenericString, location_name: "AttachmentArn"))
     EndpointConfiguration.struct_class = Types::EndpointConfiguration
 
     EndpointConfigurations.member = Shapes::ShapeRef.new(shape: EndpointConfiguration)
@@ -530,6 +625,12 @@ module Aws::GlobalAccelerator
 
     EndpointGroups.member = Shapes::ShapeRef.new(shape: EndpointGroup)
 
+    EndpointIdentifier.add_member(:endpoint_id, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "EndpointId"))
+    EndpointIdentifier.add_member(:client_ip_preservation_enabled, Shapes::ShapeRef.new(shape: GenericBoolean, location_name: "ClientIPPreservationEnabled"))
+    EndpointIdentifier.struct_class = Types::EndpointIdentifier
+
+    EndpointIdentifiers.member = Shapes::ShapeRef.new(shape: EndpointIdentifier)
+
     EndpointIds.member = Shapes::ShapeRef.new(shape: GenericString)
 
     EndpointNotFoundException.add_member(:message, Shapes::ShapeRef.new(shape: ErrorMessage, location_name: "Message"))
@@ -552,8 +653,9 @@ module Aws::GlobalAccelerator
 
     IpAddresses.member = Shapes::ShapeRef.new(shape: IpAddress)
 
-    IpSet.add_member(:ip_family, Shapes::ShapeRef.new(shape: GenericString, location_name: "IpFamily"))
+    IpSet.add_member(:ip_family, Shapes::ShapeRef.new(shape: GenericString, deprecated: true, location_name: "IpFamily", metadata: {"deprecatedMessage"=>"IpFamily has been replaced by IpAddressFamily"}))
     IpSet.add_member(:ip_addresses, Shapes::ShapeRef.new(shape: IpAddresses, location_name: "IpAddresses"))
+    IpSet.add_member(:ip_address_family, Shapes::ShapeRef.new(shape: IpAddressFamily, location_name: "IpAddressFamily"))
     IpSet.struct_class = Types::IpSet
 
     IpSets.member = Shapes::ShapeRef.new(shape: IpSet)
@@ -576,6 +678,29 @@ module Aws::GlobalAccelerator
     ListByoipCidrsResponse.add_member(:byoip_cidrs, Shapes::ShapeRef.new(shape: ByoipCidrs, location_name: "ByoipCidrs"))
     ListByoipCidrsResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: GenericString, location_name: "NextToken"))
     ListByoipCidrsResponse.struct_class = Types::ListByoipCidrsResponse
+
+    ListCrossAccountAttachmentsRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: MaxResults, location_name: "MaxResults"))
+    ListCrossAccountAttachmentsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: GenericString, location_name: "NextToken"))
+    ListCrossAccountAttachmentsRequest.struct_class = Types::ListCrossAccountAttachmentsRequest
+
+    ListCrossAccountAttachmentsResponse.add_member(:cross_account_attachments, Shapes::ShapeRef.new(shape: Attachments, location_name: "CrossAccountAttachments"))
+    ListCrossAccountAttachmentsResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: GenericString, location_name: "NextToken"))
+    ListCrossAccountAttachmentsResponse.struct_class = Types::ListCrossAccountAttachmentsResponse
+
+    ListCrossAccountResourceAccountsRequest.struct_class = Types::ListCrossAccountResourceAccountsRequest
+
+    ListCrossAccountResourceAccountsResponse.add_member(:resource_owner_aws_account_ids, Shapes::ShapeRef.new(shape: AwsAccountIds, location_name: "ResourceOwnerAwsAccountIds"))
+    ListCrossAccountResourceAccountsResponse.struct_class = Types::ListCrossAccountResourceAccountsResponse
+
+    ListCrossAccountResourcesRequest.add_member(:accelerator_arn, Shapes::ShapeRef.new(shape: GenericString, location_name: "AcceleratorArn"))
+    ListCrossAccountResourcesRequest.add_member(:resource_owner_aws_account_id, Shapes::ShapeRef.new(shape: AwsAccountId, required: true, location_name: "ResourceOwnerAwsAccountId"))
+    ListCrossAccountResourcesRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: MaxResults, location_name: "MaxResults"))
+    ListCrossAccountResourcesRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: GenericString, location_name: "NextToken"))
+    ListCrossAccountResourcesRequest.struct_class = Types::ListCrossAccountResourcesRequest
+
+    ListCrossAccountResourcesResponse.add_member(:cross_account_resources, Shapes::ShapeRef.new(shape: CrossAccountResources, location_name: "CrossAccountResources"))
+    ListCrossAccountResourcesResponse.add_member(:next_token, Shapes::ShapeRef.new(shape: GenericString, location_name: "NextToken"))
+    ListCrossAccountResourcesResponse.struct_class = Types::ListCrossAccountResourcesResponse
 
     ListCustomRoutingAcceleratorsRequest.add_member(:max_results, Shapes::ShapeRef.new(shape: MaxResults, location_name: "MaxResults"))
     ListCustomRoutingAcceleratorsRequest.add_member(:next_token, Shapes::ShapeRef.new(shape: GenericString, location_name: "NextToken"))
@@ -680,6 +805,8 @@ module Aws::GlobalAccelerator
 
     PortRanges.member = Shapes::ShapeRef.new(shape: PortRange)
 
+    Principals.member = Shapes::ShapeRef.new(shape: Principal)
+
     Protocols.member = Shapes::ShapeRef.new(shape: Protocol)
 
     ProvisionByoipCidrRequest.add_member(:cidr, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "Cidr"))
@@ -692,6 +819,17 @@ module Aws::GlobalAccelerator
     RemoveCustomRoutingEndpointsRequest.add_member(:endpoint_ids, Shapes::ShapeRef.new(shape: EndpointIds, required: true, location_name: "EndpointIds"))
     RemoveCustomRoutingEndpointsRequest.add_member(:endpoint_group_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "EndpointGroupArn"))
     RemoveCustomRoutingEndpointsRequest.struct_class = Types::RemoveCustomRoutingEndpointsRequest
+
+    RemoveEndpointsRequest.add_member(:endpoint_identifiers, Shapes::ShapeRef.new(shape: EndpointIdentifiers, required: true, location_name: "EndpointIdentifiers"))
+    RemoveEndpointsRequest.add_member(:endpoint_group_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "EndpointGroupArn"))
+    RemoveEndpointsRequest.struct_class = Types::RemoveEndpointsRequest
+
+    Resource.add_member(:endpoint_id, Shapes::ShapeRef.new(shape: GenericString, location_name: "EndpointId"))
+    Resource.add_member(:cidr, Shapes::ShapeRef.new(shape: GenericString, location_name: "Cidr"))
+    Resource.add_member(:region, Shapes::ShapeRef.new(shape: GenericString, location_name: "Region"))
+    Resource.struct_class = Types::Resource
+
+    Resources.member = Shapes::ShapeRef.new(shape: Resource)
 
     SocketAddress.add_member(:ip_address, Shapes::ShapeRef.new(shape: GenericString, location_name: "IpAddress"))
     SocketAddress.add_member(:port, Shapes::ShapeRef.new(shape: PortNumber, location_name: "Port"))
@@ -713,6 +851,9 @@ module Aws::GlobalAccelerator
 
     Tags.member = Shapes::ShapeRef.new(shape: Tag)
 
+    TransactionInProgressException.add_member(:message, Shapes::ShapeRef.new(shape: ErrorMessage, location_name: "Message"))
+    TransactionInProgressException.struct_class = Types::TransactionInProgressException
+
     UntagResourceRequest.add_member(:resource_arn, Shapes::ShapeRef.new(shape: ResourceArn, required: true, location_name: "ResourceArn"))
     UntagResourceRequest.add_member(:tag_keys, Shapes::ShapeRef.new(shape: TagKeys, required: true, location_name: "TagKeys"))
     UntagResourceRequest.struct_class = Types::UntagResourceRequest
@@ -731,11 +872,23 @@ module Aws::GlobalAccelerator
     UpdateAcceleratorRequest.add_member(:accelerator_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "AcceleratorArn"))
     UpdateAcceleratorRequest.add_member(:name, Shapes::ShapeRef.new(shape: GenericString, location_name: "Name"))
     UpdateAcceleratorRequest.add_member(:ip_address_type, Shapes::ShapeRef.new(shape: IpAddressType, location_name: "IpAddressType"))
+    UpdateAcceleratorRequest.add_member(:ip_addresses, Shapes::ShapeRef.new(shape: IpAddresses, location_name: "IpAddresses"))
     UpdateAcceleratorRequest.add_member(:enabled, Shapes::ShapeRef.new(shape: GenericBoolean, location_name: "Enabled"))
     UpdateAcceleratorRequest.struct_class = Types::UpdateAcceleratorRequest
 
     UpdateAcceleratorResponse.add_member(:accelerator, Shapes::ShapeRef.new(shape: Accelerator, location_name: "Accelerator"))
     UpdateAcceleratorResponse.struct_class = Types::UpdateAcceleratorResponse
+
+    UpdateCrossAccountAttachmentRequest.add_member(:attachment_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "AttachmentArn"))
+    UpdateCrossAccountAttachmentRequest.add_member(:name, Shapes::ShapeRef.new(shape: AttachmentName, location_name: "Name"))
+    UpdateCrossAccountAttachmentRequest.add_member(:add_principals, Shapes::ShapeRef.new(shape: Principals, location_name: "AddPrincipals"))
+    UpdateCrossAccountAttachmentRequest.add_member(:remove_principals, Shapes::ShapeRef.new(shape: Principals, location_name: "RemovePrincipals"))
+    UpdateCrossAccountAttachmentRequest.add_member(:add_resources, Shapes::ShapeRef.new(shape: Resources, location_name: "AddResources"))
+    UpdateCrossAccountAttachmentRequest.add_member(:remove_resources, Shapes::ShapeRef.new(shape: Resources, location_name: "RemoveResources"))
+    UpdateCrossAccountAttachmentRequest.struct_class = Types::UpdateCrossAccountAttachmentRequest
+
+    UpdateCrossAccountAttachmentResponse.add_member(:cross_account_attachment, Shapes::ShapeRef.new(shape: Attachment, location_name: "CrossAccountAttachment"))
+    UpdateCrossAccountAttachmentResponse.struct_class = Types::UpdateCrossAccountAttachmentResponse
 
     UpdateCustomRoutingAcceleratorAttributesRequest.add_member(:accelerator_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "AcceleratorArn"))
     UpdateCustomRoutingAcceleratorAttributesRequest.add_member(:flow_logs_enabled, Shapes::ShapeRef.new(shape: GenericBoolean, location_name: "FlowLogsEnabled"))
@@ -749,6 +902,7 @@ module Aws::GlobalAccelerator
     UpdateCustomRoutingAcceleratorRequest.add_member(:accelerator_arn, Shapes::ShapeRef.new(shape: GenericString, required: true, location_name: "AcceleratorArn"))
     UpdateCustomRoutingAcceleratorRequest.add_member(:name, Shapes::ShapeRef.new(shape: GenericString, location_name: "Name"))
     UpdateCustomRoutingAcceleratorRequest.add_member(:ip_address_type, Shapes::ShapeRef.new(shape: IpAddressType, location_name: "IpAddressType"))
+    UpdateCustomRoutingAcceleratorRequest.add_member(:ip_addresses, Shapes::ShapeRef.new(shape: IpAddresses, location_name: "IpAddresses"))
     UpdateCustomRoutingAcceleratorRequest.add_member(:enabled, Shapes::ShapeRef.new(shape: GenericBoolean, location_name: "Enabled"))
     UpdateCustomRoutingAcceleratorRequest.struct_class = Types::UpdateCustomRoutingAcceleratorRequest
 
@@ -799,9 +953,11 @@ module Aws::GlobalAccelerator
 
       api.metadata = {
         "apiVersion" => "2018-08-08",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "globalaccelerator",
         "jsonVersion" => "1.1",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceFullName" => "AWS Global Accelerator",
         "serviceId" => "Global Accelerator",
         "signatureVersion" => "v4",
@@ -825,6 +981,20 @@ module Aws::GlobalAccelerator
         o.errors << Shapes::ShapeRef.new(shape: ConflictException)
       end)
 
+      api.add_operation(:add_endpoints, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "AddEndpoints"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: AddEndpointsRequest)
+        o.output = Shapes::ShapeRef.new(shape: AddEndpointsResponse)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
+        o.errors << Shapes::ShapeRef.new(shape: EndpointGroupNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: LimitExceededException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+      end)
+
       api.add_operation(:advertise_byoip_cidr, Seahorse::Model::Operation.new.tap do |o|
         o.name = "AdvertiseByoipCidr"
         o.http_method = "POST"
@@ -844,6 +1014,7 @@ module Aws::GlobalAccelerator
         o.http_request_uri = "/"
         o.input = Shapes::ShapeRef.new(shape: AllowCustomRoutingTrafficRequest)
         o.output = Shapes::ShapeRef.new(shape: Shapes::StructureShape.new(struct_class: Aws::EmptyStructure))
+        o.errors << Shapes::ShapeRef.new(shape: EndpointGroupNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
       end)
@@ -857,6 +1028,21 @@ module Aws::GlobalAccelerator
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
         o.errors << Shapes::ShapeRef.new(shape: LimitExceededException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
+      end)
+
+      api.add_operation(:create_cross_account_attachment, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "CreateCrossAccountAttachment"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: CreateCrossAccountAttachmentRequest)
+        o.output = Shapes::ShapeRef.new(shape: CreateCrossAccountAttachmentResponse)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: LimitExceededException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
       end)
 
       api.add_operation(:create_custom_routing_accelerator, Seahorse::Model::Operation.new.tap do |o|
@@ -869,6 +1055,7 @@ module Aws::GlobalAccelerator
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
         o.errors << Shapes::ShapeRef.new(shape: LimitExceededException)
         o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
       end)
 
       api.add_operation(:create_custom_routing_endpoint_group, Seahorse::Model::Operation.new.tap do |o|
@@ -939,6 +1126,20 @@ module Aws::GlobalAccelerator
         o.errors << Shapes::ShapeRef.new(shape: AssociatedListenerFoundException)
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
+      end)
+
+      api.add_operation(:delete_cross_account_attachment, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DeleteCrossAccountAttachment"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DeleteCrossAccountAttachmentRequest)
+        o.output = Shapes::ShapeRef.new(shape: Shapes::StructureShape.new(struct_class: Aws::EmptyStructure))
+        o.errors << Shapes::ShapeRef.new(shape: AttachmentNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
       end)
 
       api.add_operation(:delete_custom_routing_accelerator, Seahorse::Model::Operation.new.tap do |o|
@@ -952,6 +1153,7 @@ module Aws::GlobalAccelerator
         o.errors << Shapes::ShapeRef.new(shape: AssociatedListenerFoundException)
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
       end)
 
       api.add_operation(:delete_custom_routing_endpoint_group, Seahorse::Model::Operation.new.tap do |o|
@@ -1006,6 +1208,7 @@ module Aws::GlobalAccelerator
         o.http_request_uri = "/"
         o.input = Shapes::ShapeRef.new(shape: DenyCustomRoutingTrafficRequest)
         o.output = Shapes::ShapeRef.new(shape: Shapes::StructureShape.new(struct_class: Aws::EmptyStructure))
+        o.errors << Shapes::ShapeRef.new(shape: EndpointGroupNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
       end)
@@ -1041,6 +1244,18 @@ module Aws::GlobalAccelerator
         o.input = Shapes::ShapeRef.new(shape: DescribeAcceleratorAttributesRequest)
         o.output = Shapes::ShapeRef.new(shape: DescribeAcceleratorAttributesResponse)
         o.errors << Shapes::ShapeRef.new(shape: AcceleratorNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+      end)
+
+      api.add_operation(:describe_cross_account_attachment, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "DescribeCrossAccountAttachment"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: DescribeCrossAccountAttachmentRequest)
+        o.output = Shapes::ShapeRef.new(shape: DescribeCrossAccountAttachmentResponse)
+        o.errors << Shapes::ShapeRef.new(shape: AttachmentNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
       end)
@@ -1138,6 +1353,53 @@ module Aws::GlobalAccelerator
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
         o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidNextTokenException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_results",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
+      api.add_operation(:list_cross_account_attachments, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ListCrossAccountAttachments"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: ListCrossAccountAttachmentsRequest)
+        o.output = Shapes::ShapeRef.new(shape: ListCrossAccountAttachmentsResponse)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidNextTokenException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
+        o[:pager] = Aws::Pager.new(
+          limit_key: "max_results",
+          tokens: {
+            "next_token" => "next_token"
+          }
+        )
+      end)
+
+      api.add_operation(:list_cross_account_resource_accounts, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ListCrossAccountResourceAccounts"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: ListCrossAccountResourceAccountsRequest)
+        o.output = Shapes::ShapeRef.new(shape: ListCrossAccountResourceAccountsResponse)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
+      end)
+
+      api.add_operation(:list_cross_account_resources, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "ListCrossAccountResources"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: ListCrossAccountResourcesRequest)
+        o.output = Shapes::ShapeRef.new(shape: ListCrossAccountResourcesResponse)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidNextTokenException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: AcceleratorNotFoundException)
         o[:pager] = Aws::Pager.new(
           limit_key: "max_results",
           tokens: {
@@ -1279,6 +1541,9 @@ module Aws::GlobalAccelerator
         o.input = Shapes::ShapeRef.new(shape: ListTagsForResourceRequest)
         o.output = Shapes::ShapeRef.new(shape: ListTagsForResourceResponse)
         o.errors << Shapes::ShapeRef.new(shape: AcceleratorNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: AttachmentNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: EndpointGroupNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: ListenerNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
       end)
@@ -1310,6 +1575,19 @@ module Aws::GlobalAccelerator
         o.errors << Shapes::ShapeRef.new(shape: ConflictException)
       end)
 
+      api.add_operation(:remove_endpoints, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "RemoveEndpoints"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: RemoveEndpointsRequest)
+        o.output = Shapes::ShapeRef.new(shape: Shapes::StructureShape.new(struct_class: Aws::EmptyStructure))
+        o.errors << Shapes::ShapeRef.new(shape: EndpointGroupNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
+      end)
+
       api.add_operation(:tag_resource, Seahorse::Model::Operation.new.tap do |o|
         o.name = "TagResource"
         o.http_method = "POST"
@@ -1339,8 +1617,11 @@ module Aws::GlobalAccelerator
         o.input = Shapes::ShapeRef.new(shape: UpdateAcceleratorRequest)
         o.output = Shapes::ShapeRef.new(shape: UpdateAcceleratorResponse)
         o.errors << Shapes::ShapeRef.new(shape: AcceleratorNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
+        o.errors << Shapes::ShapeRef.new(shape: ConflictException)
       end)
 
       api.add_operation(:update_accelerator_attributes, Seahorse::Model::Operation.new.tap do |o|
@@ -1353,6 +1634,21 @@ module Aws::GlobalAccelerator
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
         o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
+      end)
+
+      api.add_operation(:update_cross_account_attachment, Seahorse::Model::Operation.new.tap do |o|
+        o.name = "UpdateCrossAccountAttachment"
+        o.http_method = "POST"
+        o.http_request_uri = "/"
+        o.input = Shapes::ShapeRef.new(shape: UpdateCrossAccountAttachmentRequest)
+        o.output = Shapes::ShapeRef.new(shape: UpdateCrossAccountAttachmentResponse)
+        o.errors << Shapes::ShapeRef.new(shape: AttachmentNotFoundException)
+        o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
+        o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: LimitExceededException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
       end)
 
       api.add_operation(:update_custom_routing_accelerator, Seahorse::Model::Operation.new.tap do |o|
@@ -1364,6 +1660,8 @@ module Aws::GlobalAccelerator
         o.errors << Shapes::ShapeRef.new(shape: AcceleratorNotFoundException)
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
+        o.errors << Shapes::ShapeRef.new(shape: ConflictException)
       end)
 
       api.add_operation(:update_custom_routing_accelerator_attributes, Seahorse::Model::Operation.new.tap do |o|
@@ -1376,6 +1674,7 @@ module Aws::GlobalAccelerator
         o.errors << Shapes::ShapeRef.new(shape: InternalServiceErrorException)
         o.errors << Shapes::ShapeRef.new(shape: InvalidArgumentException)
         o.errors << Shapes::ShapeRef.new(shape: AccessDeniedException)
+        o.errors << Shapes::ShapeRef.new(shape: TransactionInProgressException)
       end)
 
       api.add_operation(:update_custom_routing_listener, Seahorse::Model::Operation.new.tap do |o|

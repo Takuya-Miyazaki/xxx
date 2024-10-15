@@ -3,20 +3,15 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::IoTFleetHub
   module Types
 
-    # A summary of information about a AWS IoT Device Management web
-    # application.
-    #
-    # <note markdown="1"> Fleet Hub for AWS IoT Device Management is in public preview and is
-    # subject to change.
-    #
-    #  </note>
+    # A summary of information about a Fleet Hub for IoT Device Management
+    # web application.
     #
     # @!attribute [rw] application_id
     #   The unique Id of the web application.
@@ -70,19 +65,6 @@ module Aws::IoTFleetHub
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_name: "Name", # required
-    #         application_description: "Description",
-    #         client_token: "ClientRequestToken",
-    #         role_arn: "Arn", # required
-    #         tags: {
-    #           "TagKey" => "TagValue",
-    #         },
-    #       }
-    #
     # @!attribute [rw] application_name
     #   The name of the web application.
     #   @return [String]
@@ -102,7 +84,7 @@ module Aws::IoTFleetHub
     #
     # @!attribute [rw] role_arn
     #   The ARN of the role that the web application assumes when it
-    #   interacts with AWS IoT Core.
+    #   interacts with Amazon Web Services IoT Core.
     #
     #   <note markdown="1"> The name of the role must be in the form
     #   `AWSIotFleetHub_random_string `.
@@ -140,14 +122,6 @@ module Aws::IoTFleetHub
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "Id", # required
-    #         client_token: "ClientRequestToken",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   The unique Id of the web application.
     #   @return [String]
@@ -170,13 +144,6 @@ module Aws::IoTFleetHub
 
     class DeleteApplicationResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DescribeApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "Id", # required
-    #       }
-    #
     # @!attribute [rw] application_id
     #   The unique Id of the web application.
     #   @return [String]
@@ -221,7 +188,7 @@ module Aws::IoTFleetHub
     #
     # @!attribute [rw] role_arn
     #   The ARN of the role that the web application assumes when it
-    #   interacts with AWS IoT Core.
+    #   interacts with Amazon Web Services IoT Core.
     #   @return [String]
     #
     # @!attribute [rw] sso_client_id
@@ -230,7 +197,9 @@ module Aws::IoTFleetHub
     #   @return [String]
     #
     # @!attribute [rw] error_message
-    #   A message indicating why the `DescribeApplication` API failed.
+    #   A message that explains any failures included in the
+    #   `applicationState` response field. This message explains failures in
+    #   the `CreateApplication` and `DeleteApplication` actions.
     #   @return [String]
     #
     # @!attribute [rw] tags
@@ -288,13 +257,6 @@ module Aws::IoTFleetHub
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListApplicationsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] next_token
     #   A token used to get the next set of results.
     #   @return [String]
@@ -321,13 +283,6 @@ module Aws::IoTFleetHub
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The ARN of the resource.
     #   @return [String]
@@ -359,16 +314,6 @@ module Aws::IoTFleetHub
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #         tags: { # required
-    #           "TagKey" => "TagValue",
-    #         },
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The ARN of the resource.
     #   @return [String]
@@ -397,14 +342,6 @@ module Aws::IoTFleetHub
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The ARN of the resource.
     #   @return [String]
@@ -422,16 +359,6 @@ module Aws::IoTFleetHub
 
     class UntagResourceResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UpdateApplicationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         application_id: "Id", # required
-    #         application_name: "Name",
-    #         application_description: "Description",
-    #         client_token: "ClientRequestToken",
-    #       }
-    #
     # @!attribute [rw] application_id
     #   The unique Id of the web application.
     #   @return [String]
@@ -466,3 +393,4 @@ module Aws::IoTFleetHub
 
   end
 end
+

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -76,17 +76,6 @@ module Aws::EBS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CompleteSnapshotRequest
-    #   data as a hash:
-    #
-    #       {
-    #         snapshot_id: "SnapshotId", # required
-    #         changed_blocks_count: 1, # required
-    #         checksum: "Checksum",
-    #         checksum_algorithm: "SHA256", # accepts SHA256
-    #         checksum_aggregation_method: "LINEAR", # accepts LINEAR
-    #       }
-    #
     # @!attribute [rw] snapshot_id
     #   The ID of the snapshot.
     #   @return [String]
@@ -173,30 +162,30 @@ module Aws::EBS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetSnapshotBlockRequest
-    #   data as a hash:
-    #
-    #       {
-    #         snapshot_id: "SnapshotId", # required
-    #         block_index: 1, # required
-    #         block_token: "BlockToken", # required
-    #       }
-    #
     # @!attribute [rw] snapshot_id
     #   The ID of the snapshot containing the block from which to get data.
+    #
+    #   If the specified snapshot is encrypted, you must have permission to
+    #   use the KMS key that was used to encrypt the snapshot. For more
+    #   information, see [ Using encryption][1] in the *Amazon Elastic
+    #   Compute Cloud User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapis-using-encryption.html
     #   @return [String]
     #
     # @!attribute [rw] block_index
-    #   The block index of the block from which to get data.
-    #
-    #   Obtain the `BlockIndex` by running the `ListChangedBlocks` or
-    #   `ListSnapshotBlocks` operations.
+    #   The block index of the block in which to read the data. A block
+    #   index is a logical index in units of `512` KiB blocks. To identify
+    #   the block index, divide the logical offset of the data in the
+    #   logical volume by the block size (logical offset of data/`524288`).
+    #   The logical offset of the data must be `512` KiB aligned.
     #   @return [Integer]
     #
     # @!attribute [rw] block_token
-    #   The block token of the block from which to get data.
-    #
-    #   Obtain the `BlockToken` by running the `ListChangedBlocks` or
+    #   The block token of the block from which to get data. You can obtain
+    #   the `BlockToken` by running the `ListChangedBlocks` or
     #   `ListSnapshotBlocks` operations.
     #   @return [String]
     #
@@ -238,7 +227,12 @@ module Aws::EBS
       include Aws::Structure
     end
 
-    # An internal error has occurred.
+    # An internal error has occurred. For more information see [Error
+    # retries][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -251,17 +245,6 @@ module Aws::EBS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListChangedBlocksRequest
-    #   data as a hash:
-    #
-    #       {
-    #         first_snapshot_id: "SnapshotId",
-    #         second_snapshot_id: "SnapshotId", # required
-    #         next_token: "PageToken",
-    #         max_results: 1,
-    #         starting_block_index: 1,
-    #       }
-    #
     # @!attribute [rw] first_snapshot_id
     #   The ID of the first snapshot to use for the comparison.
     #
@@ -278,10 +261,21 @@ module Aws::EBS
     #
     # @!attribute [rw] next_token
     #   The token to request the next page of results.
+    #
+    #   If you specify **NextToken**, then **StartingBlockIndex** is
+    #   ignored.
     #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The number of results to return.
+    #   The maximum number of blocks to be returned by the request.
+    #
+    #   Even if additional blocks can be retrieved from the snapshot, the
+    #   request can return less blocks than **MaxResults** or an empty array
+    #   of blocks.
+    #
+    #   To retrieve the next set of blocks from the snapshot, make another
+    #   request with the returned **NextToken** value. The value of
+    #   **NextToken** is `null` when there are no more blocks to return.
     #   @return [Integer]
     #
     # @!attribute [rw] starting_block_index
@@ -289,6 +283,9 @@ module Aws::EBS
     #
     #   The list in the response will start from this block index or the
     #   next valid block index in the snapshots.
+    #
+    #   If you specify **NextToken**, then **StartingBlockIndex** is
+    #   ignored.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ebs-2019-11-02/ListChangedBlocksRequest AWS API Documentation
@@ -316,7 +313,7 @@ module Aws::EBS
     #   @return [Integer]
     #
     # @!attribute [rw] block_size
-    #   The size of the block.
+    #   The size of the blocks in the snapshot, in bytes.
     #   @return [Integer]
     #
     # @!attribute [rw] next_token
@@ -332,20 +329,10 @@ module Aws::EBS
       :volume_size,
       :block_size,
       :next_token)
-      SENSITIVE = []
+      SENSITIVE = [:changed_blocks]
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListSnapshotBlocksRequest
-    #   data as a hash:
-    #
-    #       {
-    #         snapshot_id: "SnapshotId", # required
-    #         next_token: "PageToken",
-    #         max_results: 1,
-    #         starting_block_index: 1,
-    #       }
-    #
     # @!attribute [rw] snapshot_id
     #   The ID of the snapshot from which to get block indexes and block
     #   tokens.
@@ -353,16 +340,30 @@ module Aws::EBS
     #
     # @!attribute [rw] next_token
     #   The token to request the next page of results.
+    #
+    #   If you specify **NextToken**, then **StartingBlockIndex** is
+    #   ignored.
     #   @return [String]
     #
     # @!attribute [rw] max_results
-    #   The number of results to return.
+    #   The maximum number of blocks to be returned by the request.
+    #
+    #   Even if additional blocks can be retrieved from the snapshot, the
+    #   request can return less blocks than **MaxResults** or an empty array
+    #   of blocks.
+    #
+    #   To retrieve the next set of blocks from the snapshot, make another
+    #   request with the returned **NextToken** value. The value of
+    #   **NextToken** is `null` when there are no more blocks to return.
     #   @return [Integer]
     #
     # @!attribute [rw] starting_block_index
     #   The block index from which the list should start. The list in the
     #   response will start from this block index or the next valid block
     #   index in the snapshot.
+    #
+    #   If you specify **NextToken**, then **StartingBlockIndex** is
+    #   ignored.
     #   @return [Integer]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ebs-2019-11-02/ListSnapshotBlocksRequest AWS API Documentation
@@ -389,7 +390,7 @@ module Aws::EBS
     #   @return [Integer]
     #
     # @!attribute [rw] block_size
-    #   The size of the block.
+    #   The size of the blocks in the snapshot, in bytes.
     #   @return [Integer]
     #
     # @!attribute [rw] next_token
@@ -409,21 +410,17 @@ module Aws::EBS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutSnapshotBlockRequest
-    #   data as a hash:
-    #
-    #       {
-    #         snapshot_id: "SnapshotId", # required
-    #         block_index: 1, # required
-    #         block_data: "data", # required
-    #         data_length: 1, # required
-    #         progress: 1,
-    #         checksum: "Checksum", # required
-    #         checksum_algorithm: "SHA256", # required, accepts SHA256
-    #       }
-    #
     # @!attribute [rw] snapshot_id
     #   The ID of the snapshot.
+    #
+    #   If the specified snapshot is encrypted, you must have permission to
+    #   use the KMS key that was used to encrypt the snapshot. For more
+    #   information, see [ Using encryption][1] in the *Amazon Elastic
+    #   Compute Cloud User Guide*..
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapis-using-encryption.html
     #   @return [String]
     #
     # @!attribute [rw] block_index
@@ -456,7 +453,7 @@ module Aws::EBS
     #
     # @!attribute [rw] data_length
     #   The size of the data to write to the block, in bytes. Currently, the
-    #   only supported size is `524288`.
+    #   only supported size is `524288` bytes.
     #
     #   Valid values: `524288`
     #   @return [Integer]
@@ -506,8 +503,13 @@ module Aws::EBS
       include Aws::Structure
     end
 
-    # The number of API requests has exceed the maximum allowed API request
-    # throttling limit.
+    # The number of API requests has exceeded the maximum allowed API
+    # request throttling limit for the snapshot. For more information see
+    # [Error retries][1].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -561,27 +563,8 @@ module Aws::EBS
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass StartSnapshotRequest
-    #   data as a hash:
-    #
-    #       {
-    #         volume_size: 1, # required
-    #         parent_snapshot_id: "SnapshotId",
-    #         tags: [
-    #           {
-    #             key: "TagKey",
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #         description: "Description",
-    #         client_token: "IdempotencyToken",
-    #         encrypted: false,
-    #         kms_key_arn: "KmsKeyArn",
-    #         timeout: 1,
-    #       }
-    #
     # @!attribute [rw] volume_size
-    #   The size of the volume, in GiB. The maximum size is `16384` GiB (16
+    #   The size of the volume, in GiB. The maximum size is `65536` GiB (64
     #   TiB).
     #   @return [Integer]
     #
@@ -590,13 +573,27 @@ module Aws::EBS
     #   you are creating the first snapshot for an on-premises volume, omit
     #   this parameter.
     #
-    #   If your account is enabled for encryption by default, you cannot use
-    #   an unencrypted snapshot as a parent snapshot. You must first create
-    #   an encrypted copy of the parent snapshot using [CopySnapshot][1].
+    #   You can't specify **ParentSnapshotId** and **Encrypted** in the
+    #   same request. If you specify both parameters, the request fails with
+    #   `ValidationException`.
+    #
+    #   The encryption status of the snapshot depends on the values that you
+    #   specify for **Encrypted**, **KmsKeyArn**, and **ParentSnapshotId**,
+    #   and whether your Amazon Web Services account is enabled for [
+    #   encryption by default][1]. For more information, see [ Using
+    #   encryption][2] in the *Amazon Elastic Compute Cloud User Guide*.
+    #
+    #   If you specify an encrypted parent snapshot, you must have
+    #   permission to use the KMS key that was used to encrypt the parent
+    #   snapshot. For more information, see [ Permissions to use Key
+    #   Management Service keys][3] in the *Amazon Elastic Compute Cloud
+    #   User Guide*.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CopySnapshot.html
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html#encryption-by-default
+    #   [2]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapis-using-encryption.html
+    #   [3]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapi-permissions.html#ebsapi-kms-permissions
     #   @return [String]
     #
     # @!attribute [rw] tags
@@ -616,7 +613,7 @@ module Aws::EBS
     #   and they have no additional effect.
     #
     #   If you do not specify a client token, one is automatically generated
-    #   by the AWS SDK.
+    #   by the Amazon Web Services SDK.
     #
     #   For more information, see [ Idempotency for StartSnapshot API][1] in
     #   the *Amazon Elastic Compute Cloud User Guide*.
@@ -630,44 +627,50 @@ module Aws::EBS
     #   @return [String]
     #
     # @!attribute [rw] encrypted
-    #   Indicates whether to encrypt the snapshot. To create an encrypted
-    #   snapshot, specify `true`. To create an unencrypted snapshot, omit
-    #   this parameter.
+    #   Indicates whether to encrypt the snapshot.
     #
-    #   If you specify a value for **ParentSnapshotId**, omit this
-    #   parameter.
+    #   You can't specify **Encrypted** and <b> ParentSnapshotId</b> in the
+    #   same request. If you specify both parameters, the request fails with
+    #   `ValidationException`.
     #
-    #   If you specify `true`, the snapshot is encrypted using the CMK
-    #   specified using the **KmsKeyArn** parameter. If no value is
-    #   specified for **KmsKeyArn**, the default CMK for your account is
-    #   used. If no default CMK has been specified for your account, the AWS
-    #   managed CMK is used. To set a default CMK for your account, use [
-    #   ModifyEbsDefaultKmsKeyId][1].
+    #   The encryption status of the snapshot depends on the values that you
+    #   specify for **Encrypted**, **KmsKeyArn**, and **ParentSnapshotId**,
+    #   and whether your Amazon Web Services account is enabled for [
+    #   encryption by default][1]. For more information, see [ Using
+    #   encryption][2] in the *Amazon Elastic Compute Cloud User Guide*.
     #
-    #   If your account is enabled for encryption by default, you cannot set
-    #   this parameter to `false`. In this case, you can omit this
-    #   parameter.
-    #
-    #   For more information, see [ Using encryption][2] in the *Amazon
-    #   Elastic Compute Cloud User Guide*.
+    #   To create an encrypted snapshot, you must have permission to use the
+    #   KMS key. For more information, see [ Permissions to use Key
+    #   Management Service keys][3] in the *Amazon Elastic Compute Cloud
+    #   User Guide*.
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ModifyEbsDefaultKmsKeyId.html
-    #   [2]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-accessing-snapshot.html#ebsapis-using-encryption
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html#encryption-by-default
+    #   [2]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapis-using-encryption.html
+    #   [3]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapi-permissions.html#ebsapi-kms-permissions
     #   @return [Boolean]
     #
     # @!attribute [rw] kms_key_arn
-    #   The Amazon Resource Name (ARN) of the AWS Key Management Service
-    #   (AWS KMS) customer master key (CMK) to be used to encrypt the
-    #   snapshot. If you do not specify a CMK, the default AWS managed CMK
-    #   is used.
+    #   The Amazon Resource Name (ARN) of the Key Management Service (KMS)
+    #   key to be used to encrypt the snapshot.
     #
-    #   If you specify a **ParentSnapshotId**, omit this parameter; the
-    #   snapshot will be encrypted using the same CMK that was used to
-    #   encrypt the parent snapshot.
+    #   The encryption status of the snapshot depends on the values that you
+    #   specify for **Encrypted**, **KmsKeyArn**, and **ParentSnapshotId**,
+    #   and whether your Amazon Web Services account is enabled for [
+    #   encryption by default][1]. For more information, see [ Using
+    #   encryption][2] in the *Amazon Elastic Compute Cloud User Guide*.
     #
-    #   If **Encrypted** is set to `true`, you must specify a CMK ARN.
+    #   To create an encrypted snapshot, you must have permission to use the
+    #   KMS key. For more information, see [ Permissions to use Key
+    #   Management Service keys][3] in the *Amazon Elastic Compute Cloud
+    #   User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html#encryption-by-default
+    #   [2]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapis-using-encryption.html
+    #   [3]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebsapi-permissions.html#ebsapi-kms-permissions
     #   @return [String]
     #
     # @!attribute [rw] timeout
@@ -706,7 +709,7 @@ module Aws::EBS
     #   @return [String]
     #
     # @!attribute [rw] owner_id
-    #   The AWS account ID of the snapshot owner.
+    #   The Amazon Web Services account ID of the snapshot owner.
     #   @return [String]
     #
     # @!attribute [rw] status
@@ -740,8 +743,12 @@ module Aws::EBS
     #   @return [String]
     #
     # @!attribute [rw] kms_key_arn
-    #   The Amazon Resource Name (ARN) of the AWS Key Management Service
-    #   (AWS KMS) customer master key (CMK) used to encrypt the snapshot.
+    #   The Amazon Resource Name (ARN) of the Key Management Service (KMS)
+    #   key used to encrypt the snapshot.
+    #   @return [String]
+    #
+    # @!attribute [rw] sse_type
+    #   Reserved for future use.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ebs-2019-11-02/StartSnapshotResponse AWS API Documentation
@@ -756,20 +763,13 @@ module Aws::EBS
       :block_size,
       :tags,
       :parent_snapshot_id,
-      :kms_key_arn)
+      :kms_key_arn,
+      :sse_type)
       SENSITIVE = [:kms_key_arn]
       include Aws::Structure
     end
 
     # Describes a tag.
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey",
-    #         value: "TagValue",
-    #       }
     #
     # @!attribute [rw] key
     #   The key of the tag.
@@ -808,3 +808,4 @@ module Aws::EBS
 
   end
 end
+

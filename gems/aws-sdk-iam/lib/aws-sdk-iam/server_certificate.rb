@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -53,6 +53,18 @@ module Aws::IAM
       data[:certificate_chain]
     end
 
+    # A list of tags that are attached to the server certificate. For more
+    # information about tagging, see [Tagging IAM resources][1] in the *IAM
+    # User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html
+    # @return [Array<Types::Tag>]
+    def tags
+      data[:tags]
+    end
+
     # @!endgroup
 
     # @return [Client]
@@ -67,7 +79,9 @@ module Aws::IAM
     #
     # @return [self]
     def load
-      resp = @client.get_server_certificate(server_certificate_name: @name)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_server_certificate(server_certificate_name: @name)
+      end
       @data = resp.server_certificate
       self
     end
@@ -182,7 +196,9 @@ module Aws::IAM
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -194,7 +210,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(server_certificate_name: @name)
-      resp = @client.delete_server_certificate(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_server_certificate(options)
+      end
       resp.data
     end
 
@@ -235,7 +253,9 @@ module Aws::IAM
     # @return [ServerCertificate]
     def update(options = {})
       options = options.merge(server_certificate_name: @name)
-      @client.update_server_certificate(options)
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.update_server_certificate(options)
+      end
       ServerCertificate.new(
         name: options[:new_server_certificate_name],
         client: @client

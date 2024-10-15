@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-appflow/types'
-require_relative 'aws-sdk-appflow/client_api'
-require_relative 'aws-sdk-appflow/client'
-require_relative 'aws-sdk-appflow/errors'
-require_relative 'aws-sdk-appflow/resource'
-require_relative 'aws-sdk-appflow/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:appflow)
 
 # This module provides support for Amazon Appflow. This module is available in the
 # `aws-sdk-appflow` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-appflow/customizations'
 # structure.
 #
 #     appflow = Aws::Appflow::Client.new
-#     resp = appflow.create_connector_profile(params)
+#     resp = appflow.cancel_flow_executions(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-appflow/customizations'
 #
 # @!group service
 module Aws::Appflow
+  autoload :Types, 'aws-sdk-appflow/types'
+  autoload :ClientApi, 'aws-sdk-appflow/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-appflow/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-appflow/client'
+  autoload :Errors, 'aws-sdk-appflow/errors'
+  autoload :Resource, 'aws-sdk-appflow/resource'
+  autoload :EndpointParameters, 'aws-sdk-appflow/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-appflow/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-appflow/endpoints'
 
-  GEM_VERSION = '1.4.0'
+  GEM_VERSION = '1.69.0'
 
 end
+
+require_relative 'aws-sdk-appflow/customizations'

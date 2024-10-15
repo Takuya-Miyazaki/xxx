@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-kinesisvideomedia/types'
-require_relative 'aws-sdk-kinesisvideomedia/client_api'
-require_relative 'aws-sdk-kinesisvideomedia/client'
-require_relative 'aws-sdk-kinesisvideomedia/errors'
-require_relative 'aws-sdk-kinesisvideomedia/resource'
-require_relative 'aws-sdk-kinesisvideomedia/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:kinesisvideomedia)
 
 # This module provides support for Amazon Kinesis Video Streams Media. This module is available in the
 # `aws-sdk-kinesisvideomedia` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-kinesisvideomedia/customizations'
 #
 # @!group service
 module Aws::KinesisVideoMedia
+  autoload :Types, 'aws-sdk-kinesisvideomedia/types'
+  autoload :ClientApi, 'aws-sdk-kinesisvideomedia/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-kinesisvideomedia/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-kinesisvideomedia/client'
+  autoload :Errors, 'aws-sdk-kinesisvideomedia/errors'
+  autoload :Resource, 'aws-sdk-kinesisvideomedia/resource'
+  autoload :EndpointParameters, 'aws-sdk-kinesisvideomedia/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-kinesisvideomedia/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-kinesisvideomedia/endpoints'
 
-  GEM_VERSION = '1.26.0'
+  GEM_VERSION = '1.62.0'
 
 end
+
+require_relative 'aws-sdk-kinesisvideomedia/customizations'

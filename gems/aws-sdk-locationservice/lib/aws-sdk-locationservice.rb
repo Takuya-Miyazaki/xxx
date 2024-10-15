@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-locationservice/types'
-require_relative 'aws-sdk-locationservice/client_api'
-require_relative 'aws-sdk-locationservice/client'
-require_relative 'aws-sdk-locationservice/errors'
-require_relative 'aws-sdk-locationservice/resource'
-require_relative 'aws-sdk-locationservice/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:locationservice)
 
 # This module provides support for Amazon Location Service. This module is available in the
 # `aws-sdk-locationservice` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-locationservice/customizations'
 #
 # @!group service
 module Aws::LocationService
+  autoload :Types, 'aws-sdk-locationservice/types'
+  autoload :ClientApi, 'aws-sdk-locationservice/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-locationservice/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-locationservice/client'
+  autoload :Errors, 'aws-sdk-locationservice/errors'
+  autoload :Resource, 'aws-sdk-locationservice/resource'
+  autoload :EndpointParameters, 'aws-sdk-locationservice/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-locationservice/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-locationservice/endpoints'
 
-  GEM_VERSION = '1.0.0'
+  GEM_VERSION = '1.61.0'
 
 end
+
+require_relative 'aws-sdk-locationservice/customizations'

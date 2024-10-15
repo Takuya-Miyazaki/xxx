@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-outposts/types'
-require_relative 'aws-sdk-outposts/client_api'
-require_relative 'aws-sdk-outposts/client'
-require_relative 'aws-sdk-outposts/errors'
-require_relative 'aws-sdk-outposts/resource'
-require_relative 'aws-sdk-outposts/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:outposts)
 
 # This module provides support for AWS Outposts. This module is available in the
 # `aws-sdk-outposts` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-outposts/customizations'
 # structure.
 #
 #     outposts = Aws::Outposts::Client.new
-#     resp = outposts.create_outpost(params)
+#     resp = outposts.cancel_capacity_task(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-outposts/customizations'
 #
 # @!group service
 module Aws::Outposts
+  autoload :Types, 'aws-sdk-outposts/types'
+  autoload :ClientApi, 'aws-sdk-outposts/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-outposts/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-outposts/client'
+  autoload :Errors, 'aws-sdk-outposts/errors'
+  autoload :Resource, 'aws-sdk-outposts/resource'
+  autoload :EndpointParameters, 'aws-sdk-outposts/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-outposts/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-outposts/endpoints'
 
-  GEM_VERSION = '1.13.0'
+  GEM_VERSION = '1.70.0'
 
 end
+
+require_relative 'aws-sdk-outposts/customizations'

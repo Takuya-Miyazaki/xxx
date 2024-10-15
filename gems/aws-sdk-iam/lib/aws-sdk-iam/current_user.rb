@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -25,7 +25,10 @@ module Aws::IAM
     # @!group Read-Only Attributes
 
     # The path to the user. For more information about paths, see [IAM
-    # Identifiers][1] in the *IAM User Guide*.
+    # identifiers][1] in the *IAM User Guide*.
+    #
+    # The ARN of the policy used to set the permissions boundary for the
+    # user.
     #
     #
     #
@@ -42,7 +45,7 @@ module Aws::IAM
     end
 
     # The stable and unique string identifying the user. For more
-    # information about IDs, see [IAM Identifiers][1] in the *IAM User
+    # information about IDs, see [IAM identifiers][1] in the *IAM User
     # Guide*.
     #
     #
@@ -77,12 +80,13 @@ module Aws::IAM
     end
 
     # The date and time, in [ISO 8601 date-time format][1], when the user's
-    # password was last used to sign in to an AWS website. For a list of AWS
-    # websites that capture a user's last sign-in time, see the [Credential
-    # Reports][2] topic in the *IAM User Guide*. If a password is used more
-    # than once in a five-minute span, only the first use is returned in
-    # this field. If the field is null (no value), then it indicates that
-    # they never signed in with a password. This can be because:
+    # password was last used to sign in to an Amazon Web Services website.
+    # For a list of Amazon Web Services websites that capture a user's last
+    # sign-in time, see the [Credential reports][2] topic in the *IAM User
+    # Guide*. If a password is used more than once in a five-minute span,
+    # only the first use is returned in this field. If the field is null (no
+    # value), then it indicates that they never signed in with a password.
+    # This can be because:
     #
     # * The user never had a password.
     #
@@ -105,11 +109,8 @@ module Aws::IAM
       data[:password_last_used]
     end
 
-    # The ARN of the policy used to set the permissions boundary for the
-    # user.
-    #
     # For more information about permissions boundaries, see [Permissions
-    # Boundaries for IAM Identities ][1] in the *IAM User Guide*.
+    # boundaries for IAM identities ][1] in the *IAM User Guide*.
     #
     #
     #
@@ -119,9 +120,8 @@ module Aws::IAM
       data[:permissions_boundary]
     end
 
-    # A list of tags that are associated with the specified user. For more
-    # information about tagging, see [Tagging IAM Identities][1] in the *IAM
-    # User Guide*.
+    # A list of tags that are associated with the user. For more information
+    # about tagging, see [Tagging IAM resources][1] in the *IAM User Guide*.
     #
     #
     #
@@ -145,7 +145,9 @@ module Aws::IAM
     #
     # @return [self]
     def load
-      resp = @client.get_user
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_user
+      end
       @data = resp.user
       self
     end
@@ -260,7 +262,9 @@ module Aws::IAM
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Associations
@@ -285,7 +289,9 @@ module Aws::IAM
     # @return [AccessKey::Collection]
     def access_keys(options = {})
       batches = Enumerator.new do |y|
-        resp = @client.list_access_keys(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_access_keys(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.access_key_metadata.each do |a|
@@ -322,7 +328,9 @@ module Aws::IAM
     # @return [MfaDevice::Collection]
     def mfa_devices(options = {})
       batches = Enumerator.new do |y|
-        resp = @client.list_mfa_devices(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_mfa_devices(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.mfa_devices.each do |m|
@@ -360,7 +368,9 @@ module Aws::IAM
     # @return [SigningCertificate::Collection]
     def signing_certificates(options = {})
       batches = Enumerator.new do |y|
-        resp = @client.list_signing_certificates(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_signing_certificates(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.certificates.each do |c|

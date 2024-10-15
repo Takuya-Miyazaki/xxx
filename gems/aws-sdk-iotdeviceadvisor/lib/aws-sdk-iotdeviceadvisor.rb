@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-iotdeviceadvisor/types'
-require_relative 'aws-sdk-iotdeviceadvisor/client_api'
-require_relative 'aws-sdk-iotdeviceadvisor/client'
-require_relative 'aws-sdk-iotdeviceadvisor/errors'
-require_relative 'aws-sdk-iotdeviceadvisor/resource'
-require_relative 'aws-sdk-iotdeviceadvisor/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:iotdeviceadvisor)
 
 # This module provides support for AWS IoT Core Device Advisor. This module is available in the
 # `aws-sdk-iotdeviceadvisor` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-iotdeviceadvisor/customizations'
 #
 # @!group service
 module Aws::IoTDeviceAdvisor
+  autoload :Types, 'aws-sdk-iotdeviceadvisor/types'
+  autoload :ClientApi, 'aws-sdk-iotdeviceadvisor/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-iotdeviceadvisor/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-iotdeviceadvisor/client'
+  autoload :Errors, 'aws-sdk-iotdeviceadvisor/errors'
+  autoload :Resource, 'aws-sdk-iotdeviceadvisor/resource'
+  autoload :EndpointParameters, 'aws-sdk-iotdeviceadvisor/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-iotdeviceadvisor/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-iotdeviceadvisor/endpoints'
 
-  GEM_VERSION = '1.0.0'
+  GEM_VERSION = '1.43.0'
 
 end
+
+require_relative 'aws-sdk-iotdeviceadvisor/customizations'

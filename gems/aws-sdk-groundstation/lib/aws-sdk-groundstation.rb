@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-groundstation/types'
-require_relative 'aws-sdk-groundstation/client_api'
-require_relative 'aws-sdk-groundstation/client'
-require_relative 'aws-sdk-groundstation/errors'
-require_relative 'aws-sdk-groundstation/resource'
-require_relative 'aws-sdk-groundstation/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:groundstation)
 
 # This module provides support for AWS Ground Station. This module is available in the
 # `aws-sdk-groundstation` gem.
@@ -47,7 +42,21 @@ require_relative 'aws-sdk-groundstation/customizations'
 #
 # @!group service
 module Aws::GroundStation
+  autoload :Types, 'aws-sdk-groundstation/types'
+  autoload :ClientApi, 'aws-sdk-groundstation/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-groundstation/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-groundstation/client'
+  autoload :Errors, 'aws-sdk-groundstation/errors'
+  autoload :Waiters, 'aws-sdk-groundstation/waiters'
+  autoload :Resource, 'aws-sdk-groundstation/resource'
+  autoload :EndpointParameters, 'aws-sdk-groundstation/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-groundstation/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-groundstation/endpoints'
 
-  GEM_VERSION = '1.15.0'
+  GEM_VERSION = '1.59.0'
 
 end
+
+require_relative 'aws-sdk-groundstation/customizations'

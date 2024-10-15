@@ -49,7 +49,8 @@ module Aws
       #   before the presigned URL expires. Defaults to 15 minutes. As signature
       #   version 4 has a maximum expiry time of one week for presigned URLs,
       #   attempts to set this value to greater than one week (604800) will
-      #   raise an exception.
+      #   raise an exception. The min value of this option and the credentials
+      #   expiration time is used in the presigned URL.
       #
       # @option params [Time] :time (Time.now) The starting time for when the
       #   presigned url becomes active.
@@ -58,8 +59,7 @@ module Aws
       #   is returned instead of the default HTTPS URL.
       #
       # @option params [Boolean] :virtual_host (false) When `true`, the
-      #   bucket name will be used as the hostname. This will cause
-      #   the returned URL to be 'http' and not 'https'.
+      #   bucket name will be used as the hostname.
       #
       # @option params [Boolean] :use_accelerate_endpoint (false) When `true`,
       #   Presigner will attempt to use accelerated endpoint.
@@ -97,7 +97,8 @@ module Aws
       #   before the presigned URL expires. Defaults to 15 minutes. As signature
       #   version 4 has a maximum expiry time of one week for presigned URLs,
       #   attempts to set this value to greater than one week (604800) will
-      #   raise an exception.
+      #   raise an exception. The min value of this option and the credentials
+      #   expiration time is used in the presigned URL.
       #
       # @option params [Time] :time (Time.now) The starting time for when the
       #   presigned url becomes active.
@@ -134,14 +135,15 @@ module Aws
         virtual_host = params.delete(:virtual_host)
         time = params.delete(:time)
         unsigned_headers = unsigned_headers(params)
-        scheme = http_scheme(params)
+        secure = params.delete(:secure) != false
         expires_in = expires_in(params)
 
         req = @client.build_request(method, params)
         use_bucket_as_hostname(req) if virtual_host
+        handle_presigned_url_context(req)
 
         x_amz_headers = sign_but_dont_send(
-          req, expires_in, scheme, time, unsigned_headers, hoist
+          req, expires_in, secure, time, unsigned_headers, hoist
         )
         [req.send_request.data, x_amz_headers]
       end
@@ -149,14 +151,6 @@ module Aws
       def unsigned_headers(params)
         whitelist_headers = params.delete(:whitelist_headers) || []
         BLACKLISTED_HEADERS - whitelist_headers
-      end
-
-      def http_scheme(params)
-        if params.delete(:secure) == false
-          'http'
-        else
-          @client.config.endpoint.scheme
-        end
       end
 
       def expires_in(params)
@@ -175,8 +169,7 @@ module Aws
       end
 
       def use_bucket_as_hostname(req)
-        req.handlers.remove(Plugins::BucketDns::Handler)
-        req.handle do |context|
+        req.handle(priority: 35) do |context|
           uri = context.http_request.endpoint
           uri.host = context.params[:bucket]
           uri.path.sub!("/#{context.params[:bucket]}", '')
@@ -184,26 +177,36 @@ module Aws
         end
       end
 
+      # Used for excluding presigned_urls from API request count.
+      #
+      # Store context information as early as possible, to allow
+      # handlers to perform decisions based on this flag if need.
+      def handle_presigned_url_context(req)
+        req.handle(step: :initialize, priority: 98) do |context|
+          context[:presigned_url] = true
+          @handler.call(context)
+        end
+      end
+
       # @param [Seahorse::Client::Request] req
       def sign_but_dont_send(
-        req, expires_in, scheme, time, unsigned_headers, hoist = true
+        req, expires_in, secure, time, unsigned_headers, hoist = true
       )
         x_amz_headers = {}
 
         http_req = req.context.http_request
 
         req.handlers.remove(Aws::S3::Plugins::S3Signer::LegacyHandler)
-        req.handlers.remove(Aws::S3::Plugins::S3Signer::V4Handler)
+        req.handlers.remove(Aws::Plugins::Sign::Handler)
         req.handlers.remove(Seahorse::Client::Plugins::ContentLength::Handler)
-
-        signer = build_signer(req.context, unsigned_headers)
+        req.handlers.remove(Aws::Rest::ContentTypeHandler)
+        req.handlers.remove(Aws::Plugins::InvocationId::Handler)
 
         req.handle(step: :send) do |context|
-          if scheme != http_req.endpoint.scheme
-            endpoint = http_req.endpoint.dup
-            endpoint.scheme = scheme
-            endpoint.port = (scheme == 'http' ? 80 : 443)
-            http_req.endpoint = URI.parse(endpoint.to_s)
+          # if an endpoint was not provided, force secure or insecure
+          if context.config.regional_endpoint
+            http_req.endpoint.scheme = secure ? 'https' : 'http'
+            http_req.endpoint.port = secure ? 443 : 80
           end
 
           query = http_req.endpoint.query ? http_req.endpoint.query.split('&') : []
@@ -222,6 +225,23 @@ module Aws
           end
           http_req.endpoint.query = query.join('&') unless query.empty?
 
+          auth_scheme = context[:auth_scheme]
+          scheme_name = auth_scheme['name']
+          region = if scheme_name == 'sigv4a'
+                     auth_scheme['signingRegionSet'].first
+                   else
+                     auth_scheme['signingRegion']
+                   end
+          signer = Aws::Sigv4::Signer.new(
+            service: auth_scheme['signingName'] || 's3',
+            region: context[:sigv4_region] || region || context.config.region,
+            credentials_provider: context[:sigv4_credentials] || context.config.credentials,
+            signing_algorithm: scheme_name.to_sym,
+            uri_escape_path: !!!auth_scheme['disableDoubleEncoding'],
+            unsigned_headers: unsigned_headers,
+            apply_checksum_header: false
+          )
+
           url = signer.presign_url(
             http_method: http_req.http_method,
             url: http_req.endpoint,
@@ -231,36 +251,10 @@ module Aws
             time: time
           ).to_s
 
-          # Used for excluding presigned_urls from API request count
-          context[:presigned_url] = true
-
           Seahorse::Client::Response.new(context: context, data: url)
         end
         # Return the headers
         x_amz_headers
-      end
-
-      def build_signer(context, unsigned_headers)
-        signer_opts = {
-          service: 's3',
-          region: context.config.region,
-          credentials_provider: context.config.credentials,
-          unsigned_headers: unsigned_headers,
-          uri_escape_path: false
-        }
-
-        resolved_region, arn = Aws::S3::Plugins::ARN.resolve_arn!(
-          context.params[:bucket],
-          context.config.sigv4_signer.region,
-          context.config.s3_use_arn_region
-        )
-
-        if arn
-          signer_opts[:region] = resolved_region
-          signer_opts[:service] = arn.service
-        end
-
-        Aws::Sigv4::Signer.new(signer_opts)
       end
     end
   end

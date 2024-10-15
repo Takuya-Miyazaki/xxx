@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::KinesisVideoSignalingChannels
   # @api private
@@ -91,8 +92,10 @@ module Aws::KinesisVideoSignalingChannels
 
       api.metadata = {
         "apiVersion" => "2019-12-04",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "kinesisvideo",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceAbbreviation" => "Amazon Kinesis Video Signaling Channels",
         "serviceFullName" => "Amazon Kinesis Video Signaling Channels",
         "serviceId" => "Kinesis Video Signaling",

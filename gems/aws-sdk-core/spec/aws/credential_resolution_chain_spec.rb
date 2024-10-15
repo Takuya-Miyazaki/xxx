@@ -31,6 +31,8 @@ module Aws
 
     before(:each) do
       allow(InstanceProfileCredentials).to receive(:new).and_return(mock_instance_creds)
+
+      expect_any_instance_of(ProcessCredentials).not_to receive(:warn)
     end
 
     describe 'default behavior' do
@@ -66,7 +68,7 @@ module Aws
           'AWS_SECRET_ACCESS_KEY' => 'SECRET_ENV_STUB'
         )
         assume_role_stub(
-          'arn:aws:iam:123456789012:role/foo',
+          'arn:aws:iam::123456789012:role/foo',
           'ACCESS_KEY_1', # from 'fooprofile'
           'AR_AKID',
           'AR_SECRET',
@@ -80,7 +82,7 @@ module Aws
 
       it 'prefers assume role web identity over sso' do
         assume_role_web_identity_stub(
-          'arn:aws:iam:123456789012:role/foo',
+          'arn:aws:iam::123456789012:role/foo',
           'AR_AKID',
           'AR_SECRET',
           'AR_TOKEN'
@@ -98,7 +100,8 @@ module Aws
           sso_start_url: 'START_URL',
           sso_region: 'us-east-1',
           sso_account_id: 'SSO_ACCOUNT_ID',
-          sso_role_name: 'SSO_ROLE_NAME'
+          sso_role_name: 'SSO_ROLE_NAME',
+          sso_session: 'sso-test-session'
         ).and_return(
           double(
             'creds',
@@ -107,7 +110,76 @@ module Aws
           )
         )
         client = ApiHelper.sample_rest_xml::Client.new(
-          profile: 'sso_creds'
+          profile: 'sso_creds',
+          token_provider: nil
+        )
+        expect(
+          client.config.credentials.credentials.access_key_id
+        ).to eq('SSO_AKID')
+      end
+
+      it 'loads SSO credentials from a legacy profile' do
+        expect(SSOCredentials).to receive(:new).with(
+          sso_start_url: 'START_URL',
+          sso_region: 'us-east-1',
+          sso_account_id: 'SSO_ACCOUNT_ID',
+          sso_role_name: 'SSO_ROLE_NAME',
+          sso_session: nil
+        ).and_return(
+          double(
+            'creds',
+            set?: true,
+            credentials: double(access_key_id: 'SSO_AKID')
+          )
+        )
+        client = ApiHelper.sample_rest_xml::Client.new(
+          profile: 'sso_creds_legacy'
+        )
+        expect(
+          client.config.credentials.credentials.access_key_id
+        ).to eq('SSO_AKID')
+      end
+
+      it 'loads SSO credentials from a mixed legacy profile when values match' do
+        expect(SSOCredentials).to receive(:new).with(
+          sso_start_url: 'START_URL',
+          sso_region: 'us-east-1',
+          sso_account_id: 'SSO_ACCOUNT_ID',
+          sso_role_name: 'SSO_ROLE_NAME',
+          sso_session: 'sso-test-session'
+        ).and_return(
+          double(
+            'creds',
+            set?: true,
+            credentials: double(access_key_id: 'SSO_AKID')
+          )
+        )
+        client = ApiHelper.sample_rest_xml::Client.new(
+          profile: 'sso_creds_mixed_legacy',
+          token_provider: nil,
+        )
+        expect(
+          client.config.credentials.credentials.access_key_id
+        ).to eq('SSO_AKID')
+      end
+
+      it 'loads SSO credentials from when the session name has quotes' do
+        expect(SSOCredentials).to receive(:new).with(
+          sso_start_url: 'START_URL',
+          sso_region: 'us-east-1',
+          sso_account_id: 'SSO_ACCOUNT_ID',
+          sso_role_name: 'SSO_ROLE_NAME',
+          sso_session: 'sso test session'
+        ).and_return(
+          double(
+            'creds',
+            set?: true,
+            credentials: double(access_key_id: 'SSO_AKID')
+          )
+        )
+        client = ApiHelper.sample_rest_xml::Client.new(
+          profile: 'sso_creds_session_with_quotes',
+          token_provider: nil
         )
         expect(
           client.config.credentials.credentials.access_key_id
@@ -123,9 +195,28 @@ module Aws
         end.to raise_error(ArgumentError, /Missing required keys/)
       end
 
+      it 'raises when attempting to load a mixed legacy SSO Profile with mismatched values' do
+        expect do
+          ApiHelper.sample_rest_xml::Client.new(
+            profile: 'sso_creds_mixed_legacy_mismatch',
+            region: 'us-east-1'
+          )
+        end.to raise_error(ArgumentError, /does not match the profile/)
+      end
+
+      it 'raises when attempting to load an SSO profile with a missing sso-session' do
+        expect do
+          ApiHelper.sample_rest_xml::Client.new(
+            profile: 'sso_creds_bad_session',
+            region: 'us-east-1'
+          )
+        end.to raise_error(ArgumentError,
+          /sso-session session-does-not-exist must be defined in the config file/)
+      end
+
       it 'prefers assume role over shared config' do
         assume_role_stub(
-          'arn:aws:iam:123456789012:role/bar',
+          'arn:aws:iam::123456789012:role/bar',
           'ACCESS_KEY_1', # from 'fooprofile'
           'AR_AKID',
           'AR_SECRET',
@@ -256,13 +347,13 @@ module Aws
 
         it 'supports :source_profile from assume_role_web_identity' do
           assume_role_web_identity_stub(
-            'arn:aws:iam:123456789012:role/foo',
+            'arn:aws:iam::123456789012:role/foo',
             'AR_AKID_WEB',
             'AR_SECRET',
             'AR_TOKEN'
           )
           assume_role_stub(
-            'arn:aws:iam:123456789012:role/bar',
+            'arn:aws:iam::123456789012:role/bar',
             'AR_AKID_WEB', # from web_only
             'AR_AKID',
             'AR_SECRET',
@@ -283,7 +374,7 @@ module Aws
 
         it 'supports :source_profile from process credentials' do
           assume_role_stub(
-            'arn:aws:iam:123456789012:role/foo',
+            'arn:aws:iam::123456789012:role/foo',
             'AK_PROC1',
             'AK_PROC1',
             'SECRET_AK_PROC1',
@@ -303,7 +394,8 @@ module Aws
             sso_start_url: 'START_URL',
             sso_region: 'us-east-1',
             sso_account_id: 'SSO_ACCOUNT_ID',
-            sso_role_name: 'SSO_ROLE_NAME'
+            sso_role_name: 'SSO_ROLE_NAME',
+            sso_session: 'sso-test-session'
           ).and_return(
             double(
               'SSOCreds',
@@ -312,8 +404,11 @@ module Aws
             )
           )
 
+          allow(SSOTokenProvider).to receive(:new)
+           .and_return(double('SSOToken', set?: true))
+
           assume_role_stub(
-            'arn:aws:iam:123456789012:role/foo',
+            'arn:aws:iam::123456789012:role/foo',
             'SSO_AKID',
             'AR_AKID',
             'SECRET_AK',
@@ -327,6 +422,74 @@ module Aws
             client.config.credentials.credentials.access_key_id
           ).to eq('AR_AKID')
         end
+
+        it 'supports assume role chaining' do
+          assume_role_stub(
+            'arn:aws:iam::123456789012:role/role_b',
+            'ACCESS_KEY_BASE',
+            'AK_1',
+            'SECRET_AK_1',
+            'TOKEN_1'
+          )
+
+          assume_role_stub(
+            'arn:aws:iam::123456789012:role/role_a',
+            'AK_1',
+            'AK_2',
+            'SECRET_AK_2',
+            'TOKEN_2'
+          )
+
+          client = ApiHelper.sample_rest_xml::Client.new(
+            profile: 'assume_role_chain_b', region: 'us-east-1'
+          )
+          expect(
+            client.config.credentials.credentials.access_key_id
+          ).to eq('AK_2')
+        end
+
+        it 'uses source credentials when source and static are both set' do
+          assume_role_stub(
+            'arn:aws:iam::123456789012:role/role_a',
+            'ACCESS_KEY_BASE',
+            'AK_2',
+            'SECRET_AK_2',
+            'TOKEN_2'
+          )
+
+          client = ApiHelper.sample_rest_xml::Client.new(
+            profile: 'assume_role_source_and_credentials', region: 'us-east-1'
+          )
+          expect(
+            client.config.credentials.credentials.access_key_id
+          ).to eq('AK_2')
+        end
+
+        it 'uses static credentials when the profile self references' do
+          assume_role_stub(
+            'arn:aws:iam::123456789012:role/role_a',
+            'ACCESS_KEY_SELF',
+            'AK_2',
+            'SECRET_AK_2',
+            'TOKEN_2'
+          )
+
+          client = ApiHelper.sample_rest_xml::Client.new(
+            profile: 'assume_role_self_reference', region: 'us-east-1'
+          )
+          expect(
+            client.config.credentials.credentials.access_key_id
+          ).to eq('AK_2')
+        end
+
+        it 'raises if there is a loop in chained profiles' do
+          expect do
+            ApiHelper.sample_rest_xml::Client.new(
+              profile: 'assume_role_chain_loop_a', region: 'us-east-1'
+            )
+          end.to raise_error(Errors::SourceProfileCircularReferenceError)
+        end
+
 
         it 'raises if credential_source is present but invalid' do
           expect do
@@ -346,7 +509,7 @@ module Aws
 
         it 'will assume a role from shared credentials before shared config' do
           assume_role_stub(
-            'arn:aws:iam:123456789012:role/bar',
+            'arn:aws:iam::123456789012:role/bar',
             'ACCESS_KEY_1', # from 'fooprofile'
             'AR_AKID',
             'AR_SECRET',
@@ -362,7 +525,7 @@ module Aws
 
         it 'will then try to assume a role from shared config' do
           assume_role_stub(
-            'arn:aws:iam:123456789012:role/bar',
+            'arn:aws:iam::123456789012:role/bar',
             'ACCESS_KEY_ARPC', # from 'ar_from_self'
             'AR_AKID',
             'AR_SECRET',
@@ -378,7 +541,7 @@ module Aws
 
         it 'assumes a role from config using source in shared credentials' do
           assume_role_stub(
-            'arn:aws:iam:123456789012:role/foo',
+            'arn:aws:iam::123456789012:role/foo',
             'ACCESS_KEY_1', # from 'creds_from_sc'
             'AR_AKID',
             'AR_SECRET',
@@ -389,6 +552,26 @@ module Aws
           )
           expect(
             client.config.credentials.credentials.access_key_id
+          ).to eq('AR_AKID')
+        end
+
+        it 'allows region to be resolved when unspecified' do
+          assume_role_stub(
+            'arn:aws:iam::123456789012:role/bar',
+            'ACCESS_KEY_ARPC',
+            'AR_AKID',
+            'AR_SECRET',
+            'AR_TOKEN'
+          )
+
+          allow(ENV).to receive(:[])
+          allow(ENV).to receive(:[]).with('AWS_PROFILE').and_return('ar_from_self')
+          allow(ENV).to receive(:values_at).and_return(['us-east-1'])
+
+          credentials = CredentialProviderChain.new.resolve
+
+          expect(
+            credentials.credentials.access_key_id
           ).to eq('AR_AKID')
         end
       end
@@ -409,7 +592,7 @@ module Aws
           }
         JSON
         assume_role_stub(
-          'arn:aws:iam:123456789012:role/foo',
+          'arn:aws:iam::123456789012:role/foo',
           'ACCESS_KEY_EC2',
           'AR_AKID',
           'AR_SECRET',
@@ -453,7 +636,7 @@ module Aws
         stub_request(:get, "http://169.254.170.2#{path}")
           .to_return(status: 200, body: resp)
         assume_role_stub(
-          'arn:aws:iam:123456789012:role/foo',
+          'arn:aws:iam::123456789012:role/foo',
           'ACCESS_KEY_ECS',
           'AR_AKID',
           'AR_SECRET',

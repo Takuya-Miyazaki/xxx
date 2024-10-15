@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -186,7 +186,9 @@ module Aws::IAM
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -202,7 +204,9 @@ module Aws::IAM
         certificate_id: @id,
         status: "Active"
       )
-      resp = @client.update_signing_certificate(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.update_signing_certificate(options)
+      end
       resp.data
     end
 
@@ -217,7 +221,9 @@ module Aws::IAM
         certificate_id: @id,
         status: "Inactive"
       )
-      resp = @client.update_signing_certificate(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.update_signing_certificate(options)
+      end
       resp.data
     end
 
@@ -231,7 +237,9 @@ module Aws::IAM
         user_name: @user_name,
         certificate_id: @id
       )
-      resp = @client.delete_signing_certificate(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_signing_certificate(options)
+      end
       resp.data
     end
 

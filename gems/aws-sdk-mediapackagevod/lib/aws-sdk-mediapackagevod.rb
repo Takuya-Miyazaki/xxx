@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-mediapackagevod/types'
-require_relative 'aws-sdk-mediapackagevod/client_api'
-require_relative 'aws-sdk-mediapackagevod/client'
-require_relative 'aws-sdk-mediapackagevod/errors'
-require_relative 'aws-sdk-mediapackagevod/resource'
-require_relative 'aws-sdk-mediapackagevod/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:mediapackagevod)
 
 # This module provides support for AWS Elemental MediaPackage VOD. This module is available in the
 # `aws-sdk-mediapackagevod` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-mediapackagevod/customizations'
 # structure.
 #
 #     media_package_vod = Aws::MediaPackageVod::Client.new
-#     resp = media_package_vod.create_asset(params)
+#     resp = media_package_vod.configure_logs(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-mediapackagevod/customizations'
 #
 # @!group service
 module Aws::MediaPackageVod
+  autoload :Types, 'aws-sdk-mediapackagevod/types'
+  autoload :ClientApi, 'aws-sdk-mediapackagevod/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-mediapackagevod/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-mediapackagevod/client'
+  autoload :Errors, 'aws-sdk-mediapackagevod/errors'
+  autoload :Resource, 'aws-sdk-mediapackagevod/resource'
+  autoload :EndpointParameters, 'aws-sdk-mediapackagevod/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-mediapackagevod/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-mediapackagevod/endpoints'
 
-  GEM_VERSION = '1.19.0'
+  GEM_VERSION = '1.64.0'
 
 end
+
+require_relative 'aws-sdk-mediapackagevod/customizations'

@@ -9,19 +9,19 @@ module Aws
       [:ox, :oga, :nokogiri, :libxml, :rexml].each do |engine|
         describe("ENGINE: #{engine}") do
 
-          begin
+          before(:all) do
             Parser.engine = engine
           rescue LoadError
-            next
+            skip "Skipping tests for missing engine: #{engine}"
           end
 
           let(:shapes) { ApiHelper.sample_shapes }
 
-          let(:parser) {
+          let(:parser) do
             api = ApiHelper.sample_api(shapes:shapes)
             rules = api.operation(:example_operation).output
             Parser.new(rules)
-          }
+          end
 
           def parse(xml, to_h = true)
             data = parser.parse(xml)
@@ -110,6 +110,8 @@ module Aws
               <Integer>123</Integer>
               <Long>321</Long>
               <String>Hello</String>
+              <StringWithConsecutiveSpaces>foo  bar</StringWithConsecutiveSpaces>
+              <StringWithLF>foo\nbar</StringWithLF>
               <Timestamp>123456789</Timestamp>
             </xml>
             XML
@@ -145,6 +147,8 @@ module Aws
               long: 321,
               string: "Hello",
               timestamp: Time.at(123456789),
+              string_with_consecutive_spaces: "foo  bar",
+              string_with_lf: "foo\nbar",
             })
           end
 
@@ -239,27 +243,32 @@ module Aws
               ])
             end
 
-            it 'supports flattened lists with member locationName trait' do
+            it 'does not support member locationName trait in flattened lists' do
               shapes['StructureList']['flattened'] = true
+              # locationName trait on targeted member is ignored when serializing
+              # serializing flattened lists in structures
               shapes['StructureList']['member']['locationName'] = 'ListMember'
+
               xml = <<-XML.strip
               <xml>
-                <ListMember>
+                <NestedList>
                   <String>v1</String>
-                </ListMember>
-                <ListMember>
+                </NestedList>
+                <NestedList>
                   <String>v2</String>
-                </ListMember>
-                <ListMember>
+                </NestedList>
+                <NestedList>
                   <String>v3</String>
-                </ListMember>
+                </NestedList>
               </xml>
               XML
-              expect(parse(xml)).to eq(nested_list: [
-                { string: 'v1' },
-                { string: 'v2' },
-                { string: 'v3' },
-              ])
+              expect(parse(xml)).to eq(
+                nested_list: [
+                  { string: 'v1' },
+                  { string: 'v2' },
+                  { string: 'v3' }
+                ]
+              )
             end
 
           end

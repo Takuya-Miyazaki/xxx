@@ -5,11 +5,13 @@
     "endpointPrefix":"databrew",
     "jsonVersion":"1.1",
     "protocol":"rest-json",
+    "protocols":["rest-json"],
     "serviceFullName":"AWS Glue DataBrew",
     "serviceId":"DataBrew",
     "signatureVersion":"v4",
     "signingName":"databrew",
-    "uid":"databrew-2017-07-25"
+    "uid":"databrew-2017-07-25",
+    "auth":["aws.auth#sigv4"]
   },
   "operations":{
     "BatchDeleteRecipeVersion":{
@@ -50,6 +52,10 @@
       "input":{"shape":"CreateProfileJobRequest"},
       "output":{"shape":"CreateProfileJobResponse"},
       "errors":[
+        {"shape":"AccessDeniedException"},
+        {"shape":"ConflictException"},
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ServiceQuotaExceededException"},
         {"shape":"ValidationException"}
       ]
     },
@@ -91,6 +97,24 @@
       "input":{"shape":"CreateRecipeJobRequest"},
       "output":{"shape":"CreateRecipeJobResponse"},
       "errors":[
+        {"shape":"AccessDeniedException"},
+        {"shape":"ConflictException"},
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ServiceQuotaExceededException"},
+        {"shape":"ValidationException"}
+      ]
+    },
+    "CreateRuleset":{
+      "name":"CreateRuleset",
+      "http":{
+        "method":"POST",
+        "requestUri":"/rulesets"
+      },
+      "input":{"shape":"CreateRulesetRequest"},
+      "output":{"shape":"CreateRulesetResponse"},
+      "errors":[
+        {"shape":"ConflictException"},
+        {"shape":"ServiceQuotaExceededException"},
         {"shape":"ValidationException"}
       ]
     },
@@ -103,6 +127,8 @@
       "input":{"shape":"CreateScheduleRequest"},
       "output":{"shape":"CreateScheduleResponse"},
       "errors":[
+        {"shape":"ConflictException"},
+        {"shape":"ServiceQuotaExceededException"},
         {"shape":"ValidationException"}
       ]
     },
@@ -115,6 +141,7 @@
       "input":{"shape":"DeleteDatasetRequest"},
       "output":{"shape":"DeleteDatasetResponse"},
       "errors":[
+        {"shape":"ConflictException"},
         {"shape":"ResourceNotFoundException"},
         {"shape":"ValidationException"}
       ]
@@ -128,6 +155,7 @@
       "input":{"shape":"DeleteJobRequest"},
       "output":{"shape":"DeleteJobResponse"},
       "errors":[
+        {"shape":"ConflictException"},
         {"shape":"ResourceNotFoundException"},
         {"shape":"ValidationException"}
       ]
@@ -141,6 +169,7 @@
       "input":{"shape":"DeleteProjectRequest"},
       "output":{"shape":"DeleteProjectResponse"},
       "errors":[
+        {"shape":"ConflictException"},
         {"shape":"ResourceNotFoundException"},
         {"shape":"ValidationException"}
       ]
@@ -154,8 +183,23 @@
       "input":{"shape":"DeleteRecipeVersionRequest"},
       "output":{"shape":"DeleteRecipeVersionResponse"},
       "errors":[
+        {"shape":"ConflictException"},
         {"shape":"ResourceNotFoundException"},
         {"shape":"ValidationException"}
+      ]
+    },
+    "DeleteRuleset":{
+      "name":"DeleteRuleset",
+      "http":{
+        "method":"DELETE",
+        "requestUri":"/rulesets/{name}"
+      },
+      "input":{"shape":"DeleteRulesetRequest"},
+      "output":{"shape":"DeleteRulesetResponse"},
+      "errors":[
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"},
+        {"shape":"ConflictException"}
       ]
     },
     "DeleteSchedule":{
@@ -197,6 +241,19 @@
         {"shape":"ValidationException"}
       ]
     },
+    "DescribeJobRun":{
+      "name":"DescribeJobRun",
+      "http":{
+        "method":"GET",
+        "requestUri":"/jobs/{name}/jobRun/{runId}"
+      },
+      "input":{"shape":"DescribeJobRunRequest"},
+      "output":{"shape":"DescribeJobRunResponse"},
+      "errors":[
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
+      ]
+    },
     "DescribeProject":{
       "name":"DescribeProject",
       "http":{
@@ -218,6 +275,19 @@
       },
       "input":{"shape":"DescribeRecipeRequest"},
       "output":{"shape":"DescribeRecipeResponse"},
+      "errors":[
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
+      ]
+    },
+    "DescribeRuleset":{
+      "name":"DescribeRuleset",
+      "http":{
+        "method":"GET",
+        "requestUri":"/rulesets/{name}"
+      },
+      "input":{"shape":"DescribeRulesetRequest"},
+      "output":{"shape":"DescribeRulesetResponse"},
       "errors":[
         {"shape":"ResourceNotFoundException"},
         {"shape":"ValidationException"}
@@ -309,6 +379,19 @@
         {"shape":"ValidationException"}
       ]
     },
+    "ListRulesets":{
+      "name":"ListRulesets",
+      "http":{
+        "method":"GET",
+        "requestUri":"/rulesets"
+      },
+      "input":{"shape":"ListRulesetsRequest"},
+      "output":{"shape":"ListRulesetsResponse"},
+      "errors":[
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
+      ]
+    },
     "ListSchedules":{
       "name":"ListSchedules",
       "http":{
@@ -345,7 +428,8 @@
       "output":{"shape":"PublishRecipeResponse"},
       "errors":[
         {"shape":"ValidationException"},
-        {"shape":"ResourceNotFoundException"}
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ServiceQuotaExceededException"}
       ]
     },
     "SendProjectSessionAction":{
@@ -371,7 +455,9 @@
       "input":{"shape":"StartJobRunRequest"},
       "output":{"shape":"StartJobRunResponse"},
       "errors":[
+        {"shape":"ConflictException"},
         {"shape":"ResourceNotFoundException"},
+        {"shape":"ServiceQuotaExceededException"},
         {"shape":"ValidationException"}
       ]
     },
@@ -384,7 +470,9 @@
       "input":{"shape":"StartProjectSessionRequest"},
       "output":{"shape":"StartProjectSessionResponse"},
       "errors":[
+        {"shape":"ConflictException"},
         {"shape":"ResourceNotFoundException"},
+        {"shape":"ServiceQuotaExceededException"},
         {"shape":"ValidationException"}
       ]
     },
@@ -438,6 +526,7 @@
       "input":{"shape":"UpdateDatasetRequest"},
       "output":{"shape":"UpdateDatasetResponse"},
       "errors":[
+        {"shape":"AccessDeniedException"},
         {"shape":"ResourceNotFoundException"},
         {"shape":"ValidationException"}
       ]
@@ -451,6 +540,8 @@
       "input":{"shape":"UpdateProfileJobRequest"},
       "output":{"shape":"UpdateProfileJobResponse"},
       "errors":[
+        {"shape":"AccessDeniedException"},
+        {"shape":"ResourceNotFoundException"},
         {"shape":"ValidationException"}
       ]
     },
@@ -489,6 +580,21 @@
       "input":{"shape":"UpdateRecipeJobRequest"},
       "output":{"shape":"UpdateRecipeJobResponse"},
       "errors":[
+        {"shape":"AccessDeniedException"},
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ValidationException"}
+      ]
+    },
+    "UpdateRuleset":{
+      "name":"UpdateRuleset",
+      "http":{
+        "method":"PUT",
+        "requestUri":"/rulesets/{name}"
+      },
+      "input":{"shape":"UpdateRulesetRequest"},
+      "output":{"shape":"UpdateRulesetResponse"},
+      "errors":[
+        {"shape":"ResourceNotFoundException"},
         {"shape":"ValidationException"}
       ]
     },
@@ -501,6 +607,8 @@
       "input":{"shape":"UpdateScheduleRequest"},
       "output":{"shape":"UpdateScheduleResponse"},
       "errors":[
+        {"shape":"ResourceNotFoundException"},
+        {"shape":"ServiceQuotaExceededException"},
         {"shape":"ValidationException"}
       ]
     }
@@ -519,6 +627,25 @@
       "max":255
     },
     "ActionId":{"type":"integer"},
+    "AllowedStatisticList":{
+      "type":"list",
+      "member":{"shape":"AllowedStatistics"},
+      "min":1
+    },
+    "AllowedStatistics":{
+      "type":"structure",
+      "required":["Statistics"],
+      "members":{
+        "Statistics":{"shape":"StatisticList"}
+      }
+    },
+    "AnalyticsMode":{
+      "type":"string",
+      "enum":[
+        "ENABLE",
+        "DISABLE"
+      ]
+    },
     "Arn":{
       "type":"string",
       "max":2048,
@@ -554,6 +681,12 @@
       "max":63,
       "min":3
     },
+    "BucketOwner":{
+      "type":"string",
+      "max":12,
+      "min":12,
+      "pattern":"^[0-9]{12}$"
+    },
     "CatalogId":{
       "type":"string",
       "max":255,
@@ -563,7 +696,8 @@
       "type":"string",
       "max":255,
       "min":1,
-      "pattern":"^[a-zA-Z0-9][a-zA-Z0-9-]*$"
+      "pattern":"^[a-zA-Z0-9][a-zA-Z0-9-]*$",
+      "sensitive":true
     },
     "ColumnName":{
       "type":"string",
@@ -579,6 +713,31 @@
       "type":"integer",
       "max":20,
       "min":0
+    },
+    "ColumnSelector":{
+      "type":"structure",
+      "members":{
+        "Regex":{"shape":"ColumnName"},
+        "Name":{"shape":"ColumnName"}
+      }
+    },
+    "ColumnSelectorList":{
+      "type":"list",
+      "member":{"shape":"ColumnSelector"},
+      "min":1
+    },
+    "ColumnStatisticsConfiguration":{
+      "type":"structure",
+      "required":["Statistics"],
+      "members":{
+        "Selectors":{"shape":"ColumnSelectorList"},
+        "Statistics":{"shape":"StatisticsConfiguration"}
+      }
+    },
+    "ColumnStatisticsConfigurationList":{
+      "type":"list",
+      "member":{"shape":"ColumnStatisticsConfiguration"},
+      "min":1
     },
     "CompressionFormat":{
       "type":"string",
@@ -628,6 +787,7 @@
       "error":{"httpStatusCode":409},
       "exception":true
     },
+    "CreateColumn":{"type":"boolean"},
     "CreateDatasetRequest":{
       "type":"structure",
       "required":[
@@ -636,8 +796,10 @@
       ],
       "members":{
         "Name":{"shape":"DatasetName"},
+        "Format":{"shape":"InputFormat"},
         "FormatOptions":{"shape":"FormatOptions"},
         "Input":{"shape":"Input"},
+        "PathOptions":{"shape":"PathOptions"},
         "Tags":{"shape":"TagMap"}
       }
     },
@@ -665,9 +827,12 @@
         "MaxCapacity":{"shape":"MaxCapacity"},
         "MaxRetries":{"shape":"MaxRetries"},
         "OutputLocation":{"shape":"S3Location"},
+        "Configuration":{"shape":"ProfileConfiguration"},
+        "ValidationConfigurations":{"shape":"ValidationConfigurationList"},
         "RoleArn":{"shape":"Arn"},
         "Tags":{"shape":"TagMap"},
-        "Timeout":{"shape":"Timeout"}
+        "Timeout":{"shape":"Timeout"},
+        "JobSample":{"shape":"JobSample"}
       }
     },
     "CreateProfileJobResponse":{
@@ -705,7 +870,6 @@
       "type":"structure",
       "required":[
         "Name",
-        "Outputs",
         "RoleArn"
       ],
       "members":{
@@ -717,6 +881,8 @@
         "MaxCapacity":{"shape":"MaxCapacity"},
         "MaxRetries":{"shape":"MaxRetries"},
         "Outputs":{"shape":"OutputList"},
+        "DataCatalogOutputs":{"shape":"DataCatalogOutputList"},
+        "DatabaseOutputs":{"shape":"DatabaseOutputList"},
         "ProjectName":{"shape":"ProjectName"},
         "RecipeReference":{"shape":"RecipeReference"},
         "RoleArn":{"shape":"Arn"},
@@ -751,6 +917,28 @@
         "Name":{"shape":"RecipeName"}
       }
     },
+    "CreateRulesetRequest":{
+      "type":"structure",
+      "required":[
+        "Name",
+        "TargetArn",
+        "Rules"
+      ],
+      "members":{
+        "Name":{"shape":"RulesetName"},
+        "Description":{"shape":"RulesetDescription"},
+        "TargetArn":{"shape":"Arn"},
+        "Rules":{"shape":"RuleList"},
+        "Tags":{"shape":"TagMap"}
+      }
+    },
+    "CreateRulesetResponse":{
+      "type":"structure",
+      "required":["Name"],
+      "members":{
+        "Name":{"shape":"RulesetName"}
+      }
+    },
     "CreateScheduleRequest":{
       "type":"structure",
       "required":[
@@ -777,6 +965,19 @@
       "max":512,
       "min":1
     },
+    "CsvOptions":{
+      "type":"structure",
+      "members":{
+        "Delimiter":{"shape":"Delimiter"},
+        "HeaderRow":{"shape":"HeaderRow"}
+      }
+    },
+    "CsvOutputOptions":{
+      "type":"structure",
+      "members":{
+        "Delimiter":{"shape":"Delimiter"}
+      }
+    },
     "DataCatalogInputDefinition":{
       "type":"structure",
       "required":[
@@ -790,10 +991,74 @@
         "TempDirectory":{"shape":"S3Location"}
       }
     },
+    "DataCatalogOutput":{
+      "type":"structure",
+      "required":[
+        "DatabaseName",
+        "TableName"
+      ],
+      "members":{
+        "CatalogId":{"shape":"CatalogId"},
+        "DatabaseName":{"shape":"DatabaseName"},
+        "TableName":{"shape":"TableName"},
+        "S3Options":{"shape":"S3TableOutputOptions"},
+        "DatabaseOptions":{"shape":"DatabaseTableOutputOptions"},
+        "Overwrite":{"shape":"OverwriteOutput"}
+      }
+    },
+    "DataCatalogOutputList":{
+      "type":"list",
+      "member":{"shape":"DataCatalogOutput"},
+      "min":1
+    },
+    "DatabaseInputDefinition":{
+      "type":"structure",
+      "required":["GlueConnectionName"],
+      "members":{
+        "GlueConnectionName":{"shape":"GlueConnectionName"},
+        "DatabaseTableName":{"shape":"DatabaseTableName"},
+        "TempDirectory":{"shape":"S3Location"},
+        "QueryString":{"shape":"QueryString"}
+      }
+    },
     "DatabaseName":{
       "type":"string",
       "max":255,
       "min":1
+    },
+    "DatabaseOutput":{
+      "type":"structure",
+      "required":[
+        "GlueConnectionName",
+        "DatabaseOptions"
+      ],
+      "members":{
+        "GlueConnectionName":{"shape":"GlueConnectionName"},
+        "DatabaseOptions":{"shape":"DatabaseTableOutputOptions"},
+        "DatabaseOutputMode":{"shape":"DatabaseOutputMode"}
+      }
+    },
+    "DatabaseOutputList":{
+      "type":"list",
+      "member":{"shape":"DatabaseOutput"},
+      "min":1
+    },
+    "DatabaseOutputMode":{
+      "type":"string",
+      "enum":["NEW_TABLE"]
+    },
+    "DatabaseTableName":{
+      "type":"string",
+      "max":255,
+      "min":1
+    },
+    "DatabaseTableOutputOptions":{
+      "type":"structure",
+      "required":["TableName"],
+      "members":{
+        "TempDirectory":{"shape":"S3Location"},
+        "TableName":{"shape":"DatabaseTableName"}
+      }
     },
     "Dataset":{
       "type":"structure",
@@ -806,11 +1071,13 @@
         "CreatedBy":{"shape":"CreatedBy"},
         "CreateDate":{"shape":"Date"},
         "Name":{"shape":"DatasetName"},
+        "Format":{"shape":"InputFormat"},
         "FormatOptions":{"shape":"FormatOptions"},
         "Input":{"shape":"Input"},
         "LastModifiedDate":{"shape":"Date"},
         "LastModifiedBy":{"shape":"LastModifiedBy"},
         "Source":{"shape":"Source"},
+        "PathOptions":{"shape":"PathOptions"},
         "Tags":{"shape":"TagMap"},
         "ResourceArn":{"shape":"Arn"}
       }
@@ -824,7 +1091,35 @@
       "max":255,
       "min":1
     },
+    "DatasetParameter":{
+      "type":"structure",
+      "required":[
+        "Name",
+        "Type"
+      ],
+      "members":{
+        "Name":{"shape":"PathParameterName"},
+        "Type":{"shape":"ParameterType"},
+        "DatetimeOptions":{"shape":"DatetimeOptions"},
+        "CreateColumn":{"shape":"CreateColumn"},
+        "Filter":{"shape":"FilterExpression"}
+      }
+    },
     "Date":{"type":"timestamp"},
+    "DatetimeFormat":{
+      "type":"string",
+      "max":100,
+      "min":2
+    },
+    "DatetimeOptions":{
+      "type":"structure",
+      "required":["Format"],
+      "members":{
+        "Format":{"shape":"DatetimeFormat"},
+        "TimezoneOffset":{"shape":"TimezoneOffset"},
+        "LocaleCode":{"shape":"LocaleCode"}
+      }
+    },
     "DeleteDatasetRequest":{
       "type":"structure",
       "required":["Name"],
@@ -909,6 +1204,24 @@
         "RecipeVersion":{"shape":"RecipeVersion"}
       }
     },
+    "DeleteRulesetRequest":{
+      "type":"structure",
+      "required":["Name"],
+      "members":{
+        "Name":{
+          "shape":"RulesetName",
+          "location":"uri",
+          "locationName":"name"
+        }
+      }
+    },
+    "DeleteRulesetResponse":{
+      "type":"structure",
+      "required":["Name"],
+      "members":{
+        "Name":{"shape":"RulesetName"}
+      }
+    },
     "DeleteScheduleRequest":{
       "type":"structure",
       "required":["Name"],
@@ -926,6 +1239,11 @@
       "members":{
         "Name":{"shape":"ScheduleName"}
       }
+    },
+    "Delimiter":{
+      "type":"string",
+      "max":1,
+      "min":1
     },
     "DescribeDatasetRequest":{
       "type":"structure",
@@ -948,11 +1266,13 @@
         "CreatedBy":{"shape":"CreatedBy"},
         "CreateDate":{"shape":"Date"},
         "Name":{"shape":"DatasetName"},
+        "Format":{"shape":"InputFormat"},
         "FormatOptions":{"shape":"FormatOptions"},
         "Input":{"shape":"Input"},
         "LastModifiedDate":{"shape":"Date"},
         "LastModifiedBy":{"shape":"LastModifiedBy"},
         "Source":{"shape":"Source"},
+        "PathOptions":{"shape":"PathOptions"},
         "Tags":{"shape":"TagMap"},
         "ResourceArn":{"shape":"Arn"}
       }
@@ -985,12 +1305,61 @@
         "MaxCapacity":{"shape":"MaxCapacity"},
         "MaxRetries":{"shape":"MaxRetries"},
         "Outputs":{"shape":"OutputList"},
+        "DataCatalogOutputs":{"shape":"DataCatalogOutputList"},
+        "DatabaseOutputs":{"shape":"DatabaseOutputList"},
         "ProjectName":{"shape":"ProjectName"},
+        "ProfileConfiguration":{"shape":"ProfileConfiguration"},
+        "ValidationConfigurations":{"shape":"ValidationConfigurationList"},
         "RecipeReference":{"shape":"RecipeReference"},
         "ResourceArn":{"shape":"Arn"},
         "RoleArn":{"shape":"Arn"},
         "Tags":{"shape":"TagMap"},
-        "Timeout":{"shape":"Timeout"}
+        "Timeout":{"shape":"Timeout"},
+        "JobSample":{"shape":"JobSample"}
+      }
+    },
+    "DescribeJobRunRequest":{
+      "type":"structure",
+      "required":[
+        "Name",
+        "RunId"
+      ],
+      "members":{
+        "Name":{
+          "shape":"JobName",
+          "location":"uri",
+          "locationName":"name"
+        },
+        "RunId":{
+          "shape":"JobRunId",
+          "location":"uri",
+          "locationName":"runId"
+        }
+      }
+    },
+    "DescribeJobRunResponse":{
+      "type":"structure",
+      "required":["JobName"],
+      "members":{
+        "Attempt":{"shape":"Attempt"},
+        "CompletedOn":{"shape":"Date"},
+        "DatasetName":{"shape":"DatasetName"},
+        "ErrorMessage":{"shape":"JobRunErrorMessage"},
+        "ExecutionTime":{"shape":"ExecutionTime"},
+        "JobName":{"shape":"JobName"},
+        "ProfileConfiguration":{"shape":"ProfileConfiguration"},
+        "ValidationConfigurations":{"shape":"ValidationConfigurationList"},
+        "RunId":{"shape":"JobRunId"},
+        "State":{"shape":"JobRunState"},
+        "LogSubscription":{"shape":"LogSubscription"},
+        "LogGroupName":{"shape":"LogGroupName"},
+        "Outputs":{"shape":"OutputList"},
+        "DataCatalogOutputs":{"shape":"DataCatalogOutputList"},
+        "DatabaseOutputs":{"shape":"DatabaseOutputList"},
+        "RecipeReference":{"shape":"RecipeReference"},
+        "StartedBy":{"shape":"StartedBy"},
+        "StartedOn":{"shape":"Date"},
+        "JobSample":{"shape":"JobSample"}
       }
     },
     "DescribeProjectRequest":{
@@ -1059,6 +1428,33 @@
         "RecipeVersion":{"shape":"RecipeVersion"}
       }
     },
+    "DescribeRulesetRequest":{
+      "type":"structure",
+      "required":["Name"],
+      "members":{
+        "Name":{
+          "shape":"RulesetName",
+          "location":"uri",
+          "locationName":"name"
+        }
+      }
+    },
+    "DescribeRulesetResponse":{
+      "type":"structure",
+      "required":["Name"],
+      "members":{
+        "Name":{"shape":"RulesetName"},
+        "Description":{"shape":"RulesetDescription"},
+        "TargetArn":{"shape":"Arn"},
+        "Rules":{"shape":"RuleList"},
+        "CreateDate":{"shape":"Date"},
+        "CreatedBy":{"shape":"CreatedBy"},
+        "LastModifiedBy":{"shape":"LastModifiedBy"},
+        "LastModifiedDate":{"shape":"Date"},
+        "ResourceArn":{"shape":"Arn"},
+        "Tags":{"shape":"TagMap"}
+      }
+    },
     "DescribeScheduleRequest":{
       "type":"structure",
       "required":["Name"],
@@ -1085,6 +1481,7 @@
         "Name":{"shape":"ScheduleName"}
       }
     },
+    "Disabled":{"type":"boolean"},
     "EncryptionKeyArn":{
       "type":"string",
       "max":2048,
@@ -1097,6 +1494,25 @@
         "SSE-S3"
       ]
     },
+    "EntityDetectorConfiguration":{
+      "type":"structure",
+      "required":["EntityTypes"],
+      "members":{
+        "EntityTypes":{"shape":"EntityTypeList"},
+        "AllowedStatistics":{"shape":"AllowedStatisticList"}
+      }
+    },
+    "EntityType":{
+      "type":"string",
+      "max":128,
+      "min":1,
+      "pattern":"^[A-Z_][A-Z\\\\d_]*$"
+    },
+    "EntityTypeList":{
+      "type":"list",
+      "member":{"shape":"EntityType"},
+      "min":1
+    },
     "ErrorCode":{
       "type":"string",
       "pattern":"^[1-5][0-9][0-9]$"
@@ -1105,17 +1521,51 @@
       "type":"structure",
       "members":{
         "SheetNames":{"shape":"SheetNameList"},
-        "SheetIndexes":{"shape":"SheetIndexList"}
+        "SheetIndexes":{"shape":"SheetIndexList"},
+        "HeaderRow":{"shape":"HeaderRow"}
       }
     },
     "ExecutionTime":{"type":"integer"},
+    "Expression":{
+      "type":"string",
+      "max":1024,
+      "min":4,
+      "pattern":"^[<>0-9A-Za-z_.,:)(!= ]+$"
+    },
+    "FilesLimit":{
+      "type":"structure",
+      "required":["MaxFiles"],
+      "members":{
+        "MaxFiles":{"shape":"MaxFiles"},
+        "OrderedBy":{"shape":"OrderedBy"},
+        "Order":{"shape":"Order"}
+      }
+    },
+    "FilterExpression":{
+      "type":"structure",
+      "required":[
+        "Expression",
+        "ValuesMap"
+      ],
+      "members":{
+        "Expression":{"shape":"Expression"},
+        "ValuesMap":{"shape":"ValuesMap"}
+      }
+    },
     "FormatOptions":{
       "type":"structure",
       "members":{
         "Json":{"shape":"JsonOptions"},
-        "Excel":{"shape":"ExcelOptions"}
+        "Excel":{"shape":"ExcelOptions"},
+        "Csv":{"shape":"CsvOptions"}
       }
     },
+    "GlueConnectionName":{
+      "type":"string",
+      "max":255,
+      "min":1
+    },
+    "HeaderRow":{"type":"boolean"},
     "HiddenColumnList":{
       "type":"list",
       "member":{"shape":"ColumnName"}
@@ -1124,8 +1574,20 @@
       "type":"structure",
       "members":{
         "S3InputDefinition":{"shape":"S3Location"},
-        "DataCatalogInputDefinition":{"shape":"DataCatalogInputDefinition"}
+        "DataCatalogInputDefinition":{"shape":"DataCatalogInputDefinition"},
+        "DatabaseInputDefinition":{"shape":"DatabaseInputDefinition"},
+        "Metadata":{"shape":"Metadata"}
       }
+    },
+    "InputFormat":{
+      "type":"string",
+      "enum":[
+        "CSV",
+        "JSON",
+        "PARQUET",
+        "EXCEL",
+        "ORC"
+      ]
     },
     "InternalServerException":{
       "type":"structure",
@@ -1153,12 +1615,16 @@
         "MaxCapacity":{"shape":"MaxCapacity"},
         "MaxRetries":{"shape":"MaxRetries"},
         "Outputs":{"shape":"OutputList"},
+        "DataCatalogOutputs":{"shape":"DataCatalogOutputList"},
+        "DatabaseOutputs":{"shape":"DatabaseOutputList"},
         "ProjectName":{"shape":"ProjectName"},
         "RecipeReference":{"shape":"RecipeReference"},
         "ResourceArn":{"shape":"Arn"},
         "RoleArn":{"shape":"Arn"},
         "Timeout":{"shape":"Timeout"},
-        "Tags":{"shape":"TagMap"}
+        "Tags":{"shape":"TagMap"},
+        "JobSample":{"shape":"JobSample"},
+        "ValidationConfigurations":{"shape":"ValidationConfigurationList"}
       }
     },
     "JobList":{
@@ -1189,9 +1655,13 @@
         "LogSubscription":{"shape":"LogSubscription"},
         "LogGroupName":{"shape":"LogGroupName"},
         "Outputs":{"shape":"OutputList"},
+        "DataCatalogOutputs":{"shape":"DataCatalogOutputList"},
+        "DatabaseOutputs":{"shape":"DatabaseOutputList"},
         "RecipeReference":{"shape":"RecipeReference"},
         "StartedBy":{"shape":"StartedBy"},
-        "StartedOn":{"shape":"Date"}
+        "StartedOn":{"shape":"Date"},
+        "JobSample":{"shape":"JobSample"},
+        "ValidationConfigurations":{"shape":"ValidationConfigurationList"}
       }
     },
     "JobRunErrorMessage":{"type":"string"},
@@ -1216,6 +1686,14 @@
         "TIMEOUT"
       ]
     },
+    "JobSample":{
+      "type":"structure",
+      "members":{
+        "Mode":{"shape":"SampleMode"},
+        "Size":{"shape":"JobSize"}
+      }
+    },
+    "JobSize":{"type":"long"},
     "JobType":{
       "type":"string",
       "enum":[
@@ -1400,6 +1878,34 @@
         "NextToken":{"shape":"NextToken"}
       }
     },
+    "ListRulesetsRequest":{
+      "type":"structure",
+      "members":{
+        "TargetArn":{
+          "shape":"Arn",
+          "location":"querystring",
+          "locationName":"targetArn"
+        },
+        "MaxResults":{
+          "shape":"MaxResults100",
+          "location":"querystring",
+          "locationName":"maxResults"
+        },
+        "NextToken":{
+          "shape":"NextToken",
+          "location":"querystring",
+          "locationName":"nextToken"
+        }
+      }
+    },
+    "ListRulesetsResponse":{
+      "type":"structure",
+      "required":["Rulesets"],
+      "members":{
+        "Rulesets":{"shape":"RulesetItemList"},
+        "NextToken":{"shape":"NextToken"}
+      }
+    },
     "ListSchedulesRequest":{
       "type":"structure",
       "members":{
@@ -1445,6 +1951,12 @@
         "Tags":{"shape":"TagMap"}
       }
     },
+    "LocaleCode":{
+      "type":"string",
+      "max":100,
+      "min":2,
+      "pattern":"^[A-Za-z0-9_\\.#@\\-]+$"
+    },
     "LogGroupName":{
       "type":"string",
       "max":512,
@@ -1458,6 +1970,15 @@
       ]
     },
     "MaxCapacity":{"type":"integer"},
+    "MaxFiles":{
+      "type":"integer",
+      "min":1
+    },
+    "MaxOutputFiles":{
+      "type":"integer",
+      "max":999,
+      "min":1
+    },
     "MaxResults100":{
       "type":"integer",
       "max":100,
@@ -1468,6 +1989,12 @@
       "min":0
     },
     "Message":{"type":"string"},
+    "Metadata":{
+      "type":"structure",
+      "members":{
+        "SourceArn":{"shape":"Arn"}
+      }
+    },
     "MultiLine":{"type":"boolean"},
     "NextToken":{
       "type":"string",
@@ -1481,6 +2008,17 @@
       "min":1,
       "pattern":"^[A-Z\\_]+$"
     },
+    "Order":{
+      "type":"string",
+      "enum":[
+        "DESCENDING",
+        "ASCENDING"
+      ]
+    },
+    "OrderedBy":{
+      "type":"string",
+      "enum":["LAST_MODIFIED_DATE"]
+    },
     "Output":{
       "type":"structure",
       "required":["Location"],
@@ -1489,7 +2027,9 @@
         "Format":{"shape":"OutputFormat"},
         "PartitionColumns":{"shape":"ColumnNameList"},
         "Location":{"shape":"S3Location"},
-        "Overwrite":{"shape":"OverwriteOutput"}
+        "Overwrite":{"shape":"OverwriteOutput"},
+        "FormatOptions":{"shape":"OutputFormatOptions"},
+        "MaxOutputFiles":{"shape":"MaxOutputFiles"}
       }
     },
     "OutputFormat":{
@@ -1501,8 +2041,15 @@
         "GLUEPARQUET",
         "AVRO",
         "ORC",
-        "XML"
+        "XML",
+        "TABLEAUHYPER"
       ]
+    },
+    "OutputFormatOptions":{
+      "type":"structure",
+      "members":{
+        "Csv":{"shape":"CsvOutputOptions"}
+      }
     },
     "OutputList":{
       "type":"list",
@@ -1521,12 +2068,49 @@
       "min":1,
       "pattern":"^[A-Za-z0-9]+$"
     },
+    "ParameterType":{
+      "type":"string",
+      "enum":[
+        "Datetime",
+        "Number",
+        "String"
+      ]
+    },
     "ParameterValue":{
       "type":"string",
-      "max":8192,
+      "max":32768,
+      "min":1
+    },
+    "PathOptions":{
+      "type":"structure",
+      "members":{
+        "LastModifiedDateCondition":{"shape":"FilterExpression"},
+        "FilesLimit":{"shape":"FilesLimit"},
+        "Parameters":{"shape":"PathParametersMap"}
+      }
+    },
+    "PathParameterName":{
+      "type":"string",
+      "max":255,
+      "min":1
+    },
+    "PathParametersMap":{
+      "type":"map",
+      "key":{"shape":"PathParameterName"},
+      "value":{"shape":"DatasetParameter"},
+      "max":10,
       "min":1
     },
     "Preview":{"type":"boolean"},
+    "ProfileConfiguration":{
+      "type":"structure",
+      "members":{
+        "DatasetStatisticsConfiguration":{"shape":"StatisticsConfiguration"},
+        "ProfileColumns":{"shape":"ColumnSelectorList"},
+        "ColumnStatisticsConfigurations":{"shape":"ColumnStatisticsConfigurationList"},
+        "EntityDetectorConfiguration":{"shape":"EntityDetectorConfiguration"}
+      }
+    },
     "Project":{
       "type":"structure",
       "required":[
@@ -1579,6 +2163,11 @@
       }
     },
     "PublishedBy":{"type":"string"},
+    "QueryString":{
+      "type":"string",
+      "max":10000,
+      "min":1
+    },
     "Recipe":{
       "type":"structure",
       "required":["Name"],
@@ -1672,12 +2261,83 @@
       "exception":true
     },
     "Result":{"type":"string"},
+    "RowRange":{"type":"integer"},
+    "Rule":{
+      "type":"structure",
+      "required":[
+        "Name",
+        "CheckExpression"
+      ],
+      "members":{
+        "Name":{"shape":"RuleName"},
+        "Disabled":{"shape":"Disabled"},
+        "CheckExpression":{"shape":"Expression"},
+        "SubstitutionMap":{"shape":"ValuesMap"},
+        "Threshold":{"shape":"Threshold"},
+        "ColumnSelectors":{"shape":"ColumnSelectorList"}
+      }
+    },
+    "RuleCount":{
+      "type":"integer",
+      "min":0
+    },
+    "RuleList":{
+      "type":"list",
+      "member":{"shape":"Rule"},
+      "min":1
+    },
+    "RuleName":{
+      "type":"string",
+      "max":128,
+      "min":1
+    },
+    "RulesetDescription":{
+      "type":"string",
+      "max":1024
+    },
+    "RulesetItem":{
+      "type":"structure",
+      "required":[
+        "Name",
+        "TargetArn"
+      ],
+      "members":{
+        "AccountId":{"shape":"AccountId"},
+        "CreatedBy":{"shape":"CreatedBy"},
+        "CreateDate":{"shape":"Date"},
+        "Description":{"shape":"RulesetDescription"},
+        "LastModifiedBy":{"shape":"LastModifiedBy"},
+        "LastModifiedDate":{"shape":"Date"},
+        "Name":{"shape":"RulesetName"},
+        "ResourceArn":{"shape":"Arn"},
+        "RuleCount":{"shape":"RuleCount"},
+        "Tags":{"shape":"TagMap"},
+        "TargetArn":{"shape":"Arn"}
+      }
+    },
+    "RulesetItemList":{
+      "type":"list",
+      "member":{"shape":"RulesetItem"}
+    },
+    "RulesetName":{
+      "type":"string",
+      "max":255,
+      "min":1
+    },
     "S3Location":{
       "type":"structure",
       "required":["Bucket"],
       "members":{
         "Bucket":{"shape":"Bucket"},
-        "Key":{"shape":"Key"}
+        "Key":{"shape":"Key"},
+        "BucketOwner":{"shape":"BucketOwner"}
+      }
+    },
+    "S3TableOutputOptions":{
+      "type":"structure",
+      "required":["Location"],
+      "members":{
+        "Location":{"shape":"S3Location"}
       }
     },
     "Sample":{
@@ -1687,6 +2347,13 @@
         "Size":{"shape":"SampleSize"},
         "Type":{"shape":"SampleType"}
       }
+    },
+    "SampleMode":{
+      "type":"string",
+      "enum":[
+        "FULL_DATASET",
+        "CUSTOM_ROWS"
+      ]
     },
     "SampleSize":{
       "type":"integer",
@@ -1800,7 +2467,8 @@
       "type":"string",
       "enum":[
         "S3",
-        "DATA-CATALOG"
+        "DATA-CATALOG",
+        "DATABASE"
       ]
     },
     "StartColumnIndex":{
@@ -1845,7 +2513,45 @@
         "ClientSessionId":{"shape":"ClientSessionId"}
       }
     },
+    "StartRowIndex":{
+      "type":"integer",
+      "min":0
+    },
     "StartedBy":{"type":"string"},
+    "Statistic":{
+      "type":"string",
+      "max":128,
+      "min":1,
+      "pattern":"^[A-Z\\_]+$"
+    },
+    "StatisticList":{
+      "type":"list",
+      "member":{"shape":"Statistic"},
+      "min":1
+    },
+    "StatisticOverride":{
+      "type":"structure",
+      "required":[
+        "Statistic",
+        "Parameters"
+      ],
+      "members":{
+        "Statistic":{"shape":"Statistic"},
+        "Parameters":{"shape":"ParameterMap"}
+      }
+    },
+    "StatisticOverrideList":{
+      "type":"list",
+      "member":{"shape":"StatisticOverride"},
+      "min":1
+    },
+    "StatisticsConfiguration":{
+      "type":"structure",
+      "members":{
+        "IncludedStatistics":{"shape":"StatisticList"},
+        "Overrides":{"shape":"StatisticOverrideList"}
+      }
+    },
     "StepIndex":{
       "type":"integer",
       "min":0
@@ -1928,9 +2634,44 @@
       "max":1024,
       "min":1
     },
+    "Threshold":{
+      "type":"structure",
+      "required":["Value"],
+      "members":{
+        "Value":{"shape":"ThresholdValue"},
+        "Type":{"shape":"ThresholdType"},
+        "Unit":{"shape":"ThresholdUnit"}
+      }
+    },
+    "ThresholdType":{
+      "type":"string",
+      "enum":[
+        "GREATER_THAN_OR_EQUAL",
+        "LESS_THAN_OR_EQUAL",
+        "GREATER_THAN",
+        "LESS_THAN"
+      ]
+    },
+    "ThresholdUnit":{
+      "type":"string",
+      "enum":[
+        "COUNT",
+        "PERCENTAGE"
+      ]
+    },
+    "ThresholdValue":{
+      "type":"double",
+      "min":0
+    },
     "Timeout":{
       "type":"integer",
       "min":0
+    },
+    "TimezoneOffset":{
+      "type":"string",
+      "max":6,
+      "min":1,
+      "pattern":"^(Z|[-+](\\d|\\d{2}|\\d{2}:?\\d{2}))$"
     },
     "UntagResourceRequest":{
       "type":"structure",
@@ -1968,8 +2709,10 @@
           "location":"uri",
           "locationName":"name"
         },
+        "Format":{"shape":"InputFormat"},
         "FormatOptions":{"shape":"FormatOptions"},
-        "Input":{"shape":"Input"}
+        "Input":{"shape":"Input"},
+        "PathOptions":{"shape":"PathOptions"}
       }
     },
     "UpdateDatasetResponse":{
@@ -1987,6 +2730,7 @@
         "RoleArn"
       ],
       "members":{
+        "Configuration":{"shape":"ProfileConfiguration"},
         "EncryptionKeyArn":{"shape":"EncryptionKeyArn"},
         "EncryptionMode":{"shape":"EncryptionMode"},
         "Name":{
@@ -1998,8 +2742,10 @@
         "MaxCapacity":{"shape":"MaxCapacity"},
         "MaxRetries":{"shape":"MaxRetries"},
         "OutputLocation":{"shape":"S3Location"},
+        "ValidationConfigurations":{"shape":"ValidationConfigurationList"},
         "RoleArn":{"shape":"Arn"},
-        "Timeout":{"shape":"Timeout"}
+        "Timeout":{"shape":"Timeout"},
+        "JobSample":{"shape":"JobSample"}
       }
     },
     "UpdateProfileJobResponse":{
@@ -2037,7 +2783,6 @@
       "type":"structure",
       "required":[
         "Name",
-        "Outputs",
         "RoleArn"
       ],
       "members":{
@@ -2052,6 +2797,8 @@
         "MaxCapacity":{"shape":"MaxCapacity"},
         "MaxRetries":{"shape":"MaxRetries"},
         "Outputs":{"shape":"OutputList"},
+        "DataCatalogOutputs":{"shape":"DataCatalogOutputList"},
+        "DatabaseOutputs":{"shape":"DatabaseOutputList"},
         "RoleArn":{"shape":"Arn"},
         "Timeout":{"shape":"Timeout"}
       }
@@ -2083,6 +2830,29 @@
         "Name":{"shape":"RecipeName"}
       }
     },
+    "UpdateRulesetRequest":{
+      "type":"structure",
+      "required":[
+        "Name",
+        "Rules"
+      ],
+      "members":{
+        "Name":{
+          "shape":"RulesetName",
+          "location":"uri",
+          "locationName":"name"
+        },
+        "Description":{"shape":"RulesetDescription"},
+        "Rules":{"shape":"RuleList"}
+      }
+    },
+    "UpdateRulesetResponse":{
+      "type":"structure",
+      "required":["Name"],
+      "members":{
+        "Name":{"shape":"RulesetName"}
+      }
+    },
     "UpdateScheduleRequest":{
       "type":"structure",
       "required":[
@@ -2106,6 +2876,19 @@
         "Name":{"shape":"ScheduleName"}
       }
     },
+    "ValidationConfiguration":{
+      "type":"structure",
+      "required":["RulesetArn"],
+      "members":{
+        "RulesetArn":{"shape":"Arn"},
+        "ValidationMode":{"shape":"ValidationMode"}
+      }
+    },
+    "ValidationConfigurationList":{
+      "type":"list",
+      "member":{"shape":"ValidationConfiguration"},
+      "min":1
+    },
     "ValidationException":{
       "type":"structure",
       "members":{
@@ -2114,13 +2897,31 @@
       "error":{"httpStatusCode":400},
       "exception":true
     },
+    "ValidationMode":{
+      "type":"string",
+      "enum":["CHECK_ALL"]
+    },
+    "ValueReference":{
+      "type":"string",
+      "max":128,
+      "min":2,
+      "pattern":"^:[A-Za-z0-9_]+$"
+    },
+    "ValuesMap":{
+      "type":"map",
+      "key":{"shape":"ValueReference"},
+      "value":{"shape":"ConditionValue"}
+    },
     "ViewFrame":{
       "type":"structure",
       "required":["StartColumnIndex"],
       "members":{
         "StartColumnIndex":{"shape":"StartColumnIndex"},
         "ColumnRange":{"shape":"ColumnRange"},
-        "HiddenColumns":{"shape":"HiddenColumnList"}
+        "HiddenColumns":{"shape":"HiddenColumnList"},
+        "StartRowIndex":{"shape":"StartRowIndex"},
+        "RowRange":{"shape":"RowRange"},
+        "Analytics":{"shape":"AnalyticsMode"}
       }
     }
   }

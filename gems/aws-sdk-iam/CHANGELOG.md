@@ -1,6 +1,333 @@
 Unreleased Changes
 ------------------
 
+1.111.0 (2024-09-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.110.0 (2024-09-23)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.109.0 (2024-09-20)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.108.0 (2024-09-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.107.0 (2024-09-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.106.0 (2024-09-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.105.0 (2024-08-15)
+------------------
+
+* Feature - Make the LastUsedDate field in the GetAccessKeyLastUsed response optional. This may break customers who only call the API for access keys with a valid LastUsedDate. This fixes a deserialization issue for access keys without a LastUsedDate, because the field was marked as required but could be null.
+
+1.104.0 (2024-08-01)
+------------------
+
+* Feature - Add v2 smoke tests and smithy smokeTests trait for SDK testing.
+
+1.103.0 (2024-07-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.102.0 (2024-06-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.101.0 (2024-06-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.100.0 (2024-06-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.99.0 (2024-06-05)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.98.0 (2024-05-13)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.97.0 (2024-04-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.96.0 (2024-04-16)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.95.0 (2024-04-11)
+------------------
+
+* Feature - For CreateOpenIDConnectProvider API, the ThumbprintList parameter is no longer required.
+
+1.94.0 (2024-01-26)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.93.0 (2023-12-26)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.92.0 (2023-11-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.91.0 (2023-11-22)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.90.0 (2023-11-06)
+------------------
+
+* Feature - Add partitional endpoint for iso-e.
+
+1.89.0 (2023-10-25)
+------------------
+
+* Feature - Updates to GetAccessKeyLastUsed action to replace NoSuchEntity error with AccessDeniedException error.
+
+1.88.0 (2023-10-24)
+------------------
+
+* Feature - Add the partitional endpoint for IAM in iso-f.
+
+1.87.0 (2023-09-27)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.86.0 (2023-07-13)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.85.0 (2023-07-11)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.84.0 (2023-07-06)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.83.0 (2023-06-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.82.0 (2023-06-26)
+------------------
+
+* Feature - Support for a new API "GetMFADevice" to present MFA device metadata such as device certifications
+
+1.81.0 (2023-06-16)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.80.0 (2023-06-15)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.79.0 (2023-06-06)
+------------------
+
+* Feature - This release updates the AccountAlias regex pattern with the same length restrictions enforced by the length constraint.
+
+1.78.0 (2023-05-31)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.77.0 (2023-03-22)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.76.0 (2023-03-14)
+------------------
+
+* Feature - Documentation only updates to correct customer-reported issues
+
+1.75.0 (2023-02-01)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.74.0 (2023-01-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+* Issue - Replace runtime endpoint resolution approach with generated ruby code.
+
+1.73.0 (2022-10-26)
+------------------
+
+* Feature - Doc only update that corrects instances of CLI not using an entity.
+
+1.72.0 (2022-10-25)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.71.0 (2022-10-13)
+------------------
+
+* Feature - Documentation updates for the AWS Identity and Access Management API Reference.
+
+1.70.0 (2022-08-24)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.69.0 (2022-06-08)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.68.0 (2022-02-24)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.67.0 (2022-02-17)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.66.0 (2022-02-03)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.65.0 (2021-12-21)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.64.0 (2021-11-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.63.0 (2021-11-04)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.62.0 (2021-10-18)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.61.0 (2021-09-22)
+------------------
+
+* Feature - Added changes to OIDC API about not using port numbers in the URL.
+
+1.60.0 (2021-09-01)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.59.0 (2021-07-30)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.58.0 (2021-07-28)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.57.0 (2021-07-21)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.56.0 (2021-07-07)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.55.0 (2021-06-02)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.54.0 (2021-05-20)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.53.0 (2021-05-19)
+------------------
+
+* Feature - Add pagination to ListUserTags operation
+
+1.52.0 (2021-03-29)
+------------------
+
+* Feature - AWS Identity and Access Management GetAccessKeyLastUsed API will throw a custom error if customer public key is not found for access keys.
+
+1.51.0 (2021-03-23)
+------------------
+
+* Feature - Documentation updates for IAM operations and descriptions.
+
+1.50.0 (2021-03-16)
+------------------
+
+* Feature - Documentation updates for AWS Identity and Access Management (IAM).
+
+1.49.0 (2021-03-10)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
+1.48.0 (2021-02-12)
+------------------
+
+* Feature - AWS Identity and Access Management now supports tagging for the following resources: customer managed policies, identity providers, instance profiles, server certificates, and virtual MFA devices.
+
+1.47.0 (2021-02-02)
+------------------
+
+* Feature - Code Generated Changes, see `./build_tools` or `aws-sdk-core`'s CHANGELOG.md for details.
+
 1.46.0 (2020-09-30)
 ------------------
 

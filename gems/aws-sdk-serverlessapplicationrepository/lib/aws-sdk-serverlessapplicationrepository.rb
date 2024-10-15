@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-serverlessapplicationrepository/types'
-require_relative 'aws-sdk-serverlessapplicationrepository/client_api'
-require_relative 'aws-sdk-serverlessapplicationrepository/client'
-require_relative 'aws-sdk-serverlessapplicationrepository/errors'
-require_relative 'aws-sdk-serverlessapplicationrepository/resource'
-require_relative 'aws-sdk-serverlessapplicationrepository/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:serverlessapplicationrepository)
 
 # This module provides support for AWSServerlessApplicationRepository. This module is available in the
 # `aws-sdk-serverlessapplicationrepository` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-serverlessapplicationrepository/customizations'
 #
 # @!group service
 module Aws::ServerlessApplicationRepository
+  autoload :Types, 'aws-sdk-serverlessapplicationrepository/types'
+  autoload :ClientApi, 'aws-sdk-serverlessapplicationrepository/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-serverlessapplicationrepository/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-serverlessapplicationrepository/client'
+  autoload :Errors, 'aws-sdk-serverlessapplicationrepository/errors'
+  autoload :Resource, 'aws-sdk-serverlessapplicationrepository/resource'
+  autoload :EndpointParameters, 'aws-sdk-serverlessapplicationrepository/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-serverlessapplicationrepository/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-serverlessapplicationrepository/endpoints'
 
-  GEM_VERSION = '1.32.0'
+  GEM_VERSION = '1.68.0'
 
 end
+
+require_relative 'aws-sdk-serverlessapplicationrepository/customizations'

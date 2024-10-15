@@ -3,15 +3,15 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::CodeCommit
   module Types
 
-    # The specified Amazon Resource Name (ARN) does not exist in the AWS
-    # account.
+    # The specified Amazon Resource Name (ARN) does not exist in the Amazon
+    # Web Services account.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/ActorDoesNotExistException AWS API Documentation
     #
@@ -221,8 +221,8 @@ module Aws::CodeCommit
     class ApprovalRuleTemplateContentRequiredException < Aws::EmptyStructure; end
 
     # The specified approval rule template does not exist. Verify that the
-    # name is correct and that you are signed in to the AWS Region where the
-    # template was created, and then try again.
+    # name is correct and that you are signed in to the Amazon Web Services
+    # Region where the template was created, and then try again.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/ApprovalRuleTemplateDoesNotExistException AWS API Documentation
     #
@@ -237,8 +237,9 @@ module Aws::CodeCommit
     class ApprovalRuleTemplateInUseException < Aws::EmptyStructure; end
 
     # You cannot create an approval rule template with that name because a
-    # template with that name already exists in this AWS Region for your AWS
-    # account. Approval rule template names must be unique.
+    # template with that name already exists in this Amazon Web Services
+    # Region for your Amazon Web Services account. Approval rule template
+    # names must be unique.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/ApprovalRuleTemplateNameAlreadyExistsException AWS API Documentation
     #
@@ -276,14 +277,6 @@ module Aws::CodeCommit
     #
     class ApprovalStateRequiredException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass AssociateApprovalRuleTemplateWithRepositoryInput
-    #   data as a hash:
-    #
-    #       {
-    #         approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #         repository_name: "RepositoryName", # required
-    #       }
-    #
     # @!attribute [rw] approval_rule_template_name
     #   The name for the approval rule template.
     #   @return [String]
@@ -302,8 +295,8 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # The specified Amazon Resource Name (ARN) does not exist in the AWS
-    # account.
+    # The specified Amazon Resource Name (ARN) does not exist in the Amazon
+    # Web Services account.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/AuthorDoesNotExistException AWS API Documentation
     #
@@ -336,14 +329,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchAssociateApprovalRuleTemplateWithRepositoriesInput
-    #   data as a hash:
-    #
-    #       {
-    #         approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #         repository_names: ["RepositoryName"], # required
-    #       }
-    #
     # @!attribute [rw] approval_rule_template_name
     #   The name of the template you want to associate with one or more
     #   repositories.
@@ -412,22 +397,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchDescribeMergeConflictsInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         destination_commit_specifier: "CommitName", # required
-    #         source_commit_specifier: "CommitName", # required
-    #         merge_option: "FAST_FORWARD_MERGE", # required, accepts FAST_FORWARD_MERGE, SQUASH_MERGE, THREE_WAY_MERGE
-    #         max_merge_hunks: 1,
-    #         max_conflict_files: 1,
-    #         file_paths: ["Path"],
-    #         conflict_detail_level: "FILE_LEVEL", # accepts FILE_LEVEL, LINE_LEVEL
-    #         conflict_resolution_strategy: "NONE", # accepts NONE, ACCEPT_SOURCE, ACCEPT_DESTINATION, AUTOMERGE
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the merge conflicts you
     #   want to review.
@@ -567,14 +536,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchDisassociateApprovalRuleTemplateFromRepositoriesInput
-    #   data as a hash:
-    #
-    #       {
-    #         approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #         repository_names: ["RepositoryName"], # required
-    #       }
-    #
     # @!attribute [rw] approval_rule_template_name
     #   The name of the template that you want to disassociate from one or
     #   more repositories.
@@ -645,14 +606,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass BatchGetCommitsInput
-    #   data as a hash:
-    #
-    #       {
-    #         commit_ids: ["ObjectId"], # required
-    #         repository_name: "RepositoryName", # required
-    #       }
-    #
     # @!attribute [rw] commit_ids
     #   The full commit IDs of the commits to get information about.
     #
@@ -696,14 +649,39 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
+    # Returns information about errors in a BatchGetRepositories operation.
+    #
+    # @!attribute [rw] repository_id
+    #   The ID of a repository that either could not be found or was not in
+    #   a valid state.
+    #   @return [String]
+    #
+    # @!attribute [rw] repository_name
+    #   The name of a repository that either could not be found or was not
+    #   in a valid state.
+    #   @return [String]
+    #
+    # @!attribute [rw] error_code
+    #   An error code that specifies the type of failure.
+    #   @return [String]
+    #
+    # @!attribute [rw] error_message
+    #   An error message that provides detail about why the repository
+    #   either was not found or was not in a valid state.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/BatchGetRepositoriesError AWS API Documentation
+    #
+    class BatchGetRepositoriesError < Struct.new(
+      :repository_id,
+      :repository_name,
+      :error_code,
+      :error_message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Represents the input of a batch get repositories operation.
-    #
-    # @note When making an API call, you may pass BatchGetRepositoriesInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_names: ["RepositoryName"], # required
-    #       }
     #
     # @!attribute [rw] repository_names
     #   The names of the repositories to get information about.
@@ -734,11 +712,17 @@ module Aws::CodeCommit
     #   be found.
     #   @return [Array<String>]
     #
+    # @!attribute [rw] errors
+    #   Returns information about any errors returned when attempting to
+    #   retrieve information about the repositories.
+    #   @return [Array<Types::BatchGetRepositoriesError>]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/BatchGetRepositoriesOutput AWS API Documentation
     #
     class BatchGetRepositoriesOutput < Struct.new(
       :repositories,
-      :repositories_not_found)
+      :repositories_not_found,
+      :errors)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -943,7 +927,7 @@ module Aws::CodeCommit
     #
     class CommentContentRequiredException < Aws::EmptyStructure; end
 
-    # The comment is too large. Comments are limited to 1,000 characters.
+    # The comment is too large. Comments are limited to 10,240 characters.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/CommentContentSizeLimitExceededException AWS API Documentation
     #
@@ -1291,31 +1275,6 @@ module Aws::CodeCommit
     # If AUTOMERGE is the conflict resolution strategy, a list of inputs to
     # use when resolving conflicts during a merge.
     #
-    # @note When making an API call, you may pass ConflictResolution
-    #   data as a hash:
-    #
-    #       {
-    #         replace_contents: [
-    #           {
-    #             file_path: "Path", # required
-    #             replacement_type: "KEEP_BASE", # required, accepts KEEP_BASE, KEEP_SOURCE, KEEP_DESTINATION, USE_NEW_CONTENT
-    #             content: "data",
-    #             file_mode: "EXECUTABLE", # accepts EXECUTABLE, NORMAL, SYMLINK
-    #           },
-    #         ],
-    #         delete_files: [
-    #           {
-    #             file_path: "Path", # required
-    #           },
-    #         ],
-    #         set_file_modes: [
-    #           {
-    #             file_path: "Path", # required
-    #             file_mode: "EXECUTABLE", # required, accepts EXECUTABLE, NORMAL, SYMLINK
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] replace_contents
     #   Files to have content replaced as part of the merge conflict
     #   resolution.
@@ -1339,15 +1298,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateApprovalRuleTemplateInput
-    #   data as a hash:
-    #
-    #       {
-    #         approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #         approval_rule_template_content: "ApprovalRuleTemplateContent", # required
-    #         approval_rule_template_description: "ApprovalRuleTemplateDescription",
-    #       }
-    #
     # @!attribute [rw] approval_rule_template_name
     #   The name of the approval rule template. Provide descriptive names,
     #   because this name is applied to the approval rules created
@@ -1364,27 +1314,27 @@ module Aws::CodeCommit
     #   <note markdown="1"> When you create the content of the approval rule template, you can
     #   specify approvers in an approval pool in one of two ways:
     #
-    #    * **CodeCommitApprovers**\: This option only requires an AWS account
-    #     and a resource. It can be used for both IAM users and federated
-    #     access users whose name matches the provided resource name. This
-    #     is a very powerful option that offers a great deal of flexibility.
-    #     For example, if you specify the AWS account *123456789012* and
-    #     *Mary\_Major*, all of the following are counted as approvals
-    #     coming from that user:
+    #    * **CodeCommitApprovers**: This option only requires an Amazon Web
+    #     Services account and a resource. It can be used for both IAM users
+    #     and federated access users whose name matches the provided
+    #     resource name. This is a very powerful option that offers a great
+    #     deal of flexibility. For example, if you specify the Amazon Web
+    #     Services account *123456789012* and *Mary\_Major*, all of the
+    #     following are counted as approvals coming from that user:
     #
     #     * An IAM user in the account
-    #       (arn:aws:iam::*123456789012*\:user/*Mary\_Major*)
+    #       (arn:aws:iam::*123456789012*:user/*Mary\_Major*)
     #
     #     * A federated user identified in IAM as Mary\_Major
-    #       (arn:aws:sts::*123456789012*\:federated-user/*Mary\_Major*)
+    #       (arn:aws:sts::*123456789012*:federated-user/*Mary\_Major*)
     #
     #     This option does not recognize an active session of someone
     #     assuming the role of CodeCommitReview with a role session name of
     #     *Mary\_Major*
-    #     (arn:aws:sts::*123456789012*\:assumed-role/CodeCommitReview/*Mary\_Major*)
+    #     (arn:aws:sts::*123456789012*:assumed-role/CodeCommitReview/*Mary\_Major*)
     #     unless you include a wildcard (*Mary\_Major).
     #
-    #   * **Fully qualified ARN**\: This option allows you to specify the
+    #   * **Fully qualified ARN**: This option allows you to specify the
     #     fully qualified Amazon Resource Name (ARN) of the IAM user or
     #     role.
     #
@@ -1428,15 +1378,6 @@ module Aws::CodeCommit
 
     # Represents the input of a create branch operation.
     #
-    # @note When making an API call, you may pass CreateBranchInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         branch_name: "BranchName", # required
-    #         commit_id: "CommitId", # required
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository in which you want to create the new
     #   branch.
@@ -1460,41 +1401,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateCommitInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         branch_name: "BranchName", # required
-    #         parent_commit_id: "CommitId",
-    #         author_name: "Name",
-    #         email: "Email",
-    #         commit_message: "Message",
-    #         keep_empty_folders: false,
-    #         put_files: [
-    #           {
-    #             file_path: "Path", # required
-    #             file_mode: "EXECUTABLE", # accepts EXECUTABLE, NORMAL, SYMLINK
-    #             file_content: "data",
-    #             source_file: {
-    #               file_path: "Path", # required
-    #               is_move: false,
-    #             },
-    #           },
-    #         ],
-    #         delete_files: [
-    #           {
-    #             file_path: "Path", # required
-    #           },
-    #         ],
-    #         set_file_modes: [
-    #           {
-    #             file_path: "Path", # required
-    #             file_mode: "EXECUTABLE", # required, accepts EXECUTABLE, NORMAL, SYMLINK
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you create the commit.
     #   @return [String]
@@ -1593,15 +1499,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreatePullRequestApprovalRuleInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         approval_rule_name: "ApprovalRuleName", # required
-    #         approval_rule_content: "ApprovalRuleContent", # required
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request for which you want to
     #   create the approval rule.
@@ -1614,33 +1511,33 @@ module Aws::CodeCommit
     # @!attribute [rw] approval_rule_content
     #   The content of the approval rule, including the number of approvals
     #   needed and the structure of an approval pool defined for approvals,
-    #   if any. For more information about approval pools, see the AWS
+    #   if any. For more information about approval pools, see the
     #   CodeCommit User Guide.
     #
     #   <note markdown="1"> When you create the content of the approval rule, you can specify
     #   approvers in an approval pool in one of two ways:
     #
-    #    * **CodeCommitApprovers**\: This option only requires an AWS account
-    #     and a resource. It can be used for both IAM users and federated
-    #     access users whose name matches the provided resource name. This
-    #     is a very powerful option that offers a great deal of flexibility.
-    #     For example, if you specify the AWS account *123456789012* and
-    #     *Mary\_Major*, all of the following would be counted as approvals
-    #     coming from that user:
+    #    * **CodeCommitApprovers**: This option only requires an Amazon Web
+    #     Services account and a resource. It can be used for both IAM users
+    #     and federated access users whose name matches the provided
+    #     resource name. This is a very powerful option that offers a great
+    #     deal of flexibility. For example, if you specify the Amazon Web
+    #     Services account *123456789012* and *Mary\_Major*, all of the
+    #     following would be counted as approvals coming from that user:
     #
     #     * An IAM user in the account
-    #       (arn:aws:iam::*123456789012*\:user/*Mary\_Major*)
+    #       (arn:aws:iam::*123456789012*:user/*Mary\_Major*)
     #
     #     * A federated user identified in IAM as Mary\_Major
-    #       (arn:aws:sts::*123456789012*\:federated-user/*Mary\_Major*)
+    #       (arn:aws:sts::*123456789012*:federated-user/*Mary\_Major*)
     #
     #     This option does not recognize an active session of someone
     #     assuming the role of CodeCommitReview with a role session name of
     #     *Mary\_Major*
-    #     (arn:aws:sts::*123456789012*\:assumed-role/CodeCommitReview/*Mary\_Major*)
+    #     (arn:aws:sts::*123456789012*:assumed-role/CodeCommitReview/*Mary\_Major*)
     #     unless you include a wildcard (*Mary\_Major).
     #
-    #   * **Fully qualified ARN**\: This option allows you to specify the
+    #   * **Fully qualified ARN**: This option allows you to specify the
     #     fully qualified Amazon Resource Name (ARN) of the IAM user or
     #     role.
     #
@@ -1676,22 +1573,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreatePullRequestInput
-    #   data as a hash:
-    #
-    #       {
-    #         title: "Title", # required
-    #         description: "Description",
-    #         targets: [ # required
-    #           {
-    #             repository_name: "RepositoryName", # required
-    #             source_reference: "ReferenceName", # required
-    #             destination_reference: "ReferenceName",
-    #           },
-    #         ],
-    #         client_request_token: "ClientRequestToken",
-    #       }
-    #
     # @!attribute [rw] title
     #   The title of the pull request. This title is used to identify the
     #   pull request to other users in the repository.
@@ -1715,8 +1596,9 @@ module Aws::CodeCommit
     #   token is included, the request returns information about the initial
     #   request that used that token.
     #
-    #   <note markdown="1"> The AWS SDKs prepopulate client request tokens. If you are using an
-    #   AWS SDK, an idempotency token is created for you.
+    #   <note markdown="1"> The Amazon Web ServicesSDKs prepopulate client request tokens. If
+    #   you are using an Amazon Web ServicesSDK, an idempotency token is
+    #   created for you.
     #
     #    </note>
     #
@@ -1749,26 +1631,15 @@ module Aws::CodeCommit
 
     # Represents the input of a create repository operation.
     #
-    # @note When making an API call, you may pass CreateRepositoryInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         repository_description: "RepositoryDescription",
-    #         tags: {
-    #           "TagKey" => "TagValue",
-    #         },
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the new repository to be created.
     #
-    #   <note markdown="1"> The repository name must be unique across the calling AWS account.
-    #   Repository names are limited to 100 alphanumeric, dash, and
-    #   underscore characters, and cannot include certain characters. For
-    #   more information about the limits on repository names, see
-    #   [Limits][1] in the *AWS CodeCommit User Guide*. The suffix .git is
-    #   prohibited.
+    #   <note markdown="1"> The repository name must be unique across the calling Amazon Web
+    #   Services account. Repository names are limited to 100 alphanumeric,
+    #   dash, and underscore characters, and cannot include certain
+    #   characters. For more information about the limits on repository
+    #   names, see [Quotas][1] in the *CodeCommit User Guide*. The suffix
+    #   .git is prohibited.
     #
     #    </note>
     #
@@ -1794,12 +1665,28 @@ module Aws::CodeCommit
     #   One or more tag key-value pairs to use when tagging this repository.
     #   @return [Hash<String,String>]
     #
+    # @!attribute [rw] kms_key_id
+    #   The ID of the encryption key. You can view the ID of an encryption
+    #   key in the KMS console, or use the KMS APIs to programmatically
+    #   retrieve a key ID. For more information about acceptable values for
+    #   kmsKeyID, see [KeyId][1] in the Decrypt API description in the *Key
+    #   Management Service API Reference*.
+    #
+    #   If no key is specified, the default `aws/codecommit` Amazon Web
+    #   Services managed key is used.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html#KMS-Decrypt-request-KeyId
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/CreateRepositoryInput AWS API Documentation
     #
     class CreateRepositoryInput < Struct.new(
       :repository_name,
       :repository_description,
-      :tags)
+      :tags,
+      :kms_key_id)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1818,43 +1705,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateUnreferencedMergeCommitInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         source_commit_specifier: "CommitName", # required
-    #         destination_commit_specifier: "CommitName", # required
-    #         merge_option: "FAST_FORWARD_MERGE", # required, accepts FAST_FORWARD_MERGE, SQUASH_MERGE, THREE_WAY_MERGE
-    #         conflict_detail_level: "FILE_LEVEL", # accepts FILE_LEVEL, LINE_LEVEL
-    #         conflict_resolution_strategy: "NONE", # accepts NONE, ACCEPT_SOURCE, ACCEPT_DESTINATION, AUTOMERGE
-    #         author_name: "Name",
-    #         email: "Email",
-    #         commit_message: "Message",
-    #         keep_empty_folders: false,
-    #         conflict_resolution: {
-    #           replace_contents: [
-    #             {
-    #               file_path: "Path", # required
-    #               replacement_type: "KEEP_BASE", # required, accepts KEEP_BASE, KEEP_SOURCE, KEEP_DESTINATION, USE_NEW_CONTENT
-    #               content: "data",
-    #               file_mode: "EXECUTABLE", # accepts EXECUTABLE, NORMAL, SYMLINK
-    #             },
-    #           ],
-    #           delete_files: [
-    #             {
-    #               file_path: "Path", # required
-    #             },
-    #           ],
-    #           set_file_modes: [
-    #             {
-    #               file_path: "Path", # required
-    #               file_mode: "EXECUTABLE", # required, accepts EXECUTABLE, NORMAL, SYMLINK
-    #             },
-    #           ],
-    #         },
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you want to create the unreferenced
     #   merge commit.
@@ -1959,13 +1809,6 @@ module Aws::CodeCommit
     #
     class DefaultBranchCannotBeDeletedException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteApprovalRuleTemplateInput
-    #   data as a hash:
-    #
-    #       {
-    #         approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #       }
-    #
     # @!attribute [rw] approval_rule_template_name
     #   The name of the approval rule template to delete.
     #   @return [String]
@@ -1993,14 +1836,6 @@ module Aws::CodeCommit
     end
 
     # Represents the input of a delete branch operation.
-    #
-    # @note When making an API call, you may pass DeleteBranchInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         branch_name: "BranchName", # required
-    #       }
     #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the branch to be deleted.
@@ -2034,13 +1869,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteCommentContentInput
-    #   data as a hash:
-    #
-    #       {
-    #         comment_id: "CommentId", # required
-    #       }
-    #
     # @!attribute [rw] comment_id
     #   The unique, system-generated ID of the comment. To get this ID, use
     #   GetCommentsForComparedCommit or GetCommentsForPullRequest.
@@ -2068,13 +1896,6 @@ module Aws::CodeCommit
 
     # A file that is deleted as part of a commit.
     #
-    # @note When making an API call, you may pass DeleteFileEntry
-    #   data as a hash:
-    #
-    #       {
-    #         file_path: "Path", # required
-    #       }
-    #
     # @!attribute [rw] file_path
     #   The full path of the file to be deleted, including the name of the
     #   file.
@@ -2088,20 +1909,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteFileInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         branch_name: "BranchName", # required
-    #         file_path: "Path", # required
-    #         parent_commit_id: "CommitId", # required
-    #         keep_empty_folders: false,
-    #         commit_message: "Message",
-    #         name: "Name",
-    #         email: "Email",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the file to delete.
     #   @return [String]
@@ -2197,14 +2004,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeletePullRequestApprovalRuleInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         approval_rule_name: "ApprovalRuleName", # required
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request that contains the
     #   approval rule you want to delete.
@@ -2242,13 +2041,6 @@ module Aws::CodeCommit
 
     # Represents the input of a delete repository operation.
     #
-    # @note When making an API call, you may pass DeleteRepositoryInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository to delete.
     #   @return [String]
@@ -2275,21 +2067,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeMergeConflictsInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         destination_commit_specifier: "CommitName", # required
-    #         source_commit_specifier: "CommitName", # required
-    #         merge_option: "FAST_FORWARD_MERGE", # required, accepts FAST_FORWARD_MERGE, SQUASH_MERGE, THREE_WAY_MERGE
-    #         max_merge_hunks: 1,
-    #         file_path: "Path", # required
-    #         conflict_detail_level: "FILE_LEVEL", # accepts FILE_LEVEL, LINE_LEVEL
-    #         conflict_resolution_strategy: "NONE", # accepts NONE, ACCEPT_SOURCE, ACCEPT_DESTINATION, AUTOMERGE
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you want to get information about a
     #   merge conflict.
@@ -2393,17 +2170,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribePullRequestEventsInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         pull_request_event_type: "PULL_REQUEST_CREATED", # accepts PULL_REQUEST_CREATED, PULL_REQUEST_STATUS_CHANGED, PULL_REQUEST_SOURCE_REFERENCE_UPDATED, PULL_REQUEST_MERGE_STATE_CHANGED, PULL_REQUEST_APPROVAL_RULE_CREATED, PULL_REQUEST_APPROVAL_RULE_UPDATED, PULL_REQUEST_APPROVAL_RULE_DELETED, PULL_REQUEST_APPROVAL_RULE_OVERRIDDEN, PULL_REQUEST_APPROVAL_STATE_CHANGED
-    #         actor_arn: "Arn",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request. To get this ID, use
     #   ListPullRequests.
@@ -2497,14 +2263,6 @@ module Aws::CodeCommit
     #
     class DirectoryNameConflictsWithFileNameException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DisassociateApprovalRuleTemplateFromRepositoryInput
-    #   data as a hash:
-    #
-    #       {
-    #         approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #         repository_name: "RepositoryName", # required
-    #       }
-    #
     # @!attribute [rw] approval_rule_template_name
     #   The name of the approval rule template to disassociate from a
     #   specified repository.
@@ -2542,11 +2300,31 @@ module Aws::CodeCommit
     #
     class EncryptionKeyDisabledException < Aws::EmptyStructure; end
 
+    # The Key Management Service encryption key is not valid.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/EncryptionKeyInvalidIdException AWS API Documentation
+    #
+    class EncryptionKeyInvalidIdException < Aws::EmptyStructure; end
+
+    # A KMS encryption key was used to try and encrypt or decrypt a
+    # repository, but either the repository or the key was not in a valid
+    # state to support the operation.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/EncryptionKeyInvalidUsageException AWS API Documentation
+    #
+    class EncryptionKeyInvalidUsageException < Aws::EmptyStructure; end
+
     # No encryption key was found.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/EncryptionKeyNotFoundException AWS API Documentation
     #
     class EncryptionKeyNotFoundException < Aws::EmptyStructure; end
+
+    # A KMS encryption key ID is required but was not specified.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/EncryptionKeyRequiredException AWS API Documentation
+    #
+    class EncryptionKeyRequiredException < Aws::EmptyStructure; end
 
     # The encryption key is not available.
     #
@@ -2554,14 +2332,6 @@ module Aws::CodeCommit
     #
     class EncryptionKeyUnavailableException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass EvaluatePullRequestApprovalRulesInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         revision_id: "RevisionId", # required
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request you want to evaluate.
     #   @return [String]
@@ -2796,9 +2566,9 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # The specified file exceeds the file size limit for AWS CodeCommit. For
-    # more information about limits in AWS CodeCommit, see [AWS CodeCommit
-    # User Guide][1].
+    # The specified file exceeds the file size limit for CodeCommit. For
+    # more information about limits in CodeCommit, see [Quotas][1] in the
+    # *CodeCommit User Guide*.
     #
     #
     #
@@ -2807,6 +2577,40 @@ module Aws::CodeCommit
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/FileTooLargeException AWS API Documentation
     #
     class FileTooLargeException < Aws::EmptyStructure; end
+
+    # Information about a version of a file.
+    #
+    # @!attribute [rw] commit
+    #   Returns information about a specific commit.
+    #   @return [Types::Commit]
+    #
+    # @!attribute [rw] blob_id
+    #   The blob ID of the object that represents the content of the file in
+    #   this version.
+    #   @return [String]
+    #
+    # @!attribute [rw] path
+    #   The name and path of the file at which this blob is indexed which
+    #   contains the data for this version of the file. This value will vary
+    #   between file versions if a file is renamed or if its path changes.
+    #   @return [String]
+    #
+    # @!attribute [rw] revision_children
+    #   An array of commit IDs that contain more recent versions of this
+    #   file. If there are no additional versions of the file, this array
+    #   will be empty.
+    #   @return [Array<String>]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/FileVersion AWS API Documentation
+    #
+    class FileVersion < Struct.new(
+      :commit,
+      :blob_id,
+      :path,
+      :revision_children)
+      SENSITIVE = []
+      include Aws::Structure
+    end
 
     # Returns information about a folder in a repository.
     #
@@ -2850,13 +2654,6 @@ module Aws::CodeCommit
     #
     class FolderDoesNotExistException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass GetApprovalRuleTemplateInput
-    #   data as a hash:
-    #
-    #       {
-    #         approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #       }
-    #
     # @!attribute [rw] approval_rule_template_name
     #   The name of the approval rule template for which you want to get
     #   information.
@@ -2883,14 +2680,6 @@ module Aws::CodeCommit
     end
 
     # Represents the input of a get blob operation.
-    #
-    # @note When making an API call, you may pass GetBlobInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         blob_id: "ObjectId", # required
-    #       }
     #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the blob.
@@ -2925,14 +2714,6 @@ module Aws::CodeCommit
 
     # Represents the input of a get branch operation.
     #
-    # @note When making an API call, you may pass GetBranchInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName",
-    #         branch_name: "BranchName",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the branch for which you
     #   want to retrieve information.
@@ -2965,13 +2746,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCommentInput
-    #   data as a hash:
-    #
-    #       {
-    #         comment_id: "CommentId", # required
-    #       }
-    #
     # @!attribute [rw] comment_id
     #   The unique, system-generated ID of the comment. To get this ID, use
     #   GetCommentsForComparedCommit or GetCommentsForPullRequest.
@@ -2997,16 +2771,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCommentReactionsInput
-    #   data as a hash:
-    #
-    #       {
-    #         comment_id: "CommentId", # required
-    #         reaction_user_arn: "Arn",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] comment_id
     #   The ID of the comment for which you want to get reactions
     #   information.
@@ -3057,17 +2821,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCommentsForComparedCommitInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         before_commit_id: "CommitId",
-    #         after_commit_id: "CommitId", # required
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you want to compare commits.
     #   @return [String]
@@ -3123,18 +2876,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCommentsForPullRequestInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         repository_name: "RepositoryName",
-    #         before_commit_id: "CommitId",
-    #         after_commit_id: "CommitId",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request. To get this ID, use
     #   ListPullRequests.
@@ -3142,16 +2883,22 @@ module Aws::CodeCommit
     #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the pull request.
+    #   Requirement is conditional: `repositoryName` must be specified when
+    #   `beforeCommitId` and `afterCommitId` are included.
     #   @return [String]
     #
     # @!attribute [rw] before_commit_id
     #   The full commit ID of the commit in the destination branch that was
     #   the tip of the branch at the time the pull request was created.
+    #   Requirement is conditional: `beforeCommitId` must be specified when
+    #   `repositoryName` is included.
     #   @return [String]
     #
     # @!attribute [rw] after_commit_id
     #   The full commit ID of the commit in the source branch that was the
-    #   tip of the branch at the time the comment was made.
+    #   tip of the branch at the time the comment was made. Requirement is
+    #   conditional: `afterCommitId` must be specified when `repositoryName`
+    #   is included.
     #   @return [String]
     #
     # @!attribute [rw] next_token
@@ -3198,14 +2945,6 @@ module Aws::CodeCommit
 
     # Represents the input of a get commit operation.
     #
-    # @note When making an API call, you may pass GetCommitInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         commit_id: "ObjectId", # required
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository to which the commit was made.
     #   @return [String]
@@ -3238,19 +2977,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetDifferencesInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         before_commit_specifier: "CommitName",
-    #         after_commit_specifier: "CommitName", # required
-    #         before_path: "Path",
-    #         after_path: "Path",
-    #         max_results: 1,
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you want to get differences.
     #   @return [String]
@@ -3326,15 +3052,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetFileInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         commit_specifier: "CommitName",
-    #         file_path: "Path", # required
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the file.
     #   @return [String]
@@ -3342,8 +3059,8 @@ module Aws::CodeCommit
     # @!attribute [rw] commit_specifier
     #   The fully quaified reference that identifies the commit that
     #   contains the file. For example, you can specify a full commit ID, a
-    #   tag, a branch name, or a reference such as refs/heads/master. If
-    #   none is provided, the head commit is used.
+    #   tag, a branch name, or a reference such as refs/heads/main. If none
+    #   is provided, the head commit is used.
     #   @return [String]
     #
     # @!attribute [rw] file_path
@@ -3409,15 +3126,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetFolderInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         commit_specifier: "CommitName",
-    #         folder_path: "Path", # required
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository.
     #   @return [String]
@@ -3492,17 +3200,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetMergeCommitInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         source_commit_specifier: "CommitName", # required
-    #         destination_commit_specifier: "CommitName", # required
-    #         conflict_detail_level: "FILE_LEVEL", # accepts FILE_LEVEL, LINE_LEVEL
-    #         conflict_resolution_strategy: "NONE", # accepts NONE, ACCEPT_SOURCE, ACCEPT_DESTINATION, AUTOMERGE
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the merge commit about
     #   which you want to get information.
@@ -3576,20 +3273,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetMergeConflictsInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         destination_commit_specifier: "CommitName", # required
-    #         source_commit_specifier: "CommitName", # required
-    #         merge_option: "FAST_FORWARD_MERGE", # required, accepts FAST_FORWARD_MERGE, SQUASH_MERGE, THREE_WAY_MERGE
-    #         conflict_detail_level: "FILE_LEVEL", # accepts FILE_LEVEL, LINE_LEVEL
-    #         max_conflict_files: 1,
-    #         conflict_resolution_strategy: "NONE", # accepts NONE, ACCEPT_SOURCE, ACCEPT_DESTINATION, AUTOMERGE
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where the pull request was created.
     #   @return [String]
@@ -3689,17 +3372,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetMergeOptionsInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         source_commit_specifier: "CommitName", # required
-    #         destination_commit_specifier: "CommitName", # required
-    #         conflict_detail_level: "FILE_LEVEL", # accepts FILE_LEVEL, LINE_LEVEL
-    #         conflict_resolution_strategy: "NONE", # accepts NONE, ACCEPT_SOURCE, ACCEPT_DESTINATION, AUTOMERGE
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the commits about which you
     #   want to get merge options.
@@ -3771,14 +3443,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetPullRequestApprovalStatesInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         revision_id: "RevisionId", # required
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID for the pull request.
     #   @return [String]
@@ -3808,13 +3472,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetPullRequestInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request. To get this ID, use
     #   ListPullRequests.
@@ -3840,14 +3497,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetPullRequestOverrideStateInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         revision_id: "RevisionId", # required
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The ID of the pull request for which you want to get information
     #   about whether approval rules have been set aside (overridden).
@@ -3889,13 +3538,6 @@ module Aws::CodeCommit
 
     # Represents the input of a get repository operation.
     #
-    # @note When making an API call, you may pass GetRepositoryInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository to get information about.
     #   @return [String]
@@ -3923,13 +3565,6 @@ module Aws::CodeCommit
     end
 
     # Represents the input of a get repository triggers operation.
-    #
-    # @note When making an API call, you may pass GetRepositoryTriggersInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #       }
     #
     # @!attribute [rw] repository_name
     #   The name of the repository for which the trigger is configured.
@@ -3998,8 +3633,8 @@ module Aws::CodeCommit
 
     # The description for the approval rule template is not valid because it
     # exceeds the maximum characters allowed for a description. For more
-    # information about limits in AWS CodeCommit, see [AWS CodeCommit User
-    # Guide][1].
+    # information about limits in CodeCommit, see [Quotas][1] in the
+    # *CodeCommit User Guide*.
     #
     #
     #
@@ -4011,8 +3646,8 @@ module Aws::CodeCommit
 
     # The name of the approval rule template is not valid. Template names
     # must be between 1 and 100 valid characters in length. For more
-    # information about limits in AWS CodeCommit, see [AWS CodeCommit User
-    # Guide][1].
+    # information about limits in CodeCommit, see [Quotas][1] in the
+    # *CodeCommit User Guide*.
     #
     #
     #
@@ -4236,7 +3871,7 @@ module Aws::CodeCommit
     class InvalidReactionUserArnException < Aws::EmptyStructure; end
 
     # The value of the reaction is not valid. For more information, see the
-    # [AWS CodeCommit User Guide][1].
+    # [CodeCommit User Guide][1].
     #
     #
     #
@@ -4247,7 +3882,7 @@ module Aws::CodeCommit
     class InvalidReactionValueException < Aws::EmptyStructure; end
 
     # The specified reference name format is not valid. Reference names must
-    # conform to the Git references format (for example, refs/heads/master).
+    # conform to the Git references format (for example, refs/heads/main).
     # For more information, see [Git Internals - Git References][1] or
     # consult your Git documentation.
     #
@@ -4332,17 +3967,18 @@ module Aws::CodeCommit
     #
     class InvalidRepositoryTriggerNameException < Aws::EmptyStructure; end
 
-    # The AWS Region for the trigger target does not match the AWS Region
-    # for the repository. Triggers must be created in the same Region as the
-    # target for the trigger.
+    # The Amazon Web Services Region for the trigger target does not match
+    # the Amazon Web Services Region for the repository. Triggers must be
+    # created in the same Amazon Web Services Region as the target for the
+    # trigger.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/InvalidRepositoryTriggerRegionException AWS API Documentation
     #
     class InvalidRepositoryTriggerRegionException < Aws::EmptyStructure; end
 
     # The value for the resource ARN is not valid. For more information
-    # about resources in AWS CodeCommit, see [CodeCommit Resources and
-    # Operations][1] in the AWS CodeCommit User Guide.
+    # about resources in CodeCommit, see [CodeCommit Resources and
+    # Operations][1] in the CodeCommit User Guide.
     #
     #
     #
@@ -4455,14 +4091,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListApprovalRuleTemplatesInput
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   An enumeration token that, when provided in a request, returns the
     #   next batch of the results.
@@ -4483,8 +4111,8 @@ module Aws::CodeCommit
     end
 
     # @!attribute [rw] approval_rule_template_names
-    #   The names of all the approval rule templates found in the AWS Region
-    #   for your AWS account.
+    #   The names of all the approval rule templates found in the Amazon Web
+    #   Services Region for your Amazon Web Services account.
     #   @return [Array<String>]
     #
     # @!attribute [rw] next_token
@@ -4501,15 +4129,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListAssociatedApprovalRuleTemplatesForRepositoryInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository for which you want to list all associated
     #   approval rule templates.
@@ -4556,14 +4175,6 @@ module Aws::CodeCommit
 
     # Represents the input of a list branches operation.
     #
-    # @note When making an API call, you may pass ListBranchesInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the branches.
     #   @return [String]
@@ -4600,17 +4211,63 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListPullRequestsInput
-    #   data as a hash:
+    # @!attribute [rw] repository_name
+    #   The name of the repository that contains the file.
+    #   @return [String]
     #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         author_arn: "Arn",
-    #         pull_request_status: "OPEN", # accepts OPEN, CLOSED
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
+    # @!attribute [rw] commit_specifier
+    #   The fully quaified reference that identifies the commit that
+    #   contains the file. For example, you can specify a full commit ID, a
+    #   tag, a branch name, or a reference such as `refs/heads/main`. If
+    #   none is provided, the head commit is used.
+    #   @return [String]
     #
+    # @!attribute [rw] file_path
+    #   The full path of the file whose history you want to retrieve,
+    #   including the name of the file.
+    #   @return [String]
+    #
+    # @!attribute [rw] max_results
+    #   A non-zero, non-negative integer used to limit the number of
+    #   returned results.
+    #   @return [Integer]
+    #
+    # @!attribute [rw] next_token
+    #   An enumeration token that allows the operation to batch the results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/ListFileCommitHistoryRequest AWS API Documentation
+    #
+    class ListFileCommitHistoryRequest < Struct.new(
+      :repository_name,
+      :commit_specifier,
+      :file_path,
+      :max_results,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] revision_dag
+    #   An array of FileVersion objects that form a directed acyclic graph
+    #   (DAG) of the changes to the file made by the commits that changed
+    #   the file.
+    #   @return [Array<Types::FileVersion>]
+    #
+    # @!attribute [rw] next_token
+    #   An enumeration token that can be used to return the next batch of
+    #   results.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/ListFileCommitHistoryResponse AWS API Documentation
+    #
+    class ListFileCommitHistoryResponse < Struct.new(
+      :revision_dag,
+      :next_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] repository_name
     #   The name of the repository for which you want to list pull requests.
     #   @return [String]
@@ -4666,15 +4323,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListRepositoriesForApprovalRuleTemplateInput
-    #   data as a hash:
-    #
-    #       {
-    #         approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] approval_rule_template_name
     #   The name of the approval rule template for which you want to list
     #   repositories that are associated with that template.
@@ -4721,19 +4369,10 @@ module Aws::CodeCommit
 
     # Represents the input of a list repositories operation.
     #
-    # @note When making an API call, you may pass ListRepositoriesInput
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         sort_by: "repositoryName", # accepts repositoryName, lastModifiedDate
-    #         order: "ascending", # accepts ascending, descending
-    #       }
-    #
     # @!attribute [rw] next_token
     #   An enumeration token that allows the operation to batch the results
     #   of the operation. Batch sizes are 1,000 for list repository
-    #   operations. When the client sends the token back to AWS CodeCommit,
+    #   operations. When the client sends the token back to CodeCommit,
     #   another page of 1,000 records is retrieved.
     #   @return [String]
     #
@@ -4766,7 +4405,7 @@ module Aws::CodeCommit
     # @!attribute [rw] next_token
     #   An enumeration token that allows the operation to batch the results
     #   of the operation. Batch sizes are 1,000 for list repository
-    #   operations. When the client sends the token back to AWS CodeCommit,
+    #   operations. When the client sends the token back to CodeCommit,
     #   another page of 1,000 records is retrieved.
     #   @return [String]
     #
@@ -4779,14 +4418,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #         next_token: "NextToken",
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the resource for which you want to
     #   get information about tags, if any.
@@ -4827,15 +4458,6 @@ module Aws::CodeCommit
 
     # Returns information about the location of a change or comment in the
     # comparison between two commits or a pull request.
-    #
-    # @note When making an API call, you may pass Location
-    #   data as a hash:
-    #
-    #       {
-    #         file_path: "Path",
-    #         file_position: 1,
-    #         relative_file_version: "BEFORE", # accepts BEFORE, AFTER
-    #       }
     #
     # @!attribute [rw] file_path
     #   The name of the file being compared, including its extension and
@@ -4939,16 +4561,6 @@ module Aws::CodeCommit
     #
     class MaximumRuleTemplatesAssociatedWithRepositoryException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass MergeBranchesByFastForwardInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         source_commit_specifier: "CommitName", # required
-    #         destination_commit_specifier: "CommitName", # required
-    #         target_branch: "BranchName",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you want to merge two branches.
     #   @return [String]
@@ -4995,43 +4607,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass MergeBranchesBySquashInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         source_commit_specifier: "CommitName", # required
-    #         destination_commit_specifier: "CommitName", # required
-    #         target_branch: "BranchName",
-    #         conflict_detail_level: "FILE_LEVEL", # accepts FILE_LEVEL, LINE_LEVEL
-    #         conflict_resolution_strategy: "NONE", # accepts NONE, ACCEPT_SOURCE, ACCEPT_DESTINATION, AUTOMERGE
-    #         author_name: "Name",
-    #         email: "Email",
-    #         commit_message: "Message",
-    #         keep_empty_folders: false,
-    #         conflict_resolution: {
-    #           replace_contents: [
-    #             {
-    #               file_path: "Path", # required
-    #               replacement_type: "KEEP_BASE", # required, accepts KEEP_BASE, KEEP_SOURCE, KEEP_DESTINATION, USE_NEW_CONTENT
-    #               content: "data",
-    #               file_mode: "EXECUTABLE", # accepts EXECUTABLE, NORMAL, SYMLINK
-    #             },
-    #           ],
-    #           delete_files: [
-    #             {
-    #               file_path: "Path", # required
-    #             },
-    #           ],
-    #           set_file_modes: [
-    #             {
-    #               file_path: "Path", # required
-    #               file_mode: "EXECUTABLE", # required, accepts EXECUTABLE, NORMAL, SYMLINK
-    #             },
-    #           ],
-    #         },
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you want to merge two branches.
     #   @return [String]
@@ -5126,43 +4701,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass MergeBranchesByThreeWayInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         source_commit_specifier: "CommitName", # required
-    #         destination_commit_specifier: "CommitName", # required
-    #         target_branch: "BranchName",
-    #         conflict_detail_level: "FILE_LEVEL", # accepts FILE_LEVEL, LINE_LEVEL
-    #         conflict_resolution_strategy: "NONE", # accepts NONE, ACCEPT_SOURCE, ACCEPT_DESTINATION, AUTOMERGE
-    #         author_name: "Name",
-    #         email: "Email",
-    #         commit_message: "Message",
-    #         keep_empty_folders: false,
-    #         conflict_resolution: {
-    #           replace_contents: [
-    #             {
-    #               file_path: "Path", # required
-    #               replacement_type: "KEEP_BASE", # required, accepts KEEP_BASE, KEEP_SOURCE, KEEP_DESTINATION, USE_NEW_CONTENT
-    #               content: "data",
-    #               file_mode: "EXECUTABLE", # accepts EXECUTABLE, NORMAL, SYMLINK
-    #             },
-    #           ],
-    #           delete_files: [
-    #             {
-    #               file_path: "Path", # required
-    #             },
-    #           ],
-    #           set_file_modes: [
-    #             {
-    #               file_path: "Path", # required
-    #               file_mode: "EXECUTABLE", # required, accepts EXECUTABLE, NORMAL, SYMLINK
-    #             },
-    #           ],
-    #         },
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you want to merge two branches.
     #   @return [String]
@@ -5377,15 +4915,6 @@ module Aws::CodeCommit
     #
     class MergeOptionRequiredException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass MergePullRequestByFastForwardInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         repository_name: "RepositoryName", # required
-    #         source_commit_id: "ObjectId",
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request. To get this ID, use
     #   ListPullRequests.
@@ -5424,42 +4953,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass MergePullRequestBySquashInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         repository_name: "RepositoryName", # required
-    #         source_commit_id: "ObjectId",
-    #         conflict_detail_level: "FILE_LEVEL", # accepts FILE_LEVEL, LINE_LEVEL
-    #         conflict_resolution_strategy: "NONE", # accepts NONE, ACCEPT_SOURCE, ACCEPT_DESTINATION, AUTOMERGE
-    #         commit_message: "Message",
-    #         author_name: "Name",
-    #         email: "Email",
-    #         keep_empty_folders: false,
-    #         conflict_resolution: {
-    #           replace_contents: [
-    #             {
-    #               file_path: "Path", # required
-    #               replacement_type: "KEEP_BASE", # required, accepts KEEP_BASE, KEEP_SOURCE, KEEP_DESTINATION, USE_NEW_CONTENT
-    #               content: "data",
-    #               file_mode: "EXECUTABLE", # accepts EXECUTABLE, NORMAL, SYMLINK
-    #             },
-    #           ],
-    #           delete_files: [
-    #             {
-    #               file_path: "Path", # required
-    #             },
-    #           ],
-    #           set_file_modes: [
-    #             {
-    #               file_path: "Path", # required
-    #               file_mode: "EXECUTABLE", # required, accepts EXECUTABLE, NORMAL, SYMLINK
-    #             },
-    #           ],
-    #         },
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request. To get this ID, use
     #   ListPullRequests.
@@ -5546,42 +5039,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass MergePullRequestByThreeWayInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         repository_name: "RepositoryName", # required
-    #         source_commit_id: "ObjectId",
-    #         conflict_detail_level: "FILE_LEVEL", # accepts FILE_LEVEL, LINE_LEVEL
-    #         conflict_resolution_strategy: "NONE", # accepts NONE, ACCEPT_SOURCE, ACCEPT_DESTINATION, AUTOMERGE
-    #         commit_message: "Message",
-    #         author_name: "Name",
-    #         email: "Email",
-    #         keep_empty_folders: false,
-    #         conflict_resolution: {
-    #           replace_contents: [
-    #             {
-    #               file_path: "Path", # required
-    #               replacement_type: "KEEP_BASE", # required, accepts KEEP_BASE, KEEP_SOURCE, KEEP_DESTINATION, USE_NEW_CONTENT
-    #               content: "data",
-    #               file_mode: "EXECUTABLE", # accepts EXECUTABLE, NORMAL, SYMLINK
-    #             },
-    #           ],
-    #           delete_files: [
-    #             {
-    #               file_path: "Path", # required
-    #             },
-    #           ],
-    #           set_file_modes: [
-    #             {
-    #               file_path: "Path", # required
-    #               file_mode: "EXECUTABLE", # required, accepts EXECUTABLE, NORMAL, SYMLINK
-    #             },
-    #           ],
-    #         },
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request. To get this ID, use
     #   ListPullRequests.
@@ -5699,7 +5156,7 @@ module Aws::CodeCommit
     class NoChangeException < Aws::EmptyStructure; end
 
     # The maximum number of approval rule templates has been exceeded for
-    # this AWS Region.
+    # this Amazon Web Services Region.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/NumberOfRuleTemplatesExceededException AWS API Documentation
     #
@@ -5736,6 +5193,12 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
+    # The requested action is not allowed.
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/OperationNotAllowedException AWS API Documentation
+    #
+    class OperationNotAllowedException < Aws::EmptyStructure; end
+
     # Returns information about the template that created the approval rule
     # for a pull request.
     #
@@ -5762,15 +5225,6 @@ module Aws::CodeCommit
     #
     class OverrideAlreadySetException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass OverridePullRequestApprovalRulesInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         revision_id: "RevisionId", # required
-    #         override_status: "OVERRIDE", # required, accepts OVERRIDE, REVOKE
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request for which you want to
     #   override all approval rule requirements. To get this information,
@@ -5843,22 +5297,6 @@ module Aws::CodeCommit
     #
     class PathRequiredException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass PostCommentForComparedCommitInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         before_commit_id: "CommitId",
-    #         after_commit_id: "CommitId", # required
-    #         location: {
-    #           file_path: "Path",
-    #           file_position: 1,
-    #           relative_file_version: "BEFORE", # accepts BEFORE, AFTER
-    #         },
-    #         content: "Content", # required
-    #         client_request_token: "ClientRequestToken",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you want to post a comment on the
     #   comparison between commits.
@@ -5955,23 +5393,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PostCommentForPullRequestInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         repository_name: "RepositoryName", # required
-    #         before_commit_id: "CommitId", # required
-    #         after_commit_id: "CommitId", # required
-    #         location: {
-    #           file_path: "Path",
-    #           file_position: 1,
-    #           relative_file_version: "BEFORE", # accepts BEFORE, AFTER
-    #         },
-    #         content: "Content", # required
-    #         client_request_token: "ClientRequestToken",
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request. To get this ID, use
     #   ListPullRequests.
@@ -6082,15 +5503,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PostCommentReplyInput
-    #   data as a hash:
-    #
-    #       {
-    #         in_reply_to: "CommentId", # required
-    #         client_request_token: "ClientRequestToken",
-    #         content: "Content", # required
-    #       }
-    #
     # @!attribute [rw] in_reply_to
     #   The system-generated ID of the comment to which you want to reply.
     #   To get this ID, use GetCommentsForComparedCommit or
@@ -6481,14 +5893,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass PutCommentReactionInput
-    #   data as a hash:
-    #
-    #       {
-    #         comment_id: "CommentId", # required
-    #         reaction_value: "ReactionValue", # required
-    #       }
-    #
     # @!attribute [rw] comment_id
     #   The ID of the comment to which you want to add or update a reaction.
     #   @return [String]
@@ -6496,8 +5900,8 @@ module Aws::CodeCommit
     # @!attribute [rw] reaction_value
     #   The emoji reaction you want to add or update. To remove a reaction,
     #   provide a value of blank or null. You can also provide the value of
-    #   none. For information about emoji reaction values supported in AWS
-    #   CodeCommit, see the [AWS CodeCommit User Guide][1].
+    #   none. For information about emoji reaction values supported in
+    #   CodeCommit, see the [CodeCommit User Guide][1].
     #
     #
     #
@@ -6514,19 +5918,6 @@ module Aws::CodeCommit
     end
 
     # Information about a file added or updated as part of a commit.
-    #
-    # @note When making an API call, you may pass PutFileEntry
-    #   data as a hash:
-    #
-    #       {
-    #         file_path: "Path", # required
-    #         file_mode: "EXECUTABLE", # accepts EXECUTABLE, NORMAL, SYMLINK
-    #         file_content: "data",
-    #         source_file: {
-    #           file_path: "Path", # required
-    #           is_move: false,
-    #         },
-    #       }
     #
     # @!attribute [rw] file_path
     #   The full path to the file in the repository, including the name of
@@ -6566,21 +5957,6 @@ module Aws::CodeCommit
     #
     class PutFileEntryConflictException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass PutFileInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         branch_name: "BranchName", # required
-    #         file_content: "data", # required
-    #         file_path: "Path", # required
-    #         file_mode: "EXECUTABLE", # accepts EXECUTABLE, NORMAL, SYMLINK
-    #         parent_commit_id: "CommitId",
-    #         commit_message: "Message",
-    #         name: "Name",
-    #         email: "Email",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you want to add or update the file.
     #   @return [String]
@@ -6677,22 +6053,6 @@ module Aws::CodeCommit
 
     # Represents the input of a put repository triggers operation.
     #
-    # @note When making an API call, you may pass PutRepositoryTriggersInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         triggers: [ # required
-    #           {
-    #             name: "RepositoryTriggerName", # required
-    #             destination_arn: "Arn", # required
-    #             custom_data: "RepositoryTriggerCustomData",
-    #             branches: ["BranchName"],
-    #             events: ["all"], # required, accepts all, updateReference, createReference, deleteReference
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository where you want to create or update the
     #   trigger.
@@ -6760,8 +6120,8 @@ module Aws::CodeCommit
     #
     class ReactionLimitExceededException < Aws::EmptyStructure; end
 
-    # Information about the values for reactions to a comment. AWS
-    # CodeCommit supports a limited set of reactions.
+    # Information about the values for reactions to a comment. CodeCommit
+    # supports a limited set of reactions.
     #
     # @!attribute [rw] emoji
     #   The Emoji Version 1.0 graphic of the reaction. These graphics are
@@ -6814,16 +6174,6 @@ module Aws::CodeCommit
 
     # Information about a replacement content entry in the conflict of a
     # merge or pull request operation.
-    #
-    # @note When making an API call, you may pass ReplaceContentEntry
-    #   data as a hash:
-    #
-    #       {
-    #         file_path: "Path", # required
-    #         replacement_type: "KEEP_BASE", # required, accepts KEEP_BASE, KEEP_SOURCE, KEEP_DESTINATION, USE_NEW_CONTENT
-    #         content: "data",
-    #         file_mode: "EXECUTABLE", # accepts EXECUTABLE, NORMAL, SYMLINK
-    #       }
     #
     # @!attribute [rw] file_path
     #   The path of the conflicting file.
@@ -6882,7 +6232,8 @@ module Aws::CodeCommit
     # Information about a repository.
     #
     # @!attribute [rw] account_id
-    #   The ID of the AWS account associated with the repository.
+    #   The ID of the Amazon Web Services account associated with the
+    #   repository.
     #   @return [String]
     #
     # @!attribute [rw] repository_id
@@ -6922,6 +6273,11 @@ module Aws::CodeCommit
     #   The Amazon Resource Name (ARN) of the repository.
     #   @return [String]
     #
+    # @!attribute [rw] kms_key_id
+    #   The ID of the Key Management Service encryption key used to encrypt
+    #   and decrypt the repository.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/RepositoryMetadata AWS API Documentation
     #
     class RepositoryMetadata < Struct.new(
@@ -6934,7 +6290,8 @@ module Aws::CodeCommit
       :creation_date,
       :clone_url_http,
       :clone_url_ssh,
-      :arn)
+      :arn,
+      :kms_key_id)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -6987,16 +6344,15 @@ module Aws::CodeCommit
 
     # Information about a trigger for a repository.
     #
-    # @note When making an API call, you may pass RepositoryTrigger
-    #   data as a hash:
+    # <note markdown="1"> If you want to receive notifications about repository events, consider
+    # using notifications instead of triggers. For more information, see
+    # [Configuring notifications for repository events][1].
     #
-    #       {
-    #         name: "RepositoryTriggerName", # required
-    #         destination_arn: "Arn", # required
-    #         custom_data: "RepositoryTriggerCustomData",
-    #         branches: ["BranchName"],
-    #         events: ["all"], # required, accepts all, updateReference, createReference, deleteReference
-    #       }
+    #  </note>
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/codecommit/latest/userguide/how-to-repository-email.html
     #
     # @!attribute [rw] name
     #   The name of the trigger.
@@ -7095,10 +6451,9 @@ module Aws::CodeCommit
     #
     class RepositoryTriggersListRequiredException < Aws::EmptyStructure; end
 
-    # A valid Amazon Resource Name (ARN) for an AWS CodeCommit resource is
-    # required. For a list of valid resources in AWS CodeCommit, see
-    # [CodeCommit Resources and Operations][1] in the AWS CodeCommit User
-    # Guide.
+    # A valid Amazon Resource Name (ARN) for an CodeCommit resource is
+    # required. For a list of valid resources in CodeCommit, see [CodeCommit
+    # Resources and Operations][1] in the CodeCommit User Guide.
     #
     #
     #
@@ -7148,14 +6503,6 @@ module Aws::CodeCommit
 
     # Information about the file mode changes.
     #
-    # @note When making an API call, you may pass SetFileModeEntry
-    #   data as a hash:
-    #
-    #       {
-    #         file_path: "Path", # required
-    #         file_mode: "EXECUTABLE", # required, accepts EXECUTABLE, NORMAL, SYMLINK
-    #       }
-    #
     # @!attribute [rw] file_path
     #   The full path to the file, including the name of the file.
     #   @return [String]
@@ -7190,14 +6537,6 @@ module Aws::CodeCommit
 
     # Information about a source file that is part of changes made in a
     # commit.
-    #
-    # @note When making an API call, you may pass SourceFileSpecifier
-    #   data as a hash:
-    #
-    #       {
-    #         file_path: "Path", # required
-    #         is_move: false,
-    #       }
     #
     # @!attribute [rw] file_path
     #   The full path to the file, including the name of the file.
@@ -7287,16 +6626,6 @@ module Aws::CodeCommit
     #
     class TagPolicyException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass TagResourceInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #         tags: { # required
-    #           "TagKey" => "TagValue",
-    #         },
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the resource to which you want to
     #   add or update tags.
@@ -7322,15 +6651,6 @@ module Aws::CodeCommit
     class TagsMapRequiredException < Aws::EmptyStructure; end
 
     # Returns information about a target for a pull request.
-    #
-    # @note When making an API call, you may pass Target
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         source_reference: "ReferenceName", # required
-    #         destination_reference: "ReferenceName",
-    #       }
     #
     # @!attribute [rw] repository_name
     #   The name of the repository that contains the pull request.
@@ -7371,22 +6691,6 @@ module Aws::CodeCommit
     class TargetsRequiredException < Aws::EmptyStructure; end
 
     # Represents the input of a test repository triggers operation.
-    #
-    # @note When making an API call, you may pass TestRepositoryTriggersInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         triggers: [ # required
-    #           {
-    #             name: "RepositoryTriggerName", # required
-    #             destination_arn: "Arn", # required
-    #             custom_data: "RepositoryTriggerCustomData",
-    #             branches: ["BranchName"],
-    #             events: ["all"], # required, accepts all, updateReference, createReference, deleteReference
-    #           },
-    #         ],
-    #       }
     #
     # @!attribute [rw] repository_name
     #   The name of the repository in which to test the triggers.
@@ -7450,21 +6754,13 @@ module Aws::CodeCommit
     #
     class TitleRequiredException < Aws::EmptyStructure; end
 
-    # The maximum number of tags for an AWS CodeCommit resource has been
+    # The maximum number of tags for an CodeCommit resource has been
     # exceeded.
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/TooManyTagsException AWS API Documentation
     #
     class TooManyTagsException < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass UntagResourceInput
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) of the resource to which you want to
     #   remove tags.
@@ -7483,15 +6779,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateApprovalRuleTemplateContentInput
-    #   data as a hash:
-    #
-    #       {
-    #         approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #         new_rule_content: "ApprovalRuleTemplateContent", # required
-    #         existing_rule_content_sha_256: "RuleContentSha256",
-    #       }
-    #
     # @!attribute [rw] approval_rule_template_name
     #   The name of the approval rule template where you want to update the
     #   content of the rule.
@@ -7529,14 +6816,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateApprovalRuleTemplateDescriptionInput
-    #   data as a hash:
-    #
-    #       {
-    #         approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #         approval_rule_template_description: "ApprovalRuleTemplateDescription", # required
-    #       }
-    #
     # @!attribute [rw] approval_rule_template_name
     #   The name of the template for which you want to update the
     #   description.
@@ -7567,14 +6846,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateApprovalRuleTemplateNameInput
-    #   data as a hash:
-    #
-    #       {
-    #         old_approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #         new_approval_rule_template_name: "ApprovalRuleTemplateName", # required
-    #       }
-    #
     # @!attribute [rw] old_approval_rule_template_name
     #   The current name of the approval rule template.
     #   @return [String]
@@ -7604,14 +6875,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateCommentInput
-    #   data as a hash:
-    #
-    #       {
-    #         comment_id: "CommentId", # required
-    #         content: "Content", # required
-    #       }
-    #
     # @!attribute [rw] comment_id
     #   The system-generated ID of the comment you want to update. To get
     #   this ID, use GetCommentsForComparedCommit or
@@ -7645,20 +6908,13 @@ module Aws::CodeCommit
 
     # Represents the input of an update default branch operation.
     #
-    # @note When making an API call, you may pass UpdateDefaultBranchInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         default_branch_name: "BranchName", # required
-    #       }
-    #
     # @!attribute [rw] repository_name
-    #   The name of the repository to set or change the default branch for.
+    #   The name of the repository for which you want to set or change the
+    #   default branch.
     #   @return [String]
     #
     # @!attribute [rw] default_branch_name
-    #   The name of the branch to set as the default.
+    #   The name of the branch to set as the default branch.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/UpdateDefaultBranchInput AWS API Documentation
@@ -7670,16 +6926,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdatePullRequestApprovalRuleContentInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         approval_rule_name: "ApprovalRuleName", # required
-    #         existing_rule_content_sha_256: "RuleContentSha256",
-    #         new_rule_content: "ApprovalRuleContent", # required
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request.
     #   @return [String]
@@ -7699,27 +6945,27 @@ module Aws::CodeCommit
     #   <note markdown="1"> When you update the content of the approval rule, you can specify
     #   approvers in an approval pool in one of two ways:
     #
-    #    * **CodeCommitApprovers**\: This option only requires an AWS account
-    #     and a resource. It can be used for both IAM users and federated
-    #     access users whose name matches the provided resource name. This
-    #     is a very powerful option that offers a great deal of flexibility.
-    #     For example, if you specify the AWS account *123456789012* and
-    #     *Mary\_Major*, all of the following are counted as approvals
-    #     coming from that user:
+    #    * **CodeCommitApprovers**: This option only requires an Amazon Web
+    #     Services account and a resource. It can be used for both IAM users
+    #     and federated access users whose name matches the provided
+    #     resource name. This is a very powerful option that offers a great
+    #     deal of flexibility. For example, if you specify the Amazon Web
+    #     Services account *123456789012* and *Mary\_Major*, all of the
+    #     following are counted as approvals coming from that user:
     #
     #     * An IAM user in the account
-    #       (arn:aws:iam::*123456789012*\:user/*Mary\_Major*)
+    #       (arn:aws:iam::*123456789012*:user/*Mary\_Major*)
     #
     #     * A federated user identified in IAM as Mary\_Major
-    #       (arn:aws:sts::*123456789012*\:federated-user/*Mary\_Major*)
+    #       (arn:aws:sts::*123456789012*:federated-user/*Mary\_Major*)
     #
     #     This option does not recognize an active session of someone
     #     assuming the role of CodeCommitReview with a role session name of
     #     *Mary\_Major*
-    #     (arn:aws:sts::*123456789012*\:assumed-role/CodeCommitReview/*Mary\_Major*)
+    #     (arn:aws:sts::*123456789012*:assumed-role/CodeCommitReview/*Mary\_Major*)
     #     unless you include a wildcard (*Mary\_Major).
     #
-    #   * **Fully qualified ARN**\: This option allows you to specify the
+    #   * **Fully qualified ARN**: This option allows you to specify the
     #     fully qualified Amazon Resource Name (ARN) of the IAM user or
     #     role.
     #
@@ -7756,15 +7002,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdatePullRequestApprovalStateInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         revision_id: "RevisionId", # required
-    #         approval_state: "APPROVE", # required, accepts APPROVE, REVOKE
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request.
     #   @return [String]
@@ -7787,14 +7024,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdatePullRequestDescriptionInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         description: "Description", # required
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request. To get this ID, use
     #   ListPullRequests.
@@ -7826,14 +7055,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdatePullRequestStatusInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         pull_request_status: "OPEN", # required, accepts OPEN, CLOSED
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request. To get this ID, use
     #   ListPullRequests.
@@ -7866,14 +7087,6 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdatePullRequestTitleInput
-    #   data as a hash:
-    #
-    #       {
-    #         pull_request_id: "PullRequestId", # required
-    #         title: "Title", # required
-    #       }
-    #
     # @!attribute [rw] pull_request_id
     #   The system-generated ID of the pull request. To get this ID, use
     #   ListPullRequests.
@@ -7907,14 +7120,6 @@ module Aws::CodeCommit
 
     # Represents the input of an update repository description operation.
     #
-    # @note When making an API call, you may pass UpdateRepositoryDescriptionInput
-    #   data as a hash:
-    #
-    #       {
-    #         repository_name: "RepositoryName", # required
-    #         repository_description: "RepositoryDescription",
-    #       }
-    #
     # @!attribute [rw] repository_name
     #   The name of the repository to set or change the comment or
     #   description for.
@@ -7934,15 +7139,56 @@ module Aws::CodeCommit
       include Aws::Structure
     end
 
+    # @!attribute [rw] repository_name
+    #   The name of the repository for which you want to update the KMS
+    #   encryption key used to encrypt and decrypt the repository.
+    #   @return [String]
+    #
+    # @!attribute [rw] kms_key_id
+    #   The ID of the encryption key. You can view the ID of an encryption
+    #   key in the KMS console, or use the KMS APIs to programmatically
+    #   retrieve a key ID. For more information about acceptable values for
+    #   keyID, see [KeyId][1] in the Decrypt API description in the *Key
+    #   Management Service API Reference*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html#KMS-Decrypt-request-KeyId
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/UpdateRepositoryEncryptionKeyInput AWS API Documentation
+    #
+    class UpdateRepositoryEncryptionKeyInput < Struct.new(
+      :repository_name,
+      :kms_key_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # @!attribute [rw] repository_id
+    #   The ID of the repository.
+    #   @return [String]
+    #
+    # @!attribute [rw] kms_key_id
+    #   The ID of the encryption key.
+    #   @return [String]
+    #
+    # @!attribute [rw] original_kms_key_id
+    #   The ID of the encryption key formerly used to encrypt and decrypt
+    #   the repository.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/codecommit-2015-04-13/UpdateRepositoryEncryptionKeyOutput AWS API Documentation
+    #
+    class UpdateRepositoryEncryptionKeyOutput < Struct.new(
+      :repository_id,
+      :kms_key_id,
+      :original_kms_key_id)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # Represents the input of an update repository description operation.
-    #
-    # @note When making an API call, you may pass UpdateRepositoryNameInput
-    #   data as a hash:
-    #
-    #       {
-    #         old_name: "RepositoryName", # required
-    #         new_name: "RepositoryName", # required
-    #       }
     #
     # @!attribute [rw] old_name
     #   The current name of the repository.
@@ -7989,3 +7235,4 @@ module Aws::CodeCommit
 
   end
 end
+

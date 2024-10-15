@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,14 +11,6 @@ module Aws::MediaPackage
   module Types
 
     # CDN Authorization credentials
-    #
-    # @note When making an API call, you may pass Authorization
-    #   data as a hash:
-    #
-    #       {
-    #         cdn_identifier_secret: "__string", # required
-    #         secrets_role_arn: "__string", # required
-    #       }
     #
     # @!attribute [rw] cdn_identifier_secret
     #   The Amazon Resource Name (ARN) for the secret in Secrets Manager
@@ -44,6 +36,10 @@ module Aws::MediaPackage
     #
     # @!attribute [rw] arn
     #   The Amazon Resource Name (ARN) assigned to the Channel.
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
+    #   The date and time the Channel was created.
     #   @return [String]
     #
     # @!attribute [rw] description
@@ -74,6 +70,7 @@ module Aws::MediaPackage
     #
     class Channel < Struct.new(
       :arn,
+      :created_at,
       :description,
       :egress_access_logs,
       :hls_ingest,
@@ -145,19 +142,16 @@ module Aws::MediaPackage
 
     # A Common Media Application Format (CMAF) encryption configuration.
     #
-    # @note When making an API call, you may pass CmafEncryption
-    #   data as a hash:
+    # @!attribute [rw] constant_initialization_vector
+    #   An optional 128-bit, 16-byte hex value represented by a 32-character
+    #   string, used in conjunction with the key for encrypting blocks. If
+    #   you don't specify a value, then MediaPackage creates the constant
+    #   initialization vector (IV).
+    #   @return [String]
     #
-    #       {
-    #         key_rotation_interval_seconds: 1,
-    #         speke_key_provider: { # required
-    #           certificate_arn: "__string",
-    #           resource_id: "__string", # required
-    #           role_arn: "__string", # required
-    #           system_ids: ["__string"], # required
-    #           url: "__string", # required
-    #         },
-    #       }
+    # @!attribute [rw] encryption_method
+    #   The encryption method to use.
+    #   @return [String]
     #
     # @!attribute [rw] key_rotation_interval_seconds
     #   Time (in seconds) between each encryption key rotation.
@@ -172,6 +166,8 @@ module Aws::MediaPackage
     # @see http://docs.aws.amazon.com/goto/WebAPI/mediapackage-2017-10-12/CmafEncryption AWS API Documentation
     #
     class CmafEncryption < Struct.new(
+      :constant_initialization_vector,
+      :encryption_method,
       :key_rotation_interval_seconds,
       :speke_key_provider)
       SENSITIVE = []
@@ -215,42 +211,6 @@ module Aws::MediaPackage
     end
 
     # A Common Media Application Format (CMAF) packaging configuration.
-    #
-    # @note When making an API call, you may pass CmafPackageCreateOrUpdateParameters
-    #   data as a hash:
-    #
-    #       {
-    #         encryption: {
-    #           key_rotation_interval_seconds: 1,
-    #           speke_key_provider: { # required
-    #             certificate_arn: "__string",
-    #             resource_id: "__string", # required
-    #             role_arn: "__string", # required
-    #             system_ids: ["__string"], # required
-    #             url: "__string", # required
-    #           },
-    #         },
-    #         hls_manifests: [
-    #           {
-    #             ad_markers: "NONE", # accepts NONE, SCTE35_ENHANCED, PASSTHROUGH, DATERANGE
-    #             ad_triggers: ["SPLICE_INSERT"], # accepts SPLICE_INSERT, BREAK, PROVIDER_ADVERTISEMENT, DISTRIBUTOR_ADVERTISEMENT, PROVIDER_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_PLACEMENT_OPPORTUNITY, PROVIDER_OVERLAY_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_OVERLAY_PLACEMENT_OPPORTUNITY
-    #             ads_on_delivery_restrictions: "NONE", # accepts NONE, RESTRICTED, UNRESTRICTED, BOTH
-    #             id: "__string", # required
-    #             include_iframe_only_stream: false,
-    #             manifest_name: "__string",
-    #             playlist_type: "NONE", # accepts NONE, EVENT, VOD
-    #             playlist_window_seconds: 1,
-    #             program_date_time_interval_seconds: 1,
-    #           },
-    #         ],
-    #         segment_duration_seconds: 1,
-    #         segment_prefix: "__string",
-    #         stream_selection: {
-    #           max_video_bits_per_second: 1,
-    #           min_video_bits_per_second: 1,
-    #           stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #         },
-    #       }
     #
     # @!attribute [rw] encryption
     #   A Common Media Application Format (CMAF) encryption configuration.
@@ -305,19 +265,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ConfigureLogsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         egress_access_logs: {
-    #           log_group_name: "__string",
-    #         },
-    #         id: "__string", # required
-    #         ingress_access_logs: {
-    #           log_group_name: "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] egress_access_logs
     #   Configure egress access logging.
     #   @return [Types::EgressAccessLogs]
@@ -340,6 +287,9 @@ module Aws::MediaPackage
     end
 
     # @!attribute [rw] arn
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
     #   @return [String]
     #
     # @!attribute [rw] description
@@ -368,6 +318,7 @@ module Aws::MediaPackage
     #
     class ConfigureLogsResponse < Struct.new(
       :arn,
+      :created_at,
       :description,
       :egress_access_logs,
       :hls_ingest,
@@ -378,17 +329,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         description: "__string",
-    #         id: "__string", # required
-    #         tags: {
-    #           "__string" => "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] description
     #   @return [String]
     #
@@ -410,6 +350,9 @@ module Aws::MediaPackage
     end
 
     # @!attribute [rw] arn
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
     #   @return [String]
     #
     # @!attribute [rw] description
@@ -438,6 +381,7 @@ module Aws::MediaPackage
     #
     class CreateChannelResponse < Struct.new(
       :arn,
+      :created_at,
       :description,
       :egress_access_logs,
       :hls_ingest,
@@ -448,21 +392,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateHarvestJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         end_time: "__string", # required
-    #         id: "__string", # required
-    #         origin_endpoint_id: "__string", # required
-    #         s3_destination: { # required
-    #           bucket_name: "__string", # required
-    #           manifest_key: "__string", # required
-    #           role_arn: "__string", # required
-    #         },
-    #         start_time: "__string", # required
-    #       }
-    #
     # @!attribute [rw] end_time
     #   @return [String]
     #
@@ -537,136 +466,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass CreateOriginEndpointRequest
-    #   data as a hash:
-    #
-    #       {
-    #         authorization: {
-    #           cdn_identifier_secret: "__string", # required
-    #           secrets_role_arn: "__string", # required
-    #         },
-    #         channel_id: "__string", # required
-    #         cmaf_package: {
-    #           encryption: {
-    #             key_rotation_interval_seconds: 1,
-    #             speke_key_provider: { # required
-    #               certificate_arn: "__string",
-    #               resource_id: "__string", # required
-    #               role_arn: "__string", # required
-    #               system_ids: ["__string"], # required
-    #               url: "__string", # required
-    #             },
-    #           },
-    #           hls_manifests: [
-    #             {
-    #               ad_markers: "NONE", # accepts NONE, SCTE35_ENHANCED, PASSTHROUGH, DATERANGE
-    #               ad_triggers: ["SPLICE_INSERT"], # accepts SPLICE_INSERT, BREAK, PROVIDER_ADVERTISEMENT, DISTRIBUTOR_ADVERTISEMENT, PROVIDER_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_PLACEMENT_OPPORTUNITY, PROVIDER_OVERLAY_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_OVERLAY_PLACEMENT_OPPORTUNITY
-    #               ads_on_delivery_restrictions: "NONE", # accepts NONE, RESTRICTED, UNRESTRICTED, BOTH
-    #               id: "__string", # required
-    #               include_iframe_only_stream: false,
-    #               manifest_name: "__string",
-    #               playlist_type: "NONE", # accepts NONE, EVENT, VOD
-    #               playlist_window_seconds: 1,
-    #               program_date_time_interval_seconds: 1,
-    #             },
-    #           ],
-    #           segment_duration_seconds: 1,
-    #           segment_prefix: "__string",
-    #           stream_selection: {
-    #             max_video_bits_per_second: 1,
-    #             min_video_bits_per_second: 1,
-    #             stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #           },
-    #         },
-    #         dash_package: {
-    #           ad_triggers: ["SPLICE_INSERT"], # accepts SPLICE_INSERT, BREAK, PROVIDER_ADVERTISEMENT, DISTRIBUTOR_ADVERTISEMENT, PROVIDER_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_PLACEMENT_OPPORTUNITY, PROVIDER_OVERLAY_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_OVERLAY_PLACEMENT_OPPORTUNITY
-    #           ads_on_delivery_restrictions: "NONE", # accepts NONE, RESTRICTED, UNRESTRICTED, BOTH
-    #           encryption: {
-    #             key_rotation_interval_seconds: 1,
-    #             speke_key_provider: { # required
-    #               certificate_arn: "__string",
-    #               resource_id: "__string", # required
-    #               role_arn: "__string", # required
-    #               system_ids: ["__string"], # required
-    #               url: "__string", # required
-    #             },
-    #           },
-    #           manifest_layout: "FULL", # accepts FULL, COMPACT
-    #           manifest_window_seconds: 1,
-    #           min_buffer_time_seconds: 1,
-    #           min_update_period_seconds: 1,
-    #           period_triggers: ["ADS"], # accepts ADS
-    #           profile: "NONE", # accepts NONE, HBBTV_1_5
-    #           segment_duration_seconds: 1,
-    #           segment_template_format: "NUMBER_WITH_TIMELINE", # accepts NUMBER_WITH_TIMELINE, TIME_WITH_TIMELINE, NUMBER_WITH_DURATION
-    #           stream_selection: {
-    #             max_video_bits_per_second: 1,
-    #             min_video_bits_per_second: 1,
-    #             stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #           },
-    #           suggested_presentation_delay_seconds: 1,
-    #           utc_timing: "NONE", # accepts NONE, HTTP-HEAD, HTTP-ISO
-    #           utc_timing_uri: "__string",
-    #         },
-    #         description: "__string",
-    #         hls_package: {
-    #           ad_markers: "NONE", # accepts NONE, SCTE35_ENHANCED, PASSTHROUGH, DATERANGE
-    #           ad_triggers: ["SPLICE_INSERT"], # accepts SPLICE_INSERT, BREAK, PROVIDER_ADVERTISEMENT, DISTRIBUTOR_ADVERTISEMENT, PROVIDER_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_PLACEMENT_OPPORTUNITY, PROVIDER_OVERLAY_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_OVERLAY_PLACEMENT_OPPORTUNITY
-    #           ads_on_delivery_restrictions: "NONE", # accepts NONE, RESTRICTED, UNRESTRICTED, BOTH
-    #           encryption: {
-    #             constant_initialization_vector: "__string",
-    #             encryption_method: "AES_128", # accepts AES_128, SAMPLE_AES
-    #             key_rotation_interval_seconds: 1,
-    #             repeat_ext_x_key: false,
-    #             speke_key_provider: { # required
-    #               certificate_arn: "__string",
-    #               resource_id: "__string", # required
-    #               role_arn: "__string", # required
-    #               system_ids: ["__string"], # required
-    #               url: "__string", # required
-    #             },
-    #           },
-    #           include_iframe_only_stream: false,
-    #           playlist_type: "NONE", # accepts NONE, EVENT, VOD
-    #           playlist_window_seconds: 1,
-    #           program_date_time_interval_seconds: 1,
-    #           segment_duration_seconds: 1,
-    #           stream_selection: {
-    #             max_video_bits_per_second: 1,
-    #             min_video_bits_per_second: 1,
-    #             stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #           },
-    #           use_audio_rendition_group: false,
-    #         },
-    #         id: "__string", # required
-    #         manifest_name: "__string",
-    #         mss_package: {
-    #           encryption: {
-    #             speke_key_provider: { # required
-    #               certificate_arn: "__string",
-    #               resource_id: "__string", # required
-    #               role_arn: "__string", # required
-    #               system_ids: ["__string"], # required
-    #               url: "__string", # required
-    #             },
-    #           },
-    #           manifest_window_seconds: 1,
-    #           segment_duration_seconds: 1,
-    #           stream_selection: {
-    #             max_video_bits_per_second: 1,
-    #             min_video_bits_per_second: 1,
-    #             stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #           },
-    #         },
-    #         origination: "ALLOW", # accepts ALLOW, DENY
-    #         startover_window_seconds: 1,
-    #         tags: {
-    #           "__string" => "__string",
-    #         },
-    #         time_delay_seconds: 1,
-    #         whitelist: ["__string"],
-    #       }
-    #
     # @!attribute [rw] authorization
     #   CDN Authorization credentials
     #   @return [Types::Authorization]
@@ -751,6 +550,9 @@ module Aws::MediaPackage
     #   A Common Media Application Format (CMAF) packaging configuration.
     #   @return [Types::CmafPackage]
     #
+    # @!attribute [rw] created_at
+    #   @return [String]
+    #
     # @!attribute [rw] dash_package
     #   A Dynamic Adaptive Streaming over HTTP (DASH) packaging
     #   configuration.
@@ -799,6 +601,7 @@ module Aws::MediaPackage
       :authorization,
       :channel_id,
       :cmaf_package,
+      :created_at,
       :dash_package,
       :description,
       :hls_package,
@@ -817,20 +620,6 @@ module Aws::MediaPackage
 
     # A Dynamic Adaptive Streaming over HTTP (DASH) encryption
     # configuration.
-    #
-    # @note When making an API call, you may pass DashEncryption
-    #   data as a hash:
-    #
-    #       {
-    #         key_rotation_interval_seconds: 1,
-    #         speke_key_provider: { # required
-    #           certificate_arn: "__string",
-    #           resource_id: "__string", # required
-    #           role_arn: "__string", # required
-    #           system_ids: ["__string"], # required
-    #           url: "__string", # required
-    #         },
-    #       }
     #
     # @!attribute [rw] key_rotation_interval_seconds
     #   Time (in seconds) between each encryption key rotation.
@@ -852,40 +641,6 @@ module Aws::MediaPackage
     end
 
     # A Dynamic Adaptive Streaming over HTTP (DASH) packaging configuration.
-    #
-    # @note When making an API call, you may pass DashPackage
-    #   data as a hash:
-    #
-    #       {
-    #         ad_triggers: ["SPLICE_INSERT"], # accepts SPLICE_INSERT, BREAK, PROVIDER_ADVERTISEMENT, DISTRIBUTOR_ADVERTISEMENT, PROVIDER_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_PLACEMENT_OPPORTUNITY, PROVIDER_OVERLAY_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_OVERLAY_PLACEMENT_OPPORTUNITY
-    #         ads_on_delivery_restrictions: "NONE", # accepts NONE, RESTRICTED, UNRESTRICTED, BOTH
-    #         encryption: {
-    #           key_rotation_interval_seconds: 1,
-    #           speke_key_provider: { # required
-    #             certificate_arn: "__string",
-    #             resource_id: "__string", # required
-    #             role_arn: "__string", # required
-    #             system_ids: ["__string"], # required
-    #             url: "__string", # required
-    #           },
-    #         },
-    #         manifest_layout: "FULL", # accepts FULL, COMPACT
-    #         manifest_window_seconds: 1,
-    #         min_buffer_time_seconds: 1,
-    #         min_update_period_seconds: 1,
-    #         period_triggers: ["ADS"], # accepts ADS
-    #         profile: "NONE", # accepts NONE, HBBTV_1_5
-    #         segment_duration_seconds: 1,
-    #         segment_template_format: "NUMBER_WITH_TIMELINE", # accepts NUMBER_WITH_TIMELINE, TIME_WITH_TIMELINE, NUMBER_WITH_DURATION
-    #         stream_selection: {
-    #           max_video_bits_per_second: 1,
-    #           min_video_bits_per_second: 1,
-    #           stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #         },
-    #         suggested_presentation_delay_seconds: 1,
-    #         utc_timing: "NONE", # accepts NONE, HTTP-HEAD, HTTP-ISO
-    #         utc_timing_uri: "__string",
-    #       }
     #
     # @!attribute [rw] ad_triggers
     #   A list of SCTE-35 message types that are treated as ad markers in
@@ -912,11 +667,17 @@ module Aws::MediaPackage
     #   configuration.
     #   @return [Types::DashEncryption]
     #
+    # @!attribute [rw] include_iframe_only_stream
+    #   When enabled, an I-Frame only stream will be included in the output.
+    #   @return [Boolean]
+    #
     # @!attribute [rw] manifest_layout
     #   Determines the position of some tags in the Media Presentation
     #   Description (MPD). When set to FULL, elements like SegmentTemplate
     #   and ContentProtection are included in each Representation. When set
     #   to COMPACT, duplicate elements are combined and presented at the
+    #   AdaptationSet level. When set to DRM\_TOP\_LEVEL\_COMPACT, content
+    #   protection elements are placed the MPD level and referenced at the
     #   AdaptationSet level.
     #   @return [String]
     #
@@ -946,7 +707,9 @@ module Aws::MediaPackage
     #
     # @!attribute [rw] profile
     #   The Dynamic Adaptive Streaming over HTTP (DASH) profile type. When
-    #   set to "HBBTV\_1\_5", HbbTV 1.5 compliant output is enabled.
+    #   set to "HBBTV\_1\_5", HbbTV 1.5 compliant output is enabled. When
+    #   set to "DVB-DASH\_2014", DVB-DASH 2014 compliant output is
+    #   enabled.
     #   @return [String]
     #
     # @!attribute [rw] segment_duration_seconds
@@ -979,7 +742,7 @@ module Aws::MediaPackage
     #
     # @!attribute [rw] utc_timing_uri
     #   Specifies the value attribute of the UTCTiming field when utcTiming
-    #   is set to HTTP-ISO or HTTP-HEAD
+    #   is set to HTTP-ISO, HTTP-HEAD or HTTP-XSDATE
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/mediapackage-2017-10-12/DashPackage AWS API Documentation
@@ -988,6 +751,7 @@ module Aws::MediaPackage
       :ad_triggers,
       :ads_on_delivery_restrictions,
       :encryption,
+      :include_iframe_only_stream,
       :manifest_layout,
       :manifest_window_seconds,
       :min_buffer_time_seconds,
@@ -1004,13 +768,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] id
     #   @return [String]
     #
@@ -1026,13 +783,6 @@ module Aws::MediaPackage
     #
     class DeleteChannelResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DeleteOriginEndpointRequest
-    #   data as a hash:
-    #
-    #       {
-    #         id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] id
     #   @return [String]
     #
@@ -1048,13 +798,6 @@ module Aws::MediaPackage
     #
     class DeleteOriginEndpointResponse < Aws::EmptyStructure; end
 
-    # @note When making an API call, you may pass DescribeChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] id
     #   @return [String]
     #
@@ -1067,6 +810,9 @@ module Aws::MediaPackage
     end
 
     # @!attribute [rw] arn
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
     #   @return [String]
     #
     # @!attribute [rw] description
@@ -1095,6 +841,7 @@ module Aws::MediaPackage
     #
     class DescribeChannelResponse < Struct.new(
       :arn,
+      :created_at,
       :description,
       :egress_access_logs,
       :hls_ingest,
@@ -1105,13 +852,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeHarvestJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] id
     #   @return [String]
     #
@@ -1168,13 +908,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeOriginEndpointRequest
-    #   data as a hash:
-    #
-    #       {
-    #         id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] id
     #   @return [String]
     #
@@ -1199,6 +932,9 @@ module Aws::MediaPackage
     # @!attribute [rw] cmaf_package
     #   A Common Media Application Format (CMAF) packaging configuration.
     #   @return [Types::CmafPackage]
+    #
+    # @!attribute [rw] created_at
+    #   @return [String]
     #
     # @!attribute [rw] dash_package
     #   A Dynamic Adaptive Streaming over HTTP (DASH) packaging
@@ -1248,6 +984,7 @@ module Aws::MediaPackage
       :authorization,
       :channel_id,
       :cmaf_package,
+      :created_at,
       :dash_package,
       :description,
       :hls_package,
@@ -1266,13 +1003,6 @@ module Aws::MediaPackage
 
     # Configure egress access logging.
     #
-    # @note When making an API call, you may pass EgressAccessLogs
-    #   data as a hash:
-    #
-    #       {
-    #         log_group_name: "__string",
-    #       }
-    #
     # @!attribute [rw] log_group_name
     #   Customize the log group name.
     #   @return [String]
@@ -1281,6 +1011,34 @@ module Aws::MediaPackage
     #
     class EgressAccessLogs < Struct.new(
       :log_group_name)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Use encryptionContractConfiguration to configure one or more content
+    # encryption keys for your endpoints that use SPEKE 2.0. The encryption
+    # contract defines which content keys are used to encrypt the audio and
+    # video tracks in your stream. To configure the encryption contract,
+    # specify which audio and video encryption presets to use. Note the
+    # following considerations when using encryptionContractConfiguration:
+    # encryptionContractConfiguration can be used for DASH or CMAF endpoints
+    # that use SPEKE 2.0. SPEKE 2.0 relies on the CPIX 2.3 specification.
+    # You must disable key rotation for this endpoint by setting
+    # keyRotationIntervalSeconds to 0.
+    #
+    # @!attribute [rw] preset_speke_20_audio
+    #   A collection of audio encryption presets.
+    #   @return [String]
+    #
+    # @!attribute [rw] preset_speke_20_video
+    #   A collection of video encryption presets.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/mediapackage-2017-10-12/EncryptionContractConfiguration AWS API Documentation
+    #
+    class EncryptionContractConfiguration < Struct.new(
+      :preset_speke_20_audio,
+      :preset_speke_20_video)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1307,7 +1065,7 @@ module Aws::MediaPackage
     #   @return [String]
     #
     # @!attribute [rw] created_at
-    #   The time the HarvestJob was submitted
+    #   The date and time the HarvestJob was submitted.
     #   @return [String]
     #
     # @!attribute [rw] end_time
@@ -1414,23 +1172,6 @@ module Aws::MediaPackage
     end
 
     # An HTTP Live Streaming (HLS) encryption configuration.
-    #
-    # @note When making an API call, you may pass HlsEncryption
-    #   data as a hash:
-    #
-    #       {
-    #         constant_initialization_vector: "__string",
-    #         encryption_method: "AES_128", # accepts AES_128, SAMPLE_AES
-    #         key_rotation_interval_seconds: 1,
-    #         repeat_ext_x_key: false,
-    #         speke_key_provider: { # required
-    #           certificate_arn: "__string",
-    #           resource_id: "__string", # required
-    #           role_arn: "__string", # required
-    #           system_ids: ["__string"], # required
-    #           url: "__string", # required
-    #         },
-    #       }
     #
     # @!attribute [rw] constant_initialization_vector
     #   A constant initialization vector for encryption (optional). When not
@@ -1555,21 +1296,6 @@ module Aws::MediaPackage
 
     # A HTTP Live Streaming (HLS) manifest configuration.
     #
-    # @note When making an API call, you may pass HlsManifestCreateOrUpdateParameters
-    #   data as a hash:
-    #
-    #       {
-    #         ad_markers: "NONE", # accepts NONE, SCTE35_ENHANCED, PASSTHROUGH, DATERANGE
-    #         ad_triggers: ["SPLICE_INSERT"], # accepts SPLICE_INSERT, BREAK, PROVIDER_ADVERTISEMENT, DISTRIBUTOR_ADVERTISEMENT, PROVIDER_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_PLACEMENT_OPPORTUNITY, PROVIDER_OVERLAY_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_OVERLAY_PLACEMENT_OPPORTUNITY
-    #         ads_on_delivery_restrictions: "NONE", # accepts NONE, RESTRICTED, UNRESTRICTED, BOTH
-    #         id: "__string", # required
-    #         include_iframe_only_stream: false,
-    #         manifest_name: "__string",
-    #         playlist_type: "NONE", # accepts NONE, EVENT, VOD
-    #         playlist_window_seconds: 1,
-    #         program_date_time_interval_seconds: 1,
-    #       }
-    #
     # @!attribute [rw] ad_markers
     #   This setting controls how ad markers are included in the packaged
     #   OriginEndpoint. "NONE" will omit all SCTE-35 ad markers from the
@@ -1658,39 +1384,6 @@ module Aws::MediaPackage
 
     # An HTTP Live Streaming (HLS) packaging configuration.
     #
-    # @note When making an API call, you may pass HlsPackage
-    #   data as a hash:
-    #
-    #       {
-    #         ad_markers: "NONE", # accepts NONE, SCTE35_ENHANCED, PASSTHROUGH, DATERANGE
-    #         ad_triggers: ["SPLICE_INSERT"], # accepts SPLICE_INSERT, BREAK, PROVIDER_ADVERTISEMENT, DISTRIBUTOR_ADVERTISEMENT, PROVIDER_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_PLACEMENT_OPPORTUNITY, PROVIDER_OVERLAY_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_OVERLAY_PLACEMENT_OPPORTUNITY
-    #         ads_on_delivery_restrictions: "NONE", # accepts NONE, RESTRICTED, UNRESTRICTED, BOTH
-    #         encryption: {
-    #           constant_initialization_vector: "__string",
-    #           encryption_method: "AES_128", # accepts AES_128, SAMPLE_AES
-    #           key_rotation_interval_seconds: 1,
-    #           repeat_ext_x_key: false,
-    #           speke_key_provider: { # required
-    #             certificate_arn: "__string",
-    #             resource_id: "__string", # required
-    #             role_arn: "__string", # required
-    #             system_ids: ["__string"], # required
-    #             url: "__string", # required
-    #           },
-    #         },
-    #         include_iframe_only_stream: false,
-    #         playlist_type: "NONE", # accepts NONE, EVENT, VOD
-    #         playlist_window_seconds: 1,
-    #         program_date_time_interval_seconds: 1,
-    #         segment_duration_seconds: 1,
-    #         stream_selection: {
-    #           max_video_bits_per_second: 1,
-    #           min_video_bits_per_second: 1,
-    #           stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #         },
-    #         use_audio_rendition_group: false,
-    #       }
-    #
     # @!attribute [rw] ad_markers
     #   This setting controls how ad markers are included in the packaged
     #   OriginEndpoint. "NONE" will omit all SCTE-35 ad markers from the
@@ -1727,6 +1420,11 @@ module Aws::MediaPackage
     # @!attribute [rw] encryption
     #   An HTTP Live Streaming (HLS) encryption configuration.
     #   @return [Types::HlsEncryption]
+    #
+    # @!attribute [rw] include_dvb_subtitles
+    #   When enabled, MediaPackage passes through digital video broadcasting
+    #   (DVB) subtitles into the output.
+    #   @return [Boolean]
     #
     # @!attribute [rw] include_iframe_only_stream
     #   When enabled, an I-Frame only stream will be included in the output.
@@ -1775,6 +1473,7 @@ module Aws::MediaPackage
       :ad_triggers,
       :ads_on_delivery_restrictions,
       :encryption,
+      :include_dvb_subtitles,
       :include_iframe_only_stream,
       :playlist_type,
       :playlist_window_seconds,
@@ -1811,18 +1510,11 @@ module Aws::MediaPackage
       :password,
       :url,
       :username)
-      SENSITIVE = []
+      SENSITIVE = [:password, :username]
       include Aws::Structure
     end
 
     # Configure ingress access logging.
-    #
-    # @note When making an API call, you may pass IngressAccessLogs
-    #   data as a hash:
-    #
-    #       {
-    #         log_group_name: "__string",
-    #       }
     #
     # @!attribute [rw] log_group_name
     #   Customize the log group name.
@@ -1847,14 +1539,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListChannelsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         max_results: 1,
-    #         next_token: "__string",
-    #       }
-    #
     # @!attribute [rw] max_results
     #   @return [Integer]
     #
@@ -1885,16 +1569,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListHarvestJobsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         include_channel_id: "__string",
-    #         include_status: "__string",
-    #         max_results: 1,
-    #         next_token: "__string",
-    #       }
-    #
     # @!attribute [rw] include_channel_id
     #   @return [String]
     #
@@ -1933,15 +1607,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListOriginEndpointsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         channel_id: "__string",
-    #         max_results: 1,
-    #         next_token: "__string",
-    #       }
-    #
     # @!attribute [rw] channel_id
     #   @return [String]
     #
@@ -1976,13 +1641,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "__string", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   @return [String]
     #
@@ -2007,19 +1665,6 @@ module Aws::MediaPackage
 
     # A Microsoft Smooth Streaming (MSS) encryption configuration.
     #
-    # @note When making an API call, you may pass MssEncryption
-    #   data as a hash:
-    #
-    #       {
-    #         speke_key_provider: { # required
-    #           certificate_arn: "__string",
-    #           resource_id: "__string", # required
-    #           role_arn: "__string", # required
-    #           system_ids: ["__string"], # required
-    #           url: "__string", # required
-    #         },
-    #       }
-    #
     # @!attribute [rw] speke_key_provider
     #   A configuration for accessing an external Secure Packager and
     #   Encoder Key Exchange (SPEKE) service that will provide encryption
@@ -2035,28 +1680,6 @@ module Aws::MediaPackage
     end
 
     # A Microsoft Smooth Streaming (MSS) packaging configuration.
-    #
-    # @note When making an API call, you may pass MssPackage
-    #   data as a hash:
-    #
-    #       {
-    #         encryption: {
-    #           speke_key_provider: { # required
-    #             certificate_arn: "__string",
-    #             resource_id: "__string", # required
-    #             role_arn: "__string", # required
-    #             system_ids: ["__string"], # required
-    #             url: "__string", # required
-    #           },
-    #         },
-    #         manifest_window_seconds: 1,
-    #         segment_duration_seconds: 1,
-    #         stream_selection: {
-    #           max_video_bits_per_second: 1,
-    #           min_video_bits_per_second: 1,
-    #           stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #         },
-    #       }
     #
     # @!attribute [rw] encryption
     #   A Microsoft Smooth Streaming (MSS) encryption configuration.
@@ -2113,6 +1736,10 @@ module Aws::MediaPackage
     # @!attribute [rw] cmaf_package
     #   A Common Media Application Format (CMAF) packaging configuration.
     #   @return [Types::CmafPackage]
+    #
+    # @!attribute [rw] created_at
+    #   The date and time the OriginEndpoint was created.
+    #   @return [String]
     #
     # @!attribute [rw] dash_package
     #   A Dynamic Adaptive Streaming over HTTP (DASH) packaging
@@ -2179,6 +1806,7 @@ module Aws::MediaPackage
       :authorization,
       :channel_id,
       :cmaf_package,
+      :created_at,
       :dash_package,
       :description,
       :hls_package,
@@ -2381,13 +2009,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RotateChannelCredentialsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] id
     #   @return [String]
     #
@@ -2400,6 +2021,9 @@ module Aws::MediaPackage
     end
 
     # @!attribute [rw] arn
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
     #   @return [String]
     #
     # @!attribute [rw] description
@@ -2428,6 +2052,7 @@ module Aws::MediaPackage
     #
     class RotateChannelCredentialsResponse < Struct.new(
       :arn,
+      :created_at,
       :description,
       :egress_access_logs,
       :hls_ingest,
@@ -2438,14 +2063,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RotateIngestEndpointCredentialsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         id: "__string", # required
-    #         ingest_endpoint_id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] id
     #   @return [String]
     #
@@ -2462,6 +2079,9 @@ module Aws::MediaPackage
     end
 
     # @!attribute [rw] arn
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
     #   @return [String]
     #
     # @!attribute [rw] description
@@ -2490,6 +2110,7 @@ module Aws::MediaPackage
     #
     class RotateIngestEndpointCredentialsResponse < Struct.new(
       :arn,
+      :created_at,
       :description,
       :egress_access_logs,
       :hls_ingest,
@@ -2502,15 +2123,6 @@ module Aws::MediaPackage
 
     # Configuration parameters for where in an S3 bucket to place the
     # harvested content
-    #
-    # @note When making an API call, you may pass S3Destination
-    #   data as a hash:
-    #
-    #       {
-    #         bucket_name: "__string", # required
-    #         manifest_key: "__string", # required
-    #         role_arn: "__string", # required
-    #       }
     #
     # @!attribute [rw] bucket_name
     #   The name of an S3 bucket within which harvested content will be
@@ -2550,22 +2162,24 @@ module Aws::MediaPackage
     # A configuration for accessing an external Secure Packager and Encoder
     # Key Exchange (SPEKE) service that will provide encryption keys.
     #
-    # @note When making an API call, you may pass SpekeKeyProvider
-    #   data as a hash:
-    #
-    #       {
-    #         certificate_arn: "__string",
-    #         resource_id: "__string", # required
-    #         role_arn: "__string", # required
-    #         system_ids: ["__string"], # required
-    #         url: "__string", # required
-    #       }
-    #
     # @!attribute [rw] certificate_arn
     #   An Amazon Resource Name (ARN) of a Certificate Manager certificate
     #   that MediaPackage will use for enforcing secure end-to-end data
     #   transfer with the key provider service.
     #   @return [String]
+    #
+    # @!attribute [rw] encryption_contract_configuration
+    #   Use encryptionContractConfiguration to configure one or more content
+    #   encryption keys for your endpoints that use SPEKE 2.0. The
+    #   encryption contract defines which content keys are used to encrypt
+    #   the audio and video tracks in your stream. To configure the
+    #   encryption contract, specify which audio and video encryption
+    #   presets to use. Note the following considerations when using
+    #   encryptionContractConfiguration: encryptionContractConfiguration can
+    #   be used for DASH or CMAF endpoints that use SPEKE 2.0. SPEKE 2.0
+    #   relies on the CPIX 2.3 specification. You must disable key rotation
+    #   for this endpoint by setting keyRotationIntervalSeconds to 0.
+    #   @return [Types::EncryptionContractConfiguration]
     #
     # @!attribute [rw] resource_id
     #   The resource ID to include in key requests.
@@ -2588,6 +2202,7 @@ module Aws::MediaPackage
     #
     class SpekeKeyProvider < Struct.new(
       :certificate_arn,
+      :encryption_contract_configuration,
       :resource_id,
       :role_arn,
       :system_ids,
@@ -2597,15 +2212,6 @@ module Aws::MediaPackage
     end
 
     # A StreamSelection configuration.
-    #
-    # @note When making an API call, you may pass StreamSelection
-    #   data as a hash:
-    #
-    #       {
-    #         max_video_bits_per_second: 1,
-    #         min_video_bits_per_second: 1,
-    #         stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #       }
     #
     # @!attribute [rw] max_video_bits_per_second
     #   The maximum video bitrate (bps) to include in output.
@@ -2629,16 +2235,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "__string", # required
-    #         tags: { # required
-    #           "__string" => "__string",
-    #         },
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   @return [String]
     #
@@ -2687,14 +2283,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "__string", # required
-    #         tag_keys: ["__string"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   @return [String]
     #
@@ -2710,14 +2298,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateChannelRequest
-    #   data as a hash:
-    #
-    #       {
-    #         description: "__string",
-    #         id: "__string", # required
-    #       }
-    #
     # @!attribute [rw] description
     #   @return [String]
     #
@@ -2734,6 +2314,9 @@ module Aws::MediaPackage
     end
 
     # @!attribute [rw] arn
+    #   @return [String]
+    #
+    # @!attribute [rw] created_at
     #   @return [String]
     #
     # @!attribute [rw] description
@@ -2762,6 +2345,7 @@ module Aws::MediaPackage
     #
     class UpdateChannelResponse < Struct.new(
       :arn,
+      :created_at,
       :description,
       :egress_access_logs,
       :hls_ingest,
@@ -2772,132 +2356,6 @@ module Aws::MediaPackage
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateOriginEndpointRequest
-    #   data as a hash:
-    #
-    #       {
-    #         authorization: {
-    #           cdn_identifier_secret: "__string", # required
-    #           secrets_role_arn: "__string", # required
-    #         },
-    #         cmaf_package: {
-    #           encryption: {
-    #             key_rotation_interval_seconds: 1,
-    #             speke_key_provider: { # required
-    #               certificate_arn: "__string",
-    #               resource_id: "__string", # required
-    #               role_arn: "__string", # required
-    #               system_ids: ["__string"], # required
-    #               url: "__string", # required
-    #             },
-    #           },
-    #           hls_manifests: [
-    #             {
-    #               ad_markers: "NONE", # accepts NONE, SCTE35_ENHANCED, PASSTHROUGH, DATERANGE
-    #               ad_triggers: ["SPLICE_INSERT"], # accepts SPLICE_INSERT, BREAK, PROVIDER_ADVERTISEMENT, DISTRIBUTOR_ADVERTISEMENT, PROVIDER_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_PLACEMENT_OPPORTUNITY, PROVIDER_OVERLAY_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_OVERLAY_PLACEMENT_OPPORTUNITY
-    #               ads_on_delivery_restrictions: "NONE", # accepts NONE, RESTRICTED, UNRESTRICTED, BOTH
-    #               id: "__string", # required
-    #               include_iframe_only_stream: false,
-    #               manifest_name: "__string",
-    #               playlist_type: "NONE", # accepts NONE, EVENT, VOD
-    #               playlist_window_seconds: 1,
-    #               program_date_time_interval_seconds: 1,
-    #             },
-    #           ],
-    #           segment_duration_seconds: 1,
-    #           segment_prefix: "__string",
-    #           stream_selection: {
-    #             max_video_bits_per_second: 1,
-    #             min_video_bits_per_second: 1,
-    #             stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #           },
-    #         },
-    #         dash_package: {
-    #           ad_triggers: ["SPLICE_INSERT"], # accepts SPLICE_INSERT, BREAK, PROVIDER_ADVERTISEMENT, DISTRIBUTOR_ADVERTISEMENT, PROVIDER_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_PLACEMENT_OPPORTUNITY, PROVIDER_OVERLAY_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_OVERLAY_PLACEMENT_OPPORTUNITY
-    #           ads_on_delivery_restrictions: "NONE", # accepts NONE, RESTRICTED, UNRESTRICTED, BOTH
-    #           encryption: {
-    #             key_rotation_interval_seconds: 1,
-    #             speke_key_provider: { # required
-    #               certificate_arn: "__string",
-    #               resource_id: "__string", # required
-    #               role_arn: "__string", # required
-    #               system_ids: ["__string"], # required
-    #               url: "__string", # required
-    #             },
-    #           },
-    #           manifest_layout: "FULL", # accepts FULL, COMPACT
-    #           manifest_window_seconds: 1,
-    #           min_buffer_time_seconds: 1,
-    #           min_update_period_seconds: 1,
-    #           period_triggers: ["ADS"], # accepts ADS
-    #           profile: "NONE", # accepts NONE, HBBTV_1_5
-    #           segment_duration_seconds: 1,
-    #           segment_template_format: "NUMBER_WITH_TIMELINE", # accepts NUMBER_WITH_TIMELINE, TIME_WITH_TIMELINE, NUMBER_WITH_DURATION
-    #           stream_selection: {
-    #             max_video_bits_per_second: 1,
-    #             min_video_bits_per_second: 1,
-    #             stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #           },
-    #           suggested_presentation_delay_seconds: 1,
-    #           utc_timing: "NONE", # accepts NONE, HTTP-HEAD, HTTP-ISO
-    #           utc_timing_uri: "__string",
-    #         },
-    #         description: "__string",
-    #         hls_package: {
-    #           ad_markers: "NONE", # accepts NONE, SCTE35_ENHANCED, PASSTHROUGH, DATERANGE
-    #           ad_triggers: ["SPLICE_INSERT"], # accepts SPLICE_INSERT, BREAK, PROVIDER_ADVERTISEMENT, DISTRIBUTOR_ADVERTISEMENT, PROVIDER_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_PLACEMENT_OPPORTUNITY, PROVIDER_OVERLAY_PLACEMENT_OPPORTUNITY, DISTRIBUTOR_OVERLAY_PLACEMENT_OPPORTUNITY
-    #           ads_on_delivery_restrictions: "NONE", # accepts NONE, RESTRICTED, UNRESTRICTED, BOTH
-    #           encryption: {
-    #             constant_initialization_vector: "__string",
-    #             encryption_method: "AES_128", # accepts AES_128, SAMPLE_AES
-    #             key_rotation_interval_seconds: 1,
-    #             repeat_ext_x_key: false,
-    #             speke_key_provider: { # required
-    #               certificate_arn: "__string",
-    #               resource_id: "__string", # required
-    #               role_arn: "__string", # required
-    #               system_ids: ["__string"], # required
-    #               url: "__string", # required
-    #             },
-    #           },
-    #           include_iframe_only_stream: false,
-    #           playlist_type: "NONE", # accepts NONE, EVENT, VOD
-    #           playlist_window_seconds: 1,
-    #           program_date_time_interval_seconds: 1,
-    #           segment_duration_seconds: 1,
-    #           stream_selection: {
-    #             max_video_bits_per_second: 1,
-    #             min_video_bits_per_second: 1,
-    #             stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #           },
-    #           use_audio_rendition_group: false,
-    #         },
-    #         id: "__string", # required
-    #         manifest_name: "__string",
-    #         mss_package: {
-    #           encryption: {
-    #             speke_key_provider: { # required
-    #               certificate_arn: "__string",
-    #               resource_id: "__string", # required
-    #               role_arn: "__string", # required
-    #               system_ids: ["__string"], # required
-    #               url: "__string", # required
-    #             },
-    #           },
-    #           manifest_window_seconds: 1,
-    #           segment_duration_seconds: 1,
-    #           stream_selection: {
-    #             max_video_bits_per_second: 1,
-    #             min_video_bits_per_second: 1,
-    #             stream_order: "ORIGINAL", # accepts ORIGINAL, VIDEO_BITRATE_ASCENDING, VIDEO_BITRATE_DESCENDING
-    #           },
-    #         },
-    #         origination: "ALLOW", # accepts ALLOW, DENY
-    #         startover_window_seconds: 1,
-    #         time_delay_seconds: 1,
-    #         whitelist: ["__string"],
-    #       }
-    #
     # @!attribute [rw] authorization
     #   CDN Authorization credentials
     #   @return [Types::Authorization]
@@ -2973,6 +2431,9 @@ module Aws::MediaPackage
     #   A Common Media Application Format (CMAF) packaging configuration.
     #   @return [Types::CmafPackage]
     #
+    # @!attribute [rw] created_at
+    #   @return [String]
+    #
     # @!attribute [rw] dash_package
     #   A Dynamic Adaptive Streaming over HTTP (DASH) packaging
     #   configuration.
@@ -3021,6 +2482,7 @@ module Aws::MediaPackage
       :authorization,
       :channel_id,
       :cmaf_package,
+      :created_at,
       :dash_package,
       :description,
       :hls_package,
@@ -3039,3 +2501,4 @@ module Aws::MediaPackage
 
   end
 end
+

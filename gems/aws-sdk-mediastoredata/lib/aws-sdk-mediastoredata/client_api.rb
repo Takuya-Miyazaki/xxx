@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::MediaStoreData
   # @api private
@@ -134,8 +135,10 @@ module Aws::MediaStoreData
 
       api.metadata = {
         "apiVersion" => "2017-09-01",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "data.mediastore",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceAbbreviation" => "MediaStore Data",
         "serviceFullName" => "AWS Elemental MediaStore Data Plane",
         "serviceId" => "MediaStore Data",
@@ -199,6 +202,7 @@ module Aws::MediaStoreData
         o.http_method = "PUT"
         o.http_request_uri = "/{Path+}"
         o['authtype'] = "v4-unsigned-body"
+        o['unsignedPayload'] = true
         o.input = Shapes::ShapeRef.new(shape: PutObjectRequest)
         o.output = Shapes::ShapeRef.new(shape: PutObjectResponse)
         o.errors << Shapes::ShapeRef.new(shape: ContainerNotFoundException)

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -36,7 +36,7 @@ module Aws::IAM
     alias :group_name :name
 
     # The path to the group. For more information about paths, see [IAM
-    # Identifiers][1] in the *IAM User Guide*.
+    # identifiers][1] in the *IAM User Guide*.
     #
     #
     #
@@ -47,7 +47,7 @@ module Aws::IAM
     end
 
     # The stable and unique string identifying the group. For more
-    # information about IDs, see [IAM Identifiers][1] in the *IAM User
+    # information about IDs, see [IAM identifiers][1] in the *IAM User
     # Guide*.
     #
     #
@@ -60,7 +60,7 @@ module Aws::IAM
 
     # The Amazon Resource Name (ARN) specifying the group. For more
     # information about ARNs and how to use them in policies, see [IAM
-    # Identifiers][1] in the *IAM User Guide*.
+    # identifiers][1] in the *IAM User Guide*.
     #
     #
     #
@@ -95,7 +95,9 @@ module Aws::IAM
     #
     # @return [self]
     def load
-      resp = @client.get_group(group_name: @name)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_group(group_name: @name)
+      end
       @data = resp.group
       self
     end
@@ -210,7 +212,9 @@ module Aws::IAM
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -235,7 +239,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def add_user(options = {})
       options = options.merge(group_name: @name)
-      resp = @client.add_user_to_group(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.add_user_to_group(options)
+      end
       resp.data
     end
 
@@ -248,8 +254,8 @@ module Aws::IAM
     # @option options [required, String] :policy_arn
     #   The Amazon Resource Name (ARN) of the IAM policy you want to attach.
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs) and
-    #   AWS Service Namespaces][1] in the *AWS General Reference*.
+    #   For more information about ARNs, see [Amazon Resource Names (ARNs)][1]
+    #   in the *Amazon Web Services General Reference*.
     #
     #
     #
@@ -257,7 +263,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def attach_policy(options = {})
       options = options.merge(group_name: @name)
-      resp = @client.attach_group_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.attach_group_policy(options)
+      end
       resp.data
     end
 
@@ -269,7 +277,7 @@ module Aws::IAM
     # @param [Hash] options ({})
     # @option options [String] :path
     #   The path to the group. For more information about paths, see [IAM
-    #   Identifiers][1] in the *IAM User Guide*.
+    #   identifiers][1] in the *IAM User Guide*.
     #
     #   This parameter is optional. If it is not included, it defaults to a
     #   slash (/).
@@ -288,7 +296,9 @@ module Aws::IAM
     # @return [Group]
     def create(options = {})
       options = options.merge(group_name: @name)
-      resp = @client.create_group(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.create_group(options)
+      end
       Group.new(
         name: options[:group_name],
         data: resp.data.group,
@@ -317,10 +327,10 @@ module Aws::IAM
     # @option options [required, String] :policy_document
     #   The policy document.
     #
-    #   You must provide policies in JSON format in IAM. However, for AWS
+    #   You must provide policies in JSON format in IAM. However, for
     #   CloudFormation templates formatted in YAML, you can provide the policy
-    #   in JSON or YAML format. AWS CloudFormation always converts a YAML
-    #   policy to JSON format before submitting it to IAM.
+    #   in JSON or YAML format. CloudFormation always converts a YAML policy
+    #   to JSON format before submitting it to IAM.
     #
     #   The [regex pattern][1] used to validate this parameter is a string of
     #   characters consisting of the following:
@@ -340,7 +350,9 @@ module Aws::IAM
     # @return [GroupPolicy]
     def create_policy(options = {})
       options = options.merge(group_name: @name)
-      @client.put_group_policy(options)
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.put_group_policy(options)
+      end
       GroupPolicy.new(
         group_name: @name,
         name: options[:policy_name],
@@ -355,7 +367,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(group_name: @name)
-      resp = @client.delete_group(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_group(options)
+      end
       resp.data
     end
 
@@ -368,8 +382,8 @@ module Aws::IAM
     # @option options [required, String] :policy_arn
     #   The Amazon Resource Name (ARN) of the IAM policy you want to detach.
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs) and
-    #   AWS Service Namespaces][1] in the *AWS General Reference*.
+    #   For more information about ARNs, see [Amazon Resource Names (ARNs)][1]
+    #   in the *Amazon Web Services General Reference*.
     #
     #
     #
@@ -377,7 +391,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def detach_policy(options = {})
       options = options.merge(group_name: @name)
-      resp = @client.detach_group_policy(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.detach_group_policy(options)
+      end
       resp.data
     end
 
@@ -401,7 +417,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def remove_user(options = {})
       options = options.merge(group_name: @name)
-      resp = @client.remove_user_from_group(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.remove_user_from_group(options)
+      end
       resp.data
     end
 
@@ -436,7 +454,9 @@ module Aws::IAM
     # @return [Group]
     def update(options = {})
       options = options.merge(group_name: @name)
-      @client.update_group(options)
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.update_group(options)
+      end
       Group.new(
         name: options[:new_group_name],
         client: @client
@@ -470,7 +490,9 @@ module Aws::IAM
     def attached_policies(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(group_name: @name)
-        resp = @client.list_attached_group_policies(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_attached_group_policies(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.attached_policies.each do |a|
@@ -493,7 +515,9 @@ module Aws::IAM
     def policies(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(group_name: @name)
-        resp = @client.list_group_policies(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.list_group_policies(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.policy_names.each do |p|
@@ -527,7 +551,9 @@ module Aws::IAM
     def users(options = {})
       batches = Enumerator.new do |y|
         options = options.merge(group_name: @name)
-        resp = @client.get_group(options)
+        resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+          @client.get_group(options)
+        end
         resp.each_page do |page|
           batch = []
           page.data.users.each do |u|

@@ -5,12 +5,12 @@ module Seahorse
     class AsyncBase < Seahorse::Client::Base
 
       # default H2 plugins
+      # @api private
       @plugins = PluginList.new([
         Plugins::Endpoint,
         Plugins::H2,
         Plugins::ResponseTarget
       ])
-
       def initialize(plugins, options)
         super
         @connection = H2::Connection.new(options)
@@ -49,4 +49,3 @@ module Seahorse
     end
   end
 end
-

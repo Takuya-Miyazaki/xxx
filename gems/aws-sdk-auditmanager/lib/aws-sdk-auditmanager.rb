@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-auditmanager/types'
-require_relative 'aws-sdk-auditmanager/client_api'
-require_relative 'aws-sdk-auditmanager/client'
-require_relative 'aws-sdk-auditmanager/errors'
-require_relative 'aws-sdk-auditmanager/resource'
-require_relative 'aws-sdk-auditmanager/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:auditmanager)
 
 # This module provides support for AWS Audit Manager. This module is available in the
 # `aws-sdk-auditmanager` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-auditmanager/customizations'
 #
 # @!group service
 module Aws::AuditManager
+  autoload :Types, 'aws-sdk-auditmanager/types'
+  autoload :ClientApi, 'aws-sdk-auditmanager/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-auditmanager/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-auditmanager/client'
+  autoload :Errors, 'aws-sdk-auditmanager/errors'
+  autoload :Resource, 'aws-sdk-auditmanager/resource'
+  autoload :EndpointParameters, 'aws-sdk-auditmanager/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-auditmanager/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-auditmanager/endpoints'
 
-  GEM_VERSION = '1.1.0'
+  GEM_VERSION = '1.57.0'
 
 end
+
+require_relative 'aws-sdk-auditmanager/customizations'

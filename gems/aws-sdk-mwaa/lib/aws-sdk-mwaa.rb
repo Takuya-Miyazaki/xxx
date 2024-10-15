@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-mwaa/types'
-require_relative 'aws-sdk-mwaa/client_api'
-require_relative 'aws-sdk-mwaa/client'
-require_relative 'aws-sdk-mwaa/errors'
-require_relative 'aws-sdk-mwaa/resource'
-require_relative 'aws-sdk-mwaa/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:mwaa)
 
 # This module provides support for AmazonMWAA. This module is available in the
 # `aws-sdk-mwaa` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-mwaa/customizations'
 #
 # @!group service
 module Aws::MWAA
+  autoload :Types, 'aws-sdk-mwaa/types'
+  autoload :ClientApi, 'aws-sdk-mwaa/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-mwaa/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-mwaa/client'
+  autoload :Errors, 'aws-sdk-mwaa/errors'
+  autoload :Resource, 'aws-sdk-mwaa/resource'
+  autoload :EndpointParameters, 'aws-sdk-mwaa/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-mwaa/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-mwaa/endpoints'
 
-  GEM_VERSION = '1.0.0'
+  GEM_VERSION = '1.48.0'
 
 end
+
+require_relative 'aws-sdk-mwaa/customizations'

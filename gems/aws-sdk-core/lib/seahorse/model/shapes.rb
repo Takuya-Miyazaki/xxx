@@ -61,6 +61,9 @@ module Seahorse
         # @return [Boolean]
         attr_accessor :eventheader_type
 
+        # @return [Boolean]
+        attr_accessor :document
+
         # @return [String, nil]
         def location
           @location || (shape && shape[:location])
@@ -72,7 +75,7 @@ module Seahorse
 
         # @return [String, nil]
         def location_name
-          @location_name || (shape && shape[:location_name])
+          @location_name || (shape && shape['locationName'])
         end
 
         def location_name= location_name
@@ -83,7 +86,7 @@ module Seahorse
         def [](key)
           if @metadata.key?(key.to_s)
             @metadata[key.to_s]
-          else
+          elsif @shape
             @shape[key.to_s]
           end
         end
@@ -113,6 +116,9 @@ module Seahorse
 
         # @return [String, nil]
         attr_accessor :documentation
+
+        # @return [Boolean]
+        attr_accessor :union
 
         # Gets metadata for the given `key`.
         def [](key)
@@ -264,7 +270,26 @@ module Seahorse
 
       end
 
+      class UnionShape < StructureShape
+        def initialize(options = {})
+          @member_subclasses = {}
+          super options.merge(union: true)
+        end
+
+        # @api private
+        def member_subclass(member)
+          @member_subclasses[member]
+        end
+
+        # @api private
+        def add_member_subclass(member, subclass)
+          @member_subclasses[member] = subclass
+        end
+      end
+
       class TimestampShape < Shape; end
+
+      class DocumentShape < Shape; end
 
     end
   end

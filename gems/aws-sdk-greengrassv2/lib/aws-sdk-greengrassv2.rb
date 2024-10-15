@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-greengrassv2/types'
-require_relative 'aws-sdk-greengrassv2/client_api'
-require_relative 'aws-sdk-greengrassv2/client'
-require_relative 'aws-sdk-greengrassv2/errors'
-require_relative 'aws-sdk-greengrassv2/resource'
-require_relative 'aws-sdk-greengrassv2/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:greengrassv2)
 
 # This module provides support for AWS IoT Greengrass V2. This module is available in the
 # `aws-sdk-greengrassv2` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-greengrassv2/customizations'
 # structure.
 #
 #     greengrass_v2 = Aws::GreengrassV2::Client.new
-#     resp = greengrass_v2.cancel_deployment(params)
+#     resp = greengrass_v2.associate_service_role_to_account(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-greengrassv2/customizations'
 #
 # @!group service
 module Aws::GreengrassV2
+  autoload :Types, 'aws-sdk-greengrassv2/types'
+  autoload :ClientApi, 'aws-sdk-greengrassv2/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-greengrassv2/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-greengrassv2/client'
+  autoload :Errors, 'aws-sdk-greengrassv2/errors'
+  autoload :Resource, 'aws-sdk-greengrassv2/resource'
+  autoload :EndpointParameters, 'aws-sdk-greengrassv2/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-greengrassv2/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-greengrassv2/endpoints'
 
-  GEM_VERSION = '1.0.0'
+  GEM_VERSION = '1.49.0'
 
 end
+
+require_relative 'aws-sdk-greengrassv2/customizations'

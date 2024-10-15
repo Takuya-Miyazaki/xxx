@@ -3,34 +3,34 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
 module Aws::ACM
   module Types
 
-    # @note When making an API call, you may pass AddTagsToCertificateRequest
-    #   data as a hash:
+    # You do not have access required to perform this action.
     #
-    #       {
-    #         certificate_arn: "Arn", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
+    # @!attribute [rw] message
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/acm-2015-12-08/AccessDeniedException AWS API Documentation
+    #
+    class AccessDeniedException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] certificate_arn
     #   String that contains the ARN of the ACM certificate to which the tag
     #   is to be applied. This must be of the form:
     #
     #   `arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012`
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs)
-    #   and AWS Service Namespaces][1].
+    #   For more information about ARNs, see [Amazon Resource Names
+    #   (ARNs)][1].
     #
     #
     #
@@ -55,8 +55,8 @@ module Aws::ACM
     #
     # @!attribute [rw] certificate_arn
     #   The Amazon Resource Name (ARN) of the certificate. For more
-    #   information about ARNs, see [Amazon Resource Names (ARNs) and AWS
-    #   Service Namespaces][1] in the *AWS General Reference*.
+    #   information about ARNs, see [Amazon Resource Names (ARNs)][1] in the
+    #   *Amazon Web Services General Reference*.
     #
     #
     #
@@ -98,8 +98,7 @@ module Aws::ACM
     #   @return [String]
     #
     # @!attribute [rw] created_at
-    #   The time at which the certificate was requested. This value exists
-    #   only when the certificate type is `AMAZON_ISSUED`.
+    #   The time at which the certificate was requested.
     #   @return [Time]
     #
     # @!attribute [rw] issued_at
@@ -108,12 +107,27 @@ module Aws::ACM
     #   @return [Time]
     #
     # @!attribute [rw] imported_at
-    #   The date and time at which the certificate was imported. This value
+    #   The date and time when the certificate was imported. This value
     #   exists only when the certificate type is `IMPORTED`.
     #   @return [Time]
     #
     # @!attribute [rw] status
     #   The status of the certificate.
+    #
+    #   A certificate enters status PENDING\_VALIDATION upon being
+    #   requested, unless it fails for any of the reasons given in the
+    #   troubleshooting topic [Certificate request fails][1]. ACM makes
+    #   repeated attempts to validate a certificate for 72 hours and then
+    #   times out. If a certificate shows status FAILED or
+    #   VALIDATION\_TIMED\_OUT, delete the request, correct the issue with
+    #   [DNS validation][2] or [Email validation][3], and try again. If
+    #   validation succeeds, the certificate enters status ISSUED.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/acm/latest/userguide/troubleshooting-failed.html
+    #   [2]: https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html
+    #   [3]: https://docs.aws.amazon.com/acm/latest/userguide/email-validation.html
     #   @return [String]
     #
     # @!attribute [rw] revoked_at
@@ -143,14 +157,15 @@ module Aws::ACM
     #   @return [String]
     #
     # @!attribute [rw] in_use_by
-    #   A list of ARNs for the AWS resources that are using the certificate.
-    #   A certificate can be used by multiple AWS resources.
+    #   A list of ARNs for the Amazon Web Services resources that are using
+    #   the certificate. A certificate can be used by multiple Amazon Web
+    #   Services resources.
     #   @return [Array<String>]
     #
     # @!attribute [rw] failure_reason
     #   The reason the certificate request failed. This value exists only
     #   when the certificate status is `FAILED`. For more information, see
-    #   [Certificate Request Failed][1] in the *AWS Certificate Manager User
+    #   [Certificate Request Failed][1] in the *Certificate Manager User
     #   Guide*.
     #
     #
@@ -165,7 +180,7 @@ module Aws::ACM
     #   provide [managed renewal][1] for imported certificates. For more
     #   information about the differences between certificates that you
     #   import and those that ACM provides, see [Importing Certificates][2]
-    #   in the *AWS Certificate Manager User Guide*.
+    #   in the *Certificate Manager User Guide*.
     #
     #
     #
@@ -197,9 +212,8 @@ module Aws::ACM
     #   @return [Array<Types::ExtendedKeyUsage>]
     #
     # @!attribute [rw] certificate_authority_arn
-    #   The Amazon Resource Name (ARN) of the ACM PCA private certificate
-    #   authority (CA) that issued the certificate. This has the following
-    #   format:
+    #   The Amazon Resource Name (ARN) of the private certificate authority
+    #   (CA) that issued the certificate. This has the following format:
     #
     #   `arn:aws:acm-pca:region:account:certificate-authority/12345678-1234-1234-1234-123456789012`
     #   @return [String]
@@ -265,13 +279,6 @@ module Aws::ACM
     #
     # [1]: https://docs.aws.amazon.com/acm/latest/userguide/acm-concepts.html#concept-transparency
     #
-    # @note When making an API call, you may pass CertificateOptions
-    #   data as a hash:
-    #
-    #       {
-    #         certificate_transparency_logging_preference: "ENABLED", # accepts ENABLED, DISABLED
-    #       }
-    #
     # @!attribute [rw] certificate_transparency_logging_preference
     #   You can opt out of certificate transparency logging by specifying
     #   the `DISABLED` option. Opt in by specifying `ENABLED`.
@@ -293,8 +300,8 @@ module Aws::ACM
     #
     #   `arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012`
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs)
-    #   and AWS Service Namespaces][1].
+    #   For more information about ARNs, see [Amazon Resource Names
+    #   (ARNs)][1].
     #
     #
     #
@@ -306,30 +313,172 @@ module Aws::ACM
     #   example.com, for the certificate.
     #   @return [String]
     #
+    # @!attribute [rw] subject_alternative_name_summaries
+    #   One or more domain names (subject alternative names) included in the
+    #   certificate. This list contains the domain names that are bound to
+    #   the public key that is contained in the certificate. The subject
+    #   alternative names include the canonical domain name (CN) of the
+    #   certificate and additional domain names that can be used to connect
+    #   to the website.
+    #
+    #   When called by ListCertificates, this parameter will only return the
+    #   first 100 subject alternative names included in the certificate. To
+    #   display the full list of subject alternative names, use
+    #   DescribeCertificate.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] has_additional_subject_alternative_names
+    #   When called by ListCertificates, indicates whether the full list of
+    #   subject alternative names has been included in the response. If
+    #   false, the response includes all of the subject alternative names
+    #   included in the certificate. If true, the response only includes the
+    #   first 100 subject alternative names included in the certificate. To
+    #   display the full list of subject alternative names, use
+    #   DescribeCertificate.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] status
+    #   The status of the certificate.
+    #
+    #   A certificate enters status PENDING\_VALIDATION upon being
+    #   requested, unless it fails for any of the reasons given in the
+    #   troubleshooting topic [Certificate request fails][1]. ACM makes
+    #   repeated attempts to validate a certificate for 72 hours and then
+    #   times out. If a certificate shows status FAILED or
+    #   VALIDATION\_TIMED\_OUT, delete the request, correct the issue with
+    #   [DNS validation][2] or [Email validation][3], and try again. If
+    #   validation succeeds, the certificate enters status ISSUED.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/acm/latest/userguide/troubleshooting-failed.html
+    #   [2]: https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html
+    #   [3]: https://docs.aws.amazon.com/acm/latest/userguide/email-validation.html
+    #   @return [String]
+    #
+    # @!attribute [rw] type
+    #   The source of the certificate. For certificates provided by ACM,
+    #   this value is `AMAZON_ISSUED`. For certificates that you imported
+    #   with ImportCertificate, this value is `IMPORTED`. ACM does not
+    #   provide [managed renewal][1] for imported certificates. For more
+    #   information about the differences between certificates that you
+    #   import and those that ACM provides, see [Importing Certificates][2]
+    #   in the *Certificate Manager User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/acm/latest/userguide/acm-renewal.html
+    #   [2]: https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html
+    #   @return [String]
+    #
+    # @!attribute [rw] key_algorithm
+    #   The algorithm that was used to generate the public-private key pair.
+    #   @return [String]
+    #
+    # @!attribute [rw] key_usages
+    #   A list of Key Usage X.509 v3 extension objects. Each object is a
+    #   string value that identifies the purpose of the public key contained
+    #   in the certificate. Possible extension values include
+    #   DIGITAL\_SIGNATURE, KEY\_ENCHIPHERMENT, NON\_REPUDIATION, and more.
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] extended_key_usages
+    #   Contains a list of Extended Key Usage X.509 v3 extension objects.
+    #   Each object specifies a purpose for which the certificate public key
+    #   can be used and consists of a name and an object identifier (OID).
+    #   @return [Array<String>]
+    #
+    # @!attribute [rw] in_use
+    #   Indicates whether the certificate is currently in use by any Amazon
+    #   Web Services resources.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] exported
+    #   Indicates whether the certificate has been exported. This value
+    #   exists only when the certificate type is `PRIVATE`.
+    #   @return [Boolean]
+    #
+    # @!attribute [rw] renewal_eligibility
+    #   Specifies whether the certificate is eligible for renewal. At this
+    #   time, only exported private certificates can be renewed with the
+    #   RenewCertificate command.
+    #   @return [String]
+    #
+    # @!attribute [rw] not_before
+    #   The time before which the certificate is not valid.
+    #   @return [Time]
+    #
+    # @!attribute [rw] not_after
+    #   The time after which the certificate is not valid.
+    #   @return [Time]
+    #
+    # @!attribute [rw] created_at
+    #   The time at which the certificate was requested.
+    #   @return [Time]
+    #
+    # @!attribute [rw] issued_at
+    #   The time at which the certificate was issued. This value exists only
+    #   when the certificate type is `AMAZON_ISSUED`.
+    #   @return [Time]
+    #
+    # @!attribute [rw] imported_at
+    #   The date and time when the certificate was imported. This value
+    #   exists only when the certificate type is `IMPORTED`.
+    #   @return [Time]
+    #
+    # @!attribute [rw] revoked_at
+    #   The time at which the certificate was revoked. This value exists
+    #   only when the certificate status is `REVOKED`.
+    #   @return [Time]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/acm-2015-12-08/CertificateSummary AWS API Documentation
     #
     class CertificateSummary < Struct.new(
       :certificate_arn,
-      :domain_name)
+      :domain_name,
+      :subject_alternative_name_summaries,
+      :has_additional_subject_alternative_names,
+      :status,
+      :type,
+      :key_algorithm,
+      :key_usages,
+      :extended_key_usages,
+      :in_use,
+      :exported,
+      :renewal_eligibility,
+      :not_before,
+      :not_after,
+      :created_at,
+      :issued_at,
+      :imported_at,
+      :revoked_at)
       SENSITIVE = []
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DeleteCertificateRequest
-    #   data as a hash:
+    # You are trying to update a resource or configuration that is already
+    # being created or updated. Wait for the previous operation to finish
+    # and try again.
     #
-    #       {
-    #         certificate_arn: "Arn", # required
-    #       }
+    # @!attribute [rw] message
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/acm-2015-12-08/ConflictException AWS API Documentation
+    #
+    class ConflictException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] certificate_arn
     #   String that contains the ARN of the ACM certificate to be deleted.
     #   This must be of the form:
     #
     #   `arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012`
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs)
-    #   and AWS Service Namespaces][1].
+    #   For more information about ARNs, see [Amazon Resource Names
+    #   (ARNs)][1].
     #
     #
     #
@@ -344,21 +493,14 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass DescribeCertificateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         certificate_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] certificate_arn
     #   The Amazon Resource Name (ARN) of the ACM certificate. The ARN must
     #   have the following form:
     #
     #   `arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012`
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs)
-    #   and AWS Service Namespaces][1].
+    #   For more information about ARNs, see [Amazon Resource Names
+    #   (ARNs)][1].
     #
     #
     #
@@ -408,9 +550,9 @@ module Aws::ACM
     #
     #   * `PENDING_VALIDATION`
     #
-    #   * ``SUCCESS
+    #   * `SUCCESS`
     #
-    #   * ``FAILED
+    #   * `FAILED`
     #   @return [String]
     #
     # @!attribute [rw] resource_record
@@ -449,14 +591,6 @@ module Aws::ACM
     # Contains information about the domain names that you want ACM to use
     # to send you emails that enable you to validate domain ownership.
     #
-    # @note When making an API call, you may pass DomainValidationOption
-    #   data as a hash:
-    #
-    #       {
-    #         domain_name: "DomainNameString", # required
-    #         validation_domain: "DomainNameString", # required
-    #       }
-    #
     # @!attribute [rw] domain_name
     #   A fully qualified domain name (FQDN) in the certificate request.
     #   @return [String]
@@ -490,14 +624,25 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ExportCertificateRequest
-    #   data as a hash:
+    # Object containing expiration events options associated with an Amazon
+    # Web Services account.
     #
-    #       {
-    #         certificate_arn: "Arn", # required
-    #         passphrase: "data", # required
-    #       }
+    # @!attribute [rw] days_before_expiry
+    #   Specifies the number of days prior to certificate expiration when
+    #   ACM starts generating `EventBridge` events. ACM sends one event per
+    #   day per certificate until the certificate expires. By default,
+    #   accounts receive events starting 45 days before certificate
+    #   expiration.
+    #   @return [Integer]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/acm-2015-12-08/ExpiryEventsConfiguration AWS API Documentation
+    #
+    class ExpiryEventsConfiguration < Struct.new(
+      :days_before_expiry)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] certificate_arn
     #   An Amazon Resource Name (ARN) of the issued certificate. This must
     #   be of the form:
@@ -506,10 +651,17 @@ module Aws::ACM
     #   @return [String]
     #
     # @!attribute [rw] passphrase
-    #   Passphrase to associate with the encrypted exported private key. If
-    #   you want to later decrypt the private key, you must have the
+    #   Passphrase to associate with the encrypted exported private key.
+    #
+    #   <note markdown="1"> When creating your passphrase, you can use any ASCII character
+    #   except #, $, or %.
+    #
+    #    </note>
+    #
+    #   If you want to later decrypt the private key, you must have the
     #   passphrase. You can use the following OpenSSL command to decrypt a
-    #   private key:
+    #   private key. After entering the command, you are prompted for the
+    #   passphrase.
     #
     #   `openssl rsa -in encrypted_key.pem -out decrypted_key.pem`
     #   @return [String]
@@ -592,15 +744,6 @@ module Aws::ACM
     # This structure can be used in the ListCertificates action to filter
     # the output of the certificate list.
     #
-    # @note When making an API call, you may pass Filters
-    #   data as a hash:
-    #
-    #       {
-    #         extended_key_usage: ["TLS_WEB_SERVER_AUTHENTICATION"], # accepts TLS_WEB_SERVER_AUTHENTICATION, TLS_WEB_CLIENT_AUTHENTICATION, CODE_SIGNING, EMAIL_PROTECTION, TIME_STAMPING, OCSP_SIGNING, IPSEC_END_SYSTEM, IPSEC_TUNNEL, IPSEC_USER, ANY, NONE, CUSTOM
-    #         key_usage: ["DIGITAL_SIGNATURE"], # accepts DIGITAL_SIGNATURE, NON_REPUDIATION, KEY_ENCIPHERMENT, DATA_ENCIPHERMENT, KEY_AGREEMENT, CERTIFICATE_SIGNING, CRL_SIGNING, ENCIPHER_ONLY, DECIPHER_ONLY, ANY, CUSTOM
-    #         key_types: ["RSA_2048"], # accepts RSA_2048, RSA_1024, RSA_4096, EC_prime256v1, EC_secp384r1, EC_secp521r1
-    #       }
-    #
     # @!attribute [rw] extended_key_usage
     #   Specify one or more ExtendedKeyUsage extension values.
     #   @return [Array<String>]
@@ -613,10 +756,11 @@ module Aws::ACM
     #   Specify one or more algorithms that can be used to generate key
     #   pairs.
     #
-    #   Default filtering returns only `RSA_2048` certificates. To return
-    #   other certificate types, provide the desired type signatures in a
+    #   Default filtering returns only `RSA_1024` and `RSA_2048`
+    #   certificates that have at least one domain. To return other
+    #   certificate types, provide the desired type signatures in a
     #   comma-separated list. For example, `"keyTypes":
-    #   ["RSA_2048,RSA_4096"]` returns both `RSA_2048` and `RSA_4096`
+    #   ["RSA_2048","RSA_4096"]` returns both `RSA_2048` and `RSA_4096`
     #   certificates.
     #   @return [Array<String>]
     #
@@ -630,20 +774,26 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass GetCertificateRequest
-    #   data as a hash:
+    # @!attribute [rw] expiry_events
+    #   Expiration events configuration options associated with the Amazon
+    #   Web Services account.
+    #   @return [Types::ExpiryEventsConfiguration]
     #
-    #       {
-    #         certificate_arn: "Arn", # required
-    #       }
+    # @see http://docs.aws.amazon.com/goto/WebAPI/acm-2015-12-08/GetAccountConfigurationResponse AWS API Documentation
     #
+    class GetAccountConfigurationResponse < Struct.new(
+      :expiry_events)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] certificate_arn
     #   String that contains a certificate ARN in the following format:
     #
     #   `arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012`
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs)
-    #   and AWS Service Namespaces][1].
+    #   For more information about ARNs, see [Amazon Resource Names
+    #   (ARNs)][1].
     #
     #
     #
@@ -678,22 +828,6 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ImportCertificateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         certificate_arn: "Arn",
-    #         certificate: "data", # required
-    #         private_key: "data", # required
-    #         certificate_chain: "data",
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] certificate_arn
     #   The [Amazon Resource Name (ARN)][1] of an imported certificate to
     #   replace. To import a new certificate, omit this field.
@@ -860,20 +994,6 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListCertificatesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         certificate_statuses: ["PENDING_VALIDATION"], # accepts PENDING_VALIDATION, ISSUED, INACTIVE, EXPIRED, VALIDATION_TIMED_OUT, REVOKED, FAILED
-    #         includes: {
-    #           extended_key_usage: ["TLS_WEB_SERVER_AUTHENTICATION"], # accepts TLS_WEB_SERVER_AUTHENTICATION, TLS_WEB_CLIENT_AUTHENTICATION, CODE_SIGNING, EMAIL_PROTECTION, TIME_STAMPING, OCSP_SIGNING, IPSEC_END_SYSTEM, IPSEC_TUNNEL, IPSEC_USER, ANY, NONE, CUSTOM
-    #           key_usage: ["DIGITAL_SIGNATURE"], # accepts DIGITAL_SIGNATURE, NON_REPUDIATION, KEY_ENCIPHERMENT, DATA_ENCIPHERMENT, KEY_AGREEMENT, CERTIFICATE_SIGNING, CRL_SIGNING, ENCIPHER_ONLY, DECIPHER_ONLY, ANY, CUSTOM
-    #           key_types: ["RSA_2048"], # accepts RSA_2048, RSA_1024, RSA_4096, EC_prime256v1, EC_secp384r1, EC_secp521r1
-    #         },
-    #         next_token: "NextToken",
-    #         max_items: 1,
-    #       }
-    #
     # @!attribute [rw] certificate_statuses
     #   Filter the certificate list by status value.
     #   @return [Array<String>]
@@ -898,13 +1018,25 @@ module Aws::ACM
     #   retrieve additional items.
     #   @return [Integer]
     #
+    # @!attribute [rw] sort_by
+    #   Specifies the field to sort results by. If you specify `SortBy`, you
+    #   must also specify `SortOrder`.
+    #   @return [String]
+    #
+    # @!attribute [rw] sort_order
+    #   Specifies the order of sorted results. If you specify `SortOrder`,
+    #   you must also specify `SortBy`.
+    #   @return [String]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/acm-2015-12-08/ListCertificatesRequest AWS API Documentation
     #
     class ListCertificatesRequest < Struct.new(
       :certificate_statuses,
       :includes,
       :next_token,
-      :max_items)
+      :max_items,
+      :sort_by,
+      :sort_order)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -928,21 +1060,14 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ListTagsForCertificateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         certificate_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] certificate_arn
     #   String that contains the ARN of the ACM certificate for which you
     #   want to list the tags. This must have the following form:
     #
     #   `arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012`
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs)
-    #   and AWS Service Namespaces][1].
+    #   For more information about ARNs, see [Amazon Resource Names
+    #   (ARNs)][1].
     #
     #
     #
@@ -969,27 +1094,36 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RemoveTagsFromCertificateRequest
-    #   data as a hash:
+    # @!attribute [rw] expiry_events
+    #   Specifies expiration events associated with an account.
+    #   @return [Types::ExpiryEventsConfiguration]
     #
-    #       {
-    #         certificate_arn: "Arn", # required
-    #         tags: [ # required
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
+    # @!attribute [rw] idempotency_token
+    #   Customer-chosen string used to distinguish between calls to
+    #   `PutAccountConfiguration`. Idempotency tokens time out after one
+    #   hour. If you call `PutAccountConfiguration` multiple times with the
+    #   same unexpired idempotency token, ACM treats it as the same request
+    #   and returns the original result. If you change the idempotency token
+    #   for each call, ACM treats each call as a new request.
+    #   @return [String]
     #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/acm-2015-12-08/PutAccountConfigurationRequest AWS API Documentation
+    #
+    class PutAccountConfigurationRequest < Struct.new(
+      :expiry_events,
+      :idempotency_token)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # @!attribute [rw] certificate_arn
     #   String that contains the ARN of the ACM Certificate with one or more
     #   tags that you want to remove. This must be of the form:
     #
     #   `arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012`
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs)
-    #   and AWS Service Namespaces][1].
+    #   For more information about ARNs, see [Amazon Resource Names
+    #   (ARNs)][1].
     #
     #
     #
@@ -1009,21 +1143,14 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RenewCertificateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         certificate_arn: "Arn", # required
-    #       }
-    #
     # @!attribute [rw] certificate_arn
     #   String that contains the ARN of the ACM certificate to be renewed.
     #   This must be of the form:
     #
     #   `arn:aws:acm:region:123456789012:certificate/12345678-1234-1234-1234-123456789012`
     #
-    #   For more information about ARNs, see [Amazon Resource Names (ARNs)
-    #   and AWS Service Namespaces][1].
+    #   For more information about ARNs, see [Amazon Resource Names
+    #   (ARNs)][1].
     #
     #
     #
@@ -1085,32 +1212,6 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass RequestCertificateRequest
-    #   data as a hash:
-    #
-    #       {
-    #         domain_name: "DomainNameString", # required
-    #         validation_method: "EMAIL", # accepts EMAIL, DNS
-    #         subject_alternative_names: ["DomainNameString"],
-    #         idempotency_token: "IdempotencyToken",
-    #         domain_validation_options: [
-    #           {
-    #             domain_name: "DomainNameString", # required
-    #             validation_domain: "DomainNameString", # required
-    #           },
-    #         ],
-    #         options: {
-    #           certificate_transparency_logging_preference: "ENABLED", # accepts ENABLED, DISABLED
-    #         },
-    #         certificate_authority_arn: "Arn",
-    #         tags: [
-    #           {
-    #             key: "TagKey", # required
-    #             value: "TagValue",
-    #           },
-    #         ],
-    #       }
-    #
     # @!attribute [rw] domain_name
     #   Fully qualified domain name (FQDN), such as www.example.com, that
     #   you want to secure with an ACM certificate. Use an asterisk (*) to
@@ -1118,9 +1219,15 @@ module Aws::ACM
     #   same domain. For example, *.example.com protects www.example.com,
     #   site.example.com, and images.example.com.
     #
-    #   The first domain name you enter cannot exceed 64 octets, including
-    #   periods. Each subsequent Subject Alternative Name (SAN), however,
-    #   can be up to 253 octets in length.
+    #   In compliance with [RFC 5280][1], the length of the domain name
+    #   (technically, the Common Name) that you provide cannot exceed 64
+    #   octets (characters), including periods. To add a longer domain name,
+    #   specify it in the Subject Alternative Name field, which supports
+    #   names up to 253 octets in length.
+    #
+    #
+    #
+    #   [1]: https://datatracker.ietf.org/doc/html/rfc5280
     #   @return [String]
     #
     # @!attribute [rw] validation_method
@@ -1200,20 +1307,59 @@ module Aws::ACM
     #   (CA) that will be used to issue the certificate. If you do not
     #   provide an ARN and you are trying to request a private certificate,
     #   ACM will attempt to issue a public certificate. For more information
-    #   about private CAs, see the [AWS Certificate Manager Private
-    #   Certificate Authority (PCA)][1] user guide. The ARN must have the
-    #   following form:
+    #   about private CAs, see the [Amazon Web Services Private Certificate
+    #   Authority][1] user guide. The ARN must have the following form:
     #
     #   `arn:aws:acm-pca:region:account:certificate-authority/12345678-1234-1234-1234-123456789012`
     #
     #
     #
-    #   [1]: https://docs.aws.amazon.com/acm-pca/latest/userguide/PcaWelcome.html
+    #   [1]: https://docs.aws.amazon.com/privateca/latest/userguide/PcaWelcome.html
     #   @return [String]
     #
     # @!attribute [rw] tags
     #   One or more resource tags to associate with the certificate.
     #   @return [Array<Types::Tag>]
+    #
+    # @!attribute [rw] key_algorithm
+    #   Specifies the algorithm of the public and private key pair that your
+    #   certificate uses to encrypt data. RSA is the default key algorithm
+    #   for ACM certificates. Elliptic Curve Digital Signature Algorithm
+    #   (ECDSA) keys are smaller, offering security comparable to RSA keys
+    #   but with greater computing efficiency. However, ECDSA is not
+    #   supported by all network clients. Some Amazon Web Services services
+    #   may require RSA keys, or only support ECDSA keys of a particular
+    #   size, while others allow the use of either RSA and ECDSA keys to
+    #   ensure that compatibility is not broken. Check the requirements for
+    #   the Amazon Web Services service where you plan to deploy your
+    #   certificate. For more information about selecting an algorithm, see
+    #   [Key algorithms][1].
+    #
+    #   <note markdown="1"> Algorithms supported for an ACM certificate request include:
+    #
+    #    * `RSA_2048`
+    #
+    #   * `EC_prime256v1`
+    #
+    #   * `EC_secp384r1`
+    #
+    #    Other listed algorithms are for imported certificates only.
+    #
+    #    </note>
+    #
+    #   <note markdown="1"> When you request a private PKI certificate signed by a CA from
+    #   Amazon Web Services Private CA, the specified signing algorithm
+    #   family (RSA or ECDSA) must match the algorithm family of the CA's
+    #   secret key.
+    #
+    #    </note>
+    #
+    #   Default: RSA\_2048
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/acm/latest/userguide/acm-certificate.html#algorithms
+    #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/acm-2015-12-08/RequestCertificateRequest AWS API Documentation
     #
@@ -1225,7 +1371,8 @@ module Aws::ACM
       :domain_validation_options,
       :options,
       :certificate_authority_arn,
-      :tags)
+      :tags,
+      :key_algorithm)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -1259,15 +1406,6 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass ResendValidationEmailRequest
-    #   data as a hash:
-    #
-    #       {
-    #         certificate_arn: "Arn", # required
-    #         domain: "DomainNameString", # required
-    #         validation_domain: "DomainNameString", # required
-    #       }
-    #
     # @!attribute [rw] certificate_arn
     #   String that contains the ARN of the requested certificate. The
     #   certificate ARN is generated and returned by the RequestCertificate
@@ -1314,8 +1452,8 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # The certificate is in use by another AWS service in the caller's
-    # account. Remove the association and try again.
+    # The certificate is in use by another Amazon Web Services service in
+    # the caller's account. Remove the association and try again.
     #
     # @!attribute [rw] message
     #   @return [String]
@@ -1342,9 +1480,8 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # Contains a DNS record value that you can use to can use to validate
-    # ownership or control of a domain. This is used by the
-    # DescribeCertificate action.
+    # Contains a DNS record value that you can use to validate ownership or
+    # control of a domain. This is used by the DescribeCertificate action.
     #
     # @!attribute [rw] name
     #   The name of the DNS record to create in your domain. This is
@@ -1372,14 +1509,6 @@ module Aws::ACM
 
     # A key-value pair that identifies or specifies metadata about an ACM
     # resource.
-    #
-    # @note When making an API call, you may pass Tag
-    #   data as a hash:
-    #
-    #       {
-    #         key: "TagKey", # required
-    #         value: "TagValue",
-    #       }
     #
     # @!attribute [rw] key
     #   The key of the tag.
@@ -1412,6 +1541,19 @@ module Aws::ACM
       include Aws::Structure
     end
 
+    # The request was denied because it exceeded a quota.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/acm-2015-12-08/ThrottlingException AWS API Documentation
+    #
+    class ThrottlingException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
     # The request contains too many tags. Try the request again with fewer
     # tags.
     #
@@ -1426,16 +1568,6 @@ module Aws::ACM
       include Aws::Structure
     end
 
-    # @note When making an API call, you may pass UpdateCertificateOptionsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         certificate_arn: "Arn", # required
-    #         options: { # required
-    #           certificate_transparency_logging_preference: "ENABLED", # accepts ENABLED, DISABLED
-    #         },
-    #       }
-    #
     # @!attribute [rw] certificate_arn
     #   ARN of the requested certificate to update. This must be of the
     #   form:
@@ -1462,5 +1594,20 @@ module Aws::ACM
       include Aws::Structure
     end
 
+    # The supplied input failed to satisfy constraints of an Amazon Web
+    # Services service.
+    #
+    # @!attribute [rw] message
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/acm-2015-12-08/ValidationException AWS API Documentation
+    #
+    class ValidationException < Struct.new(
+      :message)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
   end
 end
+

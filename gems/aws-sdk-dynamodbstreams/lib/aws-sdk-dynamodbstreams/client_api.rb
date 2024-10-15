@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::DynamoDBStreams
   # @api private
@@ -210,9 +211,11 @@ module Aws::DynamoDBStreams
 
       api.metadata = {
         "apiVersion" => "2012-08-10",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "streams.dynamodb",
         "jsonVersion" => "1.0",
         "protocol" => "json",
+        "protocols" => ["json"],
         "serviceFullName" => "Amazon DynamoDB Streams",
         "serviceId" => "DynamoDB Streams",
         "signatureVersion" => "v4",

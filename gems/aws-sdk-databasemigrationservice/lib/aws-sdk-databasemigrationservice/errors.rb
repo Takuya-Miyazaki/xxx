@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -28,8 +28,11 @@ module Aws::DatabaseMigrationService
   #
   # ## Error Classes
   # * {AccessDeniedFault}
+  # * {CollectorNotFoundFault}
+  # * {FailedDependencyFault}
   # * {InsufficientResourceCapacityFault}
   # * {InvalidCertificateFault}
+  # * {InvalidOperationFault}
   # * {InvalidResourceStateFault}
   # * {InvalidSubnet}
   # * {KMSAccessDeniedFault}
@@ -72,6 +75,36 @@ module Aws::DatabaseMigrationService
       end
     end
 
+    class CollectorNotFoundFault < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::DatabaseMigrationService::Types::CollectorNotFoundFault] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class FailedDependencyFault < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::DatabaseMigrationService::Types::FailedDependencyFault] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class InsufficientResourceCapacityFault < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -92,6 +125,21 @@ module Aws::DatabaseMigrationService
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::DatabaseMigrationService::Types::InvalidCertificateFault] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class InvalidOperationFault < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::DatabaseMigrationService::Types::InvalidOperationFault] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

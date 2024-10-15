@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-managedblockchain/types'
-require_relative 'aws-sdk-managedblockchain/client_api'
-require_relative 'aws-sdk-managedblockchain/client'
-require_relative 'aws-sdk-managedblockchain/errors'
-require_relative 'aws-sdk-managedblockchain/resource'
-require_relative 'aws-sdk-managedblockchain/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:managedblockchain)
 
 # This module provides support for Amazon Managed Blockchain. This module is available in the
 # `aws-sdk-managedblockchain` gem.
@@ -28,7 +23,7 @@ require_relative 'aws-sdk-managedblockchain/customizations'
 # structure.
 #
 #     managed_blockchain = Aws::ManagedBlockchain::Client.new
-#     resp = managed_blockchain.create_member(params)
+#     resp = managed_blockchain.create_accessor(params)
 #
 # See {Client} for more information.
 #
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-managedblockchain/customizations'
 #
 # @!group service
 module Aws::ManagedBlockchain
+  autoload :Types, 'aws-sdk-managedblockchain/types'
+  autoload :ClientApi, 'aws-sdk-managedblockchain/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-managedblockchain/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-managedblockchain/client'
+  autoload :Errors, 'aws-sdk-managedblockchain/errors'
+  autoload :Resource, 'aws-sdk-managedblockchain/resource'
+  autoload :EndpointParameters, 'aws-sdk-managedblockchain/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-managedblockchain/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-managedblockchain/endpoints'
 
-  GEM_VERSION = '1.18.0'
+  GEM_VERSION = '1.63.0'
 
 end
+
+require_relative 'aws-sdk-managedblockchain/customizations'

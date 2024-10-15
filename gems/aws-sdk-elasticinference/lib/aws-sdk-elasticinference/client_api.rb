@@ -3,9 +3,10 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
+
 
 module Aws::ElasticInference
   # @api private
@@ -172,9 +173,11 @@ module Aws::ElasticInference
 
       api.metadata = {
         "apiVersion" => "2017-07-25",
+        "auth" => ["aws.auth#sigv4"],
         "endpointPrefix" => "api.elastic-inference",
         "jsonVersion" => "1.1",
         "protocol" => "rest-json",
+        "protocols" => ["rest-json"],
         "serviceAbbreviation" => "Amazon Elastic Inference",
         "serviceFullName" => "Amazon Elastic  Inference",
         "serviceId" => "Elastic Inference",

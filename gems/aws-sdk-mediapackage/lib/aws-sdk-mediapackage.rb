@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-mediapackage/types'
-require_relative 'aws-sdk-mediapackage/client_api'
-require_relative 'aws-sdk-mediapackage/client'
-require_relative 'aws-sdk-mediapackage/errors'
-require_relative 'aws-sdk-mediapackage/resource'
-require_relative 'aws-sdk-mediapackage/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:mediapackage)
 
 # This module provides support for AWS Elemental MediaPackage. This module is available in the
 # `aws-sdk-mediapackage` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-mediapackage/customizations'
 #
 # @!group service
 module Aws::MediaPackage
+  autoload :Types, 'aws-sdk-mediapackage/types'
+  autoload :ClientApi, 'aws-sdk-mediapackage/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-mediapackage/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-mediapackage/client'
+  autoload :Errors, 'aws-sdk-mediapackage/errors'
+  autoload :Resource, 'aws-sdk-mediapackage/resource'
+  autoload :EndpointParameters, 'aws-sdk-mediapackage/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-mediapackage/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-mediapackage/endpoints'
 
-  GEM_VERSION = '1.36.0'
+  GEM_VERSION = '1.82.0'
 
 end
+
+require_relative 'aws-sdk-mediapackage/customizations'

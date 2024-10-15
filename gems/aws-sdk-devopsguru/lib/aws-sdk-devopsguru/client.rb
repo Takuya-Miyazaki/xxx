@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/rest_json.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:devopsguru)
 
 module Aws::DevOpsGuru
   # An API client for DevOpsGuru.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::DevOpsGuru
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::RestJson)
+    add_plugin(Aws::DevOpsGuru::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::DevOpsGuru
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::DevOpsGuru
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::DevOpsGuru
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::DevOpsGuru
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::DevOpsGuru
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,10 +306,24 @@ module Aws::DevOpsGuru
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
+    #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -275,51 +334,112 @@ module Aws::DevOpsGuru
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::DevOpsGuru::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::DevOpsGuru::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -332,15 +452,17 @@ module Aws::DevOpsGuru
     # insight is generated.
     #
     # If you use an Amazon SNS topic in another account, you must attach a
-    # policy to it that grants DevOps Guru permission to it notifications.
-    # DevOps Guru adds the required policy on your behalf to send
-    # notifications using Amazon SNS in your account. For more information,
-    # see [Permissions for cross account Amazon SNS topics][1].
+    # policy to it that grants DevOps Guru permission to send it
+    # notifications. DevOps Guru adds the required policy on your behalf to
+    # send notifications using Amazon SNS in your account. DevOps Guru only
+    # supports standard SNS topics. For more information, see [Permissions
+    # for Amazon SNS topics][1].
     #
-    # If you use an Amazon SNS topic that is encrypted by an AWS Key
-    # Management Service customer-managed key (CMK), then you must add
-    # permissions to the CMK. For more information, see [Permissions for AWS
-    # KMS–encrypted Amazon SNS topics][2].
+    # If you use an Amazon SNS topic that is encrypted by an Amazon Web
+    # Services Key Management Service customer-managed key (CMK), then you
+    # must add permissions to the CMK. For more information, see
+    # [Permissions for Amazon Web Services KMS–encrypted Amazon SNS
+    # topics][2].
     #
     #
     #
@@ -363,6 +485,10 @@ module Aws::DevOpsGuru
     #       sns: { # required
     #         topic_arn: "TopicArn",
     #       },
+    #       filters: {
+    #         severities: ["LOW"], # accepts LOW, MEDIUM, HIGH
+    #         message_types: ["NEW_INSIGHT"], # accepts NEW_INSIGHT, CLOSED_INSIGHT, NEW_ASSOCIATION, SEVERITY_UPGRADED, NEW_RECOMMENDATION
+    #       },
     #     },
     #   })
     #
@@ -379,10 +505,33 @@ module Aws::DevOpsGuru
       req.send_request(options)
     end
 
+    # Deletes the insight along with the associated anomalies, events and
+    # recommendations.
+    #
+    # @option params [required, String] :id
+    #   The ID of the insight.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_insight({
+    #     id: "InsightId", # required
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DeleteInsight AWS API Documentation
+    #
+    # @overload delete_insight(params = {})
+    # @param [Hash] params ({})
+    def delete_insight(params = {}, options = {})
+      req = build_request(:delete_insight, params)
+      req.send_request(options)
+    end
+
     # Returns the number of open reactive insights, the number of open
-    # proactive insights, and the number of metrics analyzed in your AWS
-    # account. Use these numbers to gauge the health of operations in your
-    # AWS account.
+    # proactive insights, and the number of metrics analyzed in your Amazon
+    # Web Services account. Use these numbers to gauge the health of
+    # operations in your Amazon Web Services account.
     #
     # @return [Types::DescribeAccountHealthResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -390,6 +539,7 @@ module Aws::DevOpsGuru
     #   * {Types::DescribeAccountHealthResponse#open_proactive_insights #open_proactive_insights} => Integer
     #   * {Types::DescribeAccountHealthResponse#metrics_analyzed #metrics_analyzed} => Integer
     #   * {Types::DescribeAccountHealthResponse#resource_hours #resource_hours} => Integer
+    #   * {Types::DescribeAccountHealthResponse#analyzed_resource_count #analyzed_resource_count} => Integer
     #
     # @example Response structure
     #
@@ -397,6 +547,7 @@ module Aws::DevOpsGuru
     #   resp.open_proactive_insights #=> Integer
     #   resp.metrics_analyzed #=> Integer
     #   resp.resource_hours #=> Integer
+    #   resp.analyzed_resource_count #=> Integer
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DescribeAccountHealth AWS API Documentation
     #
@@ -456,6 +607,9 @@ module Aws::DevOpsGuru
     # @option params [required, String] :id
     #   The ID of the anomaly.
     #
+    # @option params [String] :account_id
+    #   The ID of the member account.
+    #
     # @return [Types::DescribeAnomalyResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DescribeAnomalyResponse#proactive_anomaly #proactive_anomaly} => Types::ProactiveAnomaly
@@ -465,6 +619,7 @@ module Aws::DevOpsGuru
     #
     #   resp = client.describe_anomaly({
     #     id: "AnomalyId", # required
+    #     account_id: "AwsAccountId",
     #   })
     #
     # @example Response structure
@@ -475,6 +630,8 @@ module Aws::DevOpsGuru
     #   resp.proactive_anomaly.update_time #=> Time
     #   resp.proactive_anomaly.anomaly_time_range.start_time #=> Time
     #   resp.proactive_anomaly.anomaly_time_range.end_time #=> Time
+    #   resp.proactive_anomaly.anomaly_reported_time_range.open_time #=> Time
+    #   resp.proactive_anomaly.anomaly_reported_time_range.close_time #=> Time
     #   resp.proactive_anomaly.prediction_time_range.start_time #=> Time
     #   resp.proactive_anomaly.prediction_time_range.end_time #=> Time
     #   resp.proactive_anomaly.source_details.cloud_watch_metrics #=> Array
@@ -486,15 +643,58 @@ module Aws::DevOpsGuru
     #   resp.proactive_anomaly.source_details.cloud_watch_metrics[0].stat #=> String, one of "Sum", "Average", "SampleCount", "Minimum", "Maximum", "p99", "p90", "p50"
     #   resp.proactive_anomaly.source_details.cloud_watch_metrics[0].unit #=> String
     #   resp.proactive_anomaly.source_details.cloud_watch_metrics[0].period #=> Integer
+    #   resp.proactive_anomaly.source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list #=> Array
+    #   resp.proactive_anomaly.source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list[0].timestamp #=> Time
+    #   resp.proactive_anomaly.source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list[0].metric_value #=> Float
+    #   resp.proactive_anomaly.source_details.cloud_watch_metrics[0].metric_data_summary.status_code #=> String, one of "Complete", "InternalError", "PartialData"
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics #=> Array
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].metric_display_name #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].unit #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].metric_query.metric #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].metric_query.group_by.group #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].metric_query.group_by.dimensions #=> Array
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].metric_query.group_by.dimensions[0] #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].metric_query.group_by.limit #=> Integer
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].metric_query.filter #=> Hash
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].metric_query.filter["PerformanceInsightsMetricFilterKey"] #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].reference_data #=> Array
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].name #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_scalar.value #=> Float
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.metric #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.group #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.dimensions #=> Array
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.dimensions[0] #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.limit #=> Integer
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.filter #=> Hash
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.filter["PerformanceInsightsMetricFilterKey"] #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].stats_at_anomaly #=> Array
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].stats_at_anomaly[0].type #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].stats_at_anomaly[0].value #=> Float
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].stats_at_baseline #=> Array
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].stats_at_baseline[0].type #=> String
+    #   resp.proactive_anomaly.source_details.performance_insights_metrics[0].stats_at_baseline[0].value #=> Float
     #   resp.proactive_anomaly.associated_insight_id #=> String
     #   resp.proactive_anomaly.resource_collection.cloud_formation.stack_names #=> Array
     #   resp.proactive_anomaly.resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.proactive_anomaly.resource_collection.tags #=> Array
+    #   resp.proactive_anomaly.resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.proactive_anomaly.resource_collection.tags[0].tag_values #=> Array
+    #   resp.proactive_anomaly.resource_collection.tags[0].tag_values[0] #=> String
     #   resp.proactive_anomaly.limit #=> Float
+    #   resp.proactive_anomaly.source_metadata.source #=> String
+    #   resp.proactive_anomaly.source_metadata.source_resource_name #=> String
+    #   resp.proactive_anomaly.source_metadata.source_resource_type #=> String
+    #   resp.proactive_anomaly.anomaly_resources #=> Array
+    #   resp.proactive_anomaly.anomaly_resources[0].name #=> String
+    #   resp.proactive_anomaly.anomaly_resources[0].type #=> String
+    #   resp.proactive_anomaly.description #=> String
     #   resp.reactive_anomaly.id #=> String
     #   resp.reactive_anomaly.severity #=> String, one of "LOW", "MEDIUM", "HIGH"
     #   resp.reactive_anomaly.status #=> String, one of "ONGOING", "CLOSED"
     #   resp.reactive_anomaly.anomaly_time_range.start_time #=> Time
     #   resp.reactive_anomaly.anomaly_time_range.end_time #=> Time
+    #   resp.reactive_anomaly.anomaly_reported_time_range.open_time #=> Time
+    #   resp.reactive_anomaly.anomaly_reported_time_range.close_time #=> Time
     #   resp.reactive_anomaly.source_details.cloud_watch_metrics #=> Array
     #   resp.reactive_anomaly.source_details.cloud_watch_metrics[0].metric_name #=> String
     #   resp.reactive_anomaly.source_details.cloud_watch_metrics[0].namespace #=> String
@@ -504,9 +704,50 @@ module Aws::DevOpsGuru
     #   resp.reactive_anomaly.source_details.cloud_watch_metrics[0].stat #=> String, one of "Sum", "Average", "SampleCount", "Minimum", "Maximum", "p99", "p90", "p50"
     #   resp.reactive_anomaly.source_details.cloud_watch_metrics[0].unit #=> String
     #   resp.reactive_anomaly.source_details.cloud_watch_metrics[0].period #=> Integer
+    #   resp.reactive_anomaly.source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list #=> Array
+    #   resp.reactive_anomaly.source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list[0].timestamp #=> Time
+    #   resp.reactive_anomaly.source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list[0].metric_value #=> Float
+    #   resp.reactive_anomaly.source_details.cloud_watch_metrics[0].metric_data_summary.status_code #=> String, one of "Complete", "InternalError", "PartialData"
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics #=> Array
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].metric_display_name #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].unit #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].metric_query.metric #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].metric_query.group_by.group #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].metric_query.group_by.dimensions #=> Array
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].metric_query.group_by.dimensions[0] #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].metric_query.group_by.limit #=> Integer
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].metric_query.filter #=> Hash
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].metric_query.filter["PerformanceInsightsMetricFilterKey"] #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].reference_data #=> Array
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].name #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_scalar.value #=> Float
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.metric #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.group #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.dimensions #=> Array
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.dimensions[0] #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.limit #=> Integer
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.filter #=> Hash
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.filter["PerformanceInsightsMetricFilterKey"] #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].stats_at_anomaly #=> Array
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].stats_at_anomaly[0].type #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].stats_at_anomaly[0].value #=> Float
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].stats_at_baseline #=> Array
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].stats_at_baseline[0].type #=> String
+    #   resp.reactive_anomaly.source_details.performance_insights_metrics[0].stats_at_baseline[0].value #=> Float
     #   resp.reactive_anomaly.associated_insight_id #=> String
     #   resp.reactive_anomaly.resource_collection.cloud_formation.stack_names #=> Array
     #   resp.reactive_anomaly.resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.reactive_anomaly.resource_collection.tags #=> Array
+    #   resp.reactive_anomaly.resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.reactive_anomaly.resource_collection.tags[0].tag_values #=> Array
+    #   resp.reactive_anomaly.resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.reactive_anomaly.type #=> String, one of "CAUSAL", "CONTEXTUAL"
+    #   resp.reactive_anomaly.name #=> String
+    #   resp.reactive_anomaly.description #=> String
+    #   resp.reactive_anomaly.causal_anomaly_id #=> String
+    #   resp.reactive_anomaly.anomaly_resources #=> Array
+    #   resp.reactive_anomaly.anomaly_resources[0].name #=> String
+    #   resp.reactive_anomaly.anomaly_resources[0].type #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DescribeAnomaly AWS API Documentation
     #
@@ -517,10 +758,66 @@ module Aws::DevOpsGuru
       req.send_request(options)
     end
 
+    # Returns the integration status of services that are integrated with
+    # DevOps Guru as Consumer via EventBridge. The one service that can be
+    # integrated with DevOps Guru is Amazon CodeGuru Profiler, which can
+    # produce proactive recommendations which can be stored and viewed in
+    # DevOps Guru.
+    #
+    # @return [Types::DescribeEventSourcesConfigResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeEventSourcesConfigResponse#event_sources #event_sources} => Types::EventSourcesConfig
+    #
+    # @example Response structure
+    #
+    #   resp.event_sources.amazon_code_guru_profiler.status #=> String, one of "ENABLED", "DISABLED"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DescribeEventSourcesConfig AWS API Documentation
+    #
+    # @overload describe_event_sources_config(params = {})
+    # @param [Hash] params ({})
+    def describe_event_sources_config(params = {}, options = {})
+      req = build_request(:describe_event_sources_config, params)
+      req.send_request(options)
+    end
+
+    # Returns the most recent feedback submitted in the current Amazon Web
+    # Services account and Region.
+    #
+    # @option params [String] :insight_id
+    #   The ID of the insight for which the feedback was provided.
+    #
+    # @return [Types::DescribeFeedbackResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeFeedbackResponse#insight_feedback #insight_feedback} => Types::InsightFeedback
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_feedback({
+    #     insight_id: "InsightId",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.insight_feedback.id #=> String
+    #   resp.insight_feedback.feedback #=> String, one of "VALID_COLLECTION", "RECOMMENDATION_USEFUL", "ALERT_TOO_SENSITIVE", "DATA_NOISY_ANOMALY", "DATA_INCORRECT"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DescribeFeedback AWS API Documentation
+    #
+    # @overload describe_feedback(params = {})
+    # @param [Hash] params ({})
+    def describe_feedback(params = {}, options = {})
+      req = build_request(:describe_feedback, params)
+      req.send_request(options)
+    end
+
     # Returns details about an insight that you specify using its ID.
     #
     # @option params [required, String] :id
     #   The ID of the insight.
+    #
+    # @option params [String] :account_id
+    #   The ID of the member account in the organization.
     #
     # @return [Types::DescribeInsightResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -531,6 +828,7 @@ module Aws::DevOpsGuru
     #
     #   resp = client.describe_insight({
     #     id: "InsightId", # required
+    #     account_id: "AwsAccountId",
     #   })
     #
     # @example Response structure
@@ -545,7 +843,12 @@ module Aws::DevOpsGuru
     #   resp.proactive_insight.prediction_time_range.end_time #=> Time
     #   resp.proactive_insight.resource_collection.cloud_formation.stack_names #=> Array
     #   resp.proactive_insight.resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.proactive_insight.resource_collection.tags #=> Array
+    #   resp.proactive_insight.resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.proactive_insight.resource_collection.tags[0].tag_values #=> Array
+    #   resp.proactive_insight.resource_collection.tags[0].tag_values[0] #=> String
     #   resp.proactive_insight.ssm_ops_item_id #=> String
+    #   resp.proactive_insight.description #=> String
     #   resp.reactive_insight.id #=> String
     #   resp.reactive_insight.name #=> String
     #   resp.reactive_insight.severity #=> String, one of "LOW", "MEDIUM", "HIGH"
@@ -554,7 +857,12 @@ module Aws::DevOpsGuru
     #   resp.reactive_insight.insight_time_range.end_time #=> Time
     #   resp.reactive_insight.resource_collection.cloud_formation.stack_names #=> Array
     #   resp.reactive_insight.resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.reactive_insight.resource_collection.tags #=> Array
+    #   resp.reactive_insight.resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.reactive_insight.resource_collection.tags[0].tag_values #=> Array
+    #   resp.reactive_insight.resource_collection.tags[0].tag_values[0] #=> String
     #   resp.reactive_insight.ssm_ops_item_id #=> String
+    #   resp.reactive_insight.description #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DescribeInsight AWS API Documentation
     #
@@ -565,18 +873,198 @@ module Aws::DevOpsGuru
       req.send_request(options)
     end
 
+    # Returns active insights, predictive insights, and resource hours
+    # analyzed in last hour.
+    #
+    # @option params [Array<String>] :account_ids
+    #   The ID of the Amazon Web Services account.
+    #
+    # @option params [Array<String>] :organizational_unit_ids
+    #   The ID of the organizational unit.
+    #
+    # @return [Types::DescribeOrganizationHealthResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeOrganizationHealthResponse#open_reactive_insights #open_reactive_insights} => Integer
+    #   * {Types::DescribeOrganizationHealthResponse#open_proactive_insights #open_proactive_insights} => Integer
+    #   * {Types::DescribeOrganizationHealthResponse#metrics_analyzed #metrics_analyzed} => Integer
+    #   * {Types::DescribeOrganizationHealthResponse#resource_hours #resource_hours} => Integer
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_organization_health({
+    #     account_ids: ["AwsAccountId"],
+    #     organizational_unit_ids: ["OrganizationalUnitId"],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.open_reactive_insights #=> Integer
+    #   resp.open_proactive_insights #=> Integer
+    #   resp.metrics_analyzed #=> Integer
+    #   resp.resource_hours #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DescribeOrganizationHealth AWS API Documentation
+    #
+    # @overload describe_organization_health(params = {})
+    # @param [Hash] params ({})
+    def describe_organization_health(params = {}, options = {})
+      req = build_request(:describe_organization_health, params)
+      req.send_request(options)
+    end
+
+    # Returns an overview of your organization's history based on the
+    # specified time range. The overview includes the total reactive and
+    # proactive insights.
+    #
+    # @option params [required, Time,DateTime,Date,Integer,String] :from_time
+    #   The start of the time range passed in. The start time granularity is
+    #   at the day level. The floor of the start time is used. Returned
+    #   information occurred after this day.
+    #
+    # @option params [Time,DateTime,Date,Integer,String] :to_time
+    #   The end of the time range passed in. The start time granularity is at
+    #   the day level. The floor of the start time is used. Returned
+    #   information occurred before this day. If this is not specified, then
+    #   the current day is used.
+    #
+    # @option params [Array<String>] :account_ids
+    #   The ID of the Amazon Web Services account.
+    #
+    # @option params [Array<String>] :organizational_unit_ids
+    #   The ID of the organizational unit.
+    #
+    # @return [Types::DescribeOrganizationOverviewResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeOrganizationOverviewResponse#reactive_insights #reactive_insights} => Integer
+    #   * {Types::DescribeOrganizationOverviewResponse#proactive_insights #proactive_insights} => Integer
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_organization_overview({
+    #     from_time: Time.now, # required
+    #     to_time: Time.now,
+    #     account_ids: ["AwsAccountId"],
+    #     organizational_unit_ids: ["OrganizationalUnitId"],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.reactive_insights #=> Integer
+    #   resp.proactive_insights #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DescribeOrganizationOverview AWS API Documentation
+    #
+    # @overload describe_organization_overview(params = {})
+    # @param [Hash] params ({})
+    def describe_organization_overview(params = {}, options = {})
+      req = build_request(:describe_organization_overview, params)
+      req.send_request(options)
+    end
+
+    # Provides an overview of your system's health. If additional member
+    # accounts are part of your organization, you can filter those accounts
+    # using the `AccountIds` field.
+    #
+    # @option params [required, String] :organization_resource_collection_type
+    #   An Amazon Web Services resource collection type. This type specifies
+    #   how analyzed Amazon Web Services resources are defined. The two types
+    #   of Amazon Web Services resource collections supported are Amazon Web
+    #   Services CloudFormation stacks and Amazon Web Services resources that
+    #   contain the same Amazon Web Services tag. DevOps Guru can be
+    #   configured to analyze the Amazon Web Services resources that are
+    #   defined in the stacks or that are tagged using the same tag *key*. You
+    #   can specify up to 500 Amazon Web Services CloudFormation stacks.
+    #
+    # @option params [Array<String>] :account_ids
+    #   The ID of the Amazon Web Services account.
+    #
+    # @option params [Array<String>] :organizational_unit_ids
+    #   The ID of the organizational unit.
+    #
+    # @option params [String] :next_token
+    #   The pagination token to use to retrieve the next page of results for
+    #   this operation. If this value is null, it retrieves the first page.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return with a single call. To
+    #   retrieve the remaining results, make another call with the returned
+    #   `nextToken` value.
+    #
+    # @return [Types::DescribeOrganizationResourceCollectionHealthResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeOrganizationResourceCollectionHealthResponse#cloud_formation #cloud_formation} => Array&lt;Types::CloudFormationHealth&gt;
+    #   * {Types::DescribeOrganizationResourceCollectionHealthResponse#service #service} => Array&lt;Types::ServiceHealth&gt;
+    #   * {Types::DescribeOrganizationResourceCollectionHealthResponse#account #account} => Array&lt;Types::AccountHealth&gt;
+    #   * {Types::DescribeOrganizationResourceCollectionHealthResponse#next_token #next_token} => String
+    #   * {Types::DescribeOrganizationResourceCollectionHealthResponse#tags #tags} => Array&lt;Types::TagHealth&gt;
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_organization_resource_collection_health({
+    #     organization_resource_collection_type: "AWS_CLOUD_FORMATION", # required, accepts AWS_CLOUD_FORMATION, AWS_SERVICE, AWS_ACCOUNT, AWS_TAGS
+    #     account_ids: ["AwsAccountId"],
+    #     organizational_unit_ids: ["OrganizationalUnitId"],
+    #     next_token: "UuidNextToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.cloud_formation #=> Array
+    #   resp.cloud_formation[0].stack_name #=> String
+    #   resp.cloud_formation[0].insight.open_proactive_insights #=> Integer
+    #   resp.cloud_formation[0].insight.open_reactive_insights #=> Integer
+    #   resp.cloud_formation[0].insight.mean_time_to_recover_in_milliseconds #=> Integer
+    #   resp.cloud_formation[0].analyzed_resource_count #=> Integer
+    #   resp.service #=> Array
+    #   resp.service[0].service_name #=> String, one of "API_GATEWAY", "APPLICATION_ELB", "AUTO_SCALING_GROUP", "CLOUD_FRONT", "DYNAMO_DB", "EC2", "ECS", "EKS", "ELASTIC_BEANSTALK", "ELASTI_CACHE", "ELB", "ES", "KINESIS", "LAMBDA", "NAT_GATEWAY", "NETWORK_ELB", "RDS", "REDSHIFT", "ROUTE_53", "S3", "SAGE_MAKER", "SNS", "SQS", "STEP_FUNCTIONS", "SWF"
+    #   resp.service[0].insight.open_proactive_insights #=> Integer
+    #   resp.service[0].insight.open_reactive_insights #=> Integer
+    #   resp.service[0].analyzed_resource_count #=> Integer
+    #   resp.account #=> Array
+    #   resp.account[0].account_id #=> String
+    #   resp.account[0].insight.open_proactive_insights #=> Integer
+    #   resp.account[0].insight.open_reactive_insights #=> Integer
+    #   resp.next_token #=> String
+    #   resp.tags #=> Array
+    #   resp.tags[0].app_boundary_key #=> String
+    #   resp.tags[0].tag_value #=> String
+    #   resp.tags[0].insight.open_proactive_insights #=> Integer
+    #   resp.tags[0].insight.open_reactive_insights #=> Integer
+    #   resp.tags[0].insight.mean_time_to_recover_in_milliseconds #=> Integer
+    #   resp.tags[0].analyzed_resource_count #=> Integer
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DescribeOrganizationResourceCollectionHealth AWS API Documentation
+    #
+    # @overload describe_organization_resource_collection_health(params = {})
+    # @param [Hash] params ({})
+    def describe_organization_resource_collection_health(params = {}, options = {})
+      req = build_request(:describe_organization_resource_collection_health, params)
+      req.send_request(options)
+    end
+
     # Returns the number of open proactive insights, open reactive insights,
     # and the Mean Time to Recover (MTTR) for all closed insights in
-    # resource collections in your account. You specify the type of AWS
-    # resources collection. The one type of AWS resource collection
-    # supported is AWS CloudFormation stacks. DevOps Guru can be configured
-    # to analyze only the AWS resources that are defined in the stacks.
+    # resource collections in your account. You specify the type of Amazon
+    # Web Services resources collection. The two types of Amazon Web
+    # Services resource collections supported are Amazon Web Services
+    # CloudFormation stacks and Amazon Web Services resources that contain
+    # the same Amazon Web Services tag. DevOps Guru can be configured to
+    # analyze the Amazon Web Services resources that are defined in the
+    # stacks or that are tagged using the same tag *key*. You can specify up
+    # to 500 Amazon Web Services CloudFormation stacks.
     #
     # @option params [required, String] :resource_collection_type
-    #   An AWS resource collection type. This type specifies how analyzed AWS
-    #   resources are defined. The one type of AWS resource collection
-    #   supported is AWS CloudFormation stacks. DevOps Guru can be configured
-    #   to analyze only the AWS resources that are defined in the stacks.
+    #   An Amazon Web Services resource collection type. This type specifies
+    #   how analyzed Amazon Web Services resources are defined. The two types
+    #   of Amazon Web Services resource collections supported are Amazon Web
+    #   Services CloudFormation stacks and Amazon Web Services resources that
+    #   contain the same Amazon Web Services tag. DevOps Guru can be
+    #   configured to analyze the Amazon Web Services resources that are
+    #   defined in the stacks or that are tagged using the same tag *key*. You
+    #   can specify up to 500 Amazon Web Services CloudFormation stacks.
     #
     # @option params [String] :next_token
     #   The pagination token to use to retrieve the next page of results for
@@ -585,14 +1073,16 @@ module Aws::DevOpsGuru
     # @return [Types::DescribeResourceCollectionHealthResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::DescribeResourceCollectionHealthResponse#cloud_formation #cloud_formation} => Array&lt;Types::CloudFormationHealth&gt;
+    #   * {Types::DescribeResourceCollectionHealthResponse#service #service} => Array&lt;Types::ServiceHealth&gt;
     #   * {Types::DescribeResourceCollectionHealthResponse#next_token #next_token} => String
+    #   * {Types::DescribeResourceCollectionHealthResponse#tags #tags} => Array&lt;Types::TagHealth&gt;
     #
     # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
     #
     # @example Request syntax with placeholder values
     #
     #   resp = client.describe_resource_collection_health({
-    #     resource_collection_type: "AWS_CLOUD_FORMATION", # required, accepts AWS_CLOUD_FORMATION
+    #     resource_collection_type: "AWS_CLOUD_FORMATION", # required, accepts AWS_CLOUD_FORMATION, AWS_SERVICE, AWS_TAGS
     #     next_token: "UuidNextToken",
     #   })
     #
@@ -603,7 +1093,20 @@ module Aws::DevOpsGuru
     #   resp.cloud_formation[0].insight.open_proactive_insights #=> Integer
     #   resp.cloud_formation[0].insight.open_reactive_insights #=> Integer
     #   resp.cloud_formation[0].insight.mean_time_to_recover_in_milliseconds #=> Integer
+    #   resp.cloud_formation[0].analyzed_resource_count #=> Integer
+    #   resp.service #=> Array
+    #   resp.service[0].service_name #=> String, one of "API_GATEWAY", "APPLICATION_ELB", "AUTO_SCALING_GROUP", "CLOUD_FRONT", "DYNAMO_DB", "EC2", "ECS", "EKS", "ELASTIC_BEANSTALK", "ELASTI_CACHE", "ELB", "ES", "KINESIS", "LAMBDA", "NAT_GATEWAY", "NETWORK_ELB", "RDS", "REDSHIFT", "ROUTE_53", "S3", "SAGE_MAKER", "SNS", "SQS", "STEP_FUNCTIONS", "SWF"
+    #   resp.service[0].insight.open_proactive_insights #=> Integer
+    #   resp.service[0].insight.open_reactive_insights #=> Integer
+    #   resp.service[0].analyzed_resource_count #=> Integer
     #   resp.next_token #=> String
+    #   resp.tags #=> Array
+    #   resp.tags[0].app_boundary_key #=> String
+    #   resp.tags[0].tag_value #=> String
+    #   resp.tags[0].insight.open_proactive_insights #=> Integer
+    #   resp.tags[0].insight.open_reactive_insights #=> Integer
+    #   resp.tags[0].insight.mean_time_to_recover_in_milliseconds #=> Integer
+    #   resp.tags[0].analyzed_resource_count #=> Integer
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DescribeResourceCollectionHealth AWS API Documentation
     #
@@ -616,8 +1119,8 @@ module Aws::DevOpsGuru
 
     # Returns the integration status of services that are integrated with
     # DevOps Guru. The one service that can be integrated with DevOps Guru
-    # is AWS Systems Manager, which can be used to create an OpsItem for
-    # each generated insight.
+    # is Amazon Web Services Systems Manager, which can be used to create an
+    # OpsItem for each generated insight.
     #
     # @return [Types::DescribeServiceIntegrationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -626,6 +1129,10 @@ module Aws::DevOpsGuru
     # @example Response structure
     #
     #   resp.service_integration.ops_center.opt_in_status #=> String, one of "ENABLED", "DISABLED"
+    #   resp.service_integration.logs_anomaly_detection.opt_in_status #=> String, one of "ENABLED", "DISABLED"
+    #   resp.service_integration.kms_server_side_encryption.kms_key_id #=> String
+    #   resp.service_integration.kms_server_side_encryption.opt_in_status #=> String, one of "ENABLED", "DISABLED"
+    #   resp.service_integration.kms_server_side_encryption.type #=> String, one of "CUSTOMER_MANAGED_KEY", "AWS_OWNED_KMS_KEY"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/DescribeServiceIntegration AWS API Documentation
     #
@@ -636,14 +1143,79 @@ module Aws::DevOpsGuru
       req.send_request(options)
     end
 
-    # Returns lists AWS resources that are of the specified resource
-    # collection type. The one type of AWS resource collection supported is
-    # AWS CloudFormation stacks. DevOps Guru can be configured to analyze
-    # only the AWS resources that are defined in the stacks.
+    # Returns an estimate of the monthly cost for DevOps Guru to analyze
+    # your Amazon Web Services resources. For more information, see
+    # [Estimate your Amazon DevOps Guru costs][1] and [Amazon DevOps Guru
+    # pricing][2].
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/devops-guru/latest/userguide/cost-estimate.html
+    # [2]: http://aws.amazon.com/devops-guru/pricing/
+    #
+    # @option params [String] :next_token
+    #   The pagination token to use to retrieve the next page of results for
+    #   this operation. If this value is null, it retrieves the first page.
+    #
+    # @return [Types::GetCostEstimationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetCostEstimationResponse#resource_collection #resource_collection} => Types::CostEstimationResourceCollectionFilter
+    #   * {Types::GetCostEstimationResponse#status #status} => String
+    #   * {Types::GetCostEstimationResponse#costs #costs} => Array&lt;Types::ServiceResourceCost&gt;
+    #   * {Types::GetCostEstimationResponse#time_range #time_range} => Types::CostEstimationTimeRange
+    #   * {Types::GetCostEstimationResponse#total_cost #total_cost} => Float
+    #   * {Types::GetCostEstimationResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_cost_estimation({
+    #     next_token: "UuidNextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.resource_collection.cloud_formation.stack_names #=> Array
+    #   resp.resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.resource_collection.tags #=> Array
+    #   resp.resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.resource_collection.tags[0].tag_values #=> Array
+    #   resp.resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.status #=> String, one of "ONGOING", "COMPLETED"
+    #   resp.costs #=> Array
+    #   resp.costs[0].type #=> String
+    #   resp.costs[0].state #=> String, one of "ACTIVE", "INACTIVE"
+    #   resp.costs[0].count #=> Integer
+    #   resp.costs[0].unit_cost #=> Float
+    #   resp.costs[0].cost #=> Float
+    #   resp.time_range.start_time #=> Time
+    #   resp.time_range.end_time #=> Time
+    #   resp.total_cost #=> Float
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/GetCostEstimation AWS API Documentation
+    #
+    # @overload get_cost_estimation(params = {})
+    # @param [Hash] params ({})
+    def get_cost_estimation(params = {}, options = {})
+      req = build_request(:get_cost_estimation, params)
+      req.send_request(options)
+    end
+
+    # Returns lists Amazon Web Services resources that are of the specified
+    # resource collection type. The two types of Amazon Web Services
+    # resource collections supported are Amazon Web Services CloudFormation
+    # stacks and Amazon Web Services resources that contain the same Amazon
+    # Web Services tag. DevOps Guru can be configured to analyze the Amazon
+    # Web Services resources that are defined in the stacks or that are
+    # tagged using the same tag *key*. You can specify up to 500 Amazon Web
+    # Services CloudFormation stacks.
     #
     # @option params [required, String] :resource_collection_type
-    #   The type of AWS resource collections to return. The one valid value is
-    #   `CLOUD_FORMATION` for AWS CloudFormation stacks.
+    #   The type of Amazon Web Services resource collections to return. The
+    #   one valid value is `CLOUD_FORMATION` for Amazon Web Services
+    #   CloudFormation stacks.
     #
     # @option params [String] :next_token
     #   The pagination token to use to retrieve the next page of results for
@@ -659,7 +1231,7 @@ module Aws::DevOpsGuru
     # @example Request syntax with placeholder values
     #
     #   resp = client.get_resource_collection({
-    #     resource_collection_type: "AWS_CLOUD_FORMATION", # required, accepts AWS_CLOUD_FORMATION
+    #     resource_collection_type: "AWS_CLOUD_FORMATION", # required, accepts AWS_CLOUD_FORMATION, AWS_SERVICE, AWS_TAGS
     #     next_token: "UuidNextToken",
     #   })
     #
@@ -667,6 +1239,10 @@ module Aws::DevOpsGuru
     #
     #   resp.resource_collection.cloud_formation.stack_names #=> Array
     #   resp.resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.resource_collection.tags #=> Array
+    #   resp.resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.resource_collection.tags[0].tag_values #=> Array
+    #   resp.resource_collection.tags[0].tag_values[0] #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/GetResourceCollection AWS API Documentation
@@ -697,6 +1273,12 @@ module Aws::DevOpsGuru
     #   The pagination token to use to retrieve the next page of results for
     #   this operation. If this value is null, it retrieves the first page.
     #
+    # @option params [String] :account_id
+    #   The ID of the Amazon Web Services account.
+    #
+    # @option params [Types::ListAnomaliesForInsightFilters] :filters
+    #   Specifies one or more service names that are used to list anomalies.
+    #
     # @return [Types::ListAnomaliesForInsightResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ListAnomaliesForInsightResponse#proactive_anomalies #proactive_anomalies} => Array&lt;Types::ProactiveAnomalySummary&gt;
@@ -715,6 +1297,12 @@ module Aws::DevOpsGuru
     #     },
     #     max_results: 1,
     #     next_token: "UuidNextToken",
+    #     account_id: "AwsAccountId",
+    #     filters: {
+    #       service_collection: {
+    #         service_names: ["API_GATEWAY"], # accepts API_GATEWAY, APPLICATION_ELB, AUTO_SCALING_GROUP, CLOUD_FRONT, DYNAMO_DB, EC2, ECS, EKS, ELASTIC_BEANSTALK, ELASTI_CACHE, ELB, ES, KINESIS, LAMBDA, NAT_GATEWAY, NETWORK_ELB, RDS, REDSHIFT, ROUTE_53, S3, SAGE_MAKER, SNS, SQS, STEP_FUNCTIONS, SWF
+    #       },
+    #     },
     #   })
     #
     # @example Response structure
@@ -726,6 +1314,8 @@ module Aws::DevOpsGuru
     #   resp.proactive_anomalies[0].update_time #=> Time
     #   resp.proactive_anomalies[0].anomaly_time_range.start_time #=> Time
     #   resp.proactive_anomalies[0].anomaly_time_range.end_time #=> Time
+    #   resp.proactive_anomalies[0].anomaly_reported_time_range.open_time #=> Time
+    #   resp.proactive_anomalies[0].anomaly_reported_time_range.close_time #=> Time
     #   resp.proactive_anomalies[0].prediction_time_range.start_time #=> Time
     #   resp.proactive_anomalies[0].prediction_time_range.end_time #=> Time
     #   resp.proactive_anomalies[0].source_details.cloud_watch_metrics #=> Array
@@ -737,16 +1327,59 @@ module Aws::DevOpsGuru
     #   resp.proactive_anomalies[0].source_details.cloud_watch_metrics[0].stat #=> String, one of "Sum", "Average", "SampleCount", "Minimum", "Maximum", "p99", "p90", "p50"
     #   resp.proactive_anomalies[0].source_details.cloud_watch_metrics[0].unit #=> String
     #   resp.proactive_anomalies[0].source_details.cloud_watch_metrics[0].period #=> Integer
+    #   resp.proactive_anomalies[0].source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list #=> Array
+    #   resp.proactive_anomalies[0].source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list[0].timestamp #=> Time
+    #   resp.proactive_anomalies[0].source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list[0].metric_value #=> Float
+    #   resp.proactive_anomalies[0].source_details.cloud_watch_metrics[0].metric_data_summary.status_code #=> String, one of "Complete", "InternalError", "PartialData"
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics #=> Array
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].metric_display_name #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].unit #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.metric #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.group_by.group #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.group_by.dimensions #=> Array
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.group_by.dimensions[0] #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.group_by.limit #=> Integer
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.filter #=> Hash
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.filter["PerformanceInsightsMetricFilterKey"] #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data #=> Array
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].name #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_scalar.value #=> Float
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.metric #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.group #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.dimensions #=> Array
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.dimensions[0] #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.limit #=> Integer
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.filter #=> Hash
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.filter["PerformanceInsightsMetricFilterKey"] #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_anomaly #=> Array
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_anomaly[0].type #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_anomaly[0].value #=> Float
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_baseline #=> Array
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_baseline[0].type #=> String
+    #   resp.proactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_baseline[0].value #=> Float
     #   resp.proactive_anomalies[0].associated_insight_id #=> String
     #   resp.proactive_anomalies[0].resource_collection.cloud_formation.stack_names #=> Array
     #   resp.proactive_anomalies[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.proactive_anomalies[0].resource_collection.tags #=> Array
+    #   resp.proactive_anomalies[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.proactive_anomalies[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.proactive_anomalies[0].resource_collection.tags[0].tag_values[0] #=> String
     #   resp.proactive_anomalies[0].limit #=> Float
+    #   resp.proactive_anomalies[0].source_metadata.source #=> String
+    #   resp.proactive_anomalies[0].source_metadata.source_resource_name #=> String
+    #   resp.proactive_anomalies[0].source_metadata.source_resource_type #=> String
+    #   resp.proactive_anomalies[0].anomaly_resources #=> Array
+    #   resp.proactive_anomalies[0].anomaly_resources[0].name #=> String
+    #   resp.proactive_anomalies[0].anomaly_resources[0].type #=> String
+    #   resp.proactive_anomalies[0].description #=> String
     #   resp.reactive_anomalies #=> Array
     #   resp.reactive_anomalies[0].id #=> String
     #   resp.reactive_anomalies[0].severity #=> String, one of "LOW", "MEDIUM", "HIGH"
     #   resp.reactive_anomalies[0].status #=> String, one of "ONGOING", "CLOSED"
     #   resp.reactive_anomalies[0].anomaly_time_range.start_time #=> Time
     #   resp.reactive_anomalies[0].anomaly_time_range.end_time #=> Time
+    #   resp.reactive_anomalies[0].anomaly_reported_time_range.open_time #=> Time
+    #   resp.reactive_anomalies[0].anomaly_reported_time_range.close_time #=> Time
     #   resp.reactive_anomalies[0].source_details.cloud_watch_metrics #=> Array
     #   resp.reactive_anomalies[0].source_details.cloud_watch_metrics[0].metric_name #=> String
     #   resp.reactive_anomalies[0].source_details.cloud_watch_metrics[0].namespace #=> String
@@ -756,9 +1389,50 @@ module Aws::DevOpsGuru
     #   resp.reactive_anomalies[0].source_details.cloud_watch_metrics[0].stat #=> String, one of "Sum", "Average", "SampleCount", "Minimum", "Maximum", "p99", "p90", "p50"
     #   resp.reactive_anomalies[0].source_details.cloud_watch_metrics[0].unit #=> String
     #   resp.reactive_anomalies[0].source_details.cloud_watch_metrics[0].period #=> Integer
+    #   resp.reactive_anomalies[0].source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list #=> Array
+    #   resp.reactive_anomalies[0].source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list[0].timestamp #=> Time
+    #   resp.reactive_anomalies[0].source_details.cloud_watch_metrics[0].metric_data_summary.timestamp_metric_value_pair_list[0].metric_value #=> Float
+    #   resp.reactive_anomalies[0].source_details.cloud_watch_metrics[0].metric_data_summary.status_code #=> String, one of "Complete", "InternalError", "PartialData"
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics #=> Array
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].metric_display_name #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].unit #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.metric #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.group_by.group #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.group_by.dimensions #=> Array
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.group_by.dimensions[0] #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.group_by.limit #=> Integer
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.filter #=> Hash
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].metric_query.filter["PerformanceInsightsMetricFilterKey"] #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data #=> Array
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].name #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_scalar.value #=> Float
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.metric #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.group #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.dimensions #=> Array
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.dimensions[0] #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.group_by.limit #=> Integer
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.filter #=> Hash
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].reference_data[0].comparison_values.reference_metric.metric_query.filter["PerformanceInsightsMetricFilterKey"] #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_anomaly #=> Array
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_anomaly[0].type #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_anomaly[0].value #=> Float
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_baseline #=> Array
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_baseline[0].type #=> String
+    #   resp.reactive_anomalies[0].source_details.performance_insights_metrics[0].stats_at_baseline[0].value #=> Float
     #   resp.reactive_anomalies[0].associated_insight_id #=> String
     #   resp.reactive_anomalies[0].resource_collection.cloud_formation.stack_names #=> Array
     #   resp.reactive_anomalies[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.reactive_anomalies[0].resource_collection.tags #=> Array
+    #   resp.reactive_anomalies[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.reactive_anomalies[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.reactive_anomalies[0].resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.reactive_anomalies[0].type #=> String, one of "CAUSAL", "CONTEXTUAL"
+    #   resp.reactive_anomalies[0].name #=> String
+    #   resp.reactive_anomalies[0].description #=> String
+    #   resp.reactive_anomalies[0].causal_anomaly_id #=> String
+    #   resp.reactive_anomalies[0].anomaly_resources #=> Array
+    #   resp.reactive_anomalies[0].anomaly_resources[0].name #=> String
+    #   resp.reactive_anomalies[0].anomaly_resources[0].type #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/ListAnomaliesForInsight AWS API Documentation
@@ -767,6 +1441,64 @@ module Aws::DevOpsGuru
     # @param [Hash] params ({})
     def list_anomalies_for_insight(params = {}, options = {})
       req = build_request(:list_anomalies_for_insight, params)
+      req.send_request(options)
+    end
+
+    # Returns the list of log groups that contain log anomalies.
+    #
+    # @option params [required, String] :insight_id
+    #   The ID of the insight containing the log groups.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return with a single call. To
+    #   retrieve the remaining results, make another call with the returned
+    #   `nextToken` value.
+    #
+    # @option params [String] :next_token
+    #   The pagination token to use to retrieve the next page of results for
+    #   this operation. If this value is null, it retrieves the first page.
+    #
+    # @return [Types::ListAnomalousLogGroupsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListAnomalousLogGroupsResponse#insight_id #insight_id} => String
+    #   * {Types::ListAnomalousLogGroupsResponse#anomalous_log_groups #anomalous_log_groups} => Array&lt;Types::AnomalousLogGroup&gt;
+    #   * {Types::ListAnomalousLogGroupsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_anomalous_log_groups({
+    #     insight_id: "InsightId", # required
+    #     max_results: 1,
+    #     next_token: "UuidNextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.insight_id #=> String
+    #   resp.anomalous_log_groups #=> Array
+    #   resp.anomalous_log_groups[0].log_group_name #=> String
+    #   resp.anomalous_log_groups[0].impact_start_time #=> Time
+    #   resp.anomalous_log_groups[0].impact_end_time #=> Time
+    #   resp.anomalous_log_groups[0].number_of_log_lines_scanned #=> Integer
+    #   resp.anomalous_log_groups[0].log_anomaly_showcases #=> Array
+    #   resp.anomalous_log_groups[0].log_anomaly_showcases[0].log_anomaly_classes #=> Array
+    #   resp.anomalous_log_groups[0].log_anomaly_showcases[0].log_anomaly_classes[0].log_stream_name #=> String
+    #   resp.anomalous_log_groups[0].log_anomaly_showcases[0].log_anomaly_classes[0].log_anomaly_type #=> String, one of "KEYWORD", "KEYWORD_TOKEN", "FORMAT", "HTTP_CODE", "BLOCK_FORMAT", "NUMERICAL_POINT", "NUMERICAL_NAN", "NEW_FIELD_NAME"
+    #   resp.anomalous_log_groups[0].log_anomaly_showcases[0].log_anomaly_classes[0].log_anomaly_token #=> String
+    #   resp.anomalous_log_groups[0].log_anomaly_showcases[0].log_anomaly_classes[0].log_event_id #=> String
+    #   resp.anomalous_log_groups[0].log_anomaly_showcases[0].log_anomaly_classes[0].explanation #=> String
+    #   resp.anomalous_log_groups[0].log_anomaly_showcases[0].log_anomaly_classes[0].number_of_log_lines_occurrences #=> Integer
+    #   resp.anomalous_log_groups[0].log_anomaly_showcases[0].log_anomaly_classes[0].log_event_timestamp #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/ListAnomalousLogGroups AWS API Documentation
+    #
+    # @overload list_anomalous_log_groups(params = {})
+    # @param [Hash] params ({})
+    def list_anomalous_log_groups(params = {}, options = {})
+      req = build_request(:list_anomalous_log_groups, params)
       req.send_request(options)
     end
 
@@ -785,6 +1517,9 @@ module Aws::DevOpsGuru
     # @option params [String] :next_token
     #   The pagination token to use to retrieve the next page of results for
     #   this operation. If this value is null, it retrieves the first page.
+    #
+    # @option params [String] :account_id
+    #   The ID of the Amazon Web Services account.
     #
     # @return [Types::ListEventsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -809,10 +1544,17 @@ module Aws::DevOpsGuru
     #         cloud_formation: {
     #           stack_names: ["StackName"],
     #         },
+    #         tags: [
+    #           {
+    #             app_boundary_key: "AppBoundaryKey", # required
+    #             tag_values: ["TagValue"], # required
+    #           },
+    #         ],
     #       },
     #     },
     #     max_results: 1,
     #     next_token: "UuidNextToken",
+    #     account_id: "AwsAccountId",
     #   })
     #
     # @example Response structure
@@ -820,6 +1562,10 @@ module Aws::DevOpsGuru
     #   resp.events #=> Array
     #   resp.events[0].resource_collection.cloud_formation.stack_names #=> Array
     #   resp.events[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.events[0].resource_collection.tags #=> Array
+    #   resp.events[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.events[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.events[0].resource_collection.tags[0].tag_values[0] #=> String
     #   resp.events[0].id #=> String
     #   resp.events[0].time #=> Time
     #   resp.events[0].event_source #=> String
@@ -841,9 +1587,9 @@ module Aws::DevOpsGuru
       req.send_request(options)
     end
 
-    # Returns a list of insights in your AWS account. You can specify which
-    # insights are returned by their start time and status (`ONGOING`,
-    # `CLOSED`, or `ANY`).
+    # Returns a list of insights in your Amazon Web Services account. You
+    # can specify which insights are returned by their start time and status
+    # (`ONGOING`, `CLOSED`, or `ANY`).
     #
     # @option params [required, Types::ListInsightsStatusFilter] :status_filter
     #   A filter used to filter the returned insights by their status. You can
@@ -905,6 +1651,14 @@ module Aws::DevOpsGuru
     #   resp.proactive_insights[0].prediction_time_range.end_time #=> Time
     #   resp.proactive_insights[0].resource_collection.cloud_formation.stack_names #=> Array
     #   resp.proactive_insights[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.proactive_insights[0].resource_collection.tags #=> Array
+    #   resp.proactive_insights[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.proactive_insights[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.proactive_insights[0].resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.proactive_insights[0].service_collection.service_names #=> Array
+    #   resp.proactive_insights[0].service_collection.service_names[0] #=> String, one of "API_GATEWAY", "APPLICATION_ELB", "AUTO_SCALING_GROUP", "CLOUD_FRONT", "DYNAMO_DB", "EC2", "ECS", "EKS", "ELASTIC_BEANSTALK", "ELASTI_CACHE", "ELB", "ES", "KINESIS", "LAMBDA", "NAT_GATEWAY", "NETWORK_ELB", "RDS", "REDSHIFT", "ROUTE_53", "S3", "SAGE_MAKER", "SNS", "SQS", "STEP_FUNCTIONS", "SWF"
+    #   resp.proactive_insights[0].associated_resource_arns #=> Array
+    #   resp.proactive_insights[0].associated_resource_arns[0] #=> String
     #   resp.reactive_insights #=> Array
     #   resp.reactive_insights[0].id #=> String
     #   resp.reactive_insights[0].name #=> String
@@ -914,6 +1668,14 @@ module Aws::DevOpsGuru
     #   resp.reactive_insights[0].insight_time_range.end_time #=> Time
     #   resp.reactive_insights[0].resource_collection.cloud_formation.stack_names #=> Array
     #   resp.reactive_insights[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.reactive_insights[0].resource_collection.tags #=> Array
+    #   resp.reactive_insights[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.reactive_insights[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.reactive_insights[0].resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.reactive_insights[0].service_collection.service_names #=> Array
+    #   resp.reactive_insights[0].service_collection.service_names[0] #=> String, one of "API_GATEWAY", "APPLICATION_ELB", "AUTO_SCALING_GROUP", "CLOUD_FRONT", "DYNAMO_DB", "EC2", "ECS", "EKS", "ELASTIC_BEANSTALK", "ELASTI_CACHE", "ELB", "ES", "KINESIS", "LAMBDA", "NAT_GATEWAY", "NETWORK_ELB", "RDS", "REDSHIFT", "ROUTE_53", "S3", "SAGE_MAKER", "SNS", "SQS", "STEP_FUNCTIONS", "SWF"
+    #   resp.reactive_insights[0].associated_resource_arns #=> Array
+    #   resp.reactive_insights[0].associated_resource_arns[0] #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/ListInsights AWS API Documentation
@@ -922,6 +1684,64 @@ module Aws::DevOpsGuru
     # @param [Hash] params ({})
     def list_insights(params = {}, options = {})
       req = build_request(:list_insights, params)
+      req.send_request(options)
+    end
+
+    # Returns the list of all log groups that are being monitored and tagged
+    # by DevOps Guru.
+    #
+    # @option params [Types::ListMonitoredResourcesFilters] :filters
+    #   Filters to determine which monitored resources you want to retrieve.
+    #   You can filter by resource type or resource permission status.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return with a single call. To
+    #   retrieve the remaining results, make another call with the returned
+    #   `nextToken` value.
+    #
+    # @option params [String] :next_token
+    #   The pagination token to use to retrieve the next page of results for
+    #   this operation. If this value is null, it retrieves the first page.
+    #
+    # @return [Types::ListMonitoredResourcesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListMonitoredResourcesResponse#monitored_resource_identifiers #monitored_resource_identifiers} => Array&lt;Types::MonitoredResourceIdentifier&gt;
+    #   * {Types::ListMonitoredResourcesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_monitored_resources({
+    #     filters: {
+    #       resource_permission: "FULL_PERMISSION", # required, accepts FULL_PERMISSION, MISSING_PERMISSION
+    #       resource_type_filters: ["LOG_GROUPS"], # required, accepts LOG_GROUPS, CLOUDFRONT_DISTRIBUTION, DYNAMODB_TABLE, EC2_NAT_GATEWAY, ECS_CLUSTER, ECS_SERVICE, EKS_CLUSTER, ELASTIC_BEANSTALK_ENVIRONMENT, ELASTIC_LOAD_BALANCER_LOAD_BALANCER, ELASTIC_LOAD_BALANCING_V2_LOAD_BALANCER, ELASTIC_LOAD_BALANCING_V2_TARGET_GROUP, ELASTICACHE_CACHE_CLUSTER, ELASTICSEARCH_DOMAIN, KINESIS_STREAM, LAMBDA_FUNCTION, OPEN_SEARCH_SERVICE_DOMAIN, RDS_DB_INSTANCE, RDS_DB_CLUSTER, REDSHIFT_CLUSTER, ROUTE53_HOSTED_ZONE, ROUTE53_HEALTH_CHECK, S3_BUCKET, SAGEMAKER_ENDPOINT, SNS_TOPIC, SQS_QUEUE, STEP_FUNCTIONS_ACTIVITY, STEP_FUNCTIONS_STATE_MACHINE
+    #     },
+    #     max_results: 1,
+    #     next_token: "UuidNextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.monitored_resource_identifiers #=> Array
+    #   resp.monitored_resource_identifiers[0].monitored_resource_name #=> String
+    #   resp.monitored_resource_identifiers[0].type #=> String
+    #   resp.monitored_resource_identifiers[0].resource_permission #=> String, one of "FULL_PERMISSION", "MISSING_PERMISSION"
+    #   resp.monitored_resource_identifiers[0].last_updated #=> Time
+    #   resp.monitored_resource_identifiers[0].resource_collection.cloud_formation.stack_names #=> Array
+    #   resp.monitored_resource_identifiers[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.monitored_resource_identifiers[0].resource_collection.tags #=> Array
+    #   resp.monitored_resource_identifiers[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.monitored_resource_identifiers[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.monitored_resource_identifiers[0].resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/ListMonitoredResources AWS API Documentation
+    #
+    # @overload list_monitored_resources(params = {})
+    # @param [Hash] params ({})
+    def list_monitored_resources(params = {}, options = {})
+      req = build_request(:list_monitored_resources, params)
       req.send_request(options)
     end
 
@@ -953,6 +1773,10 @@ module Aws::DevOpsGuru
     #   resp.channels #=> Array
     #   resp.channels[0].id #=> String
     #   resp.channels[0].config.sns.topic_arn #=> String
+    #   resp.channels[0].config.filters.severities #=> Array
+    #   resp.channels[0].config.filters.severities[0] #=> String, one of "LOW", "MEDIUM", "HIGH"
+    #   resp.channels[0].config.filters.message_types #=> Array
+    #   resp.channels[0].config.filters.message_types[0] #=> String, one of "NEW_INSIGHT", "CLOSED_INSIGHT", "NEW_ASSOCIATION", "SEVERITY_UPGRADED", "NEW_RECOMMENDATION"
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/ListNotificationChannels AWS API Documentation
@@ -961,6 +1785,111 @@ module Aws::DevOpsGuru
     # @param [Hash] params ({})
     def list_notification_channels(params = {}, options = {})
       req = build_request(:list_notification_channels, params)
+      req.send_request(options)
+    end
+
+    # Returns a list of insights associated with the account or OU Id.
+    #
+    # @option params [required, Types::ListInsightsStatusFilter] :status_filter
+    #   A filter used by `ListInsights` to specify which insights to return.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return with a single call. To
+    #   retrieve the remaining results, make another call with the returned
+    #   `nextToken` value.
+    #
+    # @option params [Array<String>] :account_ids
+    #   The ID of the Amazon Web Services account.
+    #
+    # @option params [Array<String>] :organizational_unit_ids
+    #   The ID of the organizational unit.
+    #
+    # @option params [String] :next_token
+    #   The pagination token to use to retrieve the next page of results for
+    #   this operation. If this value is null, it retrieves the first page.
+    #
+    # @return [Types::ListOrganizationInsightsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ListOrganizationInsightsResponse#proactive_insights #proactive_insights} => Array&lt;Types::ProactiveOrganizationInsightSummary&gt;
+    #   * {Types::ListOrganizationInsightsResponse#reactive_insights #reactive_insights} => Array&lt;Types::ReactiveOrganizationInsightSummary&gt;
+    #   * {Types::ListOrganizationInsightsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.list_organization_insights({
+    #     status_filter: { # required
+    #       ongoing: {
+    #         type: "REACTIVE", # required, accepts REACTIVE, PROACTIVE
+    #       },
+    #       closed: {
+    #         type: "REACTIVE", # required, accepts REACTIVE, PROACTIVE
+    #         end_time_range: { # required
+    #           from_time: Time.now,
+    #           to_time: Time.now,
+    #         },
+    #       },
+    #       any: {
+    #         type: "REACTIVE", # required, accepts REACTIVE, PROACTIVE
+    #         start_time_range: { # required
+    #           from_time: Time.now,
+    #           to_time: Time.now,
+    #         },
+    #       },
+    #     },
+    #     max_results: 1,
+    #     account_ids: ["AwsAccountId"],
+    #     organizational_unit_ids: ["OrganizationalUnitId"],
+    #     next_token: "UuidNextToken",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.proactive_insights #=> Array
+    #   resp.proactive_insights[0].id #=> String
+    #   resp.proactive_insights[0].account_id #=> String
+    #   resp.proactive_insights[0].organizational_unit_id #=> String
+    #   resp.proactive_insights[0].name #=> String
+    #   resp.proactive_insights[0].severity #=> String, one of "LOW", "MEDIUM", "HIGH"
+    #   resp.proactive_insights[0].status #=> String, one of "ONGOING", "CLOSED"
+    #   resp.proactive_insights[0].insight_time_range.start_time #=> Time
+    #   resp.proactive_insights[0].insight_time_range.end_time #=> Time
+    #   resp.proactive_insights[0].prediction_time_range.start_time #=> Time
+    #   resp.proactive_insights[0].prediction_time_range.end_time #=> Time
+    #   resp.proactive_insights[0].resource_collection.cloud_formation.stack_names #=> Array
+    #   resp.proactive_insights[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.proactive_insights[0].resource_collection.tags #=> Array
+    #   resp.proactive_insights[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.proactive_insights[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.proactive_insights[0].resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.proactive_insights[0].service_collection.service_names #=> Array
+    #   resp.proactive_insights[0].service_collection.service_names[0] #=> String, one of "API_GATEWAY", "APPLICATION_ELB", "AUTO_SCALING_GROUP", "CLOUD_FRONT", "DYNAMO_DB", "EC2", "ECS", "EKS", "ELASTIC_BEANSTALK", "ELASTI_CACHE", "ELB", "ES", "KINESIS", "LAMBDA", "NAT_GATEWAY", "NETWORK_ELB", "RDS", "REDSHIFT", "ROUTE_53", "S3", "SAGE_MAKER", "SNS", "SQS", "STEP_FUNCTIONS", "SWF"
+    #   resp.reactive_insights #=> Array
+    #   resp.reactive_insights[0].id #=> String
+    #   resp.reactive_insights[0].account_id #=> String
+    #   resp.reactive_insights[0].organizational_unit_id #=> String
+    #   resp.reactive_insights[0].name #=> String
+    #   resp.reactive_insights[0].severity #=> String, one of "LOW", "MEDIUM", "HIGH"
+    #   resp.reactive_insights[0].status #=> String, one of "ONGOING", "CLOSED"
+    #   resp.reactive_insights[0].insight_time_range.start_time #=> Time
+    #   resp.reactive_insights[0].insight_time_range.end_time #=> Time
+    #   resp.reactive_insights[0].resource_collection.cloud_formation.stack_names #=> Array
+    #   resp.reactive_insights[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.reactive_insights[0].resource_collection.tags #=> Array
+    #   resp.reactive_insights[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.reactive_insights[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.reactive_insights[0].resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.reactive_insights[0].service_collection.service_names #=> Array
+    #   resp.reactive_insights[0].service_collection.service_names[0] #=> String, one of "API_GATEWAY", "APPLICATION_ELB", "AUTO_SCALING_GROUP", "CLOUD_FRONT", "DYNAMO_DB", "EC2", "ECS", "EKS", "ELASTIC_BEANSTALK", "ELASTI_CACHE", "ELB", "ES", "KINESIS", "LAMBDA", "NAT_GATEWAY", "NETWORK_ELB", "RDS", "REDSHIFT", "ROUTE_53", "S3", "SAGE_MAKER", "SNS", "SQS", "STEP_FUNCTIONS", "SWF"
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/ListOrganizationInsights AWS API Documentation
+    #
+    # @overload list_organization_insights(params = {})
+    # @param [Hash] params ({})
+    def list_organization_insights(params = {}, options = {})
+      req = build_request(:list_organization_insights, params)
       req.send_request(options)
     end
 
@@ -975,6 +1904,12 @@ module Aws::DevOpsGuru
     #   The pagination token to use to retrieve the next page of results for
     #   this operation. If this value is null, it retrieves the first page.
     #
+    # @option params [String] :locale
+    #   A locale that specifies the language to use for recommendations.
+    #
+    # @option params [String] :account_id
+    #   The ID of the Amazon Web Services account.
+    #
     # @return [Types::ListRecommendationsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
     #   * {Types::ListRecommendationsResponse#recommendations #recommendations} => Array&lt;Types::Recommendation&gt;
@@ -987,6 +1922,8 @@ module Aws::DevOpsGuru
     #   resp = client.list_recommendations({
     #     insight_id: "InsightId", # required
     #     next_token: "UuidNextToken",
+    #     locale: "DE_DE", # accepts DE_DE, EN_US, EN_GB, ES_ES, FR_FR, IT_IT, JA_JP, KO_KR, PT_BR, ZH_CN, ZH_TW
+    #     account_id: "AwsAccountId",
     #   })
     #
     # @example Response structure
@@ -1009,6 +1946,8 @@ module Aws::DevOpsGuru
     #   resp.recommendations[0].related_anomalies[0].source_details[0].cloud_watch_metrics #=> Array
     #   resp.recommendations[0].related_anomalies[0].source_details[0].cloud_watch_metrics[0].metric_name #=> String
     #   resp.recommendations[0].related_anomalies[0].source_details[0].cloud_watch_metrics[0].namespace #=> String
+    #   resp.recommendations[0].related_anomalies[0].anomaly_id #=> String
+    #   resp.recommendations[0].category #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/ListRecommendations AWS API Documentation
@@ -1070,9 +2009,9 @@ module Aws::DevOpsGuru
       req.send_request(options)
     end
 
-    # Returns a list of insights in your AWS account. You can specify which
-    # insights are returned by their start time, one or more statuses
-    # (`ONGOING`, `CLOSED`, and `CLOSED`), one or more severities (`LOW`,
+    # Returns a list of insights in your Amazon Web Services account. You
+    # can specify which insights are returned by their start time, one or
+    # more statuses (`ONGOING` or `CLOSED`), one or more severities (`LOW`,
     # `MEDIUM`, and `HIGH`), and type (`REACTIVE` or `PROACTIVE`).
     #
     # Use the `Filters` parameter to specify status and severity search
@@ -1122,6 +2061,15 @@ module Aws::DevOpsGuru
     #         cloud_formation: {
     #           stack_names: ["StackName"],
     #         },
+    #         tags: [
+    #           {
+    #             app_boundary_key: "AppBoundaryKey", # required
+    #             tag_values: ["TagValue"], # required
+    #           },
+    #         ],
+    #       },
+    #       service_collection: {
+    #         service_names: ["API_GATEWAY"], # accepts API_GATEWAY, APPLICATION_ELB, AUTO_SCALING_GROUP, CLOUD_FRONT, DYNAMO_DB, EC2, ECS, EKS, ELASTIC_BEANSTALK, ELASTI_CACHE, ELB, ES, KINESIS, LAMBDA, NAT_GATEWAY, NETWORK_ELB, RDS, REDSHIFT, ROUTE_53, S3, SAGE_MAKER, SNS, SQS, STEP_FUNCTIONS, SWF
     #       },
     #     },
     #     max_results: 1,
@@ -1142,6 +2090,14 @@ module Aws::DevOpsGuru
     #   resp.proactive_insights[0].prediction_time_range.end_time #=> Time
     #   resp.proactive_insights[0].resource_collection.cloud_formation.stack_names #=> Array
     #   resp.proactive_insights[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.proactive_insights[0].resource_collection.tags #=> Array
+    #   resp.proactive_insights[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.proactive_insights[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.proactive_insights[0].resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.proactive_insights[0].service_collection.service_names #=> Array
+    #   resp.proactive_insights[0].service_collection.service_names[0] #=> String, one of "API_GATEWAY", "APPLICATION_ELB", "AUTO_SCALING_GROUP", "CLOUD_FRONT", "DYNAMO_DB", "EC2", "ECS", "EKS", "ELASTIC_BEANSTALK", "ELASTI_CACHE", "ELB", "ES", "KINESIS", "LAMBDA", "NAT_GATEWAY", "NETWORK_ELB", "RDS", "REDSHIFT", "ROUTE_53", "S3", "SAGE_MAKER", "SNS", "SQS", "STEP_FUNCTIONS", "SWF"
+    #   resp.proactive_insights[0].associated_resource_arns #=> Array
+    #   resp.proactive_insights[0].associated_resource_arns[0] #=> String
     #   resp.reactive_insights #=> Array
     #   resp.reactive_insights[0].id #=> String
     #   resp.reactive_insights[0].name #=> String
@@ -1151,6 +2107,14 @@ module Aws::DevOpsGuru
     #   resp.reactive_insights[0].insight_time_range.end_time #=> Time
     #   resp.reactive_insights[0].resource_collection.cloud_formation.stack_names #=> Array
     #   resp.reactive_insights[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.reactive_insights[0].resource_collection.tags #=> Array
+    #   resp.reactive_insights[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.reactive_insights[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.reactive_insights[0].resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.reactive_insights[0].service_collection.service_names #=> Array
+    #   resp.reactive_insights[0].service_collection.service_names[0] #=> String, one of "API_GATEWAY", "APPLICATION_ELB", "AUTO_SCALING_GROUP", "CLOUD_FRONT", "DYNAMO_DB", "EC2", "ECS", "EKS", "ELASTIC_BEANSTALK", "ELASTI_CACHE", "ELB", "ES", "KINESIS", "LAMBDA", "NAT_GATEWAY", "NETWORK_ELB", "RDS", "REDSHIFT", "ROUTE_53", "S3", "SAGE_MAKER", "SNS", "SQS", "STEP_FUNCTIONS", "SWF"
+    #   resp.reactive_insights[0].associated_resource_arns #=> Array
+    #   resp.reactive_insights[0].associated_resource_arns[0] #=> String
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/SearchInsights AWS API Documentation
@@ -1162,18 +2126,214 @@ module Aws::DevOpsGuru
       req.send_request(options)
     end
 
-    # Updates the collection of resources that DevOps Guru analyzes. The one
-    # type of AWS resource collection supported is AWS CloudFormation
-    # stacks. DevOps Guru can be configured to analyze only the AWS
-    # resources that are defined in the stacks. This method also creates the
-    # IAM role required for you to use DevOps Guru.
+    # Returns a list of insights in your organization. You can specify which
+    # insights are returned by their start time, one or more statuses
+    # (`ONGOING`, `CLOSED`, and `CLOSED`), one or more severities (`LOW`,
+    # `MEDIUM`, and `HIGH`), and type (`REACTIVE` or `PROACTIVE`).
+    #
+    # Use the `Filters` parameter to specify status and severity search
+    # parameters. Use the `Type` parameter to specify `REACTIVE` or
+    # `PROACTIVE` in your search.
+    #
+    # @option params [required, Array<String>] :account_ids
+    #   The ID of the Amazon Web Services account.
+    #
+    # @option params [required, Types::StartTimeRange] :start_time_range
+    #   A time range used to specify when the behavior of an insight or
+    #   anomaly started.
+    #
+    # @option params [Types::SearchOrganizationInsightsFilters] :filters
+    #   A `SearchOrganizationInsightsFilters` object that is used to set the
+    #   severity and status filters on your insight search.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of results to return with a single call. To
+    #   retrieve the remaining results, make another call with the returned
+    #   `nextToken` value.
+    #
+    # @option params [String] :next_token
+    #   The pagination token to use to retrieve the next page of results for
+    #   this operation. If this value is null, it retrieves the first page.
+    #
+    # @option params [required, String] :type
+    #   The type of insights you are searching for (`REACTIVE` or
+    #   `PROACTIVE`).
+    #
+    # @return [Types::SearchOrganizationInsightsResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::SearchOrganizationInsightsResponse#proactive_insights #proactive_insights} => Array&lt;Types::ProactiveInsightSummary&gt;
+    #   * {Types::SearchOrganizationInsightsResponse#reactive_insights #reactive_insights} => Array&lt;Types::ReactiveInsightSummary&gt;
+    #   * {Types::SearchOrganizationInsightsResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.search_organization_insights({
+    #     account_ids: ["AwsAccountId"], # required
+    #     start_time_range: { # required
+    #       from_time: Time.now,
+    #       to_time: Time.now,
+    #     },
+    #     filters: {
+    #       severities: ["LOW"], # accepts LOW, MEDIUM, HIGH
+    #       statuses: ["ONGOING"], # accepts ONGOING, CLOSED
+    #       resource_collection: {
+    #         cloud_formation: {
+    #           stack_names: ["StackName"],
+    #         },
+    #         tags: [
+    #           {
+    #             app_boundary_key: "AppBoundaryKey", # required
+    #             tag_values: ["TagValue"], # required
+    #           },
+    #         ],
+    #       },
+    #       service_collection: {
+    #         service_names: ["API_GATEWAY"], # accepts API_GATEWAY, APPLICATION_ELB, AUTO_SCALING_GROUP, CLOUD_FRONT, DYNAMO_DB, EC2, ECS, EKS, ELASTIC_BEANSTALK, ELASTI_CACHE, ELB, ES, KINESIS, LAMBDA, NAT_GATEWAY, NETWORK_ELB, RDS, REDSHIFT, ROUTE_53, S3, SAGE_MAKER, SNS, SQS, STEP_FUNCTIONS, SWF
+    #       },
+    #     },
+    #     max_results: 1,
+    #     next_token: "UuidNextToken",
+    #     type: "REACTIVE", # required, accepts REACTIVE, PROACTIVE
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.proactive_insights #=> Array
+    #   resp.proactive_insights[0].id #=> String
+    #   resp.proactive_insights[0].name #=> String
+    #   resp.proactive_insights[0].severity #=> String, one of "LOW", "MEDIUM", "HIGH"
+    #   resp.proactive_insights[0].status #=> String, one of "ONGOING", "CLOSED"
+    #   resp.proactive_insights[0].insight_time_range.start_time #=> Time
+    #   resp.proactive_insights[0].insight_time_range.end_time #=> Time
+    #   resp.proactive_insights[0].prediction_time_range.start_time #=> Time
+    #   resp.proactive_insights[0].prediction_time_range.end_time #=> Time
+    #   resp.proactive_insights[0].resource_collection.cloud_formation.stack_names #=> Array
+    #   resp.proactive_insights[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.proactive_insights[0].resource_collection.tags #=> Array
+    #   resp.proactive_insights[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.proactive_insights[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.proactive_insights[0].resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.proactive_insights[0].service_collection.service_names #=> Array
+    #   resp.proactive_insights[0].service_collection.service_names[0] #=> String, one of "API_GATEWAY", "APPLICATION_ELB", "AUTO_SCALING_GROUP", "CLOUD_FRONT", "DYNAMO_DB", "EC2", "ECS", "EKS", "ELASTIC_BEANSTALK", "ELASTI_CACHE", "ELB", "ES", "KINESIS", "LAMBDA", "NAT_GATEWAY", "NETWORK_ELB", "RDS", "REDSHIFT", "ROUTE_53", "S3", "SAGE_MAKER", "SNS", "SQS", "STEP_FUNCTIONS", "SWF"
+    #   resp.proactive_insights[0].associated_resource_arns #=> Array
+    #   resp.proactive_insights[0].associated_resource_arns[0] #=> String
+    #   resp.reactive_insights #=> Array
+    #   resp.reactive_insights[0].id #=> String
+    #   resp.reactive_insights[0].name #=> String
+    #   resp.reactive_insights[0].severity #=> String, one of "LOW", "MEDIUM", "HIGH"
+    #   resp.reactive_insights[0].status #=> String, one of "ONGOING", "CLOSED"
+    #   resp.reactive_insights[0].insight_time_range.start_time #=> Time
+    #   resp.reactive_insights[0].insight_time_range.end_time #=> Time
+    #   resp.reactive_insights[0].resource_collection.cloud_formation.stack_names #=> Array
+    #   resp.reactive_insights[0].resource_collection.cloud_formation.stack_names[0] #=> String
+    #   resp.reactive_insights[0].resource_collection.tags #=> Array
+    #   resp.reactive_insights[0].resource_collection.tags[0].app_boundary_key #=> String
+    #   resp.reactive_insights[0].resource_collection.tags[0].tag_values #=> Array
+    #   resp.reactive_insights[0].resource_collection.tags[0].tag_values[0] #=> String
+    #   resp.reactive_insights[0].service_collection.service_names #=> Array
+    #   resp.reactive_insights[0].service_collection.service_names[0] #=> String, one of "API_GATEWAY", "APPLICATION_ELB", "AUTO_SCALING_GROUP", "CLOUD_FRONT", "DYNAMO_DB", "EC2", "ECS", "EKS", "ELASTIC_BEANSTALK", "ELASTI_CACHE", "ELB", "ES", "KINESIS", "LAMBDA", "NAT_GATEWAY", "NETWORK_ELB", "RDS", "REDSHIFT", "ROUTE_53", "S3", "SAGE_MAKER", "SNS", "SQS", "STEP_FUNCTIONS", "SWF"
+    #   resp.reactive_insights[0].associated_resource_arns #=> Array
+    #   resp.reactive_insights[0].associated_resource_arns[0] #=> String
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/SearchOrganizationInsights AWS API Documentation
+    #
+    # @overload search_organization_insights(params = {})
+    # @param [Hash] params ({})
+    def search_organization_insights(params = {}, options = {})
+      req = build_request(:search_organization_insights, params)
+      req.send_request(options)
+    end
+
+    # Starts the creation of an estimate of the monthly cost to analyze your
+    # Amazon Web Services resources.
+    #
+    # @option params [required, Types::CostEstimationResourceCollectionFilter] :resource_collection
+    #   The collection of Amazon Web Services resources used to create a
+    #   monthly DevOps Guru cost estimate.
+    #
+    # @option params [String] :client_token
+    #   The idempotency token used to identify each cost estimate request.
+    #
+    #   **A suitable default value is auto-generated.** You should normally
+    #   not need to pass this option.**
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.start_cost_estimation({
+    #     resource_collection: { # required
+    #       cloud_formation: {
+    #         stack_names: ["StackName"],
+    #       },
+    #       tags: [
+    #         {
+    #           app_boundary_key: "AppBoundaryKey", # required
+    #           tag_values: ["TagValue"], # required
+    #         },
+    #       ],
+    #     },
+    #     client_token: "ClientToken",
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/StartCostEstimation AWS API Documentation
+    #
+    # @overload start_cost_estimation(params = {})
+    # @param [Hash] params ({})
+    def start_cost_estimation(params = {}, options = {})
+      req = build_request(:start_cost_estimation, params)
+      req.send_request(options)
+    end
+
+    # Enables or disables integration with a service that can be integrated
+    # with DevOps Guru. The one service that can be integrated with DevOps
+    # Guru is Amazon CodeGuru Profiler, which can produce proactive
+    # recommendations which can be stored and viewed in DevOps Guru.
+    #
+    # @option params [Types::EventSourcesConfig] :event_sources
+    #   Configuration information about the integration of DevOps Guru as the
+    #   Consumer via EventBridge with another AWS Service.
+    #
+    # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_event_sources_config({
+    #     event_sources: {
+    #       amazon_code_guru_profiler: {
+    #         status: "ENABLED", # accepts ENABLED, DISABLED
+    #       },
+    #     },
+    #   })
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/devops-guru-2020-12-01/UpdateEventSourcesConfig AWS API Documentation
+    #
+    # @overload update_event_sources_config(params = {})
+    # @param [Hash] params ({})
+    def update_event_sources_config(params = {}, options = {})
+      req = build_request(:update_event_sources_config, params)
+      req.send_request(options)
+    end
+
+    # Updates the collection of resources that DevOps Guru analyzes. The two
+    # types of Amazon Web Services resource collections supported are Amazon
+    # Web Services CloudFormation stacks and Amazon Web Services resources
+    # that contain the same Amazon Web Services tag. DevOps Guru can be
+    # configured to analyze the Amazon Web Services resources that are
+    # defined in the stacks or that are tagged using the same tag *key*. You
+    # can specify up to 500 Amazon Web Services CloudFormation stacks. This
+    # method also creates the IAM role required for you to use DevOps Guru.
     #
     # @option params [required, String] :action
     #   Specifies if the resource collection in the request is added or
     #   deleted to the resource collection.
     #
     # @option params [required, Types::UpdateResourceCollectionFilter] :resource_collection
-    #   Contains information used to update a collection of AWS resources.
+    #   Contains information used to update a collection of Amazon Web
+    #   Services resources.
     #
     # @return [Struct] Returns an empty {Seahorse::Client::Response response}.
     #
@@ -1185,6 +2345,12 @@ module Aws::DevOpsGuru
     #       cloud_formation: {
     #         stack_names: ["StackName"],
     #       },
+    #       tags: [
+    #         {
+    #           app_boundary_key: "AppBoundaryKey", # required
+    #           tag_values: ["TagValue"], # required
+    #         },
+    #       ],
     #     },
     #   })
     #
@@ -1199,8 +2365,8 @@ module Aws::DevOpsGuru
 
     # Enables or disables integration with a service that can be integrated
     # with DevOps Guru. The one service that can be integrated with DevOps
-    # Guru is AWS Systems Manager, which can be used to create an OpsItem
-    # for each generated insight.
+    # Guru is Amazon Web Services Systems Manager, which can be used to
+    # create an OpsItem for each generated insight.
     #
     # @option params [required, Types::UpdateServiceIntegrationConfig] :service_integration
     #   An `IntegratedServiceConfig` object used to specify the integrated
@@ -1215,6 +2381,14 @@ module Aws::DevOpsGuru
     #     service_integration: { # required
     #       ops_center: {
     #         opt_in_status: "ENABLED", # accepts ENABLED, DISABLED
+    #       },
+    #       logs_anomaly_detection: {
+    #         opt_in_status: "ENABLED", # accepts ENABLED, DISABLED
+    #       },
+    #       kms_server_side_encryption: {
+    #         kms_key_id: "KMSKeyId",
+    #         opt_in_status: "ENABLED", # accepts ENABLED, DISABLED
+    #         type: "CUSTOMER_MANAGED_KEY", # accepts CUSTOMER_MANAGED_KEY, AWS_OWNED_KMS_KEY
     #       },
     #     },
     #   })
@@ -1234,14 +2408,19 @@ module Aws::DevOpsGuru
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::DevOpsGuru')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-devopsguru'
-      context[:gem_version] = '1.2.0'
+      context[:gem_version] = '1.53.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

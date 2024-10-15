@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -41,19 +41,65 @@ module Aws::EC2
       data[:key_pair_id]
     end
 
-    # If you used CreateKeyPair to create the key pair, this is the SHA-1
-    # digest of the DER encoded private key. If you used ImportKeyPair to
-    # provide AWS the public key, this is the MD5 public key fingerprint as
-    # specified in section 4 of RFC4716.
+    # The type of key pair.
     # @return [String]
-    def key_fingerprint
-      data[:key_fingerprint]
+    def key_type
+      data[:key_type]
     end
 
     # Any tags applied to the key pair.
     # @return [Array<Types::Tag>]
     def tags
       data[:tags]
+    end
+
+    # The public key material.
+    # @return [String]
+    def public_key
+      data[:public_key]
+    end
+
+    # If you used Amazon EC2 to create the key pair, this is the date and
+    # time when the key was created, in [ISO 8601 date-time format][1], in
+    # the UTC time zone.
+    #
+    # If you imported an existing key pair to Amazon EC2, this is the date
+    # and time the key was imported, in [ISO 8601 date-time format][1], in
+    # the UTC time zone.
+    #
+    #
+    #
+    # [1]: https://www.iso.org/iso-8601-date-and-time-format.html
+    # @return [Time]
+    def create_time
+      data[:create_time]
+    end
+
+    # If you used CreateKeyPair to create the key pair:
+    #
+    # * For RSA key pairs, the key fingerprint is the SHA-1 digest of the
+    #   DER encoded private key.
+    #
+    # * For ED25519 key pairs, the key fingerprint is the base64-encoded
+    #   SHA-256 digest, which is the default for OpenSSH, starting with
+    #   [OpenSSH 6.8][1].
+    #
+    # If you used ImportKeyPair to provide Amazon Web Services the public
+    # key:
+    #
+    # * For RSA key pairs, the key fingerprint is the MD5 public key
+    #   fingerprint as specified in section 4 of RFC4716.
+    #
+    # * For ED25519 key pairs, the key fingerprint is the base64-encoded
+    #   SHA-256 digest, which is the default for OpenSSH, starting with
+    #   [OpenSSH 6.8][1].
+    #
+    #
+    #
+    # [1]: http://www.openssh.com/txt/release-6.8
+    # @return [String]
+    def key_fingerprint
+      data[:key_fingerprint]
     end
 
     # @!endgroup
@@ -70,7 +116,9 @@ module Aws::EC2
     #
     # @return [self]
     def load
-      resp = @client.describe_key_pairs(key_names: [@name])
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.describe_key_pairs(key_names: [@name])
+      end
       @data = resp.key_pairs[0]
       self
     end
@@ -185,7 +233,9 @@ module Aws::EC2
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -204,10 +254,12 @@ module Aws::EC2
     #   without actually making the request, and provides an error response.
     #   If you have the required permissions, the error response is
     #   `DryRunOperation`. Otherwise, it is `UnauthorizedOperation`.
-    # @return [EmptyStructure]
+    # @return [Types::DeleteKeyPairResult]
     def delete(options = {})
       options = options.merge(key_name: @name)
-      resp = @client.delete_key_pair(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_key_pair(options)
+      end
       resp.data
     end
 

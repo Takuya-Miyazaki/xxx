@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -11,12 +11,7 @@
 require 'aws-sdk-core'
 require 'aws-sigv4'
 
-require_relative 'aws-sdk-appmesh/types'
-require_relative 'aws-sdk-appmesh/client_api'
-require_relative 'aws-sdk-appmesh/client'
-require_relative 'aws-sdk-appmesh/errors'
-require_relative 'aws-sdk-appmesh/resource'
-require_relative 'aws-sdk-appmesh/customizations'
+Aws::Plugins::GlobalConfiguration.add_identifier(:appmesh)
 
 # This module provides support for AWS App Mesh. This module is available in the
 # `aws-sdk-appmesh` gem.
@@ -47,7 +42,20 @@ require_relative 'aws-sdk-appmesh/customizations'
 #
 # @!group service
 module Aws::AppMesh
+  autoload :Types, 'aws-sdk-appmesh/types'
+  autoload :ClientApi, 'aws-sdk-appmesh/client_api'
+  module Plugins
+    autoload :Endpoints, 'aws-sdk-appmesh/plugins/endpoints.rb'
+  end
+  autoload :Client, 'aws-sdk-appmesh/client'
+  autoload :Errors, 'aws-sdk-appmesh/errors'
+  autoload :Resource, 'aws-sdk-appmesh/resource'
+  autoload :EndpointParameters, 'aws-sdk-appmesh/endpoint_parameters'
+  autoload :EndpointProvider, 'aws-sdk-appmesh/endpoint_provider'
+  autoload :Endpoints, 'aws-sdk-appmesh/endpoints'
 
-  GEM_VERSION = '1.33.0'
+  GEM_VERSION = '1.72.0'
 
 end
+
+require_relative 'aws-sdk-appmesh/customizations'

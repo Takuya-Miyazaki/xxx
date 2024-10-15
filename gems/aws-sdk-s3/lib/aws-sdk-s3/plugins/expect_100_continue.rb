@@ -15,7 +15,9 @@ module Aws
         class Handler < Seahorse::Client::Handler
 
           def call(context)
-            if context.http_request.body && context.http_request.body.size > 0
+            body = context.http_request.body
+            if body.respond_to?(:size) && body.size > 0 &&
+               !context[:use_accelerate_endpoint]
               context.http_request.headers['expect'] = '100-continue'
             end
             @handler.call(context)

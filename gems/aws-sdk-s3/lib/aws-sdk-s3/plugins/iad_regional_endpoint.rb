@@ -10,46 +10,23 @@ module Aws
           default: 'legacy',
           doc_type: String,
           docstring: <<-DOCS) do |cfg|
-Passing in `regional` to enable regional endpoint for S3's `us-east-1`
-region. Defaults to `legacy` mode using global endpoint.
+Pass in `regional` to enable the `us-east-1` regional endpoint.
+Defaults to `legacy` mode which uses the global endpoint.
           DOCS
           resolve_iad_regional_endpoint(cfg)
-        end
-
-        def add_handlers(handlers, config)
-          if config.region == 'us-east-1'
-            handlers.add(Handler)
-          end
-        end
-
-        # @api private
-        class Handler < Seahorse::Client::Handler
-
-          def call(context)
-            # keep legacy global endpoint pattern by default
-            if context.config.s3_us_east_1_regional_endpoint == 'legacy'
-              host = context.http_request.endpoint.host
-              # if it's an ARN, don't touch the endpoint at all
-              # TODO this should use context.metadata[:s3_arn] later
-              unless host.include?('.s3-outposts.') || host.include?('.s3-accesspoint.')
-                legacy_host = IADRegionalEndpoint.legacy_host(host)
-                context.http_request.endpoint.host = legacy_host
-              end
-            end
-            @handler.call(context)
-          end
-
-        end
-
-        def self.legacy_host(host)
-          host.sub(".us-east-1", '')
         end
 
         private
 
         def self.resolve_iad_regional_endpoint(cfg)
+          default_mode_value =
+            if cfg.respond_to?(:defaults_mode_config_resolver)
+              cfg.defaults_mode_config_resolver.resolve(:s3_us_east_1_regional_endpoint)
+            end
+
           mode = ENV['AWS_S3_US_EAST_1_REGIONAL_ENDPOINT'] ||
             Aws.shared_config.s3_us_east_1_regional_endpoint(profile: cfg.profile) ||
+            default_mode_value ||
             'legacy'
           mode = mode.downcase
           unless %w(legacy regional).include?(mode)

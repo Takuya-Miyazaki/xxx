@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -52,6 +52,16 @@ module Aws::AppConfig
       # @return [String]
       def message
         @message || @data[:message]
+      end
+
+      # @return [String]
+      def reason
+        @data[:reason]
+      end
+
+      # @return [String]
+      def details
+        @data[:details]
       end
     end
 

@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -47,7 +47,7 @@ module Aws::AutoScaling
       data[:scheduled_action_arn]
     end
 
-    # This parameter is no longer used.
+    # This property is no longer used.
     # @return [Time]
     def time
       data[:time]
@@ -96,6 +96,12 @@ module Aws::AutoScaling
       data[:desired_capacity]
     end
 
+    # The time zone for the cron expression.
+    # @return [String]
+    def time_zone
+      data[:time_zone]
+    end
+
     # @!endgroup
 
     # @return [Client]
@@ -110,7 +116,9 @@ module Aws::AutoScaling
     #
     # @return [self]
     def load
-      resp = @client.describe_scheduled_actions(scheduled_action_names: [@name])
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.describe_scheduled_actions(scheduled_action_names: [@name])
+      end
       @data = resp.scheduled_update_group_actions[0]
       self
     end
@@ -225,7 +233,9 @@ module Aws::AutoScaling
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -241,7 +251,9 @@ module Aws::AutoScaling
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(scheduled_action_name: @name)
-      resp = @client.delete_scheduled_action(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_scheduled_action(options)
+      end
       resp.data
     end
 

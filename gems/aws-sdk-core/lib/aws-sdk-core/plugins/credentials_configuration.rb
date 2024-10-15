@@ -12,6 +12,8 @@ module Aws
 
       option(:session_token, doc_type: String, docstring: '')
 
+      option(:account_id, doc_type: String, docstring: '')
+
       option(:profile,
         doc_default: 'default',
         doc_type: String,
@@ -23,6 +25,7 @@ at HOME/.aws/credentials.  When not specified, 'default' is used.
       option(:credentials,
         required: true,
         doc_type: 'Aws::CredentialProvider',
+        rbs_type: 'untyped',
         docstring: <<-DOCS
 Your AWS credentials. This can be an instance of any one of the
 following classes:
@@ -57,14 +60,18 @@ When `:credentials` are not configured directly, the following
 locations will be searched for credentials:
 
 * `Aws.config[:credentials]`
-* The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-* ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+* The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+  `:account_id` options.
+* ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+  ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
 * `~/.aws/credentials`
 * `~/.aws/config`
 * EC2/ECS IMDS instance profile - When used by default, the timeouts
   are very aggressive. Construct and pass an instance of
-  `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-  enable retries and extended timeouts.
+  `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+  enable retries and extended timeouts. Instance profile credential
+  fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+  to true.
         DOCS
       ) do |config|
         CredentialProviderChain.new(config).resolve
@@ -73,6 +80,31 @@ locations will be searched for credentials:
       option(:instance_profile_credentials_retries, 0)
 
       option(:instance_profile_credentials_timeout, 1)
+
+      option(:token_provider,
+             required: false,
+             doc_type: 'Aws::TokenProvider',
+             rbs_type: 'untyped',
+             docstring: <<-DOCS
+A Bearer Token Provider. This can be an instance of any one of the
+following classes:
+
+* `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+  tokens.
+
+* `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+  access token generated from `aws login`.
+
+When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+will be used to search for tokens configured for your profile in shared configuration files.
+      DOCS
+      ) do |config|
+        if config.stub_responses
+          StaticTokenProvider.new('token')
+        else
+          TokenProviderChain.new(config).resolve
+        end
+      end
 
     end
   end

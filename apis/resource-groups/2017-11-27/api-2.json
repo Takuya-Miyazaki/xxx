@@ -4,14 +4,32 @@
     "apiVersion":"2017-11-27",
     "endpointPrefix":"resource-groups",
     "protocol":"rest-json",
+    "protocols":["rest-json"],
     "serviceAbbreviation":"Resource Groups",
     "serviceFullName":"AWS Resource Groups",
     "serviceId":"Resource Groups",
     "signatureVersion":"v4",
     "signingName":"resource-groups",
-    "uid":"resource-groups-2017-11-27"
+    "uid":"resource-groups-2017-11-27",
+    "auth":["aws.auth#sigv4"]
   },
   "operations":{
+    "CancelTagSyncTask":{
+      "name":"CancelTagSyncTask",
+      "http":{
+        "method":"POST",
+        "requestUri":"/cancel-tag-sync-task"
+      },
+      "input":{"shape":"CancelTagSyncTaskInput"},
+      "errors":[
+        {"shape":"UnauthorizedException"},
+        {"shape":"BadRequestException"},
+        {"shape":"ForbiddenException"},
+        {"shape":"MethodNotAllowedException"},
+        {"shape":"TooManyRequestsException"},
+        {"shape":"InternalServerErrorException"}
+      ]
+    },
     "CreateGroup":{
       "name":"CreateGroup",
       "http":{
@@ -40,6 +58,21 @@
         {"shape":"BadRequestException"},
         {"shape":"ForbiddenException"},
         {"shape":"NotFoundException"},
+        {"shape":"MethodNotAllowedException"},
+        {"shape":"TooManyRequestsException"},
+        {"shape":"InternalServerErrorException"}
+      ]
+    },
+    "GetAccountSettings":{
+      "name":"GetAccountSettings",
+      "http":{
+        "method":"POST",
+        "requestUri":"/get-account-settings"
+      },
+      "output":{"shape":"GetAccountSettingsOutput"},
+      "errors":[
+        {"shape":"BadRequestException"},
+        {"shape":"ForbiddenException"},
         {"shape":"MethodNotAllowedException"},
         {"shape":"TooManyRequestsException"},
         {"shape":"InternalServerErrorException"}
@@ -88,6 +121,24 @@
       "input":{"shape":"GetGroupQueryInput"},
       "output":{"shape":"GetGroupQueryOutput"},
       "errors":[
+        {"shape":"BadRequestException"},
+        {"shape":"ForbiddenException"},
+        {"shape":"NotFoundException"},
+        {"shape":"MethodNotAllowedException"},
+        {"shape":"TooManyRequestsException"},
+        {"shape":"InternalServerErrorException"}
+      ]
+    },
+    "GetTagSyncTask":{
+      "name":"GetTagSyncTask",
+      "http":{
+        "method":"POST",
+        "requestUri":"/get-tag-sync-task"
+      },
+      "input":{"shape":"GetTagSyncTaskInput"},
+      "output":{"shape":"GetTagSyncTaskOutput"},
+      "errors":[
+        {"shape":"UnauthorizedException"},
         {"shape":"BadRequestException"},
         {"shape":"ForbiddenException"},
         {"shape":"NotFoundException"},
@@ -148,6 +199,22 @@
         {"shape":"InternalServerErrorException"}
       ]
     },
+    "ListGroupingStatuses":{
+      "name":"ListGroupingStatuses",
+      "http":{
+        "method":"POST",
+        "requestUri":"/list-grouping-statuses"
+      },
+      "input":{"shape":"ListGroupingStatusesInput"},
+      "output":{"shape":"ListGroupingStatusesOutput"},
+      "errors":[
+        {"shape":"BadRequestException"},
+        {"shape":"ForbiddenException"},
+        {"shape":"MethodNotAllowedException"},
+        {"shape":"TooManyRequestsException"},
+        {"shape":"InternalServerErrorException"}
+      ]
+    },
     "ListGroups":{
       "name":"ListGroups",
       "http":{
@@ -157,6 +224,23 @@
       "input":{"shape":"ListGroupsInput"},
       "output":{"shape":"ListGroupsOutput"},
       "errors":[
+        {"shape":"BadRequestException"},
+        {"shape":"ForbiddenException"},
+        {"shape":"MethodNotAllowedException"},
+        {"shape":"TooManyRequestsException"},
+        {"shape":"InternalServerErrorException"}
+      ]
+    },
+    "ListTagSyncTasks":{
+      "name":"ListTagSyncTasks",
+      "http":{
+        "method":"POST",
+        "requestUri":"/list-tag-sync-tasks"
+      },
+      "input":{"shape":"ListTagSyncTasksInput"},
+      "output":{"shape":"ListTagSyncTasksOutput"},
+      "errors":[
+        {"shape":"UnauthorizedException"},
         {"shape":"BadRequestException"},
         {"shape":"ForbiddenException"},
         {"shape":"MethodNotAllowedException"},
@@ -194,6 +278,24 @@
         {"shape":"UnauthorizedException"},
         {"shape":"BadRequestException"},
         {"shape":"ForbiddenException"},
+        {"shape":"MethodNotAllowedException"},
+        {"shape":"TooManyRequestsException"},
+        {"shape":"InternalServerErrorException"}
+      ]
+    },
+    "StartTagSyncTask":{
+      "name":"StartTagSyncTask",
+      "http":{
+        "method":"POST",
+        "requestUri":"/start-tag-sync-task"
+      },
+      "input":{"shape":"StartTagSyncTaskInput"},
+      "output":{"shape":"StartTagSyncTaskOutput"},
+      "errors":[
+        {"shape":"UnauthorizedException"},
+        {"shape":"BadRequestException"},
+        {"shape":"ForbiddenException"},
+        {"shape":"NotFoundException"},
         {"shape":"MethodNotAllowedException"},
         {"shape":"TooManyRequestsException"},
         {"shape":"InternalServerErrorException"}
@@ -250,6 +352,22 @@
         {"shape":"InternalServerErrorException"}
       ]
     },
+    "UpdateAccountSettings":{
+      "name":"UpdateAccountSettings",
+      "http":{
+        "method":"POST",
+        "requestUri":"/update-account-settings"
+      },
+      "input":{"shape":"UpdateAccountSettingsInput"},
+      "output":{"shape":"UpdateAccountSettingsOutput"},
+      "errors":[
+        {"shape":"BadRequestException"},
+        {"shape":"ForbiddenException"},
+        {"shape":"MethodNotAllowedException"},
+        {"shape":"TooManyRequestsException"},
+        {"shape":"InternalServerErrorException"}
+      ]
+    },
     "UpdateGroup":{
       "name":"UpdateGroup",
       "http":{
@@ -286,6 +404,29 @@
     }
   },
   "shapes":{
+    "AccountSettings":{
+      "type":"structure",
+      "members":{
+        "GroupLifecycleEventsDesiredStatus":{"shape":"GroupLifecycleEventsDesiredStatus"},
+        "GroupLifecycleEventsStatus":{"shape":"GroupLifecycleEventsStatus"},
+        "GroupLifecycleEventsStatusMessage":{"shape":"GroupLifecycleEventsStatusMessage"}
+      }
+    },
+    "ApplicationArn":{
+      "type":"string",
+      "max":1600,
+      "min":12,
+      "pattern":"arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\\d{1}:[0-9]{12}:group/[a-zA-Z0-9_\\.-]{1,150}/[a-zA-Z0-9]{22,26}"
+    },
+    "ApplicationTag":{
+      "type":"map",
+      "key":{"shape":"ApplicationTagKey"},
+      "value":{"shape":"ApplicationArn"}
+    },
+    "ApplicationTagKey":{
+      "type":"string",
+      "pattern":"awsApplication"
+    },
     "BadRequestException":{
       "type":"structure",
       "members":{
@@ -294,16 +435,32 @@
       "error":{"httpStatusCode":400},
       "exception":true
     },
+    "CancelTagSyncTaskInput":{
+      "type":"structure",
+      "required":["TaskArn"],
+      "members":{
+        "TaskArn":{"shape":"TagSyncTaskArn"}
+      }
+    },
     "CreateGroupInput":{
       "type":"structure",
       "required":["Name"],
       "members":{
-        "Name":{"shape":"GroupName"},
+        "Name":{"shape":"CreateGroupName"},
         "Description":{"shape":"Description"},
         "ResourceQuery":{"shape":"ResourceQuery"},
         "Tags":{"shape":"Tags"},
-        "Configuration":{"shape":"GroupConfigurationList"}
+        "Configuration":{"shape":"GroupConfigurationList"},
+        "Criticality":{"shape":"Criticality"},
+        "Owner":{"shape":"Owner"},
+        "DisplayName":{"shape":"DisplayName"}
       }
+    },
+    "CreateGroupName":{
+      "type":"string",
+      "max":300,
+      "min":1,
+      "pattern":"[a-zA-Z0-9_\\.-]+"
     },
     "CreateGroupOutput":{
       "type":"structure",
@@ -314,6 +471,11 @@
         "GroupConfiguration":{"shape":"GroupConfiguration"}
       }
     },
+    "Criticality":{
+      "type":"integer",
+      "max":10,
+      "min":1
+    },
     "DeleteGroupInput":{
       "type":"structure",
       "members":{
@@ -322,7 +484,7 @@
           "deprecated":true,
           "deprecatedMessage":"This field is deprecated, use Group instead."
         },
-        "Group":{"shape":"GroupString"}
+        "Group":{"shape":"GroupStringV2"}
       }
     },
     "DeleteGroupOutput":{
@@ -333,8 +495,14 @@
     },
     "Description":{
       "type":"string",
-      "max":512,
+      "max":1024,
       "pattern":"[\\sa-zA-Z0-9_\\.-]*"
+    },
+    "DisplayName":{
+      "type":"string",
+      "max":300,
+      "min":0,
+      "pattern":"^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$"
     },
     "ErrorCode":{
       "type":"string",
@@ -366,6 +534,12 @@
       "error":{"httpStatusCode":403},
       "exception":true
     },
+    "GetAccountSettingsOutput":{
+      "type":"structure",
+      "members":{
+        "AccountSettings":{"shape":"AccountSettings"}
+      }
+    },
     "GetGroupConfigurationInput":{
       "type":"structure",
       "members":{
@@ -386,7 +560,7 @@
           "deprecated":true,
           "deprecatedMessage":"This field is deprecated, use Group instead."
         },
-        "Group":{"shape":"GroupString"}
+        "Group":{"shape":"GroupStringV2"}
       }
     },
     "GetGroupOutput":{
@@ -412,12 +586,33 @@
         "GroupQuery":{"shape":"GroupQuery"}
       }
     },
+    "GetTagSyncTaskInput":{
+      "type":"structure",
+      "required":["TaskArn"],
+      "members":{
+        "TaskArn":{"shape":"TagSyncTaskArn"}
+      }
+    },
+    "GetTagSyncTaskOutput":{
+      "type":"structure",
+      "members":{
+        "GroupArn":{"shape":"GroupArnV2"},
+        "GroupName":{"shape":"GroupName"},
+        "TaskArn":{"shape":"TagSyncTaskArn"},
+        "TagKey":{"shape":"TagKey"},
+        "TagValue":{"shape":"TagValue"},
+        "RoleArn":{"shape":"RoleArn"},
+        "Status":{"shape":"TagSyncTaskStatus"},
+        "ErrorMessage":{"shape":"ErrorMessage"},
+        "CreatedAt":{"shape":"timestamp"}
+      }
+    },
     "GetTagsInput":{
       "type":"structure",
       "required":["Arn"],
       "members":{
         "Arn":{
-          "shape":"GroupArn",
+          "shape":"GroupArnV2",
           "location":"uri",
           "locationName":"Arn"
         }
@@ -426,7 +621,7 @@
     "GetTagsOutput":{
       "type":"structure",
       "members":{
-        "Arn":{"shape":"GroupArn"},
+        "Arn":{"shape":"GroupArnV2"},
         "Tags":{"shape":"Tags"}
       }
     },
@@ -437,16 +632,26 @@
         "Name"
       ],
       "members":{
-        "GroupArn":{"shape":"GroupArn"},
+        "GroupArn":{"shape":"GroupArnV2"},
         "Name":{"shape":"GroupName"},
-        "Description":{"shape":"Description"}
+        "Description":{"shape":"Description"},
+        "Criticality":{"shape":"Criticality"},
+        "Owner":{"shape":"Owner"},
+        "DisplayName":{"shape":"DisplayName"},
+        "ApplicationTag":{"shape":"ApplicationTag"}
       }
     },
     "GroupArn":{
       "type":"string",
       "max":1600,
       "min":12,
-      "pattern":"arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\\d{1}:[0-9]{12}:group/[a-zA-Z0-9_\\.-]{1,128}"
+      "pattern":"arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\\d{1}:[0-9]{12}:group/([a-zA-Z0-9_\\.-]{1,300}|[a-zA-Z0-9_\\.-]{1,150}/[a-z0-9]{26})"
+    },
+    "GroupArnV2":{
+      "type":"string",
+      "max":1600,
+      "min":12,
+      "pattern":"arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\\d{1}:[0-9]{12}:group/([a-zA-Z0-9_\\.-]{1,300}|[a-zA-Z0-9_\\.-]{1,150}/[a-z0-9]{26})"
     },
     "GroupConfiguration":{
       "type":"structure",
@@ -489,7 +694,7 @@
       "type":"string",
       "max":256,
       "min":1,
-      "pattern":"[a-zA-Z0-9:_-]+"
+      "pattern":"[a-zA-Z0-9:\\/\\._-]+"
     },
     "GroupConfigurationParameterValueList":{
       "type":"list",
@@ -527,14 +732,17 @@
       "type":"string",
       "enum":[
         "resource-type",
-        "configuration-type"
+        "configuration-type",
+        "owner",
+        "display-name",
+        "criticality"
       ]
     },
     "GroupFilterValue":{
       "type":"string",
-      "max":128,
+      "max":300,
       "min":1,
-      "pattern":"AWS::(AllSupported|[a-zA-Z0-9]+::[a-zA-Z0-9]+)"
+      "pattern":"AWS::(AllSupported|[a-zA-Z0-9]+::[a-zA-Z0-9]+)|[\\s\\p{L}0-9_\\.-]*"
     },
     "GroupFilterValues":{
       "type":"list",
@@ -546,12 +754,37 @@
       "type":"structure",
       "members":{
         "GroupName":{"shape":"GroupName"},
-        "GroupArn":{"shape":"GroupArn"}
+        "GroupArn":{"shape":"GroupArn"},
+        "Description":{"shape":"Description"},
+        "Criticality":{"shape":"Criticality"},
+        "Owner":{"shape":"Owner"},
+        "DisplayName":{"shape":"DisplayName"}
       }
     },
     "GroupIdentifierList":{
       "type":"list",
       "member":{"shape":"GroupIdentifier"}
+    },
+    "GroupLifecycleEventsDesiredStatus":{
+      "type":"string",
+      "enum":[
+        "ACTIVE",
+        "INACTIVE"
+      ]
+    },
+    "GroupLifecycleEventsStatus":{
+      "type":"string",
+      "enum":[
+        "ACTIVE",
+        "INACTIVE",
+        "IN_PROGRESS",
+        "ERROR"
+      ]
+    },
+    "GroupLifecycleEventsStatusMessage":{
+      "type":"string",
+      "max":1024,
+      "min":1
     },
     "GroupList":{
       "type":"list",
@@ -559,9 +792,9 @@
     },
     "GroupName":{
       "type":"string",
-      "max":128,
+      "max":300,
       "min":1,
-      "pattern":"[a-zA-Z0-9_\\.-]+"
+      "pattern":"[a-zA-Z0-9_\\.-]{1,300}|[a-zA-Z0-9_\\.-]{1,150}/[a-z0-9]{26}"
     },
     "GroupParameterList":{
       "type":"list",
@@ -585,7 +818,7 @@
         "ResourceArns"
       ],
       "members":{
-        "Group":{"shape":"GroupString"},
+        "Group":{"shape":"GroupStringV2"},
         "ResourceArns":{"shape":"ResourceArnList"}
       }
     },
@@ -601,7 +834,44 @@
       "type":"string",
       "max":1600,
       "min":1,
-      "pattern":"(arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\\d{1}:[0-9]{12}:group/)?[a-zA-Z0-9_\\.-]{1,128}"
+      "pattern":"[a-zA-Z0-9_\\.-]{1,300}|[a-zA-Z0-9_\\.-]{1,150}/[a-z0-9]{26}|arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\\d{1}:[0-9]{12}:group/([a-zA-Z0-9_\\.-]{1,300}|[a-zA-Z0-9_\\.-]{1,150}/[a-z0-9]{26})"
+    },
+    "GroupStringV2":{
+      "type":"string",
+      "max":1600,
+      "min":1,
+      "pattern":"[a-zA-Z0-9_\\.-]{1,300}|[a-zA-Z0-9_\\.-]{1,150}/[a-z0-9]{26}|arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\\d{1}:[0-9]{12}:group/([a-zA-Z0-9_\\.-]{1,300}|[a-zA-Z0-9_\\.-]{1,150}/[a-z0-9]{26})"
+    },
+    "GroupingStatus":{
+      "type":"string",
+      "enum":[
+        "SUCCESS",
+        "FAILED",
+        "IN_PROGRESS",
+        "SKIPPED"
+      ]
+    },
+    "GroupingStatusesItem":{
+      "type":"structure",
+      "members":{
+        "ResourceArn":{"shape":"ResourceArn"},
+        "Action":{"shape":"GroupingType"},
+        "Status":{"shape":"GroupingStatus"},
+        "ErrorMessage":{"shape":"ErrorMessage"},
+        "ErrorCode":{"shape":"ErrorCode"},
+        "UpdatedAt":{"shape":"timestamp"}
+      }
+    },
+    "GroupingStatusesList":{
+      "type":"list",
+      "member":{"shape":"GroupingStatusesItem"}
+    },
+    "GroupingType":{
+      "type":"string",
+      "enum":[
+        "GROUP",
+        "UNGROUP"
+      ]
     },
     "InternalServerErrorException":{
       "type":"structure",
@@ -619,7 +889,7 @@
           "deprecated":true,
           "deprecatedMessage":"This field is deprecated, use Group instead."
         },
-        "Group":{"shape":"GroupString"},
+        "Group":{"shape":"GroupStringV2"},
         "Filters":{"shape":"ResourceFilterList"},
         "MaxResults":{"shape":"MaxResults"},
         "NextToken":{"shape":"NextToken"}
@@ -647,6 +917,56 @@
         },
         "NextToken":{"shape":"NextToken"},
         "QueryErrors":{"shape":"QueryErrorList"}
+      }
+    },
+    "ListGroupingStatusesFilter":{
+      "type":"structure",
+      "required":[
+        "Name",
+        "Values"
+      ],
+      "members":{
+        "Name":{"shape":"ListGroupingStatusesFilterName"},
+        "Values":{"shape":"ListGroupingStatusesFilterValues"}
+      }
+    },
+    "ListGroupingStatusesFilterList":{
+      "type":"list",
+      "member":{"shape":"ListGroupingStatusesFilter"}
+    },
+    "ListGroupingStatusesFilterName":{
+      "type":"string",
+      "enum":[
+        "status",
+        "resource-arn"
+      ]
+    },
+    "ListGroupingStatusesFilterValue":{
+      "type":"string",
+      "pattern":"SUCCESS|FAILED|IN_PROGRESS|SKIPPED|arn:aws(-[a-z]+)*:[a-z0-9\\-]*:([a-z]{2}(-[a-z]+)+-\\d{1})?:([0-9]{12})?:.+"
+    },
+    "ListGroupingStatusesFilterValues":{
+      "type":"list",
+      "member":{"shape":"ListGroupingStatusesFilterValue"},
+      "max":10,
+      "min":1
+    },
+    "ListGroupingStatusesInput":{
+      "type":"structure",
+      "required":["Group"],
+      "members":{
+        "Group":{"shape":"GroupStringV2"},
+        "MaxResults":{"shape":"MaxResults"},
+        "Filters":{"shape":"ListGroupingStatusesFilterList"},
+        "NextToken":{"shape":"NextToken"}
+      }
+    },
+    "ListGroupingStatusesOutput":{
+      "type":"structure",
+      "members":{
+        "Group":{"shape":"GroupStringV2"},
+        "GroupingStatuses":{"shape":"GroupingStatusesList"},
+        "NextToken":{"shape":"NextToken"}
       }
     },
     "ListGroupsInput":{
@@ -677,6 +997,32 @@
         "NextToken":{"shape":"NextToken"}
       }
     },
+    "ListTagSyncTasksFilter":{
+      "type":"structure",
+      "members":{
+        "GroupArn":{"shape":"GroupArnV2"},
+        "GroupName":{"shape":"GroupName"}
+      }
+    },
+    "ListTagSyncTasksFilterList":{
+      "type":"list",
+      "member":{"shape":"ListTagSyncTasksFilter"}
+    },
+    "ListTagSyncTasksInput":{
+      "type":"structure",
+      "members":{
+        "Filters":{"shape":"ListTagSyncTasksFilterList"},
+        "MaxResults":{"shape":"MaxResults"},
+        "NextToken":{"shape":"NextToken"}
+      }
+    },
+    "ListTagSyncTasksOutput":{
+      "type":"structure",
+      "members":{
+        "TagSyncTasks":{"shape":"TagSyncTaskList"},
+        "NextToken":{"shape":"NextToken"}
+      }
+    },
     "MaxResults":{
       "type":"integer",
       "max":50,
@@ -703,6 +1049,12 @@
       },
       "error":{"httpStatusCode":404},
       "exception":true
+    },
+    "Owner":{
+      "type":"string",
+      "max":300,
+      "min":0,
+      "pattern":"^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$"
     },
     "PendingResource":{
       "type":"structure",
@@ -742,7 +1094,9 @@
       "type":"string",
       "enum":[
         "CLOUDFORMATION_STACK_INACTIVE",
-        "CLOUDFORMATION_STACK_NOT_EXISTING"
+        "CLOUDFORMATION_STACK_NOT_EXISTING",
+        "CLOUDFORMATION_STACK_UNASSUMABLE_ROLE",
+        "RESOURCE_TYPE_NOT_SUPPORTED"
       ]
     },
     "QueryErrorList":{
@@ -837,6 +1191,12 @@
       "type":"string",
       "pattern":"AWS::[a-zA-Z0-9]+::\\w+"
     },
+    "RoleArn":{
+      "type":"string",
+      "max":2048,
+      "min":20,
+      "pattern":"arn:(aws[a-zA-Z-]*)?:iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+"
+    },
     "SearchResourcesInput":{
       "type":"structure",
       "required":["ResourceQuery"],
@@ -854,6 +1214,32 @@
         "QueryErrors":{"shape":"QueryErrorList"}
       }
     },
+    "StartTagSyncTaskInput":{
+      "type":"structure",
+      "required":[
+        "Group",
+        "TagKey",
+        "TagValue",
+        "RoleArn"
+      ],
+      "members":{
+        "Group":{"shape":"GroupStringV2"},
+        "TagKey":{"shape":"TagKey"},
+        "TagValue":{"shape":"TagValue"},
+        "RoleArn":{"shape":"RoleArn"}
+      }
+    },
+    "StartTagSyncTaskOutput":{
+      "type":"structure",
+      "members":{
+        "GroupArn":{"shape":"GroupArnV2"},
+        "GroupName":{"shape":"GroupName"},
+        "TaskArn":{"shape":"TagSyncTaskArn"},
+        "TagKey":{"shape":"TagKey"},
+        "TagValue":{"shape":"TagValue"},
+        "RoleArn":{"shape":"RoleArn"}
+      }
+    },
     "TagInput":{
       "type":"structure",
       "required":[
@@ -862,7 +1248,7 @@
       ],
       "members":{
         "Arn":{
-          "shape":"GroupArn",
+          "shape":"GroupArnV2",
           "location":"uri",
           "locationName":"Arn"
         },
@@ -882,9 +1268,40 @@
     "TagOutput":{
       "type":"structure",
       "members":{
-        "Arn":{"shape":"GroupArn"},
+        "Arn":{"shape":"GroupArnV2"},
         "Tags":{"shape":"Tags"}
       }
+    },
+    "TagSyncTaskArn":{
+      "type":"string",
+      "max":1600,
+      "min":12,
+      "pattern":"arn:aws(-[a-z]+)*:resource-groups:[a-z]{2}(-[a-z]+)+-\\d{1}:[0-9]{12}:group/[a-zA-Z0-9_\\.-]{1,150}/[a-z0-9]{26}/tag-sync-task/[a-z0-9]{26}"
+    },
+    "TagSyncTaskItem":{
+      "type":"structure",
+      "members":{
+        "GroupArn":{"shape":"GroupArnV2"},
+        "GroupName":{"shape":"GroupName"},
+        "TaskArn":{"shape":"TagSyncTaskArn"},
+        "TagKey":{"shape":"TagKey"},
+        "TagValue":{"shape":"TagValue"},
+        "RoleArn":{"shape":"RoleArn"},
+        "Status":{"shape":"TagSyncTaskStatus"},
+        "ErrorMessage":{"shape":"ErrorMessage"},
+        "CreatedAt":{"shape":"timestamp"}
+      }
+    },
+    "TagSyncTaskList":{
+      "type":"list",
+      "member":{"shape":"TagSyncTaskItem"}
+    },
+    "TagSyncTaskStatus":{
+      "type":"string",
+      "enum":[
+        "ACTIVE",
+        "ERROR"
+      ]
     },
     "TagValue":{
       "type":"string",
@@ -920,7 +1337,7 @@
         "ResourceArns"
       ],
       "members":{
-        "Group":{"shape":"GroupString"},
+        "Group":{"shape":"GroupStringV2"},
         "ResourceArns":{"shape":"ResourceArnList"}
       }
     },
@@ -940,7 +1357,7 @@
       ],
       "members":{
         "Arn":{
-          "shape":"GroupArn",
+          "shape":"GroupArnV2",
           "location":"uri",
           "locationName":"Arn"
         },
@@ -950,8 +1367,20 @@
     "UntagOutput":{
       "type":"structure",
       "members":{
-        "Arn":{"shape":"GroupArn"},
+        "Arn":{"shape":"GroupArnV2"},
         "Keys":{"shape":"TagKeyList"}
+      }
+    },
+    "UpdateAccountSettingsInput":{
+      "type":"structure",
+      "members":{
+        "GroupLifecycleEventsDesiredStatus":{"shape":"GroupLifecycleEventsDesiredStatus"}
+      }
+    },
+    "UpdateAccountSettingsOutput":{
+      "type":"structure",
+      "members":{
+        "AccountSettings":{"shape":"AccountSettings"}
       }
     },
     "UpdateGroupInput":{
@@ -962,8 +1391,11 @@
           "deprecated":true,
           "deprecatedMessage":"This field is deprecated, use Group instead."
         },
-        "Group":{"shape":"GroupString"},
-        "Description":{"shape":"Description"}
+        "Group":{"shape":"GroupStringV2"},
+        "Description":{"shape":"Description"},
+        "Criticality":{"shape":"Criticality"},
+        "Owner":{"shape":"Owner"},
+        "DisplayName":{"shape":"DisplayName"}
       }
     },
     "UpdateGroupOutput":{
@@ -990,6 +1422,7 @@
       "members":{
         "GroupQuery":{"shape":"GroupQuery"}
       }
-    }
+    },
+    "timestamp":{"type":"timestamp"}
   }
 }

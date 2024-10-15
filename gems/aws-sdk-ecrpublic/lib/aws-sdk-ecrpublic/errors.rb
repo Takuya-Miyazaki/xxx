@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -35,6 +35,7 @@ module Aws::ECRPublic
   # * {InvalidLayerException}
   # * {InvalidLayerPartException}
   # * {InvalidParameterException}
+  # * {InvalidTagParameterException}
   # * {LayerAlreadyExistsException}
   # * {LayerPartTooSmallException}
   # * {LayersNotFoundException}
@@ -42,10 +43,12 @@ module Aws::ECRPublic
   # * {ReferencedImagesNotFoundException}
   # * {RegistryNotFoundException}
   # * {RepositoryAlreadyExistsException}
+  # * {RepositoryCatalogDataNotFoundException}
   # * {RepositoryNotEmptyException}
   # * {RepositoryNotFoundException}
   # * {RepositoryPolicyNotFoundException}
   # * {ServerException}
+  # * {TooManyTagsException}
   # * {UnsupportedCommandException}
   # * {UploadNotFoundException}
   #
@@ -195,6 +198,21 @@ module Aws::ECRPublic
       end
     end
 
+    class InvalidTagParameterException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::ECRPublic::Types::InvalidTagParameterException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class LayerAlreadyExistsException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -300,6 +318,21 @@ module Aws::ECRPublic
       end
     end
 
+    class RepositoryCatalogDataNotFoundException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::ECRPublic::Types::RepositoryCatalogDataNotFoundException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
     class RepositoryNotEmptyException < ServiceError
 
       # @param [Seahorse::Client::RequestContext] context
@@ -350,6 +383,21 @@ module Aws::ECRPublic
       # @param [Seahorse::Client::RequestContext] context
       # @param [String] message
       # @param [Aws::ECRPublic::Types::ServerException] data
+      def initialize(context, message, data = Aws::EmptyStructure.new)
+        super(context, message, data)
+      end
+
+      # @return [String]
+      def message
+        @message || @data[:message]
+      end
+    end
+
+    class TooManyTagsException < ServiceError
+
+      # @param [Seahorse::Client::RequestContext] context
+      # @param [String] message
+      # @param [Aws::ECRPublic::Types::TooManyTagsException] data
       def initialize(context, message, data = Aws::EmptyStructure.new)
         super(context, message, data)
       end

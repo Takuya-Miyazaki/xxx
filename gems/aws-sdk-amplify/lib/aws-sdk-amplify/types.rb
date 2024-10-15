@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -34,11 +34,18 @@ module Aws::Amplify
     #   @return [String]
     #
     # @!attribute [rw] repository
-    #   The repository for the Amplify app.
+    #   The Git repository for the Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] platform
-    #   The platform for the Amplify app.
+    #   The platform for the Amplify app. For a static app, set the platform
+    #   type to `WEB`. For a dynamic server-side rendered (SSR) app, set the
+    #   platform type to `WEB_COMPUTE`. For an app requiring Amplify
+    #   Hosting's original SSR support only, set the platform type to
+    #   `WEB_DYNAMIC`.
+    #
+    #   If you are deploying an SSG only app with Next.js 14 or later, you
+    #   must use the platform type `WEB_COMPUTE`.
     #   @return [String]
     #
     # @!attribute [rw] create_time
@@ -56,6 +63,14 @@ module Aws::Amplify
     #
     # @!attribute [rw] environment_variables
     #   The environment variables for the Amplify app.
+    #
+    #   For a list of the environment variables that are accessible to
+    #   Amplify by default, see [Amplify Environment variables][1] in the
+    #   *Amplify Hosting User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/amplify/latest/userguide/amplify-console-environment-variables.html
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] default_domain
@@ -67,7 +82,7 @@ module Aws::Amplify
     #   @return [Boolean]
     #
     # @!attribute [rw] enable_branch_auto_deletion
-    #   Automatically disconnect a branch in the Amplify Console when you
+    #   Automatically disconnect a branch in the Amplify console when you
     #   delete a branch from your Git repository.
     #   @return [Boolean]
     #
@@ -77,7 +92,8 @@ module Aws::Amplify
     #
     # @!attribute [rw] basic_auth_credentials
     #   The basic authorization credentials for branches for the Amplify
-    #   app.
+    #   app. You must base64-encode the authorization credentials and
+    #   provide them in the format `user:password`.
     #   @return [String]
     #
     # @!attribute [rw] custom_rules
@@ -112,6 +128,24 @@ module Aws::Amplify
     #   Amplify app.
     #   @return [Types::AutoBranchCreationConfig]
     #
+    # @!attribute [rw] repository_clone_method
+    #   <note markdown="1"> This is for internal use.
+    #
+    #    </note>
+    #
+    #   The Amplify service uses this parameter to specify the
+    #   authentication protocol to use to access the Git repository for an
+    #   Amplify app. Amplify specifies `TOKEN` for a GitHub repository,
+    #   `SIGV4` for an Amazon Web Services CodeCommit repository, and `SSH`
+    #   for GitLab and Bitbucket repositories.
+    #   @return [String]
+    #
+    # @!attribute [rw] cache_config
+    #   The cache configuration for the Amplify app. If you don't specify
+    #   the cache configuration `type`, Amplify uses the default
+    #   `AMPLIFY_MANAGED` setting.
+    #   @return [Types::CacheConfig]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/App AWS API Documentation
     #
     class App < Struct.new(
@@ -137,8 +171,10 @@ module Aws::Amplify
       :custom_headers,
       :enable_auto_branch_creation,
       :auto_branch_creation_patterns,
-      :auto_branch_creation_config)
-      SENSITIVE = [:basic_auth_credentials]
+      :auto_branch_creation_config,
+      :repository_clone_method,
+      :cache_config)
+      SENSITIVE = [:basic_auth_credentials, :build_spec]
       include Aws::Structure
     end
 
@@ -163,24 +199,6 @@ module Aws::Amplify
 
     # Describes the automated branch creation configuration.
     #
-    # @note When making an API call, you may pass AutoBranchCreationConfig
-    #   data as a hash:
-    #
-    #       {
-    #         stage: "PRODUCTION", # accepts PRODUCTION, BETA, DEVELOPMENT, EXPERIMENTAL, PULL_REQUEST
-    #         framework: "Framework",
-    #         enable_auto_build: false,
-    #         environment_variables: {
-    #           "EnvKey" => "EnvValue",
-    #         },
-    #         basic_auth_credentials: "BasicAuthCredentials",
-    #         enable_basic_auth: false,
-    #         enable_performance_mode: false,
-    #         build_spec: "BuildSpec",
-    #         enable_pull_request_preview: false,
-    #         pull_request_environment_name: "PullRequestEnvironmentName",
-    #       }
-    #
     # @!attribute [rw] stage
     #   Describes the current stage for the autocreated branch.
     #   @return [String]
@@ -198,7 +216,9 @@ module Aws::Amplify
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] basic_auth_credentials
-    #   The basic authorization credentials for the autocreated branch.
+    #   The basic authorization credentials for the autocreated branch. You
+    #   must base64-encode the authorization credentials and provide them in
+    #   the format `user:password`.
     #   @return [String]
     #
     # @!attribute [rw] enable_basic_auth
@@ -239,11 +259,31 @@ module Aws::Amplify
       :build_spec,
       :enable_pull_request_preview,
       :pull_request_environment_name)
-      SENSITIVE = [:basic_auth_credentials]
+      SENSITIVE = [:basic_auth_credentials, :build_spec]
       include Aws::Structure
     end
 
-    # Describes the backend environment for an Amplify app.
+    # Describes the backend associated with an Amplify `Branch`.
+    #
+    # This property is available to Amplify Gen 2 apps only. When you deploy
+    # an application with Amplify Gen 2, you provision the app's backend
+    # infrastructure using Typescript code.
+    #
+    # @!attribute [rw] stack_arn
+    #   The Amazon Resource Name (ARN) for the CloudFormation stack.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/Backend AWS API Documentation
+    #
+    class Backend < Struct.new(
+      :stack_arn)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the backend environment associated with a `Branch` of a Gen
+    # 1 Amplify app. Amplify Gen 1 applications are created using Amplify
+    # Studio or the Amplify command line interface (CLI).
     #
     # @!attribute [rw] backend_environment_arn
     #   The Amazon Resource Name (ARN) for a backend environment that is
@@ -384,6 +424,8 @@ module Aws::Amplify
     #
     # @!attribute [rw] basic_auth_credentials
     #   The basic authorization credentials for a branch of an Amplify app.
+    #   You must base64-encode the authorization credentials and provide
+    #   them in the format `user:password`.
     #   @return [String]
     #
     # @!attribute [rw] build_spec
@@ -418,7 +460,19 @@ module Aws::Amplify
     # @!attribute [rw] backend_environment_arn
     #   The Amazon Resource Name (ARN) for a backend environment that is
     #   part of an Amplify app.
+    #
+    #   This property is available to Amplify Gen 1 apps only. When you
+    #   deploy an application with Amplify Gen 2, you provision the app's
+    #   backend infrastructure using Typescript code.
     #   @return [String]
+    #
+    # @!attribute [rw] backend
+    #   Describes the backend associated with an Amplify `Branch`.
+    #
+    #   This property is available to Amplify Gen 2 apps only. When you
+    #   deploy an application with Amplify Gen 2, you provision the app's
+    #   backend infrastructure using Typescript code.
+    #   @return [Types::Backend]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/Branch AWS API Documentation
     #
@@ -449,76 +503,158 @@ module Aws::Amplify
       :pull_request_environment_name,
       :destination_branch,
       :source_branch,
-      :backend_environment_arn)
-      SENSITIVE = [:basic_auth_credentials]
+      :backend_environment_arn,
+      :backend)
+      SENSITIVE = [:basic_auth_credentials, :build_spec]
+      include Aws::Structure
+    end
+
+    # Describes the cache configuration for an Amplify app.
+    #
+    # For more information about how Amplify applies an optimal cache
+    # configuration for your app based on the type of content that is being
+    # served, see [Managing cache configuration][1] in the *Amplify User
+    # guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/amplify/latest/userguide/managing-cache-configuration
+    #
+    # @!attribute [rw] type
+    #   The type of cache configuration to use for an Amplify app.
+    #
+    #   The `AMPLIFY_MANAGED` cache configuration automatically applies an
+    #   optimized cache configuration for your app based on its platform,
+    #   routing rules, and rewrite rules. This is the default setting.
+    #
+    #   The `AMPLIFY_MANAGED_NO_COOKIES` cache configuration type is the
+    #   same as `AMPLIFY_MANAGED`, except that it excludes all cookies from
+    #   the cache key.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/CacheConfig AWS API Documentation
+    #
+    class CacheConfig < Struct.new(
+      :type)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # Describes the current SSL/TLS certificate that is in use for the
+    # domain. If you are using `CreateDomainAssociation` to create a new
+    # domain association, `Certificate` describes the new certificate that
+    # you are creating.
+    #
+    # @!attribute [rw] type
+    #   The type of SSL/TLS certificate that you want to use.
+    #
+    #   Specify `AMPLIFY_MANAGED` to use the default certificate that
+    #   Amplify provisions for you.
+    #
+    #   Specify `CUSTOM` to use your own certificate that you have already
+    #   added to Certificate Manager in your Amazon Web Services account.
+    #   Make sure you request (or import) the certificate in the US East (N.
+    #   Virginia) Region (us-east-1). For more information about using ACM,
+    #   see [Importing certificates into Certificate Manager][1] in the *ACM
+    #   User guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html
+    #   @return [String]
+    #
+    # @!attribute [rw] custom_certificate_arn
+    #   The Amazon resource name (ARN) for a custom certificate that you
+    #   have already added to Certificate Manager in your Amazon Web
+    #   Services account.
+    #
+    #   This field is required only when the certificate type is `CUSTOM`.
+    #   @return [String]
+    #
+    # @!attribute [rw] certificate_verification_dns_record
+    #   The DNS record for certificate verification.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/Certificate AWS API Documentation
+    #
+    class Certificate < Struct.new(
+      :type,
+      :custom_certificate_arn,
+      :certificate_verification_dns_record)
+      SENSITIVE = []
+      include Aws::Structure
+    end
+
+    # The type of SSL/TLS certificate to use for your custom domain. If a
+    # certificate type isn't specified, Amplify uses the default
+    # `AMPLIFY_MANAGED` certificate.
+    #
+    # @!attribute [rw] type
+    #   The certificate type.
+    #
+    #   Specify `AMPLIFY_MANAGED` to use the default certificate that
+    #   Amplify provisions for you.
+    #
+    #   Specify `CUSTOM` to use your own certificate that you have already
+    #   added to Certificate Manager in your Amazon Web Services account.
+    #   Make sure you request (or import) the certificate in the US East (N.
+    #   Virginia) Region (us-east-1). For more information about using ACM,
+    #   see [Importing certificates into Certificate Manager][1] in the *ACM
+    #   User guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html
+    #   @return [String]
+    #
+    # @!attribute [rw] custom_certificate_arn
+    #   The Amazon resource name (ARN) for the custom certificate that you
+    #   have already added to Certificate Manager in your Amazon Web
+    #   Services account.
+    #
+    #   This field is required only when the certificate type is `CUSTOM`.
+    #   @return [String]
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/CertificateSettings AWS API Documentation
+    #
+    class CertificateSettings < Struct.new(
+      :type,
+      :custom_certificate_arn)
+      SENSITIVE = []
       include Aws::Structure
     end
 
     # The request structure used to create apps in Amplify.
     #
-    # @note When making an API call, you may pass CreateAppRequest
-    #   data as a hash:
-    #
-    #       {
-    #         name: "Name", # required
-    #         description: "Description",
-    #         repository: "Repository",
-    #         platform: "WEB", # accepts WEB
-    #         iam_service_role_arn: "ServiceRoleArn",
-    #         oauth_token: "OauthToken",
-    #         access_token: "AccessToken",
-    #         environment_variables: {
-    #           "EnvKey" => "EnvValue",
-    #         },
-    #         enable_branch_auto_build: false,
-    #         enable_branch_auto_deletion: false,
-    #         enable_basic_auth: false,
-    #         basic_auth_credentials: "BasicAuthCredentials",
-    #         custom_rules: [
-    #           {
-    #             source: "Source", # required
-    #             target: "Target", # required
-    #             status: "Status",
-    #             condition: "Condition",
-    #           },
-    #         ],
-    #         tags: {
-    #           "TagKey" => "TagValue",
-    #         },
-    #         build_spec: "BuildSpec",
-    #         custom_headers: "CustomHeaders",
-    #         enable_auto_branch_creation: false,
-    #         auto_branch_creation_patterns: ["AutoBranchCreationPattern"],
-    #         auto_branch_creation_config: {
-    #           stage: "PRODUCTION", # accepts PRODUCTION, BETA, DEVELOPMENT, EXPERIMENTAL, PULL_REQUEST
-    #           framework: "Framework",
-    #           enable_auto_build: false,
-    #           environment_variables: {
-    #             "EnvKey" => "EnvValue",
-    #           },
-    #           basic_auth_credentials: "BasicAuthCredentials",
-    #           enable_basic_auth: false,
-    #           enable_performance_mode: false,
-    #           build_spec: "BuildSpec",
-    #           enable_pull_request_preview: false,
-    #           pull_request_environment_name: "PullRequestEnvironmentName",
-    #         },
-    #       }
-    #
     # @!attribute [rw] name
-    #   The name for an Amplify app.
+    #   The name of the Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] description
-    #   The description for an Amplify app.
+    #   The description of the Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] repository
-    #   The repository for an Amplify app.
+    #   The Git repository for the Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] platform
-    #   The platform or framework for an Amplify app.
+    #   The platform for the Amplify app. For a static app, set the platform
+    #   type to `WEB`. For a dynamic server-side rendered (SSR) app, set the
+    #   platform type to `WEB_COMPUTE`. For an app requiring Amplify
+    #   Hosting's original SSR support only, set the platform type to
+    #   `WEB_DYNAMIC`.
+    #
+    #   If you are deploying an SSG only app with Next.js version 14 or
+    #   later, you must set the platform type to `WEB_COMPUTE` and set the
+    #   artifacts `baseDirectory` to `.next` in the application's build
+    #   settings. For an example of the build specification settings, see
+    #   [Amplify build settings for a Next.js 14 SSG application][1] in the
+    #   *Amplify Hosting User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/amplify/latest/userguide/deploy-nextjs-app.html#build-setting-detection-ssg-14
     #   @return [String]
     #
     # @!attribute [rw] iam_service_role_arn
@@ -529,17 +665,61 @@ module Aws::Amplify
     # @!attribute [rw] oauth_token
     #   The OAuth token for a third-party source control system for an
     #   Amplify app. The OAuth token is used to create a webhook and a
-    #   read-only deploy key. The OAuth token is not stored.
+    #   read-only deploy key using SSH cloning. The OAuth token is not
+    #   stored.
+    #
+    #   Use `oauthToken` for repository providers other than GitHub, such as
+    #   Bitbucket or CodeCommit. To authorize access to GitHub as your
+    #   repository provider, use `accessToken`.
+    #
+    #   You must specify either `oauthToken` or `accessToken` when you
+    #   create a new app.
+    #
+    #   Existing Amplify apps deployed from a GitHub repository using OAuth
+    #   continue to work with CI/CD. However, we strongly recommend that you
+    #   migrate these apps to use the GitHub App. For more information, see
+    #   [Migrating an existing OAuth app to the Amplify GitHub App][1] in
+    #   the *Amplify User Guide* .
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/amplify/latest/userguide/setting-up-GitHub-access.html#migrating-to-github-app-auth
     #   @return [String]
     #
     # @!attribute [rw] access_token
-    #   The personal access token for a third-party source control system
-    #   for an Amplify app. The personal access token is used to create a
-    #   webhook and a read-only deploy key. The token is not stored.
+    #   The personal access token for a GitHub repository for an Amplify
+    #   app. The personal access token is used to authorize access to a
+    #   GitHub repository using the Amplify GitHub App. The token is not
+    #   stored.
+    #
+    #   Use `accessToken` for GitHub repositories only. To authorize access
+    #   to a repository provider such as Bitbucket or CodeCommit, use
+    #   `oauthToken`.
+    #
+    #   You must specify either `accessToken` or `oauthToken` when you
+    #   create a new app.
+    #
+    #   Existing Amplify apps deployed from a GitHub repository using OAuth
+    #   continue to work with CI/CD. However, we strongly recommend that you
+    #   migrate these apps to use the GitHub App. For more information, see
+    #   [Migrating an existing OAuth app to the Amplify GitHub App][1] in
+    #   the *Amplify User Guide* .
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/amplify/latest/userguide/setting-up-GitHub-access.html#migrating-to-github-app-auth
     #   @return [String]
     #
     # @!attribute [rw] environment_variables
     #   The environment variables map for an Amplify app.
+    #
+    #   For a list of the environment variables that are accessible to
+    #   Amplify by default, see [Amplify Environment variables][1] in the
+    #   *Amplify Hosting User Guide*.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/amplify/latest/userguide/amplify-console-environment-variables.html
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] enable_branch_auto_build
@@ -547,7 +727,7 @@ module Aws::Amplify
     #   @return [Boolean]
     #
     # @!attribute [rw] enable_branch_auto_deletion
-    #   Automatically disconnects a branch in the Amplify Console when you
+    #   Automatically disconnects a branch in the Amplify console when you
     #   delete a branch from your Git repository.
     #   @return [Boolean]
     #
@@ -557,7 +737,9 @@ module Aws::Amplify
     #   @return [Boolean]
     #
     # @!attribute [rw] basic_auth_credentials
-    #   The credentials for basic authorization for an Amplify app.
+    #   The credentials for basic authorization for an Amplify app. You must
+    #   base64-encode the authorization credentials and provide them in the
+    #   format `user:password`.
     #   @return [String]
     #
     # @!attribute [rw] custom_rules
@@ -588,6 +770,10 @@ module Aws::Amplify
     #   The automated branch creation configuration for an Amplify app.
     #   @return [Types::AutoBranchCreationConfig]
     #
+    # @!attribute [rw] cache_config
+    #   The cache configuration for the Amplify app.
+    #   @return [Types::CacheConfig]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/CreateAppRequest AWS API Documentation
     #
     class CreateAppRequest < Struct.new(
@@ -609,8 +795,9 @@ module Aws::Amplify
       :custom_headers,
       :enable_auto_branch_creation,
       :auto_branch_creation_patterns,
-      :auto_branch_creation_config)
-      SENSITIVE = [:oauth_token, :access_token, :basic_auth_credentials]
+      :auto_branch_creation_config,
+      :cache_config)
+      SENSITIVE = [:oauth_token, :access_token, :basic_auth_credentials, :build_spec]
       include Aws::Structure
     end
 
@@ -628,16 +815,6 @@ module Aws::Amplify
     end
 
     # The request structure for the backend environment create request.
-    #
-    # @note When making an API call, you may pass CreateBackendEnvironmentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         environment_name: "EnvironmentName", # required
-    #         stack_name: "StackName",
-    #         deployment_artifacts: "DeploymentArtifacts",
-    #       }
     #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
@@ -682,34 +859,6 @@ module Aws::Amplify
 
     # The request structure for the create branch request.
     #
-    # @note When making an API call, you may pass CreateBranchRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         description: "Description",
-    #         stage: "PRODUCTION", # accepts PRODUCTION, BETA, DEVELOPMENT, EXPERIMENTAL, PULL_REQUEST
-    #         framework: "Framework",
-    #         enable_notification: false,
-    #         enable_auto_build: false,
-    #         environment_variables: {
-    #           "EnvKey" => "EnvValue",
-    #         },
-    #         basic_auth_credentials: "BasicAuthCredentials",
-    #         enable_basic_auth: false,
-    #         enable_performance_mode: false,
-    #         tags: {
-    #           "TagKey" => "TagValue",
-    #         },
-    #         build_spec: "BuildSpec",
-    #         ttl: "TTL",
-    #         display_name: "DisplayName",
-    #         enable_pull_request_preview: false,
-    #         pull_request_environment_name: "PullRequestEnvironmentName",
-    #         backend_environment_arn: "BackendEnvironmentArn",
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
@@ -743,7 +892,9 @@ module Aws::Amplify
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] basic_auth_credentials
-    #   The basic authorization credentials for the branch.
+    #   The basic authorization credentials for the branch. You must
+    #   base64-encode the authorization credentials and provide them in the
+    #   format `user:password`.
     #   @return [String]
     #
     # @!attribute [rw] enable_basic_auth
@@ -786,8 +937,21 @@ module Aws::Amplify
     #
     # @!attribute [rw] backend_environment_arn
     #   The Amazon Resource Name (ARN) for a backend environment that is
-    #   part of an Amplify app.
+    #   part of a Gen 1 Amplify app.
+    #
+    #   This field is available to Amplify Gen 1 apps only where the backend
+    #   is created using Amplify Studio or the Amplify command line
+    #   interface (CLI).
     #   @return [String]
+    #
+    # @!attribute [rw] backend
+    #   The backend for a `Branch` of an Amplify app. Use for a backend
+    #   created from an CloudFormation stack.
+    #
+    #   This field is available to Amplify Gen 2 apps only. When you deploy
+    #   an application with Amplify Gen 2, you provision the app's backend
+    #   infrastructure using Typescript code.
+    #   @return [Types::Backend]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/CreateBranchRequest AWS API Documentation
     #
@@ -809,8 +973,9 @@ module Aws::Amplify
       :display_name,
       :enable_pull_request_preview,
       :pull_request_environment_name,
-      :backend_environment_arn)
-      SENSITIVE = [:basic_auth_credentials]
+      :backend_environment_arn,
+      :backend)
+      SENSITIVE = [:basic_auth_credentials, :build_spec]
       include Aws::Structure
     end
 
@@ -831,23 +996,12 @@ module Aws::Amplify
 
     # The request structure for the create a new deployment request.
     #
-    # @note When making an API call, you may pass CreateDeploymentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         file_map: {
-    #           "FileName" => "MD5Hash",
-    #         },
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] branch_name
-    #   The name for the branch, for the job.
+    #   The name of the branch to use for the job.
     #   @return [String]
     #
     # @!attribute [rw] file_map
@@ -896,23 +1050,6 @@ module Aws::Amplify
 
     # The request structure for the create domain association request.
     #
-    # @note When making an API call, you may pass CreateDomainAssociationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         domain_name: "DomainName", # required
-    #         enable_auto_sub_domain: false,
-    #         sub_domain_settings: [ # required
-    #           {
-    #             prefix: "DomainPrefix", # required
-    #             branch_name: "BranchName", # required
-    #           },
-    #         ],
-    #         auto_sub_domain_creation_patterns: ["AutoSubDomainCreationPattern"],
-    #         auto_sub_domain_iam_role: "AutoSubDomainIAMRole",
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
@@ -939,6 +1076,12 @@ module Aws::Amplify
     #   subdomains.
     #   @return [String]
     #
+    # @!attribute [rw] certificate_settings
+    #   The type of SSL/TLS certificate to use for your custom domain. If
+    #   you don't specify a certificate type, Amplify uses the default
+    #   certificate that it provisions and manages for you.
+    #   @return [Types::CertificateSettings]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/CreateDomainAssociationRequest AWS API Documentation
     #
     class CreateDomainAssociationRequest < Struct.new(
@@ -947,7 +1090,8 @@ module Aws::Amplify
       :enable_auto_sub_domain,
       :sub_domain_settings,
       :auto_sub_domain_creation_patterns,
-      :auto_sub_domain_iam_role)
+      :auto_sub_domain_iam_role,
+      :certificate_settings)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -968,15 +1112,6 @@ module Aws::Amplify
     end
 
     # The request structure for the create webhook request.
-    #
-    # @note When making an API call, you may pass CreateWebhookRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         description: "Description",
-    #       }
     #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
@@ -1017,16 +1152,6 @@ module Aws::Amplify
 
     # Describes a custom rewrite or redirect rule.
     #
-    # @note When making an API call, you may pass CustomRule
-    #   data as a hash:
-    #
-    #       {
-    #         source: "Source", # required
-    #         target: "Target", # required
-    #         status: "Status",
-    #         condition: "Condition",
-    #       }
-    #
     # @!attribute [rw] source
     #   The source pattern for a URL rewrite or redirect rule.
     #   @return [String]
@@ -1044,7 +1169,7 @@ module Aws::Amplify
     #
     #   301
     #
-    #   : Represents a 301 (moved pemanently) redirect rule. This and all
+    #   : Represents a 301 (moved permanently) redirect rule. This and all
     #     future requests should be directed to the target URL.
     #
     #   302
@@ -1078,13 +1203,6 @@ module Aws::Amplify
 
     # Describes the request structure for the delete app request.
     #
-    # @note When making an API call, you may pass DeleteAppRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
@@ -1113,14 +1231,6 @@ module Aws::Amplify
     end
 
     # The request structure for the delete backend environment request.
-    #
-    # @note When making an API call, you may pass DeleteBackendEnvironmentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         environment_name: "EnvironmentName", # required
-    #       }
     #
     # @!attribute [rw] app_id
     #   The unique ID of an Amplify app.
@@ -1155,20 +1265,12 @@ module Aws::Amplify
 
     # The request structure for the delete branch request.
     #
-    # @note When making an API call, you may pass DeleteBranchRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] branch_name
-    #   The name for the branch.
+    #   The name of the branch.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/DeleteBranchRequest AWS API Documentation
@@ -1197,14 +1299,6 @@ module Aws::Amplify
 
     # The request structure for the delete domain association request.
     #
-    # @note When making an API call, you may pass DeleteDomainAssociationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         domain_name: "DomainName", # required
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique id for an Amplify app.
     #   @return [String]
@@ -1223,8 +1317,8 @@ module Aws::Amplify
     end
 
     # @!attribute [rw] domain_association
-    #   Describes a domain association that associates a custom domain with
-    #   an Amplify app.
+    #   Describes the association between a custom domain and an Amplify
+    #   app.
     #   @return [Types::DomainAssociation]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/DeleteDomainAssociationResult AWS API Documentation
@@ -1237,21 +1331,12 @@ module Aws::Amplify
 
     # The request structure for the delete job request.
     #
-    # @note When making an API call, you may pass DeleteJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         job_id: "JobId", # required
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] branch_name
-    #   The name for the branch, for the job.
+    #   The name of the branch to use for the job.
     #   @return [String]
     #
     # @!attribute [rw] job_id
@@ -1283,13 +1368,6 @@ module Aws::Amplify
     end
 
     # The request structure for the delete webhook request.
-    #
-    # @note When making an API call, you may pass DeleteWebhookRequest
-    #   data as a hash:
-    #
-    #       {
-    #         webhook_id: "WebhookId", # required
-    #       }
     #
     # @!attribute [rw] webhook_id
     #   The unique ID for a webhook.
@@ -1331,8 +1409,7 @@ module Aws::Amplify
       include Aws::Structure
     end
 
-    # Describes a domain association that associates a custom domain with an
-    # Amplify app.
+    # Describes the association between a custom domain and an Amplify app.
     #
     # @!attribute [rw] domain_association_arn
     #   The Amazon Resource Name (ARN) for the domain association.
@@ -1360,8 +1437,56 @@ module Aws::Amplify
     #   The current status of the domain association.
     #   @return [String]
     #
+    # @!attribute [rw] update_status
+    #   The status of the domain update operation that is currently in
+    #   progress. The following list describes the valid update states.
+    #
+    #   REQUESTING\_CERTIFICATE
+    #
+    #   : The certificate is in the process of being updated.
+    #
+    #   PENDING\_VERIFICATION
+    #
+    #   : Indicates that an Amplify managed certificate is in the process of
+    #     being verified. This occurs during the creation of a custom domain
+    #     or when a custom domain is updated to use a managed certificate.
+    #
+    #   IMPORTING\_CUSTOM\_CERTIFICATE
+    #
+    #   : Indicates that an Amplify custom certificate is in the process of
+    #     being imported. This occurs during the creation of a custom domain
+    #     or when a custom domain is updated to use a custom certificate.
+    #
+    #   PENDING\_DEPLOYMENT
+    #
+    #   : Indicates that the subdomain or certificate changes are being
+    #     propagated.
+    #
+    #   AWAITING\_APP\_CNAME
+    #
+    #   : Amplify is waiting for CNAME records corresponding to subdomains
+    #     to be propagated. If your custom domain is on Route 53, Amplify
+    #     handles this for you automatically. For more information about
+    #     custom domains, see [Setting up custom domains][1] in the *Amplify
+    #     Hosting User Guide*.
+    #
+    #   UPDATE\_COMPLETE
+    #
+    #   : The certificate has been associated with a domain.
+    #
+    #   UPDATE\_FAILED
+    #
+    #   : The certificate has failed to be provisioned or associated, and
+    #     there is no existing active certificate to roll back to.
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/amplify/latest/userguide/custom-domains.html
+    #   @return [String]
+    #
     # @!attribute [rw] status_reason
-    #   The reason for the current status of the domain association.
+    #   Additional information that describes why the domain association is
+    #   in the current state.
     #   @return [String]
     #
     # @!attribute [rw] certificate_verification_dns_record
@@ -1372,6 +1497,17 @@ module Aws::Amplify
     #   The subdomains for the domain association.
     #   @return [Array<Types::SubDomain>]
     #
+    # @!attribute [rw] certificate
+    #   Describes the SSL/TLS certificate for the domain association. This
+    #   can be your own custom certificate or the default certificate that
+    #   Amplify provisions for you.
+    #
+    #   If you are updating your domain to use a different certificate,
+    #   `certificate` points to the new certificate that is being created
+    #   instead of the current active certificate. Otherwise, `certificate`
+    #   points to the current active certificate.
+    #   @return [Types::Certificate]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/DomainAssociation AWS API Documentation
     #
     class DomainAssociation < Struct.new(
@@ -1381,24 +1517,16 @@ module Aws::Amplify
       :auto_sub_domain_creation_patterns,
       :auto_sub_domain_iam_role,
       :domain_status,
+      :update_status,
       :status_reason,
       :certificate_verification_dns_record,
-      :sub_domains)
+      :sub_domains,
+      :certificate)
       SENSITIVE = []
       include Aws::Structure
     end
 
     # The request structure for the generate access logs request.
-    #
-    # @note When making an API call, you may pass GenerateAccessLogsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         start_time: Time.now,
-    #         end_time: Time.now,
-    #         domain_name: "DomainName", # required
-    #         app_id: "AppId", # required
-    #       }
     #
     # @!attribute [rw] start_time
     #   The time at which the logs should start. The time range specified is
@@ -1445,13 +1573,6 @@ module Aws::Amplify
 
     # The request structure for the get app request.
     #
-    # @note When making an API call, you may pass GetAppRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
@@ -1478,13 +1599,6 @@ module Aws::Amplify
     end
 
     # Returns the request structure for the get artifact request.
-    #
-    # @note When making an API call, you may pass GetArtifactUrlRequest
-    #   data as a hash:
-    #
-    #       {
-    #         artifact_id: "ArtifactId", # required
-    #       }
     #
     # @!attribute [rw] artifact_id
     #   The unique ID for an artifact.
@@ -1519,14 +1633,6 @@ module Aws::Amplify
 
     # The request structure for the get backend environment request.
     #
-    # @note When making an API call, you may pass GetBackendEnvironmentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         environment_name: "EnvironmentName", # required
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique id for an Amplify app.
     #   @return [String]
@@ -1560,20 +1666,12 @@ module Aws::Amplify
 
     # The request structure for the get branch request.
     #
-    # @note When making an API call, you may pass GetBranchRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] branch_name
-    #   The name for the branch.
+    #   The name of the branch.
     #   @return [String]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/GetBranchRequest AWS API Documentation
@@ -1599,14 +1697,6 @@ module Aws::Amplify
     end
 
     # The request structure for the get domain association request.
-    #
-    # @note When making an API call, you may pass GetDomainAssociationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         domain_name: "DomainName", # required
-    #       }
     #
     # @!attribute [rw] app_id
     #   The unique id for an Amplify app.
@@ -1642,21 +1732,12 @@ module Aws::Amplify
 
     # The request structure for the get job request.
     #
-    # @note When making an API call, you may pass GetJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         job_id: "JobId", # required
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] branch_name
-    #   The branch name for the job.
+    #   The name of the branch to use for the job.
     #   @return [String]
     #
     # @!attribute [rw] job_id
@@ -1686,13 +1767,6 @@ module Aws::Amplify
     end
 
     # The request structure for the get webhook request.
-    #
-    # @note When making an API call, you may pass GetWebhookRequest
-    #   data as a hash:
-    #
-    #       {
-    #         webhook_id: "WebhookId", # required
-    #       }
     #
     # @!attribute [rw] webhook_id
     #   The unique ID for a webhook.
@@ -1826,14 +1900,6 @@ module Aws::Amplify
 
     # The request structure for the list apps request.
     #
-    # @note When making an API call, you may pass ListAppsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] next_token
     #   A pagination token. If non-null, the pagination token is returned in
     #   a result. Pass its value in another request to retrieve more
@@ -1875,17 +1941,6 @@ module Aws::Amplify
     end
 
     # Describes the request structure for the list artifacts request.
-    #
-    # @note When making an API call, you may pass ListArtifactsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         job_id: "JobId", # required
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
     #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
@@ -1943,16 +1998,6 @@ module Aws::Amplify
 
     # The request structure for the list backend environments request.
     #
-    # @note When making an API call, you may pass ListBackendEnvironmentsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         environment_name: "EnvironmentName",
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
@@ -2005,15 +2050,6 @@ module Aws::Amplify
 
     # The request structure for the list branches request.
     #
-    # @note When making an API call, you may pass ListBranchesRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
@@ -2059,15 +2095,6 @@ module Aws::Amplify
     end
 
     # The request structure for the list domain associations request.
-    #
-    # @note When making an API call, you may pass ListDomainAssociationsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
     #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
@@ -2115,22 +2142,12 @@ module Aws::Amplify
 
     # The request structure for the list jobs request.
     #
-    # @note When making an API call, you may pass ListJobsRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] branch_name
-    #   The name for a branch.
+    #   The name of the branch to use for the request.
     #   @return [String]
     #
     # @!attribute [rw] next_token
@@ -2177,13 +2194,6 @@ module Aws::Amplify
 
     # The request structure to use to list tags for a resource.
     #
-    # @note When making an API call, you may pass ListTagsForResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) to use to list tags.
     #   @return [String]
@@ -2211,15 +2221,6 @@ module Aws::Amplify
     end
 
     # The request structure for the list webhooks request.
-    #
-    # @note When making an API call, you may pass ListWebhooksRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         next_token: "NextToken",
-    #         max_results: 1,
-    #       }
     #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
@@ -2328,22 +2329,12 @@ module Aws::Amplify
 
     # The request structure for the start a deployment request.
     #
-    # @note When making an API call, you may pass StartDeploymentRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         job_id: "JobId",
-    #         source_url: "SourceUrl",
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] branch_name
-    #   The name for the branch, for the job.
+    #   The name of the branch to use for the job.
     #   @return [String]
     #
     # @!attribute [rw] job_id
@@ -2385,26 +2376,12 @@ module Aws::Amplify
 
     # The request structure for the start job request.
     #
-    # @note When making an API call, you may pass StartJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         job_id: "JobId",
-    #         job_type: "RELEASE", # required, accepts RELEASE, RETRY, MANUAL, WEB_HOOK
-    #         job_reason: "JobReason",
-    #         commit_id: "CommitId",
-    #         commit_message: "CommitMessage",
-    #         commit_time: Time.now,
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] branch_name
-    #   The branch name for the job.
+    #   The name of the branch to use for the job.
     #   @return [String]
     #
     # @!attribute [rw] job_id
@@ -2415,13 +2392,14 @@ module Aws::Amplify
     # @!attribute [rw] job_type
     #   Describes the type for the job. The job type `RELEASE` starts a new
     #   job with the latest change from the specified branch. This value is
-    #   available only for apps that are connected to a repository. The job
-    #   type `RETRY` retries an existing job. If the job type value is
-    #   `RETRY`, the `jobId` is also required.
+    #   available only for apps that are connected to a repository.
+    #
+    #   The job type `RETRY` retries an existing job. If the job type value
+    #   is `RETRY`, the `jobId` is also required.
     #   @return [String]
     #
     # @!attribute [rw] job_reason
-    #   A descriptive reason for starting this job.
+    #   A descriptive reason for starting the job.
     #   @return [String]
     #
     # @!attribute [rw] commit_id
@@ -2533,21 +2511,12 @@ module Aws::Amplify
 
     # The request structure for the stop job request.
     #
-    # @note When making an API call, you may pass StopJobRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         job_id: "JobId", # required
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] branch_name
-    #   The name for the branch, for the job.
+    #   The name of the branch to use for the stop job request.
     #   @return [String]
     #
     # @!attribute [rw] job_id
@@ -2604,14 +2573,6 @@ module Aws::Amplify
 
     # Describes the settings for the subdomain.
     #
-    # @note When making an API call, you may pass SubDomainSetting
-    #   data as a hash:
-    #
-    #       {
-    #         prefix: "DomainPrefix", # required
-    #         branch_name: "BranchName", # required
-    #       }
-    #
     # @!attribute [rw] prefix
     #   The prefix setting for the subdomain.
     #   @return [String]
@@ -2630,16 +2591,6 @@ module Aws::Amplify
     end
 
     # The request structure to tag a resource with a tag key and value.
-    #
-    # @note When making an API call, you may pass TagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #         tags: { # required
-    #           "TagKey" => "TagValue",
-    #         },
-    #       }
     #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) to use to tag a resource.
@@ -2679,14 +2630,6 @@ module Aws::Amplify
 
     # The request structure for the untag resource request.
     #
-    # @note When making an API call, you may pass UntagResourceRequest
-    #   data as a hash:
-    #
-    #       {
-    #         resource_arn: "ResourceArn", # required
-    #         tag_keys: ["TagKey"], # required
-    #       }
-    #
     # @!attribute [rw] resource_arn
     #   The Amazon Resource Name (ARN) to use to untag a resource.
     #   @return [String]
@@ -2712,53 +2655,6 @@ module Aws::Amplify
 
     # The request structure for the update app request.
     #
-    # @note When making an API call, you may pass UpdateAppRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         name: "Name",
-    #         description: "Description",
-    #         platform: "WEB", # accepts WEB
-    #         iam_service_role_arn: "ServiceRoleArn",
-    #         environment_variables: {
-    #           "EnvKey" => "EnvValue",
-    #         },
-    #         enable_branch_auto_build: false,
-    #         enable_branch_auto_deletion: false,
-    #         enable_basic_auth: false,
-    #         basic_auth_credentials: "BasicAuthCredentials",
-    #         custom_rules: [
-    #           {
-    #             source: "Source", # required
-    #             target: "Target", # required
-    #             status: "Status",
-    #             condition: "Condition",
-    #           },
-    #         ],
-    #         build_spec: "BuildSpec",
-    #         custom_headers: "CustomHeaders",
-    #         enable_auto_branch_creation: false,
-    #         auto_branch_creation_patterns: ["AutoBranchCreationPattern"],
-    #         auto_branch_creation_config: {
-    #           stage: "PRODUCTION", # accepts PRODUCTION, BETA, DEVELOPMENT, EXPERIMENTAL, PULL_REQUEST
-    #           framework: "Framework",
-    #           enable_auto_build: false,
-    #           environment_variables: {
-    #             "EnvKey" => "EnvValue",
-    #           },
-    #           basic_auth_credentials: "BasicAuthCredentials",
-    #           enable_basic_auth: false,
-    #           enable_performance_mode: false,
-    #           build_spec: "BuildSpec",
-    #           enable_pull_request_preview: false,
-    #           pull_request_environment_name: "PullRequestEnvironmentName",
-    #         },
-    #         repository: "Repository",
-    #         oauth_token: "OauthToken",
-    #         access_token: "AccessToken",
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
@@ -2772,7 +2668,14 @@ module Aws::Amplify
     #   @return [String]
     #
     # @!attribute [rw] platform
-    #   The platform for an Amplify app.
+    #   The platform for the Amplify app. For a static app, set the platform
+    #   type to `WEB`. For a dynamic server-side rendered (SSR) app, set the
+    #   platform type to `WEB_COMPUTE`. For an app requiring Amplify
+    #   Hosting's original SSR support only, set the platform type to
+    #   `WEB_DYNAMIC`.
+    #
+    #   If you are deploying an SSG only app with Next.js version 14 or
+    #   later, you must set the platform type to `WEB_COMPUTE`.
     #   @return [String]
     #
     # @!attribute [rw] iam_service_role_arn
@@ -2789,7 +2692,7 @@ module Aws::Amplify
     #   @return [Boolean]
     #
     # @!attribute [rw] enable_branch_auto_deletion
-    #   Automatically disconnects a branch in the Amplify Console when you
+    #   Automatically disconnects a branch in the Amplify console when you
     #   delete a branch from your Git repository.
     #   @return [Boolean]
     #
@@ -2798,7 +2701,9 @@ module Aws::Amplify
     #   @return [Boolean]
     #
     # @!attribute [rw] basic_auth_credentials
-    #   The basic authorization credentials for an Amplify app.
+    #   The basic authorization credentials for an Amplify app. You must
+    #   base64-encode the authorization credentials and provide them in the
+    #   format `user:password`.
     #   @return [String]
     #
     # @!attribute [rw] custom_rules
@@ -2827,20 +2732,62 @@ module Aws::Amplify
     #   @return [Types::AutoBranchCreationConfig]
     #
     # @!attribute [rw] repository
-    #   The name of the repository for an Amplify app
+    #   The name of the Git repository for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] oauth_token
     #   The OAuth token for a third-party source control system for an
-    #   Amplify app. The token is used to create a webhook and a read-only
-    #   deploy key. The OAuth token is not stored.
+    #   Amplify app. The OAuth token is used to create a webhook and a
+    #   read-only deploy key using SSH cloning. The OAuth token is not
+    #   stored.
+    #
+    #   Use `oauthToken` for repository providers other than GitHub, such as
+    #   Bitbucket or CodeCommit.
+    #
+    #   To authorize access to GitHub as your repository provider, use
+    #   `accessToken`.
+    #
+    #   You must specify either `oauthToken` or `accessToken` when you
+    #   update an app.
+    #
+    #   Existing Amplify apps deployed from a GitHub repository using OAuth
+    #   continue to work with CI/CD. However, we strongly recommend that you
+    #   migrate these apps to use the GitHub App. For more information, see
+    #   [Migrating an existing OAuth app to the Amplify GitHub App][1] in
+    #   the *Amplify User Guide* .
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/amplify/latest/userguide/setting-up-GitHub-access.html#migrating-to-github-app-auth
     #   @return [String]
     #
     # @!attribute [rw] access_token
-    #   The personal access token for a third-party source control system
-    #   for an Amplify app. The token is used to create webhook and a
-    #   read-only deploy key. The token is not stored.
+    #   The personal access token for a GitHub repository for an Amplify
+    #   app. The personal access token is used to authorize access to a
+    #   GitHub repository using the Amplify GitHub App. The token is not
+    #   stored.
+    #
+    #   Use `accessToken` for GitHub repositories only. To authorize access
+    #   to a repository provider such as Bitbucket or CodeCommit, use
+    #   `oauthToken`.
+    #
+    #   You must specify either `accessToken` or `oauthToken` when you
+    #   update an app.
+    #
+    #   Existing Amplify apps deployed from a GitHub repository using OAuth
+    #   continue to work with CI/CD. However, we strongly recommend that you
+    #   migrate these apps to use the GitHub App. For more information, see
+    #   [Migrating an existing OAuth app to the Amplify GitHub App][1] in
+    #   the *Amplify User Guide* .
+    #
+    #
+    #
+    #   [1]: https://docs.aws.amazon.com/amplify/latest/userguide/setting-up-GitHub-access.html#migrating-to-github-app-auth
     #   @return [String]
+    #
+    # @!attribute [rw] cache_config
+    #   The cache configuration for the Amplify app.
+    #   @return [Types::CacheConfig]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/UpdateAppRequest AWS API Documentation
     #
@@ -2863,8 +2810,9 @@ module Aws::Amplify
       :auto_branch_creation_config,
       :repository,
       :oauth_token,
-      :access_token)
-      SENSITIVE = [:basic_auth_credentials, :oauth_token, :access_token]
+      :access_token,
+      :cache_config)
+      SENSITIVE = [:basic_auth_credentials, :build_spec, :oauth_token, :access_token]
       include Aws::Structure
     end
 
@@ -2884,37 +2832,12 @@ module Aws::Amplify
 
     # The request structure for the update branch request.
     #
-    # @note When making an API call, you may pass UpdateBranchRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         branch_name: "BranchName", # required
-    #         description: "Description",
-    #         framework: "Framework",
-    #         stage: "PRODUCTION", # accepts PRODUCTION, BETA, DEVELOPMENT, EXPERIMENTAL, PULL_REQUEST
-    #         enable_notification: false,
-    #         enable_auto_build: false,
-    #         environment_variables: {
-    #           "EnvKey" => "EnvValue",
-    #         },
-    #         basic_auth_credentials: "BasicAuthCredentials",
-    #         enable_basic_auth: false,
-    #         enable_performance_mode: false,
-    #         build_spec: "BuildSpec",
-    #         ttl: "TTL",
-    #         display_name: "DisplayName",
-    #         enable_pull_request_preview: false,
-    #         pull_request_environment_name: "PullRequestEnvironmentName",
-    #         backend_environment_arn: "BackendEnvironmentArn",
-    #       }
-    #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
     #   @return [String]
     #
     # @!attribute [rw] branch_name
-    #   The name for the branch.
+    #   The name of the branch.
     #   @return [String]
     #
     # @!attribute [rw] description
@@ -2942,7 +2865,9 @@ module Aws::Amplify
     #   @return [Hash<String,String>]
     #
     # @!attribute [rw] basic_auth_credentials
-    #   The basic authorization credentials for the branch.
+    #   The basic authorization credentials for the branch. You must
+    #   base64-encode the authorization credentials and provide them in the
+    #   format `user:password`.
     #   @return [String]
     #
     # @!attribute [rw] enable_basic_auth
@@ -2981,8 +2906,21 @@ module Aws::Amplify
     #
     # @!attribute [rw] backend_environment_arn
     #   The Amazon Resource Name (ARN) for a backend environment that is
-    #   part of an Amplify app.
+    #   part of a Gen 1 Amplify app.
+    #
+    #   This field is available to Amplify Gen 1 apps only where the backend
+    #   is created using Amplify Studio or the Amplify command line
+    #   interface (CLI).
     #   @return [String]
+    #
+    # @!attribute [rw] backend
+    #   The backend for a `Branch` of an Amplify app. Use for a backend
+    #   created from an CloudFormation stack.
+    #
+    #   This field is available to Amplify Gen 2 apps only. When you deploy
+    #   an application with Amplify Gen 2, you provision the app's backend
+    #   infrastructure using Typescript code.
+    #   @return [Types::Backend]
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/UpdateBranchRequest AWS API Documentation
     #
@@ -3003,8 +2941,9 @@ module Aws::Amplify
       :display_name,
       :enable_pull_request_preview,
       :pull_request_environment_name,
-      :backend_environment_arn)
-      SENSITIVE = [:basic_auth_credentials]
+      :backend_environment_arn,
+      :backend)
+      SENSITIVE = [:basic_auth_credentials, :build_spec]
       include Aws::Structure
     end
 
@@ -3024,23 +2963,6 @@ module Aws::Amplify
     end
 
     # The request structure for the update domain association request.
-    #
-    # @note When making an API call, you may pass UpdateDomainAssociationRequest
-    #   data as a hash:
-    #
-    #       {
-    #         app_id: "AppId", # required
-    #         domain_name: "DomainName", # required
-    #         enable_auto_sub_domain: false,
-    #         sub_domain_settings: [ # required
-    #           {
-    #             prefix: "DomainPrefix", # required
-    #             branch_name: "BranchName", # required
-    #           },
-    #         ],
-    #         auto_sub_domain_creation_patterns: ["AutoSubDomainCreationPattern"],
-    #         auto_sub_domain_iam_role: "AutoSubDomainIAMRole",
-    #       }
     #
     # @!attribute [rw] app_id
     #   The unique ID for an Amplify app.
@@ -3068,6 +2990,10 @@ module Aws::Amplify
     #   subdomains.
     #   @return [String]
     #
+    # @!attribute [rw] certificate_settings
+    #   The type of SSL/TLS certificate to use for your custom domain.
+    #   @return [Types::CertificateSettings]
+    #
     # @see http://docs.aws.amazon.com/goto/WebAPI/amplify-2017-07-25/UpdateDomainAssociationRequest AWS API Documentation
     #
     class UpdateDomainAssociationRequest < Struct.new(
@@ -3076,7 +3002,8 @@ module Aws::Amplify
       :enable_auto_sub_domain,
       :sub_domain_settings,
       :auto_sub_domain_creation_patterns,
-      :auto_sub_domain_iam_role)
+      :auto_sub_domain_iam_role,
+      :certificate_settings)
       SENSITIVE = []
       include Aws::Structure
     end
@@ -3097,15 +3024,6 @@ module Aws::Amplify
     end
 
     # The request structure for the update webhook request.
-    #
-    # @note When making an API call, you may pass UpdateWebhookRequest
-    #   data as a hash:
-    #
-    #       {
-    #         webhook_id: "WebhookId", # required
-    #         branch_name: "BranchName",
-    #         description: "Description",
-    #       }
     #
     # @!attribute [rw] webhook_id
     #   The unique ID for a webhook.
@@ -3190,3 +3108,4 @@ module Aws::Amplify
 
   end
 end
+

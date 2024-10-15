@@ -19,7 +19,7 @@ module Aws
       let(:rules) { operation.input }
 
       def xml(params)
-        Builder.new(rules).to_xml(params)
+        Builder.new(rules, indent: '  ').to_xml(params)
       end
 
       it 'serializes empty values as empty elements' do
@@ -221,16 +221,18 @@ module Aws
         XML
       end
 
-      it 'supports flat list with locationName traits' do
+      it 'does not support member locationName trait in flattened lists' do
         shapes['IntegerList']['flattened'] = true
+        # locationName trait on targeted member is ignored when serializing
+        # serializing flattened lists in structures
         shapes['IntegerList']['member']['locationName'] = 'Number'
-        expect(xml(string:'abc', number_list:[1,2,3])).to eq(<<-XML)
-<xml>
-  <Number>1</Number>
-  <Number>2</Number>
-  <Number>3</Number>
-  <String>abc</String>
-</xml>
+        expect(xml(string: 'abc', number_list: [1, 2, 3])).to eq(<<~XML)
+          <xml>
+            <NumberList>1</NumberList>
+            <NumberList>2</NumberList>
+            <NumberList>3</NumberList>
+            <String>abc</String>
+          </xml>
         XML
       end
 
@@ -245,8 +247,7 @@ module Aws
       it 'correctly serializes newlines' do
         expect(xml(string:"\n")).to eq(<<-XML)
 <xml>
-  <String>
-</String>
+  <String>&#xA;</String>
 </xml>
         XML
       end

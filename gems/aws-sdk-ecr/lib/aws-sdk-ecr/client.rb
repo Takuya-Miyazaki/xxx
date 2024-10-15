@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -22,15 +22,19 @@ require 'aws-sdk-core/plugins/endpoint_pattern.rb'
 require 'aws-sdk-core/plugins/response_paging.rb'
 require 'aws-sdk-core/plugins/stub_responses.rb'
 require 'aws-sdk-core/plugins/idempotency_token.rb'
+require 'aws-sdk-core/plugins/invocation_id.rb'
 require 'aws-sdk-core/plugins/jsonvalue_converter.rb'
 require 'aws-sdk-core/plugins/client_metrics_plugin.rb'
 require 'aws-sdk-core/plugins/client_metrics_send_plugin.rb'
 require 'aws-sdk-core/plugins/transfer_encoding.rb'
 require 'aws-sdk-core/plugins/http_checksum.rb'
-require 'aws-sdk-core/plugins/signature_v4.rb'
+require 'aws-sdk-core/plugins/checksum_algorithm.rb'
+require 'aws-sdk-core/plugins/request_compression.rb'
+require 'aws-sdk-core/plugins/defaults_mode.rb'
+require 'aws-sdk-core/plugins/recursion_detection.rb'
+require 'aws-sdk-core/plugins/telemetry.rb'
+require 'aws-sdk-core/plugins/sign.rb'
 require 'aws-sdk-core/plugins/protocols/json_rpc.rb'
-
-Aws::Plugins::GlobalConfiguration.add_identifier(:ecr)
 
 module Aws::ECR
   # An API client for ECR.  To construct a client, you need to configure a `:region` and `:credentials`.
@@ -68,16 +72,28 @@ module Aws::ECR
     add_plugin(Aws::Plugins::ResponsePaging)
     add_plugin(Aws::Plugins::StubResponses)
     add_plugin(Aws::Plugins::IdempotencyToken)
+    add_plugin(Aws::Plugins::InvocationId)
     add_plugin(Aws::Plugins::JsonvalueConverter)
     add_plugin(Aws::Plugins::ClientMetricsPlugin)
     add_plugin(Aws::Plugins::ClientMetricsSendPlugin)
     add_plugin(Aws::Plugins::TransferEncoding)
     add_plugin(Aws::Plugins::HttpChecksum)
-    add_plugin(Aws::Plugins::SignatureV4)
+    add_plugin(Aws::Plugins::ChecksumAlgorithm)
+    add_plugin(Aws::Plugins::RequestCompression)
+    add_plugin(Aws::Plugins::DefaultsMode)
+    add_plugin(Aws::Plugins::RecursionDetection)
+    add_plugin(Aws::Plugins::Telemetry)
+    add_plugin(Aws::Plugins::Sign)
     add_plugin(Aws::Plugins::Protocols::JsonRpc)
+    add_plugin(Aws::ECR::Plugins::Endpoints)
 
     # @overload initialize(options)
     #   @param [Hash] options
+    #
+    #   @option options [Array<Seahorse::Client::Plugin>] :plugins ([]])
+    #     A list of plugins to apply to the client. Each plugin is either a
+    #     class name or an instance of a plugin class.
+    #
     #   @option options [required, Aws::CredentialProvider] :credentials
     #     Your AWS credentials. This can be an instance of any one of the
     #     following classes:
@@ -112,14 +128,18 @@ module Aws::ECR
     #     locations will be searched for credentials:
     #
     #     * `Aws.config[:credentials]`
-    #     * The `:access_key_id`, `:secret_access_key`, and `:session_token` options.
-    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY']
+    #     * The `:access_key_id`, `:secret_access_key`, `:session_token`, and
+    #       `:account_id` options.
+    #     * ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'],
+    #       ENV['AWS_SESSION_TOKEN'], and ENV['AWS_ACCOUNT_ID']
     #     * `~/.aws/credentials`
     #     * `~/.aws/config`
     #     * EC2/ECS IMDS instance profile - When used by default, the timeouts
     #       are very aggressive. Construct and pass an instance of
-    #       `Aws::InstanceProfileCredentails` or `Aws::ECSCredentials` to
-    #       enable retries and extended timeouts.
+    #       `Aws::InstanceProfileCredentials` or `Aws::ECSCredentials` to
+    #       enable retries and extended timeouts. Instance profile credential
+    #       fetching can be disabled by setting ENV['AWS_EC2_METADATA_DISABLED']
+    #       to true.
     #
     #   @option options [required, String] :region
     #     The AWS region to connect to.  The configured `:region` is
@@ -134,6 +154,8 @@ module Aws::ECR
     #     * `~/.aws/config`
     #
     #   @option options [String] :access_key_id
+    #
+    #   @option options [String] :account_id
     #
     #   @option options [Boolean] :active_endpoint_cache (false)
     #     When set to `true`, a thread polling for endpoints will be running in
@@ -173,14 +195,28 @@ module Aws::ECR
     #     Used only in `standard` and adaptive retry modes. Specifies whether to apply
     #     a clock skew correction and retry requests with skewed client clocks.
     #
+    #   @option options [String] :defaults_mode ("legacy")
+    #     See {Aws::DefaultsModeConfiguration} for a list of the
+    #     accepted modes and the configuration defaults that are included.
+    #
     #   @option options [Boolean] :disable_host_prefix_injection (false)
     #     Set to true to disable SDK automatically adding host prefix
     #     to default service endpoint when available.
     #
-    #   @option options [String] :endpoint
-    #     The client endpoint is normally constructed from the `:region`
-    #     option. You should only configure an `:endpoint` when connecting
-    #     to test or custom endpoints. This should be a valid HTTP(S) URI.
+    #   @option options [Boolean] :disable_request_compression (false)
+    #     When set to 'true' the request body will not be compressed
+    #     for supported operations.
+    #
+    #   @option options [String, URI::HTTPS, URI::HTTP] :endpoint
+    #     Normally you should not configure the `:endpoint` option
+    #     directly. This is normally constructed from the `:region`
+    #     option. Configuring `:endpoint` is normally reserved for
+    #     connecting to test or custom endpoints. The endpoint should
+    #     be a URI formatted like:
+    #
+    #         'http://example.com'
+    #         'https://example.com'
+    #         'http://example.com:123'
     #
     #   @option options [Integer] :endpoint_cache_max_entries (1000)
     #     Used for the maximum size limit of the LRU cache storing endpoints data
@@ -196,6 +232,10 @@ module Aws::ECR
     #
     #   @option options [Boolean] :endpoint_discovery (false)
     #     When set to `true`, endpoint discovery will be enabled for operations when available.
+    #
+    #   @option options [Boolean] :ignore_configured_endpoint_urls
+    #     Setting to true disables use of endpoint URLs provided via environment
+    #     variables and the shared configuration file.
     #
     #   @option options [Aws::Log::Formatter] :log_formatter (Aws::Log::Formatter.default)
     #     The log formatter.
@@ -216,6 +256,11 @@ module Aws::ECR
     #   @option options [String] :profile ("default")
     #     Used when loading credentials from the shared credentials file
     #     at HOME/.aws/credentials.  When not specified, 'default' is used.
+    #
+    #   @option options [Integer] :request_min_compression_size_bytes (10240)
+    #     The minimum size in bytes that triggers compression for request
+    #     bodies. The value must be non-negative integer value between 0
+    #     and 10485780 bytes inclusive.
     #
     #   @option options [Proc] :retry_backoff
     #     A proc or lambda used for backoff. Defaults to 2**retries * retry_base_delay.
@@ -261,20 +306,31 @@ module Aws::ECR
     #       throttling.  This is a provisional mode that may change behavior
     #       in the future.
     #
+    #   @option options [String] :sdk_ua_app_id
+    #     A unique and opaque application ID that is appended to the
+    #     User-Agent header as app/sdk_ua_app_id. It should have a
+    #     maximum length of 50. This variable is sourced from environment
+    #     variable AWS_SDK_UA_APP_ID or the shared config profile attribute sdk_ua_app_id.
     #
     #   @option options [String] :secret_access_key
     #
     #   @option options [String] :session_token
     #
+    #   @option options [Array] :sigv4a_signing_region_set
+    #     A list of regions that should be signed with SigV4a signing. When
+    #     not passed, a default `:sigv4a_signing_region_set` is searched for
+    #     in the following locations:
+    #
+    #     * `Aws.config[:sigv4a_signing_region_set]`
+    #     * `ENV['AWS_SIGV4A_SIGNING_REGION_SET']`
+    #     * `~/.aws/config`
+    #
     #   @option options [Boolean] :simple_json (false)
     #     Disables request parameter conversion, validation, and formatting.
-    #     Also disable response data type conversions. This option is useful
-    #     when you want to ensure the highest level of performance by
-    #     avoiding overhead of walking request parameters and response data
-    #     structures.
-    #
-    #     When `:simple_json` is enabled, the request parameters hash must
-    #     be formatted exactly as the DynamoDB API expects.
+    #     Also disables response data type conversions. The request parameters
+    #     hash must be formatted exactly as the API expects.This option is useful
+    #     when you want to ensure the highest level of performance by avoiding
+    #     overhead of walking request parameters and response data structures.
     #
     #   @option options [Boolean] :stub_responses (false)
     #     Causes the client to return stubbed responses. By default
@@ -285,51 +341,112 @@ module Aws::ECR
     #     ** Please note ** When response stubbing is enabled, no HTTP
     #     requests are made, and retries are disabled.
     #
+    #   @option options [Aws::Telemetry::TelemetryProviderBase] :telemetry_provider (Aws::Telemetry::NoOpTelemetryProvider)
+    #     Allows you to provide a telemetry provider, which is used to
+    #     emit telemetry data. By default, uses `NoOpTelemetryProvider` which
+    #     will not record or emit any telemetry data. The SDK supports the
+    #     following telemetry providers:
+    #
+    #     * OpenTelemetry (OTel) - To use the OTel provider, install and require the
+    #     `opentelemetry-sdk` gem and then, pass in an instance of a
+    #     `Aws::Telemetry::OTelProvider` for telemetry provider.
+    #
+    #   @option options [Aws::TokenProvider] :token_provider
+    #     A Bearer Token Provider. This can be an instance of any one of the
+    #     following classes:
+    #
+    #     * `Aws::StaticTokenProvider` - Used for configuring static, non-refreshing
+    #       tokens.
+    #
+    #     * `Aws::SSOTokenProvider` - Used for loading tokens from AWS SSO using an
+    #       access token generated from `aws login`.
+    #
+    #     When `:token_provider` is not configured directly, the `Aws::TokenProviderChain`
+    #     will be used to search for tokens configured for your profile in shared configuration files.
+    #
+    #   @option options [Boolean] :use_dualstack_endpoint
+    #     When set to `true`, dualstack enabled endpoints (with `.aws` TLD)
+    #     will be used if available.
+    #
+    #   @option options [Boolean] :use_fips_endpoint
+    #     When set to `true`, fips compatible endpoints will be used if available.
+    #     When a `fips` region is used, the region is normalized and this config
+    #     is set to `true`.
+    #
     #   @option options [Boolean] :validate_params (true)
     #     When `true`, request parameters are validated before
     #     sending the request.
     #
-    #   @option options [URI::HTTP,String] :http_proxy A proxy to send
-    #     requests through.  Formatted like 'http://proxy.com:123'.
+    #   @option options [Aws::ECR::EndpointProvider] :endpoint_provider
+    #     The endpoint provider used to resolve endpoints. Any object that responds to
+    #     `#resolve_endpoint(parameters)` where `parameters` is a Struct similar to
+    #     `Aws::ECR::EndpointParameters`.
     #
-    #   @option options [Float] :http_open_timeout (15) The number of
-    #     seconds to wait when opening a HTTP session before raising a
-    #     `Timeout::Error`.
+    #   @option options [Float] :http_continue_timeout (1)
+    #     The number of seconds to wait for a 100-continue response before sending the
+    #     request body.  This option has no effect unless the request has "Expect"
+    #     header set to "100-continue".  Defaults to `nil` which  disables this
+    #     behaviour.  This value can safely be set per request on the session.
     #
-    #   @option options [Integer] :http_read_timeout (60) The default
-    #     number of seconds to wait for response data.  This value can
-    #     safely be set per-request on the session.
+    #   @option options [Float] :http_idle_timeout (5)
+    #     The number of seconds a connection is allowed to sit idle before it
+    #     is considered stale.  Stale connections are closed and removed from the
+    #     pool before making a request.
     #
-    #   @option options [Float] :http_idle_timeout (5) The number of
-    #     seconds a connection is allowed to sit idle before it is
-    #     considered stale.  Stale connections are closed and removed
-    #     from the pool before making a request.
+    #   @option options [Float] :http_open_timeout (15)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Float] :http_continue_timeout (1) The number of
-    #     seconds to wait for a 100-continue response before sending the
-    #     request body.  This option has no effect unless the request has
-    #     "Expect" header set to "100-continue".  Defaults to `nil` which
-    #     disables this behaviour.  This value can safely be set per
-    #     request on the session.
+    #   @option options [URI::HTTP,String] :http_proxy
+    #     A proxy to send requests through.  Formatted like 'http://proxy.com:123'.
     #
-    #   @option options [Boolean] :http_wire_trace (false) When `true`,
-    #     HTTP debug output will be sent to the `:logger`.
+    #   @option options [Float] :http_read_timeout (60)
+    #     The default number of seconds to wait for response data.
+    #     This value can safely be set per-request on the session.
     #
-    #   @option options [Boolean] :ssl_verify_peer (true) When `true`,
-    #     SSL peer certificates are verified when establishing a
-    #     connection.
+    #   @option options [Boolean] :http_wire_trace (false)
+    #     When `true`,  HTTP debug output will be sent to the `:logger`.
     #
-    #   @option options [String] :ssl_ca_bundle Full path to the SSL
-    #     certificate authority bundle file that should be used when
-    #     verifying peer certificates.  If you do not pass
-    #     `:ssl_ca_bundle` or `:ssl_ca_directory` the the system default
-    #     will be used if available.
+    #   @option options [Proc] :on_chunk_received
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the response body is received. It provides three arguments: the chunk,
+    #     the number of bytes received, and the total number of
+    #     bytes in the response (or nil if the server did not send a `content-length`).
     #
-    #   @option options [String] :ssl_ca_directory Full path of the
-    #     directory that contains the unbundled SSL certificate
+    #   @option options [Proc] :on_chunk_sent
+    #     When a Proc object is provided, it will be used as callback when each chunk
+    #     of the request body is sent. It provides three arguments: the chunk,
+    #     the number of bytes read from the body, and the total number of
+    #     bytes in the body.
+    #
+    #   @option options [Boolean] :raise_response_errors (true)
+    #     When `true`, response errors are raised.
+    #
+    #   @option options [String] :ssl_ca_bundle
+    #     Full path to the SSL certificate authority bundle file that should be used when
+    #     verifying peer certificates.  If you do not pass `:ssl_ca_bundle` or
+    #     `:ssl_ca_directory` the the system default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_directory
+    #     Full path of the directory that contains the unbundled SSL certificate
     #     authority files for verifying peer certificates.  If you do
-    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the
-    #     system default will be used if available.
+    #     not pass `:ssl_ca_bundle` or `:ssl_ca_directory` the the system
+    #     default will be used if available.
+    #
+    #   @option options [String] :ssl_ca_store
+    #     Sets the X509::Store to verify peer certificate.
+    #
+    #   @option options [OpenSSL::X509::Certificate] :ssl_cert
+    #     Sets a client certificate when creating http connections.
+    #
+    #   @option options [OpenSSL::PKey] :ssl_key
+    #     Sets a client key when creating http connections.
+    #
+    #   @option options [Float] :ssl_timeout
+    #     Sets the SSL timeout in seconds
+    #
+    #   @option options [Boolean] :ssl_verify_peer (true)
+    #     When `true`, SSL peer certificates are verified when establishing a connection.
     #
     def initialize(*args)
       super
@@ -350,9 +467,9 @@ module Aws::ECR
     #  </note>
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   image layers to check. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the image layers to check. If you do not specify a registry,
+    #   the default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository that is associated with the image layers to
@@ -406,9 +523,9 @@ module Aws::ECR
     # the image's digest in your request.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   image to delete. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the image to delete. If you do not specify a registry, the
+    #   default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The repository that contains the image to delete.
@@ -471,7 +588,7 @@ module Aws::ECR
     #   resp.failures #=> Array
     #   resp.failures[0].image_id.image_digest #=> String
     #   resp.failures[0].image_id.image_tag #=> String
-    #   resp.failures[0].failure_code #=> String, one of "InvalidImageDigest", "InvalidImageTag", "ImageTagDoesNotMatchDigest", "ImageNotFound", "MissingDigestAndTag", "ImageReferencedByManifestList", "KmsError"
+    #   resp.failures[0].failure_code #=> String, one of "InvalidImageDigest", "InvalidImageTag", "ImageTagDoesNotMatchDigest", "ImageNotFound", "MissingDigestAndTag", "ImageReferencedByManifestList", "KmsError", "UpstreamAccessDenied", "UpstreamTooManyRequests", "UpstreamUnavailable"
     #   resp.failures[0].failure_reason #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/BatchDeleteImage AWS API Documentation
@@ -490,9 +607,9 @@ module Aws::ECR
     # retrieve the image manifest.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   images to describe. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the images to describe. If you do not specify a registry, the
+    #   default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The repository that contains the images to describe.
@@ -572,7 +689,7 @@ module Aws::ECR
     #   resp.failures #=> Array
     #   resp.failures[0].image_id.image_digest #=> String
     #   resp.failures[0].image_id.image_tag #=> String
-    #   resp.failures[0].failure_code #=> String, one of "InvalidImageDigest", "InvalidImageTag", "ImageTagDoesNotMatchDigest", "ImageNotFound", "MissingDigestAndTag", "ImageReferencedByManifestList", "KmsError"
+    #   resp.failures[0].failure_code #=> String, one of "InvalidImageDigest", "InvalidImageTag", "ImageTagDoesNotMatchDigest", "ImageNotFound", "MissingDigestAndTag", "ImageReferencedByManifestList", "KmsError", "UpstreamAccessDenied", "UpstreamTooManyRequests", "UpstreamUnavailable"
     #   resp.failures[0].failure_reason #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/BatchGetImage AWS API Documentation
@@ -581,6 +698,46 @@ module Aws::ECR
     # @param [Hash] params ({})
     def batch_get_image(params = {}, options = {})
       req = build_request(:batch_get_image, params)
+      req.send_request(options)
+    end
+
+    # Gets the scanning configuration for one or more repositories.
+    #
+    # @option params [required, Array<String>] :repository_names
+    #   One or more repository names to get the scanning configuration for.
+    #
+    # @return [Types::BatchGetRepositoryScanningConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::BatchGetRepositoryScanningConfigurationResponse#scanning_configurations #scanning_configurations} => Array&lt;Types::RepositoryScanningConfiguration&gt;
+    #   * {Types::BatchGetRepositoryScanningConfigurationResponse#failures #failures} => Array&lt;Types::RepositoryScanningConfigurationFailure&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.batch_get_repository_scanning_configuration({
+    #     repository_names: ["RepositoryName"], # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.scanning_configurations #=> Array
+    #   resp.scanning_configurations[0].repository_arn #=> String
+    #   resp.scanning_configurations[0].repository_name #=> String
+    #   resp.scanning_configurations[0].scan_on_push #=> Boolean
+    #   resp.scanning_configurations[0].scan_frequency #=> String, one of "SCAN_ON_PUSH", "CONTINUOUS_SCAN", "MANUAL"
+    #   resp.scanning_configurations[0].applied_scan_filters #=> Array
+    #   resp.scanning_configurations[0].applied_scan_filters[0].filter #=> String
+    #   resp.scanning_configurations[0].applied_scan_filters[0].filter_type #=> String, one of "WILDCARD"
+    #   resp.failures #=> Array
+    #   resp.failures[0].repository_name #=> String
+    #   resp.failures[0].failure_code #=> String, one of "REPOSITORY_NOT_FOUND"
+    #   resp.failures[0].failure_reason #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/BatchGetRepositoryScanningConfiguration AWS API Documentation
+    #
+    # @overload batch_get_repository_scanning_configuration(params = {})
+    # @param [Hash] params ({})
+    def batch_get_repository_scanning_configuration(params = {}, options = {})
+      req = build_request(:batch_get_repository_scanning_configuration, params)
       req.send_request(options)
     end
 
@@ -599,9 +756,9 @@ module Aws::ECR
     #  </note>
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry to which to upload
-    #   layers. If you do not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry to
+    #   which to upload layers. If you do not specify a registry, the default
+    #   registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository to associate with the image layer.
@@ -645,19 +802,108 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Creates a pull through cache rule. A pull through cache rule provides
+    # a way to cache images from an upstream registry source in your Amazon
+    # ECR private registry. For more information, see [Using pull through
+    # cache rules][1] in the *Amazon Elastic Container Registry User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/pull-through-cache.html
+    #
+    # @option params [required, String] :ecr_repository_prefix
+    #   The repository name prefix to use when caching images from the source
+    #   registry.
+    #
+    # @option params [required, String] :upstream_registry_url
+    #   The registry URL of the upstream public registry to use as the source
+    #   for the pull through cache rule. The following is the syntax to use
+    #   for each supported upstream registry.
+    #
+    #   * Amazon ECR Public (`ecr-public`) - `public.ecr.aws`
+    #
+    #   * Docker Hub (`docker-hub`) - `registry-1.docker.io`
+    #
+    #   * Quay (`quay`) - `quay.io`
+    #
+    #   * Kubernetes (`k8s`) - `registry.k8s.io`
+    #
+    #   * GitHub Container Registry (`github-container-registry`) - `ghcr.io`
+    #
+    #   * Microsoft Azure Container Registry (`azure-container-registry`) -
+    #     `<custom>.azurecr.io`
+    #
+    # @option params [String] :registry_id
+    #   The Amazon Web Services account ID associated with the registry to
+    #   create the pull through cache rule for. If you do not specify a
+    #   registry, the default registry is assumed.
+    #
+    # @option params [String] :upstream_registry
+    #   The name of the upstream registry.
+    #
+    # @option params [String] :credential_arn
+    #   The Amazon Resource Name (ARN) of the Amazon Web Services Secrets
+    #   Manager secret that identifies the credentials to authenticate to the
+    #   upstream registry.
+    #
+    # @return [Types::CreatePullThroughCacheRuleResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreatePullThroughCacheRuleResponse#ecr_repository_prefix #ecr_repository_prefix} => String
+    #   * {Types::CreatePullThroughCacheRuleResponse#upstream_registry_url #upstream_registry_url} => String
+    #   * {Types::CreatePullThroughCacheRuleResponse#created_at #created_at} => Time
+    #   * {Types::CreatePullThroughCacheRuleResponse#registry_id #registry_id} => String
+    #   * {Types::CreatePullThroughCacheRuleResponse#upstream_registry #upstream_registry} => String
+    #   * {Types::CreatePullThroughCacheRuleResponse#credential_arn #credential_arn} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_pull_through_cache_rule({
+    #     ecr_repository_prefix: "PullThroughCacheRuleRepositoryPrefix", # required
+    #     upstream_registry_url: "Url", # required
+    #     registry_id: "RegistryId",
+    #     upstream_registry: "ecr-public", # accepts ecr-public, quay, k8s, docker-hub, github-container-registry, azure-container-registry, gitlab-container-registry
+    #     credential_arn: "CredentialArn",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.ecr_repository_prefix #=> String
+    #   resp.upstream_registry_url #=> String
+    #   resp.created_at #=> Time
+    #   resp.registry_id #=> String
+    #   resp.upstream_registry #=> String, one of "ecr-public", "quay", "k8s", "docker-hub", "github-container-registry", "azure-container-registry", "gitlab-container-registry"
+    #   resp.credential_arn #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CreatePullThroughCacheRule AWS API Documentation
+    #
+    # @overload create_pull_through_cache_rule(params = {})
+    # @param [Hash] params ({})
+    def create_pull_through_cache_rule(params = {}, options = {})
+      req = build_request(:create_pull_through_cache_rule, params)
+      req.send_request(options)
+    end
+
     # Creates a repository. For more information, see [Amazon ECR
-    # Repositories][1] in the *Amazon Elastic Container Registry User
+    # repositories][1] in the *Amazon Elastic Container Registry User
     # Guide*.
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Repositories.html
     #
+    # @option params [String] :registry_id
+    #   The Amazon Web Services account ID associated with the registry to
+    #   create the repository. If you do not specify a registry, the default
+    #   registry is assumed.
+    #
     # @option params [required, String] :repository_name
     #   The name to use for the repository. The repository name may be
     #   specified on its own (such as `nginx-web-app`) or it can be prepended
     #   with a namespace to group the repository into a category (such as
     #   `project-a/nginx-web-app`).
+    #
+    #   The repository name must start with a letter and can only contain
+    #   lowercase letters, numbers, hyphens, underscores, and forward slashes.
     #
     # @option params [Array<Types::Tag>] :tags
     #   The metadata that you apply to the repository to help you categorize
@@ -708,11 +954,12 @@ module Aws::ECR
     # @example Request syntax with placeholder values
     #
     #   resp = client.create_repository({
+    #     registry_id: "RegistryId",
     #     repository_name: "RepositoryName", # required
     #     tags: [
     #       {
-    #         key: "TagKey",
-    #         value: "TagValue",
+    #         key: "TagKey", # required
+    #         value: "TagValue", # required
     #       },
     #     ],
     #     image_tag_mutability: "MUTABLE", # accepts MUTABLE, IMMUTABLE
@@ -720,7 +967,7 @@ module Aws::ECR
     #       scan_on_push: false,
     #     },
     #     encryption_configuration: {
-    #       encryption_type: "AES256", # required, accepts AES256, KMS
+    #       encryption_type: "AES256", # required, accepts AES256, KMS, KMS_DSSE
     #       kms_key: "KmsKey",
     #     },
     #   })
@@ -734,7 +981,7 @@ module Aws::ECR
     #   resp.repository.created_at #=> Time
     #   resp.repository.image_tag_mutability #=> String, one of "MUTABLE", "IMMUTABLE"
     #   resp.repository.image_scanning_configuration.scan_on_push #=> Boolean
-    #   resp.repository.encryption_configuration.encryption_type #=> String, one of "AES256", "KMS"
+    #   resp.repository.encryption_configuration.encryption_type #=> String, one of "AES256", "KMS", "KMS_DSSE"
     #   resp.repository.encryption_configuration.kms_key #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CreateRepository AWS API Documentation
@@ -746,12 +993,190 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Creates a repository creation template. This template is used to
+    # define the settings for repositories created by Amazon ECR on your
+    # behalf. For example, repositories created through pull through cache
+    # actions. For more information, see [Private repository creation
+    # templates][1] in the *Amazon Elastic Container Registry User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/repository-creation-templates.html
+    #
+    # @option params [required, String] :prefix
+    #   The repository namespace prefix to associate with the template. All
+    #   repositories created using this namespace prefix will have the
+    #   settings defined in this template applied. For example, a prefix of
+    #   `prod` would apply to all repositories beginning with `prod/`.
+    #   Similarly, a prefix of `prod/team` would apply to all repositories
+    #   beginning with `prod/team/`.
+    #
+    #   To apply a template to all repositories in your registry that don't
+    #   have an associated creation template, you can use `ROOT` as the
+    #   prefix.
+    #
+    #   There is always an assumed `/` applied to the end of the prefix. If
+    #   you specify `ecr-public` as the prefix, Amazon ECR treats that as
+    #   `ecr-public/`. When using a pull through cache rule, the repository
+    #   prefix you specify during rule creation is what you should specify as
+    #   your repository creation template prefix as well.
+    #
+    # @option params [String] :description
+    #   A description for the repository creation template.
+    #
+    # @option params [Types::EncryptionConfigurationForRepositoryCreationTemplate] :encryption_configuration
+    #   The encryption configuration to use for repositories created using the
+    #   template.
+    #
+    # @option params [Array<Types::Tag>] :resource_tags
+    #   The metadata to apply to the repository to help you categorize and
+    #   organize. Each tag consists of a key and an optional value, both of
+    #   which you define. Tag keys can have a maximum character length of 128
+    #   characters, and tag values can have a maximum length of 256
+    #   characters.
+    #
+    # @option params [String] :image_tag_mutability
+    #   The tag mutability setting for the repository. If this parameter is
+    #   omitted, the default setting of `MUTABLE` will be used which will
+    #   allow image tags to be overwritten. If `IMMUTABLE` is specified, all
+    #   image tags within the repository will be immutable which will prevent
+    #   them from being overwritten.
+    #
+    # @option params [String] :repository_policy
+    #   The repository policy to apply to repositories created using the
+    #   template. A repository policy is a permissions policy associated with
+    #   a repository to control access permissions.
+    #
+    # @option params [String] :lifecycle_policy
+    #   The lifecycle policy to use for repositories created using the
+    #   template.
+    #
+    # @option params [required, Array<String>] :applied_for
+    #   A list of enumerable strings representing the Amazon ECR repository
+    #   creation scenarios that this template will apply towards. The two
+    #   supported scenarios are `PULL_THROUGH_CACHE` and `REPLICATION`
+    #
+    # @option params [String] :custom_role_arn
+    #   The ARN of the role to be assumed by Amazon ECR. This role must be in
+    #   the same account as the registry that you are configuring. Amazon ECR
+    #   will assume your supplied role when the customRoleArn is specified.
+    #   When this field isn't specified, Amazon ECR will use the
+    #   service-linked role for the repository creation template.
+    #
+    # @return [Types::CreateRepositoryCreationTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::CreateRepositoryCreationTemplateResponse#registry_id #registry_id} => String
+    #   * {Types::CreateRepositoryCreationTemplateResponse#repository_creation_template #repository_creation_template} => Types::RepositoryCreationTemplate
+    #
+    #
+    # @example Example: Create a new repository creation template
+    #
+    #   # This example creates a repository creation template.
+    #
+    #   resp = client.create_repository_creation_template({
+    #     applied_for: [
+    #       "REPLICATION", 
+    #       "PULL_THROUGH_CACHE", 
+    #     ], 
+    #     description: "Repos for testing images", 
+    #     encryption_configuration: {
+    #       encryption_type: "AES256", 
+    #     }, 
+    #     image_tag_mutability: "MUTABLE", 
+    #     lifecycle_policy: "{\r\n    \"rules\": [\r\n        {\r\n            \"rulePriority\": 1,\r\n            \"description\": \"Expire images older than 14 days\",\r\n            \"selection\": {\r\n                \"tagStatus\": \"untagged\",\r\n                \"countType\": \"sinceImagePushed\",\r\n                \"countUnit\": \"days\",\r\n                \"countNumber\": 14\r\n            },\r\n            \"action\": {\r\n                \"type\": \"expire\"\r\n            }\r\n        }\r\n    ]\r\n}", 
+    #     prefix: "eng/test", 
+    #     repository_policy: "{\r\n  \"Version\": \"2012-10-17\",\r\n  \"Statement\": [\r\n    {\r\n      \"Sid\": \"LambdaECRPullPolicy\",\r\n      \"Effect\": \"Allow\",\r\n      \"Principal\": {\r\n        \"Service\": \"lambda.amazonaws.com\"\r\n      },\r\n      \"Action\": \"ecr:BatchGetImage\"\r\n    }\r\n  ]\r\n}", 
+    #     resource_tags: [
+    #       {
+    #         key: "environment", 
+    #         value: "test", 
+    #       }, 
+    #     ], 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     registry_id: "012345678901", 
+    #     repository_creation_template: {
+    #       applied_for: [
+    #         "REPLICATION", 
+    #         "PULL_THROUGH_CACHE", 
+    #       ], 
+    #       created_at: Time.parse("2023-12-16T17:29:02-07:00"), 
+    #       description: "Repos for testing images", 
+    #       encryption_configuration: {
+    #         encryption_type: "AES256", 
+    #       }, 
+    #       image_tag_mutability: "MUTABLE", 
+    #       lifecycle_policy: "{\r\n    \"rules\": [\r\n        {\r\n            \"rulePriority\": 1,\r\n            \"description\": \"Expire images older than 14 days\",\r\n            \"selection\": {\r\n                \"tagStatus\": \"untagged\",\r\n                \"countType\": \"sinceImagePushed\",\r\n                \"countUnit\": \"days\",\r\n                \"countNumber\": 14\r\n            },\r\n            \"action\": {\r\n                \"type\": \"expire\"\r\n            }\r\n        }\r\n    ]\r\n}", 
+    #       prefix: "eng/test", 
+    #       repository_policy: "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"LambdaECRPullPolicy\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"Service\" : \"lambda.amazonaws.com\"\n    },\n    \"Action\" : \"ecr:BatchGetImage\"\n  } ]\n}", 
+    #       resource_tags: [
+    #         {
+    #           key: "environment", 
+    #           value: "test", 
+    #         }, 
+    #       ], 
+    #       updated_at: Time.parse("2023-12-16T17:29:02-07:00"), 
+    #     }, 
+    #   }
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.create_repository_creation_template({
+    #     prefix: "Prefix", # required
+    #     description: "RepositoryTemplateDescription",
+    #     encryption_configuration: {
+    #       encryption_type: "AES256", # required, accepts AES256, KMS, KMS_DSSE
+    #       kms_key: "KmsKeyForRepositoryCreationTemplate",
+    #     },
+    #     resource_tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue", # required
+    #       },
+    #     ],
+    #     image_tag_mutability: "MUTABLE", # accepts MUTABLE, IMMUTABLE
+    #     repository_policy: "RepositoryPolicyText",
+    #     lifecycle_policy: "LifecyclePolicyTextForRepositoryCreationTemplate",
+    #     applied_for: ["REPLICATION"], # required, accepts REPLICATION, PULL_THROUGH_CACHE
+    #     custom_role_arn: "CustomRoleArn",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.registry_id #=> String
+    #   resp.repository_creation_template.prefix #=> String
+    #   resp.repository_creation_template.description #=> String
+    #   resp.repository_creation_template.encryption_configuration.encryption_type #=> String, one of "AES256", "KMS", "KMS_DSSE"
+    #   resp.repository_creation_template.encryption_configuration.kms_key #=> String
+    #   resp.repository_creation_template.resource_tags #=> Array
+    #   resp.repository_creation_template.resource_tags[0].key #=> String
+    #   resp.repository_creation_template.resource_tags[0].value #=> String
+    #   resp.repository_creation_template.image_tag_mutability #=> String, one of "MUTABLE", "IMMUTABLE"
+    #   resp.repository_creation_template.repository_policy #=> String
+    #   resp.repository_creation_template.lifecycle_policy #=> String
+    #   resp.repository_creation_template.applied_for #=> Array
+    #   resp.repository_creation_template.applied_for[0] #=> String, one of "REPLICATION", "PULL_THROUGH_CACHE"
+    #   resp.repository_creation_template.custom_role_arn #=> String
+    #   resp.repository_creation_template.created_at #=> Time
+    #   resp.repository_creation_template.updated_at #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/CreateRepositoryCreationTemplate AWS API Documentation
+    #
+    # @overload create_repository_creation_template(params = {})
+    # @param [Hash] params ({})
+    def create_repository_creation_template(params = {}, options = {})
+      req = build_request(:create_repository_creation_template, params)
+      req.send_request(options)
+    end
+
     # Deletes the lifecycle policy associated with the specified repository.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the default
+    #   registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository.
@@ -786,6 +1211,49 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Deletes a pull through cache rule.
+    #
+    # @option params [required, String] :ecr_repository_prefix
+    #   The Amazon ECR repository prefix associated with the pull through
+    #   cache rule to delete.
+    #
+    # @option params [String] :registry_id
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the pull through cache rule. If you do not specify a
+    #   registry, the default registry is assumed.
+    #
+    # @return [Types::DeletePullThroughCacheRuleResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeletePullThroughCacheRuleResponse#ecr_repository_prefix #ecr_repository_prefix} => String
+    #   * {Types::DeletePullThroughCacheRuleResponse#upstream_registry_url #upstream_registry_url} => String
+    #   * {Types::DeletePullThroughCacheRuleResponse#created_at #created_at} => Time
+    #   * {Types::DeletePullThroughCacheRuleResponse#registry_id #registry_id} => String
+    #   * {Types::DeletePullThroughCacheRuleResponse#credential_arn #credential_arn} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_pull_through_cache_rule({
+    #     ecr_repository_prefix: "PullThroughCacheRuleRepositoryPrefix", # required
+    #     registry_id: "RegistryId",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.ecr_repository_prefix #=> String
+    #   resp.upstream_registry_url #=> String
+    #   resp.created_at #=> Time
+    #   resp.registry_id #=> String
+    #   resp.credential_arn #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DeletePullThroughCacheRule AWS API Documentation
+    #
+    # @overload delete_pull_through_cache_rule(params = {})
+    # @param [Hash] params ({})
+    def delete_pull_through_cache_rule(params = {}, options = {})
+      req = build_request(:delete_pull_through_cache_rule, params)
+      req.send_request(options)
+    end
+
     # Deletes the registry permissions policy.
     #
     # @return [Types::DeleteRegistryPolicyResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
@@ -807,20 +1275,23 @@ module Aws::ECR
       req.send_request(options)
     end
 
-    # Deletes a repository. If the repository contains images, you must
-    # either delete all images in the repository or use the `force` option
-    # to delete the repository.
+    # Deletes a repository. If the repository isn't empty, you must either
+    # delete the contents of the repository or use the `force` option to
+    # delete the repository and have Amazon ECR delete all of its contents
+    # on your behalf.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository to delete. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository to delete. If you do not specify a registry,
+    #   the default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository to delete.
     #
     # @option params [Boolean] :force
-    #   If a repository contains images, forces the deletion.
+    #   If true, deleting the repository force deletes the contents of the
+    #   repository. If false, the repository must be empty before attempting
+    #   to delete it.
     #
     # @return [Types::DeleteRepositoryResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -863,7 +1334,7 @@ module Aws::ECR
     #   resp.repository.created_at #=> Time
     #   resp.repository.image_tag_mutability #=> String, one of "MUTABLE", "IMMUTABLE"
     #   resp.repository.image_scanning_configuration.scan_on_push #=> Boolean
-    #   resp.repository.encryption_configuration.encryption_type #=> String, one of "AES256", "KMS"
+    #   resp.repository.encryption_configuration.encryption_type #=> String, one of "AES256", "KMS", "KMS_DSSE"
     #   resp.repository.encryption_configuration.kms_key #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DeleteRepository AWS API Documentation
@@ -875,13 +1346,81 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Deletes a repository creation template.
+    #
+    # @option params [required, String] :prefix
+    #   The repository namespace prefix associated with the repository
+    #   creation template.
+    #
+    # @return [Types::DeleteRepositoryCreationTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DeleteRepositoryCreationTemplateResponse#registry_id #registry_id} => String
+    #   * {Types::DeleteRepositoryCreationTemplateResponse#repository_creation_template #repository_creation_template} => Types::RepositoryCreationTemplate
+    #
+    #
+    # @example Example: Delete a repository creation template
+    #
+    #   # This example deletes a repository creation template.
+    #
+    #   resp = client.delete_repository_creation_template({
+    #     prefix: "eng", 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     registry_id: "012345678901", 
+    #     repository_creation_template: {
+    #       created_at: Time.parse("2023-12-03T16:27:57.933000-08:00"), 
+    #       encryption_configuration: {
+    #         encryption_type: "AES256", 
+    #       }, 
+    #       image_tag_mutability: "MUTABLE", 
+    #       prefix: "eng", 
+    #       updated_at: Time.parse("2023-12-03T16:27:57.933000-08:00"), 
+    #     }, 
+    #   }
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.delete_repository_creation_template({
+    #     prefix: "Prefix", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.registry_id #=> String
+    #   resp.repository_creation_template.prefix #=> String
+    #   resp.repository_creation_template.description #=> String
+    #   resp.repository_creation_template.encryption_configuration.encryption_type #=> String, one of "AES256", "KMS", "KMS_DSSE"
+    #   resp.repository_creation_template.encryption_configuration.kms_key #=> String
+    #   resp.repository_creation_template.resource_tags #=> Array
+    #   resp.repository_creation_template.resource_tags[0].key #=> String
+    #   resp.repository_creation_template.resource_tags[0].value #=> String
+    #   resp.repository_creation_template.image_tag_mutability #=> String, one of "MUTABLE", "IMMUTABLE"
+    #   resp.repository_creation_template.repository_policy #=> String
+    #   resp.repository_creation_template.lifecycle_policy #=> String
+    #   resp.repository_creation_template.applied_for #=> Array
+    #   resp.repository_creation_template.applied_for[0] #=> String, one of "REPLICATION", "PULL_THROUGH_CACHE"
+    #   resp.repository_creation_template.custom_role_arn #=> String
+    #   resp.repository_creation_template.created_at #=> Time
+    #   resp.repository_creation_template.updated_at #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DeleteRepositoryCreationTemplate AWS API Documentation
+    #
+    # @overload delete_repository_creation_template(params = {})
+    # @param [Hash] params ({})
+    def delete_repository_creation_template(params = {}, options = {})
+      req = build_request(:delete_repository_creation_template, params)
+      req.send_request(options)
+    end
+
     # Deletes the repository policy associated with the specified
     # repository.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository policy to delete. If you do not specify a registry, the
-    #   default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository policy to delete. If you do not specify a
+    #   registry, the default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository that is associated with the repository
@@ -931,18 +1470,70 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Returns the replication status for a specified image.
+    #
+    # @option params [required, String] :repository_name
+    #   The name of the repository that the image is in.
+    #
+    # @option params [required, Types::ImageIdentifier] :image_id
+    #   An object with identifying information for an image in an Amazon ECR
+    #   repository.
+    #
+    # @option params [String] :registry_id
+    #   The Amazon Web Services account ID associated with the registry. If
+    #   you do not specify a registry, the default registry is assumed.
+    #
+    # @return [Types::DescribeImageReplicationStatusResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeImageReplicationStatusResponse#repository_name #repository_name} => String
+    #   * {Types::DescribeImageReplicationStatusResponse#image_id #image_id} => Types::ImageIdentifier
+    #   * {Types::DescribeImageReplicationStatusResponse#replication_statuses #replication_statuses} => Array&lt;Types::ImageReplicationStatus&gt;
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_image_replication_status({
+    #     repository_name: "RepositoryName", # required
+    #     image_id: { # required
+    #       image_digest: "ImageDigest",
+    #       image_tag: "ImageTag",
+    #     },
+    #     registry_id: "RegistryId",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.repository_name #=> String
+    #   resp.image_id.image_digest #=> String
+    #   resp.image_id.image_tag #=> String
+    #   resp.replication_statuses #=> Array
+    #   resp.replication_statuses[0].region #=> String
+    #   resp.replication_statuses[0].registry_id #=> String
+    #   resp.replication_statuses[0].status #=> String, one of "IN_PROGRESS", "COMPLETE", "FAILED"
+    #   resp.replication_statuses[0].failure_code #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribeImageReplicationStatus AWS API Documentation
+    #
+    # @overload describe_image_replication_status(params = {})
+    # @param [Hash] params ({})
+    def describe_image_replication_status(params = {}, options = {})
+      req = build_request(:describe_image_replication_status, params)
+      req.send_request(options)
+    end
+
     # Returns the scan findings for the specified image.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to describe the image scan findings for. If you do
-    #   not specify a registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to describe the image scan findings
+    #   for. If you do not specify a registry, the default registry is
+    #   assumed.
     #
     # @option params [required, String] :repository_name
     #   The repository for the image for which to describe the scan findings.
     #
     # @option params [required, Types::ImageIdentifier] :image_id
-    #   An object with identifying information for an Amazon ECR image.
+    #   An object with identifying information for an image in an Amazon ECR
+    #   repository.
     #
     # @option params [String] :next_token
     #   The `nextToken` value returned from a previous paginated
@@ -992,10 +1583,12 @@ module Aws::ECR
     #   resp.repository_name #=> String
     #   resp.image_id.image_digest #=> String
     #   resp.image_id.image_tag #=> String
-    #   resp.image_scan_status.status #=> String, one of "IN_PROGRESS", "COMPLETE", "FAILED"
+    #   resp.image_scan_status.status #=> String, one of "IN_PROGRESS", "COMPLETE", "FAILED", "UNSUPPORTED_IMAGE", "ACTIVE", "PENDING", "SCAN_ELIGIBILITY_EXPIRED", "FINDINGS_UNAVAILABLE"
     #   resp.image_scan_status.description #=> String
     #   resp.image_scan_findings.image_scan_completed_at #=> Time
     #   resp.image_scan_findings.vulnerability_source_updated_at #=> Time
+    #   resp.image_scan_findings.finding_severity_counts #=> Hash
+    #   resp.image_scan_findings.finding_severity_counts["FindingSeverity"] #=> Integer
     #   resp.image_scan_findings.findings #=> Array
     #   resp.image_scan_findings.findings[0].name #=> String
     #   resp.image_scan_findings.findings[0].description #=> String
@@ -1004,8 +1597,68 @@ module Aws::ECR
     #   resp.image_scan_findings.findings[0].attributes #=> Array
     #   resp.image_scan_findings.findings[0].attributes[0].key #=> String
     #   resp.image_scan_findings.findings[0].attributes[0].value #=> <Hash,Array,String,Numeric,Boolean,IO,Set,nil>
-    #   resp.image_scan_findings.finding_severity_counts #=> Hash
-    #   resp.image_scan_findings.finding_severity_counts["FindingSeverity"] #=> Integer
+    #   resp.image_scan_findings.enhanced_findings #=> Array
+    #   resp.image_scan_findings.enhanced_findings[0].aws_account_id #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].description #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].finding_arn #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].first_observed_at #=> Time
+    #   resp.image_scan_findings.enhanced_findings[0].last_observed_at #=> Time
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.cvss #=> Array
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.cvss[0].base_score #=> Float
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.cvss[0].scoring_vector #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.cvss[0].source #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.cvss[0].version #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.reference_urls #=> Array
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.reference_urls[0] #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.related_vulnerabilities #=> Array
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.related_vulnerabilities[0] #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.source #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.source_url #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vendor_created_at #=> Time
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vendor_severity #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vendor_updated_at #=> Time
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerability_id #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerable_packages #=> Array
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerable_packages[0].arch #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerable_packages[0].epoch #=> Integer
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerable_packages[0].file_path #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerable_packages[0].name #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerable_packages[0].package_manager #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerable_packages[0].release #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerable_packages[0].source_layer_hash #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerable_packages[0].version #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].package_vulnerability_details.vulnerable_packages[0].fixed_in_version #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].remediation.recommendation.url #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].remediation.recommendation.text #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].resources #=> Array
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].details.aws_ecr_container_image.architecture #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].details.aws_ecr_container_image.author #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].details.aws_ecr_container_image.image_hash #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].details.aws_ecr_container_image.image_tags #=> Array
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].details.aws_ecr_container_image.image_tags[0] #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].details.aws_ecr_container_image.platform #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].details.aws_ecr_container_image.pushed_at #=> Time
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].details.aws_ecr_container_image.registry #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].details.aws_ecr_container_image.repository_name #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].id #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].tags #=> Hash
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].tags["TagKey"] #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].resources[0].type #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].score #=> Float
+    #   resp.image_scan_findings.enhanced_findings[0].score_details.cvss.adjustments #=> Array
+    #   resp.image_scan_findings.enhanced_findings[0].score_details.cvss.adjustments[0].metric #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].score_details.cvss.adjustments[0].reason #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].score_details.cvss.score #=> Float
+    #   resp.image_scan_findings.enhanced_findings[0].score_details.cvss.score_source #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].score_details.cvss.scoring_vector #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].score_details.cvss.version #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].severity #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].status #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].title #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].type #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].updated_at #=> Time
+    #   resp.image_scan_findings.enhanced_findings[0].fix_available #=> String
+    #   resp.image_scan_findings.enhanced_findings[0].exploit_available #=> String
     #   resp.next_token #=> String
     #
     #
@@ -1033,9 +1686,9 @@ module Aws::ECR
     #  </note>
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to describe images. If you do not specify a
-    #   registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to describe images. If you do not
+    #   specify a registry, the default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The repository that contains the images to describe.
@@ -1101,7 +1754,7 @@ module Aws::ECR
     #   resp.image_details[0].image_tags[0] #=> String
     #   resp.image_details[0].image_size_in_bytes #=> Integer
     #   resp.image_details[0].image_pushed_at #=> Time
-    #   resp.image_details[0].image_scan_status.status #=> String, one of "IN_PROGRESS", "COMPLETE", "FAILED"
+    #   resp.image_details[0].image_scan_status.status #=> String, one of "IN_PROGRESS", "COMPLETE", "FAILED", "UNSUPPORTED_IMAGE", "ACTIVE", "PENDING", "SCAN_ELIGIBILITY_EXPIRED", "FINDINGS_UNAVAILABLE"
     #   resp.image_details[0].image_scan_status.description #=> String
     #   resp.image_details[0].image_scan_findings_summary.image_scan_completed_at #=> Time
     #   resp.image_details[0].image_scan_findings_summary.vulnerability_source_updated_at #=> Time
@@ -1109,6 +1762,7 @@ module Aws::ECR
     #   resp.image_details[0].image_scan_findings_summary.finding_severity_counts["FindingSeverity"] #=> Integer
     #   resp.image_details[0].image_manifest_media_type #=> String
     #   resp.image_details[0].artifact_media_type #=> String
+    #   resp.image_details[0].last_recorded_pull_time #=> Time
     #   resp.next_token #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribeImages AWS API Documentation
@@ -1117,6 +1771,75 @@ module Aws::ECR
     # @param [Hash] params ({})
     def describe_images(params = {}, options = {})
       req = build_request(:describe_images, params)
+      req.send_request(options)
+    end
+
+    # Returns the pull through cache rules for a registry.
+    #
+    # @option params [String] :registry_id
+    #   The Amazon Web Services account ID associated with the registry to
+    #   return the pull through cache rules for. If you do not specify a
+    #   registry, the default registry is assumed.
+    #
+    # @option params [Array<String>] :ecr_repository_prefixes
+    #   The Amazon ECR repository prefixes associated with the pull through
+    #   cache rules to return. If no repository prefix value is specified, all
+    #   pull through cache rules are returned.
+    #
+    # @option params [String] :next_token
+    #   The `nextToken` value returned from a previous paginated
+    #   `DescribePullThroughCacheRulesRequest` request where `maxResults` was
+    #   used and the results exceeded the value of that parameter. Pagination
+    #   continues from the end of the previous results that returned the
+    #   `nextToken` value. This value is null when there are no more results
+    #   to return.
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of pull through cache rules returned by
+    #   `DescribePullThroughCacheRulesRequest` in paginated output. When this
+    #   parameter is used, `DescribePullThroughCacheRulesRequest` only returns
+    #   `maxResults` results in a single page along with a `nextToken`
+    #   response element. The remaining results of the initial request can be
+    #   seen by sending another `DescribePullThroughCacheRulesRequest` request
+    #   with the returned `nextToken` value. This value can be between 1 and
+    #   1000. If this parameter is not used, then
+    #   `DescribePullThroughCacheRulesRequest` returns up to 100 results and a
+    #   `nextToken` value, if applicable.
+    #
+    # @return [Types::DescribePullThroughCacheRulesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribePullThroughCacheRulesResponse#pull_through_cache_rules #pull_through_cache_rules} => Array&lt;Types::PullThroughCacheRule&gt;
+    #   * {Types::DescribePullThroughCacheRulesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_pull_through_cache_rules({
+    #     registry_id: "RegistryId",
+    #     ecr_repository_prefixes: ["PullThroughCacheRuleRepositoryPrefix"],
+    #     next_token: "NextToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.pull_through_cache_rules #=> Array
+    #   resp.pull_through_cache_rules[0].ecr_repository_prefix #=> String
+    #   resp.pull_through_cache_rules[0].upstream_registry_url #=> String
+    #   resp.pull_through_cache_rules[0].created_at #=> Time
+    #   resp.pull_through_cache_rules[0].registry_id #=> String
+    #   resp.pull_through_cache_rules[0].credential_arn #=> String
+    #   resp.pull_through_cache_rules[0].upstream_registry #=> String, one of "ecr-public", "quay", "k8s", "docker-hub", "github-container-registry", "azure-container-registry", "gitlab-container-registry"
+    #   resp.pull_through_cache_rules[0].updated_at #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribePullThroughCacheRules AWS API Documentation
+    #
+    # @overload describe_pull_through_cache_rules(params = {})
+    # @param [Hash] params ({})
+    def describe_pull_through_cache_rules(params = {}, options = {})
+      req = build_request(:describe_pull_through_cache_rules, params)
       req.send_request(options)
     end
 
@@ -1136,6 +1859,9 @@ module Aws::ECR
     #   resp.replication_configuration.rules[0].destinations #=> Array
     #   resp.replication_configuration.rules[0].destinations[0].region #=> String
     #   resp.replication_configuration.rules[0].destinations[0].registry_id #=> String
+    #   resp.replication_configuration.rules[0].repository_filters #=> Array
+    #   resp.replication_configuration.rules[0].repository_filters[0].filter #=> String
+    #   resp.replication_configuration.rules[0].repository_filters[0].filter_type #=> String, one of "PREFIX_MATCH"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribeRegistry AWS API Documentation
     #
@@ -1149,9 +1875,9 @@ module Aws::ECR
     # Describes image repositories in a registry.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repositories to be described. If you do not specify a registry, the
-    #   default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repositories to be described. If you do not specify a
+    #   registry, the default registry is assumed.
     #
     # @option params [Array<String>] :repository_names
     #   A list of repositories to describe. If this parameter is omitted, then
@@ -1235,7 +1961,7 @@ module Aws::ECR
     #   resp.repositories[0].created_at #=> Time
     #   resp.repositories[0].image_tag_mutability #=> String, one of "MUTABLE", "IMMUTABLE"
     #   resp.repositories[0].image_scanning_configuration.scan_on_push #=> Boolean
-    #   resp.repositories[0].encryption_configuration.encryption_type #=> String, one of "AES256", "KMS"
+    #   resp.repositories[0].encryption_configuration.encryption_type #=> String, one of "AES256", "KMS", "KMS_DSSE"
     #   resp.repositories[0].encryption_configuration.kms_key #=> String
     #   resp.next_token #=> String
     #
@@ -1248,6 +1974,164 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Returns details about the repository creation templates in a registry.
+    # The `prefixes` request parameter can be used to return the details for
+    # a specific repository creation template.
+    #
+    # @option params [Array<String>] :prefixes
+    #   The repository namespace prefixes associated with the repository
+    #   creation templates to describe. If this value is not specified, all
+    #   repository creation templates are returned.
+    #
+    # @option params [String] :next_token
+    #   The `nextToken` value returned from a previous paginated
+    #   `DescribeRepositoryCreationTemplates` request where `maxResults` was
+    #   used and the results exceeded the value of that parameter. Pagination
+    #   continues from the end of the previous results that returned the
+    #   `nextToken` value. This value is `null` when there are no more results
+    #   to return.
+    #
+    #   <note markdown="1"> This token should be treated as an opaque identifier that is only used
+    #   to retrieve the next items in a list and not for other programmatic
+    #   purposes.
+    #
+    #    </note>
+    #
+    # @option params [Integer] :max_results
+    #   The maximum number of repository results returned by
+    #   `DescribeRepositoryCreationTemplatesRequest` in paginated output. When
+    #   this parameter is used, `DescribeRepositoryCreationTemplatesRequest`
+    #   only returns `maxResults` results in a single page along with a
+    #   `nextToken` response element. The remaining results of the initial
+    #   request can be seen by sending another
+    #   `DescribeRepositoryCreationTemplatesRequest` request with the returned
+    #   `nextToken` value. This value can be between 1 and 1000. If this
+    #   parameter is not used, then
+    #   `DescribeRepositoryCreationTemplatesRequest` returns up to 100 results
+    #   and a `nextToken` value, if applicable.
+    #
+    # @return [Types::DescribeRepositoryCreationTemplatesResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::DescribeRepositoryCreationTemplatesResponse#registry_id #registry_id} => String
+    #   * {Types::DescribeRepositoryCreationTemplatesResponse#repository_creation_templates #repository_creation_templates} => Array&lt;Types::RepositoryCreationTemplate&gt;
+    #   * {Types::DescribeRepositoryCreationTemplatesResponse#next_token #next_token} => String
+    #
+    # The returned {Seahorse::Client::Response response} is a pageable response and is Enumerable. For details on usage see {Aws::PageableResponse PageableResponse}.
+    #
+    #
+    # @example Example: Describe a repository creation template
+    #
+    #   # This example describes the contents of a repository creation template.
+    #
+    #   resp = client.describe_repository_creation_templates({
+    #     max_results: 123, 
+    #     next_token: "", 
+    #     prefixes: [
+    #       "eng", 
+    #     ], 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     next_token: "", 
+    #     registry_id: "012345678901", 
+    #     repository_creation_templates: [
+    #       {
+    #         applied_for: [
+    #           "PULL_THROUGH_CACHE", 
+    #           "REPLICATION", 
+    #         ], 
+    #         created_at: Time.parse("2023-12-16T17:29:02-07:00"), 
+    #         encryption_configuration: {
+    #           encryption_type: "AES256", 
+    #         }, 
+    #         image_tag_mutability: "MUTABLE", 
+    #         prefix: "eng/test", 
+    #         updated_at: Time.parse("2023-12-16T19:55:02-07:00"), 
+    #       }, 
+    #       {
+    #         applied_for: [
+    #           "REPLICATION", 
+    #         ], 
+    #         created_at: Time.parse("2023-12-14T17:29:02-07:00"), 
+    #         encryption_configuration: {
+    #           encryption_type: "AES256", 
+    #         }, 
+    #         image_tag_mutability: "IMMUTABLE", 
+    #         prefix: "eng/replication-test", 
+    #         updated_at: Time.parse("2023-12-14T19:55:02-07:00"), 
+    #       }, 
+    #     ], 
+    #   }
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.describe_repository_creation_templates({
+    #     prefixes: ["Prefix"],
+    #     next_token: "NextToken",
+    #     max_results: 1,
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.registry_id #=> String
+    #   resp.repository_creation_templates #=> Array
+    #   resp.repository_creation_templates[0].prefix #=> String
+    #   resp.repository_creation_templates[0].description #=> String
+    #   resp.repository_creation_templates[0].encryption_configuration.encryption_type #=> String, one of "AES256", "KMS", "KMS_DSSE"
+    #   resp.repository_creation_templates[0].encryption_configuration.kms_key #=> String
+    #   resp.repository_creation_templates[0].resource_tags #=> Array
+    #   resp.repository_creation_templates[0].resource_tags[0].key #=> String
+    #   resp.repository_creation_templates[0].resource_tags[0].value #=> String
+    #   resp.repository_creation_templates[0].image_tag_mutability #=> String, one of "MUTABLE", "IMMUTABLE"
+    #   resp.repository_creation_templates[0].repository_policy #=> String
+    #   resp.repository_creation_templates[0].lifecycle_policy #=> String
+    #   resp.repository_creation_templates[0].applied_for #=> Array
+    #   resp.repository_creation_templates[0].applied_for[0] #=> String, one of "REPLICATION", "PULL_THROUGH_CACHE"
+    #   resp.repository_creation_templates[0].custom_role_arn #=> String
+    #   resp.repository_creation_templates[0].created_at #=> Time
+    #   resp.repository_creation_templates[0].updated_at #=> Time
+    #   resp.next_token #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/DescribeRepositoryCreationTemplates AWS API Documentation
+    #
+    # @overload describe_repository_creation_templates(params = {})
+    # @param [Hash] params ({})
+    def describe_repository_creation_templates(params = {}, options = {})
+      req = build_request(:describe_repository_creation_templates, params)
+      req.send_request(options)
+    end
+
+    # Retrieves the basic scan type version name.
+    #
+    # @option params [required, String] :name
+    #   Basic scan type version name.
+    #
+    # @return [Types::GetAccountSettingResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetAccountSettingResponse#name #name} => String
+    #   * {Types::GetAccountSettingResponse#value #value} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.get_account_setting({
+    #     name: "AccountSettingName", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #   resp.value #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/GetAccountSetting AWS API Documentation
+    #
+    # @overload get_account_setting(params = {})
+    # @param [Hash] params ({})
+    def get_account_setting(params = {}, options = {})
+      req = build_request(:get_account_setting, params)
+      req.send_request(options)
+    end
+
     # Retrieves an authorization token. An authorization token represents
     # your IAM authentication credentials and can be used to access any
     # Amazon ECR registry that your IAM principal has access to. The
@@ -1255,9 +2139,9 @@ module Aws::ECR
     #
     # The `authorizationToken` returned is a base64 encoded string that can
     # be decoded and used in a `docker login` command to authenticate to a
-    # registry. The AWS CLI offers an `get-login-password` command that
+    # registry. The CLI offers an `get-login-password` command that
     # simplifies the login process. For more information, see [Registry
-    # Authentication][1] in the *Amazon Elastic Container Registry User
+    # authentication][1] in the *Amazon Elastic Container Registry User
     # Guide*.
     #
     #
@@ -1265,9 +2149,9 @@ module Aws::ECR
     # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html#registry_auth
     #
     # @option params [Array<String>] :registry_ids
-    #   A list of AWS account IDs that are associated with the registries for
-    #   which to get AuthorizationData objects. If you do not specify a
-    #   registry, the default registry is assumed.
+    #   A list of Amazon Web Services account IDs that are associated with the
+    #   registries for which to get AuthorizationData objects. If you do not
+    #   specify a registry, the default registry is assumed.
     #
     # @return [Types::GetAuthorizationTokenResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -1285,8 +2169,8 @@ module Aws::ECR
     #   {
     #     authorization_data: [
     #       {
-    #         authorization_token: "QVdTOkN...", 
-    #         expires_at: Time.parse("1470951892432"), 
+    #         authorization_token: "QVdTOkNEXAMPLE", 
+    #         expires_at: Time.parse("2022-05-17T06:56:13.652000+00:00"), 
     #         proxy_endpoint: "https://012345678901.dkr.ecr.us-west-2.amazonaws.com", 
     #       }, 
     #     ], 
@@ -1328,9 +2212,9 @@ module Aws::ECR
     #  </note>
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   image layer to download. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the image layer to download. If you do not specify a
+    #   registry, the default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository that is associated with the image layer to
@@ -1369,9 +2253,9 @@ module Aws::ECR
     # Retrieves the lifecycle policy for the specified repository.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the default
+    #   registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository.
@@ -1410,9 +2294,9 @@ module Aws::ECR
     # specified repository.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the default
+    #   registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository.
@@ -1527,12 +2411,38 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Retrieves the scanning configuration for a registry.
+    #
+    # @return [Types::GetRegistryScanningConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::GetRegistryScanningConfigurationResponse#registry_id #registry_id} => String
+    #   * {Types::GetRegistryScanningConfigurationResponse#scanning_configuration #scanning_configuration} => Types::RegistryScanningConfiguration
+    #
+    # @example Response structure
+    #
+    #   resp.registry_id #=> String
+    #   resp.scanning_configuration.scan_type #=> String, one of "BASIC", "ENHANCED"
+    #   resp.scanning_configuration.rules #=> Array
+    #   resp.scanning_configuration.rules[0].scan_frequency #=> String, one of "SCAN_ON_PUSH", "CONTINUOUS_SCAN", "MANUAL"
+    #   resp.scanning_configuration.rules[0].repository_filters #=> Array
+    #   resp.scanning_configuration.rules[0].repository_filters[0].filter #=> String
+    #   resp.scanning_configuration.rules[0].repository_filters[0].filter_type #=> String, one of "WILDCARD"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/GetRegistryScanningConfiguration AWS API Documentation
+    #
+    # @overload get_registry_scanning_configuration(params = {})
+    # @param [Hash] params ({})
+    def get_registry_scanning_configuration(params = {}, options = {})
+      req = build_request(:get_registry_scanning_configuration, params)
+      req.send_request(options)
+    end
+
     # Retrieves the repository policy for the specified repository.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the default
+    #   registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository with the policy to retrieve.
@@ -1595,9 +2505,9 @@ module Aws::ECR
     #  </note>
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry to which you intend to
-    #   upload layers. If you do not specify a registry, the default registry
-    #   is assumed.
+    #   The Amazon Web Services account ID associated with the registry to
+    #   which you intend to upload layers. If you do not specify a registry,
+    #   the default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository to which you intend to upload layers.
@@ -1638,9 +2548,9 @@ module Aws::ECR
     # only `TAGGED` images to list all of the tags in your repository.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to list images. If you do not specify a registry,
-    #   the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to list images. If you do not specify
+    #   a registry, the default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The repository with image IDs to be listed.
@@ -1758,6 +2668,42 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Allows you to change the basic scan type version by setting the `name`
+    # parameter to either `CLAIR` to `AWS_NATIVE`.
+    #
+    # @option params [required, String] :name
+    #   Basic scan type version name.
+    #
+    # @option params [required, String] :value
+    #   Setting value that determines what basic scan type is being used:
+    #   `AWS_NATIVE` or `CLAIR`.
+    #
+    # @return [Types::PutAccountSettingResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::PutAccountSettingResponse#name #name} => String
+    #   * {Types::PutAccountSettingResponse#value #value} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.put_account_setting({
+    #     name: "AccountSettingName", # required
+    #     value: "AccountSettingValue", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.name #=> String
+    #   resp.value #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PutAccountSetting AWS API Documentation
+    #
+    # @overload put_account_setting(params = {})
+    # @param [Hash] params ({})
+    def put_account_setting(params = {}, options = {})
+      req = build_request(:put_account_setting, params)
+      req.send_request(options)
+    end
+
     # Creates or updates the image manifest and tags associated with an
     # image.
     #
@@ -1772,9 +2718,9 @@ module Aws::ECR
     #  </note>
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to put the image. If you do not specify a
-    #   registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to put the image. If you do not
+    #   specify a registry, the default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository in which to put the image.
@@ -1828,13 +2774,17 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # The `PutImageScanningConfiguration` API is being deprecated, in favor
+    # of specifying the image scanning configuration at the registry level.
+    # For more information, see PutRegistryScanningConfiguration.
+    #
     # Updates the image scanning configuration for the specified repository.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to update the image scanning configuration
-    #   setting. If you do not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to update the image scanning
+    #   configuration setting. If you do not specify a registry, the default
+    #   registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository in which to update the image scanning
@@ -1877,7 +2827,7 @@ module Aws::ECR
     end
 
     # Updates the image tag mutability settings for the specified
-    # repository. For more information, see [Image Tag Mutability][1] in the
+    # repository. For more information, see [Image tag mutability][1] in the
     # *Amazon Elastic Container Registry User Guide*.
     #
     #
@@ -1885,9 +2835,10 @@ module Aws::ECR
     # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-tag-mutability.html
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to update the image tag mutability settings. If
-    #   you do not specify a registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to update the image tag mutability
+    #   settings. If you do not specify a registry, the default registry is
+    #   assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository in which to update the image tag mutability
@@ -1929,16 +2880,16 @@ module Aws::ECR
     end
 
     # Creates or updates the lifecycle policy for the specified repository.
-    # For more information, see [Lifecycle Policy Template][1].
+    # For more information, see [Lifecycle policy template][1].
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do  not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do  not specify a registry, the
+    #   default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository to receive the policy.
@@ -1977,10 +2928,10 @@ module Aws::ECR
 
     # Creates or updates the permissions policy for your registry.
     #
-    # A registry policy is used to specify permissions for another AWS
-    # account and is used when configuring cross-account replication. For
-    # more information, see [Registry permissions][1] in the *Amazon Elastic
-    # Container Registry User Guide*.
+    # A registry policy is used to specify permissions for another Amazon
+    # Web Services account and is used when configuring cross-account
+    # replication. For more information, see [Registry permissions][1] in
+    # the *Amazon Elastic Container Registry User Guide*.
     #
     #
     #
@@ -2021,13 +2972,77 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Creates or updates the scanning configuration for your private
+    # registry.
+    #
+    # @option params [String] :scan_type
+    #   The scanning type to set for the registry.
+    #
+    #   When a registry scanning configuration is not defined, by default the
+    #   `BASIC` scan type is used. When basic scanning is used, you may
+    #   specify filters to determine which individual repositories, or all
+    #   repositories, are scanned when new images are pushed to those
+    #   repositories. Alternatively, you can do manual scans of images with
+    #   basic scanning.
+    #
+    #   When the `ENHANCED` scan type is set, Amazon Inspector provides
+    #   automated vulnerability scanning. You may choose between continuous
+    #   scanning or scan on push and you may specify filters to determine
+    #   which individual repositories, or all repositories, are scanned.
+    #
+    # @option params [Array<Types::RegistryScanningRule>] :rules
+    #   The scanning rules to use for the registry. A scanning rule is used to
+    #   determine which repository filters are used and at what frequency
+    #   scanning will occur.
+    #
+    # @return [Types::PutRegistryScanningConfigurationResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::PutRegistryScanningConfigurationResponse#registry_scanning_configuration #registry_scanning_configuration} => Types::RegistryScanningConfiguration
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.put_registry_scanning_configuration({
+    #     scan_type: "BASIC", # accepts BASIC, ENHANCED
+    #     rules: [
+    #       {
+    #         scan_frequency: "SCAN_ON_PUSH", # required, accepts SCAN_ON_PUSH, CONTINUOUS_SCAN, MANUAL
+    #         repository_filters: [ # required
+    #           {
+    #             filter: "ScanningRepositoryFilterValue", # required
+    #             filter_type: "WILDCARD", # required, accepts WILDCARD
+    #           },
+    #         ],
+    #       },
+    #     ],
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.registry_scanning_configuration.scan_type #=> String, one of "BASIC", "ENHANCED"
+    #   resp.registry_scanning_configuration.rules #=> Array
+    #   resp.registry_scanning_configuration.rules[0].scan_frequency #=> String, one of "SCAN_ON_PUSH", "CONTINUOUS_SCAN", "MANUAL"
+    #   resp.registry_scanning_configuration.rules[0].repository_filters #=> Array
+    #   resp.registry_scanning_configuration.rules[0].repository_filters[0].filter #=> String
+    #   resp.registry_scanning_configuration.rules[0].repository_filters[0].filter_type #=> String, one of "WILDCARD"
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PutRegistryScanningConfiguration AWS API Documentation
+    #
+    # @overload put_registry_scanning_configuration(params = {})
+    # @param [Hash] params ({})
+    def put_registry_scanning_configuration(params = {}, options = {})
+      req = build_request(:put_registry_scanning_configuration, params)
+      req.send_request(options)
+    end
+
     # Creates or updates the replication configuration for a registry. The
     # existing replication configuration for a repository can be retrieved
     # with the DescribeRegistry API action. The first time the
     # PutReplicationConfiguration API is called, a service-linked IAM role
     # is created in your account for the replication process. For more
-    # information, see [Using Service-Linked Roles for Amazon ECR][1] in the
-    # *Amazon Elastic Container Registry User Guide*.
+    # information, see [Using service-linked roles for Amazon ECR][1] in the
+    # *Amazon Elastic Container Registry User Guide*. For more information
+    # on the custom role for replication, see [Creating an IAM role for
+    # replication][2].
     #
     # <note markdown="1"> When configuring cross-account replication, the destination account
     # must grant the source account permission to replicate. This permission
@@ -2039,6 +3054,7 @@ module Aws::ECR
     #
     #
     # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/using-service-linked-roles.html
+    # [2]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/replication-creation-templates.html#roles-creatingrole-user-console
     #
     # @option params [required, Types::ReplicationConfiguration] :replication_configuration
     #   An object representing the replication configuration for a registry.
@@ -2059,6 +3075,12 @@ module Aws::ECR
     #               registry_id: "RegistryId", # required
     #             },
     #           ],
+    #           repository_filters: [
+    #             {
+    #               filter: "RepositoryFilterValue", # required
+    #               filter_type: "PREFIX_MATCH", # required, accepts PREFIX_MATCH
+    #             },
+    #           ],
     #         },
     #       ],
     #     },
@@ -2070,6 +3092,9 @@ module Aws::ECR
     #   resp.replication_configuration.rules[0].destinations #=> Array
     #   resp.replication_configuration.rules[0].destinations[0].region #=> String
     #   resp.replication_configuration.rules[0].destinations[0].registry_id #=> String
+    #   resp.replication_configuration.rules[0].repository_filters #=> Array
+    #   resp.replication_configuration.rules[0].repository_filters[0].filter #=> String
+    #   resp.replication_configuration.rules[0].repository_filters[0].filter_type #=> String, one of "PREFIX_MATCH"
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/PutReplicationConfiguration AWS API Documentation
     #
@@ -2082,23 +3107,23 @@ module Aws::ECR
 
     # Applies a repository policy to the specified repository to control
     # access permissions. For more information, see [Amazon ECR Repository
-    # Policies][1] in the *Amazon Elastic Container Registry User Guide*.
+    # policies][1] in the *Amazon Elastic Container Registry User Guide*.
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/repository-policies.html
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the default
+    #   registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository to receive the policy.
     #
     # @option params [required, String] :policy_text
     #   The JSON repository policy text to apply to the repository. For more
-    #   information, see [Amazon ECR Repository Policies][1] in the *Amazon
+    #   information, see [Amazon ECR repository policies][1] in the *Amazon
     #   Elastic Container Registry User Guide*.
     #
     #
@@ -2142,24 +3167,25 @@ module Aws::ECR
     end
 
     # Starts an image vulnerability scan. An image scan can only be started
-    # once per day on an individual image. This limit includes if an image
-    # was scanned on initial push. For more information, see [Image
-    # Scanning][1] in the *Amazon Elastic Container Registry User Guide*.
+    # once per 24 hours on an individual image. This limit includes if an
+    # image was scanned on initial push. For more information, see [Image
+    # scanning][1] in the *Amazon Elastic Container Registry User Guide*.
     #
     #
     #
     # [1]: https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository in which to start an image scan request. If you do not
-    #   specify a registry, the default registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository in which to start an image scan request. If
+    #   you do not specify a registry, the default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository that contains the images to scan.
     #
     # @option params [required, Types::ImageIdentifier] :image_id
-    #   An object with identifying information for an Amazon ECR image.
+    #   An object with identifying information for an image in an Amazon ECR
+    #   repository.
     #
     # @return [Types::StartImageScanResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
     #
@@ -2185,7 +3211,7 @@ module Aws::ECR
     #   resp.repository_name #=> String
     #   resp.image_id.image_digest #=> String
     #   resp.image_id.image_tag #=> String
-    #   resp.image_scan_status.status #=> String, one of "IN_PROGRESS", "COMPLETE", "FAILED"
+    #   resp.image_scan_status.status #=> String, one of "IN_PROGRESS", "COMPLETE", "FAILED", "UNSUPPORTED_IMAGE", "ACTIVE", "PENDING", "SCAN_ELIGIBILITY_EXPIRED", "FINDINGS_UNAVAILABLE"
     #   resp.image_scan_status.description #=> String
     #
     # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/StartImageScan AWS API Documentation
@@ -2202,9 +3228,9 @@ module Aws::ECR
     # policy with the repository.
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry that contains the
-    #   repository. If you do not specify a registry, the default registry is
-    #   assumed.
+    #   The Amazon Web Services account ID associated with the registry that
+    #   contains the repository. If you do not specify a registry, the default
+    #   registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository to be evaluated.
@@ -2266,8 +3292,8 @@ module Aws::ECR
     #     resource_arn: "Arn", # required
     #     tags: [ # required
     #       {
-    #         key: "TagKey",
-    #         value: "TagValue",
+    #         key: "TagKey", # required
+    #         value: "TagValue", # required
     #       },
     #     ],
     #   })
@@ -2309,6 +3335,208 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Updates an existing pull through cache rule.
+    #
+    # @option params [String] :registry_id
+    #   The Amazon Web Services account ID associated with the registry
+    #   associated with the pull through cache rule. If you do not specify a
+    #   registry, the default registry is assumed.
+    #
+    # @option params [required, String] :ecr_repository_prefix
+    #   The repository name prefix to use when caching images from the source
+    #   registry.
+    #
+    # @option params [required, String] :credential_arn
+    #   The Amazon Resource Name (ARN) of the Amazon Web Services Secrets
+    #   Manager secret that identifies the credentials to authenticate to the
+    #   upstream registry.
+    #
+    # @return [Types::UpdatePullThroughCacheRuleResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdatePullThroughCacheRuleResponse#ecr_repository_prefix #ecr_repository_prefix} => String
+    #   * {Types::UpdatePullThroughCacheRuleResponse#registry_id #registry_id} => String
+    #   * {Types::UpdatePullThroughCacheRuleResponse#updated_at #updated_at} => Time
+    #   * {Types::UpdatePullThroughCacheRuleResponse#credential_arn #credential_arn} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_pull_through_cache_rule({
+    #     registry_id: "RegistryId",
+    #     ecr_repository_prefix: "PullThroughCacheRuleRepositoryPrefix", # required
+    #     credential_arn: "CredentialArn", # required
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.ecr_repository_prefix #=> String
+    #   resp.registry_id #=> String
+    #   resp.updated_at #=> Time
+    #   resp.credential_arn #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UpdatePullThroughCacheRule AWS API Documentation
+    #
+    # @overload update_pull_through_cache_rule(params = {})
+    # @param [Hash] params ({})
+    def update_pull_through_cache_rule(params = {}, options = {})
+      req = build_request(:update_pull_through_cache_rule, params)
+      req.send_request(options)
+    end
+
+    # Updates an existing repository creation template.
+    #
+    # @option params [required, String] :prefix
+    #   The repository namespace prefix that matches an existing repository
+    #   creation template in the registry. All repositories created using this
+    #   namespace prefix will have the settings defined in this template
+    #   applied. For example, a prefix of `prod` would apply to all
+    #   repositories beginning with `prod/`. This includes a repository named
+    #   `prod/team1` as well as a repository named `prod/repository1`.
+    #
+    #   To apply a template to all repositories in your registry that don't
+    #   have an associated creation template, you can use `ROOT` as the
+    #   prefix.
+    #
+    # @option params [String] :description
+    #   A description for the repository creation template.
+    #
+    # @option params [Types::EncryptionConfigurationForRepositoryCreationTemplate] :encryption_configuration
+    #   The encryption configuration to associate with the repository creation
+    #   template.
+    #
+    # @option params [Array<Types::Tag>] :resource_tags
+    #   The metadata to apply to the repository to help you categorize and
+    #   organize. Each tag consists of a key and an optional value, both of
+    #   which you define. Tag keys can have a maximum character length of 128
+    #   characters, and tag values can have a maximum length of 256
+    #   characters.
+    #
+    # @option params [String] :image_tag_mutability
+    #   Updates the tag mutability setting for the repository. If this
+    #   parameter is omitted, the default setting of `MUTABLE` will be used
+    #   which will allow image tags to be overwritten. If `IMMUTABLE` is
+    #   specified, all image tags within the repository will be immutable
+    #   which will prevent them from being overwritten.
+    #
+    # @option params [String] :repository_policy
+    #   Updates the repository policy created using the template. A repository
+    #   policy is a permissions policy associated with a repository to control
+    #   access permissions.
+    #
+    # @option params [String] :lifecycle_policy
+    #   Updates the lifecycle policy associated with the specified repository
+    #   creation template.
+    #
+    # @option params [Array<String>] :applied_for
+    #   Updates the list of enumerable strings representing the Amazon ECR
+    #   repository creation scenarios that this template will apply towards.
+    #   The two supported scenarios are `PULL_THROUGH_CACHE` and `REPLICATION`
+    #
+    # @option params [String] :custom_role_arn
+    #   The ARN of the role to be assumed by Amazon ECR. This role must be in
+    #   the same account as the registry that you are configuring. Amazon ECR
+    #   will assume your supplied role when the customRoleArn is specified.
+    #   When this field isn't specified, Amazon ECR will use the
+    #   service-linked role for the repository creation template.
+    #
+    # @return [Types::UpdateRepositoryCreationTemplateResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::UpdateRepositoryCreationTemplateResponse#registry_id #registry_id} => String
+    #   * {Types::UpdateRepositoryCreationTemplateResponse#repository_creation_template #repository_creation_template} => Types::RepositoryCreationTemplate
+    #
+    #
+    # @example Example: Update a repository creation template
+    #
+    #   # This example updates a repository creation template.
+    #
+    #   resp = client.update_repository_creation_template({
+    #     applied_for: [
+    #       "REPLICATION", 
+    #     ], 
+    #     prefix: "eng/test", 
+    #     resource_tags: [
+    #       {
+    #         key: "environment", 
+    #         value: "test", 
+    #       }, 
+    #     ], 
+    #   })
+    #
+    #   resp.to_h outputs the following:
+    #   {
+    #     registry_id: "012345678901", 
+    #     repository_creation_template: {
+    #       applied_for: [
+    #         "REPLICATION", 
+    #       ], 
+    #       created_at: Time.parse("2023-12-16T17:29:02-07:00"), 
+    #       description: "Repos for testing images", 
+    #       encryption_configuration: {
+    #         encryption_type: "AES256", 
+    #       }, 
+    #       image_tag_mutability: "MUTABLE", 
+    #       lifecycle_policy: "{\r\n    \"rules\": [\r\n        {\r\n            \"rulePriority\": 1,\r\n            \"description\": \"Expire images older than 14 days\",\r\n            \"selection\": {\r\n                \"tagStatus\": \"untagged\",\r\n                \"countType\": \"sinceImagePushed\",\r\n                \"countUnit\": \"days\",\r\n                \"countNumber\": 14\r\n            },\r\n            \"action\": {\r\n                \"type\": \"expire\"\r\n            }\r\n        }\r\n    ]\r\n}", 
+    #       prefix: "eng/test", 
+    #       repository_policy: "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"LambdaECRPullPolicy\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"Service\" : \"lambda.amazonaws.com\"\n    },\n    \"Action\" : \"ecr:BatchGetImage\"\n  } ]\n}", 
+    #       resource_tags: [
+    #         {
+    #           key: "environment", 
+    #           value: "test", 
+    #         }, 
+    #       ], 
+    #       updated_at: Time.parse("2023-12-16T19:55:02-07:00"), 
+    #     }, 
+    #   }
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.update_repository_creation_template({
+    #     prefix: "Prefix", # required
+    #     description: "RepositoryTemplateDescription",
+    #     encryption_configuration: {
+    #       encryption_type: "AES256", # required, accepts AES256, KMS, KMS_DSSE
+    #       kms_key: "KmsKeyForRepositoryCreationTemplate",
+    #     },
+    #     resource_tags: [
+    #       {
+    #         key: "TagKey", # required
+    #         value: "TagValue", # required
+    #       },
+    #     ],
+    #     image_tag_mutability: "MUTABLE", # accepts MUTABLE, IMMUTABLE
+    #     repository_policy: "RepositoryPolicyText",
+    #     lifecycle_policy: "LifecyclePolicyTextForRepositoryCreationTemplate",
+    #     applied_for: ["REPLICATION"], # accepts REPLICATION, PULL_THROUGH_CACHE
+    #     custom_role_arn: "CustomRoleArn",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.registry_id #=> String
+    #   resp.repository_creation_template.prefix #=> String
+    #   resp.repository_creation_template.description #=> String
+    #   resp.repository_creation_template.encryption_configuration.encryption_type #=> String, one of "AES256", "KMS", "KMS_DSSE"
+    #   resp.repository_creation_template.encryption_configuration.kms_key #=> String
+    #   resp.repository_creation_template.resource_tags #=> Array
+    #   resp.repository_creation_template.resource_tags[0].key #=> String
+    #   resp.repository_creation_template.resource_tags[0].value #=> String
+    #   resp.repository_creation_template.image_tag_mutability #=> String, one of "MUTABLE", "IMMUTABLE"
+    #   resp.repository_creation_template.repository_policy #=> String
+    #   resp.repository_creation_template.lifecycle_policy #=> String
+    #   resp.repository_creation_template.applied_for #=> Array
+    #   resp.repository_creation_template.applied_for[0] #=> String, one of "REPLICATION", "PULL_THROUGH_CACHE"
+    #   resp.repository_creation_template.custom_role_arn #=> String
+    #   resp.repository_creation_template.created_at #=> Time
+    #   resp.repository_creation_template.updated_at #=> Time
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/UpdateRepositoryCreationTemplate AWS API Documentation
+    #
+    # @overload update_repository_creation_template(params = {})
+    # @param [Hash] params ({})
+    def update_repository_creation_template(params = {}, options = {})
+      req = build_request(:update_repository_creation_template, params)
+      req.send_request(options)
+    end
+
     # Uploads an image layer part to Amazon ECR.
     #
     # When an image is pushed, each new image layer is uploaded in parts.
@@ -2323,9 +3551,9 @@ module Aws::ECR
     #  </note>
     #
     # @option params [String] :registry_id
-    #   The AWS account ID associated with the registry to which you are
-    #   uploading layer parts. If you do not specify a registry, the default
-    #   registry is assumed.
+    #   The Amazon Web Services account ID associated with the registry to
+    #   which you are uploading layer parts. If you do not specify a registry,
+    #   the default registry is assumed.
     #
     # @option params [required, String] :repository_name
     #   The name of the repository to which you are uploading layer parts.
@@ -2379,20 +3607,73 @@ module Aws::ECR
       req.send_request(options)
     end
 
+    # Validates an existing pull through cache rule for an upstream registry
+    # that requires authentication. This will retrieve the contents of the
+    # Amazon Web Services Secrets Manager secret, verify the syntax, and
+    # then validate that authentication to the upstream registry is
+    # successful.
+    #
+    # @option params [required, String] :ecr_repository_prefix
+    #   The repository name prefix associated with the pull through cache
+    #   rule.
+    #
+    # @option params [String] :registry_id
+    #   The registry ID associated with the pull through cache rule. If you do
+    #   not specify a registry, the default registry is assumed.
+    #
+    # @return [Types::ValidatePullThroughCacheRuleResponse] Returns a {Seahorse::Client::Response response} object which responds to the following methods:
+    #
+    #   * {Types::ValidatePullThroughCacheRuleResponse#ecr_repository_prefix #ecr_repository_prefix} => String
+    #   * {Types::ValidatePullThroughCacheRuleResponse#registry_id #registry_id} => String
+    #   * {Types::ValidatePullThroughCacheRuleResponse#upstream_registry_url #upstream_registry_url} => String
+    #   * {Types::ValidatePullThroughCacheRuleResponse#credential_arn #credential_arn} => String
+    #   * {Types::ValidatePullThroughCacheRuleResponse#is_valid #is_valid} => Boolean
+    #   * {Types::ValidatePullThroughCacheRuleResponse#failure #failure} => String
+    #
+    # @example Request syntax with placeholder values
+    #
+    #   resp = client.validate_pull_through_cache_rule({
+    #     ecr_repository_prefix: "PullThroughCacheRuleRepositoryPrefix", # required
+    #     registry_id: "RegistryId",
+    #   })
+    #
+    # @example Response structure
+    #
+    #   resp.ecr_repository_prefix #=> String
+    #   resp.registry_id #=> String
+    #   resp.upstream_registry_url #=> String
+    #   resp.credential_arn #=> String
+    #   resp.is_valid #=> Boolean
+    #   resp.failure #=> String
+    #
+    # @see http://docs.aws.amazon.com/goto/WebAPI/ecr-2015-09-21/ValidatePullThroughCacheRule AWS API Documentation
+    #
+    # @overload validate_pull_through_cache_rule(params = {})
+    # @param [Hash] params ({})
+    def validate_pull_through_cache_rule(params = {}, options = {})
+      req = build_request(:validate_pull_through_cache_rule, params)
+      req.send_request(options)
+    end
+
     # @!endgroup
 
     # @param params ({})
     # @api private
     def build_request(operation_name, params = {})
       handlers = @handlers.for(operation_name)
+      tracer = config.telemetry_provider.tracer_provider.tracer(
+        Aws::Telemetry.module_to_tracer_name('Aws::ECR')
+      )
       context = Seahorse::Client::RequestContext.new(
         operation_name: operation_name,
         operation: config.api.operation(operation_name),
         client: self,
         params: params,
-        config: config)
+        config: config,
+        tracer: tracer
+      )
       context[:gem_name] = 'aws-sdk-ecr'
-      context[:gem_version] = '1.40.0'
+      context[:gem_version] = '1.87.0'
       Seahorse::Client::Request.new(handlers, context)
     end
 

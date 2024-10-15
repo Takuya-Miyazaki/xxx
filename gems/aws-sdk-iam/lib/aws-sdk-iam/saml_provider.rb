@@ -3,7 +3,7 @@
 # WARNING ABOUT GENERATED CODE
 #
 # This file is generated. See the contributing guide for more information:
-# https://github.com/aws/aws-sdk-ruby/blob/master/CONTRIBUTING.md
+# https://github.com/aws/aws-sdk-ruby/blob/version-3/CONTRIBUTING.md
 #
 # WARNING ABOUT GENERATED CODE
 
@@ -53,6 +53,18 @@ module Aws::IAM
       data[:valid_until]
     end
 
+    # A list of tags that are attached to the specified IAM SAML provider.
+    # The returned list of tags is sorted by tag key. For more information
+    # about tagging, see [Tagging IAM resources][1] in the *IAM User Guide*.
+    #
+    #
+    #
+    # [1]: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html
+    # @return [Array<Types::Tag>]
+    def tags
+      data[:tags]
+    end
+
     # @!endgroup
 
     # @return [Client]
@@ -67,7 +79,9 @@ module Aws::IAM
     #
     # @return [self]
     def load
-      resp = @client.get_saml_provider(saml_provider_arn: @arn)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.get_saml_provider(saml_provider_arn: @arn)
+      end
       @data = resp.data
       self
     end
@@ -182,7 +196,9 @@ module Aws::IAM
           :retry
         end
       end
-      Aws::Waiters::Waiter.new(options).wait({})
+      Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        Aws::Waiters::Waiter.new(options).wait({})
+      end
     end
 
     # @!group Actions
@@ -194,7 +210,9 @@ module Aws::IAM
     # @return [EmptyStructure]
     def delete(options = {})
       options = options.merge(saml_provider_arn: @arn)
-      resp = @client.delete_saml_provider(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.delete_saml_provider(options)
+      end
       resp.data
     end
 
@@ -214,7 +232,9 @@ module Aws::IAM
     # @return [Types::UpdateSAMLProviderResponse]
     def update(options = {})
       options = options.merge(saml_provider_arn: @arn)
-      resp = @client.update_saml_provider(options)
+      resp = Aws::Plugins::UserAgent.metric('RESOURCE_MODEL') do
+        @client.update_saml_provider(options)
+      end
       resp.data
     end
 
